@@ -287,10 +287,20 @@
 		}
 	</style>
 	<script>
-		// Runtime tokens loader: pulls /design/tokens.json and applies to :root
+		// Load optional runtime config for non-Netlify hosting (e.g., DreamHost)
+		window.__PDOOM_CONFIG__ = {};
+		(async function loadConfig(){
+			try {
+				const res = await fetch('config.json', { cache: 'no-store' });
+				if (res.ok) {
+					window.__PDOOM_CONFIG__ = await res.json();
+				}
+			} catch (_) {}
+		})();
+		// Runtime tokens loader: pulls design/tokens.json and applies to :root
 		(async function loadTokens() {
 			try {
-				const res = await fetch('/design/tokens.json', { cache: 'no-store' });
+				const res = await fetch('design/tokens.json', { cache: 'no-store' });
 				if (!res.ok) return;
 				const t = await res.json();
 				const r = document.documentElement;
@@ -481,7 +491,7 @@ python main.py</pre>
 
 	<script>
 		// Bug report form submission -> shared backend
-		document.getElementById('bug-report-form').addEventListener('submit', async function(e) {
+	document.getElementById('bug-report-form').addEventListener('submit', async function(e) {
 			e.preventDefault();
 			const formData = new FormData(e.target);
 			const bugData = {
@@ -495,7 +505,9 @@ python main.py</pre>
 			const originalText = button.textContent;
 			button.disabled = true;
 			try {
-				const res = await fetch('/api/report-bug', {
+		const base = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.apiBase) || '';
+		const url = (base ? base.replace(/\/$/, '') : '') + '/api/report-bug';
+		const res = await fetch(url, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(bugData)

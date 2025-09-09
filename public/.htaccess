@@ -1,0 +1,22 @@
+# Security hardening for DreamHost Apache (optional)
+# Place this in your site root if using DreamHost for hosting
+
+# Deny access to dotfiles
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+# Prevent directory listings
+Options -Indexes
+
+# Block access to design tokens directly if desired (comment to allow)
+#<Files "tokens.json">
+#  Require all denied
+#</Files>
+
+# Basic CORS for API if you proxy elsewhere (adjust as needed)
+#<IfModule mod_headers.c>
+#  Header set Access-Control-Allow-Origin "https://YOUR_DOMAIN"
+#  Header set Access-Control-Allow-Methods "POST, OPTIONS"
+#  Header set Access-Control-Allow-Headers "Content-Type"
+#</IfModule>
