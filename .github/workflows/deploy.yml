@@ -1,1 +1,16 @@
-# Placeholder GitHub Actions workflow\nname: deploy\n\non: { push: { branches: [ main ] } }\n\njobs:\n  noop:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: echo 'Add your deploy steps here'\n
+# Placeholder deploy (manual only)
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      note:
+        description: Manual run only
+        required: false
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo 'Add your deploy steps here'

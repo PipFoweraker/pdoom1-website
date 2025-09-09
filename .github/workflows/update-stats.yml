@@ -1,0 +1,10 @@
+name: update-stats (disabled)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Stats updater disabled. Add steps when ready."
