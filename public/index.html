@@ -356,6 +356,11 @@
 				<li><a href="#about">About</a></li>
 				<li><a href="#download">Download</a></li>
 				<li><a href="#docs">Documentation</a></li>
+				<li><a href="#roadmap">Roadmap</a></li>
+				<li><a href="/docs/steam-readiness.md">Steam</a></li>
+				<li><a href="/blog/">Blog</a></li>
+				<li><a href="/changelog/">Changelog</a></li>
+				<li><a href="/dev-notes/">Dev Notes</a></li>
 				<li><a href="#support">Support</a></li>
 				<li><a href="#contact">Contact</a></li>
 			</ul>
@@ -370,7 +375,7 @@
 				<span class="status-indicator status-active"></span>
 				Currently in Development - Alpha Release Available
 			</p>
-			<a href="https://github.com/PipFoweraker/pdoom1" class="cta-button">Download Game</a>
+			<a href="https://github.com/PipFoweraker/pdoom1" class="cta-button">Download Game (main repo)</a>
 		</section>
 
 		<section class="stats">
@@ -404,6 +409,29 @@
 				<div class="card">
 					<h3>⚡ Dynamic Events</h3>
 					<p>Handle unexpected challenges with our sophisticated event system featuring popup events, deferrals, and strategic timing.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="section" id="roadmap">
+			<h2>Roadmap</h2>
+			<p>High-level milestones for the website and game distribution. Full details live in <a href="/docs/roadmap.md" style="color: var(--accent-primary);">docs/roadmap.md</a>. Also see <a href="/docs/pdoom1-open-issues.md" style="color: var(--accent-primary);">Open issues from the main repo</a> for day-to-day tasks.</p>
+			<div class="grid">
+				<div class="card">
+					<h3>Short term (weeks)</h3>
+					<ul>
+						<li>Alpha updates 2–3x weekly via Dev Blog</li>
+						<li>Automated posts to Discord, Bluesky, X, LinkedIn</li>
+						<li>Bug intake via GitHub Issues (Netlify function)</li>
+					</ul>
+				</div>
+				<div class="card">
+					<h3>Mid term (months)</h3>
+					<ul>
+						<li>Steam release preparation</li>
+						<li>Design tokens synced from main repo style guide</li>
+						<li>Content pipeline from Airtable finalized</li>
+					</ul>
 				</div>
 			</div>
 		</section>
@@ -518,6 +546,19 @@ python main.py</pre>
 			const button = e.target.querySelector('button[type="submit"]');
 			const originalText = button.textContent;
 			button.disabled = true;
+				// Local mock: when running on localhost, simulate a successful submission
+				if (['localhost','127.0.0.1'].includes(window.location.hostname)) {
+					await new Promise(r => setTimeout(r, 400));
+					button.textContent = '✅ Report Submitted! (local mock)';
+					button.style.background = 'var(--success-color)';
+					setTimeout(() => {
+						button.textContent = originalText;
+						button.style.background = '';
+						e.target.reset();
+						button.disabled = false;
+					}, 2000);
+					return;
+				}
 			try {
 		const base = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.apiBase) || '';
 		const url = (base ? base.replace(/\/$/, '') : '') + '/api/report-bug';

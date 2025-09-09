@@ -1,0 +1,33 @@
+name: Pull pdoom1 open issues to MD
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '17 */6 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Generate Markdown
+        run: |
+          node scripts/generate_pdoom1_issues_md.js
+      - name: Commit changes
+        run: |
+          if git diff --quiet public/docs/pdoom1-open-issues.md; then
+            echo "No changes"
+          else
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git add public/docs/pdoom1-open-issues.md
+            git commit -m "chore(docs): refresh pdoom1 open issues"
+            git push
+          fi

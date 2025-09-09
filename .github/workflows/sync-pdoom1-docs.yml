@@ -1,0 +1,43 @@
+name: Sync docs from pdoom1
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref (branch, tag, or SHA) in PipFoweraker/pdoom1
+        required: true
+        default: main
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout main repo
+        uses: actions/checkout@v4
+        with:
+          repository: PipFoweraker/pdoom1
+          ref: ${{ github.event.inputs.ref }}
+          path: _pdoom1_src
+      - name: Copy docs into public/docs/pdoom1/${{ github.event.inputs.ref }}
+        run: |
+          set -euo pipefail
+          DEST="public/docs/pdoom1/${{ github.event.inputs.ref }}"
+          mkdir -p "$DEST"
+          # Copy selected files if they exist
+          [ -f _pdoom1_src/README.md ] && cp _pdoom1_src/README.md "$DEST/README.md" || true
+          [ -d _pdoom1_src/docs ] && rsync -av --delete _pdoom1_src/docs/ "$DEST/docs/" || true
+      - name: Commit changes
+        run: |
+          if git diff --quiet public/docs; then
+            echo "No changes"
+          else
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git add public/docs
+            git commit -m "chore(docs): sync pdoom1 docs at ${{ github.event.inputs.ref }}"
+            git push
+          fi

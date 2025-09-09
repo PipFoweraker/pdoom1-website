@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pdoom1 – Dev Notes</title>
+  <style>
+    :root { --bg:#1a1a1a; --bg2:#2d2d2d; --fg:#fff; --muted:#bbb; --accent:#00ff41; --border:#444; --radius:6px; }
+    body { font-family: 'Courier New', monospace; background: var(--bg); color: var(--fg); }
+    a { color: var(--accent); text-decoration: none; }
+    header { background: var(--bg2); border-bottom: 2px solid var(--accent); padding: 1rem; }
+    main { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+    .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    h1 { margin: 0 0 1rem; }
+    .muted { color: var(--muted); }
+    pre { background:#111; padding:1rem; border-radius: var(--radius); overflow-x:auto; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" style="font-weight:bold;">← Back to Home</a>
+  </header>
+  <main>
+    <h1>Dev Notes</h1>
+    <div id="notes" class="card">
+      <p class="muted">Loading…</p>
+    </div>
+  </main>
+  <script>
+    async function load(){
+      try {
+        const res = await fetch('/docs/DEV_NOTES.md', { cache: 'no-store' });
+        if(!res.ok){ document.getElementById('notes').innerHTML = '<p class="muted">No notes found.</p>'; return; }
+        const md = await res.text();
+        // Lightweight render: convert basic markdown headings/links/code to HTML
+        let html = md
+          .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+          .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+          .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+          .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+          .replace(/`([^`]+)`/g, '<code>$1</code>')
+          .replace(/\n\n/g, '<br/><br/>' )
+          .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+        document.getElementById('notes').innerHTML = html;
+      } catch (e) {
+        document.getElementById('notes').innerHTML = '<p class="muted">Failed to load notes.</p>';
+      }
+    }
+    load();
+  </script>
+</body>
+</html>

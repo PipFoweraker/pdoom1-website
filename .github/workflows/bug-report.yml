@@ -1,4 +1,75 @@
-name: Create GitHub Issue from Web or Game Client
+name: Bug report intake
+
+on:
+  repository_dispatch:
+    types: [bug-report]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  create_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dedupe and create/update issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const payload = context.payload.client_payload || {};
+            const dedupeKey = payload.dedupeKey || '';
+            const type = (payload.type || 'bug').toLowerCase();
+            const labelMap = {
+              bug: 'type: bug',
+              feature: 'type: enhancement',
+              documentation: 'type: docs',
+              performance: 'type: enhancement',
+            };
+            const labels = [labelMap[type] || 'type: bug'];
+
+            // Search for existing open issues containing the dedupeKey
+            let existing = null;
+            if (dedupeKey) {
+              const q = `repo:${context.repo.owner}/${context.repo.repo} state:open in:body "${dedupeKey}"`;
+              const res = await github.request('GET /search/issues', { q });
+              if (res.data.total_count > 0) {
+                existing = res.data.items[0];
+              }
+            }
+
+            const body = `
+            Source: ${payload.source || 'web'}
+            App: ${payload.appVersion || ''} Build: ${payload.buildId || ''}
+            OS: ${payload.os || ''}
+            Email: ${payload.email || ''}
+
+            ${payload.description || ''}
+
+            Logs:
+            ${payload.logs ? '```\n' + payload.logs + '\n```' : '(none)'}
+
+            dedupeKey: ${dedupeKey}
+            `.trim();
+
+            if (existing) {
+              core.info(`Found existing issue #${existing.number}, adding comment`);
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: `Another report received:\n\n${body}`
+              });
+              return;
+            }
+
+            const resp = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: payload.title?.slice(0, 120) || 'Bug report',
+              body,
+              labels,
+            });
+            core.info(`Created issue #${resp.data.number}`);name: Create GitHub Issue from Web or Game Client
 
 on:
   repository_dispatch:
