@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pdoom1 Changelog</title>
+  <style>
+    :root { --bg-primary:#1a1a1a; --bg-secondary:#2d2d2d; --text-primary:#fff; --text-muted:#888; --accent-primary:#00ff41; --border-color:#444; --radius-md:6px; }
+    body { font-family: 'Courier New', monospace; background: var(--bg-primary); color: var(--text-primary); }
+    a { color: var(--accent-primary); text-decoration: none; }
+    header { background: var(--bg-secondary); border-bottom: 2px solid var(--accent-primary); padding: 1rem; }
+    main { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+    .entry { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem; }
+    .entry h2 { margin: 0 0 .25rem 0; color: var(--accent-primary); }
+    .meta { color: var(--text-muted); font-size: .9rem; margin-bottom: .5rem; }
+    ul { margin: 0 0 0 1.25rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" style="font-weight:bold;">← Back to Home</a>
+  </header>
+  <main>
+    <h1>Changelog</h1>
+    <div id="changes"></div>
+  </main>
+  <script>
+    async function load(){
+      try{
+        const res = await fetch('/data/changes.json', { cache:'no-store' });
+        const data = await res.json();
+        const entries = data.entries || [];
+        const el = document.getElementById('changes');
+        if(entries.length===0){ el.innerHTML='<p style="color:#ccc">No changes yet.</p>'; return; }
+        el.innerHTML = entries.map(x=>{
+          const date = x.date ? new Date(x.date).toLocaleDateString() : '';
+          const items = (x.items||[]).map(i=>`<li>${String(i).replace(/</g,'&lt;')}</li>`).join('');
+          return `<section class="entry">
+            <h2>${x.version || 'Unversioned'}</h2>
+            <div class="meta">${date} ${x.channel? ' · '+x.channel : ''}</div>
+            ${x.summary? `<p>${String(x.summary).replace(/</g,'&lt;')}</p>`:''}
+            ${items? `<ul>${items}</ul>`:''}
+          </section>`;
+        }).join('');
+      }catch(e){ document.getElementById('changes').innerHTML='<p style="color:#ff4444">Failed to load changelog.</p>'; }
+    }
+    load();
+  </script>
+</body>
+</html>

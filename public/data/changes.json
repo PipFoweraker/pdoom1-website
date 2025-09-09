@@ -1,0 +1,15 @@
+{
+  "entries": [
+    {
+      "version": "0.1.0-alpha",
+      "date": "2025-09-09",
+      "channel": "alpha",
+      "summary": "First playable alpha with basic mechanics.",
+      "items": [
+        "Initial landing page and bug reporting pipeline",
+        "DreamHost deploy workflow",
+        "Netlify function for GitHub issue creation"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pdoom1 Blog</title>
+  <style>
+    :root {
+      --bg-primary: #1a1a1a; --bg-secondary: #2d2d2d; --bg-tertiary: #3d3d3d;
+      --text-primary: #ffffff; --text-secondary: #cccccc; --text-muted: #888888;
+      --accent-primary: #00ff41; --accent-secondary: #ff6b35; --border-color: #444444;
+      --radius-md: 6px; --border-width: 1px; --easing: cubic-bezier(0.2,0.8,0.2,1);
+    }
+    body { font-family: 'Courier New', monospace; background: var(--bg-primary); color: var(--text-primary); }
+    a { color: var(--accent-primary); text-decoration: none; }
+    header { background: var(--bg-secondary); border-bottom: 2px solid var(--accent-primary); padding: 1rem; }
+    main { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+    .post { background: var(--bg-secondary); border: var(--border-width) solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem; }
+    .post h2 { margin: 0 0 0.5rem 0; color: var(--accent-primary); }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem; }
+  </style>
+  <script>
+    // Optional runtime tokens
+    (async function loadTokens(){ try{ const r=await fetch('/design/tokens.json',{cache:'no-store'}); if(!r.ok) return; const t=await r.json(); const s=(k,v)=>v!=null&&document.documentElement.style.setProperty(k,String(v)); if(t.colors){ s('--bg-primary',t.colors.bgPrimary); s('--bg-secondary',t.colors.bgSecondary); s('--bg-tertiary',t.colors.bgTertiary); s('--text-primary',t.colors.textPrimary); s('--text-secondary',t.colors.textSecondary); s('--text-muted',t.colors.textMuted); s('--accent-primary',t.colors.accentPrimary); s('--accent-secondary',t.colors.accentSecondary); s('--border-color',t.colors.border); } }catch(e){} })();
+  </script>
+</head>
+<body>
+  <header>
+    <a href="/" style="font-weight: bold;">← Back to Home</a>
+  </header>
+  <main>
+    <h1>Blog</h1>
+    <div id="posts"></div>
+  </main>
+  <script>
+    async function load(){
+      try{
+        const res = await fetch('/data/blog.json', { cache: 'no-store' });
+        const data = await res.json();
+        const posts = (data.posts||[]).filter(p=>p.published!==false);
+        const container = document.getElementById('posts');
+        if(posts.length===0){ container.innerHTML = '<p style="color:var(--text-secondary)">No posts yet.</p>'; return; }
+        container.innerHTML = posts.map(p=>{
+          const date = p.published_at ? new Date(p.published_at).toLocaleDateString() : '';
+          const tags = (p.tags||[]).map(t=>`<span style="color:var(--text-muted)">#${t}</span>`).join(' ');
+          return `<article class="post">
+            <h2>${p.title||'Untitled'}</h2>
+            <div class="meta">${date} ${tags? ' · '+tags : ''}</div>
+            <p>${(p.excerpt||'').replace(/</g,'&lt;')}</p>
+          </article>`;
+        }).join('');
+      }catch(e){ document.getElementById('posts').innerHTML = '<p style="color:#ff4444">Failed to load posts.</p>'; }
+    }
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "posts": [
+    {
+      "id": "welcome",
+      "title": "Welcome to the pdoom1 dev blog",
+      "excerpt": "Kicking off the development blog with goals, roadmap, and how to get involved.",
+      "published_at": "2025-09-09T20:00:00Z",
+      "tags": ["devlog", "roadmap"],
+      "published": true
+    }
+  ]
+}
