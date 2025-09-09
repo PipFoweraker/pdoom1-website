@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Disallow internal or non-canonical paths
+Disallow: /.netlify/
+Disallow: /api/
+Disallow: /assets/private/
+
+# Sitemap (update if domain differs)
+Sitemap: https://pdoom1.com/sitemap.xml

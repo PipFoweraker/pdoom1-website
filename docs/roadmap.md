@@ -28,3 +28,4 @@ This roadmap is a living document. It summarizes major goals and feeds the GitHu
 
 ## Notes
 - Source of truth for game code and design system is the `PipFoweraker/pdoom1` repo. This site links there for downloads until Steam launch.
+ - Live backlog snapshot: see `/docs/pdoom1-open-issues.md` (pulled from the main repo).

@@ -1,9 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>pdoom1 - AI Safety Strategy Game</title>
+	<title>p(Doom)1 - AI Safety Strategy Game</title>
+	<link rel="canonical" href="https://pdoom1.com/" />
+	<meta name="description" content="p(Doom)1 is a satirical meta-strategy game about AI Safety. Manage labs, policy, and p(doom) while avoiding catastrophic outcomes." />
+	<meta name="author" content="p(Doom)1" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="p(Doom)1" />
+	<meta property="og:title" content="p(Doom)1 - AI Safety Strategy Game" />
+	<meta property="og:description" content="A satirical meta-strategy game about AI Safety." />
+	<meta property="og:url" content="https://pdoom1.com/" />
+	<meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<!-- twitter:site intentionally omitted until handle is finalized (must be ASCII, suggest @pdoom1) -->
 	<style>
 		:root {
 			/* Color scheme inspired by typical pygame/terminal aesthetics */
@@ -346,6 +357,22 @@
 	</script>
 	<link rel="preconnect" href="https://github.com" />
 	<link rel="preconnect" href="https://cli.github.com" />
+	<link rel="alternate" hreflang="en-au" href="https://pdoom1.com/" />
+
+	<!-- Google Analytics (placeholder). Replace GA_ID to enable. -->
+	<script>
+	(function(){
+	  var GA_ID = '';
+	  if (!GA_ID) return; // disabled until configured
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);} 
+	  gtag('js', new Date());
+	  gtag('config', GA_ID);
+	  var s=document.createElement('script');
+	  s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+	  document.head.appendChild(s);
+	})();
+	</script>
 </head>
 <body>
 	<header>
