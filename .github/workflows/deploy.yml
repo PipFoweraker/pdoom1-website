@@ -1,0 +1,1 @@
+# Placeholder GitHub Actions workflow\nname: deploy\n\non: { push: { branches: [ main ] } }\n\njobs:\n  noop:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: echo 'Add your deploy steps here'\n

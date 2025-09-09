@@ -1,0 +1,1 @@
+# pdoom1-website\n\nShell website scaffold for pdoom1.\n\n- src: components/pages/styles\n- public: static assets (index.html)\n- .github/workflows: CI placeholders\n\n## Next steps\n- Create the GitHub repo and push (see instructions printed by this script).\n- Set any required repo secrets via 'gh secret set'.\n
