@@ -489,7 +489,7 @@ python main.py</pre>
 				<div class="card">
 					<h3>✉️ Email</h3>
 					<p>Prefer email? Reach us directly:</p>
-					<p style="margin-top: 1rem;"><a id="contact-email-link" href="#" style="color: var(--accent-primary);">team@dreamhost.com</a></p>
+					<p style="margin-top: 1rem;"><a id="contact-email-link" href="#" style="color: var(--accent-primary);">team@pdoom1.com</a></p>
 				</div>
 			</div>
 		</section>
@@ -550,7 +550,7 @@ python main.py</pre>
 		document.getElementById('newsletter-form').addEventListener('submit', function(e) {
 			e.preventDefault();
 			const input = e.target.querySelector('input[type="email"]');
-			const email = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.contactEmail) || 'team@dreamhost.com';
+			const email = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.contactEmail) || 'team@pdoom1.com';
 			const subject = encodeURIComponent('Subscribe: pdoom1 newsletter');
 			const body = encodeURIComponent(`Please subscribe this address: ${input?.value || ''}`);
 			window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
