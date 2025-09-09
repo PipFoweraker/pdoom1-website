@@ -4,12 +4,17 @@ This repo includes a manual GitHub Actions workflow to deploy the static site in
 
 ## One-time setup
 
-1. Create or reuse an SSH key that DreamHost accepts (no passphrase or use a PATTERN with ssh-agent). Copy the private key contents.
-2. Add repository secrets in GitHub (Settings → Secrets and variables → Actions → New repository secret):
+1. Create or reuse an SSH key that DreamHost accepts (no passphrase or use ssh-agent). Copy the private key contents.
+2. Ensure you have a DreamHost Shell user (not just SFTP-only) that owns the site files:
+   - DreamHost Panel → Users → Manage Users → Add New User → choose Shell user (or edit an existing user to enable Shell access).
+   - You can reuse an existing shell user even if its name is not the same as the domain; what matters is DH_PATH points into that user’s home directory.
+   - Upload your public key to this user.
+3. Add repository secrets in GitHub (Settings → Secrets and variables → Actions → New repository secret):
    - `DH_HOST`: your DreamHost domain or host (e.g. `example.dreamhost.com` or `yourdomain.com`).
    - `DH_USER`: your shell user on DreamHost.
    - `DH_PATH`: absolute or home-relative path to the web root for the site (e.g. `/home/youruser/yourdomain.com`).
    - `DH_SSH_KEY`: the private key contents (BEGIN/END blocks included).
+   - Optional: `DH_PORT`: custom SSH port if your host doesn’t use 22.
 
 3. If you’ll use Netlify for the API only (recommended):
     - Create a Netlify site from this repo.
@@ -27,7 +32,7 @@ Optionally, restrict environment protection rules for the `production` environme
 
 1. Go to Actions → "Deploy to DreamHost (manual)".
 2. Click "Run workflow" → choose branch `main` and optionally enable `dry_run` for a preview.
-3. Run. The job uses `rsync -avz --delete` to mirror `public/` to `${DH_PATH}`.
+3. Run. The job ensures the remote path exists and uses `rsync -avz --delete` to mirror `public/` to `${DH_PATH}` (honors `DH_PORT` if provided).
 4. Ensure `config.json` contains the correct `apiBase` for the Netlify function host.
 
 Notes:

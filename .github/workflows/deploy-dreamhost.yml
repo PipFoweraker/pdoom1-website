@@ -27,6 +27,7 @@ jobs:
           DH_USER: ${{ secrets.DH_USER }}
           DH_PATH: ${{ secrets.DH_PATH }}
           DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+          DH_PORT: ${{ secrets.DH_PORT }}
 
       - uses: actions/checkout@v4
 
@@ -39,15 +40,27 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
+      - name: Ensure remote path exists
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+        run: |
+          PORT=${DH_PORT:-22}
+          ssh -p "$PORT" "${DH_USER}@${DH_HOST}" "mkdir -p '${DH_PATH}'"
+
       - name: Deploy public/ via rsync
         env:
           DH_HOST: ${{ secrets.DH_HOST }}
           DH_USER: ${{ secrets.DH_USER }}
           DH_PATH: ${{ secrets.DH_PATH }}
+          DH_PORT: ${{ secrets.DH_PORT }}
         run: |
           set -euo pipefail
           RSYNC_FLAGS="-avz --delete"
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             RSYNC_FLAGS="$RSYNC_FLAGS --dry-run"
           fi
-          rsync $RSYNC_FLAGS public/ "${DH_USER}@${DH_HOST}:${DH_PATH}/"
+          PORT=${DH_PORT:-22}
+          rsync $RSYNC_FLAGS -e "ssh -p $PORT" public/ "${DH_USER}@${DH_HOST}:${DH_PATH}/"
