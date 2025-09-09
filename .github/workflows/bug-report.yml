@@ -1,0 +1,559 @@
+name: Create GitHub Issue from Web or Game Client
+
+on:
+	repository_dispatch:
+		types: [bug-report]
+	workflow_dispatch:
+		inputs:
+			title:
+				description: Issue title
+				required: true
+				type: string
+			description:
+				description: Issue description
+				required: true
+				type: string
+			type:
+				description: Issue type
+				required: true
+				type: choice
+				options:
+					- bug
+					- feature
+					- documentation
+					- performance
+			email:
+				description: Contact email (optional)
+				required: false
+				type: string
+			source:
+				description: Source (web/game)
+				required: false
+				type: choice
+				options:
+					- web
+					- game
+			appVersion:
+				description: App version (optional)
+				required: false
+				type: string
+			buildId:
+				description: Build ID (optional)
+				required: false
+				type: string
+			os:
+				description: OS (optional)
+				required: false
+				type: string
+			logs:
+				description: Logs (optional)
+				required: false
+				type: string
+			notify:
+				description: Request notification (optional)
+				required: false
+				type: boolean
+
+permissions:
+	contents: read
+	issues: write
+
+concurrency:
+	group: bug-report-${{ github.event.client_payload.dedupeKey || github.event.client_payload.title || github.event.inputs.title }}
+
+jobs:
+	create-issue:
+		runs-on: ubuntu-latest
+		steps:
+			- name: Create Issue
+				uses: actions/github-script@v7
+				with:
+					github-token: ${{ github.token }}
+					script: |
+						// Support repository_dispatch and manual workflow_dispatch
+						const pd = context.payload.client_payload || {};
+						const inp = context.payload.inputs || {};
+
+						function take(k, def='') { return (pd[k] ?? inp[k] ?? def); }
+						function clamp(s, n) { s = String(s||''); return s.length>n ? s.slice(0,n) : s; }
+
+						const allowedTypes = ['bug','feature','documentation','performance'];
+						let title = clamp(take('title'), 120).trim();
+						let description = clamp(take('description'), 10000).trim();
+						let type = String(take('type','bug')).toLowerCase();
+						if (!allowedTypes.includes(type)) type = 'bug';
+						const email = clamp(take('email'), 320);
+						const source = String(take('source','web')).toLowerCase();
+						const appVersion = clamp(take('appVersion'), 64);
+						const buildId = clamp(take('buildId'), 64);
+						const os = clamp(take('os'), 128);
+						const logs = clamp(take('logs'), 20000);
+						const notify = Boolean(take('notify', false));
+						const dedupeKey = take('dedupeKey', '');
+
+						if (!title || !description) {
+							core.setFailed('Missing required fields: title and description');
+							return;
+						}
+
+						// Ensure labels exist
+						const labelMap = {
+							bug: ['bug','needs-triage'],
+							feature: ['enhancement','feature-request'],
+							documentation: ['documentation','needs-triage'],
+							performance: ['performance','needs-investigation']
+						};
+						const wanted = labelMap[type] || ['needs-triage'];
+						const existing = await github.paginate(github.rest.issues.listLabelsForRepo, {
+							owner: context.repo.owner,
+							repo: context.repo.repo,
+							per_page: 100
+						});
+						const existingNames = new Set(existing.map(l=>l.name));
+						for (const name of wanted) {
+							if (!existingNames.has(name)) {
+								try {
+									await github.rest.issues.createLabel({
+										owner: context.repo.owner,
+										repo: context.repo.repo,
+										name,
+										color: 'ededed'
+									});
+								} catch (e) {
+									core.info(`Label '${name}' may already exist: ${e.message}`);
+								}
+							}
+						}
+
+						// Dedupe by hidden marker in body if a dedupeKey is present
+						let existingIssue = null;
+						if (dedupeKey) {
+							const q = `repo:${context.repo.owner}/${context.repo.repo} in:body ${dedupeKey} state:open`;
+							const search = await github.rest.search.issuesAndPullRequests({ q });
+							existingIssue = search.data.items?.[0] || null;
+						}
+
+						if (existingIssue) {
+							core.info(`Duplicate detected; referencing existing issue #${existingIssue.number}`);
+							core.setOutput('issue_number', existingIssue.number);
+							core.setOutput('issue_url', existingIssue.html_url);
+							return;
+						}
+
+						const titlePrefix = source === 'game' ? '[game] ' : '[web] ';
+						const body = `## Description\n${description}\n\n` +
+							`## Issue Type\n${type}\n\n` +
+							`## Submitted From\n${source === 'game' ? 'Game client' : 'Web form'}\n\n` +
+							`## Contact Information\n${email ? `Email: ${email}` : 'No contact email provided'}\n\n` +
+							`## Environment\n- App Version: ${appVersion || 'n/a'}\n- Build ID: ${buildId || 'n/a'}\n- OS: ${os || 'n/a'}\n\n` +
+							(logs ? `## Logs\n<details><summary>Show logs</summary>\n\n\n\n${'```'}\n${logs}\n${'```'}\n\n</details>\n\n` : '') +
+							`---\n*This issue was automatically created from a ${source} submission.*\n\n` +
+							(dedupeKey ? `<!-- dedupe:${dedupeKey} -->\n` : '') +
+							`\n### Next Steps\n- [ ] Reproduce the issue\n- [ ] Assign appropriate labels\n- [ ] Set milestone if applicable\n- [ ] Link to related issues if any`;
+
+						const issue = await github.rest.issues.create({
+							owner: context.repo.owner,
+							repo: context.repo.repo,
+							title: titlePrefix + title,
+							body,
+							labels: wanted
+						});
+
+						core.info(`Created issue #${issue.data.number}: ${issue.data.title}`);
+						core.setOutput('issue_number', issue.data.number);
+						core.setOutput('issue_url', issue.data.html_url);
+
+						// Priority bump for critical/crash/urgent
+						const descLower = description.toLowerCase();
+						if (descLower.includes('crash') || descLower.includes('critical') || descLower.includes('urgent')) {
+							try {
+								await github.rest.issues.addLabels({
+									owner: context.repo.owner,
+									repo: context.repo.repo,
+									issue_number: issue.data.number,
+									labels: ['priority-high','critical']
+								});
+							} catch {}
+						}
+
+	notify:
+		needs: create-issue
+		runs-on: ubuntu-latest
+		if: ${{ (github.event.client_payload && github.event.client_payload.notify == true) || (github.event.inputs && github.event.inputs.notify == 'true') }}
+		steps:
+			- name: Send notification
+				run: |
+					echo "New bug report received"
+					if [ -n "${{ github.event.client_payload.title }}" ]; then echo "Title: ${{ github.event.client_payload.title }}"; fi
+					if [ -n "${{ github.event.inputs.title }}" ]; then echo "Title: ${{ github.event.inputs.title }}"; fi
+name: Create GitHub Issue from Web or Game Client
+
+on:
+	repository_dispatch:
+		types: [bug-report]
+	workflow_dispatch:
+		inputs:
+			title:
+				description: Issue title
+				required: true
+				type: string
+			description:
+				description: Issue description
+				required: true
+				type: string
+			type:
+				description: Issue type
+				required: true
+				type: choice
+				options:
+					- bug
+					- feature
+					- documentation
+					- performance
+			email:
+				description: Contact email (optional)
+				required: false
+				type: string
+			source:
+				description: Source (web/game)
+				required: false
+				type: choice
+				options:
+					- web
+					- game
+			appVersion:
+				description: App version (optional)
+				required: false
+				type: string
+			buildId:
+				description: Build ID (optional)
+				required: false
+				type: string
+			os:
+				description: OS (optional)
+				required: false
+				type: string
+			logs:
+				description: Logs (optional)
+				required: false
+				type: string
+			notify:
+				description: Request notification (optional)
+				required: false
+				type: boolean
+
+permissions:
+	contents: read
+	issues: write
+
+concurrency:
+	group: bug-report-${{ github.event.client_payload.dedupeKey || github.event.client_payload.title || github.event.inputs.title }}
+
+jobs:
+	create-issue:
+		runs-on: ubuntu-latest
+		steps:
+			- name: Create Issue
+				uses: actions/github-script@v7
+				with:
+					github-token: ${{ github.token }}
+					script: |
+						// Support repository_dispatch and manual workflow_dispatch
+						const pd = context.payload.client_payload || {};
+						const inp = context.payload.inputs || {};
+
+						function take(k, def='') { return (pd[k] ?? inp[k] ?? def); }
+						function clamp(s, n) { s = String(s||''); return s.length>n ? s.slice(0,n) : s; }
+
+						const allowedTypes = ['bug','feature','documentation','performance'];
+						let title = clamp(take('title'), 120).trim();
+						let description = clamp(take('description'), 10000).trim();
+						let type = String(take('type','bug')).toLowerCase();
+						if (!allowedTypes.includes(type)) type = 'bug';
+						const email = clamp(take('email'), 320);
+						const source = String(take('source','web')).toLowerCase();
+						const appVersion = clamp(take('appVersion'), 64);
+						const buildId = clamp(take('buildId'), 64);
+						const os = clamp(take('os'), 128);
+						const logs = clamp(take('logs'), 20000);
+						const notify = Boolean(take('notify', false));
+						const dedupeKey = take('dedupeKey', '');
+
+						if (!title || !description) {
+							core.setFailed('Missing required fields: title and description');
+							return;
+						}
+
+						// Ensure labels exist
+						const labelMap = {
+							bug: ['bug','needs-triage'],
+							feature: ['enhancement','feature-request'],
+							documentation: ['documentation','needs-triage'],
+							performance: ['performance','needs-investigation']
+						};
+						const wanted = labelMap[type] || ['needs-triage'];
+						const existing = await github.paginate(github.rest.issues.listLabelsForRepo, {
+							owner: context.repo.owner,
+							repo: context.repo.repo,
+							per_page: 100
+						});
+						const existingNames = new Set(existing.map(l=>l.name));
+						for (const name of wanted) {
+							if (!existingNames.has(name)) {
+								try {
+									await github.rest.issues.createLabel({
+										owner: context.repo.owner,
+										repo: context.repo.repo,
+										name,
+										color: 'ededed'
+									});
+								} catch (e) {
+									core.info(`Label '${name}' may already exist: ${e.message}`);
+								}
+							}
+						}
+
+						// Dedupe by hidden marker in body if a dedupeKey is present
+						let existingIssue = null;
+						if (dedupeKey) {
+							const q = `repo:${context.repo.owner}/${context.repo.repo} in:body ${dedupeKey} state:open`;
+							const search = await github.rest.search.issuesAndPullRequests({ q });
+							existingIssue = search.data.items?.[0] || null;
+						}
+
+						if (existingIssue) {
+							core.info(`Duplicate detected; referencing existing issue #${existingIssue.number}`);
+							core.setOutput('issue_number', existingIssue.number);
+							core.setOutput('issue_url', existingIssue.html_url);
+							return;
+						}
+
+						const titlePrefix = source === 'game' ? '[game] ' : '[web] ';
+						const body = `## Description\n${description}\n\n` +
+							`## Issue Type\n${type}\n\n` +
+							`## Submitted From\n${source === 'game' ? 'Game client' : 'Web form'}\n\n` +
+							`## Contact Information\n${email ? `Email: ${email}` : 'No contact email provided'}\n\n` +
+							`## Environment\n- App Version: ${appVersion || 'n/a'}\n- Build ID: ${buildId || 'n/a'}\n- OS: ${os || 'n/a'}\n\n` +
+							(logs ? `## Logs\n<details><summary>Show logs</summary>\n\n\n\n${'```'}\n${logs}\n${'```'}\n\n</details>\n\n` : '') +
+							`---\n*This issue was automatically created from a ${source} submission.*\n\n` +
+							(dedupeKey ? `<!-- dedupe:${dedupeKey} -->\n` : '') +
+							`\n### Next Steps\n- [ ] Reproduce the issue\n- [ ] Assign appropriate labels\n- [ ] Set milestone if applicable\n- [ ] Link to related issues if any`;
+
+						const issue = await github.rest.issues.create({
+							owner: context.repo.owner,
+							repo: context.repo.repo,
+							title: titlePrefix + title,
+							body,
+							labels: wanted
+						});
+
+						core.info(`Created issue #${issue.data.number}: ${issue.data.title}`);
+						core.setOutput('issue_number', issue.data.number);
+						core.setOutput('issue_url', issue.data.html_url);
+
+						// Priority bump for critical/crash/urgent
+						const descLower = description.toLowerCase();
+						if (descLower.includes('crash') || descLower.includes('critical') || descLower.includes('urgent')) {
+							try {
+								await github.rest.issues.addLabels({
+									owner: context.repo.owner,
+									repo: context.repo.repo,
+									issue_number: issue.data.number,
+									labels: ['priority-high','critical']
+								});
+							} catch {}
+						}
+
+	notify:
+		needs: create-issue
+		runs-on: ubuntu-latest
+		if: ${{ (github.event.client_payload && github.event.client_payload.notify == true) || (github.event.inputs && github.event.inputs.notify == 'true') }}
+		steps:
+			- name: Send notification
+				run: |
+					echo "New bug report received"
+					if [ -n "${{ github.event.client_payload.title }}" ]; then echo "Title: ${{ github.event.client_payload.title }}"; fi
+					if [ -n "${{ github.event.inputs.title }}" ]; then echo "Title: ${{ github.event.inputs.title }}"; fi
+name: Create GitHub Issue from Web or Game Client
+
+on:
+	repository_dispatch:
+		types: [bug-report]
+	workflow_dispatch:
+		inputs:
+			title:
+				description: Issue title
+				required: true
+				type: string
+			description:
+				description: Issue description
+				required: true
+				type: string
+			type:
+				description: Issue type
+				required: true
+				type: choice
+				options: [bug, feature, documentation, performance]
+			email:
+				description: Contact email (optional)
+				required: false
+				type: string
+			source:
+				description: Source (web/game)
+				required: false
+				type: choice
+				options: [web, game]
+			appVersion:
+				description: App version (optional)
+				required: false
+				type: string
+			buildId:
+				description: Build ID (optional)
+				required: false
+				type: string
+			os:
+				description: OS (optional)
+				required: false
+				type: string
+			logs:
+				description: Logs (optional)
+				required: false
+				type: string
+			notify:
+				description: Request notification (optional)
+				required: false
+				type: boolean
+
+permissions:
+	contents: read
+	issues: write
+
+concurrency:
+	group: bug-report-${{ github.event.client_payload.dedupeKey || github.event.client_payload.title || github.event.inputs.title }}
+
+jobs:
+	create-issue:
+		runs-on: ubuntu-latest
+		steps:
+			- name: Create Issue
+				uses: actions/github-script@v7
+				with:
+					github-token: ${{ github.token }}
+					script: |
+						// Support repository_dispatch and manual workflow_dispatch
+						const pd = context.payload.client_payload || {};
+						const inp = context.payload.inputs || {};
+
+						function take(k, def='') { return (pd[k] ?? inp[k] ?? def); }
+						function clamp(s, n) { s = String(s||''); return s.length>n ? s.slice(0,n) : s; }
+
+						const allowedTypes = ['bug','feature','documentation','performance'];
+						let title = clamp(take('title'), 120).trim();
+						let description = clamp(take('description'), 10000).trim();
+						let type = String(take('type','bug')).toLowerCase();
+						if (!allowedTypes.includes(type)) type = 'bug';
+						const email = clamp(take('email'), 320);
+						const source = String(take('source','web')).toLowerCase();
+						const appVersion = clamp(take('appVersion'), 64);
+						const buildId = clamp(take('buildId'), 64);
+						const os = clamp(take('os'), 128);
+						const logs = clamp(take('logs'), 20000);
+						const notify = Boolean(take('notify', false));
+						const dedupeKey = take('dedupeKey', '');
+
+						if (!title || !description) {
+							core.setFailed('Missing required fields: title and description');
+							return;
+						}
+
+						// Ensure labels exist
+						const labelMap = {
+							bug: ['bug','needs-triage'],
+							feature: ['enhancement','feature-request'],
+							documentation: ['documentation','needs-triage'],
+							performance: ['performance','needs-investigation']
+						};
+						const wanted = labelMap[type] || ['needs-triage'];
+						const existing = await github.paginate(github.rest.issues.listLabelsForRepo, {
+							owner: context.repo.owner,
+							repo: context.repo.repo,
+							per_page: 100
+						});
+						const existingNames = new Set(existing.map(l=>l.name));
+						for (const name of wanted) {
+							if (!existingNames.has(name)) {
+								try {
+									await github.rest.issues.createLabel({
+										owner: context.repo.owner,
+										repo: context.repo.repo,
+										name,
+										color: 'ededed'
+									});
+								} catch (e) {
+									core.info(`Label '${name}' may already exist: ${e.message}`);
+								}
+							}
+						}
+
+						// Dedupe by hidden marker in body if a dedupeKey is present
+						let existingIssue = null;
+						if (dedupeKey) {
+							const q = `repo:${context.repo.owner}/${context.repo.repo} in:body ${dedupeKey} state:open`;
+							const search = await github.rest.search.issuesAndPullRequests({ q });
+							existingIssue = search.data.items?.[0] || null;
+						}
+
+						if (existingIssue) {
+							core.info(`Duplicate detected; referencing existing issue #${existingIssue.number}`);
+							core.setOutput('issue_number', existingIssue.number);
+							core.setOutput('issue_url', existingIssue.html_url);
+							return;
+						}
+
+						const titlePrefix = source === 'game' ? '[game] ' : '[web] ';
+						const body = `## Description\n${description}\n\n` +
+							`## Issue Type\n${type}\n\n` +
+							`## Submitted From\n${source === 'game' ? 'Game client' : 'Web form'}\n\n` +
+							`## Contact Information\n${email ? `Email: ${email}` : 'No contact email provided'}\n\n` +
+							`## Environment\n- App Version: ${appVersion || 'n/a'}\n- Build ID: ${buildId || 'n/a'}\n- OS: ${os || 'n/a'}\n\n` +
+							(logs ? `## Logs\n<details><summary>Show logs</summary>\n\n\n\n${'```'}\n${logs}\n${'```'}\n\n</details>\n\n` : '') +
+							`---\n*This issue was automatically created from a ${source} submission.*\n\n` +
+							(dedupeKey ? `<!-- dedupe:${dedupeKey} -->\n` : '') +
+							`\n### Next Steps\n- [ ] Reproduce the issue\n- [ ] Assign appropriate labels\n- [ ] Set milestone if applicable\n- [ ] Link to related issues if any`;
+
+						const issue = await github.rest.issues.create({
+							owner: context.repo.owner,
+							repo: context.repo.repo,
+							title: titlePrefix + title,
+							body,
+							labels: wanted
+						});
+
+						core.info(`Created issue #${issue.data.number}: ${issue.data.title}`);
+						core.setOutput('issue_number', issue.data.number);
+						core.setOutput('issue_url', issue.data.html_url);
+
+						// Priority bump for critical/crash/urgent
+						const descLower = description.toLowerCase();
+						if (descLower.includes('crash') || descLower.includes('critical') || descLower.includes('urgent')) {
+							try {
+								await github.rest.issues.addLabels({
+									owner: context.repo.owner,
+									repo: context.repo.repo,
+									issue_number: issue.data.number,
+									labels: ['priority-high','critical']
+								});
+							} catch {}
+						}
+
+	notify:
+		needs: create-issue
+		runs-on: ubuntu-latest
+		if: "${{ (github.event.client_payload && github.event.client_payload.notify == true) || (github.event.inputs && github.event.inputs.notify == 'true') }}"
+		steps:
+			- name: Send notification
+				run: |
+					echo "New bug report received"
+					# Optionally print title safely
+					if [ -n "${{ github.event.client_payload.title }}" ]; then echo "Title: ${{ github.event.client_payload.title }}"; fi
+					if [ -n "${{ github.event.inputs.title }}" ]; then echo "Title: ${{ github.event.inputs.title }}"; fi

@@ -1,1 +1,9 @@
-# Placeholder; configure if you deploy with Netlify\n[build]\n  publish = "public"\n
+## Netlify configuration
+[build]
+	publish = "public"
+	functions = "netlify/functions"
+
+[[redirects]]
+	from = "/api/report-bug"
+	to = "/.netlify/functions/report-bug"
+	status = 200
