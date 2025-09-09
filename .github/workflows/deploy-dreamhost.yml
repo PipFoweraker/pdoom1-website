@@ -1,0 +1,53 @@
+name: Deploy to DreamHost (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run rsync with --dry-run to preview changes"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Check required secrets
+        run: |
+          for v in DH_HOST DH_USER DH_PATH DH_SSH_KEY; do
+            if [ -z "${!v}" ]; then echo "Missing secret: $v"; MISSING=1; fi;
+          done
+          if [ "${MISSING}" = "1" ]; then exit 1; fi
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        env:
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DH_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      - name: Deploy public/ via rsync
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+        run: |
+          set -euo pipefail
+          RSYNC_FLAGS="-avz --delete"
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            RSYNC_FLAGS="$RSYNC_FLAGS --dry-run"
+          fi
+          rsync $RSYNC_FLAGS public/ "${DH_USER}@${DH_HOST}:${DH_PATH}/"
