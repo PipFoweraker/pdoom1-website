@@ -294,6 +294,15 @@
 				const res = await fetch('config.json', { cache: 'no-store' });
 				if (res.ok) {
 					window.__PDOOM_CONFIG__ = await res.json();
+					// Apply contact email if present
+					const email = window.__PDOOM_CONFIG__.contactEmail;
+					if (email) {
+						const link = document.getElementById('contact-email-link');
+						if (link) {
+							link.href = `mailto:${email}`;
+							link.textContent = email;
+						}
+					}
 				}
 			} catch (_) {}
 		})();
@@ -477,6 +486,11 @@ python main.py</pre>
 						<button type="submit" class="cta-button" style="width: 100%; padding: 0.5rem;">Subscribe</button>
 					</form>
 				</div>
+				<div class="card">
+					<h3>✉️ Email</h3>
+					<p>Prefer email? Reach us directly:</p>
+					<p style="margin-top: 1rem;"><a id="contact-email-link" href="#" style="color: var(--accent-primary);">team@dreamhost.com</a></p>
+				</div>
 			</div>
 		</section>
 	</main>
@@ -535,15 +549,11 @@ python main.py</pre>
 		// Newsletter form
 		document.getElementById('newsletter-form').addEventListener('submit', function(e) {
 			e.preventDefault();
-			const button = e.target.querySelector('button[type="submit"]');
-			const originalText = button.textContent;
-			button.textContent = '✅ Subscribed!';
-			button.style.background = 'var(--success-color)';
-			setTimeout(() => {
-				button.textContent = originalText;
-				button.style.background = '';
-				e.target.reset();
-			}, 3000);
+			const input = e.target.querySelector('input[type="email"]');
+			const email = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.contactEmail) || 'team@dreamhost.com';
+			const subject = encodeURIComponent('Subscribe: pdoom1 newsletter');
+			const body = encodeURIComponent(`Please subscribe this address: ${input?.value || ''}`);
+			window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
 		});
         
 		// Smooth scrolling for nav links
