@@ -23,12 +23,34 @@ const bad = (status, message, origin) => ({
   body: JSON.stringify({ error: message }),
 });
 
+function matchesWildcard(origin, pattern) {
+  // very small wildcard matcher: '*' matches any char sequence
+  // e.g., https://*.netlify.app matches subdomains of netlify.app
+  const esc = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+  const re = new RegExp(`^${esc}$`, 'i');
+  return re.test(origin);
+}
+
+function pickAllowedOrigin(requestOrigin) {
+  const cfg = process.env.ALLOWED_ORIGIN;
+  if (!cfg) return '*';
+  const list = cfg.split(/[,\s]+/).map((s) => s.trim()).filter(Boolean);
+  if (list.includes('*')) return '*';
+  if (!requestOrigin) return list[0];
+  for (const pat of list) {
+    if (pat === requestOrigin || matchesWildcard(requestOrigin, pat)) return requestOrigin;
+  }
+  return list[0];
+}
+
 const corsHeaders = (origin) => {
-  const allow = process.env.ALLOWED_ORIGIN || origin || '*';
+  const allow = pickAllowedOrigin(origin);
   return {
     'Access-Control-Allow-Origin': allow,
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Max-Age': '600',
+    'Vary': 'Origin',
   };
 };
 
@@ -112,6 +134,10 @@ exports.handler = async function handler(event) {
       statusCode: 204,
       headers: corsHeaders(origin),
     };
+  }
+
+  if (event.httpMethod === 'GET') {
+    return ok({ status: 'ok', dryRun: !!process.env.DRY_RUN }, origin);
   }
 
   if (event.httpMethod !== 'POST') {
