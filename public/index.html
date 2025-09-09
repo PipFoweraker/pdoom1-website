@@ -1,1 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>pdoom1 - AI Safety Strategy Game</title>
+	<style>
+		:root {
+			/* Color scheme inspired by typical pygame/terminal aesthetics */
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #888888;
+			--accent-primary: #00ff41;  /* Matrix green */
+			--accent-secondary: #ff6b35; /* Warning orange */
+			--accent-danger: #ff4444;   /* Error red */
+			--border-color: #444444;
+			--success-color: #4caf50;
+
+			/* Tokens that may be injected from /design/tokens.json */
+			--radius-sm: 4px;
+			--radius-md: 6px;
+			--radius-lg: 10px;
+			--border-width: 1px;
+			--shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+			--duration-fast: 150ms;
+			--duration-base: 300ms;
+			--easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+			background-image: 
+				radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.02) 0%, transparent 50%),
+				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem 0;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		nav {
+			max-width: 1200px;
+			margin: 0 auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 2rem;
+		}
+
+		.logo {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			text-decoration: none;
+			text-shadow: 0 0 10px var(--accent-primary);
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 2rem;
+			list-style: none;
+		}
+
+		.nav-links a {
+			color: var(--text-secondary);
+			text-decoration: none;
+			transition: color var(--duration-base) var(--easing);
+			padding: 0.5rem 1rem;
+			border: 1px solid transparent;
+		}
+
+		.nav-links a:hover {
+			color: var(--accent-primary);
+			border-color: var(--accent-primary);
+		}
+
+		main {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 2rem;
+		}
+
+		.hero {
+			text-align: center;
+			padding: 4rem 0;
+			background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+			border-radius: var(--radius-lg, 10px);
+			margin-bottom: 3rem;
+			border: var(--border-width, 1px) solid var(--border-color);
+		}
+
+		.hero h1 {
+			font-size: 3rem;
+			margin-bottom: 1rem;
+			color: var(--accent-primary);
+			text-shadow: 0 0 20px var(--accent-primary);
+		}
+
+		.hero .subtitle {
+			font-size: 1.2rem;
+			color: var(--text-secondary);
+			margin-bottom: 2rem;
+		}
+
+		.cta-button {
+			display: inline-block;
+			background: linear-gradient(45deg, var(--accent-primary), var(--success-color));
+			color: var(--bg-primary);
+			padding: 1rem 2rem;
+			text-decoration: none;
+			border-radius: var(--radius-md, 6px);
+			font-weight: bold;
+			transition: transform var(--duration-base) var(--easing), box-shadow var(--duration-base) var(--easing);
+			border: none;
+			cursor: pointer;
+			font-family: inherit;
+			font-size: 1rem;
+		}
+
+		.cta-button:hover {
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-button, 0 10px 20px rgba(0, 255, 65, 0.3));
+		}
+
+		.section {
+			background: var(--bg-secondary);
+			border: var(--border-width, 1px) solid var(--border-color);
+			border-radius: var(--radius-md, 6px);
+			padding: 2rem;
+			margin-bottom: 2rem;
+		}
+
+		.section h2 {
+			color: var(--accent-secondary);
+			margin-bottom: 1rem;
+			font-size: 1.8rem;
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 2rem;
+			margin-top: 2rem;
+		}
+
+		.card {
+			background: var(--bg-tertiary);
+			border: var(--border-width, 1px) solid var(--border-color);
+			border-radius: var(--radius-md, 6px);
+			padding: 1.5rem;
+			transition: transform var(--duration-base) var(--easing), border-color var(--duration-base) var(--easing);
+		}
+
+		.card:hover {
+			transform: translateY(-5px);
+			border-color: var(--accent-primary);
+		}
+
+		.card h3 {
+			color: var(--accent-primary);
+			margin-bottom: 1rem;
+		}
+
+		.stats {
+			display: flex;
+			justify-content: space-around;
+			text-align: center;
+			padding: 2rem 0;
+		}
+
+		.stat {
+			flex: 1;
+		}
+
+		.stat-number {
+			font-size: 2.5rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			display: block;
+		}
+
+		.stat-label {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+		}
+
+		.form-container {
+			background: var(--bg-secondary);
+			border: var(--border-width, 1px) solid var(--border-color);
+			border-radius: var(--radius-md, 6px);
+			padding: 2rem;
+			max-width: 600px;
+			margin: 2rem auto;
+		}
+
+		.form-group {
+			margin-bottom: 1.5rem;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 0.5rem;
+			color: var(--accent-primary);
+		}
+
+		input, textarea, select {
+			width: 100%;
+			padding: 0.8rem;
+			background: var(--bg-tertiary);
+			border: var(--border-width, 1px) solid var(--border-color);
+			border-radius: var(--radius-sm, 4px);
+			color: var(--text-primary);
+			font-family: inherit;
+		}
+
+		input:focus, textarea:focus, select:focus {
+			outline: none;
+			border-color: var(--accent-primary);
+			box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.2);
+		}
+
+		footer {
+			background: var(--bg-secondary);
+			border-top: 2px solid var(--accent-primary);
+			text-align: center;
+			padding: 2rem;
+			margin-top: 4rem;
+			color: var(--text-muted);
+		}
+
+		.status-indicator {
+			display: inline-block;
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			margin-right: 0.5rem;
+			animation: pulse 2s infinite;
+		}
+
+		.status-active {
+			background: var(--success-color);
+		}
+
+		.status-warning {
+			background: var(--accent-secondary);
+		}
+
+		@keyframes pulse {
+			0% { opacity: 1; }
+			50% { opacity: 0.5; }
+			100% { opacity: 1; }
+		}
+
+		@media (max-width: 768px) {
+			.nav-links {
+				display: none;
+			}
+            
+			.hero h1 {
+				font-size: 2rem;
+			}
+            
+			nav {
+				padding: 0 1rem;
+			}
+            
+			main {
+				padding: 1rem;
+			}
+		}
+	</style>
+	<script>
+		// Runtime tokens loader: pulls /design/tokens.json and applies to :root
+		(async function loadTokens() {
+			try {
+				const res = await fetch('/design/tokens.json', { cache: 'no-store' });
+				if (!res.ok) return;
+				const t = await res.json();
+				const r = document.documentElement;
+				const set = (k, v) => v != null && r.style.setProperty(k, String(v));
+				if (t.colors) {
+					set('--bg-primary', t.colors.bgPrimary);
+					set('--bg-secondary', t.colors.bgSecondary);
+					set('--bg-tertiary', t.colors.bgTertiary);
+					set('--text-primary', t.colors.textPrimary);
+					set('--text-secondary', t.colors.textSecondary);
+					set('--text-muted', t.colors.textMuted);
+					set('--accent-primary', t.colors.accentPrimary);
+					set('--accent-secondary', t.colors.accentSecondary);
+					set('--accent-danger', t.colors.accentDanger);
+					set('--border-color', t.colors.border);
+					set('--success-color', t.colors.success);
+				}
+				if (t.shape) {
+					set('--radius-sm', t.shape.radiusSm);
+					set('--radius-md', t.shape.radiusMd);
+					set('--radius-lg', t.shape.radiusLg);
+					set('--border-width', t.shape.borderWidth);
+					set('--shadow-button', t.shape.shadowButton);
+				}
+				if (t.motion) {
+					set('--duration-fast', t.motion.durationFast);
+					set('--duration-base', t.motion.durationBase);
+					set('--easing', t.motion.easing);
+				}
+			} catch (e) {
+				// ignore; defaults apply
+			}
+		})();
+	</script>
+	<link rel="preconnect" href="https://github.com" />
+	<link rel="preconnect" href="https://cli.github.com" />
+</head>
+<body>
+	<header>
+		<nav>
+			<a href="#" class="logo">pdoom1</a>
+			<ul class="nav-links">
+				<li><a href="#home">Home</a></li>
+				<li><a href="#about">About</a></li>
+				<li><a href="#download">Download</a></li>
+				<li><a href="#docs">Documentation</a></li>
+				<li><a href="#support">Support</a></li>
+				<li><a href="#contact">Contact</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<section class="hero" id="home">
+			<h1>pdoom1</h1>
+			<p class="subtitle">A satirical meta-strategy game about AI Safety</p>
+			<p style="margin-bottom: 2rem; color: var(--text-secondary);">
+				<span class="status-indicator status-active"></span>
+				Currently in Development - Alpha Release Available
+			</p>
+			<a href="https://github.com/PipFoweraker/pdoom1" class="cta-button">Download Game</a>
+		</section>
+
+		<section class="stats">
+			<div class="stat">
+				<span class="stat-number">3</span>
+				<span class="stat-label">Competing AI Labs</span>
+			</div>
+			<div class="stat">
+				<span class="stat-number">∞</span>
+				<span class="stat-label">Strategic Possibilities</span>
+			</div>
+			<div class="stat">
+				<span class="stat-number">p(Doom)</span>
+				<span class="stat-label">Level Management</span>
+			</div>
+		</section>
+
+		<section class="section" id="about">
+			<h2>About the Game</h2>
+			<p>pdoom1 is a satirical meta-strategy game inspired by Papers Please, Pandemic, and clicker games. Navigate the complex world of AI safety research while managing resources, competing with other AI labs, and trying to prevent catastrophic outcomes.</p>
+            
+			<div class="grid">
+				<div class="card">
+					<h3>🎯 Resource Management</h3>
+					<p>Balance money, staff, reputation, and p(Doom) levels as you make critical decisions about AI development.</p>
+				</div>
+				<div class="card">
+					<h3>🔬 Research & Development</h3>
+					<p>Publish papers, buy compute resources, and advance AI safety research while racing against competitors.</p>
+				</div>
+				<div class="card">
+					<h3>⚡ Dynamic Events</h3>
+					<p>Handle unexpected challenges with our sophisticated event system featuring popup events, deferrals, and strategic timing.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="section" id="download">
+			<h2>System Requirements</h2>
+			<div class="grid">
+				<div class="card">
+					<h3>Minimum Requirements</h3>
+					<ul style="color: var(--text-secondary); margin-top: 1rem;">
+						<li>Python 3.8+</li>
+						<li>pygame library</li>
+						<li>~50MB disk space</li>
+						<li>Basic graphics support</li>
+					</ul>
+				</div>
+				<div class="card">
+					<h3>Installation</h3>
+<pre style="background: var(--bg-primary); padding: 1rem; border-radius: var(--radius-sm, 4px); overflow-x: auto; margin-top: 1rem; color: var(--accent-primary);">pip install pygame
+python main.py</pre>
+				</div>
+			</div>
+		</section>
+
+		<section class="section" id="support">
+			<h2>Support & Bug Reports</h2>
+			<p>Found a bug or need help? Report issues directly through our GitHub integration.</p>
+            
+			<div class="form-container">
+				<form id="bug-report-form">
+					<h3 style="color: var(--accent-secondary); margin-bottom: 1.5rem;">Report a Bug</h3>
+                    
+					<div class="form-group">
+						<label for="bug-title">Issue Title *</label>
+						<input type="text" id="bug-title" name="title" required placeholder="Brief description of the issue">
+					</div>
+                    
+					<div class="form-group">
+						<label for="bug-type">Bug Type</label>
+						<select id="bug-type" name="type">
+							<option value="bug">🐛 Bug Report</option>
+							<option value="feature">✨ Feature Request</option>
+							<option value="documentation">📚 Documentation Issue</option>
+							<option value="performance">⚡ Performance Issue</option>
+						</select>
+					</div>
+                    
+					<div class="form-group">
+						<label for="bug-description">Description *</label>
+						<textarea id="bug-description" name="description" rows="6" required 
+							placeholder="Detailed description of the issue, including steps to reproduce..."></textarea>
+					</div>
+                    
+					<div class="form-group">
+						<label for="user-email">Email (Optional)</label>
+						<input type="email" id="user-email" name="email" placeholder="your.email@example.com">
+						<small style="color: var(--text-muted);">Only used for follow-up questions. Not stored or shared.</small>
+					</div>
+                    
+					<button type="submit" class="cta-button" style="width: 100%;">
+						Submit Bug Report
+					</button>
+				</form>
+			</div>
+		</section>
+
+		<section class="section" id="contact">
+			<h2>Stay Connected</h2>
+			<div class="grid">
+				<div class="card">
+					<h3>🔗 GitHub</h3>
+					<p>Access source code, report issues, and contribute to development.</p>
+					<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">View Repository →</a>
+				</div>
+				<div class="card">
+					<h3>📧 Newsletter</h3>
+					<p>Get updates on new releases and development progress.</p>
+					<form style="margin-top: 1rem;" id="newsletter-form">
+						<input type="email" placeholder="Enter your email" style="margin-bottom: 1rem;">
+						<button type="submit" class="cta-button" style="width: 100%; padding: 0.5rem;">Subscribe</button>
+					</form>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer>
+		<p>&copy; 2025 pdoom1. Not affiliated with any AI organization. For fun, education, and satire only.</p>
+		<p style="margin-top: 0.5rem; font-size: 0.8rem;">
+			<span class="status-indicator status-warning"></span>
+			Game Status: Active Development | Privacy: No personal data collected
+		</p>
+	</footer>
+
+	<script>
+		// Bug report form submission -> shared backend
+		document.getElementById('bug-report-form').addEventListener('submit', async function(e) {
+			e.preventDefault();
+			const formData = new FormData(e.target);
+			const bugData = {
+				title: formData.get('title'),
+				type: formData.get('type') || 'bug',
+				description: formData.get('description'),
+				email: formData.get('email') || '',
+				source: 'web'
+			};
+			const button = e.target.querySelector('button[type="submit"]');
+			const originalText = button.textContent;
+			button.disabled = true;
+			try {
+				const res = await fetch('/api/report-bug', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(bugData)
+				});
+				if (!res.ok) throw new Error('Failed to submit');
+				button.textContent = '✅ Report Submitted!';
+				button.style.background = 'var(--success-color)';
+				setTimeout(() => {
+					button.textContent = originalText;
+					button.style.background = '';
+					e.target.reset();
+					button.disabled = false;
+				}, 3000);
+			} catch (err) {
+				button.textContent = '❌ Submit Failed';
+				button.style.background = 'var(--accent-danger)';
+				setTimeout(() => {
+					button.textContent = originalText;
+					button.style.background = '';
+					button.disabled = false;
+				}, 3000);
+			}
+		});
+        
+		// Newsletter form
+		document.getElementById('newsletter-form').addEventListener('submit', function(e) {
+			e.preventDefault();
+			const button = e.target.querySelector('button[type="submit"]');
+			const originalText = button.textContent;
+			button.textContent = '✅ Subscribed!';
+			button.style.background = 'var(--success-color)';
+			setTimeout(() => {
+				button.textContent = originalText;
+				button.style.background = '';
+				e.target.reset();
+			}, 3000);
+		});
+        
+		// Smooth scrolling for nav links
+		document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+			anchor.addEventListener('click', function (e) {
+				e.preventDefault();
+				const target = document.querySelector(this.getAttribute('href'));
+				if (target) {
+					target.scrollIntoView({
+						behavior: 'smooth',
+						block: 'start'
+					});
+				}
+			});
+		});
+	</script>
+</body>
+</html>
 <!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-width, initial-scale=1" />\n  <title>pdoom1</title>\n  <link rel="stylesheet" href="/src/styles/main.css" />\n</head>\n<body>\n  <main>\n    <h1>pdoom1</h1>\n    <p>Welcome. This is the initial shell for the pdoom1 website.</p>\n  </main>\n</body>\n</html>\n
