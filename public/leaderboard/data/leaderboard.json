@@ -1,0 +1,181 @@
+{
+  "leaderboard": {
+    "lastUpdated": "2025-09-15T00:30:00Z",
+    "totalPlayers": 1247,
+    "topPlayers": [
+      {
+        "rank": 1,
+        "playerId": "alpha_researcher_001",
+        "playerName": "Dr. SafetyFirst",
+        "score": 892456,
+        "gamesPlayed": 34,
+        "bestRun": {
+          "score": 892456,
+          "duration": "2h 34m",
+          "pDoom": 0.15,
+          "outcome": "Safe AGI Achieved"
+        },
+        "achievements": ["First Contact", "Safety Pioneer", "Doom Avoider", "Perfect Run"],
+        "lastPlayed": "2025-09-14T18:30:00Z",
+        "totalPlayTime": "45h 23m"
+      },
+      {
+        "rank": 2,
+        "playerId": "ai_strategist_42",
+        "playerName": "PolicyMaster",
+        "score": 834567,
+        "gamesPlayed": 28,
+        "bestRun": {
+          "score": 834567,
+          "duration": "3h 12m",
+          "pDoom": 0.23,
+          "outcome": "Regulatory Victory"
+        },
+        "achievements": ["Policy Expert", "Strategic Thinker", "Long Game"],
+        "lastPlayed": "2025-09-14T22:15:00Z",
+        "totalPlayTime": "38h 45m"
+      },
+      {
+        "rank": 3,
+        "playerId": "doom_calculator",
+        "playerName": "ProbabilityWiz",
+        "score": 789234,
+        "gamesPlayed": 52,
+        "bestRun": {
+          "score": 789234,
+          "duration": "1h 58m",
+          "pDoom": 0.08,
+          "outcome": "Perfect Alignment"
+        },
+        "achievements": ["Math Genius", "Risk Assessor", "Speed Runner"],
+        "lastPlayed": "2025-09-15T00:05:00Z",
+        "totalPlayTime": "62h 18m"
+      },
+      {
+        "rank": 4,
+        "playerId": "lab_manager_pro",
+        "playerName": "ResourceKing",
+        "score": 756890,
+        "gamesPlayed": 19,
+        "bestRun": {
+          "score": 756890,
+          "duration": "4h 05m",
+          "pDoom": 0.31,
+          "outcome": "Economic Victory"
+        },
+        "achievements": ["Resource Master", "Efficiency Expert"],
+        "lastPlayed": "2025-09-13T16:20:00Z",
+        "totalPlayTime": "29h 12m"
+      },
+      {
+        "rank": 5,
+        "playerId": "event_handler",
+        "playerName": "CrisisManager",
+        "score": 698123,
+        "gamesPlayed": 67,
+        "bestRun": {
+          "score": 698123,
+          "duration": "2h 47m",
+          "pDoom": 0.19,
+          "outcome": "Crisis Averted"
+        },
+        "achievements": ["Crisis Expert", "Event Master", "Survivor"],
+        "lastPlayed": "2025-09-14T20:45:00Z",
+        "totalPlayTime": "78h 35m"
+      },
+      {
+        "rank": 6,
+        "playerId": "research_veteran",
+        "playerName": "PaperPublisher",
+        "score": 645789,
+        "gamesPlayed": 41,
+        "bestRun": {
+          "score": 645789,
+          "duration": "3h 33m",
+          "pDoom": 0.27,
+          "outcome": "Research Breakthrough"
+        },
+        "achievements": ["Publication King", "Research Expert"],
+        "lastPlayed": "2025-09-14T14:30:00Z",
+        "totalPlayTime": "51h 42m"
+      },
+      {
+        "rank": 7,
+        "playerId": "ai_safety_newbie",
+        "playerName": "LearningFast",
+        "score": 589456,
+        "gamesPlayed": 15,
+        "bestRun": {
+          "score": 589456,
+          "duration": "2h 15m",
+          "pDoom": 0.42,
+          "outcome": "Narrow Escape"
+        },
+        "achievements": ["Quick Learner", "Rising Star"],
+        "lastPlayed": "2025-09-14T21:10:00Z",
+        "totalPlayTime": "22h 18m"
+      },
+      {
+        "rank": 8,
+        "playerId": "competitive_player",
+        "playerName": "RankClimber",
+        "score": 534567,
+        "gamesPlayed": 89,
+        "bestRun": {
+          "score": 534567,
+          "duration": "1h 42m",
+          "pDoom": 0.35,
+          "outcome": "Competitive Victory"
+        },
+        "achievements": ["Competitor", "Persistent", "Marathon Runner"],
+        "lastPlayed": "2025-09-15T00:15:00Z",
+        "totalPlayTime": "95h 28m"
+      },
+      {
+        "rank": 9,
+        "playerId": "strategy_student",
+        "playerName": "TacticalMind",
+        "score": 489123,
+        "gamesPlayed": 33,
+        "bestRun": {
+          "score": 489123,
+          "duration": "2h 58m",
+          "pDoom": 0.28,
+          "outcome": "Strategic Success"
+        },
+        "achievements": ["Strategist", "Tactical Expert"],
+        "lastPlayed": "2025-09-14T19:45:00Z",
+        "totalPlayTime": "41h 15m"
+      },
+      {
+        "rank": 10,
+        "playerId": "doom_preventer",
+        "playerName": "SafetyAdvocate",
+        "score": 445678,
+        "gamesPlayed": 26,
+        "bestRun": {
+          "score": 445678,
+          "duration": "3h 21m",
+          "pDoom": 0.12,
+          "outcome": "Safety Ensured"
+        },
+        "achievements": ["Safety First", "Doom Preventer"],
+        "lastPlayed": "2025-09-14T17:30:00Z",
+        "totalPlayTime": "35h 42m"
+      }
+    ]
+  },
+  "statistics": {
+    "averageScore": 245678,
+    "averageGames": 23.5,
+    "averagePDoom": 0.34,
+    "mostCommonOutcome": "Narrow Escape",
+    "totalGamesPlayed": 29456,
+    "totalPlayTime": "12,345h 28m",
+    "achievementStats": {
+      "totalAchievements": 47,
+      "mostEarnedAchievement": "Quick Learner",
+      "rarestAchievement": "Perfect Run"
+    }
+  }
+}

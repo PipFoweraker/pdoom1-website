@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>p(Doom)1 Leaderboard - Top Players</title>
+  <meta name="description" content="View the top players and scores in p(Doom)1, the AI Safety Strategy Game. See rankings, achievements, and player statistics.">
+  <link rel="canonical" href="https://pdoom1.com/leaderboard/" />
+  
+  <style>
+    :root {
+      /* Default theme colors */
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --bg-tertiary: #3d3d3d;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #888888;
+      --accent-primary: #00ff41;
+      --accent-secondary: #ff6b35;
+      --accent-danger: #ff4444;
+      --border-color: #444444;
+      --success-color: #4caf50;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+      --border-width: 1px;
+      --shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+      --duration-fast: 150ms;
+      --duration-base: 300ms;
+      --easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 2px solid var(--accent-primary);
+      padding: 1rem;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      transition: all var(--duration-base) var(--easing);
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      color: var(--accent-primary);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 20px var(--accent-primary);
+    }
+
+    .page-header .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: var(--border-width) solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+      display: block;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .leaderboard-container {
+      background: var(--bg-secondary);
+      border: var(--border-width) solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .leaderboard-header {
+      background: var(--bg-tertiary);
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .leaderboard-header h2 {
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .last-updated {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .leaderboard-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-secondary);
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+    }
+
+    .leaderboard-table tr:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .rank {
+      width: 60px;
+      text-align: center;
+      font-weight: bold;
+      color: var(--accent-primary);
+    }
+
+    .rank.top-3 {
+      font-size: 1.2rem;
+    }
+
+    .rank.rank-1 { color: #ffd700; }
+    .rank.rank-2 { color: #c0c0c0; }
+    .rank.rank-3 { color: #cd7f32; }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .player-name {
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+
+    .player-id {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .score {
+      font-weight: bold;
+      color: var(--success-color);
+      font-size: 1.1rem;
+    }
+
+    .achievements {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+
+    .achievement-badge {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+      padding: 0.2rem 0.4rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    .achievement-badge.rare {
+      background: var(--accent-secondary);
+    }
+
+    .outcome {
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .outcome.safe { background: var(--success-color); color: var(--bg-primary); }
+    .outcome.risky { background: var(--accent-secondary); color: var(--bg-primary); }
+    .outcome.dangerous { background: var(--accent-danger); color: var(--text-primary); }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      main {
+        padding: 1rem;
+      }
+      
+      .page-header h1 {
+        font-size: 2rem;
+      }
+      
+      .leaderboard-table {
+        font-size: 0.9rem;
+      }
+      
+      .leaderboard-table th,
+      .leaderboard-table td {
+        padding: 0.5rem;
+      }
+      
+      .achievements {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .leaderboard-table th:nth-child(4),
+      .leaderboard-table td:nth-child(4),
+      .leaderboard-table th:nth-child(5),
+      .leaderboard-table td:nth-child(5) {
+        display: none;
+      }
+    }
+  </style>
+  
+  <script>
+    // Load design tokens if available
+    (async function loadTokens() {
+      try {
+        const res = await fetch('/design/tokens.json', { cache: 'no-store' });
+        if (!res.ok) return;
+        const t = await res.json();
+        const r = document.documentElement;
+        const set = (k, v) => v != null && r.style.setProperty(k, String(v));
+        if (t.colors) {
+          Object.entries({
+            '--bg-primary': t.colors.bgPrimary,
+            '--bg-secondary': t.colors.bgSecondary,
+            '--bg-tertiary': t.colors.bgTertiary,
+            '--text-primary': t.colors.textPrimary,
+            '--text-secondary': t.colors.textSecondary,
+            '--text-muted': t.colors.textMuted,
+            '--accent-primary': t.colors.accentPrimary,
+            '--accent-secondary': t.colors.accentSecondary,
+            '--accent-danger': t.colors.accentDanger,
+            '--border-color': t.colors.border,
+            '--success-color': t.colors.success
+          }).forEach(([k, v]) => set(k, v));
+        }
+        if (t.shape) {
+          Object.entries({
+            '--radius-sm': t.shape.radiusSm,
+            '--radius-md': t.shape.radiusMd,
+            '--radius-lg': t.shape.radiusLg,
+            '--border-width': t.shape.borderWidth,
+            '--shadow-button': t.shape.shadowButton
+          }).forEach(([k, v]) => set(k, v));
+        }
+        if (t.motion) {
+          Object.entries({
+            '--duration-fast': t.motion.durationFast,
+            '--duration-base': t.motion.durationBase,
+            '--easing': t.motion.easing
+          }).forEach(([k, v]) => set(k, v));
+        }
+      } catch (e) {
+        // ignore; defaults apply
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a href="/" class="logo">p(Doom)1</a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/docs/">Documentation</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/leaderboard/" style="color: var(--accent-primary);">Leaderboard</a></li>
+          <li><a href="https://github.com/PipFoweraker/pdoom1">Download</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>🏆 Leaderboard</h1>
+      <p class="subtitle">Top players in the AI Safety Strategy Game</p>
+    </div>
+
+    <div class="stats-bar" id="stats-bar">
+      <div class="stat-card">
+        <span class="stat-number" id="total-players">-</span>
+        <span class="stat-label">Total Players</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="total-games">-</span>
+        <span class="stat-label">Games Played</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="avg-score">-</span>
+        <span class="stat-label">Average Score</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="avg-pdoom">-</span>
+        <span class="stat-label">Average p(Doom)</span>
+      </div>
+    </div>
+
+    <div class="leaderboard-container">
+      <div class="leaderboard-header">
+        <h2>Top 10 Players</h2>
+        <div class="last-updated" id="last-updated">Loading...</div>
+      </div>
+      
+      <div class="loading" id="loading">Loading leaderboard</div>
+      
+      <table class="leaderboard-table" id="leaderboard-table" style="display: none;">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Score</th>
+            <th>Best Run</th>
+            <th>Achievements</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    // Load and display leaderboard data
+    async function loadLeaderboard() {
+      try {
+        const response = await fetch('data/leaderboard.json', { cache: 'no-store' });
+        const data = await response.json();
+        
+        displayStats(data.statistics, data.leaderboard.totalPlayers);
+        displayLeaderboard(data.leaderboard);
+        
+        // Hide loading, show table
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('leaderboard-table').style.display = 'table';
+        
+      } catch (error) {
+        console.error('Failed to load leaderboard:', error);
+        document.getElementById('loading').innerHTML = 'Failed to load leaderboard data';
+      }
+    }
+    
+    function displayStats(stats, totalPlayers) {
+      document.getElementById('total-players').textContent = totalPlayers.toLocaleString();
+      document.getElementById('total-games').textContent = stats.totalGamesPlayed.toLocaleString();
+      document.getElementById('avg-score').textContent = stats.averageScore.toLocaleString();
+      document.getElementById('avg-pdoom').textContent = stats.averagePDoom.toFixed(2);
+    }
+    
+    function displayLeaderboard(leaderboard) {
+      const tbody = document.getElementById('leaderboard-body');
+      const lastUpdated = document.getElementById('last-updated');
+      
+      lastUpdated.textContent = `Last updated: ${new Date(leaderboard.lastUpdated).toLocaleString()}`;
+      
+      leaderboard.topPlayers.forEach(player => {
+        const row = document.createElement('tr');
+        
+        // Determine outcome class
+        const pDoom = player.bestRun.pDoom;
+        let outcomeClass = 'safe';
+        if (pDoom > 0.3) outcomeClass = 'risky';
+        if (pDoom > 0.5) outcomeClass = 'dangerous';
+        
+        // Create achievement badges
+        const achievementBadges = player.achievements.map(achievement => {
+          const isRare = ['Perfect Run', 'Safety Pioneer'].includes(achievement);
+          return `<span class="achievement-badge ${isRare ? 'rare' : ''}">${achievement}</span>`;
+        }).join('');
+        
+        row.innerHTML = `
+          <td class="rank ${player.rank <= 3 ? 'top-3 rank-' + player.rank : ''}">#${player.rank}</td>
+          <td>
+            <div class="player-info">
+              <div>
+                <div class="player-name">${player.playerName}</div>
+                <div class="player-id">${player.playerId}</div>
+              </div>
+            </div>
+          </td>
+          <td class="score">${player.score.toLocaleString()}</td>
+          <td>
+            <div style="font-size: 0.9rem;">
+              <div><strong>${player.bestRun.score.toLocaleString()}</strong> in ${player.bestRun.duration}</div>
+              <div class="outcome ${outcomeClass}" style="margin-top: 0.25rem;">
+                p(Doom): ${(player.bestRun.pDoom * 100).toFixed(0)}% - ${player.bestRun.outcome}
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="achievements">
+              ${achievementBadges}
+            </div>
+          </td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+    }
+    
+    // Load data when page loads
+    document.addEventListener('DOMContentLoaded', loadLeaderboard);
+  </script>
+</body>
+</html>
