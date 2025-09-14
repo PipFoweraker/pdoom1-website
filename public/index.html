@@ -247,6 +247,30 @@
 			box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.2);
 		}
 
+		.form-help {
+			font-size: 0.85rem;
+			color: var(--text-muted);
+			margin-top: 0.25rem;
+		}
+
+		.error-message {
+			font-size: 0.85rem;
+			color: var(--accent-danger);
+			margin-top: 0.25rem;
+			display: none;
+		}
+
+		.error-message.visible {
+			display: block;
+		}
+
+		input[aria-invalid="true"], 
+		textarea[aria-invalid="true"], 
+		select[aria-invalid="true"] {
+			border-color: var(--accent-danger);
+			box-shadow: 0 0 0 2px rgba(255, 68, 68, 0.2);
+		}
+
 		footer {
 			background: var(--bg-secondary);
 			border-top: 2px solid var(--accent-primary);
@@ -277,6 +301,50 @@
 			0% { opacity: 1; }
 			50% { opacity: 0.5; }
 			100% { opacity: 1; }
+		}
+
+		/* Keyboard navigation and focus styles */
+		.skip-link {
+			position: absolute;
+			top: -40px;
+			left: 6px;
+			background: var(--accent-primary);
+			color: var(--bg-primary);
+			padding: 8px;
+			text-decoration: none;
+			border-radius: var(--radius-sm);
+			font-weight: bold;
+			z-index: 1000;
+		}
+
+		.skip-link:focus {
+			top: 6px;
+		}
+
+		/* Enhanced focus indicators */
+		a:focus, button:focus, input:focus, textarea:focus, select:focus {
+			outline: 2px solid var(--accent-primary);
+			outline-offset: 2px;
+		}
+
+		/* High contrast mode support */
+		@media (prefers-contrast: high) {
+			:root {
+				--bg-primary: #000000;
+				--bg-secondary: #1a1a1a;
+				--text-primary: #ffffff;
+				--accent-primary: #00ff00;
+				--border-color: #666666;
+			}
+		}
+
+		/* Reduced motion support */
+		@media (prefers-reduced-motion: reduce) {
+			* {
+				animation-duration: 0.01ms !important;
+				animation-iteration-count: 1 !important;
+				transition-duration: 0.01ms !important;
+			}
 		}
 
 		@media (max-width: 768px) {
@@ -438,48 +506,68 @@
 	</script>
 </head>
 <body>
+	<a href="#main-content" class="skip-link">Skip to main content</a>
 	<header>
-		<nav>
-			<a href="#" class="logo">pdoom1</a>
-			<ul class="nav-links">
-				<li><a href="#home">Home</a></li>
-				<li><a href="#about">About</a></li>
-				<li><a href="#download">Download</a></li>
-				<li><a href="/docs/">Documentation</a></li>
-				<li><a href="#roadmap">Roadmap</a></li>
-				<li><a href="/leaderboard/">Leaderboard</a></li>
-				<li><a href="/docs/steam-readiness.md">Steam</a></li>
-				<li><a href="/blog/">Blog</a></li>
-				<li><a href="/changelog/">Changelog</a></li>
-				<li><a href="/dev-notes/">Dev Notes</a></li>
-				<li><a href="#support">Support</a></li>
+		<nav role="navigation" aria-label="Main navigation">
+			<a href="#" class="logo" aria-label="p(Doom)1 home">pdoom1</a>
+			<ul class="nav-links" role="menubar">
+				<li role="none"><a href="#home" role="menuitem" aria-label="Jump to home section">Home</a></li>
+				<li role="none"><a href="/about/" role="menuitem" aria-label="Learn more about p(Doom)1">About</a></li>
+				<li role="none"><a href="#download" role="menuitem" aria-label="Download the game">Download</a></li>
+				<li role="none"><a href="/leaderboard/" role="menuitem" aria-label="View player leaderboard">Leaderboard</a></li>
+				<li role="none"><a href="/blog/" role="menuitem" aria-label="Read development blog">Blog</a></li>
+				<li role="none"><a href="/changelog/" role="menuitem" aria-label="View version history">Changelog</a></li>
+				<li role="none"><a href="/docs/" role="menuitem" aria-label="View documentation">Docs</a></li>
+				<li role="none"><a href="/press/" role="menuitem" aria-label="Press kit and media resources">Press</a></li>
 				<li><a href="#contact">Contact</a></li>
 			</ul>
 		</nav>
 	</header>
 
-	<main>
-		<section class="hero" id="home">
-			<h1>pdoom1</h1>
+	<main role="main" id="main-content">
+		<section class="hero" id="home" role="banner" aria-labelledby="main-heading">
+			<h1 id="main-heading">pdoom1</h1>
 			<p class="subtitle">A satirical meta-strategy game about AI Safety</p>
-			<p style="margin-bottom: 2rem; color: var(--text-secondary);">
+			<p style="margin-bottom: 1rem; color: var(--text-secondary);">
 				<span class="status-indicator status-active"></span>
 				Currently in Development - Alpha Release Available
 			</p>
-			<a href="https://github.com/PipFoweraker/pdoom1" class="cta-button">Download Game (main repo)</a>
+			
+			<!-- Enhanced Download CTAs -->
+			<div class="download-ctas" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
+				<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" target="_blank" rel="noopener">
+					<span style="font-size: 1.2rem;">⬇️</span> Download Latest Release
+				</a>
+				<a href="/press/" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary);">
+					<span style="font-size: 1.2rem;">📰</span> Press Kit
+				</a>
+			</div>
+			
+			<!-- Steam Coming Soon - Valve Compliant -->
+			<div style="text-align: center; margin-top: 1.5rem;">
+				<div style="display: inline-block; padding: 8px 16px; background: #171a21; border: 1px solid #2a475e; border-radius: 4px; color: #ffffff; font-family: 'Motiva Sans', Arial, sans-serif; font-size: 13px;">
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 6px;">
+						<path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm3.71 10.89L10 9.38v-3.28c0-.44-.36-.8-.8-.8s-.8.36-.8.8v3.78l-2.11 1.31c-.14.09-.23.24-.23.41 0 .44.36.8.8.8.17 0 .32-.09.41-.23L8 10.89l1.14.69c.09.14.24.23.41.23.44 0 .8-.36.8-.8 0-.17-.09-.32-.23-.41z"/>
+					</svg>
+					Coming Soon to Steam
+				</div>
+				<div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.3rem; text-align: center;">
+					©2025 Valve Corporation. Steam® is a registered trademark.
+				</div>
+			</div>
 		</section>
 
-		<section class="stats">
-			<div class="stat">
-				<span class="stat-number">3</span>
+		<section class="stats" role="complementary" aria-label="Game statistics">
+			<div class="stat" role="img" aria-label="3 competing AI labs">
+				<span class="stat-number" aria-hidden="true">3</span>
 				<span class="stat-label">Competing AI Labs</span>
 			</div>
-			<div class="stat">
-				<span class="stat-number">∞</span>
+			<div class="stat" role="img" aria-label="Infinite strategic possibilities">
+				<span class="stat-number" aria-hidden="true">∞</span>
 				<span class="stat-label">Strategic Possibilities</span>
 			</div>
-			<div class="stat">
-				<span class="stat-number">p(Doom)</span>
+			<div class="stat" role="img" aria-label="p(Doom) level management system">
+				<span class="stat-number" aria-hidden="true">p(Doom)</span>
 				<span class="stat-label">Level Management</span>
 			</div>
 		</section>
@@ -538,63 +626,130 @@
 		</section>
 
 		<section class="section" id="download">
-			<h2>System Requirements</h2>
+			<h2>Download & Get Started</h2>
+			<p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+				Get p(Doom)1 and start playing immediately. Free and open source.
+			</p>
+			
+			<!-- Download Options -->
+			<div class="grid" style="margin-bottom: 3rem;">
+				<div class="card" style="text-align: center; border: 2px solid var(--accent-primary);">
+					<h3 style="color: var(--accent-primary);">🚀 Quick Start (Recommended)</h3>
+					<p style="margin: 1rem 0;">Download the latest pre-built release</p>
+					<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" target="_blank" rel="noopener" style="margin-bottom: 1rem; display: inline-block;">
+						Download v0.4.1 (Latest)
+					</a>
+					<p style="font-size: 0.9rem; color: var(--text-muted);">Windows, macOS, Linux</p>
+				</div>
+				
+				<div class="card" style="text-align: center;">
+					<h3 style="color: var(--accent-secondary);">🛠️ Developer Build</h3>
+					<p style="margin: 1rem 0;">Clone and run from source</p>
+					<a href="https://github.com/PipFoweraker/pdoom1" class="cta-button" target="_blank" rel="noopener" style="background: var(--accent-secondary); border-color: var(--accent-secondary); margin-bottom: 1rem; display: inline-block;">
+						View Source Code
+					</a>
+					<p style="font-size: 0.9rem; color: var(--text-muted);">Requires Python 3.8+</p>
+				</div>
+			</div>
+
+			<!-- System Requirements & Installation -->
 			<div class="grid">
 				<div class="card">
-					<h3>Minimum Requirements</h3>
-					<ul style="color: var(--text-secondary); margin-top: 1rem;">
-						<li>Python 3.8+</li>
-						<li>pygame library</li>
-						<li>~50MB disk space</li>
-						<li>Basic graphics support</li>
-					</ul>
+					<h3>💻 System Requirements</h3>
+					<div style="margin-top: 1rem;">
+						<p><strong>Minimum:</strong></p>
+						<ul style="color: var(--text-secondary); margin: 0.5rem 0 1rem 1.5rem;">
+							<li>Python 3.8+ (for source builds)</li>
+							<li>pygame library</li>
+							<li>~50MB disk space</li>
+							<li>Basic graphics support</li>
+						</ul>
+						<p><strong>Supported Platforms:</strong></p>
+						<div style="display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap;">
+							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">🪟 Windows</span>
+							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">🍎 macOS</span>
+							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">🐧 Linux</span>
+						</div>
+					</div>
 				</div>
+				
 				<div class="card">
-					<h3>Installation</h3>
-<pre style="background: var(--bg-primary); padding: 1rem; border-radius: var(--radius-sm, 4px); overflow-x: auto; margin-top: 1rem; color: var(--accent-primary);">pip install pygame
+					<h3>⚡ Quick Installation</h3>
+					<p style="margin-bottom: 1rem; color: var(--text-secondary);">For source builds:</p>
+<pre style="background: var(--bg-primary); padding: 1rem; border-radius: var(--radius-sm, 4px); overflow-x: auto; color: var(--accent-primary); font-size: 0.9rem; line-height: 1.4;">git clone https://github.com/PipFoweraker/pdoom1.git
+cd pdoom1
+pip install -r requirements.txt
 python main.py</pre>
+					<p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+						Or download the pre-built executable for instant play!
+					</p>
+				</div>
+			</div>
+			
+			<!-- Additional Resources -->
+			<div style="text-align: center; margin-top: 3rem; padding: 2rem; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+				<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">Need Help?</h3>
+				<p style="color: var(--text-secondary); margin-bottom: 2rem;">Check out our documentation and community resources</p>
+				<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+					<a href="/docs/" style="color: var(--accent-primary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-primary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">📚 Documentation</a>
+					<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-secondary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">🐛 Report Issues</a>
+					<a href="/changelog/" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">📝 Changelog</a>
 				</div>
 			</div>
 		</section>
 
-		<section class="section" id="support">
-			<h2>Support & Bug Reports</h2>
+		<section class="section" id="support" role="region" aria-labelledby="support-heading">
+			<h2 id="support-heading">Support & Bug Reports</h2>
 			<p>Found a bug or need help? Report issues directly through our GitHub integration.</p>
             
 			<div class="form-container">
-				<form id="bug-report-form">
-					<h3 style="color: var(--accent-secondary); margin-bottom: 1.5rem;">Report a Bug</h3>
+				<form id="bug-report-form" role="form" aria-labelledby="bug-form-heading" novalidate>
+					<h3 id="bug-form-heading" style="color: var(--accent-secondary); margin-bottom: 1.5rem;">Report a Bug</h3>
                     
 					<div class="form-group">
-						<label for="bug-title">Issue Title *</label>
-						<input type="text" id="bug-title" name="title" required placeholder="Brief description of the issue">
+						<label for="bug-title">Issue Title <span aria-label="required">*</span></label>
+						<input type="text" id="bug-title" name="title" required 
+							   placeholder="Brief description of the issue"
+							   aria-describedby="title-error"
+							   autocomplete="off">
+						<div id="title-error" class="error-message" role="alert" aria-live="polite"></div>
 					</div>
                     
 					<div class="form-group">
 						<label for="bug-type">Bug Type</label>
-						<select id="bug-type" name="type">
+						<select id="bug-type" name="type" aria-describedby="type-help">
 							<option value="bug">🐛 Bug Report</option>
 							<option value="feature">✨ Feature Request</option>
 							<option value="documentation">📚 Documentation Issue</option>
 							<option value="performance">⚡ Performance Issue</option>
 						</select>
+						<div id="type-help" class="form-help">Select the category that best describes your issue</div>
 					</div>
                     
 					<div class="form-group">
-						<label for="bug-description">Description *</label>
+						<label for="bug-description">Description <span aria-label="required">*</span></label>
 						<textarea id="bug-description" name="description" rows="6" required 
-							placeholder="Detailed description of the issue, including steps to reproduce..."></textarea>
+							placeholder="Detailed description of the issue, including steps to reproduce..."
+							aria-describedby="description-error description-help"></textarea>
+						<div id="description-help" class="form-help">Include steps to reproduce, expected behavior, and actual behavior</div>
+						<div id="description-error" class="error-message" role="alert" aria-live="polite"></div>
 					</div>
                     
 					<div class="form-group">
 						<label for="user-email">Email (Optional)</label>
-						<input type="email" id="user-email" name="email" placeholder="your.email@example.com">
-						<small style="color: var(--text-muted);">Only used for follow-up questions. Not stored or shared.</small>
+						<input type="email" id="user-email" name="email" 
+							   placeholder="your.email@example.com"
+							   aria-describedby="email-help email-error"
+							   autocomplete="email">
+						<div id="email-help" class="form-help">Only used for follow-up questions. Not stored or shared.</div>
+						<div id="email-error" class="error-message" role="alert" aria-live="polite"></div>
 					</div>
                     
-					<button type="submit" class="cta-button" style="width: 100%;">
+					<button type="submit" class="cta-button" style="width: 100%;" 
+							aria-describedby="submit-status">
 						Submit Bug Report
 					</button>
+					<div id="submit-status" role="status" aria-live="polite"></div>
 				</form>
 			</div>
 		</section>
@@ -633,6 +788,31 @@ python main.py</pre>
 	</footer>
 
 	<script>
+		// Form validation helpers
+		function showError(fieldId, message) {
+			const field = document.getElementById(fieldId);
+			const errorDiv = document.getElementById(fieldId.replace('bug-', '') + '-error');
+			
+			field.setAttribute('aria-invalid', 'true');
+			errorDiv.textContent = message;
+			errorDiv.classList.add('visible');
+		}
+		
+		function clearError(fieldId) {
+			const field = document.getElementById(fieldId);
+			const errorDiv = document.getElementById(fieldId.replace('bug-', '') + '-error');
+			
+			field.setAttribute('aria-invalid', 'false');
+			errorDiv.textContent = '';
+			errorDiv.classList.remove('visible');
+		}
+		
+		function updateStatus(message, isError = false) {
+			const statusDiv = document.getElementById('submit-status');
+			statusDiv.textContent = message;
+			statusDiv.style.color = isError ? 'var(--accent-danger)' : 'var(--success-color)';
+		}
+
 		// Bug report form submission -> shared backend
 	document.getElementById('bug-report-form').addEventListener('submit', async function(e) {
 			e.preventDefault();

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>About - p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/about/" />
+	<meta name="description" content="Learn about p(Doom)1 development, the team behind the AI Safety Strategy Game, and our mission to make AI safety accessible through gaming." />
+	<meta name="author" content="p(Doom)1" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="p(Doom)1" />
+	<meta property="og:title" content="About p(Doom)1 - AI Safety Strategy Game" />
+	<meta property="og:description" content="Learn about the development and mission behind p(Doom)1 - the AI Safety Strategy Game." />
+	<meta property="og:url" content="https://pdoom1.com/about/" />
+	<meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #888888;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-sm: 4px;
+			--radius-md: 6px;
+			--radius-lg: 10px;
+			--border-width: 1px;
+			--shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+			--duration-fast: 150ms;
+			--duration-base: 300ms;
+			--easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+			background-image: 
+				radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.02) 0%, transparent 50%),
+				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem 0;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		nav {
+			max-width: 1200px;
+			margin: 0 auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 2rem;
+		}
+
+		.logo {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			text-decoration: none;
+			text-shadow: 0 0 10px var(--accent-primary);
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 2rem;
+			list-style: none;
+		}
+
+		.nav-links a {
+			color: var(--text-secondary);
+			text-decoration: none;
+			transition: color var(--duration-base) var(--easing);
+			padding: 0.5rem 1rem;
+			border: 1px solid transparent;
+		}
+
+		.nav-links a:hover {
+			color: var(--accent-primary);
+			border-color: var(--accent-primary);
+			border-radius: var(--radius-sm);
+		}
+
+		main {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 4rem 2rem;
+		}
+
+		.hero {
+			text-align: center;
+			margin-bottom: 4rem;
+		}
+
+		.hero h1 {
+			font-size: 3rem;
+			color: var(--accent-primary);
+			text-shadow: 0 0 20px var(--accent-primary);
+			margin-bottom: 1rem;
+		}
+
+		.hero p {
+			font-size: 1.2rem;
+			color: var(--text-secondary);
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		.section {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 3rem;
+			margin-bottom: 3rem;
+		}
+
+		.section h2 {
+			color: var(--accent-primary);
+			margin-bottom: 2rem;
+			font-size: 2rem;
+		}
+
+		.section h3 {
+			color: var(--accent-secondary);
+			margin-bottom: 1rem;
+			margin-top: 2rem;
+		}
+
+		.section p {
+			margin-bottom: 1.5rem;
+			color: var(--text-secondary);
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 2rem;
+			margin: 2rem 0;
+		}
+
+		.card {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 2rem;
+			transition: all var(--duration-base) var(--easing);
+		}
+
+		.card:hover {
+			border-color: var(--accent-primary);
+			box-shadow: var(--shadow-button);
+		}
+
+		.card h3 {
+			color: var(--accent-primary);
+			margin-bottom: 1rem;
+			margin-top: 0;
+		}
+
+		.team-member {
+			text-align: center;
+			padding: 2rem;
+		}
+
+		.team-member .avatar {
+			width: 100px;
+			height: 100px;
+			border-radius: 50%;
+			background: var(--accent-primary);
+			margin: 0 auto 1rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 2rem;
+			color: var(--bg-primary);
+		}
+
+		.team-member h4 {
+			color: var(--accent-primary);
+			margin-bottom: 0.5rem;
+		}
+
+		.team-member .role {
+			color: var(--accent-secondary);
+			font-size: 0.9rem;
+			margin-bottom: 1rem;
+		}
+
+		.social-links {
+			display: flex;
+			gap: 1rem;
+			justify-content: center;
+			margin-top: 2rem;
+		}
+
+		.social-links a {
+			color: var(--text-secondary);
+			font-size: 1.5rem;
+			text-decoration: none;
+			transition: color var(--duration-base) var(--easing);
+			padding: 0.5rem;
+		}
+
+		.social-links a:hover {
+			color: var(--accent-primary);
+		}
+
+		.timeline {
+			position: relative;
+			padding-left: 2rem;
+		}
+
+		.timeline::before {
+			content: '';
+			position: absolute;
+			left: 0.5rem;
+			top: 0;
+			height: 100%;
+			width: 2px;
+			background: var(--accent-primary);
+		}
+
+		.timeline-item {
+			position: relative;
+			margin-bottom: 2rem;
+			padding-left: 2rem;
+		}
+
+		.timeline-item::before {
+			content: '';
+			position: absolute;
+			left: -0.5rem;
+			top: 0.5rem;
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			background: var(--accent-primary);
+		}
+
+		.timeline-item h4 {
+			color: var(--accent-secondary);
+			margin-bottom: 0.5rem;
+		}
+
+		.timeline-item .date {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.values-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 1.5rem;
+			margin: 2rem 0;
+		}
+
+		.value-card {
+			background: var(--bg-tertiary);
+			padding: 1.5rem;
+			border-radius: var(--radius-md);
+			border-left: 4px solid var(--accent-primary);
+		}
+
+		.value-card .icon {
+			font-size: 2rem;
+			margin-bottom: 1rem;
+		}
+
+		.value-card h4 {
+			color: var(--accent-primary);
+			margin-bottom: 0.5rem;
+		}
+
+		.stats-banner {
+			background: var(--bg-tertiary);
+			border-radius: var(--radius-lg);
+			padding: 2rem;
+			text-align: center;
+			margin: 3rem 0;
+		}
+
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+			gap: 2rem;
+			margin-top: 2rem;
+		}
+
+		.stat-item {
+			text-align: center;
+		}
+
+		.stat-number {
+			font-size: 2.5rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			display: block;
+		}
+
+		.stat-label {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+		}
+
+		@media (max-width: 768px) {
+			.hero h1 {
+				font-size: 2rem;
+			}
+			
+			nav {
+				flex-direction: column;
+				gap: 1rem;
+			}
+			
+			.nav-links {
+				gap: 1rem;
+			}
+			
+			.section {
+				padding: 2rem;
+			}
+			
+			.grid {
+				grid-template-columns: 1fr;
+			}
+			
+			.timeline {
+				padding-left: 1rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<nav>
+			<a href="/" class="logo">p(Doom)1</a>
+			<ul class="nav-links">
+				<li><a href="/">Home</a></li>
+				<li><a href="/leaderboard/">Leaderboard</a></li>
+				<li><a href="/blog/">Blog</a></li>
+				<li><a href="/changelog/">Changelog</a></li>
+				<li><a href="/docs/">Docs</a></li>
+				<li><a href="/press/">Press</a></li>
+				<li><a href="/about/" aria-current="page">About</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<section class="hero">
+			<h1>About p(Doom)1</h1>
+			<p>The story behind the AI Safety Strategy Game and our mission to make complex topics accessible through interactive gameplay</p>
+		</section>
+
+		<section class="section">
+			<h2>Our Mission</h2>
+			<p>p(Doom)1 was created to make AI Safety concepts accessible and engaging through interactive gameplay. We believe that games can be powerful educational tools, helping people understand complex topics by letting them experience the challenges firsthand.</p>
+			
+			<p>The game combines satirical humor with serious educational content, inspired by titles like Papers Please and Pandemic. Players navigate the complex world of AI development while managing resources, making policy decisions, and trying to prevent catastrophic outcomes.</p>
+
+			<div class="values-grid">
+				<div class="value-card">
+					<div class="icon">🎯</div>
+					<h4>Educational First</h4>
+					<p>Every game mechanic is designed to teach real AI Safety concepts in an engaging way.</p>
+				</div>
+				<div class="value-card">
+					<div class="icon">🔓</div>
+					<h4>Open Source</h4>
+					<p>Complete transparency in development with all code available for review and contribution.</p>
+				</div>
+				<div class="value-card">
+					<div class="icon">🌍</div>
+					<h4>Accessible</h4>
+					<p>Free to play and designed to be understood by both experts and newcomers to AI Safety.</p>
+				</div>
+				<div class="value-card">
+					<div class="icon">🧪</div>
+					<h4>Research-Based</h4>
+					<p>Grounded in real AI Safety research and current discussions in the field.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<h2>Development Story</h2>
+			<p>p(Doom)1 began as an exploration of how games can communicate complex ideas about AI Safety and existential risks. The project evolved from simple prototypes into a comprehensive strategy game that balances entertainment with education.</p>
+
+			<div class="timeline">
+				<div class="timeline-item">
+					<h4>Initial Concept</h4>
+					<div class="date">Early 2024</div>
+					<p>First prototype focusing on resource management and p(doom) mechanics.</p>
+				</div>
+				<div class="timeline-item">
+					<h4>Core Systems</h4>
+					<div class="date">Mid 2024</div>
+					<p>Implementation of competing AI labs, policy systems, and economic models.</p>
+				</div>
+				<div class="timeline-item">
+					<h4>Enhanced Features</h4>
+					<div class="date">September 2024</div>
+					<p>Added leaderboard system, improved UI, and comprehensive type annotations.</p>
+				</div>
+				<div class="timeline-item">
+					<h4>Current Development</h4>
+					<div class="date">Present</div>
+					<p>Preparing for Steam release, expanding content, and building community features.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<h2>Development Team</h2>
+			<p>p(Doom)1 is developed by a small team of passionate contributors who believe in the power of games to educate and inspire.</p>
+
+			<div class="grid">
+				<div class="team-member">
+					<div class="avatar">👨‍💻</div>
+					<h4>Lead Developer</h4>
+					<div class="role">Game Design & Development</div>
+					<p>Responsible for core game mechanics, AI systems, and overall project direction.</p>
+				</div>
+				<div class="team-member">
+					<div class="avatar">🎨</div>
+					<h4>Community Contributors</h4>
+					<div class="role">Open Source Development</div>
+					<p>Community members contributing code, ideas, and feedback through GitHub collaboration.</p>
+				</div>
+			</div>
+
+			<p style="text-align: center; margin-top: 2rem; color: var(--text-muted);">
+				Interested in contributing? Check out our <a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">GitHub repository</a> to get involved!
+			</p>
+		</section>
+
+		<section class="section">
+			<h2>Technology & Approach</h2>
+			<p>p(Doom)1 is built using Python and Pygame, chosen for their accessibility and the strong open-source ecosystem. This technology stack allows for:</p>
+
+			<div class="grid">
+				<div class="card">
+					<h3>🐍 Python-Powered</h3>
+					<p>Built with Python for readable, maintainable code that's easy for contributors to understand and modify.</p>
+				</div>
+				<div class="card">
+					<h3>🎮 Pygame Framework</h3>
+					<p>Using Pygame for graphics and interaction, providing cross-platform compatibility and smooth gameplay.</p>
+				</div>
+				<div class="card">
+					<h3>📊 Data-Driven Design</h3>
+					<p>Game mechanics are configurable through data files, making it easy to balance and expand content.</p>
+				</div>
+				<div class="card">
+					<h3>🔧 Modular Architecture</h3>
+					<p>Clean, modular code structure with comprehensive type annotations for maintainability.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="stats-banner">
+			<h2 style="color: var(--accent-primary); margin-bottom: 1rem;">Project Stats</h2>
+			<p style="color: var(--text-secondary);">Current development progress and community engagement</p>
+			
+			<div class="stats-grid">
+				<div class="stat-item">
+					<span class="stat-number">0.4.1</span>
+					<span class="stat-label">Current Version</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-number">Open</span>
+					<span class="stat-label">Source License</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-number">3+</span>
+					<span class="stat-label">Platforms Supported</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-number">Active</span>
+					<span class="stat-label">Development Status</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<h2>Community & Contact</h2>
+			<p>Join our growing community of players, contributors, and AI Safety enthusiasts. We welcome feedback, contributions, and discussions about the game and its educational goals.</p>
+
+			<div class="grid">
+				<div class="card" style="text-align: center;">
+					<h3>🐙 GitHub</h3>
+					<p>Source code, issue tracking, and contributions</p>
+					<a href="https://github.com/PipFoweraker/pdoom1" target="_blank" rel="noopener" style="color: var(--accent-primary); text-decoration: none;">Visit Repository</a>
+				</div>
+				<div class="card" style="text-align: center;">
+					<h3>📧 Contact</h3>
+					<p>Questions, press inquiries, or collaboration</p>
+					<a href="mailto:contact@pdoom1.com" style="color: var(--accent-primary); text-decoration: none;">Send Email</a>
+				</div>
+				<div class="card" style="text-align: center;">
+					<h3>💬 Community</h3>
+					<p>Discussion and community interaction</p>
+					<a href="#discord" style="color: var(--accent-primary); text-decoration: none;">Join Discord</a>
+				</div>
+			</div>
+
+			<div class="social-links">
+				<a href="https://github.com/PipFoweraker/pdoom1" target="_blank" rel="noopener" title="GitHub">🐙</a>
+				<a href="#twitter" title="Twitter">🐦</a>
+				<a href="#discord" title="Discord">💬</a>
+				<a href="mailto:contact@pdoom1.com" title="Email">📧</a>
+			</div>
+		</section>
+
+		<section class="section" style="text-align: center;">
+			<h2>Ready to Play?</h2>
+			<p style="margin-bottom: 2rem;">Experience the challenge of AI Safety strategy for yourself</p>
+			<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+				<a href="https://github.com/PipFoweraker/pdoom1/releases" style="background: var(--accent-primary); color: var(--bg-primary); text-decoration: none; padding: 1rem 2rem; border-radius: var(--radius-md); font-weight: bold; transition: all var(--duration-base) var(--easing);" target="_blank" rel="noopener">Download Game</a>
+				<a href="/leaderboard/" style="background: transparent; color: var(--accent-primary); text-decoration: none; padding: 1rem 2rem; border: 2px solid var(--accent-primary); border-radius: var(--radius-md); font-weight: bold; transition: all var(--duration-base) var(--easing);">View Leaderboard</a>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		// Simple analytics tracking (privacy-preserving)
+		console.log('About page loaded');
+		
+		// Track external link clicks
+		document.querySelectorAll('a[target="_blank"]').forEach(link => {
+			link.addEventListener('click', function(e) {
+				console.log(`External link clicked: ${this.href}`);
+			});
+		});
+	</script>
+</body>
+</html>

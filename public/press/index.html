@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Press Kit - p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/press/" />
+	<meta name="description" content="Press kit for p(Doom)1 - AI Safety Strategy Game. Download assets, screenshots, and factsheet." />
+	<meta name="author" content="p(Doom)1" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="p(Doom)1" />
+	<meta property="og:title" content="Press Kit - p(Doom)1" />
+	<meta property="og:description" content="Press kit and media assets for p(Doom)1 - AI Safety Strategy Game." />
+	<meta property="og:url" content="https://pdoom1.com/press/" />
+	<meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #888888;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-sm: 4px;
+			--radius-md: 6px;
+			--radius-lg: 10px;
+			--border-width: 1px;
+			--shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+			--duration-fast: 150ms;
+			--duration-base: 300ms;
+			--easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+			background-image: 
+				radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.02) 0%, transparent 50%),
+				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem 0;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		nav {
+			max-width: 1200px;
+			margin: 0 auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 2rem;
+		}
+
+		.logo {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			text-decoration: none;
+			text-shadow: 0 0 10px var(--accent-primary);
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 2rem;
+			list-style: none;
+		}
+
+		.nav-links a {
+			color: var(--text-secondary);
+			text-decoration: none;
+			transition: color var(--duration-base) var(--easing);
+			padding: 0.5rem 1rem;
+			border: 1px solid transparent;
+		}
+
+		.nav-links a:hover {
+			color: var(--accent-primary);
+			border-color: var(--accent-primary);
+			border-radius: var(--radius-sm);
+		}
+
+		main {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 4rem 2rem;
+		}
+
+		.hero {
+			text-align: center;
+			margin-bottom: 4rem;
+		}
+
+		.hero h1 {
+			font-size: 3rem;
+			color: var(--accent-primary);
+			text-shadow: 0 0 20px var(--accent-primary);
+			margin-bottom: 1rem;
+		}
+
+		.hero p {
+			font-size: 1.2rem;
+			color: var(--text-secondary);
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		.press-section {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 2rem;
+			margin-bottom: 3rem;
+		}
+
+		.press-section h2 {
+			color: var(--accent-primary);
+			margin-bottom: 1.5rem;
+			font-size: 1.8rem;
+		}
+
+		.press-section h3 {
+			color: var(--accent-secondary);
+			margin-bottom: 1rem;
+			margin-top: 2rem;
+		}
+
+		.factsheet {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 2rem;
+		}
+
+		.factsheet-item {
+			background: var(--bg-tertiary);
+			padding: 1.5rem;
+			border-radius: var(--radius-md);
+			border: 1px solid var(--border-color);
+		}
+
+		.factsheet-item strong {
+			color: var(--accent-primary);
+			display: block;
+			margin-bottom: 0.5rem;
+		}
+
+		.download-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 1.5rem;
+			margin-top: 2rem;
+		}
+
+		.download-card {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 1.5rem;
+			text-align: center;
+			transition: all var(--duration-base) var(--easing);
+		}
+
+		.download-card:hover {
+			border-color: var(--accent-primary);
+			box-shadow: var(--shadow-button);
+		}
+
+		.download-card h4 {
+			color: var(--accent-primary);
+			margin-bottom: 1rem;
+		}
+
+		.download-btn {
+			background: var(--accent-primary);
+			color: var(--bg-primary);
+			text-decoration: none;
+			padding: 0.75rem 1.5rem;
+			border-radius: var(--radius-md);
+			font-weight: bold;
+			display: inline-block;
+			margin-top: 1rem;
+			transition: all var(--duration-base) var(--easing);
+		}
+
+		.download-btn:hover {
+			background: var(--accent-secondary);
+			box-shadow: var(--shadow-button);
+		}
+
+		.steam-badge {
+			display: inline-block;
+			margin: 1rem 0;
+		}
+
+		.steam-badge img {
+			height: 60px;
+			transition: all var(--duration-base) var(--easing);
+		}
+
+		.steam-badge:hover img {
+			filter: brightness(1.2);
+		}
+
+		.legal-links {
+			display: flex;
+			gap: 2rem;
+			flex-wrap: wrap;
+			margin-top: 2rem;
+		}
+
+		.legal-links a {
+			color: var(--accent-secondary);
+			text-decoration: none;
+			padding: 0.5rem 1rem;
+			border: 1px solid var(--accent-secondary);
+			border-radius: var(--radius-sm);
+			transition: all var(--duration-base) var(--easing);
+		}
+
+		.legal-links a:hover {
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+		}
+
+		.social-links {
+			display: flex;
+			gap: 1.5rem;
+			justify-content: center;
+			margin-top: 2rem;
+		}
+
+		.social-links a {
+			color: var(--text-secondary);
+			font-size: 1.2rem;
+			text-decoration: none;
+			transition: color var(--duration-base) var(--easing);
+		}
+
+		.social-links a:hover {
+			color: var(--accent-primary);
+		}
+
+		.contact-info {
+			background: var(--bg-tertiary);
+			padding: 2rem;
+			border-radius: var(--radius-lg);
+			border: 1px solid var(--border-color);
+			text-align: center;
+		}
+
+		.contact-info h3 {
+			color: var(--accent-primary);
+			margin-bottom: 1rem;
+		}
+
+		.contact-info a {
+			color: var(--accent-secondary);
+			text-decoration: none;
+		}
+
+		.contact-info a:hover {
+			text-decoration: underline;
+		}
+
+		.rating-info {
+			background: var(--bg-tertiary);
+			padding: 1.5rem;
+			border-radius: var(--radius-md);
+			border-left: 4px solid var(--accent-secondary);
+			margin-top: 2rem;
+		}
+
+		@media (max-width: 768px) {
+			.hero h1 {
+				font-size: 2rem;
+			}
+			
+			nav {
+				flex-direction: column;
+				gap: 1rem;
+			}
+			
+			.nav-links {
+				gap: 1rem;
+			}
+			
+			.factsheet {
+				grid-template-columns: 1fr;
+			}
+			
+			.legal-links {
+				justify-content: center;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<nav>
+			<a href="/" class="logo">p(Doom)1</a>
+			<ul class="nav-links">
+				<li><a href="/">Home</a></li>
+				<li><a href="/leaderboard/">Leaderboard</a></li>
+				<li><a href="/blog/">Blog</a></li>
+				<li><a href="/changelog/">Changelog</a></li>
+				<li><a href="/docs/">Docs</a></li>
+				<li><a href="/press/" aria-current="page">Press</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<section class="hero">
+			<h1>Press Kit</h1>
+			<p>Media resources, factsheet, and press information for p(Doom)1 - the AI Safety Strategy Game</p>
+		</section>
+
+		<section class="press-section">
+			<h2>Game Factsheet</h2>
+			<div class="factsheet">
+				<div class="factsheet-item">
+					<strong>Title:</strong>
+					p(Doom)1
+				</div>
+				<div class="factsheet-item">
+					<strong>Genre:</strong>
+					Strategy, Simulation, Educational
+				</div>
+				<div class="factsheet-item">
+					<strong>Platform:</strong>
+					Windows, macOS, Linux
+				</div>
+				<div class="factsheet-item">
+					<strong>Developer:</strong>
+					Independent Developer
+				</div>
+				<div class="factsheet-item">
+					<strong>Release Status:</strong>
+					Early Access / Development
+				</div>
+				<div class="factsheet-item">
+					<strong>Engine:</strong>
+					Python/Pygame
+				</div>
+				<div class="factsheet-item">
+					<strong>Price:</strong>
+					Free & Open Source
+				</div>
+				<div class="factsheet-item">
+					<strong>Languages:</strong>
+					English
+				</div>
+			</div>
+
+			<h3>Game Description</h3>
+			<p>p(Doom)1 is a satirical meta-strategy game about AI Safety that challenges players to navigate the complex landscape of artificial intelligence development while managing existential risks. Players must balance research progress, policy decisions, and public perception while keeping the probability of doom (p(doom)) at manageable levels.</p>
+
+			<h3>Key Features</h3>
+			<ul style="margin-left: 2rem; margin-top: 1rem;">
+				<li>Strategic gameplay focused on AI Safety scenarios</li>
+				<li>Economic simulation with resource management</li>
+				<li>Policy decision-making with real-world implications</li>
+				<li>Educational content about AI Safety concepts</li>
+				<li>Leaderboard system with community competition</li>
+				<li>Open source development model</li>
+			</ul>
+		</section>
+
+		<section class="press-section">
+			<h2>Download Game</h2>
+			<p>Get the latest version of p(Doom)1 from our official channels:</p>
+			
+			<!-- Steam badge - Valve compliant -->
+			<div style="text-align: center; margin: 2rem 0;">
+				<a href="#" class="steam-badge" title="Coming Soon to Steam" style="display: inline-block; text-decoration: none;">
+					<div style="background: #171a21; color: #ffffff; padding: 12px 24px; border-radius: 4px; font-family: 'Motiva Sans', Arial, sans-serif; font-size: 14px; font-weight: normal; border: 1px solid #2a475e; transition: all 0.2s ease;">
+						<div style="display: flex; align-items: center; gap: 8px;">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+								<path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm4.64 13.36L12 11.72v-4.1c0-.55-.45-1-1-1s-1 .45-1 1v4.72l-2.64 1.64c-.18.11-.29.3-.29.51 0 .55.45 1 1 1 .21 0 .4-.11.51-.29L10 13.36l1.42.86c.11.18.3.29.51.29.55 0 1-.45 1-1 0-.21-.11-.4-.29-.51z"/>
+							</svg>
+							<span>Coming Soon</span>
+						</div>
+					</div>
+				</a>
+				
+				<!-- Required Valve Legal Attribution -->
+				<div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.3;">
+					©2025 Valve Corporation. Steam and the Steam logo are trademarks and/or<br>
+					registered trademarks of Valve Corporation in the U.S. and/or other countries.
+				</div>
+			</div>
+
+			<div class="download-grid">
+				<div class="download-card">
+					<h4>GitHub Releases</h4>
+					<p>Download the latest stable release directly from our GitHub repository.</p>
+					<a href="https://github.com/PipFoweraker/pdoom1/releases" class="download-btn" target="_blank" rel="noopener">Download Latest</a>
+				</div>
+				<div class="download-card">
+					<h4>Source Code</h4>
+					<p>Access the complete source code and contribute to development.</p>
+					<a href="https://github.com/PipFoweraker/pdoom1" class="download-btn" target="_blank" rel="noopener">View Source</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="press-section">
+			<h2>Press Assets</h2>
+			<div class="download-grid">
+				<div class="download-card">
+					<h4>Logo Pack</h4>
+					<p>High-resolution logos in various formats (PNG, SVG)</p>
+					<a href="/assets/pdoom_logo_1.png" class="download-btn" download>Download Logo</a>
+				</div>
+				<div class="download-card">
+					<h4>Screenshots</h4>
+					<p>In-game screenshots and interface examples</p>
+					<a href="#screenshots" class="download-btn">View Gallery</a>
+				</div>
+				<div class="download-card">
+					<h4>Trailer</h4>
+					<p>Gameplay trailer and promotional video</p>
+					<a href="#trailer" class="download-btn">Watch Trailer</a>
+				</div>
+				<div class="download-card">
+					<h4>Press Kit ZIP</h4>
+					<p>Complete press kit with all assets</p>
+					<a href="#presskit" class="download-btn">Download All</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="press-section">
+			<h2>Legal & Compliance</h2>
+			<div class="legal-links">
+				<a href="#eula">End User License Agreement</a>
+				<a href="#privacy">Privacy Policy</a>
+				<a href="#support">Support Contact</a>
+				<a href="#terms">Terms of Service</a>
+			</div>
+
+			<div class="rating-info">
+				<h3>Age Rating & Content</h3>
+				<p><strong>Content Rating:</strong> Not yet rated by ESRB/PEGI</p>
+				<p><strong>Content Notes:</strong> Educational content about AI safety, strategic decision-making, no violent content. Suitable for ages 13+.</p>
+				<p><strong>Regional Compliance:</strong> GDPR compliant, no data collection beyond basic analytics.</p>
+			</div>
+		</section>
+
+		<section class="press-section">
+			<h2>Community & Contact</h2>
+			<div class="contact-info">
+				<h3>Press Inquiries</h3>
+				<p>For press inquiries, interviews, or review copies:</p>
+				<p><a href="mailto:press@pdoom1.com">press@pdoom1.com</a></p>
+				
+				<div class="social-links">
+					<a href="https://github.com/PipFoweraker/pdoom1" target="_blank" rel="noopener" title="GitHub">GitHub</a>
+					<a href="#discord" title="Discord Community">Discord</a>
+					<a href="#twitter" title="Twitter">Twitter</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="press-section">
+			<h2>Development & Updates</h2>
+			<p>p(Doom)1 is actively developed with regular updates. Track development progress:</p>
+			<ul style="margin-left: 2rem; margin-top: 1rem;">
+				<li><a href="/changelog/" style="color: var(--accent-primary);">Changelog</a> - Version history and updates</li>
+				<li><a href="/blog/" style="color: var(--accent-primary);">Development Blog</a> - Behind-the-scenes development</li>
+				<li><a href="/docs/" style="color: var(--accent-primary);">Documentation</a> - Technical documentation and guides</li>
+				<li><a href="https://github.com/PipFoweraker/pdoom1/issues" style="color: var(--accent-primary);" target="_blank" rel="noopener">Issue Tracker</a> - Bug reports and feature requests</li>
+			</ul>
+		</section>
+	</main>
+
+	<script>
+		// Analytics placeholder (privacy-preserving)
+		console.log('Press page loaded');
+		
+		// Track download clicks for analytics
+		document.querySelectorAll('.download-btn').forEach(btn => {
+			btn.addEventListener('click', function(e) {
+				const item = this.closest('.download-card')?.querySelector('h4')?.textContent || 'Unknown';
+				console.log(`Download clicked: ${item}`);
+				// Add privacy-preserving analytics here
+			});
+		});
+	</script>
+</body>
+</html>
