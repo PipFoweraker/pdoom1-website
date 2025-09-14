@@ -271,6 +271,39 @@
 			box-shadow: 0 0 0 2px rgba(255, 68, 68, 0.2);
 		}
 
+		/* FAQ Section Styling */
+		.faq-item summary {
+			list-style: none;
+			position: relative;
+			padding-right: 2rem;
+		}
+
+		.faq-item summary::-webkit-details-marker {
+			display: none;
+		}
+
+		.faq-item summary::after {
+			content: '+';
+			position: absolute;
+			right: 0;
+			top: 0;
+			font-size: 1.2rem;
+			color: var(--accent-primary);
+			transition: transform var(--duration-base) var(--easing);
+		}
+
+		.faq-item[open] summary::after {
+			transform: rotate(45deg);
+		}
+
+		.faq-item[open] {
+			border-color: var(--accent-primary);
+		}
+
+		.faq-item summary:hover {
+			color: var(--accent-secondary);
+		}
+
 		footer {
 			background: var(--bg-secondary);
 			border-top: 2px solid var(--accent-primary);
@@ -698,6 +731,36 @@ python main.py</pre>
 			</div>
 		</section>
 
+		<section class="section" id="faq" role="region" aria-labelledby="faq-heading">
+			<h2 id="faq-heading">Frequently Asked Questions</h2>
+			<div class="faq-grid" style="display: grid; gap: 2rem; margin-top: 2rem;">
+				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 1rem;">What is p(Doom)1?</summary>
+					<p style="color: var(--text-secondary);">p(Doom)1 is a satirical strategy game about AI Safety. You manage competing AI labs, make policy decisions, and try to prevent catastrophic outcomes while balancing resources and public perception.</p>
+				</details>
+				
+				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 1rem;">Is the game free?</summary>
+					<p style="color: var(--text-secondary);">Yes! p(Doom)1 is completely free and open source. You can download it from GitHub or wait for the Steam release.</p>
+				</details>
+				
+				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 1rem;">What platforms are supported?</summary>
+					<p style="color: var(--text-secondary);">p(Doom)1 runs on Windows, macOS, and Linux. It's built with Python and Pygame for maximum compatibility.</p>
+				</details>
+				
+				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 1rem;">When is the Steam release?</summary>
+					<p style="color: var(--text-secondary);">We're preparing for Steam release soon! Follow our development blog for updates on the Steam launch timeline.</p>
+				</details>
+				
+				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 1rem;">Can I contribute to development?</summary>
+					<p style="color: var(--text-secondary);">Absolutely! p(Doom)1 is open source. Check out our <a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">GitHub repository</a> to report issues, suggest features, or contribute code.</p>
+				</details>
+			</div>
+		</section>
+
 		<section class="section" id="support" role="region" aria-labelledby="support-heading">
 			<h2 id="support-heading">Support & Bug Reports</h2>
 			<p>Found a bug or need help? Report issues directly through our GitHub integration.</p>
@@ -788,6 +851,45 @@ python main.py</pre>
 	</footer>
 
 	<script>
+		// Smooth scrolling for navigation links
+		document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+			anchor.addEventListener('click', function (e) {
+				e.preventDefault();
+				const target = document.querySelector(this.getAttribute('href'));
+				if (target) {
+					target.scrollIntoView({
+						behavior: 'smooth',
+						block: 'start'
+					});
+				}
+			});
+		});
+
+		// Enhanced statistics animation on scroll
+		const observerOptions = {
+			threshold: 0.5,
+			rootMargin: '0px 0px -100px 0px'
+		};
+
+		const animateStats = (entries, observer) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					entry.target.style.opacity = '1';
+					entry.target.style.transform = 'translateY(0)';
+				}
+			});
+		};
+
+		if (window.IntersectionObserver) {
+			const statsObserver = new IntersectionObserver(animateStats, observerOptions);
+			document.querySelectorAll('.stat').forEach(stat => {
+				stat.style.opacity = '0';
+				stat.style.transform = 'translateY(20px)';
+				stat.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+				statsObserver.observe(stat);
+			});
+		}
+
 		// Form validation helpers
 		function showError(fieldId, message) {
 			const field = document.getElementById(fieldId);
