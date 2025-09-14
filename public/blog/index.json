@@ -1,0 +1,383 @@
+{
+  "entries": [
+    {
+      "filename": "2025-09-14-events-typeddict-milestone.md",
+      "slug": "2025-09-14-events-typeddict-milestone",
+      "path": "entries/2025-09-14-events-typeddict-milestone.md",
+      "frontmatter": {
+        "title": "Type Annotation: Events.py TypedDict Complete",
+        "date": "2025-09-14",
+        "tags": [
+          "type-annotations",
+          "typescript",
+          "events",
+          "typeddict",
+          "pylance",
+          "phase-2"
+        ],
+        "summary": "Achieved zero pylance errors on 307-line events.py using comprehensive TypedDict patterns and systematic function annotation",
+        "commit": "TBD"
+      },
+      "word_count": 758,
+      "file_size": 6215,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-14-action-rules-type-annotation.md",
+      "slug": "2025-09-14-action-rules-type-annotation",
+      "path": "entries/2025-09-14-action-rules-type-annotation.md",
+      "frontmatter": {
+        "title": "Type Annotation: action_rules.py Complete",
+        "date": "2025-09-14",
+        "tags": [
+          "type-annotation",
+          "milestone",
+          "core",
+          "action-rules",
+          "game-logic"
+        ],
+        "summary": "Successfully completed comprehensive type annotation for ActionRules class (14 static methods) and 3 standalone functions in 355-line core game logic module",
+        "commit": "4638ba5"
+      },
+      "word_count": 749,
+      "file_size": 6233,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-14-opponents-type-annotations.md",
+      "slug": "2025-09-14-opponents-type-annotations",
+      "path": "entries/2025-09-14-opponents-type-annotations.md",
+      "frontmatter": {
+        "title": "Type Annotation Milestone: opponents.py Complete",
+        "date": "2025-09-14",
+        "tags": [
+          "type-annotation",
+          "opponents",
+          "milestone",
+          "pylance"
+        ],
+        "summary": "Completed comprehensive type annotation of opponents.py (296 lines, 9 methods) with advanced typing patterns and full integration testing",
+        "commit": "TBD"
+      },
+      "word_count": 443,
+      "file_size": 3770,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-14-ui-menus-type-annotation.md",
+      "slug": "2025-09-14-ui-menus-type-annotation",
+      "path": "entries/2025-09-14-ui-menus-type-annotation.md",
+      "frontmatter": {
+        "title": "MILESTONE: Complete Type Annotation for src/ui/menus.py",
+        "date": "2025-09-14",
+        "tags": [
+          "type-annotation",
+          "milestone",
+          "ui",
+          "menus",
+          "systematic-improvement"
+        ],
+        "summary": "Successfully completed comprehensive type annotation for all 13 functions in src/ui/menus.py (654 lines) following established patterns",
+        "commit": "a410316"
+      },
+      "word_count": 615,
+      "file_size": 5143,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-14-upgrades-type-annotation.md",
+      "slug": "2025-09-14-upgrades-type-annotation",
+      "path": "entries/2025-09-14-upgrades-type-annotation.md",
+      "frontmatter": {
+        "title": "Type Annotation: upgrades.py Data Structure",
+        "date": "2025-09-14",
+        "tags": [
+          "type-annotation",
+          "milestone",
+          "core",
+          "upgrades",
+          "data-structure",
+          "typeddict"
+        ],
+        "summary": "Successfully added comprehensive TypedDict type annotations to UPGRADES data structure with zero errors - demonstrates advanced typing patterns for game data",
+        "commit": "1b4ee92"
+      },
+      "word_count": 551,
+      "file_size": 4462,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-14-pyinstaller-implementation.md",
+      "slug": "2025-09-14-pyinstaller-implementation",
+      "path": "entries/2025-09-14-pyinstaller-implementation.md",
+      "frontmatter": {
+        "title": "PyInstaller Windows Distribution Implementation",
+        "date": "2025-09-14",
+        "tags": [
+          "distribution",
+          "pyinstaller",
+          "windows",
+          "packaging",
+          "alpha-beta"
+        ],
+        "summary": "Implemented complete PyInstaller Windows .exe distribution system with asset bundling, resource management, and build automation for alpha/beta testing",
+        "commit": "ccc6e7a"
+      },
+      "word_count": 717,
+      "file_size": 6031,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-14-deterministic-rng-complete.md",
+      "slug": "2025-09-14-deterministic-rng-complete",
+      "path": "entries/2025-09-14-deterministic-rng-complete.md",
+      "frontmatter": {
+        "title": "Complete Deterministic RNG System v0.6.0",
+        "date": "2025-09-14",
+        "tags": [
+          "milestone",
+          "deterministic",
+          "competitive",
+          "rng",
+          "v0.6.0"
+        ],
+        "summary": "MAJOR MILESTONE: Transform P(Doom) into fully deterministic competitive gaming platform with perfect reproducibility",
+        "commit": "9956d94"
+      },
+      "word_count": 553,
+      "file_size": 4728,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-14-pyinstaller-and-type-annotation-completion.md",
+      "slug": "2025-09-14-pyinstaller-and-type-annotation-completion",
+      "path": "entries/2025-09-14-pyinstaller-and-type-annotation-completion.md",
+      "frontmatter": {
+        "title": "PyInstaller Distribution & Major Type Annotation Milestone",
+        "date": "2025-09-14",
+        "tags": [
+          "distribution",
+          "type-annotations",
+          "pyinstaller",
+          "infrastructure"
+        ],
+        "summary": "Successfully merged PyInstaller v0.5.0 distribution system and completed systematic type annotations for game_state.py and actions.py",
+        "commit": "8eccc76"
+      },
+      "word_count": 421,
+      "file_size": 3606,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-14-type-annotation-session-wrap.md",
+      "slug": "2025-09-14-type-annotation-session-wrap",
+      "path": "entries/2025-09-14-type-annotation-session-wrap.md",
+      "frontmatter": {
+        "title": "Type Annotation Session Complete: Phase 1 Wrapped",
+        "date": "2025-09-14",
+        "tags": [
+          "type-annotation",
+          "session-wrap",
+          "milestone",
+          "pylance"
+        ],
+        "summary": "Completed opponents.py milestone, pushed branch, updated docs, created Phase 2 roadmap",
+        "commit": "2235aa1"
+      },
+      "word_count": 393,
+      "file_size": 3427,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-14-productive-actions-typeddict-milestone.md",
+      "slug": "2025-09-14-productive-actions-typeddict-milestone",
+      "path": "entries/2025-09-14-productive-actions-typeddict-milestone.md",
+      "frontmatter": {
+        "title": "Type Annotation: Productive Actions TypedDict",
+        "date": "2025-09-14",
+        "tags": [
+          "type-annotations",
+          "typeddict",
+          "employee-actions",
+          "method-chains",
+          "pylance",
+          "phase-2-milestone"
+        ],
+        "summary": "Achieved zero pylance errors on 315-line productive_actions.py using nested TypedDict patterns and advanced parameter validation",
+        "commit": "TBD"
+      },
+      "word_count": 795,
+      "file_size": 6813,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-13-enhanced-leaderboard-system-v0-4-1.md",
+      "slug": "2025-09-13-enhanced-leaderboard-system-v0-4-1",
+      "path": "entries/2025-09-13-enhanced-leaderboard-system-v0-4-1.md",
+      "frontmatter": {
+        "title": "Enhanced Leaderboard System v0.4.1: Seed Competition",
+        "date": "2025-09-13",
+        "tags": [
+          "milestone",
+          "leaderboard",
+          "bootstrap-economics",
+          "ui",
+          "competition"
+        ],
+        "summary": "Major competitive gaming milestone: seed-specific leaderboards, lab name integration, bootstrap economic model, and comprehensive session tracking",
+        "commit": "2dd48ac"
+      },
+      "word_count": 317,
+      "file_size": 2739,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-11-debug-console-system.md",
+      "slug": "2025-09-11-debug-console-system",
+      "path": "entries/2025-09-11-debug-console-system.md",
+      "frontmatter": {
+        "title": "Debug Console System",
+        "date": "2025-09-11",
+        "tags": [
+          "debug",
+          "ui",
+          "development"
+        ],
+        "summary": "Added real-time debug console with backtick toggle for game state monitoring",
+        "commit": "7aa2673"
+      },
+      "word_count": 181,
+      "file_size": 1460,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-11-v0-3-0-consolidated-release.md",
+      "slug": "2025-09-11-v0-3-0-consolidated-release",
+      "path": "entries/2025-09-11-v0-3-0-consolidated-release.md",
+      "frontmatter": {
+        "title": "P(Doom) v0.3.0: Consolidated Feature Release",
+        "date": "2025-09-11",
+        "tags": [
+          "milestone",
+          "release",
+          "longtermist",
+          "accessibility",
+          "alpha",
+          "consolidation"
+        ],
+        "summary": "Major consolidated release featuring longtermist 5-digit year dates, accessibility framework, comprehensive bug sweep plan, and systematic branch merge for alpha readiness",
+        "commit": "76de59c"
+      },
+      "word_count": 596,
+      "file_size": 5264,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-10-type-annotation-sprint.md",
+      "slug": "2025-09-10-type-annotation-sprint",
+      "path": "entries/2025-09-10-type-annotation-sprint.md",
+      "frontmatter": {
+        "title": "Type Annotation Sprint: game_state.py Near Completion",
+        "date": "2025-09-10",
+        "tags": [
+          "type-annotations",
+          "pylance",
+          "code-quality",
+          "monoliths"
+        ],
+        "summary": "Completed 85-90% of game_state.py type annotations with 25+ methods annotated across core systems",
+        "commit": "08180d1"
+      },
+      "word_count": 517,
+      "file_size": 4499,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-10-major-type-annotation-milestone.md",
+      "slug": "2025-09-10-major-type-annotation-milestone",
+      "path": "entries/2025-09-10-major-type-annotation-milestone.md",
+      "frontmatter": {
+        "title": "Major Type Annotation Milestone: UI and GameState Complete",
+        "date": "2025-09-10",
+        "tags": [
+          "milestone",
+          "type-annotations",
+          "infrastructure",
+          "code-quality"
+        ],
+        "summary": "Completed comprehensive type annotations for ui.py and 60% of game_state.py, resolving 1,100-1,600 pylance issues",
+        "commit": "867127d"
+      },
+      "word_count": 606,
+      "file_size": 5040,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    },
+    {
+      "filename": "2025-09-10-version-0-2-12-release.md",
+      "slug": "2025-09-10-version-0-2-12-release",
+      "path": "entries/2025-09-10-version-0-2-12-release.md",
+      "frontmatter": {
+        "title": "P(Doom) v0.2.12: Development Infrastructure",
+        "date": "2025-09-10",
+        "tags": [
+          "release",
+          "milestone",
+          "type-annotations",
+          "infrastructure",
+          "quality"
+        ],
+        "summary": "Major version release featuring comprehensive type annotations and development tooling infrastructure",
+        "commit": "fedc543"
+      },
+      "word_count": 428,
+      "file_size": 3797,
+      "modified_at": "2025-09-14T11:48:16.045847"
+    }
+  ],
+  "config": {
+    "blog": {
+      "title": "P(Doom) Development Blog",
+      "description": "Development progress updates for the P(Doom) pygame strategy game",
+      "base_url": "/dev-blog",
+      "author": "P(Doom) Development Team",
+      "language": "en"
+    },
+    "build": {
+      "auto_generate_index": true,
+      "sort_by": "date",
+      "sort_order": "desc",
+      "entries_per_page": 10
+    },
+    "content_policy": {
+      "ascii_only": true,
+      "max_title_length": 60,
+      "required_frontmatter": [
+        "title",
+        "date",
+        "tags",
+        "summary"
+      ]
+    },
+    "tags": {
+      "allowed": [
+        "infrastructure",
+        "type-annotations",
+        "refactoring",
+        "ui-improvements",
+        "testing",
+        "performance",
+        "bugfixes",
+        "milestone",
+        "automation",
+        "code-quality"
+      ]
+    }
+  },
+  "errors": [],
+  "stats": {
+    "total_entries": 16,
+    "total_errors": 0,
+    "latest_entry": "2025-09-14"
+  },
+  "generated_at": "2025-09-14T11:48:19.464224"
+}
