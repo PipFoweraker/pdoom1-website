@@ -371,6 +371,11 @@
     <div class="page-header">
       <h1>🏆 Leaderboard</h1>
       <p class="subtitle">Top players in the AI Safety Strategy Game</p>
+      <div id="seed-info" style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 0.9rem;">
+        <div><strong>Seed:</strong> <span id="current-seed">-</span></div>
+        <div><strong>Economic Model:</strong> <span id="economic-model">-</span></div>
+        <div><strong>Game Version:</strong> <span id="game-version">-</span></div>
+      </div>
     </div>
 
     <div class="stats-bar" id="stats-bar">
@@ -404,10 +409,11 @@
         <thead>
           <tr>
             <th>Rank</th>
-            <th>Player</th>
-            <th>Score</th>
-            <th>Best Run</th>
-            <th>Achievements</th>
+            <th>Lab Name</th>
+            <th>Turns Survived</th>
+            <th>Game Metrics</th>
+            <th>Economic Data</th>
+            <th>Date</th>
           </tr>
         </thead>
         <tbody id="leaderboard-body">
@@ -423,8 +429,8 @@
         const response = await fetch('data/leaderboard.json', { cache: 'no-store' });
         const data = await response.json();
         
-        displayStats(data.statistics, data.leaderboard.totalPlayers);
-        displayLeaderboard(data.leaderboard);
+        displayStats(data);
+        displayLeaderboard(data);
         
         // Hide loading, show table
         document.getElementById('loading').style.display = 'none';
@@ -436,58 +442,87 @@
       }
     }
     
-    function displayStats(stats, totalPlayers) {
+    function displayStats(data) {
+      const totalPlayers = new Set(data.entries.map(entry => entry.player_name)).size;
+      const totalGames = data.entries.length;
+      const avgScore = Math.round(data.entries.reduce((sum, entry) => sum + entry.score, 0) / totalGames);
+      const avgDoom = (data.entries.reduce((sum, entry) => sum + entry.final_doom, 0) / totalGames).toFixed(1);
+      
       document.getElementById('total-players').textContent = totalPlayers.toLocaleString();
-      document.getElementById('total-games').textContent = stats.totalGamesPlayed.toLocaleString();
-      document.getElementById('avg-score').textContent = stats.averageScore.toLocaleString();
-      document.getElementById('avg-pdoom').textContent = stats.averagePDoom.toFixed(2);
+      document.getElementById('total-games').textContent = totalGames.toLocaleString();
+      document.getElementById('avg-score').textContent = avgScore.toLocaleString();
+      document.getElementById('avg-pdoom').textContent = avgDoom + '%';
+      
+      // Display seed information
+      document.getElementById('current-seed').textContent = data.seed || 'Unknown';
+      document.getElementById('economic-model').textContent = data.economic_model || 'Unknown';
+      document.getElementById('game-version').textContent = data.meta?.game_version || 'Unknown';
     }
     
-    function displayLeaderboard(leaderboard) {
+    function displayLeaderboard(data) {
       const tbody = document.getElementById('leaderboard-body');
       const lastUpdated = document.getElementById('last-updated');
       
-      lastUpdated.textContent = `Last updated: ${new Date(leaderboard.lastUpdated).toLocaleString()}`;
+      lastUpdated.textContent = `Last updated: ${new Date(data.meta.generated).toLocaleString()}`;
       
-      leaderboard.topPlayers.forEach(player => {
+      data.entries.forEach((entry, index) => {
         const row = document.createElement('tr');
+        const rank = index + 1;
         
-        // Determine outcome class
-        const pDoom = player.bestRun.pDoom;
-        let outcomeClass = 'safe';
-        if (pDoom > 0.3) outcomeClass = 'risky';
-        if (pDoom > 0.5) outcomeClass = 'dangerous';
+        // Determine risk level class based on doom percentage
+        const doomPercent = entry.final_doom;
+        let riskClass = 'safe';
+        if (doomPercent > 30) riskClass = 'risky';
+        if (doomPercent > 50) riskClass = 'dangerous';
         
-        // Create achievement badges
-        const achievementBadges = player.achievements.map(achievement => {
-          const isRare = ['Perfect Run', 'Safety Pioneer'].includes(achievement);
-          return `<span class="achievement-badge ${isRare ? 'rare' : ''}">${achievement}</span>`;
-        }).join('');
+        // Format duration
+        const durationMinutes = Math.floor(entry.duration_seconds / 60);
+        const durationHours = Math.floor(durationMinutes / 60);
+        const remainingMinutes = durationMinutes % 60;
+        const durationText = durationHours > 0 ? 
+          `${durationHours}h ${remainingMinutes}m` : 
+          `${durationMinutes}m`;
+        
+        // Generate economic metrics display
+        const economicMetrics = `
+          <div class="economic-metrics" style="font-size: 0.85rem; margin-top: 0.5rem;">
+            <div><strong>Money:</strong> $${(entry.final_money || 0).toLocaleString()}</div>
+            <div><strong>Staff:</strong> ${entry.final_staff || 0}</div>
+            <div><strong>Papers:</strong> ${entry.research_papers_published || 0}</div>
+            <div><strong>Tech Debt:</strong> ${entry.technical_debt_accumulated || 0}</div>
+          </div>
+        `;
         
         row.innerHTML = `
-          <td class="rank ${player.rank <= 3 ? 'top-3 rank-' + player.rank : ''}">#${player.rank}</td>
+          <td class="rank ${rank <= 3 ? 'top-3 rank-' + rank : ''}">#${rank}</td>
           <td>
             <div class="player-info">
               <div>
-                <div class="player-name">${player.playerName}</div>
-                <div class="player-id">${player.playerId}</div>
+                <div class="player-name">${entry.player_name}</div>
+                <div class="player-id" style="color: var(--text-secondary); font-size: 0.8rem;">${entry.game_mode}</div>
               </div>
             </div>
           </td>
-          <td class="score">${player.score.toLocaleString()}</td>
+          <td class="score">${entry.score}</td>
           <td>
             <div style="font-size: 0.9rem;">
-              <div><strong>${player.bestRun.score.toLocaleString()}</strong> in ${player.bestRun.duration}</div>
-              <div class="outcome ${outcomeClass}" style="margin-top: 0.25rem;">
-                p(Doom): ${(player.bestRun.pDoom * 100).toFixed(0)}% - ${player.bestRun.outcome}
+              <div><strong>Turn ${entry.level_reached}</strong> in ${durationText}</div>
+              <div class="outcome ${riskClass}" style="margin-top: 0.25rem;">
+                Doom: ${doomPercent.toFixed(1)}% | Rep: ${(entry.final_reputation || 0).toFixed(1)}
               </div>
+              ${economicMetrics}
             </div>
           </td>
           <td>
-            <div class="achievements">
-              ${achievementBadges}
+            <div class="bootstrap-metrics" style="font-size: 0.85rem;">
+              <div><strong>Bootstrap Economics</strong></div>
+              <div>Compute: ${(entry.final_compute || 0).toLocaleString()}</div>
+              <div style="margin-top: 0.25rem; color: var(--text-secondary);">
+                Economic Model: ${entry.game_mode}
+              </div>
             </div>
           </td>
+          <td class="last-played">${new Date(entry.date).toLocaleDateString()}</td>
         `;
         
         tbody.appendChild(row);
