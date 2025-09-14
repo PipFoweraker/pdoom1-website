@@ -136,6 +136,230 @@
       font-size: 0.9rem;
     }
 
+    .controls-section {
+      margin-bottom: 2rem;
+    }
+
+    .search-filter-bar {
+      background: var(--bg-secondary);
+      border: var(--border-width) solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .search-container {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 0.75rem;
+      background: var(--bg-primary);
+      border: var(--border-width) solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.2);
+    }
+
+    .search-button {
+      padding: 0.75rem;
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .search-button:hover {
+      background: var(--accent-secondary);
+    }
+
+    .filter-controls {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-select, .score-filter {
+      padding: 0.5rem;
+      background: var(--bg-primary);
+      border: var(--border-width) solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+    }
+
+    .score-filter {
+      width: 100px;
+    }
+
+    .view-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .view-toggle {
+      padding: 0.5rem 1rem;
+      background: var(--bg-primary);
+      border: var(--border-width) solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all var(--duration-base) var(--easing);
+    }
+
+    .view-toggle:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    .view-toggle.active {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+      border-color: var(--accent-primary);
+    }
+
+    .cards-view {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .player-card {
+      background: var(--bg-secondary);
+      border: var(--border-width) solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      transition: all var(--duration-base) var(--easing);
+    }
+
+    .player-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: var(--bg-primary);
+      border: var(--border-width) solid var(--accent-primary);
+      border-radius: var(--radius-md);
+      max-width: 600px;
+      max-height: 80vh;
+      width: 90%;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: var(--border-width) solid var(--border-color);
+    }
+
+    .modal-header h3 {
+      color: var(--accent-primary);
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: var(--accent-primary);
+    }
+
+    .modal-body {
+      padding: 1rem;
+    }
+
+    .profile-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-section h4 {
+      color: var(--accent-secondary);
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.25rem;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .profile-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.25rem 0;
+    }
+
+    .profile-item strong {
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 768px) {
+      .search-filter-bar {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .filter-controls {
+        justify-content: center;
+      }
+      
+      .view-controls {
+        justify-content: center;
+      }
+      
+      .modal-content {
+        width: 95%;
+        max-height: 90vh;
+      }
+    }
+
     .leaderboard-container {
       background: var(--bg-secondary);
       border: var(--border-width) solid var(--border-color);
@@ -397,6 +621,39 @@
       </div>
     </div>
 
+    <div class="controls-section">
+      <div class="search-filter-bar">
+        <div class="search-container">
+          <input type="text" id="search-input" placeholder="Search players..." class="search-input">
+          <button class="search-button" onclick="filterLeaderboard()">🔍</button>
+        </div>
+        
+        <div class="filter-controls">
+          <select id="sort-by" class="filter-select" onchange="filterLeaderboard()">
+            <option value="score">Sort by Score</option>
+            <option value="player_name">Sort by Name</option>
+            <option value="date">Sort by Date</option>
+            <option value="final_doom">Sort by Doom Risk</option>
+            <option value="research_papers_published">Sort by Papers</option>
+          </select>
+          
+          <select id="filter-by-risk" class="filter-select" onchange="filterLeaderboard()">
+            <option value="all">All Risk Levels</option>
+            <option value="safe">Safe (≤30%)</option>
+            <option value="risky">Risky (30-50%)</option>
+            <option value="dangerous">Dangerous (>50%)</option>
+          </select>
+          
+          <input type="number" id="min-score" placeholder="Min Score" class="score-filter" onchange="filterLeaderboard()">
+        </div>
+        
+        <div class="view-controls">
+          <button class="view-toggle active" onclick="setViewMode('table')" id="table-view">📊 Table</button>
+          <button class="view-toggle" onclick="setViewMode('cards')" id="cards-view">🃏 Cards</button>
+        </div>
+      </div>
+    </div>
+
     <div class="leaderboard-container">
       <div class="leaderboard-header">
         <h2>Top 10 Players</h2>
@@ -419,6 +676,21 @@
         <tbody id="leaderboard-body">
         </tbody>
       </table>
+      
+      <div id="cards-view" class="cards-view"></div>
+    </div>
+    
+    <!-- Player Profile Modal -->
+    <div id="player-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-player-name">Player Profile</h3>
+          <button class="modal-close" onclick="closePlayerModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <!-- Profile content will be dynamically inserted -->
+        </div>
+      </div>
     </div>
   </main>
 
@@ -465,6 +737,9 @@
       
       lastUpdated.textContent = `Last updated: ${new Date(data.meta.generated).toLocaleString()}`;
       
+      // Store current data for player profile access
+      currentDisplayData = data.entries;
+      
       data.entries.forEach((entry, index) => {
         const row = document.createElement('tr');
         const rank = index + 1;
@@ -498,7 +773,7 @@
           <td>
             <div class="player-info">
               <div>
-                <div class="player-name">${entry.player_name}</div>
+                <div class="player-name" style="cursor: pointer; color: var(--accent-primary); text-decoration: underline;" onclick="showPlayerProfile(currentDisplayData[${index}])">${entry.player_name}</div>
                 <div class="player-id" style="color: var(--text-secondary); font-size: 0.8rem;">${entry.game_mode}</div>
               </div>
             </div>
@@ -529,8 +804,255 @@
       });
     }
     
+    // Global variables for filtering
+    let originalData = null;
+    let filteredData = null;
+    let currentDisplayData = null;
+    
+    // Store original data and set up filtering
+    async function loadLeaderboardWithFiltering() {
+      try {
+        const response = await fetch('data/leaderboard.json', { cache: 'no-store' });
+        originalData = await response.json();
+        filteredData = originalData;
+        
+        displayStats(filteredData);
+        displayLeaderboard(filteredData);
+        
+        // Hide loading, show table
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('leaderboard-table').style.display = 'table';
+        
+        // Set up search input listener
+        document.getElementById('search-input').addEventListener('input', filterLeaderboard);
+        
+      } catch (error) {
+        console.error('Failed to load leaderboard:', error);
+        document.getElementById('loading').innerHTML = 'Failed to load leaderboard data';
+      }
+    }
+    
+    // Filter and search functionality
+    function filterLeaderboard() {
+      if (!originalData) return;
+      
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+      const sortBy = document.getElementById('sort-by').value;
+      const riskFilter = document.getElementById('filter-by-risk').value;
+      const minScore = parseInt(document.getElementById('min-score').value) || 0;
+      
+      // Start with all entries
+      let filtered = [...originalData.entries];
+      
+      // Apply search filter
+      if (searchTerm) {
+        filtered = filtered.filter(entry => 
+          entry.player_name.toLowerCase().includes(searchTerm) ||
+          entry.game_mode.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // Apply risk level filter
+      if (riskFilter !== 'all') {
+        filtered = filtered.filter(entry => {
+          const doom = entry.final_doom;
+          switch (riskFilter) {
+            case 'safe': return doom <= 30;
+            case 'risky': return doom > 30 && doom <= 50;
+            case 'dangerous': return doom > 50;
+            default: return true;
+          }
+        });
+      }
+      
+      // Apply minimum score filter
+      if (minScore > 0) {
+        filtered = filtered.filter(entry => entry.score >= minScore);
+      }
+      
+      // Apply sorting
+      filtered.sort((a, b) => {
+        switch (sortBy) {
+          case 'score':
+            return b.score - a.score; // Highest first
+          case 'player_name':
+            return a.player_name.localeCompare(b.player_name);
+          case 'date':
+            return new Date(b.date) - new Date(a.date); // Most recent first
+          case 'final_doom':
+            return a.final_doom - b.final_doom; // Safest first
+          case 'research_papers_published':
+            return (b.research_papers_published || 0) - (a.research_papers_published || 0);
+          default:
+            return b.score - a.score;
+        }
+      });
+      
+      // Update filtered data
+      filteredData = {
+        ...originalData,
+        entries: filtered
+      };
+      
+      // Clear and redisplay
+      document.getElementById('leaderboard-body').innerHTML = '';
+      displayStats(filteredData);
+      displayLeaderboard(filteredData);
+      
+      // Update results count
+      const resultsText = filtered.length === originalData.entries.length ? 
+        'All entries' : 
+        `${filtered.length} of ${originalData.entries.length} entries`;
+      document.querySelector('.leaderboard-header h2').textContent = `Leaderboard (${resultsText})`;
+    }
+    
+    // View mode switching
+    function setViewMode(mode) {
+      const tableView = document.getElementById('leaderboard-table');
+      const cardsView = document.getElementById('cards-view') || createCardsView();
+      const tableButton = document.getElementById('table-view');
+      const cardsButton = document.getElementById('cards-view');
+      
+      if (mode === 'table') {
+        tableView.style.display = 'table';
+        cardsView.style.display = 'none';
+        tableButton.classList.add('active');
+        cardsButton.classList.remove('active');
+      } else {
+        tableView.style.display = 'none';
+        cardsView.style.display = 'grid';
+        tableButton.classList.remove('active');
+        cardsButton.classList.add('active');
+        displayCardsView(filteredData || originalData);
+      }
+    }
+    
+    // Create cards view container
+    function createCardsView() {
+      const container = document.querySelector('.leaderboard-container');
+      const cardsView = document.createElement('div');
+      cardsView.id = 'cards-view';
+      cardsView.className = 'cards-view';
+      container.appendChild(cardsView);
+      return cardsView;
+    }
+    
+    // Display leaderboard in cards format
+    function displayCardsView(data) {
+      const cardsContainer = document.getElementById('cards-view') || createCardsView();
+      cardsContainer.innerHTML = '';
+      
+      // Store current data for player profile access
+      currentDisplayData = data.entries;
+      
+      data.entries.forEach((entry, index) => {
+        const rank = index + 1;
+        const doomPercent = entry.final_doom;
+        let riskClass = 'safe';
+        if (doomPercent > 30) riskClass = 'risky';
+        if (doomPercent > 50) riskClass = 'dangerous';
+        
+        const card = document.createElement('div');
+        card.className = 'player-card';
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div class="rank ${rank <= 3 ? 'top-3 rank-' + rank : ''}">#${rank}</div>
+            <div class="outcome ${riskClass}" style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">
+              ${doomPercent.toFixed(1)}% Doom
+            </div>
+          </div>
+          
+          <div class="player-name" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; cursor: pointer; color: var(--accent-primary);" onclick="showPlayerProfile(currentDisplayData[${index}])">
+            ${entry.player_name}
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
+            <div><strong>Score:</strong> ${entry.score}</div>
+            <div><strong>Money:</strong> $${(entry.final_money || 0).toLocaleString()}</div>
+            <div><strong>Staff:</strong> ${entry.final_staff || 0}</div>
+            <div><strong>Papers:</strong> ${entry.research_papers_published || 0}</div>
+          </div>
+          
+          <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
+            ${entry.game_mode} • ${new Date(entry.date).toLocaleDateString()}
+          </div>
+        `;
+        
+        cardsContainer.appendChild(card);
+      });
+    }
+    
+    // Player profile modal functions
+    function showPlayerProfile(entry) {
+      const modal = document.getElementById('player-modal');
+      const modalName = document.getElementById('modal-player-name');
+      const modalBody = document.getElementById('modal-body');
+      
+      modalName.textContent = entry.player_name;
+      
+      const durationMinutes = Math.floor(entry.duration_seconds / 60);
+      const durationHours = Math.floor(durationMinutes / 60);
+      const remainingMinutes = durationMinutes % 60;
+      const durationText = durationHours > 0 ? 
+        `${durationHours}h ${remainingMinutes}m` : 
+        `${durationMinutes}m`;
+      
+      modalBody.innerHTML = `
+        <div class="profile-section">
+          <h4>Game Performance</h4>
+          <div class="profile-grid">
+            <div class="profile-item"><span>Score:</span> <strong>${entry.score}</strong></div>
+            <div class="profile-item"><span>Level Reached:</span> <strong>Turn ${entry.level_reached}</strong></div>
+            <div class="profile-item"><span>Game Duration:</span> <strong>${durationText}</strong></div>
+            <div class="profile-item"><span>Final Doom:</span> <strong>${entry.final_doom.toFixed(1)}%</strong></div>
+          </div>
+        </div>
+        
+        <div class="profile-section">
+          <h4>Economic Metrics</h4>
+          <div class="profile-grid">
+            <div class="profile-item"><span>Final Money:</span> <strong>$${(entry.final_money || 0).toLocaleString()}</strong></div>
+            <div class="profile-item"><span>Final Staff:</span> <strong>${entry.final_staff || 0}</strong></div>
+            <div class="profile-item"><span>Final Reputation:</span> <strong>${(entry.final_reputation || 0).toFixed(1)}</strong></div>
+            <div class="profile-item"><span>Final Compute:</span> <strong>${(entry.final_compute || 0).toLocaleString()}</strong></div>
+          </div>
+        </div>
+        
+        <div class="profile-section">
+          <h4>Research & Development</h4>
+          <div class="profile-grid">
+            <div class="profile-item"><span>Papers Published:</span> <strong>${entry.research_papers_published || 0}</strong></div>
+            <div class="profile-item"><span>Technical Debt:</span> <strong>${entry.technical_debt_accumulated || 0}</strong></div>
+          </div>
+        </div>
+        
+        <div class="profile-section">
+          <h4>Game Details</h4>
+          <div class="profile-grid">
+            <div class="profile-item"><span>Economic Model:</span> <strong>${entry.game_mode}</strong></div>
+            <div class="profile-item"><span>Date Played:</span> <strong>${new Date(entry.date).toLocaleDateString()}</strong></div>
+            <div class="profile-item"><span>Entry UUID:</span> <strong style="font-family: monospace; font-size: 0.8rem;">${entry.entry_uuid}</strong></div>
+          </div>
+        </div>
+      `;
+      
+      modal.style.display = 'flex';
+    }
+    
+    function closePlayerModal() {
+      document.getElementById('player-modal').style.display = 'none';
+    }
+    
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+      const modal = document.getElementById('player-modal');
+      if (e.target === modal) {
+        closePlayerModal();
+      }
+    });
+    
     // Load data when page loads
-    document.addEventListener('DOMContentLoaded', loadLeaderboard);
+    document.addEventListener('DOMContentLoaded', loadLeaderboardWithFiltering);
   </script>
 </body>
 </html>
