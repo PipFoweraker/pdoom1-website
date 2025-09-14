@@ -143,5 +143,8 @@ jobs:
 
       - name: Deploy to DreamHost (if configured)
         if: vars.AUTO_DEPLOY_ON_STATUS_UPDATE == 'true'
-        uses: ./.github/workflows/deploy-dreamhost.yml
-        secrets: inherit
+        run: |
+          echo "Triggering DreamHost deployment..."
+          gh workflow run "Deploy to DreamHost (manual)" --ref main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
