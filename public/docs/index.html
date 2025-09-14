@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>p(Doom)1 Documentation</title>
+  <style>
+    :root {
+      --bg-primary: #1a1a1a; --bg-secondary: #2d2d2d; --bg-tertiary: #3d3d3d;
+      --text-primary: #ffffff; --text-secondary: #cccccc; --text-muted: #888888;
+      --accent-primary: #00ff41; --accent-secondary: #ff6b35; --border-color: #444444;
+      --radius-md: 6px; --border-width: 1px;
+    }
+    body { font-family: 'Courier New', monospace; background: var(--bg-primary); color: var(--text-primary); margin: 0; }
+    a { color: var(--accent-primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header { background: var(--bg-secondary); border-bottom: 2px solid var(--accent-primary); padding: 1rem; }
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; }
+    .doc-section { background: var(--bg-secondary); border: var(--border-width) solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.5rem; }
+    .doc-section h2 { margin: 0 0 1rem 0; color: var(--accent-primary); }
+    .doc-list { list-style: none; padding: 0; }
+    .doc-list li { margin: 0.5rem 0; padding: 0.5rem; background: var(--bg-tertiary); border-radius: 4px; }
+    .doc-list li a { display: block; }
+    .status { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.8rem; margin-left: 0.5rem; }
+    .status.available { background: #4caf50; color: #000; }
+    .status.synced { background: #2196f3; color: #fff; }
+    .status.local { background: #ff9800; color: #000; }
+  </style>
+  <script>
+    // Optional runtime tokens
+    (async function loadTokens(){ try{ const r=await fetch('/design/tokens.json',{cache:'no-store'}); if(!r.ok) return; const t=await r.json(); const s=(k,v)=>v!=null&&document.documentElement.style.setProperty(k,String(v)); if(t.colors){ s('--bg-primary',t.colors.bgPrimary); s('--bg-secondary',t.colors.bgSecondary); s('--bg-tertiary',t.colors.bgTertiary); s('--text-primary',t.colors.textPrimary); s('--text-secondary',t.colors.textSecondary); s('--text-muted',t.colors.textMuted); s('--accent-primary',t.colors.accentPrimary); s('--accent-secondary',t.colors.accentSecondary); s('--border-color',t.colors.border); } }catch(e){} })();
+  </script>
+</head>
+<body>
+  <header>
+    <a href="/" style="font-weight: bold;">← Back to Home</a>
+  </header>
+  <main>
+    <h1>p(Doom)1 Documentation</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+      Complete documentation for the p(Doom)1 AI Safety Strategy Game. 
+      Some docs are synced from the main game repository, others are website-specific.
+    </p>
+
+    <div class="doc-section">
+      <h2>🎮 Game Documentation</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">Core game documentation synced from the main repository.</p>
+      <ul class="doc-list">
+        <li>
+          <a href="DEV_NOTES.md">Developer Notes</a>
+          <span class="status synced">Auto-synced</span>
+        </li>
+        <li>
+          <a href="pdoom1-open-issues.md">Open Issues & Tasks</a>
+          <span class="status synced">Auto-synced</span>
+        </li>
+        <li>
+          <a href="roadmap.md">Development Roadmap</a>
+          <span class="status synced">Auto-synced</span>
+        </li>
+        <li>
+          <a href="steam-readiness.md">Steam Release Preparation</a>
+          <span class="status local">Website-only</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="doc-section">
+      <h2>🌐 Website Documentation</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">Documentation specific to this website and its infrastructure.</p>
+      <ul class="doc-list">
+        <li>
+          <a href="../docs/deployment-guide.md">Deployment Guide</a>
+          <span class="status available">Complete</span>
+        </li>
+        <li>
+          <a href="../docs/cli-deployment.md">CLI Deployment Commands</a>
+          <span class="status available">Complete</span>
+        </li>
+        <li>
+          <a href="../docs/game-repository-integration.md">Game Repository Integration</a>
+          <span class="status available">Complete</span>
+        </li>
+        <li>
+          <a href="../docs/quick-deploy.md">Quick Deploy Reference</a>
+          <span class="status available">Complete</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="doc-section">
+      <h2>📊 Live Data</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">Current game and website status information.</p>
+      <ul class="doc-list">
+        <li>
+          <a href="../data/status.json">Game & Website Status</a>
+          <span class="status available">JSON</span>
+        </li>
+        <li>
+          <a href="../data/blog.json">Blog Posts Index</a>
+          <span class="status available">JSON</span>
+        </li>
+        <li>
+          <a href="../data/changes.json">Changelog Data</a>
+          <span class="status available">JSON</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="doc-section">
+      <h2>🚀 Getting Started</h2>
+      <p style="color: var(--text-muted);">New to p(Doom)1? Start here:</p>
+      <ol style="color: var(--text-secondary); line-height: 1.6;">
+        <li>Read the <a href="DEV_NOTES.md">Developer Notes</a> for game overview</li>
+        <li>Check the <a href="roadmap.md">Roadmap</a> for current development status</li>
+        <li>Review <a href="pdoom1-open-issues.md">Open Issues</a> for ways to contribute</li>
+        <li>Visit the <a href="https://github.com/PipFoweraker/pdoom1">main repository</a> to download and play</li>
+      </ol>
+    </div>
+
+    <footer style="margin-top: 3rem; text-align: center; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 2rem;">
+      <p>Documentation last updated: <span id="last-updated">Loading...</span></p>
+      <p><a href="https://github.com/PipFoweraker/pdoom1-website">View website source</a> | 
+         <a href="https://github.com/PipFoweraker/pdoom1">Main game repository</a></p>
+    </footer>
+  </main>
+
+  <script>
+    // Load status to show last updated time
+    (async function loadStatus(){
+      try {
+        const res = await fetch('../data/status.json', { cache: 'no-store' });
+        if (res.ok) {
+          const status = await res.json();
+          const lastUpdated = status.website?.lastUpdated || new Date().toISOString();
+          document.getElementById('last-updated').textContent = new Date(lastUpdated).toLocaleString();
+        }
+      } catch(e) {
+        document.getElementById('last-updated').textContent = 'Unknown';
+      }
+    })();
+  </script>
+</body>
+</html>

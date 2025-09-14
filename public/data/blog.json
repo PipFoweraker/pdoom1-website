@@ -1,11 +1,67 @@
 {
   "posts": [
     {
+      "id": "deployment-infrastructure-complete",
+      "title": "p(Doom)1 Website Release - Deployment Infrastructure Complete",
+      "excerpt": "Successfully implemented and documented the complete deployment pipeline for the p(Doom)1 website with GitHub Actions, DreamHost integration, and automated status updates.",
+      "published_at": "2025-09-14T23:30:00Z",
+      "tags": ["infrastructure", "deployment", "milestone"],
+      "published": true
+    },
+    {
+      "id": "pyinstaller-completion",
+      "title": "PyInstaller Implementation and Type Annotation Completion",
+      "excerpt": "Major milestone reached with PyInstaller integration complete and comprehensive type annotation coverage across the entire codebase.",
+      "published_at": "2025-09-14T22:00:00Z",
+      "tags": ["pyinstaller", "types", "milestone"],
+      "published": true
+    },
+    {
+      "id": "enhanced-leaderboard-v041",
+      "title": "Enhanced Leaderboard System - Version 0.4.1",
+      "excerpt": "New leaderboard features including persistent high scores, player statistics, and improved UI for competitive gameplay tracking.",
+      "published_at": "2025-09-13T18:00:00Z",
+      "tags": ["leaderboard", "features", "v0.4.1"],
+      "published": true
+    },
+    {
+      "id": "consolidated-release-v030",
+      "title": "Version 0.3.0 Consolidated Release",
+      "excerpt": "Major feature consolidation with improved debug console, enhanced event system, and significant stability improvements.",
+      "published_at": "2025-09-11T16:00:00Z",
+      "tags": ["release", "v0.3.0", "features"],
+      "published": true
+    },
+    {
+      "id": "debug-console-system",
+      "title": "Debug Console System Implementation",
+      "excerpt": "New in-game debug console for developers and advanced users, enabling real-time game state inspection and command execution.",
+      "published_at": "2025-09-11T14:00:00Z",
+      "tags": ["debug", "console", "developer-tools"],
+      "published": true
+    },
+    {
+      "id": "type-annotation-milestone",
+      "title": "Major Type Annotation Milestone Reached",
+      "excerpt": "Comprehensive type annotation sprint completed, dramatically improving code quality, IDE support, and development experience.",
+      "published_at": "2025-09-10T20:00:00Z",
+      "tags": ["types", "python", "milestone"],
+      "published": true
+    },
+    {
+      "id": "version-0212-release",
+      "title": "Version 0.2.12 Release Notes",
+      "excerpt": "Bug fixes, performance improvements, and UI enhancements in this incremental release focused on stability and user experience.",
+      "published_at": "2025-09-10T18:00:00Z",
+      "tags": ["release", "v0.2.12", "bugfixes"],
+      "published": true
+    },
+    {
       "id": "welcome",
-      "title": "Welcome to the pdoom1 dev blog",
-      "excerpt": "Kicking off the development blog with goals, roadmap, and how to get involved.",
+      "title": "Welcome to the pdoom1 Dev Blog",
+      "excerpt": "Kicking off the development blog with goals, roadmap, and how to get involved in this satirical AI safety strategy game.",
       "published_at": "2025-09-09T20:00:00Z",
-      "tags": ["devlog", "roadmap"],
+      "tags": ["devlog", "roadmap", "welcome"],
       "published": true
     }
   ]
