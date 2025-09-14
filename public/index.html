@@ -636,19 +636,29 @@ python main.py</pre>
 		// Bug report form submission -> shared backend
 	document.getElementById('bug-report-form').addEventListener('submit', async function(e) {
 			e.preventDefault();
-			const formData = new FormData(e.target);
-			const bugData = {
-				title: formData.get('title'),
-				type: formData.get('type') || 'bug',
-				description: formData.get('description'),
-				email: formData.get('email') || '',
-				source: 'web'
-			};
+			
 			const button = e.target.querySelector('button[type="submit"]');
 			const originalText = button.textContent;
 			button.disabled = true;
+			
+			try {
+				const formData = new FormData(e.target);
+				const bugData = {
+					title: formData.get('title'),
+					type: formData.get('type') || 'bug',
+					description: formData.get('description'),
+					email: formData.get('email') || '',
+					source: 'web'
+				};
+				
 				// Local mock: when running on localhost, simulate a successful submission
-				if (['localhost','127.0.0.1'].includes(window.location.hostname)) {
+				const isLocal = ['localhost','127.0.0.1','[::1]'].includes(window.location.hostname) || 
+					window.location.hostname.startsWith('192.168.') ||
+					window.location.port === '8002' ||
+					window.location.href.includes('localhost');
+				
+				if (isLocal) {
+					button.textContent = 'Submitting...';
 					await new Promise(r => setTimeout(r, 400));
 					button.textContent = '✅ Report Submitted! (local mock)';
 					button.style.background = 'var(--success-color)';
@@ -660,10 +670,11 @@ python main.py</pre>
 					}, 2000);
 					return;
 				}
-			try {
-		const base = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.apiBase) || '';
-		const url = (base ? base.replace(/\/$/, '') : '') + '/api/report-bug';
-		const res = await fetch(url, {
+				
+				// Production API submission
+				const base = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.apiBase) || '';
+				const url = (base ? base.replace(/\/$/, '') : '') + '/api/report-bug';
+				const res = await fetch(url, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(bugData)
@@ -677,6 +688,7 @@ python main.py</pre>
 					e.target.reset();
 					button.disabled = false;
 				}, 3000);
+				
 			} catch (err) {
 				button.textContent = '❌ Submit Failed';
 				button.style.background = 'var(--accent-danger)';
