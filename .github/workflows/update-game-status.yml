@@ -1,0 +1,147 @@
+name: Update Game Status
+
+on:
+  repository_dispatch:
+    types: [update-game-status]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Game version (e.g., v0.4.2)'
+        required: false
+        type: string
+      status:
+        description: 'Game status'
+        required: false
+        default: 'alpha'
+        type: choice
+        options:
+          - alpha
+          - beta
+          - release
+      warning:
+        description: 'Warning message for users'
+        required: false
+        type: string
+      phase:
+        description: 'Current development phase'
+        required: false
+        type: string
+      progress:
+        description: 'Development progress'
+        required: false
+        type: string
+      fetch_release:
+        description: 'Automatically fetch latest GitHub release'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  update-status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Update game status from repository dispatch
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          cd scripts
+          args=""
+          
+          # Parse payload from repository dispatch
+          if [ -n "${{ github.event.client_payload.version }}" ]; then
+            args="$args --version ${{ github.event.client_payload.version }}"
+          fi
+          
+          if [ -n "${{ github.event.client_payload.status }}" ]; then
+            args="$args --status ${{ github.event.client_payload.status }}"
+          fi
+          
+          if [ -n "${{ github.event.client_payload.warning }}" ]; then
+            args="$args --warning '${{ github.event.client_payload.warning }}'"
+          fi
+          
+          if [ -n "${{ github.event.client_payload.phase }}" ]; then
+            args="$args --phase '${{ github.event.client_payload.phase }}'"
+          fi
+          
+          if [ -n "${{ github.event.client_payload.progress }}" ]; then
+            args="$args --progress '${{ github.event.client_payload.progress }}'"
+          fi
+          
+          if [ "${{ github.event.client_payload.fetch_release }}" = "true" ]; then
+            args="$args --fetch-release"
+          fi
+          
+          echo "Running: node update-game-status.js $args"
+          eval "node update-game-status.js $args"
+
+      - name: Update game status from manual workflow
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cd scripts
+          args=""
+          
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            args="$args --version ${{ github.event.inputs.version }}"
+          fi
+          
+          if [ -n "${{ github.event.inputs.status }}" ]; then
+            args="$args --status ${{ github.event.inputs.status }}"
+          fi
+          
+          if [ -n "${{ github.event.inputs.warning }}" ]; then
+            args="$args --warning '${{ github.event.inputs.warning }}'"
+          fi
+          
+          if [ -n "${{ github.event.inputs.phase }}" ]; then
+            args="$args --phase '${{ github.event.inputs.phase }}'"
+          fi
+          
+          if [ -n "${{ github.event.inputs.progress }}" ]; then
+            args="$args --progress '${{ github.event.inputs.progress }}'"
+          fi
+          
+          if [ "${{ github.event.inputs.fetch_release }}" = "true" ]; then
+            args="$args --fetch-release"
+          fi
+          
+          echo "Running: node update-game-status.js $args"
+          eval "node update-game-status.js $args"
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          git add public/data/status.json
+          git commit -m "Update game status
+
+          Version: $(jq -r '.game.latestRelease.version // "unknown"' public/data/status.json)
+          Status: $(jq -r '.game.status // "unknown"' public/data/status.json)
+          Phase: $(jq -r '.game.development.phase // "unknown"' public/data/status.json)
+          
+          Updated by: ${{ github.event_name }}
+          Triggered by: ${{ github.actor }}"
+          
+          git push
+
+      - name: Deploy to DreamHost (if configured)
+        if: vars.AUTO_DEPLOY_ON_STATUS_UPDATE == 'true'
+        uses: ./.github/workflows/deploy-dreamhost.yml
+        secrets: inherit

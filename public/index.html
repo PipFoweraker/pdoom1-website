@@ -300,6 +300,8 @@
 	<script>
 		// Load optional runtime config for non-Netlify hosting (e.g., DreamHost)
 		window.__PDOOM_CONFIG__ = {};
+		window.__PDOOM_STATUS__ = {};
+		
 		(async function loadConfig(){
 			try {
 				const res = await fetch('config.json', { cache: 'no-store' });
@@ -317,6 +319,67 @@
 				}
 			} catch (_) {}
 		})();
+		
+		// Load game status and update UI
+		(async function loadGameStatus(){
+			try {
+				const res = await fetch('data/status.json', { cache: 'no-store' });
+				if (res.ok) {
+					window.__PDOOM_STATUS__ = await res.json();
+					updateGameStatusUI();
+				}
+			} catch (_) {}
+		})();
+		
+		function updateGameStatusUI() {
+			const status = window.__PDOOM_STATUS__;
+			if (!status.game) return;
+			
+			// Update hero section with current game info
+			const heroSubtitle = document.querySelector('.hero .subtitle');
+			if (heroSubtitle && status.game.warning) {
+				const warningEl = document.createElement('div');
+				warningEl.style.cssText = 'color: var(--accent-danger); font-weight: bold; margin-top: 1rem; padding: 0.5rem; background: rgba(255, 68, 68, 0.1); border-radius: var(--radius-sm); border: 1px solid var(--accent-danger);';
+				warningEl.innerHTML = `⚠️ ${status.game.warning}`;
+				heroSubtitle.parentNode.insertBefore(warningEl, heroSubtitle.nextSibling);
+			}
+			
+			// Update download link with latest release info
+			const ctaButton = document.querySelector('.cta-button');
+			if (ctaButton && status.game.latestRelease) {
+				ctaButton.href = status.game.repository || ctaButton.href;
+				ctaButton.innerHTML = `Download ${status.game.latestRelease.version || 'Latest'} (GitHub)`;
+			}
+			
+			// Add game status info to the page
+			const aboutSection = document.getElementById('about');
+			if (aboutSection && status.game.development) {
+				const statusInfo = document.createElement('div');
+				statusInfo.style.cssText = 'margin-top: 2rem; padding: 1.5rem; background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 4px solid var(--accent-primary);';
+				statusInfo.innerHTML = `
+					<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">🚧 Current Development Status</h3>
+					<p><strong>Phase:</strong> ${status.game.development.phase}</p>
+					<p><strong>Progress:</strong> ${status.game.development.progress}</p>
+					<p><strong>Latest Release:</strong> <a href="${status.game.latestRelease?.downloadUrl || status.game.repository}" style="color: var(--accent-primary);">${status.game.latestRelease?.version || 'Check GitHub'}</a></p>
+					<p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+						Released: ${status.game.latestRelease?.date || 'N/A'} | 
+						${status.game.latestRelease?.changelog || 'See repository for details'}
+					</p>
+				`;
+				aboutSection.appendChild(statusInfo);
+			}
+			
+			// Update footer with website version
+			const footer = document.querySelector('footer p:last-child');
+			if (footer && status.website) {
+				footer.innerHTML = `
+					<span class="status-indicator status-warning"></span>
+					Game Status: ${status.game.status?.toUpperCase() || 'ALPHA'} Development | 
+					Website v${status.website.version} | 
+					Privacy: No personal data collected
+				`;
+			}
+		}
 		// Runtime tokens loader: pulls design/tokens.json and applies to :root
 		(async function loadTokens() {
 			try {

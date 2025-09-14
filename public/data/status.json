@@ -1,0 +1,28 @@
+{
+  "website": {
+    "version": "1.0.0",
+    "lastUpdated": "2025-09-14T23:30:00Z",
+    "deploymentMethod": "github-actions-dreamhost",
+    "environment": "production"
+  },
+  "game": {
+    "status": "alpha",
+    "warning": "SUPER BUGGY ALPHA - Download at your own risk",
+    "repository": "https://github.com/PipFoweraker/pdoom1",
+    "latestRelease": {
+      "version": "v0.4.1",
+      "date": "2025-09-13",
+      "downloadUrl": "https://github.com/PipFoweraker/pdoom1/releases/latest",
+      "changelog": "Enhanced leaderboard system, multiple bug fixes"
+    },
+    "development": {
+      "phase": "Type annotation completion sprint",
+      "progress": "~85% complete",
+      "nextMilestone": "Steam readiness preparation"
+    }
+  },
+  "api": {
+    "bugReporting": "https://pdoom1-website-app.netlify.app/.netlify/functions/report-bug",
+    "status": "active"
+  }
+}
