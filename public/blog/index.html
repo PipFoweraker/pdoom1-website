@@ -1,19 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>pdoom1 Blog</title>
+  <title>Blog - p(Doom)1</title>
   <style>
     :root {
       --bg-primary: #1a1a1a; --bg-secondary: #2d2d2d; --bg-tertiary: #3d3d3d;
       --text-primary: #ffffff; --text-secondary: #cccccc; --text-muted: #888888;
       --accent-primary: #00ff41; --accent-secondary: #ff6b35; --border-color: #444444;
-      --radius-md: 6px; --border-width: 1px; --easing: cubic-bezier(0.2,0.8,0.2,1);
+      --radius-sm: 4px; --radius-md: 6px; --border-width: 1px; 
+      --duration-fast: 150ms; --duration-base: 300ms; --easing: cubic-bezier(0.2,0.8,0.2,1);
     }
-    body { font-family: 'Courier New', monospace; background: var(--bg-primary); color: var(--text-primary); }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Courier New', monospace; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; }
     a { color: var(--accent-primary); text-decoration: none; }
-    header { background: var(--bg-secondary); border-bottom: 2px solid var(--accent-primary); padding: 1rem; }
+    
+    header { background: var(--bg-secondary); border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; position: sticky; top: 0; z-index: 100; }
+    
+    nav { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 2rem; }
+    
+    .logo-container { display: flex; flex-direction: column; align-items: flex-start; }
+    .designer-credit { font-size: 0.75rem; color: var(--text-muted); font-weight: normal; margin-bottom: -0.2rem; letter-spacing: 0.5px; }
+    .logo { font-size: 1.5rem; font-weight: bold; color: var(--accent-primary); text-decoration: none; text-shadow: 0 0 10px var(--accent-primary); }
+    
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--text-secondary); text-decoration: none; transition: color var(--duration-base) var(--easing); padding: 0.5rem 1rem; border: 1px solid transparent; }
+    .nav-links a:hover { color: var(--accent-primary); border-color: var(--accent-primary); }
+    
+    /* Dropdown Navigation */
+    .dropdown { position: relative; }
+    .dropdown-toggle { cursor: pointer; }
+    .dropdown-menu { position: absolute; top: 100%; right: 0; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all var(--duration-base) var(--easing); min-width: 150px; z-index: 1000; list-style: none; padding: 0.5rem 0; margin: 0; }
+    .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown-menu a { display: block; padding: 0.5rem 1rem; color: var(--text-secondary); text-decoration: none; transition: all var(--duration-fast) var(--easing); border: none; }
+    .dropdown-menu a:hover { background: var(--bg-tertiary); color: var(--accent-primary); }
+    
+    @media (max-width: 768px) { .nav-links { gap: 1rem; } .dropdown-menu { position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none; border: none; background: none; padding: 0; } .dropdown-menu a { padding: 0.25rem 0.5rem; } }
+    
     main { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
     .post { background: var(--bg-secondary); border: var(--border-width) solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem; }
     .post h2 { margin: 0 0 0.5rem 0; color: var(--accent-primary); }
@@ -26,7 +51,32 @@
 </head>
 <body>
   <header>
-    <a href="/" style="font-weight: bold;">← Back to Home</a>
+    <nav role="navigation" aria-label="Main navigation">
+      <div class="logo-container">
+        <div class="designer-credit">Pip Foweraker's</div>
+        <a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
+      </div>
+      <ul class="nav-links" role="menubar">
+        <li role="none"><a href="/" role="menuitem">Game</a></li>
+        <li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
+        <li role="none" class="dropdown">
+          <a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
+          <ul class="dropdown-menu" role="menu">
+            <li role="none"><a href="/blog/" role="menuitem" aria-current="page">Dev Blog</a></li>
+            <li role="none"><a href="/changelog/" role="menuitem">Updates</a></li>
+            <li role="none"><a href="https://github.com/PipFoweraker/pdoom1" role="menuitem" target="_blank">GitHub</a></li>
+          </ul>
+        </li>
+        <li role="none" class="dropdown">
+          <a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
+          <ul class="dropdown-menu" role="menu">
+            <li role="none"><a href="/about/" role="menuitem">About</a></li>
+            <li role="none"><a href="/docs/" role="menuitem">Documentation</a></li>
+            <!-- <li role="none"><a href="/press/" role="menuitem">Press Kit</a></li> -->
+          </ul>
+        </li>
+      </ul>
+    </nav>
   </header>
   <main>
     <h1>Blog</h1>

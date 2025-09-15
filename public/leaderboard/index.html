@@ -58,11 +58,26 @@
       align-items: center;
     }
 
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .designer-credit {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: normal;
+      margin-bottom: -0.2rem;
+      letter-spacing: 0.5px;
+    }
+
     .logo {
       font-size: 1.5rem;
       font-weight: bold;
       color: var(--accent-primary);
       text-decoration: none;
+      text-shadow: 0 0 10px var(--accent-primary);
     }
 
     .nav-links {
@@ -83,6 +98,76 @@
     .nav-links a:hover {
       color: var(--accent-primary);
       border-color: var(--accent-primary);
+    }
+
+    /* Dropdown Navigation */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-toggle {
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all var(--duration-base) var(--easing);
+      min-width: 150px;
+      z-index: 1000;
+      list-style: none;
+      padding: 0.5rem 0;
+      margin: 0;
+    }
+
+    .dropdown:hover .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all var(--duration-fast) var(--easing);
+      border: none;
+    }
+
+    .dropdown-menu a:hover {
+      background: var(--bg-tertiary);
+      color: var(--accent-primary);
+    }
+
+    /* Mobile Navigation */
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 1rem;
+      }
+      
+      .dropdown-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        background: none;
+        padding: 0;
+      }
+      
+      .dropdown-menu a {
+        padding: 0.25rem 0.5rem;
+      }
     }
 
     main {
@@ -578,14 +663,30 @@
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">p(Doom)1</a>
-      <nav>
-        <ul class="nav-links">
-          <li><a href="/">Home</a></li>
-          <li><a href="/docs/">Documentation</a></li>
-          <li><a href="/blog/">Blog</a></li>
-          <li><a href="/leaderboard/" style="color: var(--accent-primary);">Leaderboard</a></li>
-          <li><a href="https://github.com/PipFoweraker/pdoom1">Download</a></li>
+      <nav role="navigation" aria-label="Main navigation">
+        <div class="logo-container">
+          <div class="designer-credit">Pip Foweraker's</div>
+          <a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
+        </div>
+        <ul class="nav-links" role="menubar">
+          <li role="none"><a href="/" role="menuitem">Game</a></li>
+          <li role="none"><a href="/leaderboard/" role="menuitem" aria-current="page" style="color: var(--accent-primary);">Leaderboard</a></li>
+          <li role="none" class="dropdown">
+            <a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
+            <ul class="dropdown-menu" role="menu">
+              <li role="none"><a href="/blog/" role="menuitem">Dev Blog</a></li>
+              <li role="none"><a href="/changelog/" role="menuitem">Updates</a></li>
+              <li role="none"><a href="https://github.com/PipFoweraker/pdoom1" role="menuitem" target="_blank">GitHub</a></li>
+            </ul>
+          </li>
+          <li role="none" class="dropdown">
+            <a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
+            <ul class="dropdown-menu" role="menu">
+              <li role="none"><a href="/about/" role="menuitem">About</a></li>
+              <li role="none"><a href="/docs/" role="menuitem">Documentation</a></li>
+              <!-- <li role="none"><a href="/press/" role="menuitem">Press Kit</a></li> -->
+            </ul>
+          </li>
         </ul>
       </nav>
     </div>
@@ -593,7 +694,7 @@
 
   <main>
     <div class="page-header">
-      <h1>🏆 Leaderboard</h1>
+      <h1>Leaderboard</h1>
       <p class="subtitle">Top players in the AI Safety Strategy Game</p>
       <div id="seed-info" style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 0.9rem;">
         <div><strong>Seed:</strong> <span id="current-seed">-</span></div>
@@ -625,7 +726,7 @@
       <div class="search-filter-bar">
         <div class="search-container">
           <input type="text" id="search-input" placeholder="Search players..." class="search-input">
-          <button class="search-button" onclick="filterLeaderboard()">🔍</button>
+          <button class="search-button" onclick="filterLeaderboard()">Search</button>
         </div>
         
         <div class="filter-controls">
@@ -648,7 +749,7 @@
         </div>
         
         <div class="view-controls">
-          <button class="view-toggle active" onclick="setViewMode('table')" id="table-view">📊 Table</button>
+          <button class="view-toggle active" onclick="setViewMode('table')" id="table-view">Table View</button>
           <button class="view-toggle" onclick="setViewMode('cards')" id="cards-view">🃏 Cards</button>
         </div>
       </div>

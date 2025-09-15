@@ -534,7 +534,7 @@
 			if (heroSubtitle && status.game.warning) {
 				const warningEl = document.createElement('div');
 				warningEl.style.cssText = 'color: var(--accent-danger); font-weight: bold; margin-top: 1rem; padding: 0.5rem; background: rgba(255, 68, 68, 0.1); border-radius: var(--radius-sm); border: 1px solid var(--accent-danger);';
-				warningEl.innerHTML = `⚠️ ${status.game.warning}`;
+				warningEl.innerHTML = `Warning: ${status.game.warning}`;
 				heroSubtitle.parentNode.insertBefore(warningEl, heroSubtitle.nextSibling);
 			}
 			
@@ -674,11 +674,11 @@
 			<!-- Enhanced Download CTAs -->
 			<div class="download-ctas" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
 				<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" target="_blank" rel="noopener">
-					<span style="font-size: 1.2rem;">⬇️</span> Download Latest Release
+					Download Latest Release
 				</a>
 				<!-- Press Kit temporarily hidden until game ready
 				<a href="/press/" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary);">
-					<span style="font-size: 1.2rem;">📰</span> Press Kit
+					Press Kit
 				</a>
 				-->
 			</div>
@@ -725,17 +725,17 @@
             
 			<div class="grid">
 				<div class="card">
-					<h3>🎯 Resource Management</h3>
+					<h3>Resource Management</h3>
 					<p>Balance money, staff, reputation, and p(Doom) levels as you make critical decisions about AI development.</p>
 					<img src="assets/screenshot-placeholder-gameplay.svg" alt="Resource Management Interface" style="width: 100%; margin-top: 1rem; border-radius: var(--radius-sm);">
 				</div>
 				<div class="card">
-					<h3>🔬 Research & Development</h3>
+					<h3>Research & Development</h3>
 					<p>Publish papers, buy compute resources, and advance AI safety research while racing against competitors.</p>
 					<img src="assets/screenshot-placeholder-ui.svg" alt="Research Interface" style="width: 100%; margin-top: 1rem; border-radius: var(--radius-sm);">
 				</div>
 				<div class="card">
-					<h3>⚡ Dynamic Events</h3>
+					<h3>Dynamic Events</h3>
 					<p>Handle unexpected challenges with our sophisticated event system featuring popup events, deferrals, and strategic timing.</p>
 					<div style="margin-top: 1rem; padding: 1rem; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px dashed var(--accent-secondary);">
 						<small style="color: var(--text-muted);">Event system screenshot coming soon...</small>
@@ -776,7 +776,7 @@
 			<!-- Download Options -->
 			<div class="grid" style="margin-bottom: 3rem;">
 				<div class="card" style="text-align: center; border: 2px solid var(--accent-primary);">
-					<h3 style="color: var(--accent-primary);">🚀 Quick Start (Recommended)</h3>
+					<h3 style="color: var(--accent-primary);">Quick Start (Recommended)</h3>
 					<p style="margin: 1rem 0;">Download the latest pre-built release</p>
 					<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" target="_blank" rel="noopener" style="margin-bottom: 1rem; display: inline-block;">
 						Download v0.4.1 (Latest)
@@ -785,7 +785,7 @@
 				</div>
 				
 				<div class="card" style="text-align: center;">
-					<h3 style="color: var(--accent-secondary);">🛠️ Developer Build</h3>
+					<h3 style="color: var(--accent-secondary);">Developer Build</h3>
 					<p style="margin: 1rem 0;">Clone and run from source</p>
 					<a href="https://github.com/PipFoweraker/pdoom1" class="cta-button" target="_blank" rel="noopener" style="background: var(--accent-secondary); border-color: var(--accent-secondary); margin-bottom: 1rem; display: inline-block;">
 						View Source Code
@@ -797,7 +797,7 @@
 			<!-- System Requirements & Installation -->
 			<div class="grid">
 				<div class="card">
-					<h3>💻 System Requirements</h3>
+					<h3>System Requirements</h3>
 					<div style="margin-top: 1rem;">
 						<p><strong>Minimum:</strong></p>
 						<ul style="color: var(--text-secondary); margin: 0.5rem 0 1rem 1.5rem;">
@@ -816,7 +816,7 @@
 				</div>
 				
 				<div class="card">
-					<h3>⚡ Quick Installation</h3>
+					<h3>Quick Installation</h3>
 					<p style="margin-bottom: 1rem; color: var(--text-secondary);">For source builds:</p>
 <pre style="background: var(--bg-primary); padding: 1rem; border-radius: var(--radius-sm, 4px); overflow-x: auto; color: var(--accent-primary); font-size: 0.9rem; line-height: 1.4;">git clone https://github.com/PipFoweraker/pdoom1.git
 cd pdoom1
@@ -833,9 +833,9 @@ python main.py</pre>
 				<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">Need Help?</h3>
 				<p style="color: var(--text-secondary); margin-bottom: 2rem;">Check out our documentation and community resources</p>
 				<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-					<a href="/docs/" style="color: var(--accent-primary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-primary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">📚 Documentation</a>
+					<a href="/docs/" style="color: var(--accent-primary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-primary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">Documentation</a>
 					<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-secondary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">🐛 Report Issues</a>
-					<a href="/changelog/" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">📝 Changelog</a>
+					<a href="/changelog/" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">Changelog</a>
 				</div>
 			</div>
 		</section>
@@ -891,9 +891,9 @@ python main.py</pre>
 						<label for="bug-type">Bug Type</label>
 						<select id="bug-type" name="type" aria-describedby="type-help">
 							<option value="bug">🐛 Bug Report</option>
-							<option value="feature">✨ Feature Request</option>
-							<option value="documentation">📚 Documentation Issue</option>
-							<option value="performance">⚡ Performance Issue</option>
+							<option value="feature">Feature Request</option>
+							<option value="documentation">Documentation Issue</option>
+							<option value="performance">Performance Issue</option>
 						</select>
 						<div id="type-help" class="form-help">Select the category that best describes your issue</div>
 					</div>
@@ -943,7 +943,7 @@ python main.py</pre>
 					</form>
 				</div>
 				<div class="card">
-					<h3>✉️ Email</h3>
+					<h3>Email</h3>
 					<p>Prefer email? Reach us directly:</p>
 					<p style="margin-top: 1rem;"><a id="contact-email-link" href="#" style="color: var(--accent-primary);">team@pdoom1.com</a></p>
 				</div>
