@@ -300,10 +300,17 @@
 		.hero {
 			text-align: center;
 			padding: 4rem 0;
-			background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+			background: 
+				linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(61, 61, 61, 0.95) 100%),
+				url('assets/20250915_0948_Doom\'s Cat Throne_simple_compose_01k559ztmqefybe80mbvyqgyvd.png');
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
 			border-radius: var(--radius-lg, 10px);
 			margin-bottom: 3rem;
 			border: var(--border-width, 1px) solid var(--border-color);
+			position: relative;
+			overflow: hidden;
 		}
 
 		.hero h1 {
@@ -1001,8 +1008,13 @@
 			<p>pdoom1 is a satirical meta-strategy game inspired by Papers Please, Pandemic, and clicker games. Navigate the complex world of AI safety research while managing resources, competing with other AI labs, and trying to prevent catastrophic outcomes.</p>
 			
 			<!-- Game Screenshots -->
-			<div style="text-align: center; margin: 2rem 0;">
+			<div style="text-align: center; margin: 2rem 0; position: relative;">
 				<img src="assets/screenshot-placeholder-main.svg" alt="p(Doom)1 Main Game Interface" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+				<div style="position: absolute; top: 10px; right: 10px; opacity: 0.3; pointer-events: none;">
+					<img src="assets/20250915_0952_Ominous Office Inferno_remix_01k55a6bc5fkxbq4txbwr8f61m.png" 
+						 alt="" 
+						 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+				</div>
 			</div>
             
 			<div class="grid">
@@ -1027,7 +1039,12 @@
 		</section>
 
 		<section class="section" id="ai-safety-resources" role="region" aria-labelledby="resources-heading">
-			<h2 id="resources-heading">AI Safety Resources</h2>
+			<div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+				<h2 id="resources-heading" style="margin: 0;">AI Safety Resources</h2>
+				<img src="assets/20250915_1159_Eerie Cat in Flames_simple_compose_01k55hhc99f5ks88kavw70994j.gif" 
+					 alt="Eerie cat decoration" 
+					 style="width: 48px; height: 48px; margin-left: 1rem; opacity: 0.8;">
+			</div>
 			<p style="color: var(--text-secondary); margin-bottom: 2rem; text-align: center;">
 				While p(Doom)1 is satirical, AI Safety is serious. Explore these curated resources to learn more about the field.
 				<br><small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">Last updated: September 2025</small>
