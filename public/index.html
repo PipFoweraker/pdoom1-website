@@ -75,6 +75,20 @@
 			padding: 0 2rem;
 		}
 
+		.logo-container {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.designer-credit {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			font-weight: normal;
+			margin-bottom: -0.2rem;
+			letter-spacing: 0.5px;
+		}
+
 		.logo {
 			font-size: 1.5rem;
 			font-weight: bold;
@@ -100,6 +114,59 @@
 		.nav-links a:hover {
 			color: var(--accent-primary);
 			border-color: var(--accent-primary);
+		}
+
+		/* Dropdown Navigation */
+		.dropdown {
+			position: relative;
+		}
+
+		.dropdown-toggle {
+			cursor: pointer;
+		}
+
+		.dropdown-menu {
+			position: absolute;
+			top: 100%;
+			right: 0;
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(-10px);
+			transition: all var(--duration-base) var(--easing);
+			min-width: 150px;
+			z-index: 1000;
+			list-style: none;
+			padding: 0.5rem 0;
+			margin: 0;
+		}
+
+		.dropdown:hover .dropdown-menu {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+
+		.dropdown-menu li {
+			margin: 0;
+		}
+
+		.dropdown-menu a {
+			display: block;
+			padding: 0.5rem 1rem;
+			color: var(--text-secondary);
+			text-decoration: none;
+			border: none;
+			transition: all var(--duration-fast) ease;
+		}
+
+		.dropdown-menu a:hover {
+			background: var(--bg-tertiary);
+			color: var(--accent-primary);
+			border-radius: 0;
 		}
 
 		main {
@@ -381,16 +448,42 @@
 		}
 
 		@media (max-width: 768px) {
+			nav {
+				flex-direction: column;
+				gap: 1rem;
+				padding: 1rem;
+			}
+
+			.logo-container {
+				align-items: center;
+			}
+
 			.nav-links {
+				gap: 1rem;
+				flex-wrap: wrap;
+				justify-content: center;
+			}
+
+			.dropdown-menu {
+				position: static;
+				opacity: 1;
+				visibility: visible;
+				transform: none;
+				box-shadow: none;
+				border: 1px solid var(--border-color);
+				background: var(--bg-tertiary);
 				display: none;
+				margin-top: 0.5rem;
+				border-radius: var(--radius-sm);
+			}
+
+			.dropdown-toggle[aria-expanded="true"] + .dropdown-menu,
+			.dropdown:hover .dropdown-menu {
+				display: block;
 			}
             
 			.hero h1 {
 				font-size: 2rem;
-			}
-            
-			nav {
-				padding: 0 1rem;
 			}
             
 			main {
@@ -542,17 +635,29 @@
 	<a href="#main-content" class="skip-link">Skip to main content</a>
 	<header>
 		<nav role="navigation" aria-label="Main navigation">
-			<a href="#" class="logo" aria-label="p(Doom)1 home">pdoom1</a>
+			<div class="logo-container">
+				<div class="designer-credit">Pip Foweraker's</div>
+				<a href="#" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
+			</div>
 			<ul class="nav-links" role="menubar">
-				<li role="none"><a href="#home" role="menuitem" aria-label="Jump to home section">Home</a></li>
-				<li role="none"><a href="/about/" role="menuitem" aria-label="Learn more about p(Doom)1">About</a></li>
-				<li role="none"><a href="#download" role="menuitem" aria-label="Download the game">Download</a></li>
-				<li role="none"><a href="/leaderboard/" role="menuitem" aria-label="View player leaderboard">Leaderboard</a></li>
-				<li role="none"><a href="/blog/" role="menuitem" aria-label="Read development blog">Blog</a></li>
-				<li role="none"><a href="/changelog/" role="menuitem" aria-label="View version history">Changelog</a></li>
-				<li role="none"><a href="/docs/" role="menuitem" aria-label="View documentation">Docs</a></li>
-				<li role="none"><a href="/press/" role="menuitem" aria-label="Press kit and media resources">Press</a></li>
-				<li><a href="#contact">Contact</a></li>
+				<li role="none"><a href="#home" role="menuitem">Game</a></li>
+				<li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
+				<li role="none" class="dropdown">
+					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
+					<ul class="dropdown-menu" role="menu">
+						<li role="none"><a href="/blog/" role="menuitem">Dev Blog</a></li>
+						<li role="none"><a href="/changelog/" role="menuitem">Updates</a></li>
+						<li role="none"><a href="https://github.com/PipFoweraker/pdoom1" role="menuitem" target="_blank">GitHub</a></li>
+					</ul>
+				</li>
+				<li role="none" class="dropdown">
+					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
+					<ul class="dropdown-menu" role="menu">
+						<li role="none"><a href="/about/" role="menuitem">About</a></li>
+						<li role="none"><a href="/docs/" role="menuitem">Documentation</a></li>
+						<!-- <li role="none"><a href="/press/" role="menuitem">Press Kit</a></li> -->
+					</ul>
+				</li>
 			</ul>
 		</nav>
 	</header>
@@ -571,12 +676,15 @@
 				<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" target="_blank" rel="noopener">
 					<span style="font-size: 1.2rem;">⬇️</span> Download Latest Release
 				</a>
+				<!-- Press Kit temporarily hidden until game ready
 				<a href="/press/" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary);">
 					<span style="font-size: 1.2rem;">📰</span> Press Kit
 				</a>
+				-->
 			</div>
 			
-			<!-- Steam Coming Soon - Valve Compliant -->
+			<!-- Steam Coming Soon - Hidden until game ready for release -->
+			<!-- 
 			<div style="text-align: center; margin-top: 1.5rem;">
 				<div style="display: inline-block; padding: 8px 16px; background: #171a21; border: 1px solid #2a475e; border-radius: 4px; color: #ffffff; font-family: 'Motiva Sans', Arial, sans-serif; font-size: 13px;">
 					<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 6px;">
@@ -588,6 +696,7 @@
 					©2025 Valve Corporation. Steam® is a registered trademark.
 				</div>
 			</div>
+			-->
 		</section>
 
 		<section class="stats" role="complementary" aria-label="Game statistics">
@@ -851,6 +960,32 @@ python main.py</pre>
 	</footer>
 
 	<script>
+		// Dropdown menu functionality
+		document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+			toggle.addEventListener('click', function(e) {
+				e.preventDefault();
+				const dropdown = this.closest('.dropdown');
+				const isExpanded = this.getAttribute('aria-expanded') === 'true';
+				
+				// Close all other dropdowns
+				document.querySelectorAll('.dropdown-toggle').forEach(other => {
+					other.setAttribute('aria-expanded', 'false');
+				});
+				
+				// Toggle current dropdown
+				this.setAttribute('aria-expanded', !isExpanded);
+			});
+		});
+
+		// Close dropdowns when clicking outside
+		document.addEventListener('click', function(e) {
+			if (!e.target.closest('.dropdown')) {
+				document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+					toggle.setAttribute('aria-expanded', 'false');
+				});
+			}
+		});
+
 		// Smooth scrolling for navigation links
 		document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 			anchor.addEventListener('click', function (e) {

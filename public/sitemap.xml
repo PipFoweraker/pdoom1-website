@@ -35,11 +35,13 @@
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
+  <!-- Press page temporarily hidden until game ready for release
   <url>
     <loc>https://pdoom1.com/press/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  -->
   <url>
     <loc>https://pdoom1.com/leaderboard/</loc>
     <changefreq>daily</changefreq>
