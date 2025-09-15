@@ -1,0 +1,25 @@
+<!-- p(Doom)1 Favicon - 32x32px -->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .bg { fill: #1a1a1a; }
+      .accent { fill: #00ff41; }
+      .text { fill: #ffffff; font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="32" height="32" class="bg"/>
+  
+  <!-- Border -->
+  <rect x="1" y="1" width="30" height="30" fill="none" stroke="#00ff41" stroke-width="1"/>
+  
+  <!-- p(D) text -->
+  <text x="3" y="12" class="text">p</text>
+  <text x="11" y="12" class="accent">(</text>
+  <text x="15" y="12" class="text">D</text>
+  <text x="23" y="12" class="accent">)</text>
+  
+  <!-- "1" -->
+  <text x="13" y="26" class="accent" font-size="10">1</text>
+</svg>

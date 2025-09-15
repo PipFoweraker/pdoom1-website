@@ -1,13 +1,46 @@
-<!-- Placeholder for game screenshot -->
-<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
-  <rect width="800" height="600" fill="#1a1a1a" stroke="#00ff41" stroke-width="2"/>
-  <text x="400" y="280" text-anchor="middle" fill="#00ff41" font-family="monospace" font-size="24">
-    p(Doom)1 Game Screenshot
-  </text>
-  <text x="400" y="320" text-anchor="middle" fill="#cccccc" font-family="monospace" font-size="16">
-    AI Safety Strategy Game Interface
-  </text>
-  <text x="400" y="360" text-anchor="middle" fill="#888888" font-family="monospace" font-size="12">
-    Screenshot coming soon...
+<!-- Professional screenshot placeholder for main menu -->
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2d2d2d;stop-opacity:1" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#333333" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  
+  <!-- Mock terminal-style interface -->
+  <rect x="160" y="140" width="1600" height="800" fill="#2d2d2d" stroke="#00ff41" stroke-width="3" rx="8"/>
+  <rect x="160" y="140" width="1600" height="60" fill="#00ff41" opacity="0.1"/>
+  
+  <!-- Mock title bar -->
+  <text x="180" y="180" fill="#00ff41" font-family="monospace" font-size="28" font-weight="bold">p(Doom)1 - AI Safety Strategy Game</text>
+  
+  <!-- Mock menu items -->
+  <text x="960" y="280" text-anchor="middle" fill="#00ff41" font-family="monospace" font-size="48" font-weight="bold">MAIN MENU</text>
+  
+  <rect x="760" y="340" width="400" height="60" fill="none" stroke="#00ff41" stroke-width="2" rx="4"/>
+  <text x="960" y="380" text-anchor="middle" fill="#cccccc" font-family="monospace" font-size="24">► NEW GAME</text>
+  
+  <rect x="760" y="420" width="400" height="60" fill="none" stroke="#666666" stroke-width="1" rx="4"/>
+  <text x="960" y="460" text-anchor="middle" fill="#888888" font-family="monospace" font-size="24">  CONTINUE</text>
+  
+  <rect x="760" y="500" width="400" height="60" fill="none" stroke="#666666" stroke-width="1" rx="4"/>
+  <text x="960" y="540" text-anchor="middle" fill="#888888" font-family="monospace" font-size="24">  OPTIONS</text>
+  
+  <rect x="760" y="580" width="400" height="60" fill="none" stroke="#666666" stroke-width="1" rx="4"/>
+  <text x="960" y="620" text-anchor="middle" fill="#888888" font-family="monospace" font-size="24">  EXIT</text>
+  
+  <!-- Version indicator -->
+  <text x="1740" y="920" text-anchor="end" fill="#666666" font-family="monospace" font-size="18">v0.4.1 Alpha</text>
+  
+  <!-- Subtle watermark -->
+  <text x="960" y="1040" text-anchor="middle" fill="#444444" font-family="monospace" font-size="16" opacity="0.7">
+    Screenshot Placeholder - Game Interface Coming Soon
   </text>
 </svg>

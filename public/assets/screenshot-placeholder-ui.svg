@@ -1,10 +1,68 @@
-<!-- Placeholder for UI screenshot -->
-<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
-  <rect width="400" height="300" fill="#3d3d3d" stroke="#4caf50" stroke-width="2"/>
-  <text x="200" y="140" text-anchor="middle" fill="#4caf50" font-family="monospace" font-size="16">
-    UI Screenshot
-  </text>
-  <text x="200" y="170" text-anchor="middle" fill="#cccccc" font-family="monospace" font-size="12">
-    Event System Interface
+<!-- Professional UI detail screenshot placeholder -->
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="uiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d2d2d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3d3d3d;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#uiGradient)"/>
+  
+  <!-- Mock detailed UI panel -->
+  <rect x="50" y="50" width="1100" height="700" fill="#1a1a1a" stroke="#00ff41" stroke-width="2" rx="8"/>
+  
+  <!-- Panel header -->
+  <rect x="50" y="50" width="1100" height="60" fill="#2d2d2d" stroke="#00ff41" stroke-width="2" rx="8 8 0 0"/>
+  <text x="70" y="85" fill="#00ff41" font-family="monospace" font-size="24" font-weight="bold">RESEARCH MANAGEMENT SYSTEM</text>
+  <text x="1070" y="85" text-anchor="end" fill="#666666" font-family="monospace" font-size="16">[ESC] Close</text>
+  
+  <!-- Detailed metrics -->
+  <text x="80" y="150" fill="#00ff41" font-family="monospace" font-size="18">Current Research Projects:</text>
+  
+  <!-- Project 1 -->
+  <rect x="100" y="170" width="1000" height="80" fill="#2d2d2d" stroke="#4caf50" stroke-width="1" rx="4"/>
+  <text x="120" y="195" fill="#4caf50" font-family="monospace" font-size="16">AI Alignment Research</text>
+  <text x="120" y="215" fill="#cccccc" font-family="monospace" font-size="12">Progress: ████████████░░░░░░░░ 65%</text>
+  <text x="120" y="235" fill="#cccccc" font-family="monospace" font-size="12">Risk Reduction: -12% p(doom)  |  Cost: $180k/turn  |  ETA: 3 turns</text>
+  
+  <!-- Project 2 -->
+  <rect x="100" y="270" width="1000" height="80" fill="#2d2d2d" stroke="#ff6b35" stroke-width="1" rx="4"/>
+  <text x="120" y="295" fill="#ff6b35" font-family="monospace" font-size="16">Capability Control Framework</text>
+  <text x="120" y="315" fill="#cccccc" font-family="monospace" font-size="12">Progress: ████████░░░░░░░░░░░░ 42%</text>
+  <text x="120" y="335" fill="#cccccc" font-family="monospace" font-size="12">Risk Reduction: -8% p(doom)   |  Cost: $220k/turn  |  ETA: 5 turns</text>
+  
+  <!-- Staff allocation -->
+  <text x="80" y="390" fill="#00ff41" font-family="monospace" font-size="18">Staff Allocation:</text>
+  
+  <rect x="100" y="410" width="500" height="120" fill="#2d2d2d" stroke="#666666" stroke-width="1" rx="4"/>
+  <text x="120" y="435" fill="#cccccc" font-family="monospace" font-size="14">Senior Researchers: 4/6</text>
+  <text x="120" y="455" fill="#cccccc" font-family="monospace" font-size="14">Research Assistants: 8/12</text>
+  <text x="120" y="475" fill="#cccccc" font-family="monospace" font-size="14">Data Scientists: 3/4</text>
+  <text x="120" y="495" fill="#cccccc" font-family="monospace" font-size="14">Safety Specialists: 2/3</text>
+  <text x="120" y="515" fill="#ff6b35" font-family="monospace" font-size="14">Efficiency: 87% (Morale: High)</text>
+  
+  <!-- Resource costs -->
+  <rect x="620" y="410" width="480" height="120" fill="#2d2d2d" stroke="#666666" stroke-width="1" rx="4"/>
+  <text x="640" y="435" fill="#cccccc" font-family="monospace" font-size="14">Monthly Costs:</text>
+  <text x="640" y="455" fill="#cccccc" font-family="monospace" font-size="14">Salaries: $847k</text>
+  <text x="640" y="475" fill="#cccccc" font-family="monospace" font-size="14">Equipment: $123k</text>
+  <text x="640" y="495" fill="#cccccc" font-family="monospace" font-size="14">Computing: $67k</text>
+  <text x="640" y="515" fill="#00ff41" font-family="monospace" font-size="14">Total: $1.037M/turn</text>
+  
+  <!-- Action buttons -->
+  <rect x="100" y="650" width="150" height="40" fill="#00ff41" stroke="#00ff41" stroke-width="1" rx="4"/>
+  <text x="175" y="675" text-anchor="middle" fill="#1a1a1a" font-family="monospace" font-size="14">HIRE STAFF</text>
+  
+  <rect x="270" y="650" width="150" height="40" fill="none" stroke="#ff6b35" stroke-width="1" rx="4"/>
+  <text x="345" y="675" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="14">NEW PROJECT</text>
+  
+  <rect x="440" y="650" width="150" height="40" fill="none" stroke="#666666" stroke-width="1" rx="4"/>
+  <text x="515" y="675" text-anchor="middle" fill="#666666" font-family="monospace" font-size="14">REALLOCATE</text>
+  
+  <!-- Watermark -->
+  <text x="600" y="780" text-anchor="middle" fill="#444444" font-family="monospace" font-size="12" opacity="0.6">
+    UI Detail Placeholder - Complex Interface Systems Under Development
   </text>
 </svg>

@@ -12,9 +12,131 @@
 	<meta property="og:title" content="p(Doom)1 - AI Safety Strategy Game" />
 	<meta property="og:description" content="A satirical meta-strategy game about AI Safety." />
 	<meta property="og:url" content="https://pdoom1.com/" />
-	<meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+	<meta property="og:image" content="https://pdoom1.com/assets/social-card.svg" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="p(Doom)1 - AI Safety Strategy Game by Pip Foweraker" />
 	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="p(Doom)1 - AI Safety Strategy Game" />
+	<meta name="twitter:description" content="A satirical meta-strategy game about AI Safety. Manage labs, policy, and p(doom) while avoiding catastrophic outcomes." />
+	<meta name="twitter:image" content="https://pdoom1.com/assets/social-card.svg" />
+	<meta name="twitter:image:alt" content="p(Doom)1 - AI Safety Strategy Game by Pip Foweraker" />
 	<!-- twitter:site intentionally omitted until handle is finalized (must be ASCII, suggest @pdoom1) -->
+	
+	<!-- Enhanced SEO Meta Tags -->
+	<meta name="keywords" content="AI Safety, strategy game, artificial intelligence, p(doom), AI alignment, existential risk, pygame, indie game, simulation" />
+	<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+	<meta name="theme-color" content="#00ff41" />
+	<meta name="color-scheme" content="dark" />
+	
+	<!-- Favicon -->
+	<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+	<link rel="icon" href="/assets/pdoom_logo_1.png" type="image/png">
+	<link rel="apple-touch-icon" href="/assets/pdoom_logo_1.png">
+	
+	<!-- Game-specific Meta Tags -->
+	<meta name="game:developer" content="Pip Foweraker" />
+	<meta name="game:genre" content="Strategy, Simulation" />
+	<meta name="game:platform" content="PC, Windows, macOS, Linux" />
+	<meta name="game:release_status" content="Early Access" />
+	
+	<!-- JSON-LD Structured Data -->
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "VideoGame",
+		"name": "p(Doom)1",
+		"description": "A satirical meta-strategy game about AI Safety. Manage labs, policy, and p(doom) while avoiding catastrophic outcomes.",
+		"url": "https://pdoom1.com",
+		"image": "https://pdoom1.com/assets/social-card.svg",
+		"author": {
+			"@type": "Person",
+			"name": "Pip Foweraker"
+		},
+		"publisher": {
+			"@type": "Person",
+			"name": "Pip Foweraker"
+		},
+		"genre": ["Strategy", "Simulation", "Educational"],
+		"gamePlatform": ["PC", "Windows", "macOS", "Linux"],
+		"operatingSystem": ["Windows", "macOS", "Linux"],
+		"applicationCategory": "Game",
+		"offers": {
+			"@type": "Offer",
+			"price": "0",
+			"priceCurrency": "USD",
+			"availability": "https://schema.org/InStock"
+		},
+		"datePublished": "2024",
+		"inLanguage": "en",
+		"isAccessibleForFree": true,
+		"keywords": "AI Safety, strategy game, artificial intelligence, p(doom), AI alignment, existential risk",
+		"mainEntity": {
+			"@type": "EducationalOrganization",
+			"name": "p(Doom)1 AI Safety Resources",
+			"description": "Curated collection of AI Safety research organizations, papers, educational materials, and community resources",
+			"url": "https://pdoom1.com/#ai-safety-resources",
+			"educationalUse": "Research, Learning, Career Development",
+			"audience": {
+				"@type": "EducationalAudience",
+				"educationalRole": ["student", "researcher", "professional"],
+				"audienceType": "AI Safety community"
+			},
+			"hasCredential": {
+				"@type": "EducationalOccupationalCredential",
+				"name": "AI Safety Knowledge Base",
+				"description": "Comprehensive resources covering AI alignment, safety research, policy, and career guidance"
+			}
+		}
+	}
+	</script>
+	
+	<!-- Additional Educational Content Structured Data -->
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "WebPage",
+		"name": "AI Safety Resources - p(Doom)1",
+		"description": "Comprehensive collection of AI Safety resources including research organizations, foundational papers, educational materials, policy resources, and community platforms",
+		"url": "https://pdoom1.com/#ai-safety-resources",
+		"inLanguage": "en",
+		"isPartOf": {
+			"@type": "WebSite",
+			"name": "p(Doom)1",
+			"url": "https://pdoom1.com"
+		},
+		"about": [
+			{
+				"@type": "Thing",
+				"name": "AI Safety",
+				"description": "Research field focused on ensuring artificial intelligence systems remain beneficial and aligned with human values"
+			},
+			{
+				"@type": "Thing", 
+				"name": "AI Alignment",
+				"description": "Ensuring AI systems pursue intended objectives and remain under human control"
+			},
+			{
+				"@type": "Thing",
+				"name": "Existential Risk",
+				"description": "Risks that threaten human survival or permanently curtail human potential"
+			}
+		],
+		"educationalLevel": ["Beginner", "Intermediate", "Advanced"],
+		"learningResourceType": ["Resource Directory", "Reference Material"],
+		"educationalUse": ["Research", "Self-Study", "Career Planning"],
+		"audience": {
+			"@type": "EducationalAudience",
+			"educationalRole": ["student", "researcher", "policymaker", "professional"],
+			"audienceType": "AI Safety community"
+		},
+		"dateModified": "2025-09-15",
+		"publisher": {
+			"@type": "Person",
+			"name": "Pip Foweraker"
+		}
+	}
+	</script>
 	<style>
 		:root {
 			/* Color scheme inspired by typical pygame/terminal aesthetics */
@@ -254,6 +376,166 @@
 		.card h3 {
 			color: var(--accent-primary);
 			margin-bottom: 1rem;
+		}
+
+		/* AI Safety Resources Styling */
+		.resources-category {
+			opacity: 0;
+			transform: translateY(20px);
+			transition: opacity 0.6s ease, transform 0.6s ease;
+		}
+
+		.resources-category.visible {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		.resources-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 1.5rem;
+		}
+
+		.resource-card {
+			background: var(--bg-tertiary);
+			border: var(--border-width, 1px) solid var(--border-color);
+			border-radius: var(--radius-md, 6px);
+			padding: 1.5rem;
+			transition: all var(--duration-base) var(--easing);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.resource-card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 3px;
+			height: 100%;
+			background: var(--accent-primary);
+			transform: scaleY(0);
+			transition: transform var(--duration-base) var(--easing);
+		}
+
+		.resource-card:hover {
+			transform: translateY(-5px);
+			border-color: var(--accent-primary);
+			box-shadow: 0 8px 25px rgba(0, 255, 65, 0.15);
+		}
+
+		.resource-card:hover::before {
+			transform: scaleY(1);
+		}
+
+		.resource-card h4 {
+			margin-bottom: 0.75rem;
+			font-size: 1.1rem;
+		}
+
+		.resource-card h4 a {
+			color: var(--accent-primary);
+			text-decoration: none;
+			font-weight: bold;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			transition: color var(--duration-base) var(--easing);
+		}
+
+		.resource-card h4 a:hover {
+			color: var(--accent-secondary);
+		}
+
+		.resource-card p {
+			color: var(--text-secondary);
+			font-size: 0.95rem;
+			line-height: 1.5;
+			margin: 0;
+		}
+
+		.external-link {
+			font-size: 0.8rem;
+			opacity: 0.7;
+			transition: opacity var(--duration-base) var(--easing);
+			margin-left: 0.5rem;
+		}
+
+		.resource-card:hover .external-link {
+			opacity: 1;
+		}
+
+		/* Mobile-friendly collapsible sections */
+		@media (max-width: 768px) {
+			.resources-category {
+				margin-bottom: 2rem;
+			}
+			
+			.resources-category h3 {
+				cursor: pointer;
+				padding: 1rem;
+				background: var(--bg-tertiary);
+				border-radius: var(--radius-md);
+				border: 1px solid var(--border-color);
+				position: relative;
+				user-select: none;
+			}
+			
+			.resources-category h3::after {
+				content: '+';
+				position: absolute;
+				right: 1rem;
+				top: 50%;
+				transform: translateY(-50%);
+				font-size: 1.2rem;
+				transition: transform var(--duration-base) var(--easing);
+			}
+			
+			.resources-category.collapsed h3::after {
+				transform: translateY(-50%) rotate(45deg);
+			}
+			
+			.resources-category .resources-grid {
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.5s ease, padding 0.5s ease;
+				padding: 0;
+			}
+			
+			.resources-category.collapsed .resources-grid {
+				max-height: 2000px;
+				padding: 1rem 0;
+			}
+			
+			.resources-grid {
+				grid-template-columns: 1fr;
+				gap: 1rem;
+			}
+			
+			.resource-card {
+				padding: 1rem;
+			}
+		}
+
+		/* Accessibility enhancements */
+		.resource-card:focus-within {
+			border-color: var(--accent-primary);
+			box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.3);
+		}
+
+		.resource-card h4 a:focus {
+			outline: 2px solid var(--accent-primary);
+			outline-offset: 2px;
+			border-radius: var(--radius-sm);
+		}
+
+		/* Progressive enhancement for animations */
+		@media (prefers-reduced-motion: reduce) {
+			.resources-category,
+			.resource-card,
+			.resource-card::before {
+				transition: none;
+			}
 		}
 
 		.stats {
@@ -744,6 +1026,147 @@
 			</div>
 		</section>
 
+		<section class="section" id="ai-safety-resources" role="region" aria-labelledby="resources-heading">
+			<h2 id="resources-heading">AI Safety Resources</h2>
+			<p style="color: var(--text-secondary); margin-bottom: 2rem; text-align: center;">
+				While p(Doom)1 is satirical, AI Safety is serious. Explore these curated resources to learn more about the field.
+				<br><small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">Last updated: September 2025</small>
+			</p>
+			
+			<!-- Research Organizations -->
+			<div class="resources-category" style="margin-bottom: 3rem;">
+				<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center;">
+					<span style="margin-right: 0.5rem;">🏛️</span> Research Organizations
+				</h3>
+				<div class="resources-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+					<div class="resource-card">
+						<h4><a href="https://intelligence.org/" target="_blank" rel="noopener">MIRI <span class="external-link">↗</span></a></h4>
+						<p>Machine Intelligence Research Institute focuses on mathematical research to ensure AI systems remain beneficial.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://www.anthropic.com/safety" target="_blank" rel="noopener">Anthropic Safety <span class="external-link">↗</span></a></h4>
+						<p>Leading research in AI safety, alignment, and interpretability with focus on Constitutional AI methods.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://humancompatible.ai/" target="_blank" rel="noopener">CHAI Berkeley <span class="external-link">↗</span></a></h4>
+						<p>Center for Human-Compatible AI developing techniques for AI systems aligned with human values.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://www.deepmind.com/safety-and-alignment" target="_blank" rel="noopener">DeepMind Safety <span class="external-link">↗</span></a></h4>
+						<p>Research on AI safety, robustness, and alignment from Google's AI research lab.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://aisafetysupport.org/" target="_blank" rel="noopener">AI Safety Support <span class="external-link">↗</span></a></h4>
+						<p>Organization providing career advice and support for those working in AI safety research.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://www.fhi.ox.ac.uk/" target="_blank" rel="noopener">Future of Humanity Institute <span class="external-link">↗</span></a></h4>
+						<p>Oxford-based research institute studying existential risks and the future of human civilization.</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Foundational Papers -->
+			<div class="resources-category" style="margin-bottom: 3rem;">
+				<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center;">
+					<span style="margin-right: 0.5rem;">📄</span> Foundational Papers
+				</h3>
+				<div class="resources-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+					<div class="resource-card">
+						<h4><a href="https://arxiv.org/abs/1606.06565" target="_blank" rel="noopener">Concrete Problems in AI Safety <span class="external-link">↗</span></a></h4>
+						<p>Seminal paper by Amodei et al. outlining practical research directions for AI safety.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://www.fhi.ox.ac.uk/superintelligence/" target="_blank" rel="noopener">Superintelligence (Bostrom) <span class="external-link">↗</span></a></h4>
+						<p>Influential book examining the potential risks and benefits of artificial superintelligence.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://arxiv.org/abs/2212.08073" target="_blank" rel="noopener">Constitutional AI <span class="external-link">↗</span></a></h4>
+						<p>Anthropic's research on training AI systems to be helpful, harmless, and honest.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://arxiv.org/abs/1803.11175" target="_blank" rel="noopener">AI Alignment Problem <span class="external-link">↗</span></a></h4>
+						<p>Russell's paper on the challenge of ensuring AI systems pursue intended objectives.</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Educational Resources -->
+			<div class="resources-category" style="margin-bottom: 3rem;">
+				<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center;">
+					<span style="margin-right: 0.5rem;">🎓</span> Educational Resources
+				</h3>
+				<div class="resources-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+					<div class="resource-card">
+						<h4><a href="https://aisafetyfundamentals.com/" target="_blank" rel="noopener">AI Safety Fundamentals <span class="external-link">↗</span></a></h4>
+						<p>Comprehensive course covering key concepts, research directions, and career paths in AI safety.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://www.amazon.com/Alignment-Problem-Machine-Learning-Values/dp/0393635821" target="_blank" rel="noopener">The Alignment Problem (Book) <span class="external-link">↗</span></a></h4>
+						<p>Brian Christian's accessible introduction to AI alignment challenges and research efforts.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://waitbutwhy.com/2015/01/artificial-intelligence-revolution-1.html" target="_blank" rel="noopener">Wait But Why AI Series <span class="external-link">↗</span></a></h4>
+						<p>Tim Urban's engaging two-part series explaining AI development and potential implications.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://80000hours.org/problem-profiles/artificial-intelligence/" target="_blank" rel="noopener">80,000 Hours AI Guide <span class="external-link">↗</span></a></h4>
+						<p>Career guide for working on AI alignment and safety, including skill building and career paths.</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Policy & Governance -->
+			<div class="resources-category" style="margin-bottom: 3rem;">
+				<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center;">
+					<span style="margin-right: 0.5rem;">⚖️</span> Policy & Governance
+				</h3>
+				<div class="resources-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+					<div class="resource-card">
+						<h4><a href="https://www.partnershiponai.org/" target="_blank" rel="noopener">Partnership on AI <span class="external-link">↗</span></a></h4>
+						<p>Multi-stakeholder organization developing best practices for AI development and deployment.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://ainowinstitute.org/" target="_blank" rel="noopener">AI Now Institute <span class="external-link">↗</span></a></h4>
+						<p>Research institute studying social implications of AI and advocating for equitable AI systems.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://www.governance.ai/" target="_blank" rel="noopener">Centre for AI Governance <span class="external-link">↗</span></a></h4>
+						<p>Oxford-based research center focused on AI governance and policy recommendations.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://www.whitehouse.gov/ostp/ai-bill-of-rights/" target="_blank" rel="noopener">AI Bill of Rights <span class="external-link">↗</span></a></h4>
+						<p>US government framework for protecting rights in the age of artificial intelligence.</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Community & Discussion -->
+			<div class="resources-category">
+				<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center;">
+					<span style="margin-right: 0.5rem;">💬</span> Community & Discussion
+				</h3>
+				<div class="resources-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+					<div class="resource-card">
+						<h4><a href="https://www.lesswrong.com/" target="_blank" rel="noopener">LessWrong <span class="external-link">↗</span></a></h4>
+						<p>Community blog focused on rationality, AI alignment, and existential risk discussions.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://forum.effectivealtruism.org/" target="_blank" rel="noopener">EA Forum <span class="external-link">↗</span></a></h4>
+						<p>Discussion forum for effective altruism community, including AI safety research and careers.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://aisafety.world/" target="_blank" rel="noopener">AI Safety World <span class="external-link">↗</span></a></h4>
+						<p>Community platform connecting AI safety researchers, students, and practitioners worldwide.</p>
+					</div>
+					<div class="resource-card">
+						<h4><a href="https://www.reddit.com/r/ControlProblem/" target="_blank" rel="noopener">r/ControlProblem <span class="external-link">↗</span></a></h4>
+						<p>Reddit community discussing AI control, alignment, and safety research developments.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
 		<section class="section" id="roadmap">
 			<h2>Roadmap</h2>
 			<p>High-level milestones for the website and game distribution. Full details live in <a href="/docs/roadmap.md" style="color: var(--accent-primary);">docs/roadmap.md</a>. Also see <a href="/docs/pdoom1-open-issues.md" style="color: var(--accent-primary);">Open issues from the main repo</a> for day-to-day tasks.</p>
@@ -1139,6 +1562,53 @@ python main.py</pre>
 					});
 				}
 			});
+		});
+
+		// AI Safety Resources animations and mobile collapsible functionality
+		document.addEventListener('DOMContentLoaded', function() {
+			// Animate resource categories on scroll
+			const resourceCategories = document.querySelectorAll('.resources-category');
+			const observerOptions = {
+				threshold: 0.2,
+				rootMargin: '0px 0px -50px 0px'
+			};
+
+			const categoryObserver = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('visible');
+					}
+				});
+			}, observerOptions);
+
+			resourceCategories.forEach(category => {
+				categoryObserver.observe(category);
+			});
+
+			// Mobile collapsible functionality
+			function initMobileCollapsible() {
+				if (window.innerWidth <= 768) {
+					resourceCategories.forEach(category => {
+						const heading = category.querySelector('h3');
+						if (heading && !heading.hasAttribute('data-mobile-init')) {
+							heading.setAttribute('data-mobile-init', 'true');
+							heading.addEventListener('click', function() {
+								category.classList.toggle('collapsed');
+							});
+							// Start collapsed on mobile
+							if (!category.classList.contains('collapsed')) {
+								// Don't auto-collapse, let user control
+							}
+						}
+					});
+				}
+			}
+
+			// Initialize mobile functionality
+			initMobileCollapsible();
+			
+			// Re-initialize on window resize
+			window.addEventListener('resize', initMobileCollapsible);
 		});
 	</script>
 </body>

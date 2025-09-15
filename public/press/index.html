@@ -53,6 +53,7 @@
 				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
 		}
 
+		/* Header Styles */
 		header {
 			background: var(--bg-secondary);
 			border-bottom: 2px solid var(--accent-primary);
@@ -62,41 +63,145 @@
 			z-index: 100;
 		}
 
-		nav {
+		.header-container {
 			max-width: 1200px;
 			margin: 0 auto;
+			padding: 0 1rem;
 			display: flex;
-			justify-content: space-between;
 			align-items: center;
-			padding: 0 2rem;
+			justify-content: space-between;
+			flex-wrap: wrap;
+			gap: 1rem;
 		}
 
-		.logo {
-			font-size: 1.5rem;
-			font-weight: bold;
-			color: var(--accent-primary);
-			text-decoration: none;
-			text-shadow: 0 0 10px var(--accent-primary);
-		}
-
-		.nav-links {
+		.logo-container {
 			display: flex;
-			gap: 2rem;
-			list-style: none;
+			align-items: center;
+			gap: 0.5rem;
 		}
 
-		.nav-links a {
-			color: var(--text-secondary);
-			text-decoration: none;
-			transition: color var(--duration-base) var(--easing);
-			padding: 0.5rem 1rem;
-			border: 1px solid transparent;
+		.designer-credit {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			margin-right: 0.5rem;
 		}
 
-		.nav-links a:hover {
+		.logo-container h1 {
+			margin: 0;
+			font-size: 1.5rem;
 			color: var(--accent-primary);
-			border-color: var(--accent-primary);
-			border-radius: var(--radius-sm);
+		}
+
+		/* Navigation Styles */
+		nav {
+			display: flex;
+			align-items: center;
+			gap: 1.5rem;
+		}
+
+		nav ul {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			align-items: center;
+			gap: 1.5rem;
+		}
+
+		nav li {
+			position: relative;
+		}
+
+		nav a {
+			color: var(--text-primary);
+			text-decoration: none;
+			padding: 0.5rem;
+			transition: color 0.2s;
+		}
+
+		nav a:hover {
+			color: var(--accent-primary);
+		}
+
+		nav a.active {
+			color: var(--accent-primary);
+		}
+
+		/* Dropdown Styles */
+		.dropdown {
+			position: relative;
+		}
+
+		.dropdown-toggle {
+			cursor: pointer;
+			user-select: none;
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+		}
+
+		.dropdown-menu {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			min-width: 150px;
+			padding: 0.5rem 0;
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(-10px);
+			transition: all 0.2s;
+			z-index: 1000;
+		}
+
+		.dropdown.active .dropdown-menu {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+
+		.dropdown-menu a {
+			display: block;
+			padding: 0.5rem 1rem;
+			color: var(--text-primary);
+			border-radius: 0;
+		}
+
+		.dropdown-menu a:hover {
+			background: var(--bg-primary);
+			color: var(--accent-primary);
+		}
+
+		/* Mobile Navigation */
+		@media (max-width: 768px) {
+			.header-container {
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+
+			nav ul {
+				flex-wrap: wrap;
+				justify-content: center;
+				gap: 1rem;
+			}
+
+			.dropdown-menu {
+				position: static;
+				opacity: 1;
+				visibility: visible;
+				transform: none;
+				background: var(--bg-primary);
+				border: none;
+				border-radius: 0;
+				padding: 0;
+				margin-top: 0.5rem;
+			}
+
+			.dropdown.active .dropdown-menu {
+				background: var(--bg-primary);
+			}
 		}
 
 		main {
@@ -315,17 +420,31 @@
 </head>
 <body>
 	<header>
-		<nav>
-			<a href="/" class="logo">p(Doom)1</a>
-			<ul class="nav-links">
-				<li><a href="/">Home</a></li>
-				<li><a href="/leaderboard/">Leaderboard</a></li>
-				<li><a href="/blog/">Blog</a></li>
-				<li><a href="/changelog/">Changelog</a></li>
-				<li><a href="/docs/">Docs</a></li>
-				<li><a href="/press/" aria-current="page">Press</a></li>
-			</ul>
-		</nav>
+		<div class="header-container">
+			<div class="logo-container">
+				<span class="designer-credit">Pip Foweraker's</span>
+				<h1><a href="/">P(DOOM)1</a></h1>
+			</div>
+			<nav role="navigation" aria-label="Main navigation">
+				<ul>
+					<li><a href="https://github.com/PipFoweraker/pdoom1/releases" role="menuitem">Game</a></li>
+					<li><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" aria-expanded="false" aria-haspopup="true">Community ▾</a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="/blog/" role="menuitem">Dev Blog</a></li>
+							<li><a href="/changelog/" role="menuitem">Changelog</a></li>
+						</ul>
+					</li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" aria-expanded="false" aria-haspopup="true">Info ▾</a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="/about/" role="menuitem">About</a></li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+		</div>
 	</header>
 
 	<main>
@@ -494,6 +613,52 @@
 	</main>
 
 	<script>
+		// Dropdown functionality
+		document.addEventListener('DOMContentLoaded', function() {
+			const dropdowns = document.querySelectorAll('.dropdown');
+			
+			dropdowns.forEach(dropdown => {
+				const toggle = dropdown.querySelector('.dropdown-toggle');
+				
+				toggle.addEventListener('click', function(e) {
+					e.preventDefault();
+					
+					// Close other dropdowns
+					dropdowns.forEach(other => {
+						if (other !== dropdown) {
+							other.classList.remove('active');
+							other.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'false');
+						}
+					});
+					
+					// Toggle current dropdown
+					dropdown.classList.toggle('active');
+					const isOpen = dropdown.classList.contains('active');
+					toggle.setAttribute('aria-expanded', isOpen);
+				});
+			});
+			
+			// Close dropdowns when clicking outside
+			document.addEventListener('click', function(e) {
+				if (!e.target.closest('.dropdown')) {
+					dropdowns.forEach(dropdown => {
+						dropdown.classList.remove('active');
+						dropdown.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'false');
+					});
+				}
+			});
+			
+			// Keyboard navigation
+			document.addEventListener('keydown', function(e) {
+				if (e.key === 'Escape') {
+					dropdowns.forEach(dropdown => {
+						dropdown.classList.remove('active');
+						dropdown.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'false');
+					});
+				}
+			});
+		});
+
 		// Analytics placeholder (privacy-preserving)
 		console.log('Press page loaded');
 		

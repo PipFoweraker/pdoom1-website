@@ -1,6 +1,30 @@
 {
   "posts": [
     {
+      "id": "website-polish-sprint-complete",
+      "title": "Website Polish Sprint: SEO, Accessibility, and Professional Polish",
+      "excerpt": "Comprehensive website polish phase complete with SEO optimization, accessibility improvements, professional placeholders, and systematic testing infrastructure.",
+      "published_at": "2025-09-15T12:00:00Z",
+      "tags": ["polish", "seo", "accessibility", "performance", "testing"],
+      "published": true
+    },
+    {
+      "id": "leaderboard-integration-deep-dive",
+      "title": "Real-Time Leaderboard Integration: Connecting Game to Web",
+      "excerpt": "Technical deep-dive into connecting the p(Doom)1 game engine with real-time web leaderboards, including data structure evolution and performance optimizations.",
+      "published_at": "2025-09-15T11:00:00Z",
+      "tags": ["leaderboard", "integration", "real-time", "game-data"],
+      "published": true
+    },
+    {
+      "id": "website-navigation-redesign",
+      "title": "Website Navigation Redesign: From Clutter to Clean",
+      "excerpt": "Complete navigation overhaul with dropdown menus, accessibility improvements, and professional game industry aesthetics including designer attribution.",
+      "published_at": "2025-09-15T10:00:00Z",
+      "tags": ["website", "ui-design", "navigation", "accessibility"],
+      "published": true
+    },
+    {
       "id": "deployment-infrastructure-complete",
       "title": "p(Doom)1 Website Release - Deployment Infrastructure Complete",
       "excerpt": "Successfully implemented and documented the complete deployment pipeline for the p(Doom)1 website with GitHub Actions, DreamHost integration, and automated status updates.",

@@ -1,10 +1,49 @@
+# P(DOOM)1 Website - Robots Configuration
+# Professional terminal-roguelike game by Pip Foweraker
+
 User-agent: *
 Allow: /
+
+# Allow all standard content paths
+Allow: /blog/
+Allow: /changelog/
+Allow: /leaderboard/
+Allow: /about/
+Allow: /assets/
+Allow: /data/
+Allow: /images/
 
 # Disallow internal or non-canonical paths
 Disallow: /.netlify/
 Disallow: /api/
-Disallow: /assets/private/
+Disallow: /netlify/
+Disallow: /scripts/
+Disallow: /src/
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /docs/  # Internal dev documentation
+Disallow: /dev-notes/  # Development notes
 
-# Sitemap (update if domain differs)
+# Temporarily disallow press section until game ready
+Disallow: /press/
+
+# Common crawl patterns
+User-agent: Googlebot
+Allow: /
+Allow: /blog/
+Allow: /changelog/
+Allow: /leaderboard/
+Allow: /about/
+
+User-agent: Bingbot
+Allow: /
+Allow: /blog/
+Allow: /changelog/
+Allow: /leaderboard/
+Allow: /about/
+
+# Crawl delay for respectful scraping
+Crawl-delay: 1
+
+# Sitemap location
 Sitemap: https://pdoom1.com/sitemap.xml
