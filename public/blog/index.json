@@ -21,7 +21,29 @@
       },
       "word_count": 713,
       "file_size": 6664,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.434364"
+    },
+    {
+      "filename": "2025-09-15-hotfix-batch-deployment.md",
+      "slug": "2025-09-15-hotfix-batch-deployment",
+      "path": "entries/2025-09-15-hotfix-batch-deployment.md",
+      "frontmatter": {
+        "title": "Hotfix Batch: Mac TypeError + GameClock Bounds + Dialog UX",
+        "date": "2025-09-15",
+        "tags": [
+          "hotfix",
+          "mac-bug",
+          "type-safety",
+          "gameclock",
+          "batch-deployment",
+          "critical-fixes"
+        ],
+        "summary": "Systematic batch deployment of three critical bug fixes including Mac TypeError resolution, GameClock bounds protection, and hiring dialog UX validation",
+        "commit": "f806f80"
+      },
+      "word_count": 627,
+      "file_size": 5400,
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-14-events-typeddict-milestone.md",
@@ -43,7 +65,7 @@
       },
       "word_count": 758,
       "file_size": 6215,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-14-action-rules-type-annotation.md",
@@ -64,7 +86,7 @@
       },
       "word_count": 749,
       "file_size": 6233,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-14-opponents-type-annotations.md",
@@ -84,7 +106,7 @@
       },
       "word_count": 443,
       "file_size": 3770,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-14-ui-menus-type-annotation.md",
@@ -105,7 +127,7 @@
       },
       "word_count": 615,
       "file_size": 5143,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-14-upgrades-type-annotation.md",
@@ -127,7 +149,7 @@
       },
       "word_count": 551,
       "file_size": 4462,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-14-pyinstaller-implementation.md",
@@ -148,7 +170,7 @@
       },
       "word_count": 717,
       "file_size": 6031,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-14-deterministic-rng-complete.md",
@@ -169,7 +191,7 @@
       },
       "word_count": 566,
       "file_size": 5073,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-14-pyinstaller-and-type-annotation-completion.md",
@@ -189,7 +211,7 @@
       },
       "word_count": 421,
       "file_size": 3606,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-14-type-annotation-session-wrap.md",
@@ -209,7 +231,7 @@
       },
       "word_count": 393,
       "file_size": 3427,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-14-productive-actions-typeddict-milestone.md",
@@ -231,7 +253,7 @@
       },
       "word_count": 795,
       "file_size": 6813,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-13-enhanced-leaderboard-system-v0-4-1.md",
@@ -252,7 +274,7 @@
       },
       "word_count": 317,
       "file_size": 2739,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-11-debug-console-system.md",
@@ -271,7 +293,7 @@
       },
       "word_count": 181,
       "file_size": 1460,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-11-v0-3-0-consolidated-release.md",
@@ -293,7 +315,7 @@
       },
       "word_count": 596,
       "file_size": 5264,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-10-type-annotation-sprint.md",
@@ -313,7 +335,7 @@
       },
       "word_count": 517,
       "file_size": 4499,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-10-major-type-annotation-milestone.md",
@@ -333,7 +355,7 @@
       },
       "word_count": 606,
       "file_size": 5040,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     },
     {
       "filename": "2025-09-10-version-0-2-12-release.md",
@@ -354,7 +376,7 @@
       },
       "word_count": 428,
       "file_size": 3797,
-      "modified_at": "2025-09-15T04:08:50.589563"
+      "modified_at": "2025-09-15T05:32:45.433364"
     }
   ],
   "config": {
@@ -398,9 +420,9 @@
   },
   "errors": [],
   "stats": {
-    "total_entries": 17,
+    "total_entries": 18,
     "total_errors": 0,
     "latest_entry": "2025-09-15"
   },
-  "generated_at": "2025-09-15T04:08:51.452254"
+  "generated_at": "2025-09-15T05:32:46.314335"
 }
