@@ -1,1 +1,10 @@
-{\n  "name": "pdoom1-website",\n  "private": true,\n  "version": "0.1.0",\n  "scripts": {\n    "start": "python -m http.server -d public 5173",\n    "test:bug": "node api/test-report-bug.js",\n    "generate:issues": "node scripts/generate_pdoom1_issues_md.js"\n  }\n}\n
+{
+  "name": "pdoom1-website",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "start": "python -m http.server -d public 5173",
+    "test:bug": "node api/test-report-bug.js",
+    "generate:issues": "node scripts/generate_pdoom1_issues_md.js"
+  }
+}
