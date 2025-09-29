@@ -207,8 +207,13 @@ jobs:
         run: |
           echo "Checking HTTPS usage..."
           
-          # Check that we're not using HTTP for external resources
-          if grep -r "http://" public/ | grep -v "localhost" | grep -v "127.0.0.1"; then
+          # Check that we're not using HTTP for external resources, excluding XML namespaces
+          if grep -r "http://" public/ \
+            | grep -v "localhost" \
+            | grep -v "127.0.0.1" \
+            | grep -v "xmlns=" \
+            | grep -v "www.w3.org" \
+            | grep -v "sitemaps.org" ; then
             echo "⚠️  HTTP URLs found - should use HTTPS"
             exit 1
           fi
