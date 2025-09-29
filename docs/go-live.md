@@ -29,12 +29,22 @@ A concise, ordered sequence to get the site live on your DreamHost domain while 
 - Actions → "Deploy to DreamHost (manual)" → Run workflow (enable `dry_run` for preview). If looks good, run without `dry_run`.
 - Ensure DNS points your domain to the DreamHost site (if not already).
 
-## 4) End-to-end bug submit test
+## 4) GitHub Actions - Bug Report Workflow
+The bug report intake is handled by the `bug-report.yml` workflow:
+- **Trigger**: `repository_dispatch` with `event_type: bug-report`
+- **Action**: Creates or deduplicates GitHub issues using `dedupeKey` from payload
+- **Labels**: Automatically applies `type: bug` and `priority: medium` (configurable by issue type)
+- **Maintainers**: Assigns or mentions repository maintainers (@PipFoweraker)
+- **Run logs**: Generates workflow summary with issue details and links
+
+Workflow documentation: [.github/workflows/bug-report.yml](../.github/workflows/bug-report.yml)
+
+## 5) End-to-end bug submit test
 - With `DRY_RUN=true` on Netlify, submit the bug form from your DreamHost site. Expect a 200 response.
 - Remove `DRY_RUN` in Netlify envs and redeploy.
-- Submit again → confirm a GitHub Issue is created.
+- Submit again → confirm a GitHub Issue is created via the bug-report workflow.
 
-## 5) Optional hardening and polish
+## 6) Optional hardening and polish
 - Add hCaptcha on the form if spam appears; validate token in `netlify/functions/report-bug.js`.
 - Restrict `ALLOWED_ORIGIN` to only your production domain (remove wildcards after testing).
 - Rotate the GitHub PAT periodically; consider a GitHub App for repository_dispatch.
