@@ -1,75 +1,4 @@
-name: Bug report intake
-
-on:
-  repository_dispatch:
-    types: [bug-report]
-
-permissions:
-  contents: read
-  issues: write
-
-jobs:
-  create_issue:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dedupe and create/update issue
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const payload = context.payload.client_payload || {};
-            const dedupeKey = payload.dedupeKey || '';
-            const type = (payload.type || 'bug').toLowerCase();
-            const labelMap = {
-              bug: 'type: bug',
-              feature: 'type: enhancement',
-              documentation: 'type: docs',
-              performance: 'type: enhancement',
-            };
-            const labels = [labelMap[type] || 'type: bug'];
-
-            // Search for existing open issues containing the dedupeKey
-            let existing = null;
-            if (dedupeKey) {
-              const q = `repo:${context.repo.owner}/${context.repo.repo} state:open in:body "${dedupeKey}"`;
-              const res = await github.request('GET /search/issues', { q });
-              if (res.data.total_count > 0) {
-                existing = res.data.items[0];
-              }
-            }
-
-            const body = `
-            Source: ${payload.source || 'web'}
-            App: ${payload.appVersion || ''} Build: ${payload.buildId || ''}
-            OS: ${payload.os || ''}
-            Email: ${payload.email || ''}
-
-            ${payload.description || ''}
-
-            Logs:
-            ${payload.logs ? '```\n' + payload.logs + '\n```' : '(none)'}
-
-            dedupeKey: ${dedupeKey}
-            `.trim();
-
-            if (existing) {
-              core.info(`Found existing issue #${existing.number}, adding comment`);
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: existing.number,
-                body: `Another report received:\n\n${body}`
-              });
-              return;
-            }
-
-            const resp = await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: payload.title?.slice(0, 120) || 'Bug report',
-              body,
-              labels,
-            });
-            core.info(`Created issue #${resp.data.number}`);name: Create GitHub Issue from Web or Game Client
+name: Bug Report Intake
 
 on:
   repository_dispatch:
@@ -136,7 +65,8 @@ jobs:
   create-issue:
     runs-on: ubuntu-latest
     steps:
-      - name: Create Issue
+      - name: Create or Dedupe Issue
+        id: create-issue
         uses: actions/github-script@v7
         with:
           github-token: ${{ github.token }}
@@ -161,74 +91,115 @@ jobs:
             const notify = Boolean(take('notify', false));
             const dedupeKey = take('dedupeKey', '');
 
+            core.info(`Processing ${type} report: "${title}"`);
+            core.info(`DedupeKey: ${dedupeKey}`);
+            core.info(`Source: ${source}`);
+
             if (!title || !description) {
               core.setFailed('Missing required fields: title and description');
               return;
             }
 
-            const labelMap = {
-              bug: ['bug','needs-triage'],
-              feature: ['enhancement','feature-request'],
-              documentation: ['documentation','needs-triage'],
-              performance: ['performance','needs-investigation']
-            };
-            const wanted = labelMap[type] || ['needs-triage'];
-            const existing = await github.paginate(github.rest.issues.listLabelsForRepo, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 100
-            });
-            const existingNames = new Set(existing.map(l=>l.name));
-            for (const name of wanted) {
-              if (!existingNames.has(name)) {
-                try {
-                  await github.rest.issues.createLabel({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    name,
-                    color: 'ededed'
-                  });
-                } catch {}
-              }
-            }
-
+            // Check for existing issue by dedupeKey
             if (dedupeKey) {
-              const q = `repo:${context.repo.owner}/${context.repo.repo} in:body ${dedupeKey} state:open`;
+              const q = `repo:${context.repo.owner}/${context.repo.repo} in:body "${dedupeKey}" state:open`;
               const search = await github.rest.search.issuesAndPullRequests({ q });
               const hit = search.data.items?.[0];
               if (hit) {
+                core.info(`Found existing issue #${hit.number} with dedupeKey ${dedupeKey}`);
                 core.setOutput('issue_number', hit.number);
                 core.setOutput('issue_url', hit.html_url);
+                core.setOutput('action', 'duplicate');
+                
+                // Add comment to existing issue
+                const commentBody = `**Duplicate report received**\n\n` +
+                  `Source: ${source === 'game' ? 'Game client' : 'Web form'}\n` +
+                  `Type: ${type}\n` +
+                  (email ? `Email: ${email}\n` : '') +
+                  (appVersion ? `App Version: ${appVersion}\n` : '') +
+                  (buildId ? `Build ID: ${buildId}\n` : '') +
+                  (os ? `OS: ${os}\n` : '') +
+                  `\n**Description:**\n${description}\n` +
+                  (logs ? `\n**Logs:**\n\`\`\`\n${logs}\n\`\`\`\n` : '') +
+                  `\n---\n*DedupeKey: ${dedupeKey}*`;
+                  
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: hit.number,
+                  body: commentBody
+                });
                 return;
               }
             }
 
-            const titlePrefix = source === 'game' ? '[game] ' : '[web] ';
-            let body = '';
-            body += '## Description\n' + description + '\n\n';
-            body += '## Issue Type\n' + type + '\n\n';
-            body += '## Submitted From\n' + (source === 'game' ? 'Game client' : 'Web form') + '\n\n';
-            body += '## Contact Information\n' + (email ? ('Email: ' + email) : 'No contact email provided') + '\n\n';
-            body += '## Environment\n- App Version: ' + (appVersion || 'n/a') + '\n- Build ID: ' + (buildId || 'n/a') + '\n- OS: ' + (os || 'n/a') + '\n\n';
-            if (logs) {
-              body += '## Logs\n<details><summary>Show logs</summary>\n\n';
-              body += '```\n' + logs + '\n```\n\n</details>\n\n';
+            // Create required labels if they don't exist
+            const labelMap = {
+              bug: ['type: bug', 'priority: medium'],
+              feature: ['type: enhancement', 'priority: medium'],
+              documentation: ['type: documentation', 'priority: medium'],
+              performance: ['type: performance', 'priority: medium']
+            };
+            const wantedLabels = labelMap[type] || ['type: bug', 'priority: medium'];
+            
+            const existingLabels = await github.paginate(github.rest.issues.listLabelsForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            const existingNames = new Set(existingLabels.map(l => l.name));
+            
+            for (const labelName of wantedLabels) {
+              if (!existingNames.has(labelName)) {
+                try {
+                  const color = labelName.startsWith('type:') ? 'B60205' : 
+                               labelName.startsWith('priority:') ? 'FBCA04' : 'CCCCCC';
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: labelName,
+                    color: color,
+                    description: labelName.startsWith('type:') ? `Issue type: ${labelName.split(': ')[1]}` :
+                                labelName.startsWith('priority:') ? `Priority level: ${labelName.split(': ')[1]}` : ''
+                  });
+                  core.info(`Created label: ${labelName}`);
+                } catch (error) {
+                  core.warning(`Failed to create label ${labelName}: ${error.message}`);
+                }
+              }
             }
-            body += '---\n*This issue was automatically created from a ' + source + ' submission.*\n\n';
-            if (dedupeKey) body += '<!-- dedupe:' + dedupeKey + ' -->\n';
-            body += '\n### Next Steps\n- [ ] Reproduce the issue\n- [ ] Assign appropriate labels\n- [ ] Set milestone if applicable\n- [ ] Link to related issues if any';
 
+            // Create issue body
+            const titlePrefix = source === 'game' ? '[game] ' : '[web] ';
+            let body = `## Description\n${description}\n\n`;
+            body += `## Issue Type\n${type}\n\n`;
+            body += `## Submitted From\n${source === 'game' ? 'Game client' : 'Web form'}\n\n`;
+            body += `## Contact Information\n${email ? `Email: ${email}` : 'No contact email provided'}\n\n`;
+            body += `## Environment\n- App Version: ${appVersion || 'n/a'}\n- Build ID: ${buildId || 'n/a'}\n- OS: ${os || 'n/a'}\n\n`;
+            
+            if (logs) {
+              body += `## Logs\n<details><summary>Show logs</summary>\n\n\`\`\`\n${logs}\n\`\`\`\n\n</details>\n\n`;
+            }
+            
+            body += `---\n*This issue was automatically created from a ${source} submission.*\n\n`;
+            if (dedupeKey) body += `<!-- dedupe:${dedupeKey} -->\n`;
+            body += `\n### Next Steps\n- [ ] Reproduce the issue\n- [ ] Assign appropriate labels\n- [ ] Set milestone if applicable\n- [ ] Link to related issues if any`;
+
+            // Create the issue
             const issue = await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: titlePrefix + title,
               body,
-              labels: wanted
+              labels: wantedLabels
             });
 
+            core.info(`Created issue #${issue.data.number}: ${issue.data.html_url}`);
             core.setOutput('issue_number', issue.data.number);
             core.setOutput('issue_url', issue.data.html_url);
+            core.setOutput('action', 'created');
 
+            // Add high priority label for critical issues
             const descLower = description.toLowerCase();
             if (descLower.includes('crash') || descLower.includes('critical') || descLower.includes('urgent')) {
               try {
@@ -236,19 +207,68 @@ jobs:
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: issue.data.number,
-                  labels: ['priority-high','critical']
+                  labels: ['priority: high', 'needs: immediate-attention']
                 });
-              } catch {}
+                core.info('Added high priority labels for critical issue');
+              } catch (error) {
+                core.warning(`Failed to add high priority labels: ${error.message}`);
+              }
             }
+
+      - name: Assign Maintainers
+        if: steps.create-issue.outputs.action == 'created'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const issueNumber = ${{ steps.create-issue.outputs.issue_number }};
+            const maintainers = ['PipFoweraker']; // Add other maintainers as needed
+            
+            try {
+              // Assign maintainers to the issue
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                assignees: maintainers
+              });
+              
+              core.info(`Assigned maintainers to issue #${issueNumber}: ${maintainers.join(', ')}`);
+            } catch (error) {
+              core.warning(`Failed to assign maintainers: ${error.message}`);
+              
+              // Fallback: mention maintainers in a comment
+              const mentionComment = `@${maintainers.join(' @')} - New ${context.payload.client_payload?.type || 'bug'} report needs attention.`;
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: mentionComment
+              });
+              
+              core.info(`Mentioned maintainers in comment: ${maintainers.join(', ')}`);
+            }
+
+      - name: Generate Run Log Summary
+        run: |
+          echo "## Bug Report Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Action**: ${{ steps.create-issue.outputs.action }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Issue Number**: #${{ steps.create-issue.outputs.issue_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Issue URL**: ${{ steps.create-issue.outputs.issue_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type**: ${{ github.event.client_payload.type || github.event.inputs.type || 'bug' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Source**: ${{ github.event.client_payload.source || github.event.inputs.source || 'web' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **DedupeKey**: ${{ github.event.client_payload.dedupeKey || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workflow Run**: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
 
   notify:
     needs: create-issue
     runs-on: ubuntu-latest
     if: ${{ (github.event.client_payload && github.event.client_payload.notify == true) || (github.event.inputs && github.event.inputs.notify == 'true') }}
     steps:
-      - name: Send notification
+      - name: Send Notification
         run: |
-          echo "New bug report received"
-          if [ -n "${{ github.event.client_payload.title }}" ]; then echo "Title: ${{ github.event.client_payload.title }}"; fi
-          if [ -n "${{ github.event.inputs.title }}" ]; then echo "Title: ${{ github.event.inputs.title }}"; fi
-  # end of workflow
+          echo "🐛 New bug report received!"
+          echo "📋 Issue: #${{ needs.create-issue.outputs.issue_number }}"
+          echo "🔗 URL: ${{ needs.create-issue.outputs.issue_url }}"
+          echo "📝 Title: ${{ github.event.client_payload.title || github.event.inputs.title }}"
+          echo "🏷️ Type: ${{ github.event.client_payload.type || github.event.inputs.type || 'bug' }}"
