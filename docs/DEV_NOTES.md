@@ -6,6 +6,7 @@ Quick reference for how this site is wired and how to operate it.
 - Static site: DreamHost (public/ served as the document root)
 - Serverless API: Netlify Functions (e.g., POST /api/report-bug)
 - Source: GitHub repo (main branch)
+- **Canonical domain**: https://pdoom1.com (www redirects to root via .htaccess)
 
 ## Bug intake (web + game)
 - Web form posts to Netlify function: /api/report-bug

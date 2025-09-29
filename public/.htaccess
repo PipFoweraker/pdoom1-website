@@ -1,6 +1,11 @@
 # Security hardening for DreamHost Apache (optional)
 # Place this in your site root if using DreamHost for hosting
 
+# Canonical domain enforcement: redirect www → root domain
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^www\.pdoom1\.com$ [NC]
+RewriteRule ^(.*)$ https://pdoom1.com/$1 [R=301,L]
+
 # Deny access to dotfiles
 <FilesMatch "^\.">
   Require all denied

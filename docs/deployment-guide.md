@@ -150,6 +150,23 @@ Example `public/config.json`:
 }
 ```
 
+## Canonical Domain Configuration
+
+The site is configured to use `https://pdoom1.com` as the canonical domain:
+
+**What's Already Configured:**
+- ✅ Canonical `<link>` tags in all HTML files point to `https://pdoom1.com/`
+- ✅ `robots.txt` references canonical sitemap URL
+- ✅ `sitemap.xml` uses consistent canonical URLs
+- ✅ `.htaccess` includes 301 redirect from `www.pdoom1.com` → `https://pdoom1.com`
+
+**Verify Setup:**
+1. **WWW Redirect**: Test that `https://www.pdoom1.com` redirects to `https://pdoom1.com`
+2. **Search Console**: Confirm canonical URLs are properly recognized
+3. **DNS**: Ensure both apex and www subdomains point to DreamHost
+
+The `.htaccess` file automatically handles www → root redirects with proper 301 status codes for SEO.
+
 ## Support
 
 - Check workflow logs first
