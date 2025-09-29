@@ -732,6 +732,7 @@
 					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
 					<ul class="dropdown-menu" role="menu">
 						<li role="none"><a href="/about/" role="menuitem">About</a></li>
+						<li role="none"><a href="/resources/" role="menuitem">AI Safety Resources</a></li>
 						<li role="none"><a href="/docs/roadmap.md" role="menuitem">Roadmap</a></li>
 						<li role="none"><a href="/docs/" role="menuitem">Documentation</a></li>
 						<!-- <li role="none"><a href="/press/" role="menuitem">Press Kit</a></li> -->
@@ -829,213 +830,6 @@
 			</div>
 		</section>
 
-		<section class="section" id="roadmap">
-			<h2>Roadmap</h2>
-			<p>High-level milestones for the website and game distribution. Full details live in <a href="/docs/roadmap.md" style="color: var(--accent-primary);">docs/roadmap.md</a>. Also see <a href="/docs/pdoom1-open-issues.md" style="color: var(--accent-primary);">Open issues from the main repo</a> for day-to-day tasks.</p>
-			<div class="grid">
-				<div class="card">
-					<h3>Short term (weeks)</h3>
-					<ul>
-						<li>Alpha updates 2-3x weekly via Dev Blog</li>
-						<li>Automated posts to Discord, Bluesky, X, LinkedIn</li>
-						<li>Bug intake via GitHub Issues (Netlify function)</li>
-					</ul>
-				</div>
-				<div class="card">
-					<h3>Mid term (months)</h3>
-					<ul>
-						<li>Steam release preparation</li>
-						<li>Design tokens synced from main repo style guide</li>
-						<li>Content pipeline from Airtable finalized</li>
-					</ul>
-				</div>
-			</div>
-		</section>
-
-		<section class="section" id="known-issues">
-			<h2>Known Issues & Development Status</h2>
-			<p>Live updates from our development repository. See what we're working on and known issues before downloading.</p>
-			
-			<div id="github-issues-container">
-				<div id="issues-loading" class="card" style="text-align: center; padding: 2rem;">
-					<div style="color: var(--text-muted);">
-						<div style="margin-bottom: 1rem;">Loading issues from GitHub...</div>
-						<div style="font-size: 0.9rem;">This may take a few seconds</div>
-					</div>
-				</div>
-				
-				<div id="issues-error" class="card" style="text-align: center; padding: 2rem; display: none; background: var(--bg-tertiary); border: 1px solid var(--accent-danger);">
-					<div style="color: var(--accent-danger);">
-						<div style="margin-bottom: 1rem;">Unable to load live issues</div>
-						<div style="font-size: 0.9rem; margin-bottom: 1rem;">GitHub API may be temporarily unavailable</div>
-						<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-primary);">
-							View issues directly on GitHub --&gt;
-						</a>
-					</div>
-				</div>
-				
-				<div id="issues-content" style="display: none;">
-					<div class="grid" id="issues-grid">
-						<!-- Issues will be populated here -->
-					</div>
-					
-					<div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-						<div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-							<span id="issues-count">0</span> open issues - 
-							Last updated: <span id="issues-timestamp">-</span>
-						</div>
-						<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-							<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary);">
-								View All Issues on GitHub
-							</a>
-							<button id="refresh-issues" class="cta-button" style="background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-color);">
-								Refresh
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<section class="section" id="ai-safety-resources" role="region" aria-labelledby="ai-safety-heading">
-			<h2 id="ai-safety-heading">AI Safety Resources</h2>
-			<p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
-				Explore the broader AI Safety ecosystem that inspires p(Doom)1. Educational resources, research organizations, and community platforms.
-			</p>
-			
-			<!-- Resource Categories -->
-			<div class="resources-container" role="main" aria-label="AI Safety resource categories">
-				<!-- Research Organizations -->
-				<div class="resource-category">
-					<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-						<span style="font-size: 1.2rem;" aria-hidden="true">[Lab]</span>
-						Research Organizations
-					</h3>
-					<div class="grid">
-						<div class="card resource-card">
-							<h4><a href="https://miri.org" target="_blank" rel="noopener">Machine Intelligence Research Institute</a></h4>
-							<p>Leading AI alignment research organization focused on ensuring smarter-than-human AI systems remain beneficial.</p>
-							<span class="resource-tag">Research</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://anthropic.com" target="_blank" rel="noopener">Anthropic</a></h4>
-							<p>AI safety company developing Constitutional AI and researching AI alignment techniques.</p>
-							<span class="resource-tag">Research</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://safe.ai" target="_blank" rel="noopener">Center for AI Safety</a></h4>
-							<p>Nonprofit dedicated to reducing societal-scale risks from artificial intelligence.</p>
-							<span class="resource-tag">Research</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://humancompatible.ai" target="_blank" rel="noopener">Center for Human-Compatible AI</a></h4>
-							<p>UC Berkeley research center developing AI systems that are provably aligned with human values.</p>
-							<span class="resource-tag">Academic</span>
-						</div>
-					</div>
-				</div>
-				
-				<!-- Educational Resources -->
-				<div class="resource-category">
-					<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-						<span style="font-size: 1.2rem;" aria-hidden="true">[Edu]</span>
-						Educational Resources
-					</h3>
-					<div class="grid">
-						<div class="card resource-card">
-							<h4><a href="https://aisafetyfundamentals.com" target="_blank" rel="noopener">AI Safety Fundamentals</a></h4>
-							<p>Comprehensive course covering key concepts in AI safety and alignment research.</p>
-							<span class="resource-tag">Course</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://stampy.ai" target="_blank" rel="noopener">Stampy's AI Safety Info</a></h4>
-							<p>Community-driven Q&A resource with answers to common AI safety questions.</p>
-							<span class="resource-tag">Beginner</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://80000hours.org/problem-profiles/artificial-intelligence/" target="_blank" rel="noopener">80,000 Hours AI Safety</a></h4>
-							<p>Career guide and problem profile for those interested in AI safety work.</p>
-							<span class="resource-tag">Career</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://aisafety.info" target="_blank" rel="noopener">AI Safety Info</a></h4>
-							<p>Comprehensive repository of AI safety research, papers, and educational materials.</p>
-							<span class="resource-tag">Reference</span>
-						</div>
-					</div>
-				</div>
-				
-				<!-- Policy & Governance -->
-				<div class="resource-category">
-					<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-						<span style="font-size: 1.2rem;" aria-hidden="true">[Gov]</span>
-						Policy & Governance
-					</h3>
-					<div class="grid">
-						<div class="card resource-card">
-							<h4><a href="https://governance.ai" target="_blank" rel="noopener">Centre for the Governance of AI</a></h4>
-							<p>Research organization focused on AI governance and policy development.</p>
-							<span class="resource-tag">Policy</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://cset.georgetown.edu" target="_blank" rel="noopener">CSET Georgetown</a></h4>
-							<p>Center for Security and Emerging Technology analyzing AI policy implications.</p>
-							<span class="resource-tag">Policy</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://ai-plans.com" target="_blank" rel="noopener">AI Plans</a></h4>
-							<p>Database of government AI strategies and policy documents worldwide.</p>
-							<span class="resource-tag">Database</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://situational-awareness.ai" target="_blank" rel="noopener">Situational Awareness</a></h4>
-							<p>Leopold Aschenbrenner's analysis of the AI race and national security implications.</p>
-							<span class="resource-tag">Analysis</span>
-						</div>
-					</div>
-				</div>
-				
-				<!-- Community -->
-				<div class="resource-category">
-					<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-						<span style="font-size: 1.2rem;" aria-hidden="true">[Community]</span>
-						Community & Discussion
-					</h3>
-					<div class="grid">
-						<div class="card resource-card">
-							<h4><a href="https://forum.effectivealtruism.org" target="_blank" rel="noopener">EA Forum</a></h4>
-							<p>Active community discussing AI safety research and effective altruism approaches.</p>
-							<span class="resource-tag">Forum</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://alignmentforum.org" target="_blank" rel="noopener">Alignment Forum</a></h4>
-							<p>Technical discussion forum for AI alignment research and ideas.</p>
-							<span class="resource-tag">Technical</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://lesswrong.com" target="_blank" rel="noopener">LessWrong</a></h4>
-							<p>Community blog focused on rationality, AI safety, and effective thinking.</p>
-							<span class="resource-tag">Community</span>
-						</div>
-						<div class="card resource-card">
-							<h4><a href="https://bluedot.org" target="_blank" rel="noopener">BlueDot Impact</a></h4>
-							<p>Platform offering courses and programs in AI safety and effective altruism.</p>
-							<span class="resource-tag">Training</span>
-						</div>
-					</div>
-				</div>
-			</div>
-			
-			<div style="text-align: center; margin-top: 3rem; padding: 2rem; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
-				<p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-					<strong>Note:</strong> p(Doom)1 is an independent satirical game and is not affiliated with any of these organizations.
-				</p>
-				<p style="color: var(--text-secondary); font-size: 0.9rem;">
-					Last updated: January 2025 | <a href="https://github.com/PipFoweraker/pdoom1-website/issues" target="_blank" rel="noopener" style="color: var(--accent-primary);">Suggest additions</a>
-				</p>
-			</div>
-		</section>
-
 		<section class="section" id="download">
 			<h2>Download & Get Started</h2>
 			<p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
@@ -1107,6 +901,85 @@ python main.py</pre>
 					<a href="/changelog/" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">Changelog</a>
 				</div>
 			</div>
+		</section>
+
+		<section class="section" id="roadmap">
+			<h2>Roadmap</h2>
+			<p>High-level milestones for the website and game distribution. Full details live in <a href="/docs/roadmap.md" style="color: var(--accent-primary);">docs/roadmap.md</a>. Also see <a href="/docs/pdoom1-open-issues.md" style="color: var(--accent-primary);">Open issues from the main repo</a> for day-to-day tasks.</p>
+			<div class="grid">
+				<div class="card">
+					<h3>Short term (weeks)</h3>
+					<ul>
+						<li>Alpha updates 2-3x weekly via Dev Blog</li>
+						<li>Automated posts to Discord, Bluesky, X, LinkedIn</li>
+						<li>Bug intake via GitHub Issues (Netlify function)</li>
+					</ul>
+				</div>
+				<div class="card">
+					<h3>Mid term (months)</h3>
+					<ul>
+						<li>Steam release preparation</li>
+						<li>Design tokens synced from main repo style guide</li>
+						<li>Content pipeline from Airtable finalized</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<section class="section" id="known-issues">
+			<h2>Known Issues & Development Status</h2>
+			<p>Live updates from our development repository. See what we're working on and known issues before downloading.</p>
+			
+			<div id="github-issues-container">
+				<div id="issues-loading" class="card" style="text-align: center; padding: 2rem;">
+					<div style="color: var(--text-muted);">
+						<div style="margin-bottom: 1rem;">Loading issues from GitHub...</div>
+						<div style="font-size: 0.9rem;">This may take a few seconds</div>
+					</div>
+				</div>
+				
+				<div id="issues-error" class="card" style="text-align: center; padding: 2rem; display: none; background: var(--bg-tertiary); border: 1px solid var(--accent-danger);">
+					<div style="color: var(--accent-danger);">
+						<div style="margin-bottom: 1rem;">Unable to load live issues</div>
+						<div style="font-size: 0.9rem; margin-bottom: 1rem;">GitHub API may be temporarily unavailable</div>
+						<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-primary);">
+							View issues directly on GitHub --&gt;
+						</a>
+					</div>
+				</div>
+				
+				<div id="issues-content" style="display: none;">
+					<div class="grid" id="issues-grid">
+						<!-- Issues will be populated here -->
+					</div>
+					
+					<div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+						<div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+							<span id="issues-count">0</span> open issues - 
+							Last updated: <span id="issues-timestamp">-</span>
+						</div>
+						<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+							<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary);">
+								View All Issues on GitHub
+							</a>
+							<button id="refresh-issues" class="cta-button" style="background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-color);">
+								Refresh
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- AI Safety Resources - Now on dedicated page -->
+		<section class="section" style="text-align: center; padding: 2rem;">
+			<h2>AI Safety Resources</h2>
+			<p style="color: var(--text-secondary); margin-bottom: 2rem;">
+				Explore the broader AI Safety ecosystem that inspires p(Doom)1.
+			</p>
+			<a href="/resources/" class="cta-button" style="display: inline-block;">
+				Browse AI Safety Resources →
+			</a>
 		</section>
 
 		<section class="section" id="faq" role="region" aria-labelledby="faq-heading">

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 Comprehensive health check for pdoom1-website deployment
 Validates critical files, data integrity, and system dependencies

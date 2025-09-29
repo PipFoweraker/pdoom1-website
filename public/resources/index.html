@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>AI Safety Resources - p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/resources/" />
+	<meta name="description" content="Comprehensive AI Safety resources, research organizations, educational materials, and community platforms that inspire p(Doom)1." />
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+	
+	<!-- Load design tokens dynamically -->
+	<script>
+		async function loadDesignTokens() {
+			try {
+				const response = await fetch('/design/tokens.json');
+				const tokens = await response.json();
+				const root = document.documentElement;
+				
+				for (const [key, value] of Object.entries(tokens)) {
+					root.style.setProperty(`--${key}`, value);
+				}
+			} catch (error) {
+				console.warn('Could not load design tokens:', error);
+			}
+		}
+		loadDesignTokens();
+	</script>
+	
+	<style>
+		/* Base styles with fallback values */
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3a3a3a;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #888888;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--border-color: #444444;
+			--radius-lg: 10px;
+			--radius-md: 6px;
+			--radius-sm: 4px;
+		}
+		
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			margin: 0;
+			line-height: 1.6;
+		}
+		
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 2rem;
+		}
+		
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem 0;
+			margin-bottom: 2rem;
+		}
+		
+		.header-content {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 0 2rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		
+		.back-link {
+			color: var(--accent-primary);
+			text-decoration: none;
+			font-weight: bold;
+			transition: opacity 0.2s;
+		}
+		
+		.back-link:hover {
+			opacity: 0.8;
+		}
+		
+		h1 {
+			color: var(--accent-primary);
+			text-align: center;
+			margin: 2rem 0;
+			font-size: 2.5rem;
+		}
+		
+		.intro {
+			text-align: center;
+			color: var(--text-secondary);
+			margin-bottom: 3rem;
+			font-size: 1.1rem;
+		}
+		
+		.resources-container {
+			display: grid;
+			gap: 3rem;
+		}
+		
+		.resource-category {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 2rem;
+		}
+		
+		.resource-category h3 {
+			color: var(--accent-primary);
+			margin-bottom: 1.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+		
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 1.5rem;
+		}
+		
+		.card {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			transition: all 0.2s ease;
+		}
+		
+		.card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0, 255, 65, 0.15);
+		}
+		
+		.resource-card h4 {
+			margin-top: 0;
+			margin-bottom: 1rem;
+		}
+		
+		.resource-card h4 a {
+			color: var(--accent-primary);
+			text-decoration: none;
+		}
+		
+		.resource-card h4 a:hover {
+			text-decoration: underline;
+		}
+		
+		.resource-card p {
+			color: var(--text-secondary);
+			margin-bottom: 1rem;
+		}
+		
+		.resource-tag {
+			display: inline-block;
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+			padding: 0.25rem 0.75rem;
+			border-radius: var(--radius-sm);
+			font-size: 0.8rem;
+			font-weight: bold;
+		}
+		
+		.disclaimer {
+			text-align: center;
+			margin-top: 3rem;
+			padding: 2rem;
+			background: var(--bg-secondary);
+			border-radius: var(--radius-lg);
+			border: 1px solid var(--border-color);
+		}
+		
+		.disclaimer p {
+			margin-bottom: 1rem;
+		}
+		
+		.disclaimer p:last-child {
+			margin-bottom: 0;
+		}
+		
+		@media (max-width: 768px) {
+			.container {
+				padding: 1rem;
+			}
+			
+			h1 {
+				font-size: 2rem;
+			}
+			
+			.grid {
+				grid-template-columns: 1fr;
+			}
+			
+			.resource-category {
+				padding: 1.5rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<div class="header-content">
+			<a href="/" class="back-link">← Back to Home</a>
+			<div style="color: var(--accent-primary); font-weight: bold;">p(Doom)1</div>
+		</div>
+	</header>
+	
+	<div class="container">
+		<h1>AI Safety Resources</h1>
+		<p class="intro">
+			Explore the broader AI Safety ecosystem that inspires p(Doom)1. Educational resources, research organizations, and community platforms.
+		</p>
+		
+		<div class="resources-container" role="main" aria-label="AI Safety resource categories">
+			<!-- Research Organizations -->
+			<div class="resource-category">
+				<h3>
+					<span style="font-size: 1.2rem;" aria-hidden="true">[Lab]</span>
+					Research Organizations
+				</h3>
+				<div class="grid">
+					<div class="card resource-card">
+						<h4><a href="https://miri.org" target="_blank" rel="noopener">Machine Intelligence Research Institute</a></h4>
+						<p>Leading AI alignment research organization focused on ensuring smarter-than-human AI systems remain beneficial.</p>
+						<span class="resource-tag">Research</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://anthropic.com" target="_blank" rel="noopener">Anthropic</a></h4>
+						<p>AI safety company developing Constitutional AI and researching AI alignment techniques.</p>
+						<span class="resource-tag">Research</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://safe.ai" target="_blank" rel="noopener">Center for AI Safety</a></h4>
+						<p>Nonprofit dedicated to reducing societal-scale risks from artificial intelligence.</p>
+						<span class="resource-tag">Research</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://humancompatible.ai" target="_blank" rel="noopener">Center for Human-Compatible AI</a></h4>
+						<p>UC Berkeley research center developing AI systems that are provably aligned with human values.</p>
+						<span class="resource-tag">Academic</span>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Educational Resources -->
+			<div class="resource-category">
+				<h3>
+					<span style="font-size: 1.2rem;" aria-hidden="true">[Edu]</span>
+					Educational Resources
+				</h3>
+				<div class="grid">
+					<div class="card resource-card">
+						<h4><a href="https://aisafetyfundamentals.com" target="_blank" rel="noopener">AI Safety Fundamentals</a></h4>
+						<p>Comprehensive course covering key concepts in AI safety and alignment research.</p>
+						<span class="resource-tag">Course</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://stampy.ai" target="_blank" rel="noopener">Stampy's AI Safety Info</a></h4>
+						<p>Community-driven Q&A resource with answers to common AI safety questions.</p>
+						<span class="resource-tag">Beginner</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://80000hours.org/problem-profiles/artificial-intelligence/" target="_blank" rel="noopener">80,000 Hours AI Safety</a></h4>
+						<p>Career guide and problem profile for those interested in AI safety work.</p>
+						<span class="resource-tag">Career</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://aisafety.info" target="_blank" rel="noopener">AI Safety Info</a></h4>
+						<p>Comprehensive repository of AI safety research, papers, and educational materials.</p>
+						<span class="resource-tag">Reference</span>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Policy & Governance -->
+			<div class="resource-category">
+				<h3>
+					<span style="font-size: 1.2rem;" aria-hidden="true">[Gov]</span>
+					Policy & Governance
+				</h3>
+				<div class="grid">
+					<div class="card resource-card">
+						<h4><a href="https://governance.ai" target="_blank" rel="noopener">Centre for the Governance of AI</a></h4>
+						<p>Research organization focused on AI governance and policy development.</p>
+						<span class="resource-tag">Policy</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://cset.georgetown.edu" target="_blank" rel="noopener">CSET Georgetown</a></h4>
+						<p>Center for Security and Emerging Technology analyzing AI policy implications.</p>
+						<span class="resource-tag">Policy</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://ai-plans.com" target="_blank" rel="noopener">AI Plans</a></h4>
+						<p>Database of government AI strategies and policy documents worldwide.</p>
+						<span class="resource-tag">Database</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://situational-awareness.ai" target="_blank" rel="noopener">Situational Awareness</a></h4>
+						<p>Leopold Aschenbrenner's analysis of the AI race and national security implications.</p>
+						<span class="resource-tag">Analysis</span>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Community -->
+			<div class="resource-category">
+				<h3>
+					<span style="font-size: 1.2rem;" aria-hidden="true">[Community]</span>
+					Community & Discussion
+				</h3>
+				<div class="grid">
+					<div class="card resource-card">
+						<h4><a href="https://forum.effectivealtruism.org" target="_blank" rel="noopener">EA Forum</a></h4>
+						<p>Active community discussing AI safety research and effective altruism approaches.</p>
+						<span class="resource-tag">Forum</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://alignmentforum.org" target="_blank" rel="noopener">Alignment Forum</a></h4>
+						<p>Technical discussion forum for AI alignment research and ideas.</p>
+						<span class="resource-tag">Technical</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://lesswrong.com" target="_blank" rel="noopener">LessWrong</a></h4>
+						<p>Community blog focused on rationality, AI safety, and effective thinking.</p>
+						<span class="resource-tag">Community</span>
+					</div>
+					<div class="card resource-card">
+						<h4><a href="https://bluedot.org" target="_blank" rel="noopener">BlueDot Impact</a></h4>
+						<p>Platform offering courses and programs in AI safety and effective altruism.</p>
+						<span class="resource-tag">Training</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="disclaimer">
+			<p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+				<strong>Note:</strong> p(Doom)1 is an independent satirical game and is not affiliated with any of these organizations.
+			</p>
+			<p style="color: var(--text-secondary); font-size: 0.9rem;">
+				Last updated: September 2025 | <a href="https://github.com/PipFoweraker/pdoom1-website/issues" target="_blank" rel="noopener" style="color: var(--accent-primary);">Suggest additions</a>
+			</p>
+		</div>
+	</div>
+</body>
+</html>
