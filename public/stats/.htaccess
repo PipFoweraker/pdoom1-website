@@ -1,9 +1,14 @@
-# Allow public access to stats page
-# Override any parent directory authentication requirements
-Satisfy Any
-Require all granted
+# Complete authentication override
+AuthName "Public Access"
+AuthType None
 
-# Ensure this directory is publicly accessible
+# Allow everyone
 <RequireAll>
     Require all granted
 </RequireAll>
+
+# Override password protection
+Allow from all
+Deny from none
+Order Allow,Deny
+Satisfy Any
