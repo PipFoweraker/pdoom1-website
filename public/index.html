@@ -551,7 +551,7 @@
 				const statusInfo = document.createElement('div');
 				statusInfo.style.cssText = 'margin-top: 2rem; padding: 1.5rem; background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 4px solid var(--accent-primary);';
 				statusInfo.innerHTML = `
-					<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">🚧 Current Development Status</h3>
+					<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">[WIP] Current Development Status</h3>
 					<p><strong>Phase:</strong> ${status.game.development.phase}</p>
 					<p><strong>Progress:</strong> ${status.game.development.progress}</p>
 					<p><strong>Latest Release:</strong> <a href="${status.game.latestRelease?.downloadUrl || status.game.repository}" style="color: var(--accent-primary);">${status.game.latestRelease?.version || 'Check GitHub'}</a></p>
@@ -643,15 +643,16 @@
 				<li role="none"><a href="#home" role="menuitem">Game</a></li>
 				<li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
 				<li role="none" class="dropdown">
-					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
+					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community v</a>
 					<ul class="dropdown-menu" role="menu">
+						<li role="none"><a href="#known-issues" role="menuitem">Known Issues</a></li>
 						<li role="none"><a href="/blog/" role="menuitem">Dev Blog</a></li>
 						<li role="none"><a href="/changelog/" role="menuitem">Updates</a></li>
 						<li role="none"><a href="https://github.com/PipFoweraker/pdoom1" role="menuitem" target="_blank">GitHub</a></li>
 					</ul>
 				</li>
 				<li role="none" class="dropdown">
-					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
+					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info v</a>
 					<ul class="dropdown-menu" role="menu">
 						<li role="none"><a href="/about/" role="menuitem">About</a></li>
 						<li role="none"><a href="/docs/" role="menuitem">Documentation</a></li>
@@ -693,7 +694,7 @@
 					Coming Soon to Steam
 				</div>
 				<div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.3rem; text-align: center;">
-					©2025 Valve Corporation. Steam® is a registered trademark.
+					(c)2025 Valve Corporation. Steam is a registered trademark.
 				</div>
 			</div>
 			-->
@@ -705,7 +706,7 @@
 				<span class="stat-label">Competing AI Labs</span>
 			</div>
 			<div class="stat" role="img" aria-label="Infinite strategic possibilities">
-				<span class="stat-number" aria-hidden="true">∞</span>
+				<span class="stat-number" aria-hidden="true">infinity</span>
 				<span class="stat-label">Strategic Possibilities</span>
 			</div>
 			<div class="stat" role="img" aria-label="p(Doom) level management system">
@@ -751,7 +752,7 @@
 				<div class="card">
 					<h3>Short term (weeks)</h3>
 					<ul>
-						<li>Alpha updates 2–3x weekly via Dev Blog</li>
+						<li>Alpha updates 2-3x weekly via Dev Blog</li>
 						<li>Automated posts to Discord, Bluesky, X, LinkedIn</li>
 						<li>Bug intake via GitHub Issues (Netlify function)</li>
 					</ul>
@@ -763,6 +764,51 @@
 						<li>Design tokens synced from main repo style guide</li>
 						<li>Content pipeline from Airtable finalized</li>
 					</ul>
+				</div>
+			</div>
+		</section>
+
+		<section class="section" id="known-issues">
+			<h2>Known Issues & Development Status</h2>
+			<p>Live updates from our development repository. See what we're working on and known issues before downloading.</p>
+			
+			<div id="github-issues-container">
+				<div id="issues-loading" class="card" style="text-align: center; padding: 2rem;">
+					<div style="color: var(--text-muted);">
+						<div style="margin-bottom: 1rem;">Loading issues from GitHub...</div>
+						<div style="font-size: 0.9rem;">This may take a few seconds</div>
+					</div>
+				</div>
+				
+				<div id="issues-error" class="card" style="text-align: center; padding: 2rem; display: none; background: var(--bg-tertiary); border: 1px solid var(--accent-danger);">
+					<div style="color: var(--accent-danger);">
+						<div style="margin-bottom: 1rem;">Unable to load live issues</div>
+						<div style="font-size: 0.9rem; margin-bottom: 1rem;">GitHub API may be temporarily unavailable</div>
+						<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-primary);">
+							View issues directly on GitHub --&gt;
+						</a>
+					</div>
+				</div>
+				
+				<div id="issues-content" style="display: none;">
+					<div class="grid" id="issues-grid">
+						<!-- Issues will be populated here -->
+					</div>
+					
+					<div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+						<div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+							<span id="issues-count">0</span> open issues - 
+							Last updated: <span id="issues-timestamp">-</span>
+						</div>
+						<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+							<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary);">
+								View All Issues on GitHub
+							</a>
+							<button id="refresh-issues" class="cta-button" style="background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-color);">
+								Refresh
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -808,9 +854,9 @@
 						</ul>
 						<p><strong>Supported Platforms:</strong></p>
 						<div style="display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap;">
-							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">🪟 Windows</span>
-							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">🍎 macOS</span>
-							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">🐧 Linux</span>
+							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">Windows</span>
+							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">macOS</span>
+							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">Linux</span>
 						</div>
 					</div>
 				</div>
@@ -834,7 +880,7 @@ python main.py</pre>
 				<p style="color: var(--text-secondary); margin-bottom: 2rem;">Check out our documentation and community resources</p>
 				<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
 					<a href="/docs/" style="color: var(--accent-primary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-primary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">Documentation</a>
-					<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-secondary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">🐛 Report Issues</a>
+					<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-secondary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">[Bug] Report Issues</a>
 					<a href="/changelog/" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">Changelog</a>
 				</div>
 			</div>
@@ -890,7 +936,7 @@ python main.py</pre>
 					<div class="form-group">
 						<label for="bug-type">Bug Type</label>
 						<select id="bug-type" name="type" aria-describedby="type-help">
-							<option value="bug">🐛 Bug Report</option>
+							<option value="bug">[Bug] Bug Report</option>
 							<option value="feature">Feature Request</option>
 							<option value="documentation">Documentation Issue</option>
 							<option value="performance">Performance Issue</option>
@@ -930,12 +976,12 @@ python main.py</pre>
 			<h2>Stay Connected</h2>
 			<div class="grid">
 				<div class="card">
-					<h3>🔗 GitHub</h3>
+					<h3>[Link] GitHub</h3>
 					<p>Access source code, report issues, and contribute to development.</p>
-					<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">View Repository →</a>
+					<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">View Repository --&gt;</a>
 				</div>
 				<div class="card">
-					<h3>📧 Newsletter</h3>
+					<h3>[Mail] Newsletter</h3>
 					<p>Get updates on new releases and development progress.</p>
 					<form style="margin-top: 1rem;" id="newsletter-form">
 						<input type="email" placeholder="Enter your email" style="margin-bottom: 1rem;">
@@ -1077,7 +1123,7 @@ python main.py</pre>
 				if (isLocal) {
 					button.textContent = 'Submitting...';
 					await new Promise(r => setTimeout(r, 400));
-					button.textContent = '✅ Report Submitted! (local mock)';
+					button.textContent = '[OK] Report Submitted! (local mock)';
 					button.style.background = 'var(--success-color)';
 					setTimeout(() => {
 						button.textContent = originalText;
@@ -1097,7 +1143,7 @@ python main.py</pre>
 					body: JSON.stringify(bugData)
 				});
 				if (!res.ok) throw new Error('Failed to submit');
-				button.textContent = '✅ Report Submitted!';
+				button.textContent = '[OK] Report Submitted!';
 				button.style.background = 'var(--success-color)';
 				setTimeout(() => {
 					button.textContent = originalText;
@@ -1107,7 +1153,7 @@ python main.py</pre>
 				}, 3000);
 				
 			} catch (err) {
-				button.textContent = '❌ Submit Failed';
+				button.textContent = '[ERROR] Submit Failed';
 				button.style.background = 'var(--accent-danger)';
 				setTimeout(() => {
 					button.textContent = originalText;
@@ -1140,6 +1186,313 @@ python main.py</pre>
 				}
 			});
 		});
+		
+		// GitHub Issues Integration
+		class GitHubIssuesLoader {
+			constructor() {
+				this.apiUrl = 'https://api.github.com/repos/PipFoweraker/pdoom1/issues';
+				this.cache = null;
+				this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
+				this.lastFetch = 0;
+			}
+			
+			async fetchIssues() {
+				const now = Date.now();
+				
+				// Return cached data if still fresh
+				if (this.cache && (now - this.lastFetch < this.cacheExpiry)) {
+					return this.cache;
+				}
+				
+				try {
+					const response = await fetch(this.apiUrl + '?state=open&per_page=10&sort=updated', {
+						headers: {
+							'Accept': 'application/vnd.github.v3+json'
+						}
+					});
+					
+					if (!response.ok) {
+						throw new Error(`GitHub API error: ${response.status}`);
+					}
+					
+					const issues = await response.json();
+					this.cache = issues;
+					this.lastFetch = now;
+					
+					return issues;
+				} catch (error) {
+					console.warn('Failed to fetch GitHub issues:', error);
+					throw error;
+				}
+			}
+			
+			formatIssueCard(issue) {
+				const labels = issue.labels.map(label => 
+					`<span class="issue-label" style="background: #${label.color}; color: ${this.getContrastColor(label.color)}; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; margin-right: 4px;">${label.name}</span>`
+				).join('');
+				
+				const updatedDate = new Date(issue.updated_at).toLocaleDateString();
+				const isPriority = issue.labels.some(l => l.name.includes('priority-high') || l.name.includes('critical'));
+				const isBug = issue.labels.some(l => l.name === 'bug');
+				
+				const icon = isBug ? '[BUG]' : isPriority ? '[!]' : '[FEAT]';
+				const cardClass = isPriority ? 'priority-issue' : '';
+				
+				return `
+					<div class="card issue-card ${cardClass}" style="position: relative;">
+						<div style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem;">
+							<span style="font-size: 1.2rem;">${icon}</span>
+							<div style="flex: 1; min-width: 0;">
+								<h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; line-height: 1.3;">
+									<a href="${issue.html_url}" target="_blank" rel="noopener" style="color: var(--text-primary); text-decoration: none;">
+										${this.escapeHtml(issue.title)}
+									</a>
+								</h4>
+								<div style="margin-bottom: 0.5rem;">
+									${labels}
+								</div>
+								<div style="color: var(--text-muted); font-size: 0.8rem;">
+									#${issue.number} - Updated ${updatedDate}
+								</div>
+							</div>
+						</div>
+						${isPriority ? '<div style="position: absolute; top: 8px; right: 8px; background: var(--accent-danger); color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold;">HIGH PRIORITY</div>' : ''}
+					</div>
+				`;
+			}
+			
+			escapeHtml(text) {
+				const div = document.createElement('div');
+				div.textContent = text;
+				return div.innerHTML;
+			}
+			
+			getContrastColor(hexColor) {
+				// Convert hex to RGB
+				const r = parseInt(hexColor.substr(0, 2), 16);
+				const g = parseInt(hexColor.substr(2, 2), 16);
+				const b = parseInt(hexColor.substr(4, 2), 16);
+				
+				// Calculate luminance
+				const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+				
+				return luminance > 0.5 ? '#000000' : '#ffffff';
+			}
+			
+			async renderIssues() {
+				const loadingEl = document.getElementById('issues-loading');
+				const errorEl = document.getElementById('issues-error');
+				const contentEl = document.getElementById('issues-content');
+				const gridEl = document.getElementById('issues-grid');
+				const countEl = document.getElementById('issues-count');
+				const timestampEl = document.getElementById('issues-timestamp');
+				
+				// Show loading state
+				loadingEl.style.display = 'block';
+				errorEl.style.display = 'none';
+				contentEl.style.display = 'none';
+				
+				try {
+					const issues = await this.fetchIssues();
+					
+					// Hide loading, show content
+					loadingEl.style.display = 'none';
+					contentEl.style.display = 'block';
+					
+					// Populate issues grid
+					if (issues.length === 0) {
+						gridEl.innerHTML = `
+							<div class="card" style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
+								<div style="color: var(--success-color); margin-bottom: 1rem;">[OK] No open issues!</div>
+								<div style="color: var(--text-muted);">Everything is working smoothly</div>
+							</div>
+						`;
+					} else {
+						gridEl.innerHTML = issues.map(issue => this.formatIssueCard(issue)).join('');
+					}
+					
+					// Update metadata
+					countEl.textContent = issues.length;
+					timestampEl.textContent = new Date().toLocaleTimeString();
+					
+				} catch (error) {
+					// Try to show fallback data from static issues
+					try {
+						const fallbackIssues = await this.getFallbackIssues();
+						if (fallbackIssues && fallbackIssues.length > 0) {
+							loadingEl.style.display = 'none';
+							contentEl.style.display = 'block';
+							
+							gridEl.innerHTML = fallbackIssues.map(issue => this.formatIssueCard(issue)).join('') + `
+								<div class="card" style="text-align: center; padding: 1rem; grid-column: 1 / -1; background: var(--bg-tertiary); border: 1px solid var(--accent-secondary);">
+									<div style="color: var(--accent-secondary); font-size: 0.9rem;">
+										[WARNING] Showing cached issues - Live data temporarily unavailable
+									</div>
+								</div>
+							`;
+							
+							countEl.textContent = fallbackIssues.length + ' (cached)';
+							timestampEl.textContent = 'Cached data';
+						} else {
+							throw error; // Fall through to error state
+						}
+					} catch (fallbackError) {
+						// Show error state
+						loadingEl.style.display = 'none';
+						errorEl.style.display = 'block';
+						contentEl.style.display = 'none';
+					}
+				}
+			}
+			
+			async getFallbackIssues() {
+				// Try to fetch from static markdown file as fallback
+				try {
+					const response = await fetch('/docs/pdoom1-open-issues.md');
+					if (response.ok) {
+						const markdown = await response.text();
+						return this.parseMarkdownIssues(markdown);
+					}
+				} catch (e) {
+					// Fallback to hardcoded recent issues
+					return [
+						{
+							number: 245,
+							title: 'Post-Rebase Test Failures: 5 Functional Issues Requiring Investigation',
+							html_url: 'https://github.com/PipFoweraker/pdoom1/issues/245',
+							updated_at: '2025-09-09T06:16:52Z',
+							labels: [{ name: 'bug', color: 'd73a4a' }]
+						},
+						{
+							number: 240,
+							title: 'UI Interaction Issues: Button clicks and spacebar not working consistently',
+							html_url: 'https://github.com/PipFoweraker/pdoom1/issues/240',
+							updated_at: '2025-09-07T22:05:21Z',
+							labels: [{ name: 'bug', color: 'd73a4a' }, { name: 'ui-ux', color: '7057ff' }]
+						},
+						{
+							number: 232,
+							title: 'Drop Python 3.8 Support Initiative',
+							html_url: 'https://github.com/PipFoweraker/pdoom1/issues/232',
+							updated_at: '2025-09-04T23:27:29Z',
+							labels: [
+								{ name: 'enhancement', color: 'a2eeef' },
+								{ name: 'priority-high', color: 'b60205' },
+								{ name: 'technical-debt', color: 'fef2c0' }
+							]
+						}
+					];
+				}
+				return [];
+			}
+			
+			parseMarkdownIssues(markdown) {
+				// Simple parser for the existing markdown format
+				const lines = markdown.split('\n');
+				const issues = [];
+				
+				for (const line of lines) {
+					const match = line.match(/- \[#(\d+)\]\(([^)]+)\) (.+?) \| labels: ([^|]*) \| milestone: ([^|]*) \| updated: (.+)/);
+					if (match) {
+						const [, number, url, title, labelsStr, milestone, updated] = match;
+						const labels = labelsStr.split(', ')
+							.filter(l => l.trim())
+							.map(name => ({ name: name.trim(), color: this.getLabelColor(name.trim()) }));
+						
+						issues.push({
+							number: parseInt(number),
+							title: title.trim(),
+							html_url: url,
+							updated_at: updated.trim(),
+							labels: labels
+						});
+					}
+				}
+				
+				return issues.slice(0, 10); // Limit to 10 issues
+			}
+			
+			getLabelColor(labelName) {
+				const colorMap = {
+					'bug': 'd73a4a',
+					'enhancement': 'a2eeef',
+					'documentation': '0075ca',
+					'priority-high': 'b60205',
+					'priority-medium': 'fbca04',
+					'technical-debt': 'fef2c0',
+					'ui-ux': '7057ff',
+					'audio': 'c2e0c6'
+				};
+				return colorMap[labelName] || '6f42c1'; // Default purple
+			}
+		}
+		
+		// Initialize GitHub issues loader
+		const issuesLoader = new GitHubIssuesLoader();
+		
+		// Load issues when page loads
+		document.addEventListener('DOMContentLoaded', () => {
+			issuesLoader.renderIssues();
+		});
+		
+		// Refresh button functionality
+		document.addEventListener('DOMContentLoaded', () => {
+			const refreshBtn = document.getElementById('refresh-issues');
+			if (refreshBtn) {
+				refreshBtn.addEventListener('click', async () => {
+					const originalText = refreshBtn.textContent;
+					refreshBtn.textContent = 'Refreshing...';
+					refreshBtn.disabled = true;
+					
+					// Force cache refresh
+					issuesLoader.cache = null;
+					issuesLoader.lastFetch = 0;
+					
+					await issuesLoader.renderIssues();
+					
+					setTimeout(() => {
+						refreshBtn.textContent = originalText;
+						refreshBtn.disabled = false;
+					}, 1000);
+				});
+			}
+		});
 	</script>
+	
+	<!-- Add CSS for GitHub Issues -->
+	<style>
+		.issue-card {
+			transition: all var(--duration-base) var(--easing);
+		}
+		
+		.issue-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0, 255, 65, 0.15);
+		}
+		
+		.issue-card.priority-issue {
+			border-left: 4px solid var(--accent-danger);
+		}
+		
+		.issue-label {
+			display: inline-block;
+			white-space: nowrap;
+		}
+		
+		#github-issues-container {
+			margin-top: 2rem;
+		}
+		
+		@media (max-width: 768px) {
+			.issue-card h4 {
+				font-size: 0.9rem;
+			}
+			
+			.issue-label {
+				font-size: 0.7rem !important;
+				padding: 1px 4px !important;
+			}
+		}
+	</style>
 </body>
 </html>
