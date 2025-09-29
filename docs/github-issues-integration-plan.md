@@ -4,7 +4,7 @@
 This document details the implementation plan for integrating live GitHub issues from the main p(Doom)1 repository into the website to provide transparency about known bugs, planned features, and development status.
 
 ## Implementation Status
-✅ **COMPLETED** - Phase 1: Basic Integration
+**COMPLETED** - Phase 1: Basic Integration
 
 ### What's Been Implemented
 
@@ -22,9 +22,9 @@ This document details the implementation plan for integrating live GitHub issues
 
 #### 3. Issue Display Features
 - **Visual Categorization**: 
-  - 🐛 Bug reports
-  - 💡 Feature requests/enhancements
-  - 🚨 High priority items
+  - [BUG] Bug reports
+  - [FEAT] Feature requests/enhancements
+  - [!] High priority items
 - **Color-coded labels** matching GitHub's label system
 - **Priority highlighting** with red border and "HIGH PRIORITY" badge
 - **Responsive design** for mobile devices
@@ -62,24 +62,24 @@ class GitHubIssuesLoader {
 - **CORS**: Works from any domain (GitHub API is public)
 
 ### Fallback Strategy
-1. **Live API** → GitHub Issues API
-2. **Static Cache** → Parse existing `/docs/pdoom1-open-issues.md`
-3. **Hardcoded** → Show 3 most critical recent issues
-4. **Error State** → Direct link to GitHub issues page
+1. **Live API** --&gt; GitHub Issues API
+2. **Static Cache** --&gt; Parse existing `/docs/pdoom1-open-issues.md`
+3. **Hardcoded** --&gt; Show 3 most critical recent issues
+4. **Error State** --&gt; Direct link to GitHub issues page
 
 ## Benefits Achieved
 
 ### For Users
-- ✅ **Transparency**: See known issues before downloading
-- ✅ **Platform Awareness**: Identify platform-specific problems
-- ✅ **Reduced Support**: Fewer duplicate bug reports
-- ✅ **Development Visibility**: Active maintenance demonstrated
+- **Transparency**: See known issues before downloading
+- **Platform Awareness**: Identify platform-specific problems
+- **Reduced Support**: Fewer duplicate bug reports
+- **Development Visibility**: Active maintenance demonstrated
 
 ### for Developers  
-- ✅ **Automated Updates**: No manual website updates needed
-- ✅ **Consistent Data**: Single source of truth (GitHub issues)
-- ✅ **Better Triage**: Users see existing issues before reporting
-- ✅ **Community Engagement**: Direct links to GitHub discussions
+- **Automated Updates**: No manual website updates needed
+- **Consistent Data**: Single source of truth (GitHub issues)
+- **Better Triage**: Users see existing issues before reporting
+- **Community Engagement**: Direct links to GitHub discussions
 
 ## Future Enhancements (Phase 2+)
 
@@ -116,7 +116,7 @@ class GitHubIssuesLoader {
 
 ## Success Metrics
 
-✅ **Achieved**:
+**Achieved**:
 - [x] Real-time issue display on website
 - [x] Graceful degradation when API unavailable  
 - [x] Users can see platform compatibility before download

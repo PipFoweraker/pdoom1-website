@@ -551,7 +551,7 @@
 				const statusInfo = document.createElement('div');
 				statusInfo.style.cssText = 'margin-top: 2rem; padding: 1.5rem; background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 4px solid var(--accent-primary);';
 				statusInfo.innerHTML = `
-					<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">🚧 Current Development Status</h3>
+					<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">[WIP] Current Development Status</h3>
 					<p><strong>Phase:</strong> ${status.game.development.phase}</p>
 					<p><strong>Progress:</strong> ${status.game.development.progress}</p>
 					<p><strong>Latest Release:</strong> <a href="${status.game.latestRelease?.downloadUrl || status.game.repository}" style="color: var(--accent-primary);">${status.game.latestRelease?.version || 'Check GitHub'}</a></p>
@@ -643,7 +643,7 @@
 				<li role="none"><a href="#home" role="menuitem">Game</a></li>
 				<li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
 				<li role="none" class="dropdown">
-					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
+					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community v</a>
 					<ul class="dropdown-menu" role="menu">
 						<li role="none"><a href="#known-issues" role="menuitem">Known Issues</a></li>
 						<li role="none"><a href="/blog/" role="menuitem">Dev Blog</a></li>
@@ -652,7 +652,7 @@
 					</ul>
 				</li>
 				<li role="none" class="dropdown">
-					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
+					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info v</a>
 					<ul class="dropdown-menu" role="menu">
 						<li role="none"><a href="/about/" role="menuitem">About</a></li>
 						<li role="none"><a href="/docs/" role="menuitem">Documentation</a></li>
@@ -694,7 +694,7 @@
 					Coming Soon to Steam
 				</div>
 				<div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.3rem; text-align: center;">
-					©2025 Valve Corporation. Steam® is a registered trademark.
+					(c)2025 Valve Corporation. Steam is a registered trademark.
 				</div>
 			</div>
 			-->
@@ -706,7 +706,7 @@
 				<span class="stat-label">Competing AI Labs</span>
 			</div>
 			<div class="stat" role="img" aria-label="Infinite strategic possibilities">
-				<span class="stat-number" aria-hidden="true">∞</span>
+				<span class="stat-number" aria-hidden="true">infinity</span>
 				<span class="stat-label">Strategic Possibilities</span>
 			</div>
 			<div class="stat" role="img" aria-label="p(Doom) level management system">
@@ -752,7 +752,7 @@
 				<div class="card">
 					<h3>Short term (weeks)</h3>
 					<ul>
-						<li>Alpha updates 2–3x weekly via Dev Blog</li>
+						<li>Alpha updates 2-3x weekly via Dev Blog</li>
 						<li>Automated posts to Discord, Bluesky, X, LinkedIn</li>
 						<li>Bug intake via GitHub Issues (Netlify function)</li>
 					</ul>
@@ -775,17 +775,17 @@
 			<div id="github-issues-container">
 				<div id="issues-loading" class="card" style="text-align: center; padding: 2rem;">
 					<div style="color: var(--text-muted);">
-						<div style="margin-bottom: 1rem;">🔄 Loading issues from GitHub...</div>
+						<div style="margin-bottom: 1rem;">Loading issues from GitHub...</div>
 						<div style="font-size: 0.9rem;">This may take a few seconds</div>
 					</div>
 				</div>
 				
 				<div id="issues-error" class="card" style="text-align: center; padding: 2rem; display: none; background: var(--bg-tertiary); border: 1px solid var(--accent-danger);">
 					<div style="color: var(--accent-danger);">
-						<div style="margin-bottom: 1rem;">❌ Unable to load live issues</div>
+						<div style="margin-bottom: 1rem;">Unable to load live issues</div>
 						<div style="font-size: 0.9rem; margin-bottom: 1rem;">GitHub API may be temporarily unavailable</div>
 						<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-primary);">
-							View issues directly on GitHub →
+							View issues directly on GitHub --&gt;
 						</a>
 					</div>
 				</div>
@@ -797,7 +797,7 @@
 					
 					<div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
 						<div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-							<span id="issues-count">0</span> open issues • 
+							<span id="issues-count">0</span> open issues - 
 							Last updated: <span id="issues-timestamp">-</span>
 						</div>
 						<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
@@ -805,7 +805,7 @@
 								View All Issues on GitHub
 							</a>
 							<button id="refresh-issues" class="cta-button" style="background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-color);">
-								🔄 Refresh
+								Refresh
 							</button>
 						</div>
 					</div>
@@ -854,9 +854,9 @@
 						</ul>
 						<p><strong>Supported Platforms:</strong></p>
 						<div style="display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap;">
-							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">🪟 Windows</span>
-							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">🍎 macOS</span>
-							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">🐧 Linux</span>
+							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">Windows</span>
+							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">macOS</span>
+							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">Linux</span>
 						</div>
 					</div>
 				</div>
@@ -880,7 +880,7 @@ python main.py</pre>
 				<p style="color: var(--text-secondary); margin-bottom: 2rem;">Check out our documentation and community resources</p>
 				<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
 					<a href="/docs/" style="color: var(--accent-primary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-primary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">Documentation</a>
-					<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-secondary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">🐛 Report Issues</a>
+					<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-secondary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">[Bug] Report Issues</a>
 					<a href="/changelog/" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">Changelog</a>
 				</div>
 			</div>
@@ -936,7 +936,7 @@ python main.py</pre>
 					<div class="form-group">
 						<label for="bug-type">Bug Type</label>
 						<select id="bug-type" name="type" aria-describedby="type-help">
-							<option value="bug">🐛 Bug Report</option>
+							<option value="bug">[Bug] Bug Report</option>
 							<option value="feature">Feature Request</option>
 							<option value="documentation">Documentation Issue</option>
 							<option value="performance">Performance Issue</option>
@@ -976,12 +976,12 @@ python main.py</pre>
 			<h2>Stay Connected</h2>
 			<div class="grid">
 				<div class="card">
-					<h3>🔗 GitHub</h3>
+					<h3>[Link] GitHub</h3>
 					<p>Access source code, report issues, and contribute to development.</p>
-					<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">View Repository →</a>
+					<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">View Repository --&gt;</a>
 				</div>
 				<div class="card">
-					<h3>📧 Newsletter</h3>
+					<h3>[Mail] Newsletter</h3>
 					<p>Get updates on new releases and development progress.</p>
 					<form style="margin-top: 1rem;" id="newsletter-form">
 						<input type="email" placeholder="Enter your email" style="margin-bottom: 1rem;">
@@ -1123,7 +1123,7 @@ python main.py</pre>
 				if (isLocal) {
 					button.textContent = 'Submitting...';
 					await new Promise(r => setTimeout(r, 400));
-					button.textContent = '✅ Report Submitted! (local mock)';
+					button.textContent = '[OK] Report Submitted! (local mock)';
 					button.style.background = 'var(--success-color)';
 					setTimeout(() => {
 						button.textContent = originalText;
@@ -1143,7 +1143,7 @@ python main.py</pre>
 					body: JSON.stringify(bugData)
 				});
 				if (!res.ok) throw new Error('Failed to submit');
-				button.textContent = '✅ Report Submitted!';
+				button.textContent = '[OK] Report Submitted!';
 				button.style.background = 'var(--success-color)';
 				setTimeout(() => {
 					button.textContent = originalText;
@@ -1153,7 +1153,7 @@ python main.py</pre>
 				}, 3000);
 				
 			} catch (err) {
-				button.textContent = '❌ Submit Failed';
+				button.textContent = '[ERROR] Submit Failed';
 				button.style.background = 'var(--accent-danger)';
 				setTimeout(() => {
 					button.textContent = originalText;
@@ -1235,7 +1235,7 @@ python main.py</pre>
 				const isPriority = issue.labels.some(l => l.name.includes('priority-high') || l.name.includes('critical'));
 				const isBug = issue.labels.some(l => l.name === 'bug');
 				
-				const icon = isBug ? '🐛' : isPriority ? '🚨' : '💡';
+				const icon = isBug ? '[BUG]' : isPriority ? '[!]' : '[FEAT]';
 				const cardClass = isPriority ? 'priority-issue' : '';
 				
 				return `
@@ -1252,7 +1252,7 @@ python main.py</pre>
 									${labels}
 								</div>
 								<div style="color: var(--text-muted); font-size: 0.8rem;">
-									#${issue.number} • Updated ${updatedDate}
+									#${issue.number} - Updated ${updatedDate}
 								</div>
 							</div>
 						</div>
@@ -1303,7 +1303,7 @@ python main.py</pre>
 					if (issues.length === 0) {
 						gridEl.innerHTML = `
 							<div class="card" style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
-								<div style="color: var(--success-color); margin-bottom: 1rem;">✅ No open issues!</div>
+								<div style="color: var(--success-color); margin-bottom: 1rem;">[OK] No open issues!</div>
 								<div style="color: var(--text-muted);">Everything is working smoothly</div>
 							</div>
 						`;
@@ -1326,7 +1326,7 @@ python main.py</pre>
 							gridEl.innerHTML = fallbackIssues.map(issue => this.formatIssueCard(issue)).join('') + `
 								<div class="card" style="text-align: center; padding: 1rem; grid-column: 1 / -1; background: var(--bg-tertiary); border: 1px solid var(--accent-secondary);">
 									<div style="color: var(--accent-secondary); font-size: 0.9rem;">
-										⚠️ Showing cached issues - Live data temporarily unavailable
+										[WARNING] Showing cached issues - Live data temporarily unavailable
 									</div>
 								</div>
 							`;
@@ -1441,7 +1441,7 @@ python main.py</pre>
 			if (refreshBtn) {
 				refreshBtn.addEventListener('click', async () => {
 					const originalText = refreshBtn.textContent;
-					refreshBtn.textContent = '🔄 Refreshing...';
+					refreshBtn.textContent = 'Refreshing...';
 					refreshBtn.disabled = true;
 					
 					// Force cache refresh
