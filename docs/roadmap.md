@@ -2,8 +2,6 @@
 
 This roadmap is a living document. It summarizes major goals and feeds the GitHub Issues backlog for execution.
 
-*This roadmap can be automatically synchronized with GitHub milestones from the [PipFoweraker/pdoom1](https://github.com/PipFoweraker/pdoom1) repository. See [roadmap-sync-strategy.md](roadmap-sync-strategy.md) for details.*
-
 ## 0.0.x (Alpha) – Now
 - Content cadence: 2–3 dev blog posts per week
 - Bug intake: Netlify function -> repo dispatch -> Issues
@@ -29,7 +27,5 @@ This roadmap is a living document. It summarizes major goals and feeds the GitHu
 - Localization scaffolding
 
 ## Notes
-- **Source of truth** for game code and design system is the [`PipFoweraker/pdoom1`](https://github.com/PipFoweraker/pdoom1) repo. This site links there for downloads until Steam launch.
-- **Live backlog snapshot**: see [`/docs/pdoom1-open-issues.md`](/docs/pdoom1-open-issues.md) (pulled from the main repo).
-- **Roadmap synchronization**: This roadmap can be updated from GitHub milestones using `npm run generate:roadmap`
-
+- Source of truth for game code and design system is the `PipFoweraker/pdoom1` repo. This site links there for downloads until Steam launch.
+ - Live backlog snapshot: see `/docs/pdoom1-open-issues.md` (pulled from the main repo).
