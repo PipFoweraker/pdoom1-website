@@ -31,6 +31,14 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Generate sitemap
+        run: node scripts/generate-sitemap.js
+
       - name: Setup SSH
         env:
           DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
