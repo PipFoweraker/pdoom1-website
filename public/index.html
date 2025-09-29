@@ -282,6 +282,32 @@
 			font-size: 0.9rem;
 		}
 
+		.stat-link {
+			text-decoration: none;
+			color: inherit;
+			transition: all var(--duration-base) var(--easing);
+			border-radius: var(--radius-md);
+			padding: 1rem;
+			margin: 0 0.5rem;
+			display: block;
+		}
+
+		.stat-link:hover {
+			background: var(--bg-secondary);
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0, 255, 65, 0.2);
+		}
+
+		.stat-link:hover .stat-number {
+			color: var(--accent-secondary);
+			text-shadow: 0 0 10px var(--accent-secondary);
+		}
+
+		.roadmap-card:hover {
+			border-color: var(--accent-primary);
+			background: var(--bg-tertiary);
+		}
+
 		.form-container {
 			background: var(--bg-secondary);
 			border: var(--border-width, 1px) solid var(--border-color);
@@ -780,23 +806,29 @@
 		</section>
 
 		<section class="stats" role="complementary" aria-label="Game statistics">
-			<div class="stat" role="img" aria-label="This week's baseline doom percentage">
-				<span class="stat-number" aria-hidden="true">23%</span>
-				<span class="stat-label">Baseline Doom</span>
-			</div>
-			<div class="stat" role="img" aria-label="Number of frontier labs">
-				<span class="stat-number" aria-hidden="true">7</span>
-				<span class="stat-label">Frontier Labs</span>
-			</div>
-			<div class="stat" role="img" aria-label="Strategic possibilities in the game">
-				<span class="stat-number" aria-hidden="true">10,000+</span>
-				<span class="stat-label">Strategic Possibilities</span>
-			</div>
+			<a href="/stats/" class="stat-link" role="img" aria-label="This week's baseline doom percentage - click for detailed statistics">
+				<div class="stat">
+					<span class="stat-number" aria-hidden="true">23%</span>
+					<span class="stat-label">Baseline Doom</span>
+				</div>
+			</a>
+			<a href="/stats/" class="stat-link" role="img" aria-label="Number of frontier labs - click for detailed statistics">
+				<div class="stat">
+					<span class="stat-number" aria-hidden="true">7</span>
+					<span class="stat-label">Frontier Labs</span>
+				</div>
+			</a>
+			<a href="/stats/" class="stat-link" role="img" aria-label="Strategic possibilities in the game - click for detailed statistics">
+				<div class="stat">
+					<span class="stat-number" aria-hidden="true">10,000+</span>
+					<span class="stat-label">Strategic Possibilities</span>
+				</div>
+			</a>
 		</section>
 		
 		<div style="text-align: center; margin: 1rem 0;">
-			<a href="/stats/" style="color: var(--accent-primary); text-decoration: none; font-size: 0.9rem; opacity: 0.8; transition: opacity 0.2s;">
-				View Detailed Game Statistics →
+			<a href="/stats/" class="cta-button" style="display: inline-block; font-size: 0.9rem; padding: 0.75rem 1.5rem;">
+				📊 View Detailed Game Statistics →
 			</a>
 		</div>
 
@@ -907,22 +939,28 @@ python main.py</pre>
 			<h2>Roadmap</h2>
 			<p>High-level milestones for the website and game distribution. Full details live in <a href="/docs/roadmap.md" style="color: var(--accent-primary);">docs/roadmap.md</a>. Also see <a href="/docs/pdoom1-open-issues.md" style="color: var(--accent-primary);">Open issues from the main repo</a> for day-to-day tasks.</p>
 			<div class="grid">
-				<div class="card">
-					<h3>Short term (weeks)</h3>
+				<a href="/docs/roadmap.md" class="card roadmap-card" style="text-decoration: none; color: inherit;">
+					<h3>Short term (weeks) 📅</h3>
 					<ul>
 						<li>Alpha updates 2-3x weekly via Dev Blog</li>
 						<li>Automated posts to Discord, Bluesky, X, LinkedIn</li>
 						<li>Bug intake via GitHub Issues (Netlify function)</li>
 					</ul>
-				</div>
-				<div class="card">
-					<h3>Mid term (months)</h3>
+					<div style="margin-top: 1rem; font-size: 0.8rem; color: var(--accent-primary);">
+						Click for detailed roadmap →
+					</div>
+				</a>
+				<a href="/docs/roadmap.md" class="card roadmap-card" style="text-decoration: none; color: inherit;">
+					<h3>Mid term (months) 🚀</h3>
 					<ul>
 						<li>Steam release preparation</li>
 						<li>Design tokens synced from main repo style guide</li>
 						<li>Content pipeline from Airtable finalized</li>
 					</ul>
-				</div>
+					<div style="margin-top: 1rem; font-size: 0.8rem; color: var(--accent-primary);">
+						Click for detailed roadmap →
+					</div>
+				</a>
 			</div>
 		</section>
 

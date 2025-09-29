@@ -1,0 +1,9 @@
+# Allow public access to stats page
+# Override any parent directory authentication requirements
+Satisfy Any
+Require all granted
+
+# Ensure this directory is publicly accessible
+<RequireAll>
+    Require all granted
+</RequireAll>
