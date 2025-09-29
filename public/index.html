@@ -61,7 +61,7 @@
 		header {
 			background: var(--bg-secondary);
 			border-bottom: 2px solid var(--accent-primary);
-			padding: 1rem 0;
+			padding: 0.8rem 0;
 			position: sticky;
 			top: 0;
 			z-index: 100;
@@ -78,15 +78,15 @@
 
 		.logo-container {
 			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
+			flex-direction: row;
+			align-items: center;
+			gap: 0.5rem;
 		}
 
 		.designer-credit {
-			font-size: 0.75rem;
+			font-size: 0.85rem;
 			color: var(--text-muted);
 			font-weight: normal;
-			margin-bottom: -0.2rem;
 			letter-spacing: 0.5px;
 		}
 
@@ -110,6 +110,8 @@
 			transition: color var(--duration-base) var(--easing);
 			padding: 0.5rem 1rem;
 			border: 1px solid transparent;
+			font-size: 1.1rem;
+			font-weight: 600;
 		}
 
 		.nav-links a:hover {
@@ -178,7 +180,7 @@
 
 		.hero {
 			text-align: center;
-			padding: 4rem 0;
+			padding: 2.5rem 0;
 			background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
 			border-radius: var(--radius-lg, 10px);
 			margin-bottom: 3rem;
@@ -741,7 +743,7 @@
 
 	<main role="main" id="main-content">
 		<section class="hero" id="home" role="banner" aria-labelledby="main-heading">
-			<h1 id="main-heading">pdoom1</h1>
+			<h1 id="main-heading">p(Doom)1</h1>
 			<p class="subtitle">A satirical meta-strategy game about AI Safety</p>
 			<p style="margin-bottom: 1rem; color: var(--text-secondary);">
 				<span class="status-indicator status-active"></span>
@@ -777,23 +779,23 @@
 		</section>
 
 		<section class="stats" role="complementary" aria-label="Game statistics">
-			<div class="stat" role="img" aria-label="3 competing AI labs">
-				<span class="stat-number" aria-hidden="true">3</span>
-				<span class="stat-label">Competing AI Labs</span>
+			<div class="stat" role="img" aria-label="This week's baseline doom percentage">
+				<span class="stat-number" aria-hidden="true">23%</span>
+				<span class="stat-label">Baseline Doom</span>
 			</div>
-			<div class="stat" role="img" aria-label="Infinite strategic possibilities">
-				<span class="stat-number" aria-hidden="true">infinity</span>
+			<div class="stat" role="img" aria-label="Number of frontier labs">
+				<span class="stat-number" aria-hidden="true">7</span>
+				<span class="stat-label">Frontier Labs</span>
+			</div>
+			<div class="stat" role="img" aria-label="Strategic possibilities in the game">
+				<span class="stat-number" aria-hidden="true">10,000+</span>
 				<span class="stat-label">Strategic Possibilities</span>
-			</div>
-			<div class="stat" role="img" aria-label="p(Doom) level management system">
-				<span class="stat-number" aria-hidden="true">p(Doom)</span>
-				<span class="stat-label">Level Management</span>
 			</div>
 		</section>
 
 		<section class="section" id="about">
 			<h2>About the Game</h2>
-			<p>pdoom1 is a satirical meta-strategy game inspired by Papers Please, Pandemic, and clicker games. Navigate the complex world of AI safety research while managing resources, competing with other AI labs, and trying to prevent catastrophic outcomes.</p>
+			<p>p(Doom)1 is a satirical meta-strategy game inspired by Papers Please, Pandemic, and clicker games. Navigate the complex world of AI safety research while managing resources, competing with other AI labs, and trying to prevent catastrophic outcomes.</p>
 			
 			<!-- Game Screenshots -->
 			<div style="text-align: center; margin: 2rem 0;">
