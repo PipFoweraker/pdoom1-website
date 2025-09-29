@@ -5,6 +5,7 @@
   "scripts": {
     "start": "python -m http.server -d public 5173",
     "test:bug": "node api/test-report-bug.js",
-    "generate:issues": "node scripts/generate_pdoom1_issues_md.js"
+    "generate:issues": "node scripts/generate_pdoom1_issues_md.js",
+    "generate:roadmap": "node scripts/generate_roadmap_from_milestones.js"
   }
 }
