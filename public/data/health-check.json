@@ -1,0 +1,111 @@
+{
+  "last_check": "2025-09-30T07:58:48.182912",
+  "total_tests": 14,
+  "passed": 12,
+  "failed": 2,
+  "warnings": [],
+  "results": [
+    {
+      "test": "Main Page Exists",
+      "passed": true,
+      "message": "File exists: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public/index.html",
+      "timestamp": "2025-09-30T07:58:45.733653",
+      "is_warning": false
+    },
+    {
+      "test": "Stats Page Exists",
+      "passed": true,
+      "message": "File exists: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public/stats/index.html",
+      "timestamp": "2025-09-30T07:58:45.733832",
+      "is_warning": false
+    },
+    {
+      "test": "Version Data Exists",
+      "passed": true,
+      "message": "File exists: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public/data/version.json",
+      "timestamp": "2025-09-30T07:58:45.734029",
+      "is_warning": false
+    },
+    {
+      "test": "Version Script Exists",
+      "passed": true,
+      "message": "File exists: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\scripts/update-version-info.py",
+      "timestamp": "2025-09-30T07:58:45.734172",
+      "is_warning": false
+    },
+    {
+      "test": "Stats Script Exists",
+      "passed": true,
+      "message": "File exists: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\scripts/calculate-game-stats.py",
+      "timestamp": "2025-09-30T07:58:45.734356",
+      "is_warning": false
+    },
+    {
+      "test": "Package Config Exists",
+      "passed": true,
+      "message": "File exists: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\package.json",
+      "timestamp": "2025-09-30T07:58:45.734461",
+      "is_warning": false
+    },
+    {
+      "test": "Version JSON Valid",
+      "passed": true,
+      "message": "JSON is valid",
+      "timestamp": "2025-09-30T07:58:45.734794",
+      "is_warning": false
+    },
+    {
+      "test": "Package JSON Valid",
+      "passed": true,
+      "message": "JSON is valid",
+      "timestamp": "2025-09-30T07:58:45.735092",
+      "is_warning": false
+    },
+    {
+      "test": "Version Data Freshness",
+      "passed": true,
+      "message": "Version data is 0.0 hours old",
+      "timestamp": "2025-09-30T07:58:45.735448",
+      "is_warning": false
+    },
+    {
+      "test": "GitHub API Access",
+      "passed": true,
+      "message": "Repository accessible: pdoom1",
+      "timestamp": "2025-09-30T07:58:45.990980",
+      "is_warning": false
+    },
+    {
+      "test": "Data Consistency",
+      "passed": true,
+      "message": "All data fields present and reasonable",
+      "timestamp": "2025-09-30T07:58:45.991645",
+      "is_warning": false
+    },
+    {
+      "test": "Website Access (https://pdoom1.com)",
+      "passed": true,
+      "message": "Site accessible with expected content",
+      "timestamp": "2025-09-30T07:58:47.564979",
+      "is_warning": false
+    },
+    {
+      "test": "Version Update Script",
+      "passed": false,
+      "message": "Script failed: ",
+      "timestamp": "2025-09-30T07:58:48.093983",
+      "is_warning": false
+    },
+    {
+      "test": "Stats Calculation Script",
+      "passed": false,
+      "message": "Script failed: ",
+      "timestamp": "2025-09-30T07:58:48.181549",
+      "is_warning": false
+    }
+  ],
+  "failed_tests": [
+    "Version Update Script: Script failed: ",
+    "Stats Calculation Script: Script failed: "
+  ]
+}

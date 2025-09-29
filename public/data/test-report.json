@@ -1,0 +1,83 @@
+{
+  "summary": {
+    "start_time": "2025-09-30T08:33:28.126339",
+    "end_time": "2025-09-30T08:33:29.941238",
+    "total_duration": 1.814899,
+    "total_tests": 7,
+    "passed_tests": 3,
+    "failed_tests": 4,
+    "success_rate": 42.857142857142854
+  },
+  "test_results": [
+    {
+      "test_name": "Python Available",
+      "command": "python --version",
+      "success": true,
+      "duration": 0.03633475303649902,
+      "timestamp": "2025-09-30T08:33:28.163232",
+      "stdout": "Python 3.13.3\n",
+      "stderr": "",
+      "return_code": 0
+    },
+    {
+      "test_name": "Package Config Exists",
+      "command": "ls package.json",
+      "success": true,
+      "duration": 0.0425107479095459,
+      "timestamp": "2025-09-30T08:33:28.205976",
+      "stdout": "package.json\n",
+      "stderr": "",
+      "return_code": 0
+    },
+    {
+      "test_name": "Main Website Exists",
+      "command": "ls public/index.html",
+      "success": true,
+      "duration": 0.03842329978942871,
+      "timestamp": "2025-09-30T08:33:28.244603",
+      "stdout": "public/index.html\n",
+      "stderr": "",
+      "return_code": 0
+    },
+    {
+      "test_name": "Version Data Update",
+      "command": "python scripts/update-version-info.py",
+      "success": false,
+      "duration": 1.293229103088379,
+      "timestamp": "2025-09-30T08:33:29.538294",
+      "stdout": "Fetching version information...\nError updating version: 'charmap' codec can't encode character '\\u2713' in position 0: character maps to <undefined>\n",
+      "stderr": "",
+      "return_code": 1
+    },
+    {
+      "test_name": "Game Stats Calculation",
+      "command": "python scripts/calculate-game-stats.py",
+      "success": false,
+      "duration": 0.11879611015319824,
+      "timestamp": "2025-09-30T08:33:29.657581",
+      "stdout": "Found 4 frontier organizations mentioned:\n  - Anthropic\n  - Machine Intelligence Research Institute\n  - Center for AI Safety\n  - Center for Human-Compatible AI\nError calculating game stats: 'charmap' codec can't encode character '\\u2713' in position 0: character maps to <undefined>\n",
+      "stderr": "",
+      "return_code": 1
+    },
+    {
+      "test_name": "Comprehensive Health Check",
+      "command": "python scripts/health-check.py",
+      "success": false,
+      "duration": 0.11625933647155762,
+      "timestamp": "2025-09-30T08:33:29.774389",
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\health-check.py\", line 270, in <module>\n    main()\n    ~~~~^^\n  File \"C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\health-check.py\", line 259, in main\n    summary = checker.run_all_checks()\n  File \"C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\health-check.py\", line 161, in run_all_checks\n    print(\"\\U0001f3e5 Running comprehensive health checks...\")\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\gday\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f3e5' in position 0: character maps to <undefined>\n",
+      "return_code": 1
+    },
+    {
+      "test_name": "Deployment Verification",
+      "command": "python scripts/verify-deployment.py",
+      "success": false,
+      "duration": 0.16557955741882324,
+      "timestamp": "2025-09-30T08:33:29.940676",
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\verify-deployment.py\", line 253, in <module>\n    main()\n    ~~~~^^\n  File \"C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\verify-deployment.py\", line 239, in main\n    deployment_approved = verifier.verify_deployment_readiness()\n  File \"C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\verify-deployment.py\", line 174, in verify_deployment_readiness\n    print(\"\\U0001f680 p(Doom)1 Deployment Verification\")\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\gday\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f680' in position 0: character maps to <undefined>\n",
+      "return_code": 1
+    }
+  ]
+}

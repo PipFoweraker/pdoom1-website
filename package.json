@@ -5,7 +5,15 @@
   "scripts": {
     "start": "python -m http.server -d public 5173",
     "test:bug": "node api/test-report-bug.js",
+    "test:health": "python scripts/health-check.py",
+    "test:deploy": "python scripts/verify-deployment.py",
+    "test:all": "python scripts/health-check.py && python scripts/verify-deployment.py",
     "generate:issues": "node scripts/generate_pdoom1_issues_md.js",
-    "generate:roadmap": "node scripts/generate_roadmap_from_milestones.js"
+    "generate:roadmap": "node scripts/generate_roadmap_from_milestones.js",
+    "update:version": "python scripts/update-version-info.py",
+    "update:stats": "python scripts/calculate-game-stats.py",
+    "sync:all": "python scripts/update-version-info.py && python scripts/calculate-game-stats.py",
+    "deploy:verify": "python scripts/verify-deployment.py && echo 'Deployment verification passed!'",
+    "deploy:prepare": "npm run sync:all && npm run test:all && echo 'Ready for deployment!'"
   }
 }

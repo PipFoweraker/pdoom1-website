@@ -1,0 +1,262 @@
+name: Health Checks and Deployment Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run health checks every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      run_full_tests:
+        description: 'Run full test suite including deployment simulation'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write  # For creating alerts as GitHub issues
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Add any required dependencies here
+          
+      - name: Run version update script
+        run: |
+          echo "Testing version update script..."
+          python scripts/update-version-info.py
+          
+      - name: Run stats calculation script  
+        run: |
+          echo "Testing stats calculation script..."
+          python scripts/calculate-game-stats.py
+          
+      - name: Verify data files created
+        run: |
+          echo "Checking generated data files..."
+          ls -la public/data/
+          test -f public/data/version.json || exit 1
+          echo "✓ version.json exists"
+          
+      - name: Run comprehensive health checks
+        run: |
+          echo "Running full health check suite..."
+          python scripts/health-check.py
+          
+      - name: Test package.json scripts
+        run: |
+          echo "Testing npm scripts..."
+          # Test that our Python scripts work via npm
+          npm run update:version
+          npm run update:stats
+          
+      - name: Validate JSON files
+        run: |
+          echo "Validating JSON syntax..."
+          python -m json.tool public/data/version.json > /dev/null
+          python -m json.tool public/data/health-check.json > /dev/null
+          echo "✓ All JSON files are valid"
+          
+      - name: Test website build integrity
+        run: |
+          echo "Testing website structure..."
+          # Check critical files exist
+          test -f public/index.html || exit 1
+          test -f public/stats/index.html || exit 1
+          test -f package.json || exit 1
+          echo "✓ Website structure is intact"
+          
+      - name: Upload health check results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: health-check-results
+          path: |
+            public/data/health-check.json
+            public/data/version.json
+          retention-days: 30
+          
+      - name: Create issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🚨 Health Check Failed - ${new Date().toISOString().split('T')[0]}`;
+            const body = `
+            ## Health Check Failure Report
+            
+            **Workflow:** ${{ github.workflow }}
+            **Run ID:** ${{ github.run_id }}
+            **Commit:** ${{ github.sha }}
+            **Branch:** ${{ github.ref_name }}
+            **Triggered by:** ${{ github.event_name }}
+            
+            ### Failed Steps
+            One or more health checks have failed. Please check the workflow logs for details.
+            
+            ### Next Steps
+            1. Review the workflow logs: [Link to run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            2. Check which scripts are failing
+            3. Verify data integrity
+            4. Test deployment process manually if needed
+            
+            ### Auto-generated Alert
+            This issue was automatically created by the health check workflow.
+            
+            **Priority:** High - Deployment process integrity compromised
+            `;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['bug', 'deployment', 'automated-alert', 'high-priority']
+            });
+            
+  deployment-simulation:
+    runs-on: ubuntu-latest
+    needs: health-check
+    if: github.event.inputs.run_full_tests == 'true' || github.event_name == 'schedule'
+    environment: production
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Simulate full deployment process
+        run: |
+          echo "Simulating deployment process..."
+          
+          # Step 1: Update version and stats
+          python scripts/update-version-info.py
+          python scripts/calculate-game-stats.py
+          
+          # Step 2: Verify data integrity
+          python scripts/health-check.py
+          
+          # Step 3: Check file sizes (detect corruption)
+          echo "Checking file sizes..."
+          stat public/index.html
+          stat public/data/version.json
+          
+          # Step 4: Test critical content exists
+          echo "Testing content integrity..."
+          grep -q "p(Doom)1" public/index.html || exit 1
+          grep -q "AI Safety" public/index.html || exit 1
+          
+          echo "✓ Deployment simulation successful"
+          
+      - name: Test deployment rollback capability
+        run: |
+          echo "Testing rollback capability..."
+          
+          # Backup current state
+          cp public/index.html public/index.html.backup
+          cp public/data/version.json public/data/version.json.backup
+          
+          # Simulate corruption
+          echo "<!-- corrupted -->" > public/index.html
+          
+          # Test rollback
+          cp public/index.html.backup public/index.html
+          cp public/data/version.json.backup public/data/version.json
+          
+          # Verify rollback worked
+          grep -q "p(Doom)1" public/index.html || exit 1
+          
+          echo "✓ Rollback capability verified"
+          
+  security-check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.inputs.run_full_tests == 'true'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Check for secrets in code
+        run: |
+          echo "Scanning for potential secrets..."
+          
+          # Check for common secret patterns
+          if grep -r -i "password\|secret\|key\|token" --include="*.py" --include="*.js" --include="*.json" . | grep -v "# Allow" | grep -v "# Safe"; then
+            echo "⚠️  Potential secrets found - please review"
+            exit 1
+          fi
+          
+          echo "✓ No obvious secrets detected"
+          
+      - name: Validate HTTPS usage
+        run: |
+          echo "Checking HTTPS usage..."
+          
+          # Check that we're not using HTTP for external resources
+          if grep -r "http://" public/ | grep -v "localhost" | grep -v "127.0.0.1"; then
+            echo "⚠️  HTTP URLs found - should use HTTPS"
+            exit 1
+          fi
+          
+          echo "✓ HTTPS usage verified"
+          
+  performance-check:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.run_full_tests == 'true'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Check file sizes
+        run: |
+          echo "Checking file sizes for performance..."
+          
+          # Check that key files aren't too large
+          INDEX_SIZE=$(stat -c%s public/index.html)
+          VERSION_SIZE=$(stat -c%s public/data/version.json)
+          
+          echo "index.html size: ${INDEX_SIZE} bytes"
+          echo "version.json size: ${VERSION_SIZE} bytes"
+          
+          # Alert if files are getting too large
+          if [ $INDEX_SIZE -gt 500000 ]; then
+            echo "⚠️  index.html is getting large (>500KB)"
+          fi
+          
+          if [ $VERSION_SIZE -gt 50000 ]; then
+            echo "⚠️  version.json is getting large (>50KB)"
+          fi
+          
+          echo "✓ File sizes checked"
+          
+      - name: Test script performance
+        run: |
+          echo "Testing script execution times..."
+          
+          time python scripts/update-version-info.py
+          time python scripts/calculate-game-stats.py
+          time python scripts/health-check.py
+          
+          echo "✓ Script performance checked"
