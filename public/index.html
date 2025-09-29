@@ -718,7 +718,7 @@
 				<li role="none"><a href="#home" role="menuitem">Game</a></li>
 				<li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
 				<li role="none" class="dropdown">
-					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community v</a>
+					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
 					<ul class="dropdown-menu" role="menu">
 						<li role="none"><a href="#known-issues" role="menuitem">Known Issues</a></li>
 						<li role="none"><a href="/blog/" role="menuitem">Dev Blog</a></li>
@@ -727,7 +727,7 @@
 					</ul>
 				</li>
 				<li role="none" class="dropdown">
-					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info v</a>
+					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
 					<ul class="dropdown-menu" role="menu">
 						<li role="none"><a href="/about/" role="menuitem">About</a></li>
 						<li role="none"><a href="/docs/roadmap.md" role="menuitem">Roadmap</a></li>
@@ -900,7 +900,7 @@
 				<!-- Research Organizations -->
 				<div class="resource-category">
 					<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-						<span style="font-size: 1.2rem;">🔬</span>
+						<span style="font-size: 1.2rem;" aria-hidden="true">[Lab]</span>
 						Research Organizations
 					</h3>
 					<div class="grid">
@@ -930,7 +930,7 @@
 				<!-- Educational Resources -->
 				<div class="resource-category">
 					<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-						<span style="font-size: 1.2rem;">📚</span>
+						<span style="font-size: 1.2rem;" aria-hidden="true">[Edu]</span>
 						Educational Resources
 					</h3>
 					<div class="grid">
@@ -960,7 +960,7 @@
 				<!-- Policy & Governance -->
 				<div class="resource-category">
 					<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-						<span style="font-size: 1.2rem;">🏛️</span>
+						<span style="font-size: 1.2rem;" aria-hidden="true">[Gov]</span>
 						Policy & Governance
 					</h3>
 					<div class="grid">
@@ -990,7 +990,7 @@
 				<!-- Community -->
 				<div class="resource-category">
 					<h3 style="color: var(--accent-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-						<span style="font-size: 1.2rem;">👥</span>
+						<span style="font-size: 1.2rem;" aria-hidden="true">[Community]</span>
 						Community & Discussion
 					</h3>
 					<div class="grid">
@@ -1221,7 +1221,7 @@ python main.py</pre>
 	</footer>
 
 	<script>
-		// Dropdown menu functionality
+		// Dropdown menu functionality with keyboard navigation
 		document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
 			toggle.addEventListener('click', function(e) {
 				e.preventDefault();
@@ -1235,6 +1235,57 @@ python main.py</pre>
 				
 				// Toggle current dropdown
 				this.setAttribute('aria-expanded', !isExpanded);
+				
+				// Focus first menu item when opening
+				if (!isExpanded) {
+					const firstMenuItem = dropdown.querySelector('.dropdown-menu a');
+					if (firstMenuItem) {
+						setTimeout(() => firstMenuItem.focus(), 100);
+					}
+				}
+			});
+
+			// Keyboard navigation for dropdown toggles
+			toggle.addEventListener('keydown', function(e) {
+				const dropdown = this.closest('.dropdown');
+				
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					this.click();
+				} else if (e.key === 'ArrowDown') {
+					e.preventDefault();
+					this.click();
+				} else if (e.key === 'Escape') {
+					this.setAttribute('aria-expanded', 'false');
+					this.focus();
+				}
+			});
+		});
+
+		// Keyboard navigation for dropdown menu items
+		document.querySelectorAll('.dropdown-menu a').forEach((menuItem, index, menuItems) => {
+			menuItem.addEventListener('keydown', function(e) {
+				const dropdown = this.closest('.dropdown');
+				const toggle = dropdown.querySelector('.dropdown-toggle');
+				
+				if (e.key === 'ArrowDown') {
+					e.preventDefault();
+					const nextIndex = (index + 1) % menuItems.length;
+					const nextItem = Array.from(dropdown.querySelectorAll('.dropdown-menu a'))[nextIndex % dropdown.querySelectorAll('.dropdown-menu a').length];
+					if (nextItem) nextItem.focus();
+				} else if (e.key === 'ArrowUp') {
+					e.preventDefault();
+					const prevIndex = index === 0 ? dropdown.querySelectorAll('.dropdown-menu a').length - 1 : index - 1;
+					const prevItem = Array.from(dropdown.querySelectorAll('.dropdown-menu a'))[prevIndex];
+					if (prevItem) prevItem.focus();
+				} else if (e.key === 'Escape') {
+					e.preventDefault();
+					toggle.setAttribute('aria-expanded', 'false');
+					toggle.focus();
+				} else if (e.key === 'Tab') {
+					// Allow natural tab behavior, but close dropdown
+					toggle.setAttribute('aria-expanded', 'false');
+				}
 			});
 		});
 
