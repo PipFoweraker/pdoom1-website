@@ -151,7 +151,7 @@ class TestOrchestrator:
                 ("python -m json.tool public/data/version.json", "Version JSON Validation"),
                 ("python -m json.tool package.json", "Package JSON Validation"),
                 ("grep -q 'p(Doom)1' public/index.html", "Content Verification"),
-                ("ls public/stats/index.html", "Stats Page Exists"),
+                ("ls public/game-stats/index.html", "Game Stats Page Exists"),
                 ("ls public/monitoring/index.html", "Monitoring Page Exists")
             ]
             

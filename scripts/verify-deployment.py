@@ -33,8 +33,8 @@ class DeploymentVerifier:
         print("🔍 Verifying file integrity...")
         
         critical_files = [
-            'public/index.html',
-            'public/stats/index.html', 
+            'public/index.html', 
+            'public/game-stats/index.html', 
             'public/data/version.json',
             'package.json'
         ]

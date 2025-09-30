@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Statistics - p(Doom)1</title>
+    <link rel="canonical" href="https://pdoom1.com/game-stats/" />
+    <meta name="description" content="Game statistics and metrics for p(Doom)1 - AI Safety Strategy Game. Strategic possibilities, baseline doom calculations, and frontier lab tracking." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --accent-primary: #00ff41;
+            --accent-secondary: #ff6b35;
+            --border-color: #444444;
+            --radius-lg: 10px;
+            --radius-md: 6px;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--accent-primary);
+            padding: 1rem;
+        }
+        
+        .back-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        h1 {
+            color: var(--accent-primary);
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 2.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--accent-primary);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .stat-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        
+        .section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section h2 {
+            color: var(--accent-primary);
+            margin-top: 0;
+        }
+        
+        .calculation-note {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-secondary);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+        
+        .update-time {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="back-link">← Back to Home</a>
+    </header>
+    
+    <div class="container">
+        <h1>Game Statistics</h1>
+        
+        <div class="stats-grid" id="stats-grid">
+            <!-- Stats will be loaded dynamically -->
+            <div class="stat-card">
+                <span class="stat-number" id="baseline-doom">23%</span>
+                <div class="stat-label">Baseline Doom</div>
+                <div class="stat-description">Weekly calculated baseline p(doom) percentage representing current AI safety landscape assessment</div>
+            </div>
+            
+            <div class="stat-card">
+                <span class="stat-number" id="frontier-labs">5</span>
+                <div class="stat-label">Frontier Labs</div>
+                <div class="stat-description">Number of AI frontier organizations actively mentioned in our resources and tracked in the game</div>
+            </div>
+            
+            <div class="stat-card">
+                <span class="stat-number" id="strategic-possibilities">10k+</span>
+                <div class="stat-label">Strategic Possibilities</div>
+                <div class="stat-description">Calculated potential strategic combinations and decision paths available in the game</div>
+            </div>
+            
+            <div class="stat-card">
+                <span class="stat-number" id="open-issues">--</span>
+                <div class="stat-label">Open Issues</div>
+                <div class="stat-description">Current number of open issues in the main game repository</div>
+            </div>
+            
+            <div class="stat-card">
+                <span class="stat-number" id="repo-stars">--</span>
+                <div class="stat-label">GitHub Stars</div>
+                <div class="stat-description">Community engagement metric from the main game repository</div>
+            </div>
+            
+            <div class="stat-card">
+                <span class="stat-number" id="last-release">--</span>
+                <div class="stat-label">Days Since Release</div>
+                <div class="stat-description">Number of days since the last stable game release</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Calculation Methodology</h2>
+            <p>These statistics are calculated using various automated methods and data sources:</p>
+            
+            <div class="calculation-note">
+                <strong>Baseline Doom:</strong> Currently stubbed at 23%. Future implementation will aggregate AI safety sentiment from research papers, news sentiment analysis, and expert forecasting platforms.
+            </div>
+            
+            <div class="calculation-note">
+                <strong>Frontier Labs:</strong> Automatically counted from organizations mentioned in our AI Safety Resources section, with manual verification for accuracy.
+            </div>
+            
+            <div class="calculation-note">
+                <strong>Strategic Possibilities:</strong> Calculated based on game mechanics, decision trees, and combinatorial analysis of game states. Updated with each major game version.
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Data Sources</h2>
+            <ul>
+                <li><strong>Game Repository:</strong> Version info, issue tracking, community engagement</li>
+                <li><strong>AI Safety Resources:</strong> Organization tracking and frontier lab identification</li>
+                <li><strong>Game Engine:</strong> Mechanics analysis for strategic possibility calculations</li>
+                <li><strong>Community Feedback:</strong> Player reports and gameplay analytics (future)</li>
+            </ul>
+        </div>
+        
+        <div class="update-time" id="last-updated">
+            Last updated: Loading...
+        </div>
+    </div>
+    
+    <script>
+        async function loadStats() {
+            try {
+                const response = await fetch('/data/version.json', { cache: 'no-store' });
+                const data = await response.json();
+                
+                // Update stats with live data
+                if (data.game_stats) {
+                    document.getElementById('baseline-doom').textContent = `${data.game_stats.baseline_doom_percent}%`;
+                    document.getElementById('frontier-labs').textContent = data.game_stats.frontier_labs_count;
+                    
+                    const possibilities = data.game_stats.strategic_possibilities;
+                    const formattedPossibilities = possibilities >= 1000 ? `${(possibilities/1000).toFixed(0)}k+` : possibilities;
+                    document.getElementById('strategic-possibilities').textContent = formattedPossibilities;
+                }
+                
+                // Update repository stats
+                if (data.repository_stats) {
+                    document.getElementById('open-issues').textContent = data.repository_stats.open_issues;
+                    document.getElementById('repo-stars').textContent = data.repository_stats.stars;
+                }
+                
+                // Calculate days since last release
+                if (data.latest_release && data.latest_release.published_at) {
+                    const releaseDate = new Date(data.latest_release.published_at);
+                    const now = new Date();
+                    const daysDiff = Math.floor((now - releaseDate) / (1000 * 60 * 60 * 24));
+                    document.getElementById('last-release').textContent = daysDiff;
+                }
+                
+                // Update last updated time
+                if (data.last_updated) {
+                    const updateTime = new Date(data.last_updated).toLocaleString();
+                    document.getElementById('last-updated').textContent = `Last updated: ${updateTime}`;
+                }
+                
+            } catch (error) {
+                console.warn('Could not load stats:', error);
+                document.getElementById('last-updated').textContent = 'Last updated: Error loading data';
+            }
+        }
+        
+        // Load stats when page loads
+        document.addEventListener('DOMContentLoaded', loadStats);
+        
+        // Refresh stats every 5 minutes
+        setInterval(loadStats, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

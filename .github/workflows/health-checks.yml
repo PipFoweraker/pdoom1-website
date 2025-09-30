@@ -79,7 +79,7 @@ jobs:
           echo "Testing website structure..."
           # Check critical files exist
           test -f public/index.html || exit 1
-          test -f public/stats/index.html || exit 1
+          test -f public/game-stats/index.html || exit 1
           test -f package.json || exit 1
           echo "✓ Website structure is intact"
           
