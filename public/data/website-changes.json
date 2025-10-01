@@ -1,0 +1,30 @@
+{
+  "entries": [
+    {
+      "version": "0.1.1",
+      "date": "2025-01-15",
+      "channel": "release",
+      "summary": "Enhanced interactivity and navigation improvements.",
+      "items": [
+        "Added interactive stats with clickable elements linking to dedicated stats page",
+        "Relocated stats page to /game-stats/ to avoid authentication conflicts",
+        "Enhanced main page with improved click areas for roadmap cards",
+        "Added prominent Download Now buttons for better conversion",
+        "Improved visual feedback on hover interactions"
+      ]
+    },
+    {
+      "version": "0.1.0",
+      "date": "2025-09-09",
+      "channel": "alpha",
+      "summary": "Initial website launch with core infrastructure.",
+      "items": [
+        "Initial landing page and bug reporting pipeline",
+        "DreamHost deploy workflow with rsync automation",
+        "Netlify function for GitHub issue creation",
+        "Health check system with automated validation",
+        "Basic changelog and navigation structure"
+      ]
+    }
+  ]
+}

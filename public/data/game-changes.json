@@ -1,0 +1,42 @@
+{
+  "entries": [
+    {
+      "version": "0.4.1",
+      "date": "2025-09-13",
+      "channel": "release",
+      "summary": "Enhanced leaderboard system with improved tracking.",
+      "items": [
+        "Comprehensive type annotations for all game systems",
+        "Deterministic RNG implementation for consistent gameplay",
+        "Enhanced debug console with advanced logging",
+        "Improved action rules with TypedDict validation",
+        "Consolidated event system with proper type safety"
+      ]
+    },
+    {
+      "version": "0.3.0",
+      "date": "2025-09-11",
+      "channel": "release",
+      "summary": "Major system consolidation and type safety improvements.",
+      "items": [
+        "Complete type annotation coverage for core systems",
+        "Debug console implementation with command interface",
+        "Consolidated release with improved stability",
+        "Enhanced opponent AI with proper typing",
+        "Event system refactoring with TypedDict support"
+      ]
+    },
+    {
+      "version": "0.2.12",
+      "date": "2025-09-10",
+      "channel": "alpha",
+      "summary": "Type annotation milestone with improved code quality.",
+      "items": [
+        "Major type annotation sprint completion",
+        "Enhanced code documentation and type hints",
+        "Improved development workflow with type checking",
+        "Better IDE support through comprehensive typing"
+      ]
+    }
+  ]
+}

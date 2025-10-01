@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Changelog - p(Doom)1</title>
+  <link rel="canonical" href="https://pdoom1.com/website-changelog/" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+  <meta name="description" content="Website changelog and update history for pdoom1.com. Track website features, infrastructure improvements, and design changes." />
+  <meta name="author" content="p(Doom)1" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="p(Doom)1" />
+  <meta property="og:title" content="Website Changelog - p(Doom)1" />
+  <meta property="og:description" content="Website changelog and update history for pdoom1.com. Track website features, infrastructure improvements, and design changes." />
+  <meta property="og:url" content="https://pdoom1.com/website-changelog/" />
+  <meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <style>
+    :root { --bg-primary:#1a1a1a; --bg-secondary:#2d2d2d; --text-primary:#fff; --text-muted:#888; --accent-primary:#00ff41; --border-color:#444; --radius-md:6px; }
+    body { font-family: 'Courier New', monospace; background: var(--bg-primary); color: var(--text-primary); }
+    a { color: var(--accent-primary); text-decoration: none; }
+    header { background: var(--bg-secondary); border-bottom: 2px solid var(--accent-primary); padding: 1rem; }
+    main { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+    .entry { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem; }
+    .entry h2 { margin: 0 0 .25rem 0; color: var(--accent-primary); }
+    .meta { color: var(--text-muted); font-size: .9rem; margin-bottom: .5rem; }
+    ul { margin: 0 0 0 1.25rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" style="font-weight:bold;">← Back to Home</a>
+  </header>
+  <main>
+    <h1>Website Changelog</h1>
+    <p>Track all updates and improvements to the pdoom1.com website, including design changes, new features, and infrastructure enhancements.</p>
+    <div id="changes"></div>
+  </main>
+  <script>
+    async function load(){
+      try{
+        const res = await fetch('/data/website-changes.json', { cache:'no-store' });
+        const data = await res.json();
+        const entries = data.entries || [];
+        const el = document.getElementById('changes');
+        if(entries.length===0){ el.innerHTML='<p style="color:#ccc">No changes yet.</p>'; return; }
+        el.innerHTML = entries.map(x=>{
+          const date = x.date ? new Date(x.date).toLocaleDateString() : '';
+          const items = (x.items||[]).map(i=>`<li>${String(i).replace(/</g,'&lt;')}</li>`).join('');
+          return `<section class="entry">
+            <h2>${x.version || 'Unversioned'}</h2>
+            <div class="meta">${date} ${x.channel? ' · '+x.channel : ''}</div>
+            ${x.summary? `<p>${String(x.summary).replace(/</g,'&lt;')}</p>`:''}
+            ${items? `<ul>${items}</ul>`:''}
+          </section>`;
+        }).join('');
+      }catch(e){ document.getElementById('changes').innerHTML='<p style="color:#ff4444">Failed to load changelog.</p>'; }
+    }
+    load();
+  </script>
+</body>
+</html>
