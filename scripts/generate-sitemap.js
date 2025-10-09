@@ -16,11 +16,15 @@ const routes = [
   { path: '/changelog/', priority: '0.8', changefreq: 'weekly' },
   { path: '/press/', priority: '0.8', changefreq: 'monthly' },
   { path: '/leaderboard/', priority: '0.8', changefreq: 'daily' },
+  { path: '/resources/', priority: '0.7', changefreq: 'monthly' },
+  { path: '/game-stats/', priority: '0.7', changefreq: 'weekly' },
   { path: '/docs/', priority: '0.7', changefreq: 'weekly' },
-  { path: '/dev-notes/', priority: '0.6', changefreq: 'weekly' },
   // Static markdown files
   { path: '/docs/roadmap.md', priority: '0.6', changefreq: 'weekly' },
   { path: '/docs/pdoom1-open-issues.md', priority: '0.6', changefreq: 'daily' },
+  { path: '/docs/DEV_NOTES.md', priority: '0.5', changefreq: 'weekly' },
+  { path: '/docs/how-leaderboards-work.md', priority: '0.6', changefreq: 'monthly' },
+  { path: '/docs/steam-readiness.md', priority: '0.6', changefreq: 'weekly' },
 ];
 
 function generateSitemap() {

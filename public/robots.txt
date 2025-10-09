@@ -6,5 +6,12 @@ Disallow: /.netlify/
 Disallow: /api/
 Disallow: /assets/private/
 
+# Disallow build artifacts and internal resources
+Disallow: /data/
+Disallow: /design/
+Disallow: /monitoring/
+Disallow: /stats/
+Disallow: /dev-notes/
+
 # Sitemap (update if domain differs)
 Sitemap: https://pdoom1.com/sitemap.xml

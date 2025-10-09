@@ -16,14 +16,9 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pdoom1.com/game-changelog/</loc>
+    <loc>https://pdoom1.com/changelog/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://pdoom1.com/website-changelog/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://pdoom1.com/press/</loc>
@@ -36,14 +31,19 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pdoom1.com/docs/</loc>
+    <loc>https://pdoom1.com/resources/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://pdoom1.com/game-stats/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pdoom1.com/dev-notes/</loc>
+    <loc>https://pdoom1.com/docs/</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://pdoom1.com/docs/roadmap.md</loc>
@@ -53,6 +53,21 @@
   <url>
     <loc>https://pdoom1.com/docs/pdoom1-open-issues.md</loc>
     <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://pdoom1.com/docs/DEV_NOTES.md</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://pdoom1.com/docs/how-leaderboards-work.md</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://pdoom1.com/docs/steam-readiness.md</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 </urlset>
