@@ -67,6 +67,132 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
     
+    def do_POST(self):
+        """Handle POST requests for score submission."""
+        parsed_url = urlparse(self.path)
+        path = parsed_url.path
+        
+        # CORS headers
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        
+        try:
+            if path == '/api/scores/submit':
+                self._handle_score_submission()
+            else:
+                self._send_404()
+        except Exception as e:
+            self._send_error(500, f"Internal server error: {str(e)}")
+    
+    def _handle_score_submission(self):
+        """Handle score submission from game clients."""
+        try:
+            # Read request data
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length == 0:
+                self._send_error(400, "No data provided")
+                return
+                
+            post_data = self.rfile.read(content_length)
+            score_data = json.loads(post_data.decode('utf-8'))
+            
+            # Validate submission
+            if self._validate_score_submission(score_data):
+                # Add to leaderboard (for now, just log it)
+                rank = self._add_score_to_leaderboard(score_data)
+                
+                # Send success response
+                response = {
+                    "status": "success", 
+                    "rank": rank,
+                    "message": "Score submitted successfully",
+                    "timestamp": datetime.now().isoformat()
+                }
+                self._send_json_response(response)
+            else:
+                self._send_error(400, "Invalid score submission")
+                
+        except json.JSONDecodeError:
+            self._send_error(400, "Invalid JSON data")
+        except Exception as e:
+            self._send_error(500, f"Score submission error: {str(e)}")
+    
+    def _validate_score_submission(self, score_data: Dict[str, Any]) -> bool:
+        """Validate score submission data."""
+        required_fields = [
+            'player_uuid', 'player_name', 'seed', 'score', 
+            'verification_hash', 'timestamp'
+        ]
+        
+        # Check required fields
+        for field in required_fields:
+            if field not in score_data:
+                return False
+        
+        # Basic validation
+        if not isinstance(score_data['score'], int) or score_data['score'] < 0:
+            return False
+            
+        if len(score_data['player_name']) > 100:  # Reasonable name length
+            return False
+            
+        return True
+    
+    def _add_score_to_leaderboard(self, score_data: Dict[str, Any]) -> int:
+        """Add submitted score to leaderboard and return rank."""
+        try:
+            # Load current leaderboard
+            with open(self.leaderboard_file, 'r', encoding='utf-8') as f:
+                leaderboard_data = json.load(f)
+            
+            # Create new entry in website format
+            new_entry = {
+                "score": score_data['score'],
+                "player_name": score_data['player_name'],
+                "date": score_data['timestamp'],
+                "level_reached": score_data['score'],
+                "game_mode": score_data.get('game_mode', 'Bootstrap_v0.4.1'),
+                "duration_seconds": score_data.get('duration_seconds', 0.0),
+                "entry_uuid": score_data.get('entry_uuid', score_data['player_uuid']),
+                "final_doom": score_data.get('final_metrics', {}).get('final_doom', 25.0),
+                "final_money": score_data.get('final_metrics', {}).get('final_money', 100000),
+                "final_staff": score_data.get('final_metrics', {}).get('final_staff', 5),
+                "final_reputation": score_data.get('final_metrics', {}).get('final_reputation', 50.0),
+                "final_compute": score_data.get('final_metrics', {}).get('final_compute', 10000),
+                "research_papers_published": score_data.get('final_metrics', {}).get('research_papers_published', 0),
+                "technical_debt_accumulated": score_data.get('final_metrics', {}).get('technical_debt_accumulated', 0)
+            }
+            
+            # Add to entries
+            leaderboard_data['entries'].append(new_entry)
+            
+            # Re-sort by score (highest first)
+            leaderboard_data['entries'].sort(key=lambda x: x['score'], reverse=True)
+            
+            # Update metadata
+            leaderboard_data['meta']['generated'] = datetime.now().isoformat() + "Z"
+            leaderboard_data['meta']['total_players'] = len(set(
+                entry['player_name'] for entry in leaderboard_data['entries']
+            ))
+            
+            # Find rank of submitted score
+            rank = None
+            for i, entry in enumerate(leaderboard_data['entries'], 1):
+                if entry['entry_uuid'] == new_entry['entry_uuid']:
+                    rank = i
+                    break
+            
+            # Save updated leaderboard
+            with open(self.leaderboard_file, 'w', encoding='utf-8') as f:
+                json.dump(leaderboard_data, f, indent=2, ensure_ascii=False)
+            
+            return rank or len(leaderboard_data['entries'])
+            
+        except Exception as e:
+            print(f"Error adding score to leaderboard: {e}")
+            return 999  # Default rank on error
+    
     def _handle_current_leaderboard(self, query_params: Dict[str, Any]):
         """Handle /api/leaderboards/current endpoint."""
         try:
