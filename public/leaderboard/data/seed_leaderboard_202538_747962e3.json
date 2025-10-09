@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "generated": "2025-10-09T20:29:20.976717Z",
+    "game_version": "1.0.0",
+    "total_seeds": 1,
+    "total_players": 1,
+    "export_source": "game-repository",
+    "source_file": "leaderboard_202538_747962e3.json",
+    "note": "Exported from actual game leaderboard data"
+  },
+  "seed": "leaderboard_202538_747962e3",
+  "economic_model": "Bootstrap_v0.4.1",
+  "entries": [
+    {
+      "score": 1,
+      "player_name": "Catalyst Labs",
+      "date": "2025-09-15T23:18:04.983570",
+      "level_reached": 1,
+      "game_mode": "Bootstrap_v0.4.1",
+      "duration_seconds": 28.196656,
+      "entry_uuid": "f19c05b2-5156-41f4-aa86-8cc9424bbf71",
+      "final_doom": 25.0,
+      "final_money": 100000,
+      "final_staff": 5,
+      "final_reputation": 50.0,
+      "final_compute": 10000,
+      "research_papers_published": 0,
+      "technical_debt_accumulated": 0
+    }
+  ]
+}

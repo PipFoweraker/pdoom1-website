@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "generated": "2025-10-09T20:29:20.988438Z",
+    "game_version": "1.0.0",
+    "total_seeds": 1,
+    "total_players": 1,
+    "export_source": "game-repository",
+    "source_file": "leaderboard_202539_25079545.json",
+    "note": "Exported from actual game leaderboard data"
+  },
+  "seed": "leaderboard_202539_25079545",
+  "economic_model": "Bootstrap_v0.4.1",
+  "entries": [
+    {
+      "score": 8,
+      "player_name": "Silver Stream AI",
+      "date": "2025-09-28T07:01:13.657469",
+      "level_reached": 8,
+      "game_mode": "Bootstrap_v0.4.1",
+      "duration_seconds": 18.775655,
+      "entry_uuid": "dae54f6d-7eb1-47c3-be4d-b468ae173723",
+      "final_doom": 25.0,
+      "final_money": 100000,
+      "final_staff": 5,
+      "final_reputation": 50.0,
+      "final_compute": 10000,
+      "research_papers_published": 0,
+      "technical_debt_accumulated": 0
+    },
+    {
+      "score": 8,
+      "player_name": "Silver Stream AI",
+      "date": "2025-09-28T09:31:56.547928",
+      "level_reached": 8,
+      "game_mode": "Bootstrap_v0.4.1",
+      "duration_seconds": 2.409599,
+      "entry_uuid": "4d38eeb8-783b-4b92-b395-584ecafcbd2f",
+      "final_doom": 25.0,
+      "final_money": 100000,
+      "final_staff": 5,
+      "final_reputation": 50.0,
+      "final_compute": 10000,
+      "research_papers_published": 0,
+      "technical_debt_accumulated": 0
+    },
+    {
+      "score": 8,
+      "player_name": "Silver Stream AI",
+      "date": "2025-09-28T10:55:52.284025",
+      "level_reached": 8,
+      "game_mode": "Bootstrap_v0.4.1",
+      "duration_seconds": 3.11863,
+      "entry_uuid": "2f375dbe-075f-4d6c-af32-0596f1915d53",
+      "final_doom": 25.0,
+      "final_money": 100000,
+      "final_staff": 5,
+      "final_reputation": 50.0,
+      "final_compute": 10000,
+      "research_papers_published": 0,
+      "technical_debt_accumulated": 0
+    }
+  ]
+}

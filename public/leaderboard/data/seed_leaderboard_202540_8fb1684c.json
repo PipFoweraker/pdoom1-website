@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "generated": "2025-10-09T20:29:21.000684Z",
+    "game_version": "1.0.0",
+    "total_seeds": 1,
+    "total_players": 1,
+    "export_source": "game-repository",
+    "source_file": "leaderboard_202540_8fb1684c.json",
+    "note": "Exported from actual game leaderboard data"
+  },
+  "seed": "leaderboard_202540_8fb1684c",
+  "economic_model": "Bootstrap_v0.4.1",
+  "entries": [
+    {
+      "score": 11,
+      "player_name": "Infinitas Research",
+      "date": "2025-09-29T14:13:05.632445",
+      "level_reached": 11,
+      "game_mode": "Bootstrap_v0.4.1",
+      "duration_seconds": 15.990487000000002,
+      "entry_uuid": "21cf1b7c-d2d0-4164-93d9-9fe395267090",
+      "final_doom": 25.0,
+      "final_money": 100000,
+      "final_staff": 5,
+      "final_reputation": 50.0,
+      "final_compute": 10000,
+      "research_papers_published": 0,
+      "technical_debt_accumulated": 0
+    },
+    {
+      "score": 11,
+      "player_name": "Infinitas Research",
+      "date": "2025-09-29T14:49:56.463980",
+      "level_reached": 11,
+      "game_mode": "Bootstrap_v0.4.1",
+      "duration_seconds": 156.906781,
+      "entry_uuid": "5f6ad8a6-c9d5-4858-ae1b-a5ee0e40690d",
+      "final_doom": 25.0,
+      "final_money": 100000,
+      "final_staff": 5,
+      "final_reputation": 50.0,
+      "final_compute": 10000,
+      "research_papers_published": 0,
+      "technical_debt_accumulated": 0
+    },
+    {
+      "score": 8,
+      "player_name": "Infinitas Research",
+      "date": "2025-09-29T14:18:18.462285",
+      "level_reached": 8,
+      "game_mode": "Bootstrap_v0.4.1",
+      "duration_seconds": 57.751537,
+      "entry_uuid": "41c3ed79-e341-46fd-8fe7-610d1bbee636",
+      "final_doom": 25.0,
+      "final_money": 100000,
+      "final_staff": 5,
+      "final_reputation": 50.0,
+      "final_compute": 10000,
+      "research_papers_published": 0,
+      "technical_debt_accumulated": 0
+    }
+  ]
+}

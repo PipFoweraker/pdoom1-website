@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "generated": "2025-10-09T20:29:21.229879Z",
+    "game_version": "1.0.0",
+    "total_seeds": 1,
+    "total_players": 1,
+    "export_source": "game-repository",
+    "source_file": "leaderboard_party-seed_c53217a3.json",
+    "note": "Exported from actual game leaderboard data"
+  },
+  "seed": "leaderboard_party-c53217a3",
+  "economic_model": "Bootstrap_v0.4.1",
+  "entries": [
+    {
+      "score": 1,
+      "player_name": "Nexus Computing",
+      "date": "2025-09-14T02:28:35.896648",
+      "level_reached": 1,
+      "game_mode": "Bootstrap_v0.4.1",
+      "duration_seconds": 0.043876,
+      "entry_uuid": "9195cd08-f93f-4e88-9349-8ac6fbbac14c",
+      "final_doom": 25.0,
+      "final_money": 100000,
+      "final_staff": 5,
+      "final_reputation": 50.0,
+      "final_compute": 10000,
+      "research_papers_published": 0,
+      "technical_debt_accumulated": 0
+    }
+  ]
+}

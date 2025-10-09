@@ -7,21 +7,23 @@ This script integrates with the actual p(Doom)1 game repository to:
 2. Export real leaderboard data from the game
 3. Sync with website data format
 4. Monitor for game updates
+5. Manage weekly league synchronization
+6. Handle bulk leaderboard data sync
 
 Usage:
-    python scripts/game-integration.py --scan          # Scan for game installations
-    python scripts/game-integration.py --export        # Export real game data
-    python scripts/game-integration.py --setup         # Set up integration
+    python scripts/game-integration.py --scan              # Scan for game installations
+    python scripts/game-integration.py --export            # Export real game data
+    python scripts/game-integration.py --setup             # Set up integration
+    python scripts/game-integration.py --sync-leaderboards # Sync all leaderboard data
+    python scripts/game-integration.py --weekly-sync       # Sync weekly league data
 """
 
 import json
 import argparse
 import sys
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional
-import glob
 
 
 class GameRepositoryIntegration:
@@ -198,7 +200,7 @@ class GameRepositoryIntegration:
             entries = game_data
         else:
             # Try to extract entries from other structures
-            for key, value in game_data.items():
+            for _, value in game_data.items():
                 if isinstance(value, list) and value:
                     # Check if this looks like leaderboard entries
                     if all(isinstance(item, dict) and "score" in item for item in value[:3]):
@@ -373,6 +375,170 @@ class GameRepositoryIntegration:
             status["repo_valid"] = self.validate_game_repo(repo_path) if repo_path.exists() else False
         
         return status
+    
+    def sync_all_leaderboards(self) -> bool:
+        """Sync all available leaderboard data from game repository."""
+        if not self.game_repo_path:
+            print("ERROR: No game repository configured. Run --setup first.")
+            return False
+        
+        print(f"SYNC: Starting bulk leaderboard sync from: {self.game_repo_path}")
+        
+        # Look for all leaderboard data in game repository
+        leaderboard_dirs = [
+            self.game_repo_path / "leaderboards",
+            self.game_repo_path / "data" / "leaderboards", 
+            self.game_repo_path / "saves" / "leaderboards"
+        ]
+        
+        synced_count = 0
+        total_entries = 0
+        
+        for leaderboard_dir in leaderboard_dirs:
+            if leaderboard_dir.exists():
+                print(f"FOUND: Scanning directory: {leaderboard_dir}")
+                
+                # Get all JSON files
+                json_files = list(leaderboard_dir.glob("*.json"))
+                
+                for json_file in json_files:
+                    try:
+                        with open(json_file, 'r', encoding='utf-8') as f:
+                            data = json.load(f)
+                        
+                        # Convert and merge with existing data
+                        converted_data = self.convert_game_to_website_format(data, json_file)
+                        
+                        if converted_data and converted_data.get('entries'):
+                            # Create seed-specific output file
+                            seed = converted_data.get('seed', 'unknown')
+                            seed_output = self.website_dir / "public" / "leaderboard" / "data" / f"seed_{seed}.json"
+                            seed_output.parent.mkdir(parents=True, exist_ok=True)
+                            
+                            with open(seed_output, 'w', encoding='utf-8') as f:
+                                json.dump(converted_data, f, indent=2, ensure_ascii=False)
+                            
+                            entries_count = len(converted_data['entries'])
+                            total_entries += entries_count
+                            synced_count += 1
+                            
+                            print(f"SUCCESS: Synced {json_file.name} -> {seed_output.name} ({entries_count} entries)")
+                        
+                    except Exception as e:
+                        print(f"WARNING: Failed to sync {json_file.name}: {e}")
+        
+        # Update main leaderboard with most recent data
+        if synced_count > 0:
+            self.export_game_data()
+        
+        print(f"\nSYNC: Bulk sync complete!")
+        print(f"FILES: Synced {synced_count} leaderboard files")
+        print(f"ENTRIES: Total entries: {total_entries}")
+        
+        # Update config
+        self.config["last_sync"] = datetime.now().isoformat()
+        self.config["total_synced_files"] = synced_count
+        self.save_config()
+        
+        return synced_count > 0
+    
+    def sync_weekly_league_data(self) -> bool:
+        """Sync weekly league specific data from game repository."""
+        if not self.game_repo_path:
+            print("ERROR: No game repository configured. Run --setup first.")
+            return False
+        
+        print("WEEKLY: Starting weekly league data sync...")
+        
+        # Calculate current week info
+        current_week = self.get_current_week_info()
+        print(f"WEEK: Current week: {current_week['week_id']} ({current_week['start_date']} - {current_week['end_date']})")
+        
+        # Look for weekly league data
+        weekly_data_found = False
+        
+        # Search for weekly seed patterns in game repository
+        leaderboard_dirs = [
+            self.game_repo_path / "leaderboards",
+            self.game_repo_path / "data" / "leaderboards",
+            self.game_repo_path / "saves" / "leaderboards"
+        ]
+        
+        for leaderboard_dir in leaderboard_dirs:
+            if leaderboard_dir.exists():
+                # Look for weekly seed files
+                weekly_pattern = f"weekly_{current_week['year']}_W{current_week['week']:02d}*.json"
+                weekly_files = list(leaderboard_dir.glob(weekly_pattern))
+                
+                if weekly_files:
+                    for weekly_file in weekly_files:
+                        try:
+                            with open(weekly_file, 'r', encoding='utf-8') as f:
+                                data = json.load(f)
+                            
+                            # Convert to website format
+                            converted_data = self.convert_game_to_website_format(data, weekly_file)
+                            
+                            # Save as current weekly league data
+                            weekly_output = self.website_dir / "public" / "leaderboard" / "data" / "weekly_current.json"
+                            weekly_output.parent.mkdir(parents=True, exist_ok=True)
+                            
+                            with open(weekly_output, 'w', encoding='utf-8') as f:
+                                json.dump(converted_data, f, indent=2, ensure_ascii=False)
+                            
+                            weekly_data_found = True
+                            entries_count = len(converted_data.get('entries', []))
+                            print(f"SUCCESS: Synced weekly league data: {entries_count} entries")
+                            
+                        except Exception as e:
+                            print(f"WARNING: Failed to sync weekly file {weekly_file.name}: {e}")
+        
+        if not weekly_data_found:
+            print("INFO: No weekly league data found, using regular leaderboard data")
+            # Fall back to regular export
+            self.export_game_data()
+        
+        # Update config
+        self.config["last_weekly_sync"] = datetime.now().isoformat()
+        self.config["current_week"] = current_week['week_id']
+        self.save_config()
+        
+        return True
+    
+    def get_current_week_info(self) -> Dict[str, Any]:
+        """Get current week information for weekly league system."""
+        from datetime import datetime, timedelta
+        
+        now = datetime.now()
+        
+        # Find the start of the current week (Monday)
+        days_since_monday = now.weekday()
+        week_start = now - timedelta(days=days_since_monday)
+        week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # Week end is Sunday
+        week_end = week_start + timedelta(days=6, hours=23, minutes=59, seconds=59)
+        
+        # ISO week number
+        year, week, _ = now.isocalendar()
+        
+        return {
+            "week_id": f"{year}_W{week:02d}",
+            "year": year,
+            "week": week,
+            "start_date": week_start.strftime("%Y-%m-%d"),
+            "end_date": week_end.strftime("%Y-%m-%d"),
+            "start_timestamp": week_start.isoformat(),
+            "end_timestamp": week_end.isoformat(),
+            "is_current": True
+        }
+    
+    def get_weekly_seed(self, week_info: Optional[Dict[str, Any]] = None) -> str:
+        """Generate or get weekly competitive seed."""
+        if not week_info:
+            week_info = self.get_current_week_info()
+        
+        return f"weekly_{week_info['week_id']}"
 
 
 def main():
@@ -382,6 +548,8 @@ def main():
     parser.add_argument("--export", action="store_true", help="Export game leaderboard data to website")
     parser.add_argument("--setup", action="store_true", help="Set up integration with game repository")
     parser.add_argument("--status", action="store_true", help="Show integration status")
+    parser.add_argument("--sync-leaderboards", action="store_true", help="Sync all leaderboard data from game")
+    parser.add_argument("--weekly-sync", action="store_true", help="Sync weekly league data")
     parser.add_argument("--repo-path", type=str, help="Manually specify game repository path")
     
     args = parser.parse_args()
@@ -397,6 +565,13 @@ def main():
             print(f"   VALID: {status.get('repo_valid', False)}")
             print(f"   LAST_EXPORT: {status.get('last_export', 'Never')}")
             print(f"   STATUS: {status['integration_status']}")
+            
+            # Show weekly league info
+            week_info = integration.get_current_week_info()
+            print(f"\nWEEKLY LEAGUE:")
+            print(f"   CURRENT_WEEK: {week_info['week_id']}")
+            print(f"   WEEK_PERIOD: {week_info['start_date']} to {week_info['end_date']}")
+            print(f"   WEEKLY_SEED: {integration.get_weekly_seed(week_info)}")
             return
         
         if args.repo_path:
@@ -419,13 +594,27 @@ def main():
             success = integration.export_game_data()
             sys.exit(0 if success else 1)
         
+        elif args.sync_leaderboards:
+            success = integration.sync_all_leaderboards()
+            sys.exit(0 if success else 1)
+        
+        elif args.weekly_sync:
+            success = integration.sync_weekly_league_data()
+            sys.exit(0 if success else 1)
+        
         else:
             print("USAGE: p(Doom)1 Game Repository Integration")
             print("\nAvailable commands:")
-            print("   --setup     Set up integration with game repository")
-            print("   --scan      Scan for game repository installations")
-            print("   --export    Export game leaderboard data to website")
-            print("   --status    Show current integration status")
+            print("   --setup                Set up integration with game repository")
+            print("   --scan                 Scan for game repository installations")
+            print("   --export               Export game leaderboard data to website")
+            print("   --sync-leaderboards    Sync all leaderboard data from game")
+            print("   --weekly-sync          Sync weekly league data")
+            print("   --status               Show current integration status")
+            print("\nWeekly League Commands:")
+            week_info = integration.get_current_week_info()
+            print(f"   Current Week: {week_info['week_id']} ({week_info['start_date']} - {week_info['end_date']})")
+            print(f"   Weekly Seed: {integration.get_weekly_seed(week_info)}")
             print("\nSTART: Start with: python scripts/game-integration.py --setup")
     
     except KeyboardInterrupt:

@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "generated": "2025-10-09T20:29:21.087511Z",
+    "game_version": "1.0.0",
+    "total_seeds": 1,
+    "total_players": 1,
+    "export_source": "game-repository",
+    "source_file": "leaderboard_final-verification_21062d2e.json",
+    "note": "Exported from actual game leaderboard data"
+  },
+  "seed": "leaderboard_final-verification_21062d2e",
+  "economic_model": "Bootstrap_v0.4.1",
+  "entries": [
+    {
+      "score": 1,
+      "player_name": "Rain Research",
+      "date": "2025-09-16T22:14:55.455524",
+      "level_reached": 1,
+      "game_mode": "Bootstrap_v0.4.1",
+      "duration_seconds": 0.044944,
+      "entry_uuid": "a9d48376-83f6-4552-8ce8-ab7bed5c23cf",
+      "final_doom": 25.0,
+      "final_money": 100000,
+      "final_staff": 5,
+      "final_reputation": 50.0,
+      "final_compute": 10000,
+      "research_papers_published": 0,
+      "technical_debt_accumulated": 0
+    }
+  ]
+}

@@ -14,9 +14,9 @@ Usage:
 
 import json
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import socket
@@ -25,7 +25,7 @@ import socket
 class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
     """HTTP request handler for game integration API endpoints."""
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.data_dir = Path(__file__).parent.parent / "public" / "data"
         self.leaderboard_file = Path(__file__).parent.parent / "public" / "leaderboard" / "data" / "leaderboard.json"
         super().__init__(*args, **kwargs)
@@ -53,6 +53,12 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
                 self._handle_integration_status()
             elif path == '/api/health':
                 self._handle_health_check()
+            elif path == '/api/league/current':
+                self._handle_current_league(query_params)
+            elif path == '/api/league/status':
+                self._handle_league_status()
+            elif path == '/api/league/standings':
+                self._handle_league_standings(query_params)
             else:
                 self._send_404()
                 
@@ -109,7 +115,7 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
                     "message": "Score submitted successfully",
                     "timestamp": datetime.now().isoformat()
                 }
-                self._send_json_response(response)
+                self._send_json_response(200, response)
             else:
                 self._send_error(400, "Invalid score submission")
                 
@@ -168,7 +174,10 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
             leaderboard_data['entries'].append(new_entry)
             
             # Re-sort by score (highest first)
-            leaderboard_data['entries'].sort(key=lambda x: x['score'], reverse=True)
+            def get_score(entry: Dict[str, Any]) -> int:
+                return entry['score']
+            
+            leaderboard_data['entries'].sort(key=get_score, reverse=True)
             
             # Update metadata
             leaderboard_data['meta']['generated'] = datetime.now().isoformat() + "Z"
@@ -334,7 +343,6 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
         """Handle /api/status endpoint for integration status."""
         try:
             # Check if various data files exist
-            status_file = self.data_dir / "status.json"
             version_file = self.data_dir / "version.json"
             
             integration_status = {
@@ -406,6 +414,144 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
         
         self._send_json_response(200, response)
     
+    def _handle_current_league(self, query_params: Dict[str, Any]):
+        """Handle /api/league/current endpoint for weekly league data."""
+        try:
+            # Load current weekly league data
+            weekly_file = Path(__file__).parent.parent / "public" / "leaderboard" / "data" / "weekly" / "current.json"
+            
+            if not weekly_file.exists():
+                # Fall back to main leaderboard data if no weekly league is active
+                self._handle_current_leaderboard(query_params)
+                return
+            
+            with open(weekly_file, 'r', encoding='utf-8') as f:
+                league_data = json.load(f)
+            
+            # Apply limit if specified
+            limit = int(query_params.get('limit', [10])[0])
+            entries = league_data.get('entries', [])[:limit]
+            
+            response = {
+                "status": "success",
+                "data": {
+                    "meta": league_data.get('meta', {}),
+                    "week_info": league_data.get('week_info', {}),
+                    "seed": league_data.get('seed', ''),
+                    "economic_model": league_data.get('economic_model', 'Bootstrap_v0.4.1'),
+                    "entries": entries,
+                    "statistics": league_data.get('statistics', {}),
+                    "api_info": {
+                        "endpoint": "/api/league/current",
+                        "requested_limit": limit,
+                        "returned_count": len(entries),
+                        "total_available": len(league_data.get('entries', []))
+                    }
+                },
+                "timestamp": datetime.now().isoformat() + "Z"
+            }
+            
+            self._send_json_response(200, response)
+            
+        except Exception as e:
+            self._send_error(500, f"Failed to load current league: {str(e)}")
+    
+    def _handle_league_status(self) -> None:
+        """Handle /api/league/status endpoint for weekly league status."""
+        try:
+            # Try to import and use weekly league manager
+            from pathlib import Path
+            import sys
+            
+            # Add scripts directory to path for import
+            scripts_dir = Path(__file__).parent
+            sys.path.insert(0, str(scripts_dir))
+            
+            try:
+                # Dynamic import to avoid linting issues
+                import importlib
+                weekly_league_module = importlib.import_module('weekly-league-manager')
+                WeeklyLeagueManager = getattr(weekly_league_module, 'WeeklyLeagueManager')
+                
+                manager = WeeklyLeagueManager()
+                status = manager.get_league_status()
+                
+                response: Dict[str, Any] = {
+                    "status": "success",
+                    "data": status,
+                    "timestamp": datetime.now().isoformat() + "Z"
+                }
+                
+                self._send_json_response(200, response)
+                
+            except (ImportError, AttributeError):
+                # Fall back to basic status if weekly league manager not available
+                basic_status: Dict[str, Any] = {
+                    "league_active": False,
+                    "message": "Weekly league manager not available",
+                    "current_week": self._get_basic_week_info()
+                }
+                
+                response = {
+                    "status": "success", 
+                    "data": basic_status,
+                    "timestamp": datetime.now().isoformat() + "Z"
+                }
+                
+                self._send_json_response(200, response)
+                
+        except Exception as e:
+            self._send_error(500, f"Failed to get league status: {str(e)}")
+    
+    def _handle_league_standings(self, query_params: Dict[str, Any]) -> None:
+        """Handle /api/league/standings endpoint."""
+        try:
+            # Try to import weekly league manager with dynamic import
+            import importlib
+            
+            try:
+                # Dynamic import to avoid linting issues
+                weekly_league_module = importlib.import_module('weekly-league-manager')
+                WeeklyLeagueManager = getattr(weekly_league_module, 'WeeklyLeagueManager')
+                
+                manager = WeeklyLeagueManager()
+                standings = manager.get_league_standings()
+                
+                if not standings:
+                    self._send_error(404, "No active league standings available")
+                    return
+                
+                # Apply limit if specified
+                limit = int(query_params.get('limit', [50])[0])
+                if 'top_10' in standings:
+                    standings['top_entries'] = standings['top_10'][:limit]
+                
+                response: Dict[str, Any] = {
+                    "status": "success",
+                    "data": standings,
+                    "timestamp": datetime.now().isoformat() + "Z"
+                }
+                
+                self._send_json_response(200, response)
+                
+            except (ImportError, AttributeError):
+                self._send_error(500, "Weekly league manager not available")
+                
+        except Exception as e:
+            self._send_error(500, f"Failed to get league standings: {str(e)}")
+    
+    def _get_basic_week_info(self) -> Dict[str, Any]:
+        """Get basic week information when weekly league manager is not available."""
+        now = datetime.now()
+        year, week, _ = now.isocalendar()
+        
+        return {
+            "week_id": f"{year}_W{week:02d}",
+            "year": year,
+            "week_number": week,
+            "basic_info": True
+        }
+    
     def _send_json_response(self, status_code: int, data: Dict[str, Any]):
         """Send a JSON response with proper headers."""
         self.send_response(status_code)
@@ -416,9 +562,9 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
         json_data = json.dumps(data, indent=2, ensure_ascii=False)
         self.wfile.write(json_data.encode('utf-8'))
     
-    def _send_error(self, status_code: int, message: str):
+    def _send_error(self, status_code: int, message: str) -> None:
         """Send an error response."""
-        error_response = {
+        error_response: Dict[str, Any] = {
             "status": "error",
             "error": {
                 "code": status_code,
@@ -432,7 +578,7 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
         """Send a 404 Not Found response."""
         self._send_error(404, f"API endpoint not found: {self.path}")
     
-    def log_message(self, format, *args):
+    def log_message(self, format: str, *args: Any) -> None:
         """Custom log message format."""
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f"[{timestamp}] {format % args}")
@@ -457,6 +603,9 @@ class GameIntegrationAPIServer:
             print(f"   GET /api/stats")
             print(f"   GET /api/status")
             print(f"   GET /api/health")
+            print(f"   GET /api/league/current?limit=10")
+            print(f"   GET /api/league/status")
+            print(f"   GET /api/league/standings?limit=50")
             print(f"STOP: Press Ctrl+C to stop the server")
             print()
             

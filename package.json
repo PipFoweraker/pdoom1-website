@@ -20,6 +20,13 @@
     "game:setup": "python scripts/game-integration.py --setup",
     "game:export": "python scripts/game-integration.py --export",
     "game:status": "python scripts/game-integration.py --status",
+    "game:sync-all": "python scripts/game-integration.py --sync-leaderboards",
+    "game:weekly-sync": "python scripts/game-integration.py --weekly-sync",
+    "league:status": "python scripts/weekly-league-manager.py --status",
+    "league:new-week": "python scripts/weekly-league-manager.py --new-week",
+    "league:archive": "python scripts/weekly-league-manager.py --archive-week",
+    "league:standings": "python scripts/weekly-league-manager.py --standings",
+    "league:seed": "python scripts/weekly-league-manager.py --generate-seed",
     "integration:test": "python scripts/test-integration.py --quick",
     "deploy:verify": "python scripts/verify-deployment.py && echo 'Deployment verification passed!'",
     "deploy:prepare": "npm run sync:all && npm run test:all && echo 'Ready for deployment!'"
