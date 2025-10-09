@@ -7,7 +7,7 @@ Endpoint (after Netlify deploy):
 - POST /api/report-bug
 
 Environment (on Netlify):
-- GITHUB_DISPATCH_TOKEN: token with permission to call repository_dispatch
+- GITHUB_DISPATCH_TOKEN: token with permission to call repository_dispatch and create gists
 - GITHUB_REPO: owner/repo (e.g., PipFoweraker/pdoom1-website)
 - ALLOWED_ORIGIN: one or more origins allowed for CORS (comma or space separated). Wildcards supported, e.g. `https://*.netlify.app`.
 - DRY_RUN: optional flag to skip creating issues for smoke tests
@@ -24,6 +24,12 @@ Request body:
   "buildId": "string?",
   "os": "string?",
   "logs": "string?",
+  "attachment": {
+    "filename": "string",
+    "content": "base64 encoded string",
+    "size": "number (bytes, max 500KB)",
+    "type": "string (MIME type)"
+  }?,
   "notify": true|false
 }
 ```
@@ -35,5 +41,8 @@ Response:
 Notes:
 - Large fields are truncated server-side.
 - A dedupeKey is computed and embedded to avoid duplicate issues.
+- Attachments are uploaded to GitHub Gists and linked in the issue.
+- Maximum attachment size: 500 KB.
+- Supported file types: .txt, .log, .json, .zip, .png, .jpg, .jpeg
 - Do not set GITHUB_TOKEN as a repo secret; GitHub Actions injects it automatically.
  - CORS: Function returns Vary: Origin and honors ALLOWED_ORIGIN; set to your DreamHost domain for production, add a wildcard entry temporarily if testing Netlify previews.

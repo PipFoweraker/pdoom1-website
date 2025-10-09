@@ -1054,57 +1054,14 @@ python main.py</pre>
 		<section class="section" id="support" role="region" aria-labelledby="support-heading">
 			<h2 id="support-heading">Support & Bug Reports</h2>
 			<p>Found a bug or need help? Report issues directly through our GitHub integration.</p>
-            
-			<div class="form-container">
-				<form id="bug-report-form" role="form" aria-labelledby="bug-form-heading" novalidate>
-					<h3 id="bug-form-heading" style="color: var(--accent-secondary); margin-bottom: 1.5rem;">Report a Bug</h3>
-                    
-					<div class="form-group">
-						<label for="bug-title">Issue Title <span aria-label="required">*</span></label>
-						<input type="text" id="bug-title" name="title" required 
-							   placeholder="Brief description of the issue"
-							   aria-describedby="title-error"
-							   autocomplete="off">
-						<div id="title-error" class="error-message" role="alert" aria-live="polite"></div>
-					</div>
-                    
-					<div class="form-group">
-						<label for="bug-type">Bug Type</label>
-						<select id="bug-type" name="type" aria-describedby="type-help">
-							<option value="bug">[Bug] Bug Report</option>
-							<option value="feature">Feature Request</option>
-							<option value="documentation">Documentation Issue</option>
-							<option value="performance">Performance Issue</option>
-						</select>
-						<div id="type-help" class="form-help">Select the category that best describes your issue</div>
-					</div>
-                    
-					<div class="form-group">
-						<label for="bug-description">Description <span aria-label="required">*</span></label>
-						<textarea id="bug-description" name="description" rows="6" required 
-							placeholder="Detailed description of the issue, including steps to reproduce..."
-							aria-describedby="description-error description-help"></textarea>
-						<div id="description-help" class="form-help">Include steps to reproduce, expected behavior, and actual behavior</div>
-						<div id="description-error" class="error-message" role="alert" aria-live="polite"></div>
-					</div>
-                    
-					<div class="form-group">
-						<label for="user-email">Email (Optional)</label>
-						<input type="email" id="user-email" name="email" 
-							   placeholder="your.email@example.com"
-							   aria-describedby="email-help email-error"
-							   autocomplete="email">
-						<div id="email-help" class="form-help">Only used for follow-up questions. Not stored or shared.</div>
-						<div id="email-error" class="error-message" role="alert" aria-live="polite"></div>
-					</div>
-                    
-					<button type="submit" class="cta-button" style="width: 100%;" 
-							aria-describedby="submit-status">
-						Submit Bug Report
-					</button>
-					<div id="submit-status" role="status" aria-live="polite"></div>
-				</form>
-			</div>
+			<p style="margin-top: 1rem;">
+				<a href="/bug-report/" class="cta-button" style="display: inline-block; text-decoration: none;">
+					Report a Bug →
+				</a>
+			</p>
+			<p style="margin-top: 1rem; color: var(--text-muted);">
+				You can also view <a href="https://github.com/PipFoweraker/pdoom1/issues" style="color: var(--accent-primary);">existing issues on GitHub</a>.
+			</p>
 		</section>
 
 		<section class="section" id="contact">
@@ -1341,73 +1298,6 @@ python main.py</pre>
 			statusDiv.style.color = isError ? 'var(--accent-danger)' : 'var(--success-color)';
 		}
 
-		// Bug report form submission -> shared backend
-	document.getElementById('bug-report-form').addEventListener('submit', async function(e) {
-			e.preventDefault();
-			
-			const button = e.target.querySelector('button[type="submit"]');
-			const originalText = button.textContent;
-			button.disabled = true;
-			
-			try {
-				const formData = new FormData(e.target);
-				const bugData = {
-					title: formData.get('title'),
-					type: formData.get('type') || 'bug',
-					description: formData.get('description'),
-					email: formData.get('email') || '',
-					source: 'web'
-				};
-				
-				// Local mock: when running on localhost, simulate a successful submission
-				const isLocal = ['localhost','127.0.0.1','[::1]'].includes(window.location.hostname) || 
-					window.location.hostname.startsWith('192.168.') ||
-					window.location.port === '8002' ||
-					window.location.href.includes('localhost');
-				
-				if (isLocal) {
-					button.textContent = 'Submitting...';
-					await new Promise(r => setTimeout(r, 400));
-					button.textContent = '[OK] Report Submitted! (local mock)';
-					button.style.background = 'var(--success-color)';
-					setTimeout(() => {
-						button.textContent = originalText;
-						button.style.background = '';
-						e.target.reset();
-						button.disabled = false;
-					}, 2000);
-					return;
-				}
-				
-				// Production API submission
-				const base = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.apiBase) || '';
-				const url = (base ? base.replace(/\/$/, '') : '') + '/api/report-bug';
-				const res = await fetch(url, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(bugData)
-				});
-				if (!res.ok) throw new Error('Failed to submit');
-				button.textContent = '[OK] Report Submitted!';
-				button.style.background = 'var(--success-color)';
-				setTimeout(() => {
-					button.textContent = originalText;
-					button.style.background = '';
-					e.target.reset();
-					button.disabled = false;
-				}, 3000);
-				
-			} catch (err) {
-				button.textContent = '[ERROR] Submit Failed';
-				button.style.background = 'var(--accent-danger)';
-				setTimeout(() => {
-					button.textContent = originalText;
-					button.style.background = '';
-					button.disabled = false;
-				}, 3000);
-			}
-		});
-        
 		// Newsletter form
 		document.getElementById('newsletter-form').addEventListener('submit', function(e) {
 			e.preventDefault();
