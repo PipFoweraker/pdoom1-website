@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "version": "0.2.1",
+      "date": "2025-10-09",
+      "channel": "release", 
+      "summary": "Testing version-aware deployment system with patch release.",
+      "items": [
+        "Configured GitHub environments for production deployment safeguards",
+        "Tested version change detection and automated deployment workflow",
+        "Validated manual approval gates for major version changes"
+      ]
+    },
+    {
       "version": "0.2.0",
       "date": "2025-10-09",
       "channel": "release",
