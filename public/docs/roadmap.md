@@ -2,21 +2,33 @@
 
 This roadmap is a living document. It summarizes major goals and feeds the GitHub Issues backlog for execution.
 
-## 0.0.x (Alpha) – Now
-- Content cadence: 2–3 dev blog posts per week
-- Bug intake: Netlify function -> repo dispatch -> Issues
-- Changelog automation from Airtable
-- DreamHost static hosting + Netlify API
-- Social syndication to Discord, Bluesky, X, LinkedIn
+## v1.0.0 – Weekly League System ✅ COMPLETE
+- Game repository integration with 15 seed leaderboards
+- Weekly league management system with deterministic seeding
+- Development API server with 8 endpoints
+- Enhanced game-integration.py with bulk sync capabilities
+- Production-ready code quality with comprehensive type annotations
 
-## 0.1.0 – Website polish
+## v1.1.0 – Frontend UI & Automation
+- Modern frontend interface for weekly league standings
+- Automated weekly league resets and competition cycles
+- Production deployment infrastructure and monitoring
+- User experience improvements for competition participation
+
+## v1.2.0 – Score Submission Integration
+- Automatic score submission from game to website API
+- Live competition workflow completion
+- Real-time leaderboard updates during competitions
+- Enhanced error handling and retry mechanisms
+
+## v0.1.0 – Website polish (Backlog)
 - Accessibility pass (ARIA, contrast, keyboard nav)
 - Core SEO (meta, sitemap.xml, robots.txt, OpenGraph)
 - Analytics (privacy-preserving)
 - Contact form hardening (hCaptcha optional)
 - Design tokens pulled from `pdoom1` main repo
 
-## 0.2.0 – Steam readiness
+## v0.2.0 – Steam readiness (Backlog)
 - Download page reoriented to Steam store link
 - Press kit page (media + factsheet)
 - Build/version badge + release notes integration
