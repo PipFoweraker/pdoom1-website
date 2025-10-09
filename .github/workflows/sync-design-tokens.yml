@@ -1,0 +1,65 @@
+name: Sync Design Tokens from pdoom1
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref (branch, tag, or SHA) in PipFoweraker/pdoom1'
+        required: true
+        default: 'main'
+  repository_dispatch:
+    types: [sync-tokens]
+
+permissions:
+  contents: write
+
+jobs:
+  sync-tokens:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout website repo
+        uses: actions/checkout@v4
+        
+      - name: Checkout main pdoom1 repo
+        uses: actions/checkout@v4
+        with:
+          repository: PipFoweraker/pdoom1
+          ref: ${{ github.event.inputs.ref || github.event.client_payload.ref || 'main' }}
+          path: _pdoom1_src
+          
+      - name: Copy tokens.json from main repo
+        run: |
+          set -euo pipefail
+          
+          # Check if tokens.json exists in the main repo
+          if [ -f _pdoom1_src/public/design/tokens.json ]; then
+            echo "Found tokens.json in _pdoom1_src/public/design/tokens.json"
+            cp _pdoom1_src/public/design/tokens.json public/design/tokens.json
+          elif [ -f _pdoom1_src/design/tokens.json ]; then
+            echo "Found tokens.json in _pdoom1_src/design/tokens.json"
+            cp _pdoom1_src/design/tokens.json public/design/tokens.json
+          elif [ -f _pdoom1_src/tokens.json ]; then
+            echo "Found tokens.json in _pdoom1_src/tokens.json"
+            cp _pdoom1_src/tokens.json public/design/tokens.json
+          else
+            echo "::warning::tokens.json not found in main pdoom1 repo at expected locations"
+            exit 0
+          fi
+          
+          echo "Tokens synced successfully"
+          cat public/design/tokens.json
+          
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if git diff --quiet public/design/tokens.json; then
+            echo "No changes to tokens.json"
+          else
+            git add public/design/tokens.json
+            REF="${{ github.event.inputs.ref || github.event.client_payload.ref || 'main' }}"
+            git commit -m "chore(design): sync tokens.json from pdoom1@${REF}"
+            git push
+            echo "Tokens updated and committed"
+          fi

@@ -29,6 +29,8 @@ This documentation covers the complete p(Doom)1 website project - from initial s
 ### 🔗 [03-integrations/](./03-integrations/)
 **External integrations and APIs**
 - **[game-repository-integration.md](./03-integrations/game-repository-integration.md)** - pdoom1 game integration
+- **[design-token-sync-strategy.md](./03-integrations/design-token-sync-strategy.md)** - Design tokens synchronization
+- **[roadmap-sync-strategy.md](./03-integrations/roadmap-sync-strategy.md)** - Roadmap synchronization
 - **[github-issues-integration-plan.md](./03-integrations/github-issues-integration-plan.md)** - GitHub issues integration
 - **[bug-reporting.md](./03-integrations/bug-reporting.md)** - Bug reporting system
 - **[CROSS_REPOSITORY_DOCUMENTATION_STRATEGY.md](./03-integrations/CROSS_REPOSITORY_DOCUMENTATION_STRATEGY.md)** - Multi-repo documentation
