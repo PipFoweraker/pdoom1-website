@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-10-09T12:07:39.525365+00:00",
+  "checks_passed": 5,
+  "checks_failed": 1,
+  "warnings": [
+    "On main branch: Current branch: copilot/establish-website-deployment-schedule"
+  ],
+  "errors": [
+    "Deployment verification: Some checks failed"
+  ],
+  "deployment_ready": false,
+  "check_only_mode": true,
+  "quick_mode": false
+}

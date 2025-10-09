@@ -1,93 +1,91 @@
 {
-  "timestamp": "2025-10-09T20:07:16.923577",
-  "duration_seconds": 0.186914,
+  "timestamp": "2025-10-09T12:07:39.387533",
+  "duration_seconds": 0.065636,
   "total_tests": 11,
   "passed_tests": 11,
   "failed_tests": 0,
-  "warnings": 1,
+  "warnings": 0,
   "success_rate": 100.0,
   "overall_status": "PASS",
   "results": [
     {
       "test": "Main Index File",
       "passed": true,
-      "message": "\u2713 Found: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\index.html",
-      "timestamp": "2025-10-09T20:07:16.737048",
+      "message": "\u2713 Found: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/index.html",
+      "timestamp": "2025-10-09T12:07:39.321931",
       "is_warning": false
     },
     {
       "test": "Config File",
       "passed": true,
-      "message": "\u2713 Found: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\config.json",
-      "timestamp": "2025-10-09T20:07:16.737094",
+      "message": "\u2713 Found: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/config.json",
+      "timestamp": "2025-10-09T12:07:39.321943",
       "is_warning": false
     },
     {
       "test": "Version Data",
       "passed": true,
-      "message": "\u2713 Found: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\data\\version.json",
-      "timestamp": "2025-10-09T20:07:16.737120",
+      "message": "\u2713 Found: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/data/version.json",
+      "timestamp": "2025-10-09T12:07:39.321950",
       "is_warning": false
     },
     {
       "test": "Changelog Data",
       "passed": true,
-      "message": "\u2713 Found: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\data\\changes.json",
-      "timestamp": "2025-10-09T20:07:16.737141",
+      "message": "\u2713 Found: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/data/changes.json",
+      "timestamp": "2025-10-09T12:07:39.321955",
       "is_warning": false
     },
     {
       "test": "Config JSON",
       "passed": true,
-      "message": "\u2713 Valid JSON: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\config.json",
-      "timestamp": "2025-10-09T20:07:16.737369",
+      "message": "\u2713 Valid JSON: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/config.json",
+      "timestamp": "2025-10-09T12:07:39.322011",
       "is_warning": false
     },
     {
       "test": "Version JSON",
       "passed": true,
-      "message": "\u2713 Valid JSON: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\data\\version.json",
-      "timestamp": "2025-10-09T20:07:16.737538",
+      "message": "\u2713 Valid JSON: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/data/version.json",
+      "timestamp": "2025-10-09T12:07:39.322062",
       "is_warning": false
     },
     {
       "test": "Changes JSON",
       "passed": true,
-      "message": "\u2713 Valid JSON: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\data\\changes.json",
-      "timestamp": "2025-10-09T20:07:16.737697",
+      "message": "\u2713 Valid JSON: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/data/changes.json",
+      "timestamp": "2025-10-09T12:07:39.322100",
       "is_warning": false
     },
     {
       "test": "Version Update Script",
       "passed": true,
-      "message": "\u2713 Script compiles: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\scripts\\update-version-info.py",
-      "timestamp": "2025-10-09T20:07:16.839034",
+      "message": "\u2713 Script compiles: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../scripts/update-version-info.py",
+      "timestamp": "2025-10-09T12:07:39.354889",
       "is_warning": false
     },
     {
       "test": "Stats Calculation Script",
       "passed": true,
-      "message": "\u2713 Script compiles: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\scripts\\calculate-game-stats.py",
-      "timestamp": "2025-10-09T20:07:16.923335",
+      "message": "\u2713 Script compiles: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../scripts/calculate-game-stats.py",
+      "timestamp": "2025-10-09T12:07:39.387405",
       "is_warning": false
     },
     {
       "test": "Version Data Structure",
       "passed": true,
       "message": "\u2713 All required fields present",
-      "timestamp": "2025-10-09T20:07:16.923551",
+      "timestamp": "2025-10-09T12:07:39.387510",
       "is_warning": false
     },
     {
       "test": "Data Freshness",
       "passed": true,
-      "message": "Data is 9 days old",
-      "timestamp": "2025-10-09T20:07:16.923568",
-      "is_warning": true
+      "message": "\u2713 Data is 0 days old",
+      "timestamp": "2025-10-09T12:07:39.387525",
+      "is_warning": false
     }
   ],
   "failed_test_details": [],
-  "warnings_details": [
-    "Data Freshness: Data is 9 days old"
-  ]
+  "warnings_details": []
 }
