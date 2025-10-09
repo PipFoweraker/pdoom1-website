@@ -1,0 +1,244 @@
+name: Version-Aware Deployment to DreamHost
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: "Force deployment even if version checks fail (use with caution)"
+        type: boolean
+        default: false
+      skip_version_check:
+        description: "Skip version validation (emergency deployments only)"
+        type: boolean
+        default: false
+      deployment_notes:
+        description: "Optional deployment notes"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  version_check:
+    runs-on: ubuntu-latest
+    outputs:
+      can_auto_deploy: ${{ steps.version_check.outputs.can_auto_deploy }}
+      requires_manual_approval: ${{ steps.version_check.outputs.requires_manual_approval }}
+      change_type: ${{ steps.version_check.outputs.change_type }}
+      current_version: ${{ steps.version_check.outputs.current_version }}
+      warning_message: ${{ steps.version_check.outputs.warning_message }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for version comparison
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Check version changes
+        id: version_check
+        run: |
+          python scripts/check-version-deployment.py
+        continue-on-error: true
+
+      - name: Display version check results
+        run: |
+          echo "Version Check Results:"
+          echo "- Can Auto Deploy: ${{ steps.version_check.outputs.can_auto_deploy }}"
+          echo "- Requires Manual Approval: ${{ steps.version_check.outputs.requires_manual_approval }}"
+          echo "- Change Type: ${{ steps.version_check.outputs.change_type }}"
+          echo "- Current Version: ${{ steps.version_check.outputs.current_version }}"
+          echo "- Warning: ${{ steps.version_check.outputs.warning_message }}"
+
+  manual_approval:
+    runs-on: ubuntu-latest
+    needs: version_check
+    if: needs.version_check.outputs.requires_manual_approval == 'true' && github.event.inputs.force_deploy != 'true'
+    environment: 
+      name: production-approval
+      url: https://pdoom1.com
+    steps:
+      - name: Manual Approval Required
+        run: |
+          echo "🚨 MANUAL APPROVAL REQUIRED 🚨"
+          echo ""
+          echo "${{ needs.version_check.outputs.warning_message }}"
+          echo ""
+          echo "This deployment requires manual approval because:"
+          echo "- Change Type: ${{ needs.version_check.outputs.change_type }}"
+          echo "- Version: ${{ needs.version_check.outputs.current_version }}"
+          echo ""
+          echo "Please review the changes and approve this deployment in the GitHub Actions interface."
+          echo ""
+          echo "Deployment Notes: ${{ github.event.inputs.deployment_notes }}"
+
+  pre_deployment_checks:
+    runs-on: ubuntu-latest
+    needs: [version_check, manual_approval]
+    if: always() && (needs.version_check.outputs.can_auto_deploy == 'true' || github.event.inputs.force_deploy == 'true' || (needs.manual_approval.result == 'success'))
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Run health checks
+        run: |
+          echo "🔍 Running pre-deployment health checks..."
+          python scripts/health-check.py
+        continue-on-error: false
+
+      - name: Validate deployment readiness
+        run: |
+          echo "✅ Validating deployment readiness..."
+          python scripts/verify-deployment.py --local-check
+        continue-on-error: false
+
+      - name: Generate deployment manifest
+        run: |
+          echo "📋 Generating deployment manifest..."
+          cat > deployment-manifest.json << EOF
+          {
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "version": "${{ needs.version_check.outputs.current_version }}",
+            "change_type": "${{ needs.version_check.outputs.change_type }}",
+            "commit_sha": "${{ github.sha }}",
+            "deployment_notes": "${{ github.event.inputs.deployment_notes }}",
+            "force_deploy": "${{ github.event.inputs.force_deploy }}",
+            "skip_version_check": "${{ github.event.inputs.skip_version_check }}",
+            "approved_by": "${{ github.actor }}"
+          }
+          EOF
+          
+          echo "Deployment Manifest:"
+          cat deployment-manifest.json
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [version_check, pre_deployment_checks]
+    if: always() && needs.pre_deployment_checks.result == 'success'
+    environment: production
+    steps:
+      - name: Check required secrets
+        run: |
+          for v in DH_HOST DH_USER DH_PATH DH_SSH_KEY; do
+            if [ -z "${!v}" ]; then echo "Missing secret: $v"; MISSING=1; fi;
+          done
+          if [ "${MISSING}" = "1" ]; then exit 1; fi
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Pre-deployment banner
+        run: |
+          echo "🚀 STARTING DEPLOYMENT 🚀"
+          echo ""
+          echo "${{ needs.version_check.outputs.warning_message }}"
+          echo "Change Type: ${{ needs.version_check.outputs.change_type }}"
+          echo "Target Version: ${{ needs.version_check.outputs.current_version }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Deployed by: ${{ github.actor }}"
+          echo ""
+          if [ "${{ github.event.inputs.force_deploy }}" = "true" ]; then
+            echo "⚠️  FORCE DEPLOYMENT ENABLED"
+          fi
+          if [ "${{ github.event.inputs.deployment_notes }}" != "" ]; then
+            echo "📝 Notes: ${{ github.event.inputs.deployment_notes }}"
+          fi
+
+      - name: Generate sitemap
+        run: node scripts/generate-sitemap.js
+
+      - name: Setup SSH
+        env:
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DH_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      - name: Ensure remote path exists
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+        run: |
+          PORT=${DH_PORT:-22}
+          ssh -p "$PORT" "${DH_USER}@${DH_HOST}" "mkdir -p '${DH_PATH}'"
+
+      - name: Deploy public/ via rsync
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+        run: |
+          set -euo pipefail
+          RSYNC_FLAGS="-avz --delete"
+          PORT=${DH_PORT:-22}
+          
+          echo "🔄 Deploying to DreamHost..."
+          rsync $RSYNC_FLAGS -e "ssh -p $PORT" public/ "${DH_USER}@${DH_HOST}:${DH_PATH}/"
+          
+          echo "✅ Deployment completed successfully!"
+
+  post_deployment_verification:
+    runs-on: ubuntu-latest
+    needs: [deploy, version_check]
+    if: always() && needs.deploy.result == 'success'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Wait for deployment to propagate
+        run: |
+          echo "⏳ Waiting 30 seconds for deployment to propagate..."
+          sleep 30
+
+      - name: Verify deployment
+        run: |
+          echo "🔍 Verifying deployment..."
+          python scripts/verify-deployment.py
+        continue-on-error: true
+
+      - name: Post-deployment summary
+        run: |
+          echo "🎉 DEPLOYMENT SUMMARY 🎉"
+          echo ""
+          echo "✅ Version ${{ needs.version_check.outputs.current_version }} deployed successfully"
+          echo "🔗 Site: https://pdoom1.com"
+          echo "📊 Change Type: ${{ needs.version_check.outputs.change_type }}"
+          echo "⏰ Deployed at: $(date -u)"
+          echo ""
+          if [ "${{ needs.version_check.outputs.change_type }}" = "major" ]; then
+            echo "🎯 Major version deployed! Consider:"
+            echo "   - Announcing on social media"
+            echo "   - Updating documentation"
+            echo "   - Monitoring for issues"
+          fi

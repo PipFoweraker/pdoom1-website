@@ -62,12 +62,27 @@ Full blog post content...
 2. **Infrastructure Updates**: CI/CD, deployment changes → Minor version bump  
 3. **Content Updates**: Blog posts, minor fixes → Patch version bump
 
+### Deployment Safeguards
+- **Patch Changes (0.0.X)**: Automatic deployment with health checks
+- **Minor Changes (0.X.0)**: Automatic deployment with enhanced validation
+- **Major Changes (X.0.0)**: Manual approval required + comprehensive checks
+
 ### Steps
 1. **Update package.json**: Increment version number
 2. **Update status.json**: Sync website.version with package.json
-3. **Create blog entry**: Document what changed
+3. **Create blog entry**: Document what changed (required for minor/major)
 4. **Update website changelog**: Add entry to website-changes.json
 5. **Commit with version tag**: Use `git tag vX.Y.Z`
+6. **Deploy with safeguards**: Use version-aware deployment workflow
+
+### Version-Aware Deployment
+Our GitHub Actions workflow automatically detects version changes and applies appropriate safeguards:
+
+- **Version Change Detection**: Compares current version with latest git tag
+- **Automatic Validation**: Checks changelog updates, file sync, blog posts
+- **Manual Approval Gates**: Major versions require reviewer approval
+- **Emergency Override**: Force deployment option for critical fixes
+- **Post-Deployment Verification**: Health checks and site validation
 
 ## File Locations
 
@@ -82,6 +97,7 @@ Full blog post content...
 
 ### Documentation
 - `/docs/WEBSITE_DEVELOPMENT_PROCESS.md` - This file
+- `/docs/GITHUB_ENVIRONMENT_SETUP.md` - GitHub environment configuration
 - `/docs/deployment-guide.md` - Deployment instructions
 - `/docs/style-guide.md` - Design guidelines
 
@@ -93,10 +109,21 @@ Full blog post content...
 - `npm run deploy:prepare` - Pre-deployment validation
 - `npm run test:all` - Run all health checks
 
+### Version-Aware Deployment Scripts
+- `scripts/check-version-deployment.py` - Version change detection and validation
+- `scripts/verify-deployment.py` - Post-deployment verification
+- `.github/workflows/version-aware-deploy.yml` - Main deployment workflow
+
+### Deployment Workflows
+- **version-aware-deploy.yml**: Production deployment with version safeguards
+- **deploy-dreamhost.yml**: Legacy manual deployment (backup)
+- **health-checks.yml**: Scheduled health monitoring
+
 ### Manual Updates Required
 - Blog post creation (manual)
 - Blog index.json updates (manual)
 - Version increments (manual)
+- Major version approval (manual via GitHub)
 
 ## Current Development Sprint Status
 
@@ -118,3 +145,20 @@ Full blog post content...
 3. **Update version numbers** for significant changes
 4. **Use semantic commit messages** for clear history
 5. **Sync all version files** before deployment
+
+## Setup Requirements
+
+### One-Time GitHub Environment Setup
+Before using version-aware deployments, configure GitHub environments:
+
+1. **Follow setup guide**: See `/docs/GITHUB_ENVIRONMENT_SETUP.md`
+2. **Create environments**: `production-approval` and `production`
+3. **Configure secrets**: Add all DreamHost deployment credentials
+4. **Set reviewers**: Assign manual approval reviewers for major versions
+5. **Test workflow**: Deploy a patch version to verify automation
+
+### Local Development Setup
+1. **Install dependencies**: `npm install`
+2. **Configure Python**: Ensure Python 3.11+ available
+3. **Test scripts**: Run `npm run test:all` to verify setup
+4. **Local server**: Use `npm start` for development
