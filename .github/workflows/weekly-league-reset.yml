@@ -1,0 +1,204 @@
+name: Weekly League Reset
+
+on:
+  # Monday at 14:00 UTC = Monday 00:00 AEST (standard time)
+  # Note: During daylight saving (Oct-Apr), Monday 00:00 AEDT = Sunday 13:00 UTC
+  schedule:
+    - cron: '0 14 * * 0'  # Sunday 14:00 UTC = Monday 00:00 AEST
+  
+  # Manual trigger for testing or manual league resets
+  workflow_dispatch:
+    inputs:
+      archive_previous:
+        description: 'Archive previous week before starting new one'
+        type: boolean
+        default: true
+      force_reset:
+        description: 'Force reset even if league is active'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  reset_weekly_league:
+    name: Reset Weekly League
+    runs-on: ubuntu-latest
+    steps:
+      - name: League reset banner
+        run: |
+          echo "🏆 WEEKLY LEAGUE RESET STARTING 🏆"
+          echo ""
+          echo "⏰ Time: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          echo "📅 New week beginning: Monday $(date -u +'%Y-%m-%d')"
+          echo "👤 Triggered by: ${{ github.event_name }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Check current league status
+        run: |
+          echo "📊 Current league status:"
+          python scripts/weekly-league-manager.py --status
+
+      - name: Archive previous week
+        if: github.event.inputs.archive_previous != 'false'
+        run: |
+          echo "📦 Archiving previous week..."
+          python scripts/weekly-league-manager.py --archive-week || echo "⚠️  Archive failed (may already be archived)"
+
+      - name: Generate new competitive seed
+        run: |
+          echo "🎲 Generating new competitive seed for the week..."
+          NEW_SEED=$(python scripts/weekly-league-manager.py --generate-seed)
+          echo "✅ New seed generated: $NEW_SEED"
+
+      - name: Start new weekly league
+        run: |
+          echo "🚀 Starting new weekly league..."
+          
+          if [ "${{ github.event.inputs.force_reset }}" = "true" ]; then
+            echo "⚠️  Force reset enabled"
+            python scripts/weekly-league-manager.py --new-week --force || exit 1
+          else
+            python scripts/weekly-league-manager.py --new-week || exit 1
+          fi
+          
+          echo "✅ New weekly league started successfully"
+
+      - name: Verify new league status
+        run: |
+          echo "🔍 Verifying new league status:"
+          python scripts/weekly-league-manager.py --status
+          
+          # Check standings (should be empty for new week)
+          echo ""
+          echo "📊 New week standings:"
+          python scripts/weekly-league-manager.py --standings
+
+      - name: Sync game data
+        run: |
+          echo "🎮 Syncing game data for new week..."
+          python scripts/game-integration.py --weekly-sync || echo "⚠️  Game sync failed (non-critical)"
+          python scripts/game-integration.py --status
+
+      - name: Commit league reset
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action (Weekly League)"
+          
+          if git diff --quiet; then
+            echo "ℹ️  No changes to commit"
+          else
+            WEEK_ID=$(python scripts/weekly-league-manager.py --status | grep "CURRENT_WEEK:" | awk '{print $2}')
+            
+            git add -A
+            git commit -m "Weekly league reset - $WEEK_ID
+
+            - Archived previous week's results
+            - Generated new competitive seed
+            - Started new weekly league competition
+            - Reset standings and statistics
+            
+            Automated by: weekly-league-reset.yml
+            Triggered: $(date -u +'%Y-%m-%d %H:%M UTC')
+            New week: $WEEK_ID"
+            
+            git push
+            echo "✅ League reset committed and pushed"
+          fi
+
+      - name: League reset summary
+        run: |
+          WEEK_ID=$(python scripts/weekly-league-manager.py --status | grep "CURRENT_WEEK:" | awk '{print $2}')
+          SEED=$(python scripts/weekly-league-manager.py --status | grep "CURRENT_SEED:" | awk '{print $2}')
+          
+          echo ""
+          echo "🎉 WEEKLY LEAGUE RESET COMPLETE! 🎉"
+          echo ""
+          echo "🏆 New Week: $WEEK_ID"
+          echo "🎲 Seed: $SEED"
+          echo "⏰ Started: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          echo "📅 Ends: Sunday 23:59 AEST"
+          echo ""
+          echo "🔗 Live at: https://pdoom1.com/leaderboard/"
+          echo ""
+          echo "Next steps:"
+          echo "  - Announce new week in Discord"
+          echo "  - Share competitive seed with players"
+          echo "  - Monitor first scores coming in"
+          echo "  - Prepare for Tuesday balance review"
+
+  post_reset_verification:
+    name: Post-Reset Verification
+    needs: reset_weekly_league
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Wait for changes to propagate
+        run: |
+          echo "⏳ Waiting 15 seconds for changes to propagate..."
+          sleep 15
+
+      - name: Verify league data integrity
+        run: |
+          echo "🔍 Verifying league data integrity..."
+          
+          # Check that current.json exists and is valid
+          if [ -f "public/leaderboard/data/weekly/current.json" ]; then
+            echo "✅ current.json exists"
+            python -m json.tool public/leaderboard/data/weekly/current.json > /dev/null
+            echo "✅ current.json is valid JSON"
+          else
+            echo "❌ current.json not found!"
+            exit 1
+          fi
+          
+          # Verify league status
+          python scripts/weekly-league-manager.py --status
+          
+          echo "✅ League data verification passed"
+
+      - name: Test API endpoints (if available)
+        run: |
+          echo "🧪 Testing API endpoints..."
+          python scripts/api-server.py --test || echo "⚠️  API test failed (non-critical)"
+
+  notify_failure:
+    name: Notify on Failure
+    needs: reset_weekly_league
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Failure notification
+        run: |
+          echo "❌ WEEKLY LEAGUE RESET FAILED ❌"
+          echo ""
+          echo "Time: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          echo ""
+          echo "URGENT ACTION REQUIRED:"
+          echo "  1. Check workflow logs for errors"
+          echo "  2. Verify league data integrity"
+          echo "  3. Manual reset if needed:"
+          echo "     python scripts/weekly-league-manager.py --archive-week"
+          echo "     python scripts/weekly-league-manager.py --new-week"
+          echo "  4. Notify players of delay"
+          echo "  5. Update Discord with status"
+          echo ""
+          echo "Players may already be expecting new league!"
+          echo "Time-sensitive - resolve ASAP"

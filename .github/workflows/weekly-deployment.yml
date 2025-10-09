@@ -1,0 +1,313 @@
+name: Weekly Scheduled Deployment
+
+on:
+  # Scheduled deployment: Every Friday at 06:00 UTC (16:00 AEST/17:00 AEDT)
+  schedule:
+    - cron: '0 6 * * 5'  # Friday at 06:00 UTC
+  
+  # Manual trigger for testing or emergency deployments
+  workflow_dispatch:
+    inputs:
+      skip_checks:
+        description: 'Skip pre-deployment checks (emergency only)'
+        type: boolean
+        default: false
+      reset_league:
+        description: 'Reset weekly league after deployment'
+        type: boolean
+        default: true
+      dry_run:
+        description: 'Perform dry run (no actual deployment)'
+        type: boolean
+        default: false
+      deployment_notes:
+        description: 'Deployment notes (optional)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  pre_deployment_preparation:
+    name: Pre-Deployment Preparation
+    runs-on: ubuntu-latest
+    outputs:
+      can_proceed: ${{ steps.checks.outputs.can_proceed }}
+      current_version: ${{ steps.version.outputs.version }}
+      league_week: ${{ steps.league.outputs.week }}
+      deployment_summary: ${{ steps.summary.outputs.summary }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || echo "No requirements.txt found"
+
+      - name: Get current version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Current version: v$VERSION"
+
+      - name: Check weekly league status
+        id: league
+        run: |
+          WEEK=$(python scripts/weekly-league-manager.py --status | grep "CURRENT_WEEK:" | awk '{print $2}')
+          echo "week=$WEEK" >> $GITHUB_OUTPUT
+          echo "🏆 Current league week: $WEEK"
+          
+          # Full status output
+          python scripts/weekly-league-manager.py --status
+
+      - name: Run pre-deployment checks
+        id: checks
+        if: github.event.inputs.skip_checks != 'true'
+        run: |
+          echo "🔍 Running pre-deployment health checks..."
+          
+          # Run health checks
+          if python scripts/health-check.py; then
+            echo "✅ Health checks passed"
+            HEALTH_OK=true
+          else
+            echo "❌ Health checks failed"
+            HEALTH_OK=false
+          fi
+          
+          # Run deployment verification
+          if python scripts/verify-deployment.py; then
+            echo "✅ Deployment verification passed"
+            VERIFY_OK=true
+          else
+            echo "❌ Deployment verification failed"
+            VERIFY_OK=false
+          fi
+          
+          # Determine if we can proceed
+          if [ "$HEALTH_OK" = true ] && [ "$VERIFY_OK" = true ]; then
+            echo "can_proceed=true" >> $GITHUB_OUTPUT
+            echo "✅ All pre-deployment checks passed"
+          else
+            echo "can_proceed=false" >> $GITHUB_OUTPUT
+            echo "❌ Pre-deployment checks failed"
+            exit 1
+          fi
+
+      - name: Sync game data
+        run: |
+          echo "🎮 Syncing game data from pdoom1 repository..."
+          python scripts/game-integration.py --sync-leaderboards || echo "⚠️  Game sync failed (non-critical)"
+          python scripts/game-integration.py --weekly-sync || echo "⚠️  Weekly sync failed (non-critical)"
+          python scripts/game-integration.py --status
+
+      - name: Update version info
+        run: |
+          echo "📊 Updating version and stats..."
+          npm run update:version || echo "⚠️  Version update failed (non-critical)"
+          npm run update:stats || echo "⚠️  Stats update failed (non-critical)"
+
+      - name: Generate deployment summary
+        id: summary
+        run: |
+          SUMMARY="Weekly Deployment - v$(node -p "require('./package.json').version") - $(date -u +'%Y-%m-%d %H:%M UTC')"
+          echo "summary=$SUMMARY" >> $GITHUB_OUTPUT
+          echo "📋 $SUMMARY"
+
+      - name: Commit updated data
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action (Weekly Deployment)"
+          
+          if git diff --quiet; then
+            echo "ℹ️  No data changes to commit"
+          else
+            git add -A
+            git commit -m "Weekly deployment data sync - $(date -u +'%Y-%m-%d %H:%M UTC')
+
+            - Updated game data from pdoom1 repository
+            - Synced leaderboards and weekly league data
+            - Updated version info and stats
+            
+            Automated by: weekly-deployment.yml
+            Triggered by: ${{ github.event_name }}"
+            git push
+            echo "✅ Data changes committed and pushed"
+          fi
+
+  deploy_to_production:
+    name: Deploy to Production
+    needs: pre_deployment_preparation
+    if: needs.pre_deployment_preparation.outputs.can_proceed == 'true' || github.event.inputs.skip_checks == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deployment banner
+        run: |
+          echo "🚀 WEEKLY DEPLOYMENT STARTING 🚀"
+          echo ""
+          echo "📦 Version: ${{ needs.pre_deployment_preparation.outputs.current_version }}"
+          echo "🏆 League Week: ${{ needs.pre_deployment_preparation.outputs.league_week }}"
+          echo "⏰ Time: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          echo "👤 Triggered by: ${{ github.actor }}"
+          echo ""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "⚠️  DRY RUN MODE - No actual deployment"
+          fi
+          if [ "${{ github.event.inputs.deployment_notes }}" != "" ]; then
+            echo "📝 Notes: ${{ github.event.inputs.deployment_notes }}"
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Generate sitemap
+        run: node scripts/generate-sitemap.js
+
+      - name: Setup SSH
+        if: github.event.inputs.dry_run != 'true'
+        env:
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DH_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      - name: Ensure remote directory exists
+        if: github.event.inputs.dry_run != 'true'
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+        run: |
+          PORT=${DH_PORT:-22}
+          ssh -p "$PORT" "${DH_USER}@${DH_HOST}" "mkdir -p '${DH_PATH}'"
+
+      - name: Deploy to DreamHost
+        if: github.event.inputs.dry_run != 'true'
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+        run: |
+          set -euo pipefail
+          PORT=${DH_PORT:-22}
+          
+          echo "🔄 Deploying to DreamHost..."
+          rsync -avz --delete -e "ssh -p $PORT" public/ "${DH_USER}@${DH_HOST}:${DH_PATH}/"
+          
+          echo "✅ Deployment completed successfully!"
+
+      - name: Dry run summary
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          echo "📋 DRY RUN SUMMARY"
+          echo ""
+          echo "Would have deployed:"
+          du -sh public/
+          echo ""
+          echo "Files to deploy:"
+          find public/ -type f | wc -l
+          echo "files would be synced"
+
+  post_deployment_tasks:
+    name: Post-Deployment Tasks
+    needs: [pre_deployment_preparation, deploy_to_production]
+    if: always() && needs.deploy_to_production.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Wait for deployment to propagate
+        run: |
+          echo "⏳ Waiting 30 seconds for deployment to propagate..."
+          sleep 30
+
+      - name: Run post-deployment verification
+        run: |
+          echo "🔍 Running post-deployment verification..."
+          python scripts/verify-deployment.py || echo "⚠️  Verification failed (non-critical)"
+
+      - name: Health check
+        run: |
+          echo "🏥 Running health checks on live site..."
+          python scripts/health-check.py || echo "⚠️  Health check failed (non-critical)"
+
+      - name: Archive current week (if Sunday)
+        if: github.event.inputs.reset_league != 'false'
+        run: |
+          # Check if it's Sunday (day before new league starts)
+          DAY=$(date +%u)
+          if [ "$DAY" = "7" ]; then
+            echo "📦 Archiving current week before new league starts..."
+            python scripts/weekly-league-manager.py --archive-week
+          else
+            echo "ℹ️  Not Sunday, skipping archive (will happen automatically Monday)"
+          fi
+
+      - name: Deployment success summary
+        run: |
+          echo "🎉 DEPLOYMENT COMPLETED SUCCESSFULLY! 🎉"
+          echo ""
+          echo "📦 Version: ${{ needs.pre_deployment_preparation.outputs.current_version }}"
+          echo "🏆 League Week: ${{ needs.pre_deployment_preparation.outputs.league_week }}"
+          echo "⏰ Completed: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          echo "🔗 Site: https://pdoom1.com"
+          echo ""
+          echo "Next steps:"
+          echo "  - Monitor site for next 2 hours"
+          echo "  - Check Discord for user feedback"
+          echo "  - Start Twitch stream if scheduled"
+          echo "  - New league starts Monday 00:00 AEST"
+
+  notify_failure:
+    name: Notify on Failure
+    needs: [pre_deployment_preparation, deploy_to_production, post_deployment_tasks]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Failure notification
+        run: |
+          echo "❌ DEPLOYMENT FAILED ❌"
+          echo ""
+          echo "Stage: ${{ needs.deploy_to_production.result }}"
+          echo "Time: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          echo ""
+          echo "Action required:"
+          echo "  1. Check workflow logs for errors"
+          echo "  2. Verify all secrets are configured"
+          echo "  3. Check DreamHost connectivity"
+          echo "  4. Consider manual deployment"
+          echo "  5. Notify team if unable to resolve"
+          echo ""
+          echo "Manual deployment command:"
+          echo "  gh workflow run deploy-dreamhost.yml"
