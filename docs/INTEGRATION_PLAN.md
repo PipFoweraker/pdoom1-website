@@ -1,7 +1,7 @@
 <!--
 This file is automatically synced from pdoom1/docs/shared/INTEGRATION_PLAN.md
-Last synced: 2025-10-09T11:29:32.304820
-Source commit: b021426f63d4157cf079fc875267ce69b1c8c0ba
+Last synced: 2025-10-09T12:14:14.218829
+Source commit: 3ac7b1a3f2e3ca2a553bb16107a5acbc32e388f1
 DO NOT EDIT DIRECTLY - Changes will be overwritten by sync
 -->
 
@@ -225,19 +225,19 @@ Endpoints:
 ```javascript
 // JWT Token Structure
 {
-  "sub": "user_uuid",
-  "pseudonym": "user_pseudonym",
-  "permissions": ["leaderboard_submit", "analytics_opt_in"],
-  "iat": 1234567890,
-  "exp": 1234567890
+  'sub': 'user_uuid',
+  'pseudonym': 'user_pseudonym',
+  'permissions': ['leaderboard_submit', 'analytics_opt_in'],
+  'iat': 1234567890,
+  'exp': 1234567890
 }
 
 // API Request Headers
 {
-  "Authorization": "Bearer {jwt_token}",
-  "Content-Type": "application/json",
-  "X-Game-Version": "v0.4.1",
-  "X-Client-ID": "pdoom1-client"
+  'Authorization': 'Bearer {jwt_token}',
+  'Content-Type': 'application/json',
+  'X-Game-Version': 'v0.4.1',
+  'X-Client-ID': 'pdoom1-client'
 }
 ```
 
