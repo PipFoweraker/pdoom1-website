@@ -12,7 +12,7 @@ This document establishes the weekly deployment rhythm for p(Doom)1 website and 
 | **Testing Window** | Wed-Thu | All day | - | QA and integration testing |
 | **Deployment Freeze** | Thursday | 17:00 | 07:00 | Code freeze for Friday release |
 | **Pre-Deployment** | Friday | 14:00-15:30 | 04:00-05:30 | Final checks and preparation |
-| **🚀 DEPLOYMENT** | **Friday** | **16:00** | **06:00** | Production deployment |
+| **[DEPLOY] DEPLOYMENT** | **Friday** | **16:00** | **06:00** | Production deployment |
 | **Twitch Stream** | Friday | 16:30-17:30 | 06:30-07:30 | Live deployment watch party |
 | **Post-Deploy Monitor** | Friday | 16:00-18:00 | 06:00-08:00 | Active monitoring period |
 | **Weekend Buffer** | Sat-Sun | All day | - | Time for emergency fixes if needed |
@@ -115,7 +115,7 @@ The following checks run automatically before deployment:
 #### Option 1: Automated (Recommended)
 ```bash
 # Via GitHub Actions
-1. Go to Actions → "Version-Aware Deployment to DreamHost"
+1. Go to Actions -> "Version-Aware Deployment to DreamHost"
 2. Click "Run workflow"
 3. Leave defaults (unless emergency)
 4. Click "Run workflow"

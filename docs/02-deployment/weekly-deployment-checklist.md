@@ -102,24 +102,24 @@ Expected: All tests pass
 ### Trigger Deployment
 
 #### Option A: Automated Weekly Deployment (Recommended)
-1. [ ] Go to GitHub → Actions tab
+1. [ ] Go to GitHub -> Actions tab
 2. [ ] Select "Weekly Scheduled Deployment" workflow
 3. [ ] Click "Run workflow"
 4. [ ] Configure options:
-   - Skip checks: ❌ (leave unchecked)
-   - Reset league: ✅ (if deploying on Sunday)
-   - Dry run: ❌ (uncheck for real deployment)
+   - Skip checks: [X] (leave unchecked)
+   - Reset league: [OK] (if deploying on Sunday)
+   - Dry run: [X] (uncheck for real deployment)
    - Notes: Add any relevant notes
 5. [ ] Click "Run workflow" button
 6. [ ] Monitor workflow progress
 
 #### Option B: Version-Aware Deployment (Alternative)
-1. [ ] Go to GitHub → Actions tab
+1. [ ] Go to GitHub -> Actions tab
 2. [ ] Select "Version-Aware Deployment to DreamHost"
 3. [ ] Click "Run workflow"
 4. [ ] Configure:
-   - Force deploy: ❌
-   - Skip version check: ❌
+   - Force deploy: [X]
+   - Skip version check: [X]
    - Notes: "Weekly scheduled deployment"
 5. [ ] Click "Run workflow"
 6. [ ] Approve if prompted (major versions only)
@@ -127,9 +127,9 @@ Expected: All tests pass
 ### Monitor Deployment
 - [ ] Watch workflow logs for errors
 - [ ] Verify each job completes successfully:
-  - [ ] Pre-deployment preparation ✅
-  - [ ] Deploy to production ✅
-  - [ ] Post-deployment tasks ✅
+  - [ ] Pre-deployment preparation [OK]
+  - [ ] Deploy to production [OK]
+  - [ ] Post-deployment tasks [OK]
 - [ ] Note any warnings (review but may be non-critical)
 - [ ] Check total deployment time (typically 3-5 minutes)
 
@@ -160,7 +160,7 @@ Expected: All tests pass
 Wait for automated checks to complete (~30 seconds after deployment):
 
 - [ ] Monitor workflow for post-deployment verification
-- [ ] Check GitHub Actions shows ✅ for post-deployment tasks
+- [ ] Check GitHub Actions shows [OK] for post-deployment tasks
 - [ ] Review `deployment-verification.json` results
 
 ### Live Stream Setup (16:20-16:30)
@@ -274,7 +274,7 @@ If site is broken and needs immediate rollback:
 ## Post-Deployment Review (Following Week)
 
 ### Metrics to Collect
-- [ ] Deployment success: ✅ / ❌
+- [ ] Deployment success: [OK] / [X]
 - [ ] Time from trigger to live: ___ minutes
 - [ ] Issues found: ___ critical, ___ minor
 - [ ] Rollback needed: Yes / No
@@ -299,7 +299,7 @@ If site is broken and needs immediate rollback:
 
 ## Quick Reference
 
-**Deployment Command**: GitHub Actions → "Weekly Scheduled Deployment" → Run workflow
+**Deployment Command**: GitHub Actions -> "Weekly Scheduled Deployment" -> Run workflow
 
 **Time**: Friday 16:00 AEST (06:00 UTC)
 

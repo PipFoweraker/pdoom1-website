@@ -1,18 +1,18 @@
 # Weekly Deployment Quick Reference
 
-## 🗓️ Schedule at a Glance
+## [CAL] Schedule at a Glance
 
 | Day | Time (AEST) | Event |
 |-----|-------------|-------|
-| **Monday** | 00:00 | 🏆 New league starts (automated) |
-| Tuesday | 10:00 | ⚖️ Balance changes window |
-| Wed-Thu | All day | 🧪 Testing & QA |
-| **Thursday** | 17:00 | 🔒 Code freeze |
-| **Friday** | 14:00 | ✅ Pre-deployment checks |
-| **Friday** | 16:00 | 🚀 **DEPLOYMENT** |
-| **Friday** | 16:30 | 📺 Twitch stream |
+| **Monday** | 00:00 | [TROPHY] New league starts (automated) |
+| Tuesday | 10:00 | [BALANCE] Balance changes window |
+| Wed-Thu | All day | [TEST] Testing & QA |
+| **Thursday** | 17:00 | [LOCKED] Code freeze |
+| **Friday** | 14:00 | [OK] Pre-deployment checks |
+| **Friday** | 16:00 | [DEPLOY] **DEPLOYMENT** |
+| **Friday** | 16:30 | [STREAM] Twitch stream |
 
-## ⚡ Quick Commands
+## [ZAP] Quick Commands
 
 ### Pre-Deployment (Friday 14:00)
 ```bash
@@ -46,11 +46,11 @@ curl https://pdoom1.com/leaderboard/data/weekly/current.json
 npm run test:health
 ```
 
-## 📋 Friday Deployment Checklist
+## [LIST] Friday Deployment Checklist
 
 ### Pre-Flight (14:00-15:45)
 - [ ] Run `npm run deploy:prep-weekly`
-- [ ] All checks green ✅
+- [ ] All checks green [OK]
 - [ ] Game data synced (< 24h old)
 - [ ] League seed generated for current week
 - [ ] No critical bugs reported
@@ -73,7 +73,7 @@ npm run test:health
 - [ ] Answer community questions
 - [ ] Preview upcoming week
 
-## 🚨 Emergency Procedures
+## [ALERT] Emergency Procedures
 
 ### If Deployment Fails
 1. Check GitHub Actions logs
@@ -110,7 +110,7 @@ npm run test:health
 - Test thoroughly
 - Deploy Monday with force_deploy flag
 
-## 🔗 Important Links
+## [LINK] Important Links
 
 - **GitHub Actions**: https://github.com/PipFoweraker/pdoom1-website/actions
 - **Live Site**: https://pdoom1.com
@@ -119,7 +119,7 @@ npm run test:health
 - **Full Documentation**: [Weekly Deployment Schedule](./weekly-deployment-schedule.md)
 - **Detailed Checklist**: [Deployment Checklist](./weekly-deployment-checklist.md)
 
-## 📞 Contact & Escalation
+## [PHONE] Contact & Escalation
 
 | Role | Availability | Contact |
 |------|-------------|---------|
@@ -127,7 +127,7 @@ npm run test:health
 | **Backup** | Fri 14:00-18:00 | Discord DM |
 | **On-Call** | Sat-Sun | Discord (emergencies only) |
 
-## ⏰ Timezone Reference
+## [TIME] Timezone Reference
 
 **AEST** (Australian Eastern Standard Time) = UTC+10  
 **AEDT** (Australian Eastern Daylight Time) = UTC+11 (Oct-Apr)
@@ -146,16 +146,16 @@ GitHub Actions cron uses UTC:
 
 *Note: During daylight saving, manually adjust if needed or update cron to `0 5 * * 5`*
 
-## 🎯 Success Metrics
+## [TARGET] Success Metrics
 
 Track these after each deployment:
-- ✅ Deployment completed in < 10 minutes
-- ✅ No rollback needed
-- ✅ Zero critical bugs reported
-- ✅ Stream had viewers
-- ✅ Positive community feedback
+- [OK] Deployment completed in < 10 minutes
+- [OK] No rollback needed
+- [OK] Zero critical bugs reported
+- [OK] Stream had viewers
+- [OK] Positive community feedback
 
-## 📝 Notes Space
+## [NOTE] Notes Space
 
 **This Week** (Week of ___________):
 - Version deploying: v_______
@@ -165,4 +165,4 @@ Track these after each deployment:
 
 ---
 
-💡 **Tip**: Print this page and keep it handy during Friday deployments!
+[TIP] **Tip**: Print this page and keep it handy during Friday deployments!

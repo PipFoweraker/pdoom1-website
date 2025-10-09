@@ -50,15 +50,15 @@ p(Doom)1 Weekly Deployment - v{VERSION} - {HIGHLIGHT FEATURE}
 ```
 Join us for the weekly p(Doom)1 deployment! 
 
-🚀 Deploying v{VERSION}
-🏆 New league week starting Monday
-💬 Q&A and feature showcase
+[DEPLOY] Deploying v{VERSION}
+[TROPHY] New league week starting Monday
+[CHAT] Q&A and feature showcase
 
 Links:
-🌐 Website: https://pdoom1.com
-🎮 Download: https://pipfoweraker.itch.io/pdoom1
-💬 Discord: [Your Discord link]
-🐦 Twitter: [Your Twitter]
+[WEB] Website: https://pdoom1.com
+[GAME] Download: https://pipfoweraker.itch.io/pdoom1
+[CHAT] Discord: [Your Discord link]
+[BIRD] Twitter: [Your Twitter]
 
 Schedule:
 16:30 - Deployment watch
@@ -89,9 +89,9 @@ Schedule:
 
 **Monitor GitHub Actions:**
 ```
-✅ Pre-deployment preparation
-✅ Deploy to production
-⏳ Post-deployment tasks
+[OK] Pre-deployment preparation
+[OK] Deploy to production
+[WAIT] Post-deployment tasks
 ```
 
 **Commentary:**
@@ -199,10 +199,10 @@ Discuss: What makes this seed interesting
 **Summary:**
 ```
 Recap:
-✅ v{VERSION} deployed successfully
-✅ {Key features} now live
-✅ New league starts Monday
-✅ Thanks for joining!
+[OK] v{VERSION} deployed successfully
+[OK] {Key features} now live
+[OK] New league starts Monday
+[OK] Thanks for joining!
 ```
 
 **Next Week:**
@@ -254,7 +254,7 @@ Say: "Thanks everyone! See you Monday for the new league,
 
 ## Stream Tips
 
-### Do's ✅
+### Do's [OK]
 - **Be authentic** - Show real deployment, including hiccups
 - **Explain technical** - Some viewers want to learn
 - **Engage chat** - Call out names, answer questions
@@ -262,7 +262,7 @@ Say: "Thanks everyone! See you Monday for the new league,
 - **Show passion** - Enthusiasm is contagious
 - **Thank contributors** - Community matters
 
-### Don'ts ❌
+### Don'ts [X]
 - **Don't panic on errors** - Great learning opportunity
 - **Don't go off-topic** - Stay focused on deployment
 - **Don't ignore chat** - Engagement is key
@@ -407,6 +407,6 @@ you then!"
 ---
 
 **Remember:** The stream is about **community** and **transparency**. 
-Show the real process, engage with viewers, and have fun! 🎮🚀
+Show the real process, engage with viewers, and have fun! [GAME][DEPLOY]
 
-Good luck with your first deployment stream! 📺
+Good luck with your first deployment stream! [STREAM]

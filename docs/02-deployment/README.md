@@ -1,39 +1,39 @@
 # Weekly Deployment Schedule - Implementation Summary
 
-## 📋 Overview
+## [LIST] Overview
 
 This document summarizes the complete implementation of the weekly deployment schedule for the p(Doom)1 website, addressing the issue: "Establish Weekly Website Deployment Schedule".
 
-**Status**: ✅ **COMPLETE and PRODUCTION READY**
+**Status**: [OK] **COMPLETE and PRODUCTION READY**
 
 **Implementation Date**: October 9, 2025
 
 ---
 
-## 🎯 Requirements Met
+## [TARGET] Requirements Met
 
 All original requirements from the issue have been fully addressed:
 
-### ✅ Weekly Release Schedule with Clear Timeline
+### [OK] Weekly Release Schedule with Clear Timeline
 - **Deployment Day**: Friday at 16:00 AEST (Australian Eastern Standard Time - Hobart)
 - **League Reset**: Monday at 00:00 AEST (automated)
 - **Code Freeze**: Thursday at 17:00 AEST
 - **Live Stream**: Friday at 16:30 AEST on Twitch
 
-### ✅ Automated Deployment Pipeline
+### [OK] Automated Deployment Pipeline
 - GitHub Actions workflow triggers automatically every Friday at 06:00 UTC (16:00 AEST)
 - Pre-deployment checks run automatically
 - Game data sync included in pipeline
 - Post-deployment verification automated
 - League reset runs automatically Sunday 14:00 UTC (Monday 00:00 AEST)
 
-### ✅ Integration Between Game Updates and Website Content
+### [OK] Integration Between Game Updates and Website Content
 - Automated sync from pdoom1 game repository
 - Leaderboard data updates in deployment pipeline
 - Weekly league data synchronized
 - Balance changes incorporated into deployment workflow
 
-### ✅ Process for Balance Changes, Testing, and League/Seed Updates
+### [OK] Process for Balance Changes, Testing, and League/Seed Updates
 - Tuesday: Balance change review window
 - Wednesday-Thursday: Testing and QA phase
 - Thursday 17:00: Code freeze
@@ -42,7 +42,7 @@ All original requirements from the issue have been fully addressed:
 
 ---
 
-## 📁 Files Created
+## [FOLDER] Files Created
 
 ### GitHub Actions Workflows (2 files)
 1. **`.github/workflows/weekly-deployment.yml`** (10,944 chars)
@@ -75,7 +75,7 @@ All original requirements from the issue have been fully addressed:
 4. **`docs/02-deployment/weekly-deployment-schedule.md`** (11,961 chars)
    - Complete weekly schedule (Monday-Sunday)
    - Detailed Friday deployment timeline
-   - Workflow mapping: game updates → balance → testing → deploy
+   - Workflow mapping: game updates -> balance -> testing -> deploy
    - Deployment automation procedures
    - Rollback procedures (Quick, Standard, Emergency)
    - Responsibility matrix
@@ -161,7 +161,7 @@ All original requirements from the issue have been fully addressed:
 
 ---
 
-## 🚀 How to Use
+## [DEPLOY] How to Use
 
 ### For Developers
 
@@ -221,7 +221,7 @@ git push
 
 ---
 
-## 📊 Automated Workflows
+## [CHART] Automated Workflows
 
 ### Weekly Deployment (Fridays)
 **Trigger**: Cron schedule `0 6 * * 5` (Friday 06:00 UTC = 16:00 AEST)
@@ -275,23 +275,23 @@ git push
 
 ---
 
-## 🗓️ Weekly Schedule
+## [CAL] Weekly Schedule
 
 | Day | Time (AEST) | Event | Automated |
 |-----|-------------|-------|-----------|
-| **Monday** | 00:00 | 🏆 New league starts | ✅ Yes |
-| Tuesday | 10:00 | ⚖️ Balance changes window | ❌ No |
-| Wednesday | All day | 🧪 Testing & QA | ❌ No |
-| Thursday | 17:00 | 🔒 Code freeze | ❌ Manual |
-| **Friday** | 14:00 | ✅ Pre-deployment prep | ✅ Script |
-| **Friday** | 16:00 | 🚀 **DEPLOYMENT** | ✅ Yes |
-| **Friday** | 16:30 | 📺 Twitch stream | ❌ Manual |
-| **Friday** | 18:00 | 👀 Monitoring begins | ✅ Yes |
-| Weekend | All day | 📊 Automated monitoring | ✅ Yes |
+| **Monday** | 00:00 | [TROPHY] New league starts | [OK] Yes |
+| Tuesday | 10:00 | [BALANCE] Balance changes window | [X] No |
+| Wednesday | All day | [TEST] Testing & QA | [X] No |
+| Thursday | 17:00 | [LOCKED] Code freeze | [X] Manual |
+| **Friday** | 14:00 | [OK] Pre-deployment prep | [OK] Script |
+| **Friday** | 16:00 | [DEPLOY] **DEPLOYMENT** | [OK] Yes |
+| **Friday** | 16:30 | [STREAM] Twitch stream | [X] Manual |
+| **Friday** | 18:00 | [WATCH] Monitoring begins | [OK] Yes |
+| Weekend | All day | [CHART] Automated monitoring | [OK] Yes |
 
 ---
 
-## 📈 Success Metrics
+## [CHART] Success Metrics
 
 Track these KPIs after each deployment:
 
@@ -317,7 +317,7 @@ Track these KPIs after each deployment:
 
 ---
 
-## 🔄 Rollback Procedures
+## [CYCLE] Rollback Procedures
 
 ### Quick Rollback (< 5 minutes)
 For critical site-down scenarios:
@@ -344,7 +344,7 @@ For data loss or complete failure:
 
 ---
 
-## 🎓 Training Resources
+## [GRAD] Training Resources
 
 ### For New Team Members
 1. Read: `weekly-deployment-schedule.md` (complete process)
@@ -369,7 +369,7 @@ For data loss or complete failure:
 
 ---
 
-## 🔐 Access Requirements
+## [SECURE] Access Requirements
 
 ### For Deployment
 - [ ] GitHub repository write access
@@ -388,7 +388,7 @@ For data loss or complete failure:
 
 ---
 
-## 🎉 What's Next
+## [PARTY] What's Next
 
 ### Immediate (First Deployment)
 - [ ] Test weekly-deployment.yml on Friday
@@ -413,7 +413,7 @@ For data loss or complete failure:
 
 ---
 
-## 📞 Support & Contact
+## [PHONE] Support & Contact
 
 ### During Deployment (Fri 14:00-18:00)
 - **Primary**: Lead Developer (on Twitch stream)
@@ -432,7 +432,7 @@ For data loss or complete failure:
 
 ---
 
-## ✅ Validation Checklist
+## [OK] Validation Checklist
 
 Before first production deployment, verify:
 
@@ -449,7 +449,7 @@ Before first production deployment, verify:
 
 ---
 
-## 📝 Change Log
+## [NOTE] Change Log
 
 **v1.0** - October 9, 2025
 - Initial implementation
@@ -460,7 +460,7 @@ Before first production deployment, verify:
 
 ---
 
-## 🙏 Acknowledgments
+## [THANKS] Acknowledgments
 
 This implementation establishes a world-class deployment schedule for p(Doom)1, incorporating:
 - Modern DevOps practices
@@ -470,9 +470,9 @@ This implementation establishes a world-class deployment schedule for p(Doom)1, 
 - Clear communication plans
 - Emergency procedures
 
-**Status**: Ready for production deployment Friday, 16:00 AEST! 🚀
+**Status**: Ready for production deployment Friday, 16:00 AEST! [DEPLOY]
 
 ---
 
 For questions or suggestions, see the main documentation:
-📖 [Weekly Deployment Schedule](./weekly-deployment-schedule.md)
+[BOOK] [Weekly Deployment Schedule](./weekly-deployment-schedule.md)
