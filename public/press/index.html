@@ -495,16 +495,16 @@
 		</section>
 	</main>
 
+	<!-- Privacy-preserving analytics -->
+	<script src="/assets/js/analytics.js"></script>
 	<script>
-		// Analytics placeholder (privacy-preserving)
-		console.log('Press page loaded');
-		
-		// Track download clicks for analytics
+		// Track download clicks
 		document.querySelectorAll('.download-btn').forEach(btn => {
 			btn.addEventListener('click', function(e) {
 				const item = this.closest('.download-card')?.querySelector('h4')?.textContent || 'Unknown';
-				console.log(`Download clicked: ${item}`);
-				// Add privacy-preserving analytics here
+				if (window.pdoom1Analytics && window.pdoom1Analytics.trackEvent) {
+					window.pdoom1Analytics.trackEvent('Download', { item: item });
+				}
 			});
 		});
 	</script>

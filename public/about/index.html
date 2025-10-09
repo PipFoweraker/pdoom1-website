@@ -641,14 +641,16 @@
 		</section>
 	</main>
 
+	<!-- Privacy-preserving analytics -->
+	<script src="/assets/js/analytics.js"></script>
 	<script>
-		// Simple analytics tracking (privacy-preserving)
-		console.log('About page loaded');
-		
 		// Track external link clicks
 		document.querySelectorAll('a[target="_blank"]').forEach(link => {
 			link.addEventListener('click', function(e) {
-				console.log(`External link clicked: ${this.href}`);
+				const href = this.href;
+				if (window.pdoom1Analytics && window.pdoom1Analytics.trackEvent) {
+					window.pdoom1Analytics.trackEvent('External Link', { url: href });
+				}
 			});
 		});
 	</script>
