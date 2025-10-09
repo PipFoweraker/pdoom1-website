@@ -16,6 +16,9 @@
     <meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
     <meta name="twitter:card" content="summary_large_image" />
     
+    <link rel="stylesheet" href="/assets/css/game-integration.css">
+    <link rel="stylesheet" href="/assets/css/ui-enhancements.css">
+    
     <style>
         :root {
             --bg-primary: #1a1a1a; --bg-secondary: #2d2d2d; --bg-tertiary: #3d3d3d;
@@ -284,6 +287,18 @@
 <body>
     <div class="container">
         <a href="/" class="back-link">← Back to Home</a>
+        
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb" aria-label="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="/">Home</a>
+                </li>
+                <li class="breadcrumb-item current" aria-current="page">
+                    <span>Developer Blog</span>
+                </li>
+            </ol>
+        </nav>
         
         <header class="blog-header">
             <h1>Developer Blog</h1>

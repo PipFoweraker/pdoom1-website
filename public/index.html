@@ -667,14 +667,9 @@
 			}
 			
 			// Update footer with website version
-			const footer = document.querySelector('footer p:last-child');
-			if (footer && status.website) {
-				footer.innerHTML = `
-					<span class="status-indicator status-warning"></span>
-					Game Status: ${status.game.status?.toUpperCase() || 'ALPHA'} Development | 
-					Website v${status.website.version} | 
-					Privacy: No personal data collected
-				`;
+			const versionElement = document.getElementById('website-version');
+			if (versionElement && status.website) {
+				versionElement.textContent = `Website v${status.website.version}`;
 			}
 		}
 		// Runtime tokens loader: pulls design/tokens.json and applies to :root
@@ -734,6 +729,7 @@
 	})();
 	</script>
 	<link rel="stylesheet" href="/assets/css/game-integration.css">
+	<link rel="stylesheet" href="/assets/css/ui-enhancements.css">
 </head>
 <body>
 	<a href="#main-content" class="skip-link">Skip to main content</a>
@@ -769,6 +765,15 @@
 			</ul>
 		</nav>
 	</header>
+
+	<!-- Breadcrumb Navigation -->
+	<nav class="breadcrumb" aria-label="breadcrumb">
+		<ol class="breadcrumb-list">
+			<li class="breadcrumb-item current" aria-current="page">
+				<span>Home</span>
+			</li>
+		</ol>
+	</nav>
 
 	<main role="main" id="main-content">
 		<section class="hero" id="home" role="banner" aria-labelledby="main-heading">
@@ -1143,12 +1148,71 @@ python main.py</pre>
 		</section>
 	</main>
 
+	<!-- Quick Actions Menu -->
+	<div class="quick-actions" id="quick-actions">
+		<button class="quick-actions-toggle" id="quick-actions-toggle" aria-label="Quick Actions Menu" title="Quick Actions (Press Q)">
+			⚡
+		</button>
+		<div class="quick-actions-menu" id="quick-actions-menu">
+			<a href="#overview" class="quick-action" title="Jump to Overview">📋</a>
+			<a href="#features" class="quick-action" title="View Features">⭐</a>
+			<a href="/game-stats/" class="quick-action" title="Game Statistics">📊</a>
+			<a href="/blog/" class="quick-action" title="Developer Blog">📝</a>
+			<a href="#roadmap" class="quick-action" title="Development Roadmap">🗺️</a>
+			<a href="#contact" class="quick-action" title="Contact Us">✉️</a>
+		</div>
+	</div>
+
 	<footer>
-		<p>&copy; 2025 pdoom1. Not affiliated with any AI organization. For fun, education, and satire only.</p>
-		<p style="margin-top: 0.5rem; font-size: 0.8rem;">
-			<span class="status-indicator status-warning"></span>
-			Game Status: Active Development | Privacy: No personal data collected
-		</p>
+		<div class="footer-content">
+			<div class="footer-section">
+				<h3>Game</h3>
+				<ul class="footer-links">
+					<li><a href="#overview">Overview</a></li>
+					<li><a href="#features">Features</a></li>
+					<li><a href="/game-stats/">Statistics</a></li>
+					<li><a href="/game-changelog/">Releases</a></li>
+				</ul>
+			</div>
+			<div class="footer-section">
+				<h3>Resources</h3>
+				<ul class="footer-links">
+					<li><a href="/blog/">Developer Blog</a></li>
+					<li><a href="/docs/">Documentation</a></li>
+					<li><a href="/website-changelog/">Site Updates</a></li>
+					<li><a href="#contact">Contact</a></li>
+				</ul>
+			</div>
+			<div class="footer-section">
+				<h3>Community</h3>
+				<ul class="footer-links">
+					<li><a href="#" target="_blank" rel="noopener">GitHub</a></li>
+					<li><a href="#" target="_blank" rel="noopener">Discord</a></li>
+					<li><a href="#" target="_blank" rel="noopener">YouTube</a></li>
+					<li><a href="#roadmap">Roadmap</a></li>
+				</ul>
+			</div>
+			<div class="footer-section">
+				<h3>Status</h3>
+				<div class="footer-status">
+					<p>
+						<span class="status-indicator status-active"></span>
+						Game: Active Development
+					</p>
+					<p>
+						<span class="status-indicator status-success"></span>
+						Website: Live
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="footer-bottom">
+			<p>&copy; 2025 pdoom1. Not affiliated with any AI organization. For fun, education, and satire only.</p>
+			<p class="footer-meta">
+				Privacy: No personal data collected | 
+				<span id="website-version">Version loading...</span>
+			</p>
+		</div>
 	</footer>
 
 	<script>
@@ -1709,6 +1773,123 @@ python main.py</pre>
 		// Load version info when page loads
 		document.addEventListener('DOMContentLoaded', () => {
 			loadVersionInfo();
+		});
+	</script>
+
+	<script>
+		// Quick Actions Menu functionality
+		document.addEventListener('DOMContentLoaded', () => {
+			const quickActions = document.getElementById('quick-actions');
+			const toggle = document.getElementById('quick-actions-toggle');
+			const menu = document.getElementById('quick-actions-menu');
+			
+			if (!quickActions || !toggle || !menu) return;
+			
+			let isMenuOpen = false;
+			
+			// Toggle menu
+			const toggleMenu = () => {
+				isMenuOpen = !isMenuOpen;
+				quickActions.classList.toggle('active', isMenuOpen);
+				toggle.setAttribute('aria-expanded', isMenuOpen);
+			};
+			
+			// Close menu
+			const closeMenu = () => {
+				isMenuOpen = false;
+				quickActions.classList.remove('active');
+				toggle.setAttribute('aria-expanded', 'false');
+			};
+			
+			// Event listeners
+			toggle.addEventListener('click', toggleMenu);
+			
+			// Close when clicking outside
+			document.addEventListener('click', (e) => {
+				if (!quickActions.contains(e.target)) {
+					closeMenu();
+				}
+			});
+			
+			// Keyboard shortcuts
+			document.addEventListener('keydown', (e) => {
+				// Q key to toggle quick actions
+				if (e.key.toLowerCase() === 'q' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+					// Only if not typing in an input field
+					if (!['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+						e.preventDefault();
+						toggleMenu();
+					}
+				}
+				// Escape to close
+				else if (e.key === 'Escape' && isMenuOpen) {
+					closeMenu();
+				}
+				// Number keys for quick navigation (1-6)
+				else if (e.key >= '1' && e.key <= '6' && isMenuOpen) {
+					e.preventDefault();
+					const actionIndex = parseInt(e.key) - 1;
+					const actions = menu.querySelectorAll('.quick-action');
+					if (actions[actionIndex]) {
+						actions[actionIndex].click();
+						closeMenu();
+					}
+				}
+			});
+			
+			// Add keyboard hints to tooltips
+			const actions = menu.querySelectorAll('.quick-action');
+			actions.forEach((action, index) => {
+				const originalTitle = action.getAttribute('title');
+				action.setAttribute('title', `${originalTitle} (${index + 1})`);
+			});
+		});
+		
+		// Enhanced keyboard navigation
+		document.addEventListener('keydown', (e) => {
+			// Skip if typing in form fields
+			if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+			
+			// Navigation shortcuts
+			if (e.ctrlKey || e.metaKey) {
+				switch (e.key.toLowerCase()) {
+					case 'h':
+						e.preventDefault();
+						document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' });
+						break;
+					case 'f':
+						e.preventDefault();
+						document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+						break;
+					case 'r':
+						e.preventDefault();
+						document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
+						break;
+					case 'c':
+						e.preventDefault();
+						document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+						break;
+				}
+			}
+		});
+		
+		// Add tooltips with keyboard shortcuts
+		document.addEventListener('DOMContentLoaded', () => {
+			// Add keyboard shortcut hints to navigation
+			const navLinks = document.querySelectorAll('.nav-links a');
+			navLinks.forEach(link => {
+				const href = link.getAttribute('href');
+				let shortcut = '';
+				if (href === '#home' || href === '#overview') shortcut = ' (Ctrl+H)';
+				else if (href === '#features') shortcut = ' (Ctrl+F)';
+				else if (href === '#roadmap') shortcut = ' (Ctrl+R)';
+				else if (href === '#contact') shortcut = ' (Ctrl+C)';
+				
+				if (shortcut) {
+					const originalText = link.textContent;
+					link.setAttribute('title', originalText + shortcut);
+				}
+			});
 		});
 	</script>
 	
