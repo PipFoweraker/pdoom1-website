@@ -17,6 +17,12 @@ Professional website with weekly league competition system for the p(Doom)1 game
 - **Data Management**: Automated sync and archival systems
 - **Documentation**: Comprehensive guides and specifications
 
+### Privacy & Analytics (NEW)
+- **Privacy-Preserving Analytics**: Plausible Analytics integration
+- **No Cookies**: Zero personal data collection, GDPR compliant
+- **User Controls**: Easy opt-out at `/privacy/`
+- **Documentation**: Complete setup and implementation guides
+
 ## Directory Structure
 
 - `public/`: Static site assets and leaderboard data
@@ -107,6 +113,9 @@ Complete documentation available in `docs/`:
 - [Deployment Guide](docs/03-integrations/v1-deployment-ready.md)
 - [Weekly Deployment Schedule](docs/02-deployment/weekly-deployment-schedule.md)
 - [Deployment Checklist](docs/02-deployment/weekly-deployment-checklist.md)
+- [Analytics Implementation](docs/ANALYTICS_IMPLEMENTATION.md) ⭐ NEW
+- [Analytics Setup Guide](docs/ANALYTICS_SETUP.md) ⭐ NEW
+- [Analytics Summary](docs/ANALYTICS_SUMMARY.md) ⭐ NEW
 
 ## Weekly Deployment Schedule
 
