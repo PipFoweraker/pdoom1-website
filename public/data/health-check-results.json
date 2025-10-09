@@ -1,10 +1,10 @@
 {
-  "timestamp": "2025-09-30T08:47:18.558274",
-  "duration_seconds": 0.179175,
+  "timestamp": "2025-10-09T18:07:49.104337",
+  "duration_seconds": 0.191006,
   "total_tests": 11,
   "passed_tests": 11,
   "failed_tests": 0,
-  "warnings": 0,
+  "warnings": 1,
   "success_rate": 100.0,
   "overall_status": "PASS",
   "results": [
@@ -12,80 +12,82 @@
       "test": "Main Index File",
       "passed": true,
       "message": "\u2713 Found: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\index.html",
-      "timestamp": "2025-09-30T08:47:18.379564",
+      "timestamp": "2025-10-09T18:07:48.913719",
       "is_warning": false
     },
     {
       "test": "Config File",
       "passed": true,
       "message": "\u2713 Found: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\config.json",
-      "timestamp": "2025-09-30T08:47:18.379597",
+      "timestamp": "2025-10-09T18:07:48.914175",
       "is_warning": false
     },
     {
       "test": "Version Data",
       "passed": true,
       "message": "\u2713 Found: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\data\\version.json",
-      "timestamp": "2025-09-30T08:47:18.379620",
+      "timestamp": "2025-10-09T18:07:48.914454",
       "is_warning": false
     },
     {
       "test": "Changelog Data",
       "passed": true,
       "message": "\u2713 Found: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\data\\changes.json",
-      "timestamp": "2025-09-30T08:47:18.379645",
+      "timestamp": "2025-10-09T18:07:48.914479",
       "is_warning": false
     },
     {
       "test": "Config JSON",
       "passed": true,
       "message": "\u2713 Valid JSON: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\config.json",
-      "timestamp": "2025-09-30T08:47:18.379832",
+      "timestamp": "2025-10-09T18:07:48.921967",
       "is_warning": false
     },
     {
       "test": "Version JSON",
       "passed": true,
       "message": "\u2713 Valid JSON: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\data\\version.json",
-      "timestamp": "2025-09-30T08:47:18.379985",
+      "timestamp": "2025-10-09T18:07:48.933064",
       "is_warning": false
     },
     {
       "test": "Changes JSON",
       "passed": true,
       "message": "\u2713 Valid JSON: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\public\\data\\changes.json",
-      "timestamp": "2025-09-30T08:47:18.380142",
+      "timestamp": "2025-10-09T18:07:48.933267",
       "is_warning": false
     },
     {
       "test": "Version Update Script",
       "passed": true,
       "message": "\u2713 Script compiles: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\scripts\\update-version-info.py",
-      "timestamp": "2025-09-30T08:47:18.470452",
+      "timestamp": "2025-10-09T18:07:49.023905",
       "is_warning": false
     },
     {
       "test": "Stats Calculation Script",
       "passed": true,
       "message": "\u2713 Script compiles: C:\\Users\\gday\\Documents\\A Local Code\\pdoom1-website\\scripts\\..\\scripts\\calculate-game-stats.py",
-      "timestamp": "2025-09-30T08:47:18.557877",
+      "timestamp": "2025-10-09T18:07:49.104084",
       "is_warning": false
     },
     {
       "test": "Version Data Structure",
       "passed": true,
       "message": "\u2713 All required fields present",
-      "timestamp": "2025-09-30T08:47:18.558206",
+      "timestamp": "2025-10-09T18:07:49.104311",
       "is_warning": false
     },
     {
       "test": "Data Freshness",
       "passed": true,
-      "message": "\u2713 Data is 0 days old",
-      "timestamp": "2025-09-30T08:47:18.558264",
-      "is_warning": false
+      "message": "Data is 9 days old",
+      "timestamp": "2025-10-09T18:07:49.104329",
+      "is_warning": true
     }
   ],
   "failed_test_details": [],
-  "warnings_details": []
+  "warnings_details": [
+    "Data Freshness: Data is 9 days old"
+  ]
 }

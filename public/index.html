@@ -733,6 +733,7 @@
 	  document.head.appendChild(s);
 	})();
 	</script>
+	<link rel="stylesheet" href="/assets/css/game-integration.css">
 </head>
 <body>
 	<a href="#main-content" class="skip-link">Skip to main content</a>
@@ -973,18 +974,28 @@ python main.py</pre>
 				<div id="issues-loading" class="card" style="text-align: center; padding: 2rem;">
 					<div style="color: var(--text-muted);">
 						<div style="margin-bottom: 1rem;">Loading issues from GitHub...</div>
-						<div style="font-size: 0.9rem;">This may take a few seconds</div>
+						<div class="progress-bar" style="margin: 16px auto; max-width: 200px;">
+							<div class="fill" style="width: 100%;"></div>
+						</div>
+						<div style="font-size: 0.9rem;">Connecting to development repository</div>
 					</div>
 				</div>
 				
-				<div id="issues-error" class="card" style="text-align: center; padding: 2rem; display: none; background: var(--bg-tertiary); border: 1px solid var(--accent-danger);">
-					<div style="color: var(--accent-danger);">
-						<div style="margin-bottom: 1rem;">Unable to load live issues</div>
-						<div style="font-size: 0.9rem; margin-bottom: 1rem;">GitHub API may be temporarily unavailable</div>
-						<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-primary);">
-							View issues directly on GitHub --&gt;
-						</a>
-					</div>
+				<div id="issues-error" class="error-boundary" style="display: none;">
+					<h3>Connection Failed</h3>
+					<p>Unable to connect to GitHub API. This might be due to:</p>
+					<ul style="margin: 8px 0; padding-left: 20px;">
+						<li>Temporary GitHub API limits</li>
+						<li>Network connectivity issues</li>
+						<li>High traffic periods</li>
+					</ul>
+					<p>You can still view issues directly on GitHub:</p>
+					<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" class="game-button">
+						View on GitHub →
+					</a>
+					<button onclick="retryLoadIssues()" class="retry-button">
+						Retry Loading
+					</button>
 				</div>
 				
 				<div id="issues-content" style="display: none;">
@@ -1643,6 +1654,21 @@ python main.py</pre>
 				});
 			}
 		});
+		
+		// Retry loading function for error boundary
+		async function retryLoadIssues() {
+			const errorEl = document.getElementById('issues-error');
+			const loadingEl = document.getElementById('issues-loading');
+			
+			// Hide error, show loading
+			if (errorEl) errorEl.style.display = 'none';
+			if (loadingEl) loadingEl.style.display = 'block';
+			
+			// Clear cache and retry
+			issuesLoader.cache = null;
+			issuesLoader.lastFetch = 0;
+			await issuesLoader.renderIssues();
+		}
 		
 		// Load and update version information
 		async function loadVersionInfo() {
