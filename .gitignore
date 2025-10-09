@@ -1,3 +1,8 @@
 # Dependencies\nnode_modules/\n# Builds\ndist/\nbuild/\n# Env\n.env\n.env.*\n# OS/editor\n.DS_Store\nThumbs.db\n.vscode/\n
 # Windows reserved device name
-NUL
+NULdeployment-prep-report.json
+__pycache__/
+*.pyc
+public/data/version.json
+public/leaderboard/data/leaderboard.json
+scripts/game-integration-config.json

@@ -105,3 +105,32 @@ Complete documentation available in `docs/`:
 - [API Integration Guide](docs/03-integrations/api-integration-complete.md)
 - [Weekly League Implementation](docs/03-integrations/weekly-league-phase1-complete.md)
 - [Deployment Guide](docs/03-integrations/v1-deployment-ready.md)
+- [Weekly Deployment Schedule](docs/02-deployment/weekly-deployment-schedule.md)
+- [Deployment Checklist](docs/02-deployment/weekly-deployment-checklist.md)
+
+## Weekly Deployment Schedule
+
+**Every Friday at 4:00 PM AEST (06:00 UTC)**
+
+The p(Doom)1 website follows a predictable weekly deployment rhythm:
+- **Monday 00:00 AEST**: New weekly league starts automatically
+- **Tuesday-Thursday**: Development, balance changes, and testing
+- **Thursday 17:00 AEST**: Code freeze for Friday release
+- **Friday 14:00 AEST**: Pre-deployment checks begin
+- **Friday 16:00 AEST**: Production deployment
+- **Friday 16:30 AEST**: Live Twitch stream showcasing updates
+
+### Deployment Commands
+
+```bash
+# Prepare for deployment
+npm run deploy:prep-weekly
+
+# Quick status check
+npm run deploy:check
+
+# Fast verification
+npm run deploy:quick-check
+```
+
+For detailed schedule and procedures, see [Weekly Deployment Schedule](docs/02-deployment/weekly-deployment-schedule.md).

@@ -29,6 +29,9 @@
     "league:seed": "python scripts/weekly-league-manager.py --generate-seed",
     "integration:test": "python scripts/test-integration.py --quick",
     "deploy:verify": "python scripts/verify-deployment.py && echo 'Deployment verification passed!'",
-    "deploy:prepare": "npm run sync:all && npm run test:all && echo 'Ready for deployment!'"
+    "deploy:prepare": "npm run sync:all && npm run test:all && echo 'Ready for deployment!'",
+    "deploy:prep-weekly": "python scripts/prepare-weekly-deployment.py",
+    "deploy:check": "python scripts/prepare-weekly-deployment.py --check-only",
+    "deploy:quick-check": "python scripts/prepare-weekly-deployment.py --quick"
   }
 }
