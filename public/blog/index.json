@@ -1,13 +1,22 @@
 {
   "posts": [
     {
+      "filename": "2025-10-09-website-development-sprint-complete-v0-2-0.md",
+      "title": "Website Development Sprint Complete: v0.2.0 Major Enhancement",
+      "date": "2025-10-09",
+      "tags": ["website", "milestone", "ui", "infrastructure"],
+      "summary": "Completed comprehensive 6-hour development sprint delivering major website enhancements across three phases: game asset integration, blog system overhaul, and UI polish. Transformed the website from a basic landing page into a professional developer showcase.",
+      "commit": "f675ac2",
+      "featured": true
+    },
+    {
       "filename": "2025-10-09-architecture-revolution-monolith-to-modular.md",
       "title": "Architecture Revolution: From Monolith to Modular Excellence",
       "date": "2025-10-09",
       "tags": ["milestone", "architecture", "refactoring", "type-annotation", "engineering"],
       "summary": "A comprehensive look at our systematic approach to breaking down 4,235+ line monoliths into clean, maintainable modules - featuring real metrics and engineering insights from the trenches",
       "commit": "beae890",
-      "featured": true
+      "featured": false
     },
     {
       "filename": "2025-09-15-ui-monolith-breakdown-complete.md",
