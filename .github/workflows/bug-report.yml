@@ -90,6 +90,10 @@ jobs:
             const logs = clamp(take('logs'), 20000);
             const notify = Boolean(take('notify', false));
             const dedupeKey = take('dedupeKey', '');
+            const gistUrl = take('gistUrl', '');
+            const attachmentName = take('attachmentName', '');
+            const attachmentSize = take('attachmentSize', 0);
+            const attachmentError = take('attachmentError', '');
 
             core.info(`Processing ${type} report: "${title}"`);
             core.info(`DedupeKey: ${dedupeKey}`);
@@ -112,7 +116,7 @@ jobs:
                 core.setOutput('action', 'duplicate');
                 
                 // Add comment to existing issue
-                const commentBody = `**Duplicate report received**\n\n` +
+                let commentBody = `**Duplicate report received**\n\n` +
                   `Source: ${source === 'game' ? 'Game client' : 'Web form'}\n` +
                   `Type: ${type}\n` +
                   (email ? `Email: ${email}\n` : '') +
@@ -120,8 +124,15 @@ jobs:
                   (buildId ? `Build ID: ${buildId}\n` : '') +
                   (os ? `OS: ${os}\n` : '') +
                   `\n**Description:**\n${description}\n` +
-                  (logs ? `\n**Logs:**\n\`\`\`\n${logs}\n\`\`\`\n` : '') +
-                  `\n---\n*DedupeKey: ${dedupeKey}*`;
+                  (logs ? `\n**Logs:**\n\`\`\`\n${logs}\n\`\`\`\n` : '');
+                
+                if (gistUrl) {
+                  commentBody += `\n**Attachment:** 📎 [${attachmentName}](${gistUrl}) (${Math.round(attachmentSize/1024)} KB)\n`;
+                } else if (attachmentError) {
+                  commentBody += `\n**Attachment:** ⚠️ ${attachmentError}\n`;
+                }
+                
+                commentBody += `\n---\n*DedupeKey: ${dedupeKey}*`;
                   
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
@@ -179,6 +190,13 @@ jobs:
             
             if (logs) {
               body += `## Logs\n<details><summary>Show logs</summary>\n\n\`\`\`\n${logs}\n\`\`\`\n\n</details>\n\n`;
+            }
+            
+            if (gistUrl) {
+              body += `## Attachment\n📎 **${attachmentName}** (${Math.round(attachmentSize/1024)} KB)\n\n`;
+              body += `[View attachment on Gist](${gistUrl})\n\n`;
+            } else if (attachmentError) {
+              body += `## Attachment\n⚠️ ${attachmentError}\n\n`;
             }
             
             body += `---\n*This issue was automatically created from a ${source} submission.*\n\n`;

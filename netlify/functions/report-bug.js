@@ -75,6 +75,7 @@ function sanitize(input) {
   const maxTitle = 120;
   const maxDesc = 10_000;
   const maxLogs = 20_000;
+  const maxFileSize = 500 * 1024; // 500 KB
   const out = {};
   out.title = (input.title || '').toString().trim().slice(0, maxTitle);
   out.description = (input.description || '').toString().trim().slice(0, maxDesc);
@@ -86,6 +87,20 @@ function sanitize(input) {
   out.os = (input.os || '').toString().trim().slice(0, 128);
   out.logs = (input.logs || '').toString().slice(0, maxLogs);
   out.notify = Boolean(input.notify);
+  
+  // Handle attachment
+  if (input.attachment && typeof input.attachment === 'object') {
+    const att = input.attachment;
+    if (att.filename && att.content && att.size <= maxFileSize) {
+      out.attachment = {
+        filename: String(att.filename).slice(0, 255),
+        content: String(att.content),
+        size: Number(att.size),
+        type: String(att.type || 'application/octet-stream').slice(0, 100)
+      };
+    }
+  }
+  
   // enforce allowed types
   const allowed = ['bug', 'feature', 'documentation', 'performance'];
   if (!allowed.includes(out.type)) out.type = 'bug';
@@ -124,6 +139,49 @@ async function dispatchToGitHub(payload) {
     throw new Error(`GitHub dispatch failed: ${res.status} ${text}`);
   }
   return { ok: true };
+}
+
+async function createGist(attachment, title) {
+  if (process.env.DRY_RUN) {
+    return 'https://gist.github.com/dry-run-gist';
+  }
+
+  const token = process.env.GITHUB_DISPATCH_TOKEN;
+  if (!token) {
+    throw new Error('Server not configured: missing GITHUB_DISPATCH_TOKEN');
+  }
+
+  // Decode base64 content
+  const content = Buffer.from(attachment.content, 'base64').toString('utf8');
+  
+  const gistData = {
+    description: `Bug report attachment: ${title}`,
+    public: false,
+    files: {
+      [attachment.filename]: {
+        content: content
+      }
+    }
+  };
+
+  const res = await fetch('https://api.github.com/gists', {
+    method: 'POST',
+    headers: {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+      'User-Agent': 'pdoom1-report-bug-fn',
+    },
+    body: JSON.stringify(gistData),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Gist creation failed: ${res.status} ${text}`);
+  }
+
+  const gist = await res.json();
+  return gist.html_url;
 }
 
 exports.handler = async function handler(event) {
@@ -167,6 +225,23 @@ exports.handler = async function handler(event) {
   clean.dedupeKey = dedupeKey;
 
   try {
+    // Create Gist for attachment if present
+    if (clean.attachment) {
+      try {
+        const gistUrl = await createGist(clean.attachment, clean.title);
+        clean.gistUrl = gistUrl;
+        // Remove attachment content from payload to keep it smaller
+        clean.attachmentName = clean.attachment.filename;
+        clean.attachmentSize = clean.attachment.size;
+        delete clean.attachment;
+      } catch (gistErr) {
+        // Log but don't fail the whole request if Gist creation fails
+        console.error('Failed to create Gist:', gistErr.message);
+        clean.attachmentError = 'Failed to upload attachment';
+        delete clean.attachment;
+      }
+    }
+    
     const result = await dispatchToGitHub(clean);
     return ok({ status: 'queued', dedupeKey, dryRun: !!process.env.DRY_RUN }, origin);
   } catch (err) {

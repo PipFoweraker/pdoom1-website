@@ -1098,6 +1098,15 @@ python main.py</pre>
 						<div id="email-error" class="error-message" role="alert" aria-live="polite"></div>
 					</div>
                     
+					<div class="form-group">
+						<label for="bug-attachment">Attach Log/File (Optional)</label>
+						<input type="file" id="bug-attachment" name="attachment" 
+							   accept=".txt,.log,.json,.zip,.png,.jpg,.jpeg"
+							   aria-describedby="attachment-help attachment-error">
+						<div id="attachment-help" class="form-help">Upload logs, screenshots, or config files (max 500 KB). Supported: .txt, .log, .json, .zip, .png, .jpg</div>
+						<div id="attachment-error" class="error-message" role="alert" aria-live="polite"></div>
+					</div>
+                    
 					<button type="submit" class="cta-button" style="width: 100%;" 
 							aria-describedby="submit-status">
 						Submit Bug Report
@@ -1349,6 +1358,9 @@ python main.py</pre>
 			const originalText = button.textContent;
 			button.disabled = true;
 			
+			// Clear previous error messages
+			document.getElementById('attachment-error').textContent = '';
+			
 			try {
 				const formData = new FormData(e.target);
 				const bugData = {
@@ -1358,6 +1370,36 @@ python main.py</pre>
 					email: formData.get('email') || '',
 					source: 'web'
 				};
+				
+				// Handle file attachment
+				const fileInput = document.getElementById('bug-attachment');
+				const file = fileInput.files[0];
+				if (file) {
+					// Validate file size (max 500 KB)
+					const maxSize = 500 * 1024; // 500 KB in bytes
+					if (file.size > maxSize) {
+						document.getElementById('attachment-error').textContent = 
+							`File too large: ${Math.round(file.size/1024)} KB. Maximum size is 500 KB.`;
+						button.disabled = false;
+						return;
+					}
+					
+					// Read file as base64
+					button.textContent = 'Reading file...';
+					const fileContent = await new Promise((resolve, reject) => {
+						const reader = new FileReader();
+						reader.onload = () => resolve(reader.result.split(',')[1]); // Get base64 part only
+						reader.onerror = reject;
+						reader.readAsDataURL(file);
+					});
+					
+					bugData.attachment = {
+						filename: file.name,
+						content: fileContent,
+						size: file.size,
+						type: file.type
+					};
+				}
 				
 				// Local mock: when running on localhost, simulate a successful submission
 				const isLocal = ['localhost','127.0.0.1','[::1]'].includes(window.location.hostname) || 
@@ -1380,6 +1422,7 @@ python main.py</pre>
 				}
 				
 				// Production API submission
+				button.textContent = 'Submitting...';
 				const base = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.apiBase) || '';
 				const url = (base ? base.replace(/\/$/, '') : '') + '/api/report-bug';
 				const res = await fetch(url, {
