@@ -3,3 +3,6 @@
 NULdeployment-prep-report.json
 __pycache__/
 *.pyc
+public/data/version.json
+public/leaderboard/data/leaderboard.json
+scripts/game-integration-config.json
