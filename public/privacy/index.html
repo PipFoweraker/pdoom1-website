@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Privacy & Analytics - p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/privacy/" />
+	<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+	<meta name="description" content="Privacy policy and analytics opt-out for p(Doom)1 website. Learn about our privacy-preserving analytics and how to opt out." />
+	<meta name="author" content="p(Doom)1" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="p(Doom)1" />
+	<meta property="og:title" content="Privacy & Analytics - p(Doom)1" />
+	<meta property="og:description" content="Privacy policy and analytics opt-out for the p(Doom)1 website." />
+	<meta property="og:url" content="https://pdoom1.com/privacy/" />
+	<meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #888888;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-sm: 4px;
+			--radius-md: 6px;
+			--radius-lg: 10px;
+			--border-width: 1px;
+			--shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+			--duration-fast: 150ms;
+			--duration-base: 300ms;
+			--easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+			background-image: 
+				radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.02) 0%, transparent 50%),
+				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem 0;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		nav {
+			max-width: 1200px;
+			margin: 0 auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 2rem;
+		}
+
+		.logo-container {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.designer-credit {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			font-weight: normal;
+			margin-bottom: -0.2rem;
+			letter-spacing: 0.5px;
+		}
+
+		.logo {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			text-decoration: none;
+			text-shadow: 0 0 10px var(--accent-primary);
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 2rem;
+			list-style: none;
+		}
+
+		.nav-links a {
+			color: var(--text-secondary);
+			text-decoration: none;
+			transition: color var(--duration-fast) var(--easing);
+		}
+
+		.nav-links a:hover {
+			color: var(--accent-primary);
+		}
+
+		main {
+			max-width: 900px;
+			margin: 0 auto;
+			padding: 4rem 2rem;
+		}
+
+		.hero {
+			text-align: center;
+			margin-bottom: 4rem;
+		}
+
+		.hero h1 {
+			font-size: 3rem;
+			color: var(--accent-primary);
+			text-shadow: 0 0 20px var(--accent-primary);
+			margin-bottom: 1rem;
+		}
+
+		.hero p {
+			font-size: 1.2rem;
+			color: var(--text-secondary);
+		}
+
+		.section {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 2rem;
+			margin-bottom: 2rem;
+		}
+
+		.section h2 {
+			color: var(--accent-primary);
+			margin-bottom: 1.5rem;
+			font-size: 1.8rem;
+		}
+
+		.section h3 {
+			color: var(--accent-secondary);
+			margin-top: 1.5rem;
+			margin-bottom: 1rem;
+		}
+
+		.section p {
+			color: var(--text-secondary);
+			margin-bottom: 1rem;
+		}
+
+		.section ul {
+			color: var(--text-secondary);
+			margin-left: 2rem;
+			margin-bottom: 1rem;
+		}
+
+		.section li {
+			margin-bottom: 0.5rem;
+		}
+
+		.opt-out-box {
+			background: var(--bg-tertiary);
+			border: 2px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 2rem;
+			margin: 2rem 0;
+			text-align: center;
+		}
+
+		.status-indicator {
+			display: inline-block;
+			padding: 0.5rem 1rem;
+			border-radius: var(--radius-sm);
+			margin: 1rem 0;
+			font-weight: bold;
+		}
+
+		.status-opted-in {
+			background: rgba(0, 255, 65, 0.2);
+			color: var(--accent-primary);
+			border: 1px solid var(--accent-primary);
+		}
+
+		.status-opted-out {
+			background: rgba(255, 68, 68, 0.2);
+			color: var(--accent-danger);
+			border: 1px solid var(--accent-danger);
+		}
+
+		button {
+			background: var(--accent-primary);
+			color: var(--bg-primary);
+			border: none;
+			padding: 0.75rem 2rem;
+			font-size: 1rem;
+			font-weight: bold;
+			border-radius: var(--radius-md);
+			cursor: pointer;
+			transition: all var(--duration-base) var(--easing);
+			font-family: 'Courier New', monospace;
+			margin: 0.5rem;
+		}
+
+		button:hover {
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-button);
+		}
+
+		button.secondary {
+			background: transparent;
+			color: var(--accent-secondary);
+			border: 2px solid var(--accent-secondary);
+		}
+
+		button.secondary:hover {
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+		}
+
+		.feature-list {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 1rem;
+			margin: 2rem 0;
+		}
+
+		.feature-item {
+			background: var(--bg-tertiary);
+			padding: 1rem;
+			border-radius: var(--radius-md);
+			border: 1px solid var(--border-color);
+		}
+
+		.feature-item h4 {
+			color: var(--accent-primary);
+			margin-bottom: 0.5rem;
+		}
+
+		code {
+			background: var(--bg-tertiary);
+			padding: 0.2rem 0.5rem;
+			border-radius: var(--radius-sm);
+			color: var(--accent-secondary);
+			font-family: 'Courier New', monospace;
+		}
+
+		@media (max-width: 768px) {
+			.hero h1 {
+				font-size: 2rem;
+			}
+			
+			nav {
+				flex-direction: column;
+				gap: 1rem;
+			}
+			
+			.nav-links {
+				gap: 1rem;
+			}
+			
+			.section {
+				padding: 1.5rem;
+			}
+
+			.feature-list {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<nav role="navigation" aria-label="Main navigation">
+			<div class="logo-container">
+				<div class="designer-credit">Pip Foweraker's</div>
+				<a href="/" class="logo">p(Doom)1</a>
+			</div>
+			<ul class="nav-links">
+				<li><a href="/about/">About</a></li>
+				<li><a href="/blog/">Blog</a></li>
+				<li><a href="/leaderboard/">Leaderboard</a></li>
+				<li><a href="/docs/">Docs</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<div class="hero">
+			<h1>Privacy & Analytics</h1>
+			<p>Our commitment to privacy-preserving analytics</p>
+		</div>
+
+		<section class="section">
+			<h2>Privacy-First Analytics</h2>
+			<p>
+				At p(Doom)1, we believe in respecting your privacy while understanding how our website is used.
+				We use <strong>Plausible Analytics</strong>, a privacy-first analytics service that helps us improve
+				the website without compromising your privacy.
+			</p>
+
+			<div class="feature-list">
+				<div class="feature-item">
+					<h4>🚫 No Cookies</h4>
+					<p>We don't use cookies or persistent identifiers.</p>
+				</div>
+				<div class="feature-item">
+					<h4>🔒 No Personal Data</h4>
+					<p>We never collect personally identifiable information.</p>
+				</div>
+				<div class="feature-item">
+					<h4>✅ GDPR Compliant</h4>
+					<p>Fully compliant with privacy regulations by design.</p>
+				</div>
+				<div class="feature-item">
+					<h4>🌍 Respects DNT</h4>
+					<p>We honor Do Not Track browser settings.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<h2>What We Collect</h2>
+			<p>We collect only aggregate, anonymous information to understand website usage:</p>
+			<ul>
+				<li><strong>Page views:</strong> Which pages are visited (no user identification)</li>
+				<li><strong>Referrers:</strong> Where visitors come from (e.g., search engines, social media)</li>
+				<li><strong>Browser & OS:</strong> General browser and operating system information</li>
+				<li><strong>Device type:</strong> Desktop, mobile, or tablet (no device fingerprinting)</li>
+			</ul>
+			
+			<h3>What We DON'T Collect</h3>
+			<ul>
+				<li>❌ IP addresses (anonymized immediately)</li>
+				<li>❌ Cookies or local storage (except for opt-out preference)</li>
+				<li>❌ Personal information (names, emails, etc.)</li>
+				<li>❌ Cross-site tracking data</li>
+				<li>❌ Fingerprinting data</li>
+			</ul>
+		</section>
+
+		<section class="section">
+			<h2>Opt-Out Controls</h2>
+			<p>
+				You can opt out of analytics at any time. Your preference is stored locally and will persist
+				across visits. You can also opt back in if you change your mind.
+			</p>
+
+			<div class="opt-out-box">
+				<h3>Current Analytics Status</h3>
+				<div id="status-display">
+					<div class="status-indicator" id="status-indicator">Checking status...</div>
+				</div>
+				<p id="status-description" style="color: var(--text-muted); margin: 1rem 0;">
+					Loading your preferences...
+				</p>
+				<div id="opt-out-controls">
+					<button id="opt-out-btn" style="display: none;">Opt Out of Analytics</button>
+					<button id="opt-in-btn" class="secondary" style="display: none;">Opt Back In</button>
+				</div>
+			</div>
+
+			<p>
+				<strong>Note:</strong> If you have Do Not Track enabled in your browser, analytics are automatically
+				disabled regardless of this setting.
+			</p>
+		</section>
+
+		<section class="section">
+			<h2>Data Retention</h2>
+			<p>
+				All analytics data is automatically deleted after <strong>90 days</strong>. We don't retain
+				long-term tracking data or build user profiles.
+			</p>
+		</section>
+
+		<section class="section">
+			<h2>Analytics Provider</h2>
+			<p>
+				We use <a href="https://plausible.io/" target="_blank" rel="noopener" style="color: var(--accent-primary);">Plausible Analytics</a>,
+				an open-source, privacy-focused analytics platform. Plausible is:
+			</p>
+			<ul>
+				<li>Open source and auditable</li>
+				<li>Can be self-hosted for full data ownership</li>
+				<li>Lightweight and fast (&lt;1KB script)</li>
+				<li>Does not use cookies or track users across sites</li>
+				<li>GDPR, CCPA, and PECR compliant</li>
+			</ul>
+
+			<h3>Alternative Providers</h3>
+			<p>
+				We evaluated several privacy-preserving analytics solutions including:
+			</p>
+			<ul>
+				<li><strong>Plausible:</strong> Our chosen solution (lightweight, open-source)</li>
+				<li><strong>Umami:</strong> Self-hosted option with similar privacy features</li>
+				<li><strong>Simple Analytics:</strong> Privacy-focused with carbon-conscious hosting</li>
+			</ul>
+			<p>
+				All three options are privacy-preserving and GDPR-compliant. We chose Plausible for its
+				simplicity, open-source nature, and excellent documentation.
+			</p>
+		</section>
+
+		<section class="section">
+			<h2>Questions?</h2>
+			<p>
+				If you have any questions about our privacy practices or analytics implementation,
+				please check our <a href="https://github.com/PipFoweraker/pdoom1-website" target="_blank" rel="noopener" style="color: var(--accent-primary);">GitHub repository</a>
+				or contact us through the issue tracker.
+			</p>
+		</section>
+	</main>
+
+	<script src="/assets/js/analytics.js"></script>
+	<script>
+		// Update status display
+		function updateStatus() {
+			const statusIndicator = document.getElementById('status-indicator');
+			const statusDescription = document.getElementById('status-description');
+			const optOutBtn = document.getElementById('opt-out-btn');
+			const optInBtn = document.getElementById('opt-in-btn');
+
+			// Check DNT first
+			const dntEnabled = navigator.doNotTrack === '1' || 
+			                   navigator.doNotTrack === 'yes' ||
+			                   window.doNotTrack === '1';
+
+			if (dntEnabled) {
+				statusIndicator.textContent = 'Analytics Disabled (Do Not Track)';
+				statusIndicator.className = 'status-indicator status-opted-out';
+				statusDescription.textContent = 'Your browser\'s Do Not Track setting is enabled. Analytics are automatically disabled.';
+				optOutBtn.style.display = 'none';
+				optInBtn.style.display = 'none';
+				return;
+			}
+
+			// Check opt-out status
+			const hasOptedOut = window.pdoom1Analytics && window.pdoom1Analytics.hasOptedOut();
+
+			if (hasOptedOut) {
+				statusIndicator.textContent = 'Analytics Opted Out ✓';
+				statusIndicator.className = 'status-indicator status-opted-out';
+				statusDescription.textContent = 'You have opted out of analytics. No data is being collected from your visits.';
+				optOutBtn.style.display = 'none';
+				optInBtn.style.display = 'inline-block';
+			} else {
+				statusIndicator.textContent = 'Analytics Enabled';
+				statusIndicator.className = 'status-indicator status-opted-in';
+				statusDescription.textContent = 'Privacy-preserving analytics are enabled. Only anonymous, aggregate data is collected.';
+				optOutBtn.style.display = 'inline-block';
+				optInBtn.style.display = 'none';
+			}
+		}
+
+		// Handle opt-out
+		document.getElementById('opt-out-btn').addEventListener('click', function() {
+			if (window.pdoom1Analytics && window.pdoom1Analytics.optOut()) {
+				updateStatus();
+				alert('You have successfully opted out of analytics. This preference will persist across visits.');
+			} else {
+				alert('Failed to opt out. Please ensure your browser allows local storage.');
+			}
+		});
+
+		// Handle opt-in
+		document.getElementById('opt-in-btn').addEventListener('click', function() {
+			if (window.pdoom1Analytics && window.pdoom1Analytics.optIn()) {
+				updateStatus();
+				alert('You have opted back in to analytics. Thank you for helping us improve the website!');
+				// Reload to initialize analytics
+				setTimeout(function() {
+					window.location.reload();
+				}, 1000);
+			} else {
+				alert('Failed to opt in. Please ensure your browser allows local storage.');
+			}
+		});
+
+		// Initialize status on page load
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', updateStatus);
+		} else {
+			updateStatus();
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "provider": "plausible",
+  "enabled": true,
+  "dataDomain": "pdoom1.com",
+  "scriptUrl": "https://plausible.io/js/script.js",
+  "privacyFeatures": {
+    "noCookies": true,
+    "noPersonalData": true,
+    "gdprCompliant": true,
+    "dataRetention": "90 days",
+    "optOutAvailable": true
+  },
+  "notes": {
+    "selfHosting": "For self-hosted deployment, update scriptUrl to your own Plausible instance",
+    "alternatives": {
+      "umami": "https://umami.is/docs/install",
+      "simpleAnalytics": "https://www.simpleanalytics.com/"
+    }
+  }
+}
