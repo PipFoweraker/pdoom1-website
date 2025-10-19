@@ -717,6 +717,7 @@
 
 	<link rel="stylesheet" href="/assets/css/game-integration.css">
 	<link rel="stylesheet" href="/assets/css/ui-enhancements.css">
+	<link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
 	<a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1075,8 +1076,8 @@ python main.py</pre>
 				<div class="card">
 					<h3>[Mail] Newsletter</h3>
 					<p>Get updates on new releases and development progress.</p>
-					<form style="margin-top: 1rem;" id="newsletter-form">
-						<input type="email" placeholder="Enter your email" style="margin-bottom: 1rem;">
+					<form class="newsletter-form" id="newsletter-form">
+						<input type="email" name="email" placeholder="Enter your email" aria-label="Email address for newsletter subscription" class="newsletter-input" required>
 						<button type="submit" class="cta-button" style="width: 100%; padding: 0.5rem;">Subscribe</button>
 					</form>
 				</div>

@@ -37,6 +37,7 @@
     .status.synced { background: #2196f3; color: #fff; }
     .status.local { background: #ff9800; color: #000; }
   </style>
+  <link rel="stylesheet" href="/css/site.css">
   <script>
     // Optional runtime tokens
     (async function loadTokens(){ try{ const r=await fetch('/design/tokens.json',{cache:'no-store'}); if(!r.ok) return; const t=await r.json(); const s=(k,v)=>v!=null&&document.documentElement.style.setProperty(k,String(v)); if(t.colors){ s('--bg-primary',t.colors.bgPrimary); s('--bg-secondary',t.colors.bgSecondary); s('--bg-tertiary',t.colors.bgTertiary); s('--text-primary',t.colors.textPrimary); s('--text-secondary',t.colors.textSecondary); s('--text-muted',t.colors.textMuted); s('--accent-primary',t.colors.accentPrimary); s('--accent-secondary',t.colors.accentSecondary); s('--border-color',t.colors.border); } }catch(e){} })();

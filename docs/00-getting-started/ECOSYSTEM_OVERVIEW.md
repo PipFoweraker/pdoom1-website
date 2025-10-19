@@ -42,7 +42,7 @@ P(Doom) Ecosystem (September 2025)
 - **URL**: https://github.com/PipFoweraker/pdoom1
 - **Primary Language**: Python
 - **Purpose**: Core game logic, local data management, development tools
-- **Status**: [EMOJI] Active (76 open issues)
+- **Status**: [EMOJI] Active (see [open issues](https://github.com/PipFoweraker/pdoom1/issues))
 - **Key Features**:
   - Turn-based strategy gameplay
   - Local leaderboard system
@@ -55,7 +55,7 @@ P(Doom) Ecosystem (September 2025)
 - **URL**: https://github.com/PipFoweraker/pdoom1-website
 - **Primary Language**: HTML/JavaScript
 - **Purpose**: Community engagement, content distribution, public documentation
-- **Status**: [EMOJI] Active (20 open issues)
+- **Status**: [EMOJI] Active (see [open issues](https://github.com/PipFoweraker/pdoom1-website/issues))
 - **Key Features**:
   - Static site hosting
   - Automated blog content sync
@@ -277,8 +277,8 @@ Player [EMOJI][EMOJI][EMOJI][EMOJI][EMOJI] pdoom1 (Game Client)
 
 ---
 
-**Last Updated**: September 15, 2025  
-**Version**: 1.0.0  
+**Last Updated**: Auto-generated (see website status.json for current version)  
+**Version**: See [/data/status.json](/data/status.json) for current website version  
 **Maintainer**: PipFoweraker
 
 <!-- Cross-Repository Sync Test: 2025-09-15 12:30 UTC - Website Versioning System Active -->
