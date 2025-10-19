@@ -123,6 +123,7 @@ Complete documentation available in `docs/`:
 - [Analytics Setup Guide](docs/ANALYTICS_SETUP.md) ⭐ NEW
 - [Analytics Summary](docs/ANALYTICS_SUMMARY.md) ⭐ NEW
 - [Syndication Setup Guide](docs/SYNDICATION_SETUP.md) ⭐ NEW
+- [**Syndication User Setup Guide**](docs/SYNDICATION_USER_SETUP_GUIDE.md) ⭐ **START HERE** - Complete step-by-step guide with terminal commands and scripts
 
 ## Weekly Deployment Schedule
 
