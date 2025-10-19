@@ -41,9 +41,10 @@ function toMd(issues) {
   md += `|---:|-------|--------|-----------|---------|------|\n`;
   for (const it of issues) {
     const num = it.number;
-    const title = (it.title || '').replace(/\|/g, '\\|');
-    const labels = (it.labels || []).map(l => l.name).join(', ').replace(/\|/g, '\\|');
-    const ms = it.milestone?.title ? it.milestone.title.replace(/\|/g, '\\|') : '';
+    // Escape backslashes first, then pipes to prevent markdown injection
+    const title = (it.title || '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+    const labels = (it.labels || []).map(l => l.name).join(', ').replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+    const ms = it.milestone?.title ? it.milestone.title.replace(/\\/g, '\\\\').replace(/\|/g, '\\|') : '';
     const updated = (it.updatedAt || '').replace('T', ' ').replace('Z', '');
     const link = it.url || '';
     md += `| ${num} | ${title} | ${labels} | ${ms} | ${updated} | [link](${link}) |\n`;
