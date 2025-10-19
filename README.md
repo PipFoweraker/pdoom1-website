@@ -98,38 +98,72 @@ npm run integration:test
 ## Version Status
 
 **v1.0.0 - PRODUCTION READY**
-- Weekly league infrastructure: COMPLETE
-- Game repository integration: OPERATIONAL
-- API server with 8 endpoints: FUNCTIONAL
-- Automated management system: READY
-- Professional codebase: DEPLOYED
+- ✅ Weekly league infrastructure: COMPLETE
+- ✅ Game repository integration: OPERATIONAL
+- ✅ API server with 8 endpoints: FUNCTIONAL
+- ✅ Automated management system: READY
+- ✅ Production deployment configs: READY
+- ✅ Monitoring & alerting: CONFIGURED
+- ✅ Backup & recovery: DOCUMENTED
+- ✅ Professional codebase: DEPLOYED
+
+### Production Deployment Options
+- **Railway** (recommended): One-click deployment with free tier
+- **Render**: Auto-deploy from GitHub with generous free tier
+- **Heroku**: Classic platform with robust tooling
+- **Self-hosted**: Full control on VPS
+
+See [API Deployment Guide](docs/02-deployment/API_DEPLOYMENT_GUIDE.md) for setup.
 
 ## Next: Phase 2
 
 See issues for upcoming features:
 - Real-time score submission from game
-- Production automation and hosting
 - Enhanced frontend dashboard
+- Database migration for scale
 
 ## Documentation
 
-Complete documentation available in `docs/`:
-- [API Integration Guide](docs/03-integrations/api-integration-complete.md)
-- [Weekly League Implementation](docs/03-integrations/weekly-league-phase1-complete.md)
-- [Deployment Guide](docs/03-integrations/v1-deployment-ready.md)
-
+### 🚀 Deployment & Operations ⭐ NEW
+- [**Production Deployment Guide**](docs/02-deployment/PRODUCTION_DEPLOYMENT.md) - Complete production setup
+- [**API Deployment Guide**](docs/02-deployment/API_DEPLOYMENT_GUIDE.md) - Railway, Render, Heroku, self-hosted
+- [**Backup & Recovery**](docs/02-deployment/BACKUP_RECOVERY.md) - Disaster recovery procedures
+- [**Monitoring & Alerting**](docs/02-deployment/MONITORING_ALERTING.md) - Health checks and alerts
 - [Weekly Deployment Schedule](docs/02-deployment/weekly-deployment-schedule.md)
 - [Deployment Checklist](docs/02-deployment/weekly-deployment-checklist.md)
-- [Analytics Implementation](docs/ANALYTICS_IMPLEMENTATION.md) ⭐ NEW
-- [Analytics Setup Guide](docs/ANALYTICS_SETUP.md) ⭐ NEW
-- [Analytics Summary](docs/ANALYTICS_SUMMARY.md) ⭐ NEW
-- [Syndication Setup Guide](docs/SYNDICATION_SETUP.md) ⭐ NEW
-- [**Syndication User Setup Guide**](docs/SYNDICATION_USER_SETUP_GUIDE.md) ⭐ **START HERE** - Complete step-by-step guide with terminal commands and scripts
+
+### 📊 Integration & Features
+- [API Integration Guide](docs/03-integrations/api-integration-complete.md)
+- [Weekly League Implementation](docs/03-integrations/weekly-league-phase1-complete.md)
+- [Analytics Implementation](docs/ANALYTICS_IMPLEMENTATION.md)
+- [Analytics Setup Guide](docs/ANALYTICS_SETUP.md)
+- [Syndication Setup Guide](docs/SYNDICATION_SETUP.md)
+- [**Syndication User Setup Guide**](docs/SYNDICATION_USER_SETUP_GUIDE.md) ⭐ **START HERE** - Complete step-by-step guide
 
 
-## Weekly Deployment Schedule
+## Automated Systems
 
-**Every Friday at 4:00 PM AEST (06:00 UTC)**
+### Weekly League Reset (Automated)
+
+**Schedule**: Every Monday at 00:00 AEST (Sunday 14:00 UTC)
+
+Fully automated via GitHub Actions:
+1. Archives previous week's results
+2. Generates new competitive seed (deterministic)
+3. Starts new weekly league
+4. Syncs game data
+5. Commits and deploys changes
+
+**Manual trigger** (if needed):
+```bash
+npm run league:archive    # Archive current week
+npm run league:new-week   # Start new week
+npm run game:weekly-sync  # Sync game data
+```
+
+### Weekly Deployment (Automated)
+
+**Schedule**: Every Friday at 4:00 PM AEST (06:00 UTC)
 
 The p(Doom)1 website follows a predictable weekly deployment rhythm:
 - **Monday 00:00 AEST**: New weekly league starts automatically
@@ -139,8 +173,7 @@ The p(Doom)1 website follows a predictable weekly deployment rhythm:
 - **Friday 16:00 AEST**: Production deployment
 - **Friday 16:30 AEST**: Live Twitch stream showcasing updates
 
-### Deployment Commands
-
+**Manual deployment commands**:
 ```bash
 # Prepare for deployment
 npm run deploy:prep-weekly
@@ -151,5 +184,18 @@ npm run deploy:check
 # Fast verification
 npm run deploy:quick-check
 ```
+
+### Health Checks (Automated)
+
+**Schedule**: Every 6 hours
+
+Automated monitoring via GitHub Actions:
+- File integrity checks
+- JSON validation
+- Script execution tests
+- Security scans
+- Performance metrics
+
+**Alerts**: Automatically creates GitHub issues on failures
 
 For detailed schedule and procedures, see [Weekly Deployment Schedule](docs/02-deployment/weekly-deployment-schedule.md).
