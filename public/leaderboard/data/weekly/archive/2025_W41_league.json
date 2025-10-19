@@ -2,7 +2,7 @@
   "meta": {
     "week_id": "2025_W41",
     "season": "2025_Q4",
-    "generated": "2025-10-09T20:28:48.936585Z",
+    "generated": "2025-10-12T14:01:01.633897Z",
     "game_version": "v0.4.1",
     "competition_type": "weekly_league",
     "start_date": "2025-10-06T00:00:00",
@@ -20,8 +20,8 @@
     "end_date": "2025-10-12",
     "start_timestamp": "2025-10-06T00:00:00",
     "end_timestamp": "2025-10-12T23:59:59",
-    "days_remaining": 3,
-    "hours_remaining": 3,
+    "days_remaining": 0,
+    "hours_remaining": 9,
     "is_current": true,
     "season": "2025_Q4"
   },
@@ -32,6 +32,6 @@
     "total_games": 0,
     "unique_players": 0
   },
-  "archived_at": "2025-10-12T14:01:01.505737Z",
+  "archived_at": "2025-10-19T14:01:11.690945Z",
   "archive_status": "completed"
 }
