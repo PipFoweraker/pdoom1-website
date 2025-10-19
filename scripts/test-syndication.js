@@ -8,7 +8,7 @@ console.log('🧪 Testing Syndication Helper Functions\n');
 
 // Test 1: Extract metadata from an existing blog post
 console.log('Test 1: Extract Blog Metadata');
-console.log('=' .repeat(50));
+console.log('='.repeat(50));
 
 const testBlogPath = path.join(__dirname, '../public/blog/2025-10-09-website-development-sprint-complete-v0-2-0.md');
 
@@ -28,7 +28,7 @@ console.log('\n');
 
 // Test 2: Generate blog URL
 console.log('Test 2: Generate Blog URL');
-console.log('=' .repeat(50));
+console.log('='.repeat(50));
 
 const testFilename = '2025-10-09-website-development-sprint-complete-v0-2-0.md';
 const url = helpers.generateBlogUrl(testFilename);
@@ -38,7 +38,7 @@ console.log('\n');
 
 // Test 3: Format content for different platforms
 console.log('Test 3: Format Content for Platforms');
-console.log('=' .repeat(50));
+console.log('='.repeat(50));
 
 const sampleMetadata = {
   title: 'Test Blog Post: Amazing New Feature',
@@ -75,7 +75,7 @@ console.log('\n');
 
 // Test 4: Test with very long summary (should truncate)
 console.log('Test 4: Long Summary Truncation');
-console.log('=' .repeat(50));
+console.log('='.repeat(50));
 
 const longSummary = 'A'.repeat(500);
 const longMetadata = {
