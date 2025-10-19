@@ -23,6 +23,12 @@ Professional website with weekly league competition system for the p(Doom)1 game
 - **User Controls**: Easy opt-out at `/privacy/`
 - **Documentation**: Complete setup and implementation guides
 
+### Social Media Syndication (NEW)
+- **Automated Posting**: Blog/changelog updates auto-posted to social media
+- **Multi-Platform**: Bluesky, Discord, Twitter/X, LinkedIn
+- **Smart Formatting**: Platform-optimized content formatting
+- **Documentation**: Complete setup and configuration guide
+
 ## Directory Structure
 
 - `public/`: Static site assets and leaderboard data
@@ -111,12 +117,15 @@ Complete documentation available in `docs/`:
 - [API Integration Guide](docs/03-integrations/api-integration-complete.md)
 - [Weekly League Implementation](docs/03-integrations/weekly-league-phase1-complete.md)
 - [Deployment Guide](docs/03-integrations/v1-deployment-ready.md)
-- [Weekly Deployment Schedule](docs/02-deployment/weekly-deployment-schedule.md) ⭐
-- [Deployment Checklist](docs/02-deployment/weekly-deployment-checklist.md) ⭐
-- [Deployment Validation](docs/02-deployment/DEPLOYMENT_VALIDATION.md) ⭐ NEW
-- [Analytics Implementation](docs/ANALYTICS_IMPLEMENTATION.md)
-- [Analytics Setup Guide](docs/ANALYTICS_SETUP.md)
-- [Analytics Summary](docs/ANALYTICS_SUMMARY.md)
+
+- [Weekly Deployment Schedule](docs/02-deployment/weekly-deployment-schedule.md)
+- [Deployment Checklist](docs/02-deployment/weekly-deployment-checklist.md)
+- [Analytics Implementation](docs/ANALYTICS_IMPLEMENTATION.md) ⭐ NEW
+- [Analytics Setup Guide](docs/ANALYTICS_SETUP.md) ⭐ NEW
+- [Analytics Summary](docs/ANALYTICS_SUMMARY.md) ⭐ NEW
+- [Syndication Setup Guide](docs/SYNDICATION_SETUP.md) ⭐ NEW
+- [**Syndication User Setup Guide**](docs/SYNDICATION_USER_SETUP_GUIDE.md) ⭐ **START HERE** - Complete step-by-step guide with terminal commands and scripts
+
 
 ## Weekly Deployment Schedule
 

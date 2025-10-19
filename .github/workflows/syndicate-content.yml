@@ -1,0 +1,298 @@
+name: Content Syndication
+
+on:
+  # Trigger on blog/changelog updates
+  push:
+    branches:
+      - main
+    paths:
+      - 'public/blog/**/*.md'
+      - 'public/changelog/**/*.md'
+      - 'public/game-changelog/**/*.md'
+      - 'public/website-changelog/**/*.md'
+  
+  # Manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      content_path:
+        description: 'Path to content file to syndicate'
+        required: true
+        default: 'public/blog/2025-10-09-website-development-sprint-complete-v0-2-0.md'
+      dry_run:
+        description: 'Dry run (do not actually post)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  syndicate:
+    name: Syndicate Content to Social Media
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need previous commit to detect changes
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Detect changed content files
+        id: detect
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Manual trigger - use provided path
+            echo "files=${{ github.event.inputs.content_path }}" >> $GITHUB_OUTPUT
+          else
+            # Automatic trigger - detect changed files
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- 'public/blog/*.md' 'public/*-changelog/*.md' | tr '\n' ' ')
+            echo "files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Extract content metadata
+        id: extract
+        run: |
+          FILES="${{ steps.detect.outputs.files }}"
+          
+          if [ -z "$FILES" ]; then
+            echo "No content files to syndicate"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Process first file (in case multiple files changed)
+          FILE=$(echo "$FILES" | awk '{print $1}')
+          
+          if [ ! -f "$FILE" ]; then
+            echo "File not found: $FILE"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Extract metadata from markdown
+          TITLE=$(grep -m 1 "^# " "$FILE" | sed 's/^# //')
+          DATE=$(grep -m 1 "Date.*:" "$FILE" | sed 's/.*: *//' | sed 's/\*\*//' | xargs)
+          SUMMARY=$(awk '/^## Summary/{flag=1;next}/^##/{flag=0}flag' "$FILE" | head -n 3 | tr '\n' ' ' | xargs)
+          
+          # Generate URL
+          FILENAME=$(basename "$FILE")
+          SLUG=$(echo "$FILENAME" | sed 's/^\d\{4\}-\d\{2\}-\d\{2\}-//' | sed 's/\.md$//')
+          
+          if [[ "$FILE" == *"/blog/"* ]]; then
+            URL="https://pdoom1.com/blog/#$SLUG"
+          elif [[ "$FILE" == *"/changelog/"* ]]; then
+            URL="https://pdoom1.com/changelog/#$SLUG"
+          else
+            URL="https://pdoom1.com/"
+          fi
+          
+          # Truncate summary if needed
+          if [ ${#SUMMARY} -gt 200 ]; then
+            SUMMARY="${SUMMARY:0:197}..."
+          fi
+          
+          # Format post text for each platform
+          BLUESKY_TEXT="🎮 $TITLE
+
+          $SUMMARY
+
+          🔗 $URL"
+          
+          TWITTER_TEXT="🎮 $TITLE
+
+          $SUMMARY
+
+          $URL"
+          
+          LINKEDIN_TEXT="$TITLE
+
+          $SUMMARY
+
+          Read more: $URL
+
+          #gamedev #indiegame #python"
+          
+          # Output for next steps
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "summary=$SUMMARY" >> $GITHUB_OUTPUT
+          echo "skip=false" >> $GITHUB_OUTPUT
+          
+          # Save full text to files for posting
+          echo "$BLUESKY_TEXT" > /tmp/bluesky.txt
+          echo "$TWITTER_TEXT" > /tmp/twitter.txt
+          echo "$LINKEDIN_TEXT" > /tmp/linkedin.txt
+          
+          echo "✅ Extracted metadata:"
+          echo "  Title: $TITLE"
+          echo "  URL: $URL"
+          echo "  Summary: ${SUMMARY:0:100}..."
+      
+      - name: Post to Bluesky
+        if: steps.extract.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          NETLIFY_SITE_URL: ${{ secrets.NETLIFY_SITE_URL }}
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+        run: |
+          BLUESKY_TEXT=$(cat /tmp/bluesky.txt)
+          
+          if [ -z "$NETLIFY_SITE_URL" ] || [ -z "$BLUESKY_HANDLE" ] || [ -z "$BLUESKY_APP_PASSWORD" ]; then
+            echo "⚠️  Bluesky credentials not configured, skipping"
+            exit 0
+          fi
+          
+          echo "📱 Posting to Bluesky..."
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$NETLIFY_SITE_URL/.netlify/functions/syndicate-bluesky" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"title\": \"${{ steps.extract.outputs.title }}\",
+              \"text\": $(echo "$BLUESKY_TEXT" | jq -Rs .),
+              \"url\": \"${{ steps.extract.outputs.url }}\"
+            }")
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Posted to Bluesky successfully"
+          else
+            echo "⚠️  Bluesky post failed (HTTP $HTTP_CODE): $BODY"
+          fi
+      
+      - name: Post to Discord
+        if: steps.extract.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          NETLIFY_SITE_URL: ${{ secrets.NETLIFY_SITE_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -z "$NETLIFY_SITE_URL" ] || [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "⚠️  Discord webhook not configured, skipping"
+            exit 0
+          fi
+          
+          echo "💬 Posting to Discord..."
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$NETLIFY_SITE_URL/.netlify/functions/syndicate-discord" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"title\": \"${{ steps.extract.outputs.title }}\",
+              \"text\": \"${{ steps.extract.outputs.summary }}\",
+              \"url\": \"${{ steps.extract.outputs.url }}\",
+              \"tags\": [\"blog\", \"update\"]
+            }")
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Posted to Discord successfully"
+          else
+            echo "⚠️  Discord post failed (HTTP $HTTP_CODE): $BODY"
+          fi
+      
+      - name: Post to Twitter/X
+        if: steps.extract.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          NETLIFY_SITE_URL: ${{ secrets.NETLIFY_SITE_URL }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: |
+          TWITTER_TEXT=$(cat /tmp/twitter.txt)
+          
+          if [ -z "$NETLIFY_SITE_URL" ] || [ -z "$TWITTER_API_KEY" ]; then
+            echo "⚠️  Twitter credentials not configured, skipping"
+            exit 0
+          fi
+          
+          echo "🐦 Posting to Twitter/X..."
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$NETLIFY_SITE_URL/.netlify/functions/syndicate-x" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"text\": $(echo "$TWITTER_TEXT" | jq -Rs .)
+            }")
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Posted to Twitter/X successfully"
+          else
+            echo "⚠️  Twitter/X post failed (HTTP $HTTP_CODE): $BODY"
+          fi
+      
+      - name: Post to LinkedIn
+        if: steps.extract.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          NETLIFY_SITE_URL: ${{ secrets.NETLIFY_SITE_URL }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_ORG_ID: ${{ secrets.LINKEDIN_ORG_ID }}
+        run: |
+          LINKEDIN_TEXT=$(cat /tmp/linkedin.txt)
+          
+          if [ -z "$NETLIFY_SITE_URL" ] || [ -z "$LINKEDIN_ACCESS_TOKEN" ]; then
+            echo "⚠️  LinkedIn credentials not configured, skipping"
+            exit 0
+          fi
+          
+          echo "💼 Posting to LinkedIn..."
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$NETLIFY_SITE_URL/.netlify/functions/syndicate-linkedin" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"title\": \"${{ steps.extract.outputs.title }}\",
+              \"text\": $(echo "$LINKEDIN_TEXT" | jq -Rs .),
+              \"url\": \"${{ steps.extract.outputs.url }}\"
+            }")
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Posted to LinkedIn successfully"
+          else
+            echo "⚠️  LinkedIn post failed (HTTP $HTTP_CODE): $BODY"
+          fi
+      
+      - name: Dry run summary
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          echo "🔍 DRY RUN - No posts were made"
+          echo ""
+          echo "Would have posted:"
+          echo "  Title: ${{ steps.extract.outputs.title }}"
+          echo "  URL: ${{ steps.extract.outputs.url }}"
+          echo ""
+          echo "Bluesky text:"
+          cat /tmp/bluesky.txt || echo "(not generated)"
+          echo ""
+          echo "Twitter text:"
+          cat /tmp/twitter.txt || echo "(not generated)"
+          echo ""
+          echo "LinkedIn text:"
+          cat /tmp/linkedin.txt || echo "(not generated)"
+      
+      - name: Syndication summary
+        if: steps.extract.outputs.skip != 'true'
+        run: |
+          echo "🎉 Content syndication completed!"
+          echo ""
+          echo "📄 Content: ${{ steps.extract.outputs.title }}"
+          echo "🔗 URL: ${{ steps.extract.outputs.url }}"
+          echo ""
+          echo "Platforms targeted:"
+          echo "  - Bluesky (pdoom1)"
+          echo "  - Discord (alpha channel)"
+          echo "  - Twitter/X"
+          echo "  - LinkedIn (company page)"
+          echo ""
+          echo "Check individual steps above for platform-specific results."
