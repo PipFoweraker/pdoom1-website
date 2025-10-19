@@ -55,7 +55,7 @@ function toMd(issues) {
 function atomicWrite(filePath, content) {
   const dir = path.dirname(filePath);
   fs.mkdirSync(dir, { recursive: true });
-  const tmp = path.join(dir, `.tmp-${Date.now()}.md`);
+  const tmp = path.join(dir, `.tmp-${Date.now()}-${process.pid}.md`);
   fs.writeFileSync(tmp, content, 'utf8');
   fs.renameSync(tmp, filePath);
 }
