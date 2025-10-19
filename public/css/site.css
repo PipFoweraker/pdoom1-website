@@ -1,0 +1,50 @@
+:root{
+  --accent-primary:#0066cc;
+  --text-secondary:#666666;
+  --text-muted:#999999;
+  --bg-card: #ffffff;
+}
+
+/* Visible toggles and summary */
+.summary-toggle{
+  font-weight:700;
+  color:var(--accent-primary);
+  cursor:pointer;
+  margin-bottom:1rem;
+}
+
+/* Text helpers */
+.text-secondary{ color:var(--text-secondary); }
+.text-muted{ color:var(--text-muted); }
+
+/* CTA button style */
+.cta-button{
+  display:inline-block;
+  text-decoration:none;
+  background:var(--accent-primary);
+  color:#fff;
+  padding:0.5rem 1rem;
+  border-radius:4px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Layout helpers */
+.grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; }
+.card{ background:var(--bg-card); padding:1rem; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+
+/* Status badges */
+.status{ font-size:0.9rem; padding:0.15rem 0.4rem; border-radius:3px; display:inline-block; }
+.status.available{ background:#e6f8ff; color:#0077aa; }
+.status.synced{ background:#eef7e6; color:#0a6f2f; }
+
+/* Newsletter */
+.newsletter-input{ width:100%; padding:0.5rem; margin-bottom:0.5rem; border:1px solid #ddd; border-radius:4px; }
+.newsletter-form{ margin-top:1rem; display:flex; gap:0.5rem; align-items:center; }
+.newsletter-form .cta-button{ padding:0.45rem 0.8rem; }
+
+/* Accessibility: ensure focus outlines visible */
+a:focus, button:focus, input:focus, textarea:focus {
+  outline: 3px solid rgba(0,102,204,0.18);
+  outline-offset: 2px;
+}
