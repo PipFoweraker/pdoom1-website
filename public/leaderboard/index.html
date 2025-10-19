@@ -1185,12 +1185,8 @@
           const response = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
           if (response.ok) {
             const weekData = await response.json();
-            originalData = {
-              ...originalData,
-              entries: weekData.entries || [],
-              seed: weekData.seed,
-              meta: weekData.meta
-            };
+            // Replace originalData with new week data
+            originalData = weekData;
             filteredData = originalData;
             displayStats(filteredData);
             displayLeaderboard(filteredData);
@@ -1206,6 +1202,7 @@
         const response = await fetch(`/leaderboard/data/seed_${seedFilter}.json`, { cache: 'no-store' });
         if (response.ok) {
           const seedData = await response.json();
+          // Replace originalData with new seed data
           originalData = seedData;
           filteredData = originalData;
           displayStats(filteredData);
