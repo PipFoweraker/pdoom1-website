@@ -38,13 +38,13 @@ Check these daily (morning AEST):
 
 ```bash
 # Run comprehensive health checks
-npm run test:health
+python scripts/health-check.py
 
 # Check deployment status
-npm run deploy:check
+python scripts/prepare-weekly-deployment.py --check-only
 
 # Verify league system
-npm run league:status
+python scripts/weekly-league-manager.py --status
 ```
 
 ## Weekly Operations
@@ -190,7 +190,7 @@ rm -rf /tmp/restore-test
 2. Review health check success rates:
    ```bash
    # Check recent health check results
-   cat public/data/health-check-results.json | python -m json.tool
+   python -m json.tool public/data/health-check-results.json
    ```
 
 3. API performance (if deployed):
@@ -506,16 +506,16 @@ Track these metrics for operational health:
 
 ## Operational Calendar
 
-| Day | Task | Time (AEST) | Type |
-|-----|------|-------------|------|
-| Sunday 14:00 UTC | League reset | Monday 00:00 | Auto |
-| Monday | Verify reset | 00:30 | Manual |
-| Friday 06:00 UTC | Deployment | 16:00 | Auto |
-| Friday | Verify deploy | 16:30 | Manual |
-| Friday | Twitch stream | 16:30 | Manual |
+| Day | Task | Time | Type |
+|-----|------|------|------|
+| Sunday 14:00 UTC | League reset | Monday 00:00 AEST | Auto |
+| Monday | Verify reset | 00:30 AEST | Manual |
+| Friday 06:00 UTC | Deployment | 16:00 AEST | Auto |
+| Friday | Verify deploy | 16:30 AEST | Manual |
+| Friday | Twitch stream | 16:30 AEST | Manual |
 | Every 6 hours | Health checks | Various | Auto |
-| First Monday | Monthly backup check | 09:00 | Manual |
-| First Monday (Quarter) | Security updates | 09:00 | Manual |
+| First Monday | Monthly backup check | 09:00 AEST | Manual |
+| First Monday (Quarter) | Security updates | 09:00 AEST | Manual |
 
 ## Useful Commands
 

@@ -127,6 +127,7 @@ See issues for upcoming features:
 ### 🚀 Deployment & Operations ⭐ NEW
 - [**Production Deployment Guide**](docs/02-deployment/PRODUCTION_DEPLOYMENT.md) - Complete production setup
 - [**API Deployment Guide**](docs/02-deployment/API_DEPLOYMENT_GUIDE.md) - Railway, Render, Heroku, self-hosted
+- [**Operations Guide**](docs/02-deployment/OPERATIONS_GUIDE.md) - Day-to-day operations and troubleshooting
 - [**Backup & Recovery**](docs/02-deployment/BACKUP_RECOVERY.md) - Disaster recovery procedures
 - [**Monitoring & Alerting**](docs/02-deployment/MONITORING_ALERTING.md) - Health checks and alerts
 - [Weekly Deployment Schedule](docs/02-deployment/weekly-deployment-schedule.md)
