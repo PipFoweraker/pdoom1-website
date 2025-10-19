@@ -42,19 +42,37 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
         self.leaderboard_file = Path(__file__).parent.parent / "public" / "leaderboard" / "data" / "leaderboard.json"
         super().__init__(*args, **kwargs)
     
+    def _sanitize_origin(self, origin: str) -> str:
+        """Sanitize origin header to prevent header injection attacks."""
+        if not origin:
+            return ''
+        
+        # Remove any newline characters that could enable header injection
+        sanitized = origin.replace('\r', '').replace('\n', '')
+        
+        # Validate it looks like a valid origin (scheme://host[:port])
+        # Only allow http/https schemes
+        if not (sanitized.startswith('http://') or sanitized.startswith('https://')):
+            return ''
+        
+        return sanitized
+    
     def _set_cors_headers(self):
         """Set CORS headers based on environment."""
         origin = self.headers.get('Origin', '')
         
         if self.is_production:
+            # Sanitize user-provided origin to prevent header injection
+            sanitized_origin = self._sanitize_origin(origin)
+            
             # Production: Check against allowed origins
-            if origin in self.cors_origins or '*' in self.cors_origins:
-                self.send_header('Access-Control-Allow-Origin', origin)
+            if sanitized_origin and (sanitized_origin in self.cors_origins or '*' in self.cors_origins):
+                self.send_header('Access-Control-Allow-Origin', sanitized_origin)
             else:
                 # Default to first allowed origin if request origin not in list
                 self.send_header('Access-Control-Allow-Origin', self.cors_origins[0] if self.cors_origins else 'https://pdoom1.com')
         else:
-            # Development: Allow all origins
+            # Development: Allow all origins (still use wildcard, no user input)
             self.send_header('Access-Control-Allow-Origin', '*')
         
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
