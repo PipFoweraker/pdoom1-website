@@ -23,6 +23,12 @@ Professional website with weekly league competition system for the p(Doom)1 game
 - **User Controls**: Easy opt-out at `/privacy/`
 - **Documentation**: Complete setup and implementation guides
 
+### Social Media Syndication (NEW)
+- **Automated Posting**: Blog/changelog updates auto-posted to social media
+- **Multi-Platform**: Bluesky, Discord, Twitter/X, LinkedIn
+- **Smart Formatting**: Platform-optimized content formatting
+- **Documentation**: Complete setup and configuration guide
+
 ## Directory Structure
 
 - `public/`: Static site assets and leaderboard data
@@ -116,6 +122,7 @@ Complete documentation available in `docs/`:
 - [Analytics Implementation](docs/ANALYTICS_IMPLEMENTATION.md) ⭐ NEW
 - [Analytics Setup Guide](docs/ANALYTICS_SETUP.md) ⭐ NEW
 - [Analytics Summary](docs/ANALYTICS_SUMMARY.md) ⭐ NEW
+- [Syndication Setup Guide](docs/SYNDICATION_SETUP.md) ⭐ NEW
 
 ## Weekly Deployment Schedule
 
