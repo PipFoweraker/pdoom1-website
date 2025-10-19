@@ -1,0 +1,36 @@
+{
+  "environment": "development",
+  "api": {
+    "host": "127.0.0.1",
+    "port": 8000,
+    "cors_origins": ["*"],
+    "rate_limiting": {
+      "enabled": false
+    }
+  },
+  "weekly_league": {
+    "auto_reset_enabled": false,
+    "reset_time": "Manual",
+    "timezone": "UTC",
+    "archive_policy": "keep_all",
+    "max_entries_per_week": 1000
+  },
+  "monitoring": {
+    "health_checks_enabled": true,
+    "metrics_enabled": true,
+    "alerting_enabled": false,
+    "health_check_interval_seconds": 60
+  },
+  "backup": {
+    "enabled": false,
+    "retention_days": 30
+  },
+  "deployment": {
+    "auto_deploy_enabled": false
+  },
+  "security": {
+    "https_only": false,
+    "secure_headers": false,
+    "rate_limiting": false
+  }
+}

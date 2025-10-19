@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: pdoom1-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt || echo "No requirements.txt, using stdlib only"
+    startCommand: python scripts/api-server.py --production --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: API_ENV
+        value: production
+      - key: CORS_ORIGINS
+        value: https://pdoom1.com,https://www.pdoom1.com
+      - key: WEEKLY_LEAGUE_AUTO_RESET
+        value: true
+      - key: HEALTH_CHECK_ENABLED
+        value: true

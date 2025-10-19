@@ -1,0 +1,52 @@
+{
+  "environment": "production",
+  "api": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "cors_origins": [
+      "https://pdoom1.com",
+      "https://www.pdoom1.com"
+    ],
+    "rate_limiting": {
+      "enabled": true,
+      "max_requests_per_minute": 60,
+      "max_requests_per_hour": 1000
+    }
+  },
+  "weekly_league": {
+    "auto_reset_enabled": true,
+    "reset_time": "Monday 00:00 UTC",
+    "timezone": "UTC",
+    "archive_policy": "keep_all",
+    "max_entries_per_week": 1000
+  },
+  "monitoring": {
+    "health_checks_enabled": true,
+    "metrics_enabled": true,
+    "alerting_enabled": true,
+    "health_check_interval_seconds": 300,
+    "alert_channels": [
+      "github_issues",
+      "logs"
+    ]
+  },
+  "backup": {
+    "enabled": true,
+    "retention_days": 365,
+    "weekly_archives_retention": "unlimited",
+    "backup_schedule": "daily",
+    "backup_location": "public/leaderboard/data/weekly/archive"
+  },
+  "deployment": {
+    "auto_deploy_enabled": true,
+    "deployment_schedule": "Friday 06:00 UTC",
+    "pre_deployment_checks": true,
+    "post_deployment_verification": true,
+    "rollback_on_failure": true
+  },
+  "security": {
+    "https_only": true,
+    "secure_headers": true,
+    "rate_limiting": true
+  }
+}

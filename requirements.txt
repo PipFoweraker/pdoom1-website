@@ -1,0 +1,11 @@
+# Python requirements for p(Doom)1 Website
+# This project uses Python standard library only for portability
+# No external dependencies required for core functionality
+
+# Note: The API server (scripts/api-server.py) uses only stdlib:
+# - http.server for HTTP handling
+# - json for data parsing
+# - pathlib for file operations
+# - datetime for timestamps
+
+# If you need to add dependencies in the future, list them here

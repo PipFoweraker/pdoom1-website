@@ -14,21 +14,69 @@ Usage:
 
 import json
 import argparse
+import os
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import socket
 
 
+# Production configuration
+PRODUCTION_CORS_ORIGINS = [
+    "https://pdoom1.com",
+    "https://www.pdoom1.com"
+]
+
+
 class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
     """HTTP request handler for game integration API endpoints."""
+    
+    # Class-level configuration (set by server)
+    is_production = False
+    cors_origins: List[str] = ["*"]
     
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.data_dir = Path(__file__).parent.parent / "public" / "data"
         self.leaderboard_file = Path(__file__).parent.parent / "public" / "leaderboard" / "data" / "leaderboard.json"
         super().__init__(*args, **kwargs)
+    
+    def _sanitize_origin(self, origin: str) -> str:
+        """Sanitize origin header to prevent header injection attacks."""
+        if not origin:
+            return ''
+        
+        # Remove any newline characters that could enable header injection
+        sanitized = origin.replace('\r', '').replace('\n', '')
+        
+        # Validate it looks like a valid origin (scheme://host[:port])
+        # Only allow http/https schemes
+        if not (sanitized.startswith('http://') or sanitized.startswith('https://')):
+            return ''
+        
+        return sanitized
+    
+    def _set_cors_headers(self):
+        """Set CORS headers based on environment."""
+        origin = self.headers.get('Origin', '')
+        
+        if self.is_production:
+            # Sanitize user-provided origin to prevent header injection
+            sanitized_origin = self._sanitize_origin(origin)
+            
+            # Production: Check against allowed origins
+            if sanitized_origin and (sanitized_origin in self.cors_origins or '*' in self.cors_origins):
+                self.send_header('Access-Control-Allow-Origin', sanitized_origin)
+            else:
+                # Default to first allowed origin if request origin not in list
+                self.send_header('Access-Control-Allow-Origin', self.cors_origins[0] if self.cors_origins else 'https://pdoom1.com')
+        else:
+            # Development: Allow all origins (still use wildcard, no user input)
+            self.send_header('Access-Control-Allow-Origin', '*')
+        
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
     
     def do_GET(self):
         """Handle GET requests for API endpoints."""
@@ -36,10 +84,8 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
         path = parsed_url.path
         query_params = parse_qs(parsed_url.query)
         
-        # CORS headers for development
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        # Set CORS headers
+        self._set_cors_headers()
         
         try:
             if path == '/api/leaderboards/current':
@@ -68,9 +114,7 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         """Handle OPTIONS requests for CORS preflight."""
         self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self._set_cors_headers()
         self.end_headers()
     
     def do_POST(self):
@@ -78,10 +122,8 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
         parsed_url = urlparse(self.path)
         path = parsed_url.path
         
-        # CORS headers
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        # Set CORS headers
+        self._set_cors_headers()
         
         try:
             if path == '/api/scores/submit':
@@ -587,16 +629,30 @@ class GameIntegrationAPIHandler(BaseHTTPRequestHandler):
 class GameIntegrationAPIServer:
     """Development API server for game integration endpoints."""
     
-    def __init__(self, port: int = 8080, host: str = "localhost"):
+    def __init__(self, port: int = 8080, host: str = "localhost", production: bool = False):
         self.port = port
         self.host = host
+        self.production = production
         self.server = None
+        
+        # Configure handler for production/development
+        GameIntegrationAPIHandler.is_production = production
+        if production:
+            # Load CORS origins from environment or use default
+            cors_env = os.getenv('CORS_ORIGINS', ','.join(PRODUCTION_CORS_ORIGINS))
+            GameIntegrationAPIHandler.cors_origins = [o.strip() for o in cors_env.split(',')]
+        else:
+            GameIntegrationAPIHandler.cors_origins = ["*"]
     
     def start(self):
         """Start the API server."""
         try:
             self.server = HTTPServer((self.host, self.port), GameIntegrationAPIHandler)
-            print(f"STARTING: Game Integration API Server starting on http://{self.host}:{self.port}")
+            
+            mode = "PRODUCTION" if self.production else "DEVELOPMENT"
+            print(f"STARTING: Game Integration API Server ({mode}) on http://{self.host}:{self.port}")
+            if self.production:
+                print(f"CORS: Allowed origins: {', '.join(GameIntegrationAPIHandler.cors_origins)}")
             print(f"ENDPOINTS: Available endpoints:")
             print(f"   GET /api/leaderboards/current?limit=10")
             print(f"   GET /api/leaderboards/seed/{{seed}}?limit=50")
@@ -669,18 +725,27 @@ def find_free_port(start_port: int = 8080) -> int:
 def main():
     """CLI interface for the API server."""
     parser = argparse.ArgumentParser(description="p(Doom)1 Game Integration API Server")
-    parser.add_argument("--port", type=int, default=8080, help="Port to run server on")
-    parser.add_argument("--host", type=str, default="localhost", help="Host to bind to")
+    parser.add_argument("--port", type=int, help="Port to run server on (default: from $PORT env or 8080)")
+    parser.add_argument("--host", type=str, default="localhost", help="Host to bind to (use 0.0.0.0 for production)")
+    parser.add_argument("--production", action="store_true", help="Run in production mode with restricted CORS")
     parser.add_argument("--find-port", action="store_true", help="Automatically find a free port")
     parser.add_argument("--test", action="store_true", help="Test API endpoints")
     
     args = parser.parse_args()
     
-    if args.find_port:
-        args.port = find_free_port(args.port)
-        print(f"🔍 Using free port: {args.port}")
+    # Get port from args, environment, or default
+    port = args.port or int(os.getenv('PORT', '8080'))
     
-    server = GameIntegrationAPIServer(port=args.port, host=args.host)
+    # In production mode, default to 0.0.0.0 unless specified
+    host = args.host
+    if args.production and args.host == "localhost":
+        host = "0.0.0.0"
+    
+    if args.find_port:
+        port = find_free_port(port)
+        print(f"🔍 Using free port: {port}")
+    
+    server = GameIntegrationAPIServer(port=port, host=host, production=args.production)
     
     if args.test:
         print("🧪 API endpoint testing mode")
