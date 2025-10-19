@@ -740,6 +740,13 @@
         </div>
         
         <div class="filter-controls">
+          <select id="filter-by-seed" class="filter-select" onchange="filterBySeedOrWeek()">
+            <option value="all">All Seeds/Weeks</option>
+            <option value="current-week">Current Week</option>
+            <optgroup label="Recent Seeds" id="recent-seeds-group">
+            </optgroup>
+          </select>
+          
           <select id="sort-by" class="filter-select" onchange="filterLeaderboard()">
             <option value="score">Sort by Score</option>
             <option value="player_name">Sort by Name</option>
@@ -1162,8 +1169,77 @@
       }
     });
     
+    // Filter by seed or week
+    async function filterBySeedOrWeek() {
+      const seedFilter = document.getElementById('filter-by-seed').value;
+      
+      if (seedFilter === 'all') {
+        // Reload original data
+        loadLeaderboardWithFiltering();
+        return;
+      }
+      
+      if (seedFilter === 'current-week') {
+        // Load current week data
+        try {
+          const response = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
+          if (response.ok) {
+            const weekData = await response.json();
+            // Replace originalData with new week data
+            originalData = weekData;
+            filteredData = originalData;
+            displayStats(filteredData);
+            displayLeaderboard(filteredData);
+          }
+        } catch (error) {
+          console.error('Failed to load current week:', error);
+        }
+        return;
+      }
+      
+      // Load specific seed data
+      try {
+        const response = await fetch(`/leaderboard/data/seed_${seedFilter}.json`, { cache: 'no-store' });
+        if (response.ok) {
+          const seedData = await response.json();
+          // Replace originalData with new seed data
+          originalData = seedData;
+          filteredData = originalData;
+          displayStats(filteredData);
+          displayLeaderboard(filteredData);
+        }
+      } catch (error) {
+        console.error('Failed to load seed data:', error);
+      }
+    }
+    
+    // Populate seed filter dropdown
+    async function populateSeedFilter() {
+      try {
+        // Try to get list of available seeds from weekly league
+        const response = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
+        if (response.ok) {
+          const weekData = await response.json();
+          const seedsGroup = document.getElementById('recent-seeds-group');
+          
+          // Add current week's seed
+          if (weekData.seed) {
+            const option = document.createElement('option');
+            option.value = weekData.seed;
+            option.textContent = `Week ${weekData.meta?.week_id || 'Current'} - ${weekData.seed}`;
+            seedsGroup.appendChild(option);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to populate seed filter:', error);
+      }
+    }
+    
     // Load data when page loads
-    document.addEventListener('DOMContentLoaded', loadLeaderboardWithFiltering);
+    document.addEventListener('DOMContentLoaded', () => {
+      loadLeaderboardWithFiltering();
+      populateSeedFilter();
+    });
   </script>
 </body>
 </html>

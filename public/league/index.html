@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly League - p(Doom)1</title>
+  <meta name="description" content="Compete in the weekly p(Doom)1 league. View current standings, track your ranking progress, and see historical competition data.">
+  <link rel="canonical" href="https://pdoom1.com/league/" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+  <meta name="author" content="p(Doom)1" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="p(Doom)1" />
+  <meta property="og:title" content="Weekly League - p(Doom)1" />
+  <meta property="og:description" content="Compete in the weekly p(Doom)1 league. View current standings, track your ranking, and compete for the top spot!" />
+  <meta property="og:url" content="https://pdoom1.com/league/" />
+  <meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  
+  <style>
+    :root {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --bg-tertiary: #3d3d3d;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #888888;
+      --accent-primary: #00ff41;
+      --accent-secondary: #ff6b35;
+      --accent-danger: #ff4444;
+      --border-color: #444444;
+      --success-color: #4caf50;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+      --border-width: 1px;
+      --shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+      --duration-fast: 150ms;
+      --duration-base: 300ms;
+      --easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 2px solid var(--accent-primary);
+      padding: 1rem;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .designer-credit {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: normal;
+      margin-bottom: -0.2rem;
+      letter-spacing: 0.5px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+      text-decoration: none;
+      text-shadow: 0 0 10px var(--accent-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      transition: all var(--duration-base) var(--easing);
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-toggle {
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all var(--duration-base) var(--easing);
+      min-width: 150px;
+      z-index: 1000;
+      list-style: none;
+      padding: 0.5rem 0;
+      margin: 0;
+    }
+
+    .dropdown:hover .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all var(--duration-fast) var(--easing);
+      border: none;
+    }
+
+    .dropdown-menu a:hover {
+      background: var(--bg-tertiary);
+      color: var(--accent-primary);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      color: var(--accent-primary);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 20px var(--accent-primary);
+    }
+
+    .page-header .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--accent-primary);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      color: var(--accent-primary);
+      margin-top: 1rem;
+    }
+
+    .status-badge.active {
+      background: rgba(0, 255, 65, 0.1);
+      border-color: var(--accent-primary);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .week-info-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .week-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .info-item {
+      text-align: center;
+    }
+
+    .info-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+    }
+
+    .countdown-timer {
+      background: var(--bg-tertiary);
+      border: 2px solid var(--accent-secondary);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .countdown-timer h2 {
+      color: var(--accent-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .countdown-display {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+    }
+
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 80px;
+    }
+
+    .countdown-number {
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    .countdown-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .standings-section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .section-header {
+      background: var(--bg-tertiary);
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-header h2 {
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .section-header .subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .standings-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .standings-table th,
+    .standings-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .standings-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-secondary);
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+    }
+
+    .standings-table tr:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .rank {
+      width: 60px;
+      text-align: center;
+      font-weight: bold;
+      color: var(--accent-primary);
+      font-size: 1.2rem;
+    }
+
+    .rank.top-3 {
+      font-size: 1.5rem;
+    }
+
+    .rank.rank-1 { color: #ffd700; }
+    .rank.rank-2 { color: #c0c0c0; }
+    .rank.rank-3 { color: #cd7f32; }
+
+    .player-name {
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+
+    .score {
+      font-weight: bold;
+      color: var(--success-color);
+      font-size: 1.1rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    .error-message {
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid var(--accent-danger);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--accent-danger);
+      margin: 2rem 0;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(45deg, var(--accent-primary), var(--success-color));
+      color: var(--bg-primary);
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-weight: bold;
+      transition: transform var(--duration-base) var(--easing), box-shadow var(--duration-base) var(--easing);
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-button);
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+    }
+
+    .card h3 {
+      color: var(--accent-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-row .label {
+      color: var(--text-secondary);
+    }
+
+    .stat-row .value {
+      color: var(--accent-primary);
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      .page-header h1 {
+        font-size: 2rem;
+      }
+
+      .countdown-display {
+        font-size: 1.5rem;
+      }
+
+      .countdown-number {
+        font-size: 2rem;
+      }
+
+      .standings-table {
+        font-size: 0.9rem;
+      }
+
+      .standings-table th,
+      .standings-table td {
+        padding: 0.5rem;
+      }
+
+      .week-info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .standings-table th:nth-child(4),
+      .standings-table td:nth-child(4) {
+        display: none;
+      }
+    }
+  </style>
+
+  <script>
+    // Load design tokens if available
+    (async function loadTokens() {
+      try {
+        const res = await fetch('/design/tokens.json', { cache: 'no-store' });
+        if (!res.ok) return;
+        const t = await res.json();
+        const r = document.documentElement;
+        const set = (k, v) => v != null && r.style.setProperty(k, String(v));
+        if (t.colors) {
+          Object.entries({
+            '--bg-primary': t.colors.bgPrimary,
+            '--bg-secondary': t.colors.bgSecondary,
+            '--bg-tertiary': t.colors.bgTertiary,
+            '--text-primary': t.colors.textPrimary,
+            '--text-secondary': t.colors.textSecondary,
+            '--text-muted': t.colors.textMuted,
+            '--accent-primary': t.colors.accentPrimary,
+            '--accent-secondary': t.colors.accentSecondary,
+            '--accent-danger': t.colors.accentDanger,
+            '--border-color': t.colors.border,
+            '--success-color': t.colors.success
+          }).forEach(([k, v]) => set(k, v));
+        }
+        if (t.shape) {
+          Object.entries({
+            '--radius-sm': t.shape.radiusSm,
+            '--radius-md': t.shape.radiusMd,
+            '--radius-lg': t.shape.radiusLg,
+            '--border-width': t.shape.borderWidth,
+            '--shadow-button': t.shape.shadowButton
+          }).forEach(([k, v]) => set(k, v));
+        }
+        if (t.motion) {
+          Object.entries({
+            '--duration-fast': t.motion.durationFast,
+            '--duration-base': t.motion.durationBase,
+            '--easing': t.motion.easing
+          }).forEach(([k, v]) => set(k, v));
+        }
+      } catch (e) {
+        // ignore; defaults apply
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <nav role="navigation" aria-label="Main navigation">
+        <div class="logo-container">
+          <div class="designer-credit">Pip Foweraker's</div>
+          <a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
+        </div>
+        <ul class="nav-links" role="menubar">
+          <li role="none"><a href="/" role="menuitem">Game</a></li>
+          <li role="none"><a href="/league/" role="menuitem" aria-current="page" style="color: var(--accent-primary);">Weekly League</a></li>
+          <li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
+          <li role="none" class="dropdown">
+            <a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Stats ▾</a>
+            <ul class="dropdown-menu" role="menu">
+              <li role="none"><a href="/stats/" role="menuitem">Game Stats</a></li>
+              <li role="none"><a href="/stats/competition.html" role="menuitem">Competition Stats</a></li>
+            </ul>
+          </li>
+          <li role="none" class="dropdown">
+            <a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
+            <ul class="dropdown-menu" role="menu">
+              <li role="none"><a href="/about/" role="menuitem">About</a></li>
+              <li role="none"><a href="/docs/" role="menuitem">Documentation</a></li>
+              <li role="none"><a href="/blog/" role="menuitem">Dev Blog</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>Weekly League</h1>
+      <p class="subtitle">Compete for the top spot in this week's challenge</p>
+      <div class="status-badge" id="league-status">Loading...</div>
+    </div>
+
+    <!-- Current Week Information -->
+    <div class="week-info-card">
+      <h2 style="color: var(--accent-secondary); margin-bottom: 1rem;">Current Week</h2>
+      <div class="week-info-grid">
+        <div class="info-item">
+          <div class="info-label">Week Number</div>
+          <div class="info-value" id="week-number">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Season</div>
+          <div class="info-value" id="season">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Seed</div>
+          <div class="info-value" id="seed-name" style="font-size: 0.9rem;">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Participants</div>
+          <div class="info-value" id="participants-count">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Total Submissions</div>
+          <div class="info-value" id="submissions-count">-</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div class="countdown-timer" id="countdown-section">
+      <h2>Time Remaining</h2>
+      <div class="countdown-display" id="countdown-display">
+        <div class="countdown-unit">
+          <div class="countdown-number" id="days">-</div>
+          <div class="countdown-label">DAYS</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-number" id="hours">-</div>
+          <div class="countdown-label">HOURS</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-number" id="minutes">-</div>
+          <div class="countdown-label">MINUTES</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-number" id="seconds">-</div>
+          <div class="countdown-label">SECONDS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 10 Standings -->
+    <div class="standings-section">
+      <div class="section-header">
+        <h2>Top 10 Current Standings</h2>
+        <div class="subtitle">Leading players in this week's competition</div>
+      </div>
+
+      <div class="loading" id="standings-loading">Loading standings</div>
+
+      <table class="standings-table" id="standings-table" style="display: none;">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Score</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="standings-body">
+        </tbody>
+      </table>
+
+      <div class="error-message" id="standings-error" style="display: none;">
+        Failed to load standings. Please try again later.
+      </div>
+    </div>
+
+    <!-- Season Statistics -->
+    <div class="grid-2col">
+      <div class="card">
+        <h3>Week Statistics</h3>
+        <div id="week-stats">
+          <div class="stat-row">
+            <span class="label">Highest Score</span>
+            <span class="value" id="highest-score">-</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Average Score</span>
+            <span class="value" id="average-score">-</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Total Games</span>
+            <span class="value" id="total-games">-</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Unique Players</span>
+            <span class="value" id="unique-players">-</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Quick Actions</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+          View more details and compete in the weekly league
+        </p>
+        <a href="/leaderboard/" class="cta-button" style="display: inline-block; text-decoration: none; margin-right: 1rem;">
+          View Full Leaderboard
+        </a>
+        <a href="/stats/competition.html" class="cta-button" style="display: inline-block; text-decoration: none; background: linear-gradient(45deg, var(--accent-secondary), var(--accent-danger));">
+          Competition Stats
+        </a>
+      </div>
+    </div>
+
+    <!-- Historical Data Section -->
+    <div class="card" style="margin-top: 2rem;">
+      <h3>Season Standings & Archives</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+        Access historical weekly league data and season archives
+      </p>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        Archive feature coming soon. Check back to view past week results and season statistics.
+      </p>
+    </div>
+  </main>
+
+  <script>
+    // API Configuration
+    const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:8080'
+      : '';
+
+    // Cache for API responses
+    const cache = {
+      league: { data: null, timestamp: 0 },
+      cacheDuration: 30000 // 30 seconds
+    };
+
+    // Load league data
+    async function loadLeagueData() {
+      try {
+        // Check cache first
+        const now = Date.now();
+        if (cache.league.data && (now - cache.league.timestamp) < cache.cacheDuration) {
+          displayLeagueData(cache.league.data);
+          return;
+        }
+
+        // Try to load from data file first (for static hosting)
+        let response = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
+        
+        if (!response.ok) {
+          // Fallback to API endpoint
+          response = await fetch(`${API_BASE_URL}/api/league/current?limit=10`, { cache: 'no-store' });
+        }
+
+        if (!response.ok) {
+          throw new Error('Failed to load league data');
+        }
+
+        const data = await response.json();
+        
+        // Update cache
+        cache.league.data = data;
+        cache.league.timestamp = now;
+
+        displayLeagueData(data);
+      } catch (error) {
+        console.error('Failed to load league data:', error);
+        showError();
+      }
+    }
+
+    // Display league data
+    function displayLeagueData(data) {
+      // Update league status
+      const statusBadge = document.getElementById('league-status');
+      if (data.week_info && data.week_info.is_current) {
+        statusBadge.textContent = '🔴 LIVE - Active Competition';
+        statusBadge.classList.add('active');
+      } else {
+        statusBadge.textContent = 'Week Ended';
+        statusBadge.classList.remove('active');
+      }
+
+      // Update week information
+      if (data.meta) {
+        document.getElementById('week-number').textContent = data.meta.week_id || '-';
+        document.getElementById('season').textContent = data.meta.season || '-';
+        document.getElementById('seed-name').textContent = data.seed || '-';
+        document.getElementById('participants-count').textContent = data.meta.total_participants || 0;
+        document.getElementById('submissions-count').textContent = data.meta.total_submissions || 0;
+      }
+
+      // Update countdown timer
+      if (data.week_info && data.week_info.end_timestamp) {
+        updateCountdown(data.week_info.end_timestamp);
+      }
+
+      // Update week statistics
+      if (data.statistics) {
+        document.getElementById('highest-score').textContent = data.statistics.highest_score || 0;
+        document.getElementById('average-score').textContent = (data.statistics.average_score || 0).toFixed(1);
+        document.getElementById('total-games').textContent = data.statistics.total_games || 0;
+        document.getElementById('unique-players').textContent = data.statistics.unique_players || 0;
+      }
+
+      // Display standings
+      displayStandings(data.entries || []);
+    }
+
+    // Display standings table
+    function displayStandings(entries) {
+      const tbody = document.getElementById('standings-body');
+      const loadingEl = document.getElementById('standings-loading');
+      const tableEl = document.getElementById('standings-table');
+      const errorEl = document.getElementById('standings-error');
+
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'none';
+
+      if (entries.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+              No submissions yet. Be the first to compete!
+            </td>
+          </tr>
+        `;
+        tableEl.style.display = 'table';
+        return;
+      }
+
+      // Sort by score (highest first) and take top 10
+      const topEntries = entries.sort((a, b) => b.score - a.score).slice(0, 10);
+
+      tbody.innerHTML = '';
+      topEntries.forEach((entry, index) => {
+        const rank = index + 1;
+        const row = document.createElement('tr');
+
+        // Determine risk level
+        const doomPercent = entry.final_doom || 0;
+        let riskClass = 'safe';
+        if (doomPercent > 30) riskClass = 'risky';
+        if (doomPercent > 50) riskClass = 'dangerous';
+
+        row.innerHTML = `
+          <td class="rank ${rank <= 3 ? 'top-3 rank-' + rank : ''}">#${rank}</td>
+          <td>
+            <div class="player-name">${entry.player_name}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">${entry.game_mode || 'Unknown'}</div>
+          </td>
+          <td class="score">${entry.score.toLocaleString()}</td>
+          <td>
+            <div style="font-size: 0.9rem;">
+              <div>Turn ${entry.level_reached || 1}</div>
+              <div style="color: ${riskClass === 'safe' ? 'var(--success-color)' : riskClass === 'risky' ? 'var(--accent-secondary)' : 'var(--accent-danger)'}">
+                Doom: ${doomPercent.toFixed(1)}%
+              </div>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(row);
+      });
+
+      tableEl.style.display = 'table';
+    }
+
+    // Update countdown timer
+    function updateCountdown(endTimestamp) {
+      const endDate = new Date(endTimestamp);
+
+      function update() {
+        const now = new Date();
+        const diff = endDate - now;
+
+        if (diff <= 0) {
+          document.getElementById('countdown-section').innerHTML = `
+            <h2 style="color: var(--accent-danger);">Week Ended</h2>
+            <p style="color: var(--text-secondary); margin-top: 1rem;">Check back next week for a new challenge!</p>
+          `;
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('days').textContent = String(days).padStart(2, '0');
+        document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+      }
+
+      update();
+      setInterval(update, 1000);
+    }
+
+    // Show error
+    function showError() {
+      document.getElementById('standings-loading').style.display = 'none';
+      document.getElementById('standings-error').style.display = 'block';
+      document.getElementById('league-status').textContent = 'Error Loading Data';
+    }
+
+    // Auto-refresh standings during active competition
+    function startAutoRefresh() {
+      setInterval(() => {
+        loadLeagueData();
+      }, 30000); // Refresh every 30 seconds
+    }
+
+    // Load data when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      loadLeagueData();
+      startAutoRefresh();
+    });
+  </script>
+</body>
+</html>

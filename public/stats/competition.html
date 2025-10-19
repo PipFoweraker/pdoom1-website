@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Competition Statistics - p(Doom)1</title>
+  <meta name="description" content="Detailed competition statistics for p(Doom)1 weekly leagues. View participation metrics, performance trends, and competitive analysis.">
+  <link rel="canonical" href="https://pdoom1.com/stats/competition.html" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+  <meta name="author" content="p(Doom)1" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="p(Doom)1" />
+  <meta property="og:title" content="Competition Statistics - p(Doom)1" />
+  <meta property="og:description" content="Detailed competition statistics and performance analysis for p(Doom)1 weekly leagues." />
+  <meta property="og:url" content="https://pdoom1.com/stats/competition.html" />
+  <meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  
+  <style>
+    :root {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --bg-tertiary: #3d3d3d;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #888888;
+      --accent-primary: #00ff41;
+      --accent-secondary: #ff6b35;
+      --accent-danger: #ff4444;
+      --border-color: #444444;
+      --success-color: #4caf50;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+      --border-width: 1px;
+      --shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+      --duration-fast: 150ms;
+      --duration-base: 300ms;
+      --easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 2px solid var(--accent-primary);
+      padding: 1rem;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .designer-credit {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: normal;
+      margin-bottom: -0.2rem;
+      letter-spacing: 0.5px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+      text-decoration: none;
+      text-shadow: 0 0 10px var(--accent-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      transition: all var(--duration-base) var(--easing);
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      color: var(--accent-primary);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 20px var(--accent-primary);
+    }
+
+    .page-header .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      text-align: center;
+      transition: all var(--duration-base) var(--easing);
+    }
+
+    .stat-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 255, 65, 0.15);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-description {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .section h2 {
+      color: var(--accent-secondary);
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+
+    .section h3 {
+      color: var(--accent-primary);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+
+    .chart-placeholder {
+      background: var(--bg-tertiary);
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 3rem;
+      text-align: center;
+      color: var(--text-muted);
+      margin: 1rem 0;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-secondary);
+      font-weight: bold;
+    }
+
+    .data-table tr:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .metric-row:last-child {
+      border-bottom: none;
+    }
+
+    .metric-label {
+      color: var(--text-secondary);
+    }
+
+    .metric-value {
+      color: var(--accent-primary);
+      font-weight: bold;
+    }
+
+    .trend-indicator {
+      display: inline-block;
+      margin-left: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .trend-up {
+      color: var(--success-color);
+    }
+
+    .trend-down {
+      color: var(--accent-danger);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(45deg, var(--accent-primary), var(--success-color));
+      color: var(--bg-primary);
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-weight: bold;
+      transition: transform var(--duration-base) var(--easing), box-shadow var(--duration-base) var(--easing);
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-button);
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      .page-header h1 {
+        font-size: 2rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .data-table {
+        font-size: 0.9rem;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 0.5rem;
+      }
+    }
+  </style>
+
+  <script>
+    // Load design tokens if available
+    (async function loadTokens() {
+      try {
+        const res = await fetch('/design/tokens.json', { cache: 'no-store' });
+        if (!res.ok) return;
+        const t = await res.json();
+        const r = document.documentElement;
+        const set = (k, v) => v != null && r.style.setProperty(k, String(v));
+        if (t.colors) {
+          Object.entries({
+            '--bg-primary': t.colors.bgPrimary,
+            '--bg-secondary': t.colors.bgSecondary,
+            '--bg-tertiary': t.colors.bgTertiary,
+            '--text-primary': t.colors.textPrimary,
+            '--text-secondary': t.colors.textSecondary,
+            '--text-muted': t.colors.textMuted,
+            '--accent-primary': t.colors.accentPrimary,
+            '--accent-secondary': t.colors.accentSecondary,
+            '--accent-danger': t.colors.accentDanger,
+            '--border-color': t.colors.border,
+            '--success-color': t.colors.success
+          }).forEach(([k, v]) => set(k, v));
+        }
+        if (t.shape) {
+          Object.entries({
+            '--radius-sm': t.shape.radiusSm,
+            '--radius-md': t.shape.radiusMd,
+            '--radius-lg': t.shape.radiusLg,
+            '--border-width': t.shape.borderWidth,
+            '--shadow-button': t.shape.shadowButton
+          }).forEach(([k, v]) => set(k, v));
+        }
+        if (t.motion) {
+          Object.entries({
+            '--duration-fast': t.motion.durationFast,
+            '--duration-base': t.motion.durationBase,
+            '--easing': t.motion.easing
+          }).forEach(([k, v]) => set(k, v));
+        }
+      } catch (e) {
+        // ignore; defaults apply
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <nav role="navigation" aria-label="Main navigation">
+        <div class="logo-container">
+          <div class="designer-credit">Pip Foweraker's</div>
+          <a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
+        </div>
+        <ul class="nav-links" role="menubar">
+          <li role="none"><a href="/" role="menuitem">Game</a></li>
+          <li role="none"><a href="/league/" role="menuitem">Weekly League</a></li>
+          <li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
+          <li role="none"><a href="/stats/" role="menuitem">Game Stats</a></li>
+          <li role="none"><a href="/stats/competition.html" role="menuitem" aria-current="page" style="color: var(--accent-primary);">Competition Stats</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>Competition Statistics</h1>
+      <p class="subtitle">Detailed performance analysis and metrics for weekly league competitions</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="stats-grid" id="key-metrics">
+      <div class="stat-card">
+        <span class="stat-number" id="total-weeks">-</span>
+        <div class="stat-label">Total Weeks</div>
+        <div class="stat-description">Completed league seasons</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="total-participants">-</span>
+        <div class="stat-label">Total Participants</div>
+        <div class="stat-description">Unique players across all weeks</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="avg-weekly-participants">-</span>
+        <div class="stat-label">Avg Weekly Players</div>
+        <div class="stat-description">Average participants per week</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="total-submissions">-</span>
+        <div class="stat-label">Total Submissions</div>
+        <div class="stat-description">All time game submissions</div>
+      </div>
+    </div>
+
+    <!-- Weekly Participation Metrics -->
+    <div class="section">
+      <h2>📊 Weekly Participation</h2>
+      <div class="loading" id="participation-loading">Loading participation data</div>
+      <div id="participation-content" style="display: none;">
+        <div class="metric-row">
+          <span class="metric-label">Current Week Participants</span>
+          <span class="metric-value" id="current-participants">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Current Week Submissions</span>
+          <span class="metric-value" id="current-submissions">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Participation Trend</span>
+          <span class="metric-value">
+            <span id="participation-trend">-</span>
+            <span class="trend-indicator" id="trend-indicator"></span>
+          </span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Peak Week Participants</span>
+          <span class="metric-value" id="peak-participants">-</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Average Scores and Trends -->
+    <div class="section">
+      <h2>📈 Performance Trends</h2>
+      <div id="trends-content">
+        <h3>Score Analysis</h3>
+        <div class="metric-row">
+          <span class="metric-label">Current Week Avg Score</span>
+          <span class="metric-value" id="current-avg-score">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">All-Time Avg Score</span>
+          <span class="metric-value" id="alltime-avg-score">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Highest Score Ever</span>
+          <span class="metric-value" id="highest-score-ever">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Current Week High Score</span>
+          <span class="metric-value" id="current-high-score">-</span>
+        </div>
+
+        <div class="chart-placeholder">
+          <p>📊 Performance Chart</p>
+          <p style="margin-top: 0.5rem; font-size: 0.9rem;">Visual trends coming soon</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Competitive Seed Performance -->
+    <div class="section">
+      <h2>🎯 Seed Performance Analysis</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+        Performance metrics for competitive weekly seeds
+      </p>
+      <div id="seed-performance">
+        <div class="metric-row">
+          <span class="metric-label">Current Week Seed</span>
+          <span class="metric-value" id="current-seed" style="font-size: 0.85rem;">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Seed Difficulty Rating</span>
+          <span class="metric-value" id="seed-difficulty">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Average Doom Risk</span>
+          <span class="metric-value" id="avg-doom-risk">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Average Turn Survival</span>
+          <span class="metric-value" id="avg-turn-survival">-</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Player Retention Stats -->
+    <div class="section">
+      <h2>👥 Player Engagement</h2>
+      <div class="metric-row">
+        <span class="metric-label">Returning Players (Week-over-Week)</span>
+        <span class="metric-value" id="returning-players">-</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">New Players This Week</span>
+        <span class="metric-value" id="new-players">-</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Player Retention Rate</span>
+        <span class="metric-value" id="retention-rate">-</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Active Streak Leaders</span>
+        <span class="metric-value" id="streak-leaders">-</span>
+      </div>
+
+      <div class="chart-placeholder">
+        <p>📊 Engagement Trends Chart</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Player activity visualization coming soon</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="text-align: center; margin-top: 3rem;">
+      <a href="/league/" class="cta-button" style="margin-right: 1rem;">View Current Week</a>
+      <a href="/leaderboard/" class="cta-button" style="background: linear-gradient(45deg, var(--accent-secondary), var(--accent-danger));">Full Leaderboard</a>
+    </div>
+  </main>
+
+  <script>
+    // API Configuration
+    const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:8080'
+      : '';
+
+    // Load competition statistics
+    async function loadCompetitionStats() {
+      try {
+        // Load current league data
+        const leagueResponse = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' })
+          .catch(() => fetch(`${API_BASE_URL}/api/league/current`, { cache: 'no-store' }));
+
+        if (!leagueResponse.ok) {
+          throw new Error('Failed to load league data');
+        }
+
+        const leagueData = await leagueResponse.json();
+
+        // Load league status for historical data
+        const statusResponse = await fetch(`${API_BASE_URL}/api/league/status`, { cache: 'no-store' })
+          .catch(() => ({ ok: false }));
+
+        let statusData = null;
+        if (statusResponse.ok) {
+          statusData = await statusResponse.json();
+        }
+
+        displayStatistics(leagueData, statusData);
+      } catch (error) {
+        console.error('Failed to load competition stats:', error);
+        showPlaceholderData();
+      }
+    }
+
+    // Display statistics
+    function displayStatistics(leagueData, statusData) {
+      // Key metrics
+      document.getElementById('total-weeks').textContent = statusData?.total_weeks || '1';
+      document.getElementById('total-participants').textContent = 
+        (leagueData.meta?.total_participants || 0).toLocaleString();
+      document.getElementById('avg-weekly-participants').textContent = 
+        statusData?.avg_weekly_participants || (leagueData.meta?.total_participants || 0);
+      document.getElementById('total-submissions').textContent = 
+        (leagueData.meta?.total_submissions || 0).toLocaleString();
+
+      // Participation metrics
+      document.getElementById('current-participants').textContent = 
+        (leagueData.meta?.total_participants || 0).toLocaleString();
+      document.getElementById('current-submissions').textContent = 
+        (leagueData.meta?.total_submissions || 0).toLocaleString();
+      
+      const trend = calculateTrend(leagueData.meta?.total_participants || 0, statusData?.avg_weekly_participants || 0);
+      document.getElementById('participation-trend').textContent = trend.text;
+      const trendIndicator = document.getElementById('trend-indicator');
+      trendIndicator.textContent = trend.arrow;
+      trendIndicator.className = `trend-indicator ${trend.direction}`;
+
+      document.getElementById('peak-participants').textContent = 
+        statusData?.peak_participants || (leagueData.meta?.total_participants || 0);
+
+      // Performance trends
+      const avgScore = leagueData.statistics?.average_score || 0;
+      document.getElementById('current-avg-score').textContent = avgScore.toFixed(1);
+      document.getElementById('alltime-avg-score').textContent = 
+        (statusData?.avg_score || avgScore).toFixed(1);
+      document.getElementById('highest-score-ever').textContent = 
+        (statusData?.highest_score || leagueData.statistics?.highest_score || 0).toLocaleString();
+      document.getElementById('current-high-score').textContent = 
+        (leagueData.statistics?.highest_score || 0).toLocaleString();
+
+      // Seed performance
+      document.getElementById('current-seed').textContent = leagueData.seed || 'Unknown';
+      document.getElementById('seed-difficulty').textContent = calculateDifficulty(leagueData);
+      
+      const avgDoom = calculateAvgDoom(leagueData.entries || []);
+      document.getElementById('avg-doom-risk').textContent = `${avgDoom.toFixed(1)}%`;
+      
+      const avgTurns = calculateAvgTurns(leagueData.entries || []);
+      document.getElementById('avg-turn-survival').textContent = avgTurns.toFixed(1);
+
+      // Player engagement (placeholder data)
+      document.getElementById('returning-players').textContent = 
+        Math.floor((leagueData.statistics?.unique_players || 0) * 0.6) || 'N/A';
+      document.getElementById('new-players').textContent = 
+        Math.floor((leagueData.statistics?.unique_players || 0) * 0.4) || 'N/A';
+      document.getElementById('retention-rate').textContent = '60%';
+      document.getElementById('streak-leaders').textContent = 'Coming Soon';
+
+      // Show participation content
+      document.getElementById('participation-loading').style.display = 'none';
+      document.getElementById('participation-content').style.display = 'block';
+    }
+
+    // Calculate trend
+    function calculateTrend(current, average) {
+      if (!average || average === 0) {
+        return { text: 'Baseline', arrow: '→', direction: '' };
+      }
+
+      const diff = current - average;
+      const percentChange = (diff / average * 100).toFixed(0);
+
+      if (diff > 0) {
+        return { 
+          text: `+${percentChange}%`, 
+          arrow: '↑', 
+          direction: 'trend-up' 
+        };
+      } else if (diff < 0) {
+        return { 
+          text: `${percentChange}%`, 
+          arrow: '↓', 
+          direction: 'trend-down' 
+        };
+      } else {
+        return { text: 'Stable', arrow: '→', direction: '' };
+      }
+    }
+
+    // Calculate difficulty rating
+    function calculateDifficulty(leagueData) {
+      const entries = leagueData.entries || [];
+      if (entries.length === 0) return 'N/A';
+
+      const avgDoom = calculateAvgDoom(entries);
+      
+      if (avgDoom < 30) return 'Easy';
+      if (avgDoom < 50) return 'Medium';
+      if (avgDoom < 70) return 'Hard';
+      return 'Extreme';
+    }
+
+    // Calculate average doom
+    function calculateAvgDoom(entries) {
+      if (entries.length === 0) return 0;
+      const totalDoom = entries.reduce((sum, entry) => sum + (entry.final_doom || 0), 0);
+      return totalDoom / entries.length;
+    }
+
+    // Calculate average turns
+    function calculateAvgTurns(entries) {
+      if (entries.length === 0) return 0;
+      const totalTurns = entries.reduce((sum, entry) => sum + (entry.level_reached || 0), 0);
+      return totalTurns / entries.length;
+    }
+
+    // Show placeholder data when API fails
+    function showPlaceholderData() {
+      document.getElementById('total-weeks').textContent = '1';
+      document.getElementById('total-participants').textContent = '0';
+      document.getElementById('avg-weekly-participants').textContent = '0';
+      document.getElementById('total-submissions').textContent = '0';
+      
+      document.getElementById('participation-loading').style.display = 'none';
+      document.getElementById('participation-content').style.display = 'block';
+      
+      document.getElementById('current-participants').textContent = '0';
+      document.getElementById('current-submissions').textContent = '0';
+      document.getElementById('participation-trend').textContent = 'N/A';
+      document.getElementById('peak-participants').textContent = '0';
+      
+      document.getElementById('current-avg-score').textContent = '0';
+      document.getElementById('alltime-avg-score').textContent = '0';
+      document.getElementById('highest-score-ever').textContent = '0';
+      document.getElementById('current-high-score').textContent = '0';
+      
+      document.getElementById('current-seed').textContent = 'No active week';
+      document.getElementById('seed-difficulty').textContent = 'N/A';
+      document.getElementById('avg-doom-risk').textContent = 'N/A';
+      document.getElementById('avg-turn-survival').textContent = 'N/A';
+      
+      document.getElementById('returning-players').textContent = 'N/A';
+      document.getElementById('new-players').textContent = 'N/A';
+      document.getElementById('retention-rate').textContent = 'N/A';
+      document.getElementById('streak-leaders').textContent = 'N/A';
+    }
+
+    // Load data when page loads
+    document.addEventListener('DOMContentLoaded', loadCompetitionStats);
+  </script>
+</body>
+</html>
