@@ -11,6 +11,30 @@ Environment (on Netlify):
 - GITHUB_REPO: owner/repo (e.g., PipFoweraker/pdoom1-website)
 - ALLOWED_ORIGIN: one or more origins allowed for CORS (comma or space separated). Wildcards supported, e.g. `https://*.netlify.app`.
 - DRY_RUN: optional flag to skip creating issues for smoke tests
+- HCAPTCHA_SITEKEY: optional hCaptcha site key. If set, enables hCaptcha validation.
+- HCAPTCHA_SECRET: optional hCaptcha secret key. Required if HCAPTCHA_SITEKEY is set.
+
+## hCaptcha Setup (Optional)
+
+To enable spam protection with hCaptcha:
+
+1. **Get hCaptcha credentials**:
+   - Sign up at https://hcaptcha.com
+   - Create a new site
+   - Copy the Site Key and Secret Key
+
+2. **Configure Netlify environment**:
+   - In Netlify dashboard, go to Site Settings → Environment Variables
+   - Add `HCAPTCHA_SITEKEY` with your site key
+   - Add `HCAPTCHA_SECRET` with your secret key
+
+3. **Update frontend form**:
+   - Add hCaptcha widget to your bug report form
+   - Include the hCaptcha token in the POST request body as `hcaptchaToken`
+
+4. **Behavior**:
+   - If `HCAPTCHA_SITEKEY` is NOT set: hCaptcha validation is disabled (backward compatible)
+   - If `HCAPTCHA_SITEKEY` IS set: hCaptcha validation is required, requests without a valid token will return 400
 
 Request body:
 ```
@@ -24,6 +48,7 @@ Request body:
   "buildId": "string?",
   "os": "string?",
   "logs": "string?",
+  "hcaptchaToken": "string? (required if HCAPTCHA_SITEKEY is configured)",
   "attachment": {
     "filename": "string",
     "content": "base64 encoded string",
