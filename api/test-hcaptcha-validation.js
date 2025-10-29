@@ -4,8 +4,14 @@
 
 const { handler } = require('../netlify/functions/report-bug.js');
 
-// Mock environment variables
-const originalEnv = { ...process.env };
+// Save original environment variables
+const originalEnv = {};
+const envKeysToSave = ['HCAPTCHA_SITEKEY', 'HCAPTCHA_SECRET', 'DRY_RUN', 'GITHUB_DISPATCH_TOKEN', 'GITHUB_REPO'];
+envKeysToSave.forEach(key => {
+  if (key in process.env) {
+    originalEnv[key] = process.env[key];
+  }
+});
 
 async function testWithoutHCaptcha() {
   console.log('\n=== Test 1: Without hCaptcha (backward compatible) ===');
@@ -125,7 +131,13 @@ async function runTests() {
     process.exit(1);
   } finally {
     // Restore environment
-    process.env = originalEnv;
+    envKeysToSave.forEach(key => {
+      if (key in originalEnv) {
+        process.env[key] = originalEnv[key];
+      } else {
+        delete process.env[key];
+      }
+    });
   }
 }
 
