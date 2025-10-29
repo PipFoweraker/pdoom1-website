@@ -45,10 +45,39 @@ Workflow documentation: [.github/workflows/bug-report.yml](../.github/workflows/
 - Submit again → confirm a GitHub Issue is created via the bug-report workflow.
 
 ## 6) Optional hardening and polish
-- Add hCaptcha on the form if spam appears; validate token in `netlify/functions/report-bug.js`.
+- **Add hCaptcha** for spam protection (recommended):
+  1. Sign up at https://hcaptcha.com and create a new site
+  2. In Netlify → Environment Variables, add:
+     - `HCAPTCHA_SITEKEY`: your hCaptcha site key
+     - `HCAPTCHA_SECRET`: your hCaptcha secret key
+  3. Add hCaptcha widget to your bug report form (see frontend integration below)
+  4. The backend will automatically validate tokens when `HCAPTCHA_SITEKEY` is set
+  5. **Fallback toggle**: To disable hCaptcha validation, simply remove or unset `HCAPTCHA_SITEKEY` in Netlify
 - Restrict `ALLOWED_ORIGIN` to only your production domain (remove wildcards after testing).
 - Rotate the GitHub PAT periodically; consider a GitHub App for repository_dispatch.
 - Keep `public/design/tokens.json` as the game-driven style surface; automate updates from the game pipeline.
+
+### Frontend hCaptcha Integration
+
+To add hCaptcha to the bug report form:
+
+1. Add hCaptcha script to your HTML:
+   ```html
+   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+   ```
+
+2. Add hCaptcha widget to your form:
+   ```html
+   <div class="h-captcha" data-sitekey="YOUR_SITEKEY_HERE"></div>
+   ```
+
+3. Include the token in your POST request:
+   ```javascript
+   const hcaptchaToken = document.querySelector('[name="h-captcha-response"]')?.value;
+   bugData.hcaptchaToken = hcaptchaToken;
+   ```
+
+See `docs/03-integrations/bug-reporting.md` for complete API documentation.
 
 ## Troubleshooting
 - CORS 403/blocked: ensure `ALLOWED_ORIGIN` exactly matches your DreamHost domain (scheme + host). For previews, temporarily include `https://*.netlify.app`.

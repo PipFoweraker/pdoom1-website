@@ -8,6 +8,8 @@
 // Optional:
 // - ALLOWED_ORIGIN: CORS allowlist for browser submissions
 // - DRY_RUN: if set, skips the GitHub API call (useful for local tests)
+// - HCAPTCHA_SITEKEY: hCaptcha site key (if set, enables hCaptcha validation)
+// - HCAPTCHA_SECRET: hCaptcha secret key (required if HCAPTCHA_SITEKEY is set)
 
 const crypto = require('crypto');
 
@@ -105,6 +107,34 @@ function sanitize(input) {
   const allowed = ['bug', 'feature', 'documentation', 'performance'];
   if (!allowed.includes(out.type)) out.type = 'bug';
   return out;
+}
+
+async function verifyHCaptcha(token, ip) {
+  const secret = process.env.HCAPTCHA_SECRET;
+  if (!secret) {
+    throw new Error('Server not configured: missing HCAPTCHA_SECRET');
+  }
+
+  const params = new URLSearchParams({
+    secret: secret,
+    response: token,
+    remoteip: ip
+  });
+
+  const res = await fetch('https://hcaptcha.com/siteverify', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params.toString(),
+  });
+
+  if (!res.ok) {
+    throw new Error(`hCaptcha verification failed: ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data.success === true;
 }
 
 async function dispatchToGitHub(payload) {
@@ -207,6 +237,27 @@ exports.handler = async function handler(event) {
     body = JSON.parse(event.body || '{}');
   } catch (e) {
     return bad(400, 'Invalid JSON body', origin);
+  }
+
+  // Verify hCaptcha if configured
+  const hcaptchaSitekey = process.env.HCAPTCHA_SITEKEY;
+  if (hcaptchaSitekey) {
+    const token = body.hcaptchaToken;
+    if (!token) {
+      return bad(400, 'hCaptcha token required', origin);
+    }
+
+    const ip = event.headers['x-forwarded-for']?.split(',')[0]?.trim() || event.ip || 'unknown';
+    
+    try {
+      const isValid = await verifyHCaptcha(token, ip);
+      if (!isValid) {
+        return bad(400, 'Invalid hCaptcha token', origin);
+      }
+    } catch (err) {
+      console.error('hCaptcha verification error:', err.message);
+      return bad(400, 'hCaptcha verification failed', origin);
+    }
   }
 
   const ip = event.headers['x-forwarded-for']?.split(',')[0]?.trim() || event.ip || 'unknown';
