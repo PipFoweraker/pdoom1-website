@@ -7,6 +7,114 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1] - 2025-10-30
+
+### Added - CI/CD & Accessibility
+
+**Auto-Deployment Infrastructure**
+- **auto-deploy-on-push.yml**: Automatic deployment to DreamHost on every push to main
+  - Triggers only when `public/` files or sitemap generator changes
+  - Full rsync deployment with detailed logging
+  - Error handling and secret validation
+  - Estimated 2-3 minute deployment time
+- **Workflows README**: Comprehensive guide to all deployment and automation workflows
+  - Documents all 4 deployment methods (auto, version-aware, simple, manual)
+  - Setup instructions for DreamHost secrets
+  - Cost analysis (well within GitHub free tier)
+  - Troubleshooting guide
+
+**Accessibility Improvements (WCAG 2.1 AA Compliance)**
+- **Accessibility Audit Document**: Comprehensive 200+ line audit (`docs/01-development/ACCESSIBILITY_AUDIT.md`)
+  - Full WCAG 2.1 AA compliance checklist
+  - Color contrast analysis for all theme colors
+  - Testing recommendations (axe, WAVE, Lighthouse, pa11y)
+  - Action items prioritized by impact
+  - Overall rating: 4/5 stars
+- **Fixed text-muted contrast**: Changed from #888888 (3.9:1 - FAILS) to #aaaaaa (5.6:1 - PASSES AA)
+  - Improves readability for vision-impaired users
+  - Maintains design aesthetic while meeting standards
+
+**Existing Accessibility Features Verified**
+- ✅ Skip-to-content link with proper focus handling
+- ✅ Comprehensive ARIA labels and semantic HTML
+- ✅ Enhanced focus indicators (2px outline + offset)
+- ✅ `prefers-reduced-motion` support (disables animations)
+- ✅ `prefers-contrast: high` mode (increased contrast colors)
+- ✅ Keyboard navigation throughout site
+- ✅ Form validation with aria-invalid states
+
+**Planning & Documentation**
+- **pdoom-data Integration Plan**: 400+ line comprehensive integration roadmap
+  - Event log streaming architecture
+  - Global leaderboards migration strategy
+  - User authentication system design
+  - Privacy & GDPR compliance framework
+  - 4-phase implementation timeline
+  - Risk assessment and mitigation strategies
+
+### Changed
+
+**UI Improvements**
+- Removed "Home" breadcrumb from navigation (cleaner header)
+- Reduced padding by 20% across all major layout elements:
+  - Header, nav, main, hero, sections, cards, grids, forms, footer
+  - Inline padding styles in dynamic sections
+  - Creates denser, more professional layout
+  - Improves mobile-friendliness with tighter spacing
+
+**Documentation Updates**
+- Updated README to v1.1.1 with current features
+- Added "Next: Phase 2 - pdoom-data Integration" section
+- Documented auto-deployment setup
+- Listed all accessibility achievements
+
+### Infrastructure
+
+**Continuous Deployment**
+```
+Developer pushes to main
+  → GitHub Actions detects public/ changes
+    → Runs auto-deploy-on-push.yml
+      → Generates sitemap
+        → rsync to DreamHost
+          → Site live at https://pdoom1.com
+```
+
+**Cost Analysis**
+- GitHub Actions: ~5-10 deployments/day × 2 min = 300-600 min/month
+- Well within free tier (2,000 minutes/month)
+- DreamHost bandwidth: Included with hosting
+- Total cost: $0 for automation infrastructure
+
+### Accessibility
+
+**WCAG 2.1 AA Compliance Status**
+
+Perceivable:
+- ✅ 1.1.1 Non-text Content (Alt text)
+- ✅ 1.3.1 Info and Relationships (Semantic HTML, ARIA)
+- ✅ 1.4.3 Contrast (Minimum) - Now passes with 5.6:1
+- ✅ 1.4.4 Resize Text (200% zoom works)
+- ✅ 1.4.10 Reflow (Responsive design)
+
+Operable:
+- ✅ 2.1.1 Keyboard (Full keyboard access)
+- ✅ 2.1.2 No Keyboard Trap
+- ✅ 2.4.1 Bypass Blocks (Skip link)
+- ✅ 2.4.2 Page Titled
+- ✅ 2.4.7 Focus Visible
+
+Understandable:
+- ✅ 3.1.1 Language of Page
+- ✅ 3.3.1 Error Identification
+- ✅ 3.3.2 Labels or Instructions
+
+Robust:
+- ✅ 4.1.2 Name, Role, Value
+- ✅ 4.1.3 Status Messages
+
+---
+
 ## [1.1.0] - 2025-10-30
 
 ### Added - Automation & Dynamic Front Page

@@ -1,6 +1,6 @@
-# p(Doom)1 Website v1.1.0
+# p(Doom)1 Website v1.1.1
 
-Professional website with automated weekly league system, dynamic front page, and scheduled maintenance for the p(Doom)1 game.
+Professional website with auto-deployment, WCAG AA accessibility, weekly league system, and real-time data loading for the p(Doom)1 game.
 
 ## Features
 
@@ -99,8 +99,11 @@ npm run integration:test
 
 ## Version Status
 
-**v1.1.0 - AUTOMATION & DYNAMIC UI**
-- ✅ GitHub Actions automation: LIVE (3 workflows running)
+**v1.1.1 - CI/CD & ACCESSIBILITY** (Current)
+- ✅ Auto-deployment: LIVE (deploys on every push to main)
+- ✅ WCAG 2.1 AA compliance: ACHIEVED (4/5 star rating)
+- ✅ Optimized UI: 20% reduced padding for denser layout
+- ✅ GitHub Actions automation: LIVE (4 workflows running)
 - ✅ Dynamic front page: DEPLOYED (real-time data loading)
 - ✅ Enhanced monitoring dashboard: OPERATIONAL
 - ✅ Weekly league infrastructure: COMPLETE
@@ -119,12 +122,17 @@ npm run integration:test
 
 See [API Deployment Guide](docs/02-deployment/API_DEPLOYMENT_GUIDE.md) for setup.
 
-## Next: Phase 2
+## Next: Phase 2 - pdoom-data Integration
 
-See issues for upcoming features:
-- Real-time score submission from game
-- Enhanced frontend dashboard
-- Database migration for scale
+**Target:** v1.2.0 (December 2025)
+
+Planned integrations with [pdoom-data](https://github.com/PipFoweraker/pdoom-data):
+- 🎯 **Event log streaming** from game sessions
+- 🏆 **Global leaderboards** with PostgreSQL persistence
+- 📊 **Advanced analytics** and player insights
+- 🔐 **User authentication** (optional accounts)
+
+See [pdoom-data Integration Plan](docs/03-integrations/pdoom-data-integration-plan.md) for detailed roadmap.
 
 ## Automation
 

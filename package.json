@@ -1,7 +1,7 @@
 {
   "name": "pdoom1-website",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "scripts": {
     "start": "python -m http.server -d public 5173",
     "test:bug": "node api/test-report-bug.js",
