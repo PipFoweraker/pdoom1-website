@@ -1,6 +1,15 @@
 {
-  "last_updated": null,
-  "jobs": {},
+  "last_updated": "2025-10-30T06:11:02.688792Z",
+  "jobs": {
+    "auto-update-data": {
+      "last_run": "2025-10-30T06:11:02.688792Z",
+      "last_success": "2025-10-30T06:11:02.688792Z",
+      "last_failure": null,
+      "total_runs": 1,
+      "success_count": 1,
+      "failure_count": 0
+    }
+  },
   "system_info": {
     "automation_version": "1.0.0",
     "monitoring_dashboard": "/monitoring/",
