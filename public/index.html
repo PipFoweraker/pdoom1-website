@@ -68,7 +68,7 @@
 		header {
 			background: var(--bg-secondary);
 			border-bottom: 2px solid var(--accent-primary);
-			padding: 0.64rem 0;
+			padding: 0.4rem 0;
 			position: sticky;
 			top: 0;
 			z-index: 100;
@@ -80,45 +80,52 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			padding: 0 1.6rem;
+			padding: 0 1rem;
+			gap: 0.5rem;
+			flex-wrap: nowrap;
 		}
 
 		.logo-container {
 			display: flex;
 			flex-direction: row;
 			align-items: center;
-			gap: 0.5rem;
+			gap: 0.4rem;
+			flex-shrink: 0;
 		}
 
 		.designer-credit {
-			font-size: 0.85rem;
+			font-size: 0.75rem;
 			color: var(--text-muted);
 			font-weight: normal;
-			letter-spacing: 0.5px;
+			letter-spacing: 0.3px;
+			white-space: nowrap;
 		}
 
 		.logo {
-			font-size: 1.5rem;
+			font-size: 1.3rem;
 			font-weight: bold;
 			color: var(--accent-primary);
 			text-decoration: none;
 			text-shadow: 0 0 10px var(--accent-primary);
+			white-space: nowrap;
 		}
 
 		.nav-links {
 			display: flex;
-			gap: 2rem;
+			gap: 0.8rem;
 			list-style: none;
+			flex-wrap: nowrap;
 		}
 
 		.nav-links a {
 			color: var(--text-secondary);
 			text-decoration: none;
 			transition: color var(--duration-base) var(--easing);
-			padding: 0.5rem 1rem;
+			padding: 0.3rem 0.6rem;
 			border: 1px solid transparent;
-			font-size: 1.1rem;
+			font-size: 0.9rem;
 			font-weight: 600;
+			white-space: nowrap;
 		}
 
 		.nav-links a:hover {
@@ -182,29 +189,29 @@
 		main {
 			max-width: 1200px;
 			margin: 0 auto;
-			padding: 1.6rem;
+			padding: 1rem;
 		}
 
 		.hero {
 			text-align: center;
-			padding: 2rem 0;
+			padding: 1.5rem 1rem 1.2rem 1rem;
 			background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
 			border-radius: var(--radius-lg, 10px);
-			margin-bottom: 2.4rem;
+			margin-bottom: 1.5rem;
 			border: var(--border-width, 1px) solid var(--border-color);
 		}
 
 		.hero h1 {
-			font-size: 3rem;
-			margin-bottom: 1rem;
+			font-size: 2.5rem;
+			margin-bottom: 0.5rem;
 			color: var(--accent-primary);
 			text-shadow: 0 0 20px var(--accent-primary);
 		}
 
 		.hero .subtitle {
-			font-size: 1.2rem;
+			font-size: 1rem;
 			color: var(--text-secondary);
-			margin-bottom: 2rem;
+			margin-bottom: 0.8rem;
 		}
 
 		.cta-button {
@@ -231,28 +238,28 @@
 			background: var(--bg-secondary);
 			border: var(--border-width, 1px) solid var(--border-color);
 			border-radius: var(--radius-md, 6px);
-			padding: 1.6rem;
-			margin-bottom: 1.6rem;
+			padding: 1rem;
+			margin-bottom: 1.2rem;
 		}
 
 		.section h2 {
 			color: var(--accent-secondary);
-			margin-bottom: 1rem;
-			font-size: 1.8rem;
+			margin-bottom: 0.8rem;
+			font-size: 1.5rem;
 		}
 
 		.grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-			gap: 1.6rem;
-			margin-top: 1.6rem;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 1rem;
+			margin-top: 1rem;
 		}
 
 		.card {
 			background: var(--bg-tertiary);
 			border: var(--border-width, 1px) solid var(--border-color);
 			border-radius: var(--radius-md, 6px);
-			padding: 1.2rem;
+			padding: 1rem;
 			transition: transform var(--duration-base) var(--easing), border-color var(--duration-base) var(--easing);
 		}
 
@@ -263,14 +270,14 @@
 
 		.card h3 {
 			color: var(--accent-primary);
-			margin-bottom: 1rem;
+			margin-bottom: 0.6rem;
 		}
 
 		.stats {
 			display: flex;
 			justify-content: space-around;
 			text-align: center;
-			padding: 1.6rem 0;
+			padding: 0.8rem 0;
 		}
 
 		.stat {
@@ -330,13 +337,13 @@
 			background: var(--bg-secondary);
 			border: var(--border-width, 1px) solid var(--border-color);
 			border-radius: var(--radius-md, 6px);
-			padding: 1.6rem;
+			padding: 1rem;
 			max-width: 600px;
-			margin: 1.6rem auto;
+			margin: 1rem auto;
 		}
 
 		.form-group {
-			margin-bottom: 1.2rem;
+			margin-bottom: 0.8rem;
 		}
 
 		label {
@@ -422,8 +429,8 @@
 			background: var(--bg-secondary);
 			border-top: 2px solid var(--accent-primary);
 			text-align: center;
-			padding: 1.6rem;
-			margin-top: 3.2rem;
+			padding: 1rem;
+			margin-top: 2rem;
 			color: var(--text-muted);
 		}
 
@@ -776,18 +783,18 @@
 	<main role="main" id="main-content">
 		<section class="hero" id="home" role="banner" aria-labelledby="main-heading">
 			<h1 id="main-heading">p(Doom)1</h1>
-			<p class="subtitle">A satirical meta-strategy game about AI Safety</p>
-			<p style="margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 1.1rem;">
+			<p class="subtitle">Practice saving the world from deadly AI through bureaucracy</p>
+			<p style="margin-bottom: 0.8rem; color: var(--text-secondary); font-size: 0.95rem;">
 				<span class="status-indicator status-active"></span>
 				Currently in Development - Alpha Release Available
 			</p>
 
 			<!-- Download Options - Primary CTAs -->
-			<div class="download-ctas" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem;">
-				<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" style="font-size: 1.1rem; padding: 1rem 2rem;" target="_blank" rel="noopener">
+			<div class="download-ctas" style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.8rem;">
+				<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" style="font-size: 1rem; padding: 0.8rem 1.5rem;" target="_blank" rel="noopener">
 					<span class="loading-placeholder">Download Latest Release</span>
 				</a>
-				<a href="https://github.com/PipFoweraker/pdoom1" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary); font-size: 1.1rem; padding: 1rem 2rem;" target="_blank" rel="noopener">
+				<a href="https://github.com/PipFoweraker/pdoom1" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary); font-size: 1rem; padding: 0.8rem 1.5rem;" target="_blank" rel="noopener">
 					View on GitHub →
 				</a>
 			</div>
@@ -810,20 +817,20 @@
 			</div>
 			-->
 
-			<p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;">
+			<p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
 				Windows, macOS, Linux | Free & Open Source
 			</p>
 		</section>
 
 		<!-- Live Game Stats & Status - Combined Section -->
 		<section class="section" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(0, 255, 65, 0.05) 100%); border-left: 4px solid var(--accent-primary);">
-			<h2 style="color: var(--accent-primary); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+			<h2 style="color: var(--accent-primary); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
 				<span class="status-indicator status-active" style="animation: pulse 2s infinite;"></span>
 				Live Game Stats & Status
 			</h2>
 
 			<!-- Top Row: Key Game Stats -->
-			<div class="stats" role="complementary" aria-label="Game statistics" style="padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+			<div class="stats" role="complementary" aria-label="Game statistics" style="padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1rem;">
 				<a href="/game-stats/" class="stat-link" role="img" aria-label="This week's baseline doom percentage" style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 1rem; text-align: center;">
 					<div class="stat">
 						<span class="stat-number loading-number" aria-hidden="true" style="font-size: 2rem; color: var(--accent-primary);">--</span>
@@ -891,8 +898,8 @@
 			</div>
 
 			<!-- View More CTA -->
-			<div style="text-align: center; margin-top: 1.2rem;">
-				<a href="/game-stats/" class="cta-button" style="display: inline-block; font-size: 0.85rem; padding: 0.6rem 1.2rem;">
+			<div style="text-align: center; margin-top: 0.8rem;">
+				<a href="/game-stats/" class="cta-button" style="display: inline-block; font-size: 0.85rem; padding: 0.5rem 1rem;">
 					📊 View Detailed Statistics →
 				</a>
 			</div>
@@ -902,7 +909,7 @@
 
 		<section class="section" id="about">
 			<h2>About the Game</h2>
-			<p style="margin-bottom: 1.5rem;">p(Doom)1 is a satirical meta-strategy game inspired by Papers Please, Pandemic, and clicker games. Navigate the complex world of AI safety research while managing resources, competing with other AI labs, and trying to prevent catastrophic outcomes. Learn more about real AI Safety research at <a href="https://stampy.ai" target="_blank" rel="noopener" style="color: var(--accent-primary);">Stampy.ai</a>.</p>
+			<p style="margin-bottom: 1rem;">p(Doom)1 is a satirical meta-strategy game inspired by Papers Please, Pandemic, and clicker games. Navigate the complex world of AI safety research while managing resources, competing with other AI labs, and trying to prevent catastrophic outcomes. Learn more about real AI Safety research at <a href="https://stampy.ai" target="_blank" rel="noopener" style="color: var(--accent-primary);">Stampy.ai</a>.</p>
 
 			<!-- Tabbed Content -->
 			<div class="about-tabs">
