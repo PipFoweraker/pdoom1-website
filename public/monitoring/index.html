@@ -243,7 +243,11 @@
     
     <div class="container">
         <h1>System Monitoring</h1>
-        
+
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">
+            Admin & Operations Dashboard - Infrastructure monitoring and automation status
+        </p>
+
         <div class="status-grid">
             <div class="status-card" id="website-status">
                 <div class="status-header">
@@ -301,7 +305,31 @@
                 </div>
             </div>
         </div>
-        
+
+        <!-- Automation Status Section -->
+        <div class="recent-checks" style="margin-top: 3rem;">
+            <h2>🤖 Automation Status</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                GitHub Actions automated tasks - scheduled jobs running infrastructure updates
+            </p>
+            <div id="automation-status">
+                Loading automation status...
+            </div>
+        </div>
+
+        <!-- Weekly League Management Section -->
+        <div class="recent-checks">
+            <h2>🏆 Weekly League Management</h2>
+            <div id="league-status">
+                Loading league status...
+            </div>
+            <div style="text-align: center; margin-top: 1rem;">
+                <button class="refresh-btn" onclick="triggerLeagueRollover()" id="league-rollover-btn">
+                    Manually Trigger League Rollover
+                </button>
+            </div>
+        </div>
+
         <div class="recent-checks">
             <h2>Recent Health Checks</h2>
             <div id="recent-checks-list">
@@ -489,14 +517,14 @@
         async function updateRecentChecks() {
             const healthData = await loadHealthData();
             const container = document.getElementById('recent-checks-list');
-            
+
             if (healthData && healthData.results) {
                 const recentChecks = healthData.results.slice(-10).reverse();
-                
+
                 container.innerHTML = recentChecks.map(check => {
                     const statusClass = check.passed ? 'pass' : (check.is_warning ? 'warn' : 'fail');
                     const statusText = check.passed ? 'PASS' : (check.is_warning ? 'WARN' : 'FAIL');
-                    
+
                     return `
                         <div class="check-item">
                             <span class="check-name">${check.test}</span>
@@ -507,6 +535,119 @@
             } else {
                 container.innerHTML = '<div class="check-item"><span class="check-name">No health check data available</span></div>';
             }
+        }
+
+        async function loadAutomationStatus() {
+            try {
+                const response = await fetch('/monitoring/data/automation-status.json', { cache: 'no-store' });
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.warn('Could not load automation status:', error);
+                return null;
+            }
+        }
+
+        async function updateAutomationStatus() {
+            const automationData = await loadAutomationStatus();
+            const container = document.getElementById('automation-status');
+
+            if (automationData && automationData.jobs) {
+                const jobs = Object.entries(automationData.jobs);
+
+                container.innerHTML = jobs.map(([jobName, job]) => {
+                    const successRate = job.total_runs > 0
+                        ? Math.round((job.success_count / job.total_runs) * 100)
+                        : 0;
+
+                    const statusClass = successRate >= 80 ? 'pass' : (successRate >= 50 ? 'warn' : 'fail');
+
+                    return `
+                        <div class="check-item">
+                            <div>
+                                <div class="check-name">${jobName.replace(/-/g, ' ')}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                    Last run: ${formatAge(job.last_run)} |
+                                    Success rate: ${successRate}% (${job.success_count}/${job.total_runs})
+                                </div>
+                            </div>
+                            <span class="check-status ${statusClass}">
+                                ${job.last_success && job.last_success > (job.last_failure || '') ? 'OK' : 'ISSUE'}
+                            </span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                container.innerHTML = `
+                    <div class="check-item">
+                        <span class="check-name">No automation runs logged yet</span>
+                        <span class="check-status warn">PENDING</span>
+                    </div>
+                    <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">
+                        Automation jobs will appear here once GitHub Actions workflows start running.
+                        Scheduled jobs: auto-update-data (every 6h), sync-leaderboards (daily), weekly-league-rollover (Sundays)
+                    </p>
+                `;
+            }
+        }
+
+        async function updateLeagueStatus() {
+            try {
+                const response = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
+                const league = await response.json();
+                const container = document.getElementById('league-status');
+
+                const weekInfo = league.week_info || {};
+                const daysRemaining = weekInfo.days_remaining || 0;
+                const statusClass = daysRemaining > 2 ? 'pass' : (daysRemaining > 0 ? 'warn' : 'fail');
+
+                container.innerHTML = `
+                    <div class="check-item">
+                        <div>
+                            <div class="check-name">Current Week: ${weekInfo.week_id || 'Unknown'}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                ${weekInfo.start_date} to ${weekInfo.end_date}
+                            </div>
+                        </div>
+                        <span class="check-status ${statusClass}">
+                            ${daysRemaining} days left
+                        </span>
+                    </div>
+                    <div class="check-item">
+                        <span class="check-name">Weekly Seed</span>
+                        <span style="font-family: monospace; color: var(--accent-primary);">
+                            ${league.seed || 'Not generated'}
+                        </span>
+                    </div>
+                    <div class="check-item">
+                        <span class="check-name">Participants</span>
+                        <span class="metric-value">
+                            ${league.meta?.total_participants || 0}
+                        </span>
+                    </div>
+                    <div class="check-item">
+                        <span class="check-name">Submissions</span>
+                        <span class="metric-value">
+                            ${league.meta?.total_submissions || 0}
+                        </span>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('league-status').innerHTML = `
+                    <div class="check-item">
+                        <span class="check-name">Error loading league data</span>
+                        <span class="check-status fail">ERROR</span>
+                    </div>
+                `;
+            }
+        }
+
+        function triggerLeagueRollover() {
+            if (!confirm('This will trigger a manual weekly league rollover. Are you sure?')) {
+                return;
+            }
+
+            alert('Manual trigger feature requires GitHub Actions workflow_dispatch.\n\nTo manually rollover:\n1. Run: npm run league:archive\n2. Run: npm run league:new-week\n\nOr visit GitHub Actions and run "Weekly League Rollover" workflow.');
         }
         
         async function refreshData() {
@@ -523,9 +664,11 @@
                     updateDeploymentStatus(),
                     updateDataStatus(),
                     updateGitHubStatus(),
-                    updateRecentChecks()
+                    updateRecentChecks(),
+                    updateAutomationStatus(),
+                    updateLeagueStatus()
                 ]);
-                
+
                 document.getElementById('last-updated').textContent = `Last updated: ${new Date().toLocaleString()}`;
             } catch (error) {
                 console.error('Error refreshing data:', error);

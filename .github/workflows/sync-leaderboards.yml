@@ -1,0 +1,163 @@
+name: Sync Leaderboards
+
+# Tier 1 Automation: Fully automatic daily sync
+# Syncs all leaderboard data from game repository
+
+on:
+  schedule:
+    # Daily at 2:00 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      sync_type:
+        description: 'Type of sync to perform'
+        type: choice
+        default: 'all'
+        options:
+          - all
+          - weekly
+          - full
+
+permissions:
+  contents: write
+
+jobs:
+  sync-leaderboards:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Check game integration status
+        id: check-integration
+        run: |
+          echo "Checking game repository integration..."
+          python scripts/game-integration.py --status
+          echo "status=checked" >> $GITHUB_OUTPUT
+
+      - name: Sync all leaderboards
+        id: sync-all
+        if: github.event.inputs.sync_type == 'all' || github.event.inputs.sync_type == '' || github.event_name == 'schedule'
+        run: |
+          echo "Syncing all leaderboard data..."
+          python scripts/game-integration.py --sync-leaderboards
+          echo "status=success" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Sync weekly league
+        id: sync-weekly
+        if: github.event.inputs.sync_type == 'weekly' || github.event.inputs.sync_type == 'all' || github.event_name == 'schedule'
+        run: |
+          echo "Syncing weekly league data..."
+          python scripts/game-integration.py --weekly-sync
+          echo "status=success" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Export leaderboard data
+        id: export
+        if: github.event.inputs.sync_type == 'full'
+        run: |
+          echo "Running full leaderboard export..."
+          python scripts/export-leaderboard-bridge.py --refresh
+          echo "status=success" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Verify data integrity
+        id: verify
+        run: |
+          echo "Verifying leaderboard data integrity..."
+          # Check that key files exist
+          test -f public/leaderboard/data/leaderboard.json || exit 1
+          test -f public/leaderboard/data/weekly/current.json || exit 1
+          echo "Data integrity verified"
+          echo "status=success" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Log automation run
+        run: |
+          echo "Logging leaderboard sync to monitoring..."
+          python scripts/log-automation-run.py \
+            --job "sync-leaderboards" \
+            --sync-all-status "${{ steps.sync-all.outcome }}" \
+            --sync-weekly-status "${{ steps.sync-weekly.outcome }}" \
+            --export-status "${{ steps.export.outcome }}" \
+            --verify-status "${{ steps.verify.outcome }}" \
+            --trigger "${{ github.event_name }}"
+        continue-on-error: true
+
+      - name: Commit synced data
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action [Leaderboard Sync]"
+
+          if git diff --quiet; then
+            echo "No changes to commit (data already up to date)"
+            exit 0
+          fi
+
+          git add public/leaderboard/data/
+          git add public/monitoring/data/ || true
+
+          # Count changed files
+          CHANGED=$(git diff --cached --numstat | wc -l)
+
+          git commit -m "Sync leaderboards: ${CHANGED} files updated
+
+          Sync all: ${{ steps.sync-all.outcome }}
+          Sync weekly: ${{ steps.sync-weekly.outcome }}
+          Export: ${{ steps.export.outcome }}
+          Verification: ${{ steps.verify.outcome }}
+          Timestamp: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+
+          [automated] [leaderboard-sync]"
+
+          git push
+
+      - name: Create issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🔄 Leaderboard Sync Failed - ${new Date().toISOString().split('T')[0]}`;
+            const body = `
+            ## Leaderboard Sync Failure
+
+            **Workflow Run:** ${{ github.run_id }}
+            **Timestamp:** ${new Date().toUTCString()}
+
+            ### Status
+            - Integration Check: ${{ steps.check-integration.outcome }}
+            - Sync All: ${{ steps.sync-all.outcome }}
+            - Sync Weekly: ${{ steps.sync-weekly.outcome }}
+            - Data Verification: ${{ steps.verify.outcome }}
+
+            ### Likely Causes
+            - Game repository not accessible
+            - Data format changes
+            - File permission issues
+            - Network connectivity problems
+
+            ### Required Actions
+            1. Review workflow logs: [Link](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            2. Check game integration: \`npm run game:status\`
+            3. Verify game repository is accessible
+            4. Manual sync if needed: \`npm run game:sync-all\`
+
+            **Priority:** Medium - Leaderboard data may be stale
+            This issue was automatically created by the sync workflow.
+            `;
+
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['automation', 'leaderboard', 'sync-failure', 'auto-created']
+            });

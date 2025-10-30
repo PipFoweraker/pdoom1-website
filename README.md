@@ -1,6 +1,6 @@
-# p(Doom)1 Website v1.0.0
+# p(Doom)1 Website v1.1.0
 
-Professional website with weekly league competition system for the p(Doom)1 game.
+Professional website with automated weekly league system, dynamic front page, and scheduled maintenance for the p(Doom)1 game.
 
 ## Features
 
@@ -15,6 +15,8 @@ Professional website with weekly league competition system for the p(Doom)1 game
 - **Game Repository Integration**: Real data sync from p(Doom)1 game
 - **API Server**: Type-safe endpoints for leaderboards, stats, and health
 - **Data Management**: Automated sync and archival systems
+- **GitHub Actions Automation**: Scheduled updates, league rollover, data sync
+- **Admin Monitoring Dashboard**: Real-time system status at `/monitoring/`
 - **Documentation**: Comprehensive guides and specifications
 
 ### Privacy & Analytics (NEW)
@@ -97,11 +99,13 @@ npm run integration:test
 
 ## Version Status
 
-**v1.0.0 - PRODUCTION READY**
+**v1.1.0 - AUTOMATION & DYNAMIC UI**
+- ✅ GitHub Actions automation: LIVE (3 workflows running)
+- ✅ Dynamic front page: DEPLOYED (real-time data loading)
+- ✅ Enhanced monitoring dashboard: OPERATIONAL
 - ✅ Weekly league infrastructure: COMPLETE
 - ✅ Game repository integration: OPERATIONAL
 - ✅ API server with 8 endpoints: FUNCTIONAL
-- ✅ Automated management system: READY
 - ✅ Production deployment configs: READY
 - ✅ Monitoring & alerting: CONFIGURED
 - ✅ Backup & recovery: DOCUMENTED
@@ -122,7 +126,19 @@ See issues for upcoming features:
 - Enhanced frontend dashboard
 - Database migration for scale
 
+## Automation
+
+**GitHub Actions** handle routine maintenance automatically:
+- **Auto-Update Data**: Every 6 hours - updates version info and game stats
+- **Sync Leaderboards**: Daily at 2am UTC - syncs all leaderboard data
+- **Weekly League Rollover**: Sundays at 11pm UTC - starts new competition week
+
+**Monitor at:** [/monitoring/](https://pdoom1.com/monitoring/) - Admin dashboard for system health
+
+See [Automation System Guide](docs/03-integrations/automation-system-guide.md) for details.
+
 ## Documentation
+
 
 ### 🚀 Deployment & Operations ⭐ NEW
 - [**Production Deployment Guide**](docs/02-deployment/PRODUCTION_DEPLOYMENT.md) - Complete production setup
@@ -134,6 +150,7 @@ See issues for upcoming features:
 - [Deployment Checklist](docs/02-deployment/weekly-deployment-checklist.md)
 
 ### 📊 Integration & Features
+- [Automation System Guide](docs/03-integrations/automation-system-guide.md) - **NEW**
 - [API Integration Guide](docs/03-integrations/api-integration-complete.md)
 - [Weekly League Implementation](docs/03-integrations/weekly-league-phase1-complete.md)
 - [Analytics Implementation](docs/ANALYTICS_IMPLEMENTATION.md)

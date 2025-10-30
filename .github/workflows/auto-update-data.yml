@@ -1,0 +1,119 @@
+name: Auto-Update Data
+
+# Tier 1 Automation: Fully automatic, runs every 6 hours
+# Updates version info and game stats without human approval
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force update even if data is fresh'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Update version information
+        id: update-version
+        run: |
+          echo "Running update-version-info.py..."
+          python scripts/update-version-info.py
+          echo "status=success" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Calculate game statistics
+        id: update-stats
+        run: |
+          echo "Running calculate-game-stats.py..."
+          python scripts/calculate-game-stats.py
+          echo "status=success" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Log automation run
+        run: |
+          echo "Logging automation run to monitoring data..."
+          python scripts/log-automation-run.py \
+            --job "auto-update-data" \
+            --version-status "${{ steps.update-version.outcome }}" \
+            --stats-status "${{ steps.update-stats.outcome }}" \
+            --trigger "${{ github.event_name }}"
+        continue-on-error: true
+
+      - name: Commit changes if any
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action [Auto-Update]"
+
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add public/data/version.json
+          git add public/data/health-check.json || true
+          git add public/monitoring/data/ || true
+
+          git commit -m "Auto-update: version info and game stats
+
+          Triggered by: ${{ github.event_name }}
+          Version update: ${{ steps.update-version.outcome }}
+          Stats update: ${{ steps.update-stats.outcome }}
+          Timestamp: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+
+          [automated]"
+
+          git push
+
+      - name: Create issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🤖 Auto-Update Failed - ${new Date().toISOString().split('T')[0]}`;
+            const body = `
+            ## Automated Data Update Failure
+
+            **Workflow:** Auto-Update Data
+            **Run ID:** ${{ github.run_id }}
+            **Trigger:** ${{ github.event_name }}
+            **Timestamp:** ${new Date().toUTCString()}
+
+            ### Status
+            - Version Update: ${{ steps.update-version.outcome }}
+            - Stats Update: ${{ steps.update-stats.outcome }}
+
+            ### Next Steps
+            1. Review workflow logs: [Link](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            2. Check if GitHub API rate limits are exceeded
+            3. Verify scripts are functioning correctly
+            4. Consider manual run: \`npm run sync:all\`
+
+            **Priority:** Medium - Automated process
+            This issue was automatically created by the auto-update workflow.
+            `;
+
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['automation', 'monitoring', 'auto-created']
+            });

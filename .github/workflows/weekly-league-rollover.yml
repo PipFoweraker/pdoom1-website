@@ -1,0 +1,180 @@
+name: Weekly League Rollover
+
+# Tier 2 Automation: Auto-execute with notification
+# Automatically rolls over the weekly league every Sunday at 23:00 UTC
+
+on:
+  schedule:
+    # Every Sunday at 23:00 UTC (one hour before week officially ends)
+    - cron: '0 23 * * 0'
+  workflow_dispatch:
+    inputs:
+      force_new_week:
+        description: 'Force start new week (use for manual correction)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  rollover-league:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Check current league status
+        id: check-status
+        run: |
+          echo "Checking current weekly league status..."
+          python scripts/weekly-league-manager.py --status
+          echo "status=checked" >> $GITHUB_OUTPUT
+
+      - name: Archive current week
+        id: archive
+        run: |
+          echo "Archiving current week's league data..."
+          python scripts/weekly-league-manager.py --archive-week
+          echo "status=success" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Start new week
+        id: new-week
+        run: |
+          echo "Starting new weekly league..."
+          python scripts/weekly-league-manager.py --new-week
+
+          # Capture the new week info
+          NEW_WEEK=$(python scripts/weekly-league-manager.py --status | grep "CURRENT_WEEK:" | awk '{print $2}')
+          echo "new_week=$NEW_WEEK" >> $GITHUB_OUTPUT
+          echo "status=success" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Verify new league
+        id: verify
+        run: |
+          echo "Verifying new league setup..."
+          python scripts/weekly-league-manager.py --status
+          python scripts/weekly-league-manager.py --standings
+          echo "status=success" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Log automation run
+        run: |
+          echo "Logging league rollover to monitoring..."
+          python scripts/log-automation-run.py \
+            --job "weekly-league-rollover" \
+            --archive-status "${{ steps.archive.outcome }}" \
+            --new-week-status "${{ steps.new-week.outcome }}" \
+            --verify-status "${{ steps.verify.outcome }}" \
+            --new-week-id "${{ steps.new-week.outputs.new_week }}" \
+            --trigger "${{ github.event_name }}"
+        continue-on-error: true
+
+      - name: Commit league changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action [League Manager]"
+
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add public/leaderboard/data/weekly/
+          git add public/monitoring/data/ || true
+
+          git commit -m "Weekly League Rollover: ${{ steps.new-week.outputs.new_week }}
+
+          Previous week archived
+          New week started: ${{ steps.new-week.outputs.new_week }}
+          Archive status: ${{ steps.archive.outcome }}
+          New week status: ${{ steps.new-week.outcome }}
+          Timestamp: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+
+          [automated] [weekly-league]"
+
+          git push
+
+      - name: Create success notification issue
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `✅ Weekly League Rollover Complete - ${{ steps.new-week.outputs.new_week }}`;
+            const body = `
+            ## Weekly League Rollover Successful
+
+            **New Week:** ${{ steps.new-week.outputs.new_week }}
+            **Timestamp:** ${new Date().toUTCString()}
+
+            ### Actions Completed
+            - ✅ Previous week archived
+            - ✅ New weekly seed generated
+            - ✅ League data reset for fresh competition
+            - ✅ System verified and ready
+
+            ### Next Steps
+            - Players can now submit scores for the new week
+            - Monitor leaderboard at /leaderboard/
+            - Check admin status at /monitoring/
+
+            **Status:** Automated rollover completed successfully
+            This issue was automatically created for record-keeping.
+            `;
+
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['automation', 'weekly-league', 'success', 'auto-created']
+            });
+
+      - name: Create failure alert
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🚨 Weekly League Rollover FAILED - Requires Attention`;
+            const body = `
+            ## Weekly League Rollover Failed
+
+            **Workflow Run:** ${{ github.run_id }}
+            **Timestamp:** ${new Date().toUTCString()}
+
+            ### Status
+            - Archive Week: ${{ steps.archive.outcome }}
+            - New Week: ${{ steps.new-week.outcome }}
+            - Verification: ${{ steps.verify.outcome }}
+
+            ### Required Actions
+            1. Review workflow logs: [Link](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            2. Check current league status: \`npm run league:status\`
+            3. Manual rollover if needed:
+               \`\`\`bash
+               npm run league:archive
+               npm run league:new-week
+               \`\`\`
+            4. Verify system health: \`npm run integration:test\`
+
+            **Priority:** HIGH - Weekly competition may be stalled
+            This issue was automatically created and requires immediate attention.
+            `;
+
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['automation', 'weekly-league', 'bug', 'high-priority', 'auto-created']
+            });

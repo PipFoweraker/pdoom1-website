@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "week_id": "2025_W44",
+    "season": "2025_Q4",
+    "generated": "2025-10-30T13:20:26.738725Z",
+    "game_version": "v0.4.1",
+    "competition_type": "weekly_league",
+    "start_date": "2025-10-27T00:00:00",
+    "end_date": "2025-11-02T23:59:59",
+    "total_participants": 0,
+    "total_submissions": 0
+  },
+  "seed": "weekly_2025_W44_d1322d3b",
+  "economic_model": "Bootstrap_v0.4.1",
+  "week_info": {
+    "week_id": "2025_W44",
+    "year": 2025,
+    "week_number": 44,
+    "start_date": "2025-10-27",
+    "end_date": "2025-11-02",
+    "start_timestamp": "2025-10-27T00:00:00",
+    "end_timestamp": "2025-11-02T23:59:59",
+    "days_remaining": 3,
+    "hours_remaining": 10,
+    "is_current": true,
+    "season": "2025_Q4"
+  },
+  "entries": [],
+  "statistics": {
+    "highest_score": 0,
+    "average_score": 0.0,
+    "total_games": 0,
+    "unique_players": 0
+  },
+  "archived_at": "2025-10-30T13:45:32.538693Z",
+  "archive_status": "completed"
+}
