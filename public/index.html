@@ -16,6 +16,13 @@
 	<meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<!-- twitter:site intentionally omitted until handle is finalized (must be ASCII, suggest @pdoom1) -->
+
+	<!-- Performance: Preconnect to external resources -->
+	<link rel="preconnect" href="https://api.github.com">
+	<link rel="dns-prefetch" href="https://api.github.com">
+	<link rel="preconnect" href="https://stampy.ai">
+	<link rel="dns-prefetch" href="https://stampy.ai">
+
 	<style>
 		:root {
 			/* Color scheme inspired by typical pygame/terminal aesthetics */
@@ -275,6 +282,17 @@
 			font-weight: bold;
 			color: var(--accent-primary);
 			display: block;
+			background: transparent !important;
+		}
+
+		.loading-number {
+			background: transparent !important;
+			color: var(--text-muted) !important;
+		}
+
+		.loading-placeholder {
+			background: transparent !important;
+			color: var(--text-muted) !important;
 		}
 
 		.stat-label {
@@ -735,7 +753,7 @@
 				<li role="none" class="dropdown">
 					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
 					<ul class="dropdown-menu" role="menu">
-						<li role="none"><a href="#known-issues" role="menuitem">Known Issues</a></li>
+						<li role="none"><a href="/issues/" role="menuitem">Issues & Feedback</a></li>
 						<li role="none"><a href="/blog/" role="menuitem">Dev Blog</a></li>
 						<li role="none"><a href="/game-changelog/" role="menuitem">Updates</a></li>
 						<li role="none"><a href="https://github.com/PipFoweraker/pdoom1" role="menuitem" target="_blank">GitHub</a></li>
@@ -759,13 +777,23 @@
 		<section class="hero" id="home" role="banner" aria-labelledby="main-heading">
 			<h1 id="main-heading">p(Doom)1</h1>
 			<p class="subtitle">A satirical meta-strategy game about AI Safety</p>
-			<p style="margin-bottom: 1rem; color: var(--text-secondary);">
+			<p style="margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 1.1rem;">
 				<span class="status-indicator status-active"></span>
 				Currently in Development - Alpha Release Available
 			</p>
-			
-			<!-- Steam Badge - Primary Download CTA -->
-			<div style="text-align: center; margin-top: 1.5rem;">
+
+			<!-- Download Options - Primary CTAs -->
+			<div class="download-ctas" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem;">
+				<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" style="font-size: 1.1rem; padding: 1rem 2rem;" target="_blank" rel="noopener">
+					<span class="loading-placeholder">Download Latest Release</span>
+				</a>
+				<a href="https://github.com/PipFoweraker/pdoom1" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary); font-size: 1.1rem; padding: 1rem 2rem;" target="_blank" rel="noopener">
+					View on GitHub →
+				</a>
+			</div>
+
+			<!-- Steam Badge - Commented out until available
+			<div style="text-align: center; margin-top: 1rem;">
 				<a href="https://store.steampowered.com/app/XXXXX/pdoom1" target="_blank" rel="noopener" style="text-decoration: none;">
 					<div style="display: inline-block; padding: 12px 24px; background: #171a21; border: 1px solid #2a475e; border-radius: 4px; color: #ffffff; font-family: 'Motiva Sans', Arial, sans-serif; font-size: 14px; transition: all 0.2s ease; cursor: pointer;">
 						<div style="display: flex; align-items: center; gap: 8px;">
@@ -776,93 +804,97 @@
 						</div>
 					</div>
 				</a>
-				<div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.3rem; text-align: center;">
+				<div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.3rem;">
 					©2025 Valve Corporation. Steam and the Steam logo are trademarks and/or registered trademarks of Valve Corporation in the U.S. and/or other countries.
 				</div>
 			</div>
-			
-			<!-- Fallback Download Options -->
-			<div class="download-ctas" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
-				<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary);" target="_blank" rel="noopener"><span class="loading-placeholder">Loading...</span>
-				</a>
-			</div>
+			-->
+
+			<p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;">
+				Windows, macOS, Linux | Free & Open Source
+			</p>
 		</section>
 
-		<section class="stats" role="complementary" aria-label="Game statistics">
-			<a href="/game-stats/" class="stat-link" role="img" aria-label="This week's baseline doom percentage - click for detailed statistics">
-				<div class="stat">
-					<span class="stat-number loading-number" aria-hidden="true">--</span>
-					<span class="stat-label">Baseline Doom</span>
-				</div>
-			</a>
-			<a href="/game-stats/" class="stat-link" role="img" aria-label="Number of frontier labs - click for detailed statistics">
-				<div class="stat">
-					<span class="stat-number loading-number" aria-hidden="true">--</span>
-					<span class="stat-label">Frontier Labs</span>
-				</div>
-			</a>
-			<a href="/game-stats/" class="stat-link" role="img" aria-label="Strategic possibilities in the game - click for detailed statistics">
-				<div class="stat">
-					<span class="stat-number loading-number" aria-hidden="true">--</span>
-					<span class="stat-label">Strategic Possibilities</span>
-				</div>
-			</a>
-		</section>
-		
-		<div style="text-align: center; margin: 1rem 0;">
-			<a href="/game-stats/" class="cta-button" style="display: inline-block; font-size: 0.9rem; padding: 0.75rem 1.5rem;">
-				📊 View Detailed Game Statistics →
-			</a>
-		</div>
-		<!-- Live Status Section -->
+		<!-- Live Game Stats & Status - Combined Section -->
 		<section class="section" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(0, 255, 65, 0.05) 100%); border-left: 4px solid var(--accent-primary);">
-			<h2 style="color: var(--accent-primary); display: flex; align-items: center; gap: 0.5rem;">
+			<h2 style="color: var(--accent-primary); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
 				<span class="status-indicator status-active" style="animation: pulse 2s infinite;"></span>
-				Live Game Status
+				Live Game Stats & Status
 			</h2>
-			<div class="grid" style="margin-top: 1.5rem;">
+
+			<!-- Top Row: Key Game Stats -->
+			<div class="stats" role="complementary" aria-label="Game statistics" style="padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+				<a href="/game-stats/" class="stat-link" role="img" aria-label="This week's baseline doom percentage" style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 1rem; text-align: center;">
+					<div class="stat">
+						<span class="stat-number loading-number" aria-hidden="true" style="font-size: 2rem; color: var(--accent-primary);">--</span>
+						<span class="stat-label" style="font-size: 0.9rem; color: var(--text-muted);">Baseline Doom</span>
+					</div>
+				</a>
+				<a href="/frontier-labs/" class="stat-link" role="img" aria-label="Number of frontier labs in model" style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 1rem; text-align: center;">
+					<div class="stat">
+						<span class="stat-number loading-number" aria-hidden="true" style="font-size: 2rem; color: var(--accent-primary);">7</span>
+						<span class="stat-label" style="font-size: 0.9rem; color: var(--text-muted);">Frontier Labs</span>
+					</div>
+				</a>
+				<a href="/game-stats/" class="stat-link" role="img" aria-label="Strategic possibilities" style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 1rem; text-align: center;">
+					<div class="stat">
+						<span class="stat-number loading-number" aria-hidden="true" style="font-size: 2rem; color: var(--accent-primary);">--</span>
+						<span class="stat-label" style="font-size: 0.9rem; color: var(--text-muted);">Strategic Possibilities</span>
+					</div>
+				</a>
+			</div>
+
+			<!-- Bottom Row: Detailed Status Cards -->
+			<div class="grid">
 				<div class="card">
-					<h3 style="font-size: 1rem; color: var(--text-secondary);">Current Version</h3>
-					<p style="font-size: 1.8rem; font-weight: bold; color: var(--accent-primary); margin: 0.5rem 0;">
+					<h3 style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 0.8rem;">Current Version</h3>
+					<p style="font-size: 1.5rem; font-weight: bold; color: var(--accent-primary); margin: 0.3rem 0;">
 						<span id="current-version-display" class="loading-placeholder">Loading...</span>
 					</p>
-					<p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+					<p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
 						Released: <span id="release-date" class="loading-placeholder">...</span>
 					</p>
-					<p style="font-size: 0.85rem; color: var(--text-muted);">
+					<p style="font-size: 0.8rem; color: var(--text-muted);">
 						<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" style="color: var(--accent-secondary); text-decoration: none;">
 							<span id="open-issues-count" class="loading-placeholder">--</span> open issues
 						</a>
 					</p>
 				</div>
 				<div class="card">
-					<h3 style="font-size: 1rem; color: var(--text-secondary);">Weekly League</h3>
-					<p style="font-size: 1.8rem; font-weight: bold; color: var(--accent-primary); margin: 0.5rem 0;">
+					<h3 style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 0.8rem;">Weekly League</h3>
+					<p style="font-size: 1.5rem; font-weight: bold; color: var(--accent-primary); margin: 0.3rem 0;">
 						<span id="current-week-display" class="loading-placeholder">Loading...</span>
 					</p>
-					<p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+					<p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
 						<span id="week-time-remaining" class="loading-placeholder">...</span>
 					</p>
-					<p style="font-size: 0.85rem; color: var(--text-muted);">
+					<p style="font-size: 0.8rem; color: var(--text-muted);">
 						<a href="/leaderboard/" style="color: var(--accent-secondary); text-decoration: none;">
 							<span id="league-participants" class="loading-placeholder">--</span> participants →
 						</a>
 					</p>
 				</div>
 				<div class="card">
-					<h3 style="font-size: 1rem; color: var(--text-secondary);">Last Updated</h3>
-					<p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-primary); margin: 0.5rem 0;">
+					<h3 style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 0.8rem;">Last Updated</h3>
+					<p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-primary); margin: 0.3rem 0;">
 						<span id="last-update-time" class="loading-placeholder">Loading...</span>
 					</p>
-					<p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
-						Data syncs automatically every 6 hours
+					<p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+						Data syncs every 6 hours
 					</p>
-					<p style="font-size: 0.85rem; color: var(--text-muted);">
+					<p style="font-size: 0.8rem; color: var(--text-muted);">
 						<a href="/monitoring/" style="color: var(--accent-secondary); text-decoration: none;">
-							View system status →
+							System status →
 						</a>
 					</p>
 				</div>
+			</div>
+
+			<!-- View More CTA -->
+			<div style="text-align: center; margin-top: 1.2rem;">
+				<a href="/game-stats/" class="cta-button" style="display: inline-block; font-size: 0.85rem; padding: 0.6rem 1.2rem;">
+					📊 View Detailed Statistics →
+				</a>
 			</div>
 		</section>
 
@@ -870,241 +902,195 @@
 
 		<section class="section" id="about">
 			<h2>About the Game</h2>
-			<p>p(Doom)1 is a satirical meta-strategy game inspired by Papers Please, Pandemic, and clicker games. Navigate the complex world of AI safety research while managing resources, competing with other AI labs, and trying to prevent catastrophic outcomes.</p>
-			
-			<!-- Game Screenshots -->
-			<div style="text-align: center; margin: 2rem 0;">
-				<img src="assets/screenshot-placeholder-main.svg" alt="p(Doom)1 Main Game Interface" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-			</div>
-            
-			<div class="grid">
-				<div class="card">
-					<h3>Resource Management</h3>
-					<p>Balance money, staff, reputation, and p(Doom) levels as you make critical decisions about AI development.</p>
-					<img src="assets/screenshot-placeholder-gameplay.svg" alt="Resource Management Interface" style="width: 100%; margin-top: 1rem; border-radius: var(--radius-sm);">
-				</div>
-				<div class="card">
-					<h3>Research & Development</h3>
-					<p>Publish papers, buy compute resources, and advance AI safety research while racing against competitors.</p>
-					<img src="assets/screenshot-placeholder-ui.svg" alt="Research Interface" style="width: 100%; margin-top: 1rem; border-radius: var(--radius-sm);">
-				</div>
-				<div class="card">
-					<h3>Dynamic Events</h3>
-					<p>Handle unexpected challenges with our sophisticated event system featuring popup events, deferrals, and strategic timing.</p>
-					<div style="margin-top: 1rem; padding: 1rem; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px dashed var(--accent-secondary);">
-						<small style="color: var(--text-muted);">Event system screenshot coming soon...</small>
-					</div>
-				</div>
-			</div>
-		</section>
+			<p style="margin-bottom: 1.5rem;">p(Doom)1 is a satirical meta-strategy game inspired by Papers Please, Pandemic, and clicker games. Navigate the complex world of AI safety research while managing resources, competing with other AI labs, and trying to prevent catastrophic outcomes. Learn more about real AI Safety research at <a href="https://stampy.ai" target="_blank" rel="noopener" style="color: var(--accent-primary);">Stampy.ai</a>.</p>
 
-		<section class="section" id="download">
-			<h2>Download & Get Started</h2>
-			<p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
-				Get p(Doom)1 and start playing immediately. Free and open source.
-			</p>
-			
-			<!-- Download Options -->
-			<div class="grid" style="margin-bottom: 3rem;">
-				<div class="card" style="text-align: center; border: 2px solid var(--accent-primary);">
-					<h3 style="color: var(--accent-primary);">Quick Start (Recommended)</h3>
-					<p style="margin: 1rem 0;">Get the game on Steam</p>
-					<a href="https://store.steampowered.com/app/XXXXX/pdoom1" class="cta-button" target="_blank" rel="noopener" style="margin-bottom: 1rem; display: inline-block;">
-						Get on Steam
-					</a>
-					<p style="font-size: 0.9rem; color: var(--text-muted);">Windows, macOS, Linux</p>
+			<!-- Tabbed Content -->
+			<div class="about-tabs">
+				<div class="tab-buttons" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+					<button class="tab-btn active" data-tab="features" style="flex: 1; min-width: 120px; padding: 0.8rem 1rem; background: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: var(--radius-sm); font-family: inherit; font-weight: bold; cursor: pointer; transition: all 0.2s;">Features</button>
+					<button class="tab-btn" data-tab="screenshots" style="flex: 1; min-width: 120px; padding: 0.8rem 1rem; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-weight: bold; cursor: pointer; transition: all 0.2s;">Screenshots</button>
+					<button class="tab-btn" data-tab="requirements" style="flex: 1; min-width: 120px; padding: 0.8rem 1rem; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-weight: bold; cursor: pointer; transition: all 0.2s;">Requirements</button>
 				</div>
-				
-				<div class="card" style="text-align: center;">
-					<h3 style="color: var(--accent-secondary);">Alternative Download</h3>
-					<p style="margin: 1rem 0;">Download directly from GitHub</p>
-					<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" target="_blank" rel="noopener" style="background: var(--accent-secondary); border-color: var(--accent-secondary); margin-bottom: 1rem; display: inline-block;"><span class="loading-placeholder download-btn-secondary">Loading...</span>
-					</a>
-					<p style="font-size: 0.9rem; color: var(--text-muted);">Fallback option</p>
-				</div>
-			</div>
 
-			<!-- System Requirements & Installation -->
-			<div class="grid">
-				<div class="card">
-					<h3>System Requirements</h3>
-					<div style="margin-top: 1rem;">
-						<p><strong>Minimum:</strong></p>
-						<ul style="color: var(--text-secondary); margin: 0.5rem 0 1rem 1.5rem;">
-							<li>Python 3.8+ (for source builds)</li>
-							<li>pygame library</li>
-							<li>~50MB disk space</li>
-							<li>Basic graphics support</li>
-						</ul>
-						<p><strong>Supported Platforms:</strong></p>
-						<div style="display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap;">
-							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">Windows</span>
-							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">macOS</span>
-							<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem;">Linux</span>
+				<!-- Features Tab -->
+				<div class="tab-content active" id="features-tab">
+					<div class="grid">
+						<div class="card">
+							<h3>Resource Management</h3>
+							<p>Balance money, staff, reputation, and p(Doom) levels as you make critical decisions about AI development.</p>
+						</div>
+						<div class="card">
+							<h3>Research & Development</h3>
+							<p>Publish papers, buy compute resources, and advance AI safety research while racing against competitors.</p>
+						</div>
+						<div class="card">
+							<h3>Dynamic Events</h3>
+							<p>Handle unexpected challenges with our sophisticated event system featuring popup events, deferrals, and strategic timing.</p>
 						</div>
 					</div>
 				</div>
-				
-				<div class="card">
-					<h3>Quick Installation</h3>
-					<p style="margin-bottom: 1rem; color: var(--text-secondary);">For source builds:</p>
-<pre style="background: var(--bg-primary); padding: 1rem; border-radius: var(--radius-sm, 4px); overflow-x: auto; color: var(--accent-primary); font-size: 0.9rem; line-height: 1.4;">git clone https://github.com/PipFoweraker/pdoom1.git
+
+				<!-- Screenshots Tab -->
+				<div class="tab-content" id="screenshots-tab" style="display: none;">
+					<div style="text-align: center; margin-bottom: 1rem;">
+						<img src="assets/screenshot-placeholder-main.svg" alt="p(Doom)1 Main Game Interface" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+					</div>
+					<div class="grid">
+						<div style="text-align: center;">
+							<img src="assets/screenshot-placeholder-gameplay.svg" alt="Resource Management Interface" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+							<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Resource Management</p>
+						</div>
+						<div style="text-align: center;">
+							<img src="assets/screenshot-placeholder-ui.svg" alt="Research Interface" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+							<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Research & Development</p>
+						</div>
+						<div style="text-align: center; display: flex; align-items: center; justify-content: center; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px dashed var(--accent-secondary); padding: 2rem;">
+							<small style="color: var(--text-muted);">Event system screenshot coming soon...</small>
+						</div>
+					</div>
+				</div>
+
+				<!-- Requirements Tab -->
+				<div class="tab-content" id="requirements-tab" style="display: none;">
+					<div class="grid">
+						<div class="card">
+							<h3>System Requirements</h3>
+							<p style="margin-bottom: 0.8rem;"><strong>Minimum:</strong></p>
+							<ul style="color: var(--text-secondary); margin: 0 0 1rem 1.2rem; line-height: 1.8;">
+								<li>Python 3.8+ (for source builds)</li>
+								<li>pygame library</li>
+								<li>~50MB disk space</li>
+								<li>Basic graphics support</li>
+							</ul>
+							<p style="margin-bottom: 0.5rem;"><strong>Platforms:</strong></p>
+							<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">Windows</span>
+								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">macOS</span>
+								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">Linux</span>
+							</div>
+						</div>
+						<div class="card">
+							<h3>Quick Installation</h3>
+							<p style="margin-bottom: 0.8rem;">For source builds:</p>
+<pre style="background: var(--bg-primary); padding: 0.8rem; border-radius: var(--radius-sm); overflow-x: auto; color: var(--accent-primary); font-size: 0.85rem; line-height: 1.4; margin: 0;">git clone https://github.com/PipFoweraker/pdoom1.git
 cd pdoom1
 pip install -r requirements.txt
 python main.py</pre>
-					<p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
-						Or download the pre-built executable for instant play!
-					</p>
-				</div>
-			</div>
-			
-			<!-- Additional Resources -->
-			<div style="text-align: center; margin-top: 2.4rem; padding: 1.6rem; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
-				<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">Need Help?</h3>
-				<p style="color: var(--text-secondary); margin-bottom: 2rem;">Check out our documentation and community resources</p>
-				<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-					<a href="/docs/" style="color: var(--accent-primary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-primary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">Documentation</a>
-					<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent-secondary); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">[Bug] Report Issues</a>
-					<a href="/game-changelog/" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); transition: all var(--duration-base) var(--easing);">Changelog</a>
+							<p style="margin-top: 0.8rem; font-size: 0.85rem; color: var(--text-muted);">
+								Or download the pre-built executable for instant play!
+							</p>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>
+
+		<script>
+		// Tab switching functionality
+		document.addEventListener('DOMContentLoaded', () => {
+			const tabButtons = document.querySelectorAll('.tab-btn');
+			const tabContents = document.querySelectorAll('.tab-content');
+
+			tabButtons.forEach(button => {
+				button.addEventListener('click', () => {
+					const tabName = button.getAttribute('data-tab');
+
+					// Remove active class from all buttons and contents
+					tabButtons.forEach(btn => {
+						btn.classList.remove('active');
+						btn.style.background = 'var(--bg-tertiary)';
+						btn.style.color = 'var(--text-primary)';
+						btn.style.border = '1px solid var(--border-color)';
+					});
+					tabContents.forEach(content => {
+						content.classList.remove('active');
+						content.style.display = 'none';
+					});
+
+					// Add active class to clicked button and corresponding content
+					button.classList.add('active');
+					button.style.background = 'var(--accent-primary)';
+					button.style.color = 'var(--bg-primary)';
+					button.style.border = 'none';
+
+					const activeContent = document.getElementById(`${tabName}-tab`);
+					if (activeContent) {
+						activeContent.classList.add('active');
+						activeContent.style.display = 'block';
+					}
+				});
+			});
+		});
+		</script>
+
 
 		<section class="section" id="roadmap">
 			<h2>Roadmap</h2>
-			<p>High-level milestones for the website and game distribution. Full details live in <a href="/docs/roadmap.md" style="color: var(--accent-primary);">docs/roadmap.md</a>. Also see <a href="/docs/pdoom1-open-issues.md" style="color: var(--accent-primary);">Open issues from the main repo</a> for day-to-day tasks.</p>
+			<p style="margin-bottom: 1.2rem;">High-level milestones for the website and game. <a href="/docs/roadmap.md" style="color: var(--accent-primary);">View full roadmap →</a></p>
 			<div class="grid">
 				<a href="/docs/roadmap.md" class="card roadmap-card" style="text-decoration: none; color: inherit;">
 					<h3>Short term (weeks) 📅</h3>
-					<ul>
-						<li>Alpha updates 2-3x weekly via Dev Blog</li>
-						<li>Automated posts to Discord, Bluesky, X, LinkedIn</li>
-						<li>Bug intake via GitHub Issues (Netlify function)</li>
+					<ul style="margin: 0.8rem 0; padding-left: 1.2rem;">
+						<li>Alpha updates 2-3x weekly</li>
+						<li>Social media automation</li>
+						<li>Community forum launch</li>
 					</ul>
-					<div style="margin-top: 1rem; font-size: 0.8rem; color: var(--accent-primary);">
-						Click for detailed roadmap →
-					</div>
 				</a>
 				<a href="/docs/roadmap.md" class="card roadmap-card" style="text-decoration: none; color: inherit;">
 					<h3>Mid term (months) 🚀</h3>
-					<ul>
-						<li>Steam release preparation</li>
-						<li>Design tokens synced from main repo style guide</li>
-						<li>Content pipeline from Airtable finalized</li>
+					<ul style="margin: 0.8rem 0; padding-left: 1.2rem;">
+						<li>Steam release</li>
+						<li>Reward system for contributors</li>
+						<li>Content pipeline automation</li>
 					</ul>
-					<div style="margin-top: 1rem; font-size: 0.8rem; color: var(--accent-primary);">
-						Click for detailed roadmap →
-					</div>
 				</a>
 			</div>
 		</section>
 
-		<section class="section" id="known-issues">
-			<h2>Known Issues & Development Status</h2>
-			<p>Live updates from our development repository. See what we're working on and known issues before downloading.</p>
-			
-			<div id="github-issues-container">
-				<div id="issues-loading" class="card" style="text-align: center; padding: 1.6rem;">
-					<div style="color: var(--text-muted);">
-						<div style="margin-bottom: 1rem;">Loading issues from GitHub...</div>
-						<div class="progress-bar" style="margin: 16px auto; max-width: 200px;">
-							<div class="fill" style="width: 100%;"></div>
-						</div>
-						<div style="font-size: 0.9rem;">Connecting to development repository</div>
-					</div>
+		<section class="section" id="help-support">
+			<h2>Help & Support</h2>
+			<p style="color: var(--text-secondary); text-align: center; margin-bottom: 1.5rem;">
+				Need help, found a bug, or want to learn more about AI Safety?
+			</p>
+			<div class="grid">
+				<div class="card" style="text-align: center;">
+					<h3 style="color: var(--accent-primary);">Report Issues</h3>
+					<p style="margin-bottom: 1rem;">Found a bug or have a suggestion?</p>
+					<a href="/issues/" class="cta-button" style="display: inline-block;">Submit Feedback →</a>
 				</div>
-				
-				<div id="issues-error" class="error-boundary" style="display: none;">
-					<h3>Connection Failed</h3>
-					<p>Unable to connect to GitHub API. This might be due to:</p>
-					<ul style="margin: 8px 0; padding-left: 20px;">
-						<li>Temporary GitHub API limits</li>
-						<li>Network connectivity issues</li>
-						<li>High traffic periods</li>
-					</ul>
-					<p>You can still view issues directly on GitHub:</p>
-					<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" class="game-button">
-						View on GitHub →
-					</a>
-					<button onclick="retryLoadIssues()" class="retry-button">
-						Retry Loading
-					</button>
+				<div class="card" style="text-align: center;">
+					<h3 style="color: var(--accent-secondary);">Documentation</h3>
+					<p style="margin-bottom: 1rem;">Get started or troubleshoot</p>
+					<a href="/docs/" class="cta-button" style="background: var(--accent-secondary); display: inline-block;">View Docs →</a>
 				</div>
-				
-				<div id="issues-content" style="display: none;">
-					<div class="grid" id="issues-grid">
-						<!-- Issues will be populated here -->
-					</div>
-					
-					<div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-						<div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-							<span id="issues-count">0</span> open issues - 
-							Last updated: <span id="issues-timestamp">-</span>
-						</div>
-						<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-							<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary);">
-								View All Issues on GitHub
-							</a>
-							<button id="refresh-issues" class="cta-button" style="background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-color);">
-								Refresh
-							</button>
-						</div>
-					</div>
+				<div class="card" style="text-align: center;">
+					<h3 style="color: var(--text-primary);">Learn AI Safety</h3>
+					<p style="margin-bottom: 1rem;">Explore resources from <a href="https://stampy.ai" target="_blank" rel="noopener" style="color: var(--accent-primary);">Stampy.ai</a> and more</p>
+					<a href="/resources/" class="cta-button" style="background: var(--bg-tertiary); color: var(--text-primary); display: inline-block;">AI Safety Resources →</a>
 				</div>
 			</div>
-		</section>
-
-		<!-- AI Safety Resources - Now on dedicated page -->
-		<section class="section" style="text-align: center; padding: 1.6rem;">
-			<h2>AI Safety Resources</h2>
-			<p style="color: var(--text-secondary); margin-bottom: 2rem;">
-				Explore the broader AI Safety ecosystem that inspires p(Doom)1.
-			</p>
-			<a href="/resources/" class="cta-button" style="display: inline-block;">
-				Browse AI Safety Resources →
-			</a>
 		</section>
 
 		<section class="section" id="faq" role="region" aria-labelledby="faq-heading">
-			<h2 id="faq-heading">Frequently Asked Questions</h2>
-			<div class="faq-grid" style="display: grid; gap: 2rem; margin-top: 2rem;">
-				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 1rem;">What is p(Doom)1?</summary>
-					<p style="color: var(--text-secondary);">p(Doom)1 is a satirical strategy game about AI Safety. You manage competing AI labs, make policy decisions, and try to prevent catastrophic outcomes while balancing resources and public perception.</p>
+			<h2 id="faq-heading">Quick FAQ</h2>
+			<div class="faq-grid" style="display: grid; gap: 1.2rem; margin-top: 1.5rem;">
+				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 0.8rem;">What is p(Doom)1?</summary>
+					<p style="color: var(--text-secondary); font-size: 0.95rem;">A satirical strategy game about AI Safety. Manage AI labs, make policy decisions, and prevent catastrophic outcomes. Inspired by real AI Safety debates and research from <a href="https://aisafety.info" target="_blank" rel="noopener" style="color: var(--accent-primary);">aisafety.info</a>.</p>
 				</details>
-				
-				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 1rem;">Is the game free?</summary>
-					<p style="color: var(--text-secondary);">Yes! p(Doom)1 is completely free and open source. You can download it from GitHub or wait for the Steam release.</p>
+
+				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 0.8rem;">Is it free and open source?</summary>
+					<p style="color: var(--text-secondary); font-size: 0.95rem;">Yes! Completely free on <a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">GitHub</a>. Windows, macOS, and Linux supported. Steam release coming soon.</p>
 				</details>
-				
-				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 1rem;">What platforms are supported?</summary>
-					<p style="color: var(--text-secondary);">p(Doom)1 runs on Windows, macOS, and Linux. It's built with Python and Pygame for maximum compatibility.</p>
-				</details>
-				
-				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 1rem;">When is the Steam release?</summary>
-					<p style="color: var(--text-secondary);">We're preparing for Steam release soon! Follow our development blog for updates on the Steam launch timeline.</p>
-				</details>
-				
-				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 1rem;">Can I contribute to development?</summary>
-					<p style="color: var(--text-secondary);">Absolutely! p(Doom)1 is open source. Check out our <a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">GitHub repository</a> to report issues, suggest features, or contribute code.</p>
+
+				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 0.8rem;">Want to learn more about AI Safety?</summary>
+					<p style="color: var(--text-secondary); font-size: 0.95rem;">Check out <a href="https://stampy.ai" target="_blank" rel="noopener" style="color: var(--accent-primary);">Stampy.ai</a> (AI Safety Q&A), <a href="https://www.aisafety.com" target="_blank" rel="noopener" style="color: var(--accent-primary);">aisafety.com</a>, and our <a href="/resources/" style="color: var(--accent-primary);">resources page</a> for curated links.</p>
 				</details>
 			</div>
-		</section>
-
-		<section class="section" id="support" role="region" aria-labelledby="support-heading">
-			<h2 id="support-heading">Support & Bug Reports</h2>
-			<p>Found a bug or need help? Report issues directly through our GitHub integration.</p>
-			<p style="margin-top: 1rem;">
-				<a href="/bug-report/" class="cta-button" style="display: inline-block; text-decoration: none;">
-					Report a Bug →
-				</a>
-			</p>
-			<p style="margin-top: 1rem; color: var(--text-muted);">
-				You can also view <a href="https://github.com/PipFoweraker/pdoom1/issues" style="color: var(--accent-primary);">existing issues on GitHub</a>.
+			<p style="text-align: center; margin-top: 1.5rem; color: var(--text-muted);">
+				More questions? <a href="/docs/" style="color: var(--accent-primary);">View full documentation</a> or <a href="/issues/" style="color: var(--accent-primary);">ask the community</a>
 			</p>
 		</section>
 
@@ -1153,49 +1139,56 @@ python main.py</pre>
 			<div class="footer-section">
 				<h3>Game</h3>
 				<ul class="footer-links">
-					<li><a href="#overview">Overview</a></li>
-					<li><a href="#features">Features</a></li>
+					<li><a href="/#about">About</a></li>
+					<li><a href="/#about" data-tab="features">Features</a></li>
 					<li><a href="/game-stats/">Statistics</a></li>
+					<li><a href="/leaderboard/">Leaderboard</a></li>
 					<li><a href="/game-changelog/">Releases</a></li>
+					<li><a href="/dashboard/">Risk Dashboard</a></li>
 				</ul>
 			</div>
 			<div class="footer-section">
-				<h3>Resources</h3>
+				<h3>Help & Support</h3>
 				<ul class="footer-links">
-					<li><a href="/blog/">Developer Blog</a></li>
+					<li><a href="/issues/">Report Issue</a></li>
 					<li><a href="/docs/">Documentation</a></li>
-					<li><a href="/website-changelog/">Site Updates</a></li>
-					<li><a href="#contact">Contact</a></li>
+					<li><a href="/#faq">FAQ</a></li>
+					<li><a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener">GitHub Issues</a></li>
+					<li><a href="mailto:team@pdoom1.com">Email Support</a></li>
 				</ul>
 			</div>
 			<div class="footer-section">
 				<h3>Community</h3>
 				<ul class="footer-links">
-					<li><a href="#" target="_blank" rel="noopener">GitHub</a></li>
-					<li><a href="#" target="_blank" rel="noopener">Discord</a></li>
-					<li><a href="#" target="_blank" rel="noopener">YouTube</a></li>
-					<li><a href="#roadmap">Roadmap</a></li>
+					<li><a href="https://github.com/PipFoweraker/pdoom1" target="_blank" rel="noopener">GitHub</a></li>
+					<li><a href="/blog/">Dev Blog</a></li>
+					<li><a href="/#roadmap">Roadmap</a></li>
+					<li><a href="/resources/">AI Safety Resources</a></li>
+					<li><a href="https://stampy.ai" target="_blank" rel="noopener">Stampy.ai</a></li>
 				</ul>
 			</div>
 			<div class="footer-section">
-				<h3>Status</h3>
-				<div class="footer-status">
-					<p>
+				<h3>Site</h3>
+				<ul class="footer-links">
+					<li><a href="/sitemap.xml">Sitemap</a></li>
+					<li><a href="/website-changelog/">Changelog</a></li>
+					<li><a href="/monitoring/">System Status</a></li>
+					<li><a href="/about/">About This Site</a></li>
+					<li style="margin-top: 0.8rem;">
 						<span class="status-indicator status-active"></span>
-						Game: Active Development
-					</p>
-					<p>
-						<span class="status-indicator status-success"></span>
-						Website: Live
-					</p>
-				</div>
+						<span style="font-size: 0.85rem; color: var(--text-muted);">Live</span>
+					</li>
+					<li>
+						<span id="website-version" style="font-size: 0.85rem; color: var(--text-muted);">v1.1.1</span>
+					</li>
+				</ul>
 			</div>
 		</div>
 		<div class="footer-bottom">
-			<p>&copy; 2025 pdoom1. Not affiliated with any AI organization. For fun, education, and satire only.</p>
-			<p class="footer-meta">
-				Privacy: No personal data collected | 
-				<span id="website-version">Version loading...</span>
+			<p>&copy; 2025 p(Doom)1 by <a href="https://github.com/PipFoweraker" target="_blank" rel="noopener" style="color: var(--accent-primary); text-decoration: none; font-weight: bold;">Pip Foweraker</a></p>
+			<p class="footer-meta" style="margin-top: 0.5rem;">
+				Privacy: No personal data collected | Open Source |
+				Inspired by AI Safety research from <a href="https://stampy.ai" target="_blank" rel="noopener" style="color: var(--accent-primary);">Stampy.ai</a> and others
 			</p>
 		</div>
 	</footer>
@@ -1366,292 +1359,7 @@ python main.py</pre>
 			});
 		});
 		
-		// GitHub Issues Integration
-		class GitHubIssuesLoader {
-			constructor() {
-				this.apiUrl = 'https://api.github.com/repos/PipFoweraker/pdoom1/issues';
-				this.cache = null;
-				this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
-				this.lastFetch = 0;
-			}
-			
-			async fetchIssues() {
-				const now = Date.now();
-				
-				// Return cached data if still fresh
-				if (this.cache && (now - this.lastFetch < this.cacheExpiry)) {
-					return this.cache;
-				}
-				
-				try {
-					const response = await fetch(this.apiUrl + '?state=open&per_page=10&sort=updated', {
-						headers: {
-							'Accept': 'application/vnd.github.v3+json'
-						}
-					});
-					
-					if (!response.ok) {
-						throw new Error(`GitHub API error: ${response.status}`);
-					}
-					
-					const issues = await response.json();
-					this.cache = issues;
-					this.lastFetch = now;
-					
-					return issues;
-				} catch (error) {
-					console.warn('Failed to fetch GitHub issues:', error);
-					throw error;
-				}
-			}
-			
-			formatIssueCard(issue) {
-				const labels = issue.labels.map(label => 
-					`<span class="issue-label" style="background: #${label.color}; color: ${this.getContrastColor(label.color)}; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; margin-right: 4px;">${label.name}</span>`
-				).join('');
-				
-				const updatedDate = new Date(issue.updated_at).toLocaleDateString();
-				const isPriority = issue.labels.some(l => l.name.includes('priority-high') || l.name.includes('critical'));
-				const isBug = issue.labels.some(l => l.name === 'bug');
-				
-				const icon = isBug ? '[BUG]' : isPriority ? '[!]' : '[FEAT]';
-				const cardClass = isPriority ? 'priority-issue' : '';
-				
-				return `
-					<div class="card issue-card ${cardClass}" style="position: relative;">
-						<div style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem;">
-							<span style="font-size: 1.2rem;">${icon}</span>
-							<div style="flex: 1; min-width: 0;">
-								<h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; line-height: 1.3;">
-									<a href="${issue.html_url}" target="_blank" rel="noopener" style="color: var(--text-primary); text-decoration: none;">
-										${this.escapeHtml(issue.title)}
-									</a>
-								</h4>
-								<div style="margin-bottom: 0.5rem;">
-									${labels}
-								</div>
-								<div style="color: var(--text-muted); font-size: 0.8rem;">
-									#${issue.number} - Updated ${updatedDate}
-								</div>
-							</div>
-						</div>
-						${isPriority ? '<div style="position: absolute; top: 8px; right: 8px; background: var(--accent-danger); color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold;">HIGH PRIORITY</div>' : ''}
-					</div>
-				`;
-			}
-			
-			escapeHtml(text) {
-				const div = document.createElement('div');
-				div.textContent = text;
-				return div.innerHTML;
-			}
-			
-			getContrastColor(hexColor) {
-				// Convert hex to RGB
-				const r = parseInt(hexColor.substr(0, 2), 16);
-				const g = parseInt(hexColor.substr(2, 2), 16);
-				const b = parseInt(hexColor.substr(4, 2), 16);
-				
-				// Calculate luminance
-				const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-				
-				return luminance > 0.5 ? '#000000' : '#ffffff';
-			}
-			
-			async renderIssues() {
-				const loadingEl = document.getElementById('issues-loading');
-				const errorEl = document.getElementById('issues-error');
-				const contentEl = document.getElementById('issues-content');
-				const gridEl = document.getElementById('issues-grid');
-				const countEl = document.getElementById('issues-count');
-				const timestampEl = document.getElementById('issues-timestamp');
-				
-				// Show loading state
-				loadingEl.style.display = 'block';
-				errorEl.style.display = 'none';
-				contentEl.style.display = 'none';
-				
-				try {
-					const issues = await this.fetchIssues();
-					
-					// Hide loading, show content
-					loadingEl.style.display = 'none';
-					contentEl.style.display = 'block';
-					
-					// Populate issues grid
-					if (issues.length === 0) {
-						gridEl.innerHTML = `
-							<div class="card" style="text-align: center; padding: 1.6rem; grid-column: 1 / -1;">
-								<div style="color: var(--success-color); margin-bottom: 1rem;">[OK] No open issues!</div>
-								<div style="color: var(--text-muted);">Everything is working smoothly</div>
-							</div>
-						`;
-					} else {
-						gridEl.innerHTML = issues.map(issue => this.formatIssueCard(issue)).join('');
-					}
-					
-					// Update metadata
-					countEl.textContent = issues.length;
-					timestampEl.textContent = new Date().toLocaleTimeString();
-					
-				} catch (error) {
-					// Try to show fallback data from static issues
-					try {
-						const fallbackIssues = await this.getFallbackIssues();
-						if (fallbackIssues && fallbackIssues.length > 0) {
-							loadingEl.style.display = 'none';
-							contentEl.style.display = 'block';
-							
-							gridEl.innerHTML = fallbackIssues.map(issue => this.formatIssueCard(issue)).join('') + `
-								<div class="card" style="text-align: center; padding: 1rem; grid-column: 1 / -1; background: var(--bg-tertiary); border: 1px solid var(--accent-secondary);">
-									<div style="color: var(--accent-secondary); font-size: 0.9rem;">
-										[WARNING] Showing cached issues - Live data temporarily unavailable
-									</div>
-								</div>
-							`;
-							
-							countEl.textContent = fallbackIssues.length + ' (cached)';
-							timestampEl.textContent = 'Cached data';
-						} else {
-							throw error; // Fall through to error state
-						}
-					} catch (fallbackError) {
-						// Show error state
-						loadingEl.style.display = 'none';
-						errorEl.style.display = 'block';
-						contentEl.style.display = 'none';
-					}
-				}
-			}
-			
-			async getFallbackIssues() {
-				// Try to fetch from static markdown file as fallback
-				try {
-					const response = await fetch('/docs/pdoom1-open-issues.md');
-					if (response.ok) {
-						const markdown = await response.text();
-						return this.parseMarkdownIssues(markdown);
-					}
-				} catch (e) {
-					// Fallback to hardcoded recent issues
-					return [
-						{
-							number: 245,
-							title: 'Post-Rebase Test Failures: 5 Functional Issues Requiring Investigation',
-							html_url: 'https://github.com/PipFoweraker/pdoom1/issues/245',
-							updated_at: '2025-09-09T06:16:52Z',
-							labels: [{ name: 'bug', color: 'd73a4a' }]
-						},
-						{
-							number: 240,
-							title: 'UI Interaction Issues: Button clicks and spacebar not working consistently',
-							html_url: 'https://github.com/PipFoweraker/pdoom1/issues/240',
-							updated_at: '2025-09-07T22:05:21Z',
-							labels: [{ name: 'bug', color: 'd73a4a' }, { name: 'ui-ux', color: '7057ff' }]
-						},
-						{
-							number: 232,
-							title: 'Drop Python 3.8 Support Initiative',
-							html_url: 'https://github.com/PipFoweraker/pdoom1/issues/232',
-							updated_at: '2025-09-04T23:27:29Z',
-							labels: [
-								{ name: 'enhancement', color: 'a2eeef' },
-								{ name: 'priority-high', color: 'b60205' },
-								{ name: 'technical-debt', color: 'fef2c0' }
-							]
-						}
-					];
-				}
-				return [];
-			}
-			
-			parseMarkdownIssues(markdown) {
-				// Simple parser for the existing markdown format
-				const lines = markdown.split('\n');
-				const issues = [];
-				
-				for (const line of lines) {
-					const match = line.match(/- \[#(\d+)\]\(([^)]+)\) (.+?) \| labels: ([^|]*) \| milestone: ([^|]*) \| updated: (.+)/);
-					if (match) {
-						const [, number, url, title, labelsStr, milestone, updated] = match;
-						const labels = labelsStr.split(', ')
-							.filter(l => l.trim())
-							.map(name => ({ name: name.trim(), color: this.getLabelColor(name.trim()) }));
-						
-						issues.push({
-							number: parseInt(number),
-							title: title.trim(),
-							html_url: url,
-							updated_at: updated.trim(),
-							labels: labels
-						});
-					}
-				}
-				
-				return issues.slice(0, 10); // Limit to 10 issues
-			}
-			
-			getLabelColor(labelName) {
-				const colorMap = {
-					'bug': 'd73a4a',
-					'enhancement': 'a2eeef',
-					'documentation': '0075ca',
-					'priority-high': 'b60205',
-					'priority-medium': 'fbca04',
-					'technical-debt': 'fef2c0',
-					'ui-ux': '7057ff',
-					'audio': 'c2e0c6'
-				};
-				return colorMap[labelName] || '6f42c1'; // Default purple
-			}
-		}
-		
-		// Initialize GitHub issues loader
-		const issuesLoader = new GitHubIssuesLoader();
-		
-		// Load issues when page loads
-		document.addEventListener('DOMContentLoaded', () => {
-			issuesLoader.renderIssues();
-		});
-		
-		// Refresh button functionality
-		document.addEventListener('DOMContentLoaded', () => {
-			const refreshBtn = document.getElementById('refresh-issues');
-			if (refreshBtn) {
-				refreshBtn.addEventListener('click', async () => {
-					const originalText = refreshBtn.textContent;
-					refreshBtn.textContent = 'Refreshing...';
-					refreshBtn.disabled = true;
-					
-					// Force cache refresh
-					issuesLoader.cache = null;
-					issuesLoader.lastFetch = 0;
-					
-					await issuesLoader.renderIssues();
-					
-					setTimeout(() => {
-						refreshBtn.textContent = originalText;
-						refreshBtn.disabled = false;
-					}, 1000);
-				});
-			}
-		});
-		
-		// Retry loading function for error boundary
-		async function retryLoadIssues() {
-			const errorEl = document.getElementById('issues-error');
-			const loadingEl = document.getElementById('issues-loading');
-			
-			// Hide error, show loading
-			if (errorEl) errorEl.style.display = 'none';
-			if (loadingEl) loadingEl.style.display = 'block';
-			
-			// Clear cache and retry
-			issuesLoader.cache = null;
-			issuesLoader.lastFetch = 0;
-			await issuesLoader.renderIssues();
-		}
-		
+		// GitHub Issues section removed - now on dedicated /issues/ page
 		// Load and update version information
 		async function loadVersionInfo() {
 			try {
@@ -1811,41 +1519,6 @@ python main.py</pre>
 		});
 	</script>
 	
-	<!-- Add CSS for GitHub Issues -->
-	<style>
-		.issue-card {
-			transition: all var(--duration-base) var(--easing);
-		}
-		
-		.issue-card:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(0, 255, 65, 0.15);
-		}
-		
-		.issue-card.priority-issue {
-			border-left: 4px solid var(--accent-danger);
-		}
-		
-		.issue-label {
-			display: inline-block;
-			white-space: nowrap;
-		}
-		
-		#github-issues-container {
-			margin-top: 2rem;
-		}
-		
-		@media (max-width: 768px) {
-			.issue-card h4 {
-				font-size: 0.9rem;
-			}
-			
-			.issue-label {
-				font-size: 0.7rem !important;
-				padding: 1px 4px !important;
-			}
-		}
-	</style>
 	
 	<!-- Privacy-preserving analytics -->
 	<script src="/assets/js/analytics.js"></script>

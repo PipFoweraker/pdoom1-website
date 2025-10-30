@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Frontier AI Labs - p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/frontier-labs/" />
+	<meta name="description" content="Real-world frontier AI laboratories and hypothetical future entities used in p(Doom)1 modeling" />
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-sm: 4px;
+			--radius-md: 6px;
+			--radius-lg: 10px;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+			background-image:
+				radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.02) 0%, transparent 50%),
+				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem 0;
+			margin-bottom: 2rem;
+		}
+
+		.header-content {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 0 2rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.back-link {
+			color: var(--accent-primary);
+			text-decoration: none;
+			font-weight: bold;
+			transition: opacity 0.2s;
+		}
+
+		.back-link:hover {
+			opacity: 0.8;
+		}
+
+		main {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 0 2rem 4rem;
+		}
+
+		h1 {
+			color: var(--accent-primary);
+			text-align: center;
+			margin: 2rem 0;
+			font-size: 2.5rem;
+			text-shadow: 0 0 20px var(--accent-primary);
+		}
+
+		.intro {
+			text-align: center;
+			color: var(--text-secondary);
+			margin-bottom: 3rem;
+			font-size: 1.1rem;
+			max-width: 800px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		.lab-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+			gap: 2rem;
+			margin-bottom: 3rem;
+		}
+
+		.lab-card {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 2rem;
+			transition: all 0.3s ease;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.lab-card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 4px;
+			background: var(--accent-primary);
+			transform: scaleX(0);
+			transition: transform 0.3s ease;
+		}
+
+		.lab-card:hover::before {
+			transform: scaleX(1);
+		}
+
+		.lab-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 8px 24px rgba(0, 255, 65, 0.2);
+			border-color: var(--accent-primary);
+		}
+
+		.lab-card.hypothetical {
+			border-color: var(--accent-secondary);
+			background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 107, 53, 0.05) 100%);
+		}
+
+		.lab-card.hypothetical::before {
+			background: var(--accent-secondary);
+		}
+
+		.lab-card.hypothetical:hover {
+			border-color: var(--accent-secondary);
+			box-shadow: 0 8px 24px rgba(255, 107, 53, 0.2);
+		}
+
+		.lab-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: start;
+			margin-bottom: 1rem;
+		}
+
+		.lab-name {
+			font-size: 1.5rem;
+			color: var(--accent-primary);
+			margin-bottom: 0.5rem;
+		}
+
+		.lab-card.hypothetical .lab-name {
+			color: var(--accent-secondary);
+		}
+
+		.lab-tag {
+			background: var(--accent-primary);
+			color: var(--bg-primary);
+			padding: 0.25rem 0.75rem;
+			border-radius: var(--radius-sm);
+			font-size: 0.75rem;
+			font-weight: bold;
+			text-transform: uppercase;
+		}
+
+		.lab-card.hypothetical .lab-tag {
+			background: var(--accent-secondary);
+		}
+
+		.lab-description {
+			color: var(--text-secondary);
+			margin-bottom: 1.5rem;
+			line-height: 1.7;
+		}
+
+		.lab-stats {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 1rem;
+			margin-top: 1.5rem;
+			padding-top: 1.5rem;
+			border-top: 1px solid var(--border-color);
+		}
+
+		.stat-item {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.stat-label {
+			color: var(--text-muted);
+			font-size: 0.85rem;
+			margin-bottom: 0.25rem;
+		}
+
+		.stat-value {
+			color: var(--accent-primary);
+			font-weight: bold;
+			font-size: 1.1rem;
+		}
+
+		.lab-card.hypothetical .stat-value {
+			color: var(--accent-secondary);
+		}
+
+		.lab-link {
+			display: inline-block;
+			margin-top: 1rem;
+			color: var(--accent-primary);
+			text-decoration: none;
+			font-weight: bold;
+			transition: opacity 0.2s;
+		}
+
+		.lab-link:hover {
+			opacity: 0.8;
+		}
+
+		.section-header {
+			text-align: center;
+			margin: 4rem 0 2rem;
+			padding: 1.5rem;
+			background: var(--bg-secondary);
+			border-radius: var(--radius-lg);
+			border: 1px solid var(--border-color);
+		}
+
+		.section-header h2 {
+			color: var(--accent-secondary);
+			font-size: 2rem;
+			margin-bottom: 1rem;
+		}
+
+		.section-header p {
+			color: var(--text-secondary);
+		}
+
+		.total-count {
+			text-align: center;
+			margin: 3rem 0;
+			padding: 2rem;
+			background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(0, 255, 65, 0.05) 100%);
+			border: 2px solid var(--accent-primary);
+			border-radius: var(--radius-lg);
+		}
+
+		.total-count .number {
+			font-size: 4rem;
+			color: var(--accent-primary);
+			font-weight: bold;
+			text-shadow: 0 0 30px var(--accent-primary);
+		}
+
+		.total-count .label {
+			color: var(--text-secondary);
+			font-size: 1.2rem;
+			margin-top: 0.5rem;
+		}
+
+		@media (max-width: 768px) {
+			.lab-grid {
+				grid-template-columns: 1fr;
+			}
+
+			h1 {
+				font-size: 2rem;
+			}
+
+			.lab-stats {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<div class="header-content">
+			<a href="/" class="back-link">← Back to Home</a>
+			<div style="color: var(--accent-primary); font-weight: bold;">p(Doom)1</div>
+		</div>
+	</header>
+
+	<main>
+		<h1>Frontier AI Labs</h1>
+		<p class="intro">
+			Real-world frontier AI laboratories and hypothetical future entities used in p(Doom)1 modeling.
+			These organizations represent the cutting edge of AI development and are central to AI Safety considerations.
+		</p>
+
+		<div class="total-count">
+			<div class="number" id="total-labs">7</div>
+			<div class="label">Total Frontier Labs in Model</div>
+		</div>
+
+		<!-- Real Labs -->
+		<h2 style="color: var(--accent-primary); font-size: 1.8rem; margin: 3rem 0 1.5rem; text-align: center;">Real-World Labs</h2>
+
+		<div class="lab-grid">
+			<div class="lab-card">
+				<div class="lab-header">
+					<div>
+						<h3 class="lab-name">OpenAI</h3>
+						<span class="lab-tag">Active</span>
+					</div>
+				</div>
+				<p class="lab-description">
+					Creator of GPT-4, ChatGPT, and DALL-E. Leading research in large language models and multimodal AI with a stated mission to ensure AGI benefits all of humanity.
+				</p>
+				<div class="lab-stats">
+					<div class="stat-item">
+						<span class="stat-label">Founded</span>
+						<span class="stat-value">2015</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Notable Models</span>
+						<span class="stat-value">GPT-4, o1</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Compute</span>
+						<span class="stat-value">Very High</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Safety Focus</span>
+						<span class="stat-value">High</span>
+					</div>
+				</div>
+				<a href="https://openai.com" target="_blank" rel="noopener" class="lab-link">Visit OpenAI →</a>
+			</div>
+
+			<div class="lab-card">
+				<div class="lab-header">
+					<div>
+						<h3 class="lab-name">Anthropic</h3>
+						<span class="lab-tag">Active</span>
+					</div>
+				</div>
+				<p class="lab-description">
+					Developers of Claude AI with strong focus on Constitutional AI and AI safety research. Founded by former OpenAI researchers with emphasis on alignment.
+				</p>
+				<div class="lab-stats">
+					<div class="stat-item">
+						<span class="stat-label">Founded</span>
+						<span class="stat-value">2021</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Notable Models</span>
+						<span class="stat-value">Claude 3.5</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Compute</span>
+						<span class="stat-value">High</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Safety Focus</span>
+						<span class="stat-value">Very High</span>
+					</div>
+				</div>
+				<a href="https://anthropic.com" target="_blank" rel="noopener" class="lab-link">Visit Anthropic →</a>
+			</div>
+
+			<div class="lab-card">
+				<div class="lab-header">
+					<div>
+						<h3 class="lab-name">DeepMind (Google)</h3>
+						<span class="lab-tag">Active</span>
+					</div>
+				</div>
+				<p class="lab-description">
+					Pioneers in reinforcement learning and game-playing AI (AlphaGo, AlphaFold). Now merged with Google Brain, working on Gemini and foundational AI research.
+				</p>
+				<div class="lab-stats">
+					<div class="stat-item">
+						<span class="stat-label">Founded</span>
+						<span class="stat-value">2010</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Notable Models</span>
+						<span class="stat-value">Gemini, AlphaFold</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Compute</span>
+						<span class="stat-value">Very High</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Safety Focus</span>
+						<span class="stat-value">High</span>
+					</div>
+				</div>
+				<a href="https://deepmind.google" target="_blank" rel="noopener" class="lab-link">Visit DeepMind →</a>
+			</div>
+
+			<div class="lab-card">
+				<div class="lab-header">
+					<div>
+						<h3 class="lab-name">Meta AI (FAIR)</h3>
+						<span class="lab-tag">Active</span>
+					</div>
+				</div>
+				<p class="lab-description">
+					Facebook AI Research developing Llama models with open-source approach. Focus on computer vision, NLP, and multimodal research.
+				</p>
+				<div class="lab-stats">
+					<div class="stat-item">
+						<span class="stat-label">Founded</span>
+						<span class="stat-value">2013</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Notable Models</span>
+						<span class="stat-value">Llama 3</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Compute</span>
+						<span class="stat-value">Very High</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Safety Focus</span>
+						<span class="stat-value">Medium</span>
+					</div>
+				</div>
+				<a href="https://ai.facebook.com" target="_blank" rel="noopener" class="lab-link">Visit Meta AI →</a>
+			</div>
+
+			<div class="lab-card">
+				<div class="lab-header">
+					<div>
+						<h3 class="lab-name">xAI</h3>
+						<span class="lab-tag">Active</span>
+					</div>
+				</div>
+				<p class="lab-description">
+					Founded by Elon Musk to develop AI that is "maximally truth-seeking". Creator of Grok AI assistant with emphasis on reducing political correctness.
+				</p>
+				<div class="lab-stats">
+					<div class="stat-item">
+						<span class="stat-label">Founded</span>
+						<span class="stat-value">2023</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Notable Models</span>
+						<span class="stat-value">Grok</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Compute</span>
+						<span class="stat-value">High</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Safety Focus</span>
+						<span class="stat-value">Medium</span>
+					</div>
+				</div>
+				<a href="https://x.ai" target="_blank" rel="noopener" class="lab-link">Visit xAI →</a>
+			</div>
+
+			<div class="lab-card">
+				<div class="lab-header">
+					<div>
+						<h3 class="lab-name">Mistral AI</h3>
+						<span class="lab-tag">Active</span>
+					</div>
+				</div>
+				<p class="lab-description">
+					European AI startup focused on open-source models and efficient architectures. Rapidly growing with strong technical team and investor backing.
+				</p>
+				<div class="lab-stats">
+					<div class="stat-item">
+						<span class="stat-label">Founded</span>
+						<span class="stat-value">2023</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Notable Models</span>
+						<span class="stat-value">Mistral Large</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Compute</span>
+						<span class="stat-value">Medium-High</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Safety Focus</span>
+						<span class="stat-value">Medium</span>
+					</div>
+				</div>
+				<a href="https://mistral.ai" target="_blank" rel="noopener" class="lab-link">Visit Mistral →</a>
+			</div>
+		</div>
+
+		<!-- Hypothetical Labs -->
+		<div class="section-header">
+			<h2>Hypothetical Future Lab</h2>
+			<p>
+				Used in p(Doom)1 modeling to represent potential future entrants to frontier AI development.
+				Based on AI-2027 scenario planning and extrapolation of current trends.
+			</p>
+		</div>
+
+		<div class="lab-grid">
+			<div class="lab-card hypothetical">
+				<div class="lab-header">
+					<div>
+						<h3 class="lab-name">AI-2027 Entrant</h3>
+						<span class="lab-tag">Hypothetical</span>
+					</div>
+				</div>
+				<p class="lab-description">
+					Represents a hypothetical well-resourced lab entering the frontier AI space by 2027. Could be state-backed (China, EU), a tech giant entering late (Apple, Amazon), or a well-funded startup. Used in game modeling to test scenarios where the competitive landscape shifts.
+				</p>
+				<div class="lab-stats">
+					<div class="stat-item">
+						<span class="stat-label">Scenario Year</span>
+						<span class="stat-value">2027</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Model Type</span>
+						<span class="stat-value">Hypothetical</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Compute</span>
+						<span class="stat-value">High (Projected)</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Safety Focus</span>
+						<span class="stat-value">Unknown</span>
+					</div>
+				</div>
+				<p style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.9rem;">
+					<strong style="color: var(--accent-secondary);">Modeling Note:</strong> This entity is used to test game scenarios where new entrants with significant resources enter the frontier AI race, potentially disrupting existing safety norms or accelerating capability advances.
+				</p>
+			</div>
+		</div>
+
+		<!-- Info Box -->
+		<div style="margin-top: 4rem; padding: 2rem; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+			<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">Why These Labs Matter</h3>
+			<p style="color: var(--text-secondary); margin-bottom: 1rem;">
+				These organizations are developing the most advanced AI systems on Earth. Their decisions about safety, openness, and deployment directly impact global AI risk levels - the core mechanic of p(Doom)1.
+			</p>
+			<p style="color: var(--text-secondary); margin-bottom: 1rem;">
+				In the game, you manage a lab competing in this ecosystem, making strategic choices about:
+			</p>
+			<ul style="color: var(--text-secondary); margin-left: 2rem; margin-bottom: 1rem;">
+				<li>Research priorities (capabilities vs. safety)</li>
+				<li>Publication strategy (open vs. closed)</li>
+				<li>Compute allocation and scaling</li>
+				<li>Collaboration vs. competition</li>
+				<li>Policy advocacy and governance</li>
+			</ul>
+			<p style="color: var(--text-secondary);">
+				Learn more about real AI Safety considerations at <a href="https://stampy.ai" target="_blank" rel="noopener" style="color: var(--accent-primary);">Stampy.ai</a> or explore our <a href="/resources/" style="color: var(--accent-primary);">AI Safety Resources</a>.
+			</p>
+		</div>
+	</main>
+
+	<footer style="background: var(--bg-secondary); border-top: 2px solid var(--accent-primary); text-align: center; padding: 2rem; margin-top: 4rem;">
+		<p>&copy; 2025 p(Doom)1 by <a href="https://github.com/PipFoweraker" target="_blank" rel="noopener" style="color: var(--accent-primary); text-decoration: none; font-weight: bold;">Pip Foweraker</a></p>
+		<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
+			<a href="/" style="color: var(--accent-primary);">Home</a> |
+			<a href="/resources/" style="color: var(--accent-primary);">AI Safety Resources</a> |
+			<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);" target="_blank" rel="noopener">GitHub</a>
+		</p>
+	</footer>
+</body>
+</html>

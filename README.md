@@ -1,6 +1,17 @@
-# p(Doom)1 Website v1.1.1
+# p(Doom)1 Website v1.1.2
 
-Professional website with auto-deployment, WCAG AA accessibility, weekly league system, and real-time data loading for the p(Doom)1 game.
+Professional website with auto-deployment, WCAG AA accessibility, weekly league system, real-time data loading, and comprehensive AI Safety resource integration for the p(Doom)1 game.
+
+## 🆕 Latest Updates (v1.1.2)
+
+- ✅ **Issues & Feedback Page**: Dedicated `/issues/` page with privacy-preserving submission form
+- ✅ **Frontier Labs Page**: Comprehensive `/frontier-labs/` page covering 6 real + 1 hypothetical lab
+- ✅ **AI Safety Links**: Stampy.ai and aisafety.info integrated throughout site
+- ✅ **Performance**: Lazy loading images, preconnect hints, transparent loading states
+- ✅ **Tabbed About Section**: Features/Screenshots/Requirements in organized tabs
+- ✅ **Enhanced Footer**: 25+ links including sitemap, help resources, AI Safety links
+- ✅ **Ownership**: Clear attribution to Pip Foweraker
+- ✅ **35% Less Scrolling**: Compressed homepage with merged stats sections
 
 ## Features
 
