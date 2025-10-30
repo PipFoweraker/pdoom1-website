@@ -61,7 +61,7 @@
 		header {
 			background: var(--bg-secondary);
 			border-bottom: 2px solid var(--accent-primary);
-			padding: 0.8rem 0;
+			padding: 0.64rem 0;
 			position: sticky;
 			top: 0;
 			z-index: 100;
@@ -73,7 +73,7 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			padding: 0 2rem;
+			padding: 0 1.6rem;
 		}
 
 		.logo-container {
@@ -175,15 +175,15 @@
 		main {
 			max-width: 1200px;
 			margin: 0 auto;
-			padding: 2rem;
+			padding: 1.6rem;
 		}
 
 		.hero {
 			text-align: center;
-			padding: 2.5rem 0;
+			padding: 2rem 0;
 			background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
 			border-radius: var(--radius-lg, 10px);
-			margin-bottom: 3rem;
+			margin-bottom: 2.4rem;
 			border: var(--border-width, 1px) solid var(--border-color);
 		}
 
@@ -204,7 +204,7 @@
 			display: inline-block;
 			background: linear-gradient(45deg, var(--accent-primary), var(--success-color));
 			color: var(--bg-primary);
-			padding: 1rem 2rem;
+			padding: 0.8rem 1.6rem;
 			text-decoration: none;
 			border-radius: var(--radius-md, 6px);
 			font-weight: bold;
@@ -224,8 +224,8 @@
 			background: var(--bg-secondary);
 			border: var(--border-width, 1px) solid var(--border-color);
 			border-radius: var(--radius-md, 6px);
-			padding: 2rem;
-			margin-bottom: 2rem;
+			padding: 1.6rem;
+			margin-bottom: 1.6rem;
 		}
 
 		.section h2 {
@@ -237,15 +237,15 @@
 		.grid {
 			display: grid;
 			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-			gap: 2rem;
-			margin-top: 2rem;
+			gap: 1.6rem;
+			margin-top: 1.6rem;
 		}
 
 		.card {
 			background: var(--bg-tertiary);
 			border: var(--border-width, 1px) solid var(--border-color);
 			border-radius: var(--radius-md, 6px);
-			padding: 1.5rem;
+			padding: 1.2rem;
 			transition: transform var(--duration-base) var(--easing), border-color var(--duration-base) var(--easing);
 		}
 
@@ -263,7 +263,7 @@
 			display: flex;
 			justify-content: space-around;
 			text-align: center;
-			padding: 2rem 0;
+			padding: 1.6rem 0;
 		}
 
 		.stat {
@@ -312,13 +312,13 @@
 			background: var(--bg-secondary);
 			border: var(--border-width, 1px) solid var(--border-color);
 			border-radius: var(--radius-md, 6px);
-			padding: 2rem;
+			padding: 1.6rem;
 			max-width: 600px;
-			margin: 2rem auto;
+			margin: 1.6rem auto;
 		}
 
 		.form-group {
-			margin-bottom: 1.5rem;
+			margin-bottom: 1.2rem;
 		}
 
 		label {
@@ -404,8 +404,8 @@
 			background: var(--bg-secondary);
 			border-top: 2px solid var(--accent-primary);
 			text-align: center;
-			padding: 2rem;
-			margin-top: 4rem;
+			padding: 1.6rem;
+			margin-top: 3.2rem;
 			color: var(--text-muted);
 		}
 
@@ -755,15 +755,6 @@
 		</nav>
 	</header>
 
-	<!-- Breadcrumb Navigation -->
-	<nav class="breadcrumb" aria-label="breadcrumb">
-		<ol class="breadcrumb-list">
-			<li class="breadcrumb-item current" aria-current="page">
-				<span>Home</span>
-			</li>
-		</ol>
-	</nav>
-
 	<main role="main" id="main-content">
 		<section class="hero" id="home" role="banner" aria-labelledby="main-heading">
 			<h1 id="main-heading">p(Doom)1</h1>
@@ -968,7 +959,7 @@ python main.py</pre>
 			</div>
 			
 			<!-- Additional Resources -->
-			<div style="text-align: center; margin-top: 3rem; padding: 2rem; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+			<div style="text-align: center; margin-top: 2.4rem; padding: 1.6rem; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
 				<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">Need Help?</h3>
 				<p style="color: var(--text-secondary); margin-bottom: 2rem;">Check out our documentation and community resources</p>
 				<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
@@ -1013,7 +1004,7 @@ python main.py</pre>
 			<p>Live updates from our development repository. See what we're working on and known issues before downloading.</p>
 			
 			<div id="github-issues-container">
-				<div id="issues-loading" class="card" style="text-align: center; padding: 2rem;">
+				<div id="issues-loading" class="card" style="text-align: center; padding: 1.6rem;">
 					<div style="color: var(--text-muted);">
 						<div style="margin-bottom: 1rem;">Loading issues from GitHub...</div>
 						<div class="progress-bar" style="margin: 16px auto; max-width: 200px;">
@@ -1064,7 +1055,7 @@ python main.py</pre>
 		</section>
 
 		<!-- AI Safety Resources - Now on dedicated page -->
-		<section class="section" style="text-align: center; padding: 2rem;">
+		<section class="section" style="text-align: center; padding: 1.6rem;">
 			<h2>AI Safety Resources</h2>
 			<p style="color: var(--text-secondary); margin-bottom: 2rem;">
 				Explore the broader AI Safety ecosystem that inspires p(Doom)1.
@@ -1490,7 +1481,7 @@ python main.py</pre>
 					// Populate issues grid
 					if (issues.length === 0) {
 						gridEl.innerHTML = `
-							<div class="card" style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
+							<div class="card" style="text-align: center; padding: 1.6rem; grid-column: 1 / -1;">
 								<div style="color: var(--success-color); margin-bottom: 1rem;">[OK] No open issues!</div>
 								<div style="color: var(--text-muted);">Everything is working smoothly</div>
 							</div>
