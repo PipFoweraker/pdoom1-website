@@ -1,0 +1,132 @@
+name: Auto-Deploy to DreamHost on Push
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'public/**'
+      - 'scripts/generate-sitemap.js'
+      - '.github/workflows/auto-deploy-on-push.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deployment Start Notice
+        run: |
+          echo "🚀 AUTO-DEPLOYMENT TRIGGERED 🚀"
+          echo "Triggered by push to main branch"
+          echo "Commit: ${{ github.sha }}"
+          echo "Author: ${{ github.actor }}"
+          echo "Message: ${{ github.event.head_commit.message }}"
+
+      - name: Check required secrets
+        run: |
+          MISSING=0
+          for v in DH_HOST DH_USER DH_PATH DH_SSH_KEY; do
+            if [ -z "${!v}" ]; then
+              echo "❌ Missing secret: $v"
+              MISSING=1
+            else
+              echo "✅ Secret $v is set"
+            fi
+          done
+          if [ "${MISSING}" = "1" ]; then
+            echo ""
+            echo "⚠️  Please configure DreamHost secrets in GitHub repository settings:"
+            echo "   Settings > Secrets and variables > Actions"
+            echo ""
+            echo "Required secrets:"
+            echo "   - DH_HOST: DreamHost hostname (e.g., yoursite.dreamhost.com)"
+            echo "   - DH_USER: SSH username"
+            echo "   - DH_PATH: Remote path (e.g., ~/pdoom1.com)"
+            echo "   - DH_SSH_KEY: Private SSH key for authentication"
+            echo "   - DH_PORT: SSH port (optional, defaults to 22)"
+            exit 1
+          fi
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Generate sitemap
+        run: |
+          if [ -f "scripts/generate-sitemap.js" ]; then
+            echo "📋 Generating sitemap..."
+            node scripts/generate-sitemap.js
+          else
+            echo "⚠️  No sitemap generator found, skipping..."
+          fi
+
+      - name: Setup SSH
+        env:
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+        run: |
+          echo "🔐 Setting up SSH authentication..."
+          mkdir -p ~/.ssh
+          echo "$DH_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+          echo "✅ SSH configured"
+
+      - name: Ensure remote path exists
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+        run: |
+          PORT=${DH_PORT:-22}
+          echo "📁 Ensuring remote directory exists: ${DH_PATH}"
+          ssh -p "$PORT" "${DH_USER}@${DH_HOST}" "mkdir -p '${DH_PATH}'"
+          echo "✅ Remote path ready"
+
+      - name: Deploy public/ via rsync
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PATH: ${{ secrets.DH_PATH }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+        run: |
+          set -euo pipefail
+          PORT=${DH_PORT:-22}
+
+          echo "🔄 Deploying to DreamHost via rsync..."
+          echo "   Source: ./public/"
+          echo "   Destination: ${DH_USER}@${DH_HOST}:${DH_PATH}/"
+
+          rsync -avz --delete \
+            --exclude='.git*' \
+            --exclude='node_modules' \
+            --exclude='*.log' \
+            -e "ssh -p $PORT" \
+            public/ "${DH_USER}@${DH_HOST}:${DH_PATH}/"
+
+          echo "✅ Deployment completed successfully!"
+
+      - name: Post-deployment summary
+        run: |
+          echo ""
+          echo "🎉 DEPLOYMENT COMPLETE 🎉"
+          echo ""
+          echo "✅ Files synced to DreamHost"
+          echo "🔗 Site: https://pdoom1.com"
+          echo "📝 Commit: ${{ github.sha }}"
+          echo "👤 Deployed by: ${{ github.actor }}"
+          echo "⏰ Time: $(date -u)"
+          echo ""
+          echo "🤖 Happy CI/CD gremlining! 🤖"
