@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Profile - p(Doom)1</title>
+  <meta name="description" content="View player statistics, performance history, and achievements in p(Doom)1 weekly leagues.">
+  <link rel="canonical" href="https://pdoom1.com/players/" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+  <meta name="author" content="p(Doom)1" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="p(Doom)1" />
+  <meta property="og:title" content="Player Profile - p(Doom)1" />
+  <meta property="og:description" content="View player statistics and performance history in p(Doom)1 weekly leagues." />
+  <meta property="og:url" content="https://pdoom1.com/players/" />
+  <meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  
+  <!-- Chart.js for performance charts -->
+  <!-- Note: Integrity hash should be verified against official Chart.js CDN when deploying to production -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+  
+  <style>
+    :root {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --bg-tertiary: #3d3d3d;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #888888;
+      --accent-primary: #00ff41;
+      --accent-secondary: #ff6b35;
+      --accent-danger: #ff4444;
+      --border-color: #444444;
+      --success-color: #4caf50;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+      --border-width: 1px;
+      --shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+      --duration-fast: 150ms;
+      --duration-base: 300ms;
+      --easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 2px solid var(--accent-primary);
+      padding: 1rem;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .designer-credit {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: normal;
+      margin-bottom: -0.2rem;
+      letter-spacing: 0.5px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+      text-decoration: none;
+      text-shadow: 0 0 10px var(--accent-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      transition: all var(--duration-base) var(--easing);
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent-primary);
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border: 1px solid var(--accent-primary);
+      border-radius: var(--radius-md);
+      transition: all var(--duration-base) var(--easing);
+      margin-bottom: 2rem;
+    }
+
+    .back-link:hover {
+      background: rgba(0, 255, 65, 0.1);
+      transform: translateX(-4px);
+    }
+
+    .player-header {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .player-avatar {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--success-color));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: bold;
+      color: var(--bg-primary);
+      flex-shrink: 0;
+    }
+
+    .player-info {
+      flex: 1;
+    }
+
+    .player-name {
+      font-size: 2rem;
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 10px var(--accent-primary);
+    }
+
+    .player-stats-summary {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .stat-summary-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-summary-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .stat-summary-value {
+      font-size: 1.3rem;
+      color: var(--accent-primary);
+      font-weight: bold;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+    }
+
+    .section h2 {
+      color: var(--accent-secondary);
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    .section h3 {
+      color: var(--accent-primary);
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+    }
+
+    .section h3:first-of-type {
+      margin-top: 0;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-box {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .stat-box-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-box-value {
+      font-size: 1.5rem;
+      color: var(--accent-primary);
+      font-weight: bold;
+    }
+
+    .participation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .participation-item {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .week-label {
+      color: var(--text-primary);
+      font-weight: bold;
+    }
+
+    .rank-badge {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .rank-badge.rank-1 { background: #ffd700; }
+    .rank-badge.rank-2 { background: #c0c0c0; }
+    .rank-badge.rank-3 { background: #cd7f32; }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    .error-message {
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid var(--accent-danger);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--accent-danger);
+      margin: 2rem 0;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+    }
+
+    .achievement-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+    }
+
+    .achievement-badge {
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+      transition: all var(--duration-base) var(--easing);
+      cursor: help;
+    }
+
+    .achievement-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 255, 65, 0.15);
+    }
+
+    .achievement-badge.rare {
+      border-color: var(--accent-primary);
+    }
+
+    .achievement-badge.epic {
+      border-color: #9370db;
+    }
+
+    .achievement-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .achievement-name {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      .player-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .player-stats-summary {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .achievement-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+    }
+  </style>
+
+  <script>
+    // Load design tokens if available
+    (async function loadTokens() {
+      try {
+        const res = await fetch('/design/tokens.json', { cache: 'no-store' });
+        if (!res.ok) return;
+        const t = await res.json();
+        const r = document.documentElement;
+        const set = (k, v) => v != null && r.style.setProperty(k, String(v));
+        if (t.colors) {
+          Object.entries({
+            '--bg-primary': t.colors.bgPrimary,
+            '--bg-secondary': t.colors.bgSecondary,
+            '--bg-tertiary': t.colors.bgTertiary,
+            '--text-primary': t.colors.textPrimary,
+            '--text-secondary': t.colors.textSecondary,
+            '--text-muted': t.colors.textMuted,
+            '--accent-primary': t.colors.accentPrimary,
+            '--accent-secondary': t.colors.accentSecondary,
+            '--accent-danger': t.colors.accentDanger,
+            '--border-color': t.colors.border,
+            '--success-color': t.colors.success
+          }).forEach(([k, v]) => set(k, v));
+        }
+        if (t.shape) {
+          Object.entries({
+            '--radius-sm': t.shape.radiusSm,
+            '--radius-md': t.shape.radiusMd,
+            '--radius-lg': t.shape.radiusLg,
+            '--border-width': t.shape.borderWidth,
+            '--shadow-button': t.shape.shadowButton
+          }).forEach(([k, v]) => set(k, v));
+        }
+        if (t.motion) {
+          Object.entries({
+            '--duration-fast': t.motion.durationFast,
+            '--duration-base': t.motion.durationBase,
+            '--easing': t.motion.easing
+          }).forEach(([k, v]) => set(k, v));
+        }
+      } catch (e) {
+        // ignore; defaults apply
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <nav role="navigation" aria-label="Main navigation">
+        <div class="logo-container">
+          <div class="designer-credit">Pip Foweraker's</div>
+          <a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
+        </div>
+        <ul class="nav-links" role="menubar">
+          <li role="none"><a href="/" role="menuitem">Game</a></li>
+          <li role="none"><a href="/league/" role="menuitem">Weekly League</a></li>
+          <li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
+          <li role="none"><a href="/stats/" role="menuitem">Game Stats</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <a href="/league/" class="back-link">
+      ← Back to League
+    </a>
+
+    <div class="loading" id="loading">Loading player profile</div>
+
+    <div class="error-message" id="error" style="display: none;">
+      Failed to load player profile. The player may not exist or there was an error loading the data.
+    </div>
+
+    <div id="player-content" style="display: none;">
+      <!-- Player Header -->
+      <div class="player-header">
+        <div class="player-avatar" id="player-avatar">?</div>
+        <div class="player-info">
+          <h1 class="player-name" id="player-name">Loading...</h1>
+          <div class="player-stats-summary">
+            <div class="stat-summary-item">
+              <span class="stat-summary-label">Total Games</span>
+              <span class="stat-summary-value" id="total-games">0</span>
+            </div>
+            <div class="stat-summary-item">
+              <span class="stat-summary-label">Best Score</span>
+              <span class="stat-summary-value" id="best-score">0</span>
+            </div>
+            <div class="stat-summary-item">
+              <span class="stat-summary-label">Avg Score</span>
+              <span class="stat-summary-value" id="avg-score">0</span>
+            </div>
+            <div class="stat-summary-item">
+              <span class="stat-summary-label">Best Rank</span>
+              <span class="stat-summary-value" id="best-rank">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Grid -->
+      <div class="content-grid">
+        <!-- Performance Stats -->
+        <div class="section">
+          <h2>[STATS] Performance Statistics</h2>
+          
+          <h3>Personal Best</h3>
+          <div class="stat-grid">
+            <div class="stat-box">
+              <div class="stat-box-label">Highest Score</div>
+              <div class="stat-box-value" id="pb-score">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-label">Lowest Doom</div>
+              <div class="stat-box-value" id="pb-doom">0%</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-label">Most Turns</div>
+              <div class="stat-box-value" id="pb-turns">0</div>
+            </div>
+          </div>
+
+          <h3>Averages</h3>
+          <div class="stat-grid">
+            <div class="stat-box">
+              <div class="stat-box-label">Avg Score</div>
+              <div class="stat-box-value" id="avg-score-detail">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-label">Avg Doom</div>
+              <div class="stat-box-value" id="avg-doom">0%</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-label">Avg Turns</div>
+              <div class="stat-box-value" id="avg-turns">0</div>
+            </div>
+          </div>
+
+          <h3>Rank History</h3>
+          <div style="margin-top: 1rem;">
+            <canvas id="rank-chart" style="max-height: 250px;"></canvas>
+          </div>
+        </div>
+
+        <!-- Participation & Records -->
+        <div>
+          <div class="section">
+            <h2>[PLAY] Participation</h2>
+            <div class="stat-grid">
+              <div class="stat-box">
+                <div class="stat-box-label">Weeks Played</div>
+                <div class="stat-box-value" id="weeks-played">0</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-box-label">Current Streak</div>
+                <div class="stat-box-value" id="current-streak">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section" style="margin-top: 1rem;">
+            <h2>[HIST] Recent Weeks</h2>
+            <div class="participation-list" id="participation-list">
+              <div class="no-data">No participation data available</div>
+            </div>
+          </div>
+
+          <div class="section" style="margin-top: 1rem;">
+            <h2>[WINS] Achievements</h2>
+            <div id="achievements-container">
+              <div class="no-data">No achievements earned yet</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Get player name from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const playerName = urlParams.get('player') || urlParams.get('name');
+
+    // Load player data
+    async function loadPlayerProfile() {
+      if (!playerName) {
+        showError('No player specified. Please provide a player name in the URL (e.g., ?player=PlayerName)');
+        return;
+      }
+
+      try {
+        // Load current week data
+        const currentResponse = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
+        const currentData = currentResponse.ok ? await currentResponse.json() : null;
+
+        // Load archive index
+        const indexResponse = await fetch('/leaderboard/data/weekly/archive/index.json', { cache: 'no-store' });
+        let archiveFiles = [];
+        
+        if (indexResponse.ok) {
+          const index = await indexResponse.json();
+          archiveFiles = index.archives.map(a => a.file);
+        }
+        // No fallback needed - empty array is fine
+
+        // Load all archive data
+        const archiveData = await Promise.all(
+          archiveFiles.map(file => 
+            fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })
+              .then(r => r.ok ? r.json() : null)
+              .catch(() => null)
+          )
+        );
+
+        // Combine all data
+        const allWeeks = [currentData, ...archiveData].filter(d => d !== null);
+
+        // Aggregate player data
+        const playerData = aggregatePlayerData(playerName, allWeeks);
+
+        if (playerData.totalGames === 0) {
+          showError(`No data found for player "${playerName}". They may not have participated in any weeks yet.`);
+          return;
+        }
+
+        displayPlayerProfile(playerData);
+      } catch (error) {
+        console.error('Failed to load player profile:', error);
+        showError('An error occurred while loading the player profile.');
+      }
+    }
+
+    // Aggregate player data from all weeks
+    function aggregatePlayerData(playerName, allWeeks) {
+      const playerEntries = [];
+      const weeklyRanks = [];
+
+      allWeeks.forEach(week => {
+        const entries = week.entries || [];
+        const playerEntry = entries.find(e => e.player_name === playerName);
+        
+        if (playerEntry) {
+          playerEntries.push(playerEntry);
+          
+          // Calculate rank
+          const sortedEntries = [...entries].sort((a, b) => b.score - a.score);
+          const rank = sortedEntries.findIndex(e => e.player_name === playerName) + 1;
+          
+          weeklyRanks.push({
+            week: week.meta?.week_id || 'Unknown',
+            rank: rank,
+            score: playerEntry.score,
+            doom: playerEntry.final_doom || 0,
+            turns: playerEntry.level_reached || 0
+          });
+        }
+      });
+
+      if (playerEntries.length === 0) {
+        return { totalGames: 0 };
+      }
+
+      // Calculate statistics
+      const scores = playerEntries.map(e => e.score);
+      const dooms = playerEntries.map(e => e.final_doom || 0);
+      const turns = playerEntries.map(e => e.level_reached || 0);
+      const ranks = weeklyRanks.map(w => w.rank);
+
+      return {
+        playerName: playerName,
+        totalGames: playerEntries.length,
+        bestScore: Math.max(...scores),
+        avgScore: scores.reduce((a, b) => a + b, 0) / scores.length,
+        bestRank: Math.min(...ranks),
+        lowestDoom: Math.min(...dooms),
+        avgDoom: dooms.reduce((a, b) => a + b, 0) / dooms.length,
+        mostTurns: Math.max(...turns),
+        avgTurns: turns.reduce((a, b) => a + b, 0) / turns.length,
+        weeksPlayed: allWeeks.filter(w => (w.entries || []).some(e => e.player_name === playerName)).length,
+        weeklyRanks: weeklyRanks.reverse() // Most recent first
+      };
+    }
+
+    // Display player profile
+    function displayPlayerProfile(data) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('player-content').style.display = 'block';
+
+      // Update header
+      document.getElementById('player-name').textContent = data.playerName;
+      document.getElementById('player-avatar').textContent = data.playerName[0].toUpperCase();
+      document.getElementById('total-games').textContent = data.totalGames;
+      document.getElementById('best-score').textContent = data.bestScore.toLocaleString();
+      document.getElementById('avg-score').textContent = Math.round(data.avgScore).toLocaleString();
+      document.getElementById('best-rank').textContent = `#${data.bestRank}`;
+
+      // Update performance stats
+      document.getElementById('pb-score').textContent = data.bestScore.toLocaleString();
+      document.getElementById('pb-doom').textContent = `${data.lowestDoom.toFixed(1)}%`;
+      document.getElementById('pb-turns').textContent = data.mostTurns;
+      document.getElementById('avg-score-detail').textContent = Math.round(data.avgScore).toLocaleString();
+      document.getElementById('avg-doom').textContent = `${data.avgDoom.toFixed(1)}%`;
+      document.getElementById('avg-turns').textContent = data.avgTurns.toFixed(1);
+
+      // Update participation
+      document.getElementById('weeks-played').textContent = data.weeksPlayed;
+      document.getElementById('current-streak').textContent = calculateStreak(data.weeklyRanks);
+
+      // Display recent weeks
+      displayRecentWeeks(data.weeklyRanks);
+
+      // Display achievements
+      displayAchievements(data);
+
+      // Render rank chart
+      renderRankChart(data.weeklyRanks);
+    }
+
+    // Display achievements
+    function displayAchievements(data) {
+      const container = document.getElementById('achievements-container');
+      const achievements = calculateAchievements(data);
+
+      if (achievements.length === 0) {
+        container.innerHTML = '<div class="no-data">No achievements earned yet</div>';
+        return;
+      }
+
+      container.innerHTML = '<div class="achievement-grid"></div>';
+      const grid = container.querySelector('.achievement-grid');
+
+      achievements.forEach(achievement => {
+        const badge = document.createElement('div');
+        badge.className = `achievement-badge ${achievement.rarity}`;
+        badge.title = achievement.description;
+        badge.innerHTML = `
+          <div class="achievement-icon">${achievement.icon}</div>
+          <div class="achievement-name">${achievement.name}</div>
+        `;
+        grid.appendChild(badge);
+      });
+    }
+
+    // Calculate achievements for player
+    function calculateAchievements(data) {
+      const achievements = [];
+
+      // Competition achievements
+      if (data.bestRank === 1) {
+        achievements.push({
+          icon: '[#1]',
+          name: 'First Place',
+          description: 'Achieved top rank in a weekly competition',
+          rarity: 'rare'
+        });
+      }
+      if (data.bestRank === 2) {
+        achievements.push({
+          icon: '[#2]',
+          name: 'Silver Medal',
+          description: 'Finished in 2nd place',
+          rarity: 'uncommon'
+        });
+      }
+      if (data.bestRank === 3) {
+        achievements.push({
+          icon: '[#3]',
+          name: 'Bronze Medal',
+          description: 'Finished in 3rd place',
+          rarity: 'uncommon'
+        });
+      }
+      if (data.bestScore > 1000) {
+        achievements.push({
+          icon: '[**]',
+          name: 'High Scorer',
+          description: 'Achieved a score over 1000',
+          rarity: 'common'
+        });
+      }
+
+      // Participation achievements
+      if (data.weeksPlayed >= 25) {
+        achievements.push({
+          icon: '[+25]',
+          name: 'Veteran',
+          description: 'Participated in 25+ weeks',
+          rarity: 'epic'
+        });
+      } else if (data.weeksPlayed >= 10) {
+        achievements.push({
+          icon: '[+10]',
+          name: 'Regular',
+          description: 'Participated in 10+ weeks',
+          rarity: 'rare'
+        });
+      }
+
+      const currentStreak = calculateStreak(data.weeklyRanks);
+      if (currentStreak >= 3) {
+        achievements.push({
+          icon: '[>>>]',
+          name: 'Hot Streak',
+          description: `${currentStreak} consecutive weeks`,
+          rarity: 'uncommon'
+        });
+      }
+
+      // Performance achievements
+      if (data.avgDoom < 20) {
+        achievements.push({
+          icon: '[SAFE]',
+          name: 'Safety First',
+          description: 'Average doom risk less than 20%',
+          rarity: 'uncommon'
+        });
+      }
+
+      if (data.lowestDoom === 0 && data.bestRank === 1) {
+        achievements.push({
+          icon: '[***]',
+          name: 'Perfect Week',
+          description: 'Won with 0% doom risk',
+          rarity: 'epic'
+        });
+      }
+
+      return achievements;
+    }
+
+    // Calculate current streak
+    function calculateStreak(weeklyRanks) {
+      // For simplicity, just return the number of consecutive weeks from most recent
+      // In production, this should check for actual consecutive weeks
+      let streak = 0;
+      for (let i = 0; i < weeklyRanks.length; i++) {
+        if (i === 0 || weeklyRanks[i - 1]) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+      return streak;
+    }
+
+    // Display recent weeks
+    function displayRecentWeeks(weeklyRanks) {
+      const list = document.getElementById('participation-list');
+      
+      if (weeklyRanks.length === 0) {
+        list.innerHTML = '<div class="no-data">No participation data available</div>';
+        return;
+      }
+
+      list.innerHTML = '';
+      weeklyRanks.slice(0, 5).forEach(week => {
+        const item = document.createElement('div');
+        item.className = 'participation-item';
+        
+        const rankClass = week.rank <= 3 ? `rank-${week.rank}` : '';
+        
+        item.innerHTML = `
+          <span class="week-label">${week.week}</span>
+          <span class="rank-badge ${rankClass}">#${week.rank}</span>
+        `;
+        
+        list.appendChild(item);
+      });
+    }
+
+    // Render rank history chart
+    function renderRankChart(weeklyRanks) {
+      const ctx = document.getElementById('rank-chart');
+      if (!ctx) return;
+
+      const labels = weeklyRanks.map(w => w.week.replace('2025_W', 'W'));
+      const ranks = weeklyRanks.map(w => w.rank);
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Rank',
+            data: ranks,
+            borderColor: '#00ff41',
+            backgroundColor: 'rgba(0, 255, 65, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#2d2d2d',
+              titleColor: '#00ff41',
+              bodyColor: '#cccccc',
+              borderColor: '#444444',
+              borderWidth: 1,
+              titleFont: {
+                family: "'Courier New', monospace"
+              },
+              bodyFont: {
+                family: "'Courier New', monospace"
+              }
+            }
+          },
+          scales: {
+            y: {
+              reverse: true, // Lower rank is better
+              beginAtZero: false,
+              ticks: {
+                color: '#cccccc',
+                font: {
+                  family: "'Courier New', monospace",
+                  size: 10
+                },
+                stepSize: 1
+              },
+              grid: {
+                color: '#444444'
+              }
+            },
+            x: {
+              ticks: {
+                color: '#cccccc',
+                font: {
+                  family: "'Courier New', monospace",
+                  size: 10
+                }
+              },
+              grid: {
+                color: '#444444'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Show error
+    function showError(message) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error').textContent = message || 'Failed to load player profile.';
+    }
+
+    // Load data when page loads
+    document.addEventListener('DOMContentLoaded', loadPlayerProfile);
+  </script>
+</body>
+</html>

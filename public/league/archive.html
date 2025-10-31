@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly League Archives - p(Doom)1</title>
+  <meta name="description" content="Browse historical weekly league competition data. View past standings, winners, and statistics from previous weeks.">
+  <link rel="canonical" href="https://pdoom1.com/league/archive.html" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+  <meta name="author" content="p(Doom)1" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="p(Doom)1" />
+  <meta property="og:title" content="Weekly League Archives - p(Doom)1" />
+  <meta property="og:description" content="Browse historical weekly league competition data from p(Doom)1." />
+  <meta property="og:url" content="https://pdoom1.com/league/archive.html" />
+  <meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  
+  <style>
+    :root {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --bg-tertiary: #3d3d3d;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #888888;
+      --accent-primary: #00ff41;
+      --accent-secondary: #ff6b35;
+      --accent-danger: #ff4444;
+      --border-color: #444444;
+      --success-color: #4caf50;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+      --border-width: 1px;
+      --shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+      --duration-fast: 150ms;
+      --duration-base: 300ms;
+      --easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 2px solid var(--accent-primary);
+      padding: 1rem;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .designer-credit {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: normal;
+      margin-bottom: -0.2rem;
+      letter-spacing: 0.5px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+      text-decoration: none;
+      text-shadow: 0 0 10px var(--accent-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      transition: all var(--duration-base) var(--easing);
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      color: var(--accent-primary);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 20px var(--accent-primary);
+    }
+
+    .page-header .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+
+    .filter-bar {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .filter-group label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .filter-group select {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .filter-group select:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    .archive-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .archive-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: all var(--duration-base) var(--easing);
+      cursor: pointer;
+    }
+
+    .archive-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 255, 65, 0.15);
+    }
+
+    .archive-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .week-id {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+    }
+
+    .season-badge {
+      background: var(--bg-tertiary);
+      color: var(--accent-secondary);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+    }
+
+    .archive-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+    }
+
+    .stat-value {
+      color: var(--text-primary);
+      font-weight: bold;
+    }
+
+    .winner-highlight {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+    }
+
+    .winner-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .winner-name {
+      font-size: 1.1rem;
+      color: var(--accent-primary);
+      font-weight: bold;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    .error-message {
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid var(--accent-danger);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--accent-danger);
+      margin: 2rem 0;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .pagination button {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 1rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--duration-base) var(--easing);
+    }
+
+    .pagination button:hover:not(:disabled) {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      color: var(--text-secondary);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent-primary);
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border: 1px solid var(--accent-primary);
+      border-radius: var(--radius-md);
+      transition: all var(--duration-base) var(--easing);
+      margin-bottom: 2rem;
+    }
+
+    .back-link:hover {
+      background: rgba(0, 255, 65, 0.1);
+      transform: translateX(-4px);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--accent-primary);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.5rem;
+      color: var(--text-primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transform: translateY(150%);
+      transition: transform var(--duration-base) var(--easing);
+      z-index: 1000;
+      max-width: 400px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+    }
+
+    .toast-header {
+      font-weight: bold;
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .toast-body {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      .page-header h1 {
+        font-size: 2rem;
+      }
+
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .archive-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toast {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+        max-width: none;
+      }
+    }
+  </style>
+
+  <script>
+    // Load design tokens if available
+    (async function loadTokens() {
+      try {
+        const res = await fetch('/design/tokens.json', { cache: 'no-store' });
+        if (!res.ok) return;
+        const t = await res.json();
+        const r = document.documentElement;
+        const set = (k, v) => v != null && r.style.setProperty(k, String(v));
+        if (t.colors) {
+          Object.entries({
+            '--bg-primary': t.colors.bgPrimary,
+            '--bg-secondary': t.colors.bgSecondary,
+            '--bg-tertiary': t.colors.bgTertiary,
+            '--text-primary': t.colors.textPrimary,
+            '--text-secondary': t.colors.textSecondary,
+            '--text-muted': t.colors.textMuted,
+            '--accent-primary': t.colors.accentPrimary,
+            '--accent-secondary': t.colors.accentSecondary,
+            '--accent-danger': t.colors.accentDanger,
+            '--border-color': t.colors.border,
+            '--success-color': t.colors.success
+          }).forEach(([k, v]) => set(k, v));
+        }
+        if (t.shape) {
+          Object.entries({
+            '--radius-sm': t.shape.radiusSm,
+            '--radius-md': t.shape.radiusMd,
+            '--radius-lg': t.shape.radiusLg,
+            '--border-width': t.shape.borderWidth,
+            '--shadow-button': t.shape.shadowButton
+          }).forEach(([k, v]) => set(k, v));
+        }
+        if (t.motion) {
+          Object.entries({
+            '--duration-fast': t.motion.durationFast,
+            '--duration-base': t.motion.durationBase,
+            '--easing': t.motion.easing
+          }).forEach(([k, v]) => set(k, v));
+        }
+      } catch (e) {
+        // ignore; defaults apply
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <nav role="navigation" aria-label="Main navigation">
+        <div class="logo-container">
+          <div class="designer-credit">Pip Foweraker's</div>
+          <a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
+        </div>
+        <ul class="nav-links" role="menubar">
+          <li role="none"><a href="/" role="menuitem">Game</a></li>
+          <li role="none"><a href="/league/" role="menuitem">Weekly League</a></li>
+          <li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
+          <li role="none"><a href="/stats/" role="menuitem">Game Stats</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <a href="/league/" class="back-link">
+      ← Back to Current Week
+    </a>
+
+    <div class="page-header">
+      <h1>[ARCHIVE] Weekly League Archives</h1>
+      <p class="subtitle">Browse historical competition data and past winners</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label for="season-filter">Filter by Season</label>
+        <select id="season-filter">
+          <option value="all">All Seasons</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="sort-filter">Sort By</label>
+        <select id="sort-filter">
+          <option value="week-desc">Week (Newest First)</option>
+          <option value="week-asc">Week (Oldest First)</option>
+          <option value="participants-desc">Most Participants</option>
+          <option value="score-desc">Highest Score</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading" id="loading">Loading archives</div>
+
+    <!-- Error State -->
+    <div class="error-message" id="error" style="display: none;">
+      Failed to load archive data. Please try again later.
+    </div>
+
+    <!-- No Results -->
+    <div class="no-results" id="no-results" style="display: none;">
+      No archived weeks found. Check back later!
+    </div>
+
+    <!-- Archive Grid -->
+    <div class="archive-grid" id="archive-grid" style="display: none;">
+      <!-- Archive cards will be inserted here -->
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination" style="display: none;">
+      <button id="prev-page">← Previous</button>
+      <span class="pagination-info" id="page-info">Page 1</span>
+      <button id="next-page">Next →</button>
+    </div>
+  </main>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <div class="toast-header" id="toast-header"></div>
+    <div class="toast-body" id="toast-body"></div>
+  </div>
+
+  <script>
+    // Pagination state
+    let currentPage = 1;
+    const itemsPerPage = 9;
+    let allArchives = [];
+    let filteredArchives = [];
+
+    // Load archive data
+    async function loadArchives() {
+      try {
+        // First, try to load the archive index
+        const indexResponse = await fetch('/leaderboard/data/weekly/archive/index.json', { cache: 'no-store' });
+        
+        let archiveFiles;
+        if (indexResponse.ok) {
+          // Use index file if available
+          const index = await indexResponse.json();
+          archiveFiles = index.archives.map(a => a.file);
+        }
+        // No fallback needed - empty array is fine
+
+        // Load all archive files
+        const archiveData = await Promise.all(
+          archiveFiles.map(file => 
+            fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })
+              .then(r => r.ok ? r.json() : null)
+              .catch(() => null)
+          )
+        );
+
+        // Filter out failed loads
+        allArchives = archiveData.filter(d => d !== null);
+        
+        if (allArchives.length === 0) {
+          showNoResults();
+          return;
+        }
+
+        // Extract unique seasons for filter
+        const seasons = [...new Set(allArchives.map(a => a.meta?.season).filter(Boolean))];
+        populateSeasonFilter(seasons);
+
+        // Initial display
+        filteredArchives = [...allArchives];
+        applySort();
+        displayArchives();
+      } catch (error) {
+        console.error('Failed to load archives:', error);
+        showError();
+      }
+    }
+
+    // Populate season filter dropdown
+    function populateSeasonFilter(seasons) {
+      const seasonFilter = document.getElementById('season-filter');
+      seasons.forEach(season => {
+        const option = document.createElement('option');
+        option.value = season;
+        option.textContent = season;
+        seasonFilter.appendChild(option);
+      });
+    }
+
+    // Apply filters
+    function applyFilters() {
+      const seasonFilter = document.getElementById('season-filter').value;
+      
+      filteredArchives = allArchives.filter(archive => {
+        if (seasonFilter !== 'all' && archive.meta?.season !== seasonFilter) {
+          return false;
+        }
+        return true;
+      });
+
+      applySort();
+      currentPage = 1;
+      displayArchives();
+    }
+
+    // Apply sorting
+    function applySort() {
+      const sortFilter = document.getElementById('sort-filter').value;
+      
+      filteredArchives.sort((a, b) => {
+        switch (sortFilter) {
+          case 'week-desc':
+            return (b.meta?.week_id || '').localeCompare(a.meta?.week_id || '');
+          case 'week-asc':
+            return (a.meta?.week_id || '').localeCompare(b.meta?.week_id || '');
+          case 'participants-desc':
+            return (b.meta?.total_participants || 0) - (a.meta?.total_participants || 0);
+          case 'score-desc':
+            return (b.statistics?.highest_score || 0) - (a.statistics?.highest_score || 0);
+          default:
+            return 0;
+        }
+      });
+    }
+
+    // Display archives with pagination
+    function displayArchives() {
+      const grid = document.getElementById('archive-grid');
+      const loading = document.getElementById('loading');
+      const error = document.getElementById('error');
+      const noResults = document.getElementById('no-results');
+      const pagination = document.getElementById('pagination');
+
+      loading.style.display = 'none';
+      error.style.display = 'none';
+      noResults.style.display = 'none';
+
+      if (filteredArchives.length === 0) {
+        noResults.style.display = 'block';
+        grid.style.display = 'none';
+        pagination.style.display = 'none';
+        return;
+      }
+
+      // Calculate pagination
+      const totalPages = Math.ceil(filteredArchives.length / itemsPerPage);
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageArchives = filteredArchives.slice(startIndex, endIndex);
+
+      // Render archive cards
+      grid.innerHTML = '';
+      pageArchives.forEach(archive => {
+        const card = createArchiveCard(archive);
+        grid.appendChild(card);
+      });
+
+      grid.style.display = 'grid';
+
+      // Update pagination
+      if (totalPages > 1) {
+        pagination.style.display = 'flex';
+        document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages;
+      } else {
+        pagination.style.display = 'none';
+      }
+    }
+
+    // Create archive card element
+    function createArchiveCard(archive) {
+      const card = document.createElement('div');
+      card.className = 'archive-card';
+      
+      const meta = archive.meta || {};
+      const stats = archive.statistics || {};
+      const weekInfo = archive.week_info || {};
+      
+      // Find winner (highest score entry)
+      const entries = archive.entries || [];
+      const winner = entries.length > 0 
+        ? entries.reduce((max, entry) => entry.score > max.score ? entry : max, entries[0])
+        : null;
+
+      card.innerHTML = `
+        <div class="archive-card-header">
+          <div class="week-id">${meta.week_id || 'Unknown Week'}</div>
+          <div class="season-badge">${meta.season || 'Unknown'}</div>
+        </div>
+        <div class="archive-stats">
+          <div class="stat-item">
+            <span class="stat-label">Date Range</span>
+            <span class="stat-value">${weekInfo.start_date || '-'} to ${weekInfo.end_date || '-'}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Participants</span>
+            <span class="stat-value">${meta.total_participants || 0}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Submissions</span>
+            <span class="stat-value">${meta.total_submissions || 0}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">High Score</span>
+            <span class="stat-value">${(stats.highest_score || 0).toLocaleString()}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Avg Score</span>
+            <span class="stat-value">${(stats.average_score || 0).toFixed(1)}</span>
+          </div>
+        </div>
+        ${winner ? `
+          <div class="winner-highlight">
+            <div class="winner-label">[WIN] Winner</div>
+            <div class="winner-name">${winner.player_name || 'Unknown'}</div>
+          </div>
+        ` : ''}
+      `;
+
+      // Add click handler to view details (using toast instead of alert)
+      card.addEventListener('click', () => {
+        const header = `${meta.week_id} Details`;
+        let body = 'Detailed archive view coming soon!';
+        
+        if (winner) {
+          body += `<br><br><strong>Winner:</strong> ${winner.player_name}<br><strong>Score:</strong> ${winner.score.toLocaleString()}`;
+        } else {
+          body += '<br><br>No winner data available';
+        }
+        
+        showToast(header, body);
+      });
+
+      return card;
+    }
+
+    // Show toast notification
+    function showToast(header, body) {
+      const toast = document.getElementById('toast');
+      const toastHeader = document.getElementById('toast-header');
+      const toastBody = document.getElementById('toast-body');
+      
+      toastHeader.textContent = header;
+      toastBody.innerHTML = body; // Use innerHTML to support HTML formatting
+      
+      toast.classList.add('show');
+      
+      // Auto-hide after 4 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+
+    // Show error
+    function showError() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('archive-grid').style.display = 'none';
+    }
+
+    // Show no results
+    function showNoResults() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('no-results').style.display = 'block';
+      document.getElementById('archive-grid').style.display = 'none';
+    }
+
+    // Event listeners
+    document.getElementById('season-filter').addEventListener('change', applyFilters);
+    document.getElementById('sort-filter').addEventListener('change', () => {
+      applySort();
+      currentPage = 1;
+      displayArchives();
+    });
+
+    document.getElementById('prev-page').addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        displayArchives();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+    document.getElementById('next-page').addEventListener('click', () => {
+      const totalPages = Math.ceil(filteredArchives.length / itemsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        displayArchives();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+    // Load data when page loads
+    document.addEventListener('DOMContentLoaded', loadArchives);
+  </script>
+</body>
+</html>
