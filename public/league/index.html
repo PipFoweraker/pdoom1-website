@@ -16,6 +16,9 @@
   <meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
   <meta name="twitter:card" content="summary_large_image" />
   
+  <!-- Chart.js for mini charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-xzkYGx8H6qF7P8qKVJ1RqBLYVmBLKPmEkBZXQqgYOkz/OJ8DFPgJdQYmQmXxBPQp" crossorigin="anonymous"></script>
+  
   <style>
     :root {
       --bg-primary: #1a1a1a;
@@ -664,6 +667,9 @@
             <span class="value" id="unique-players">-</span>
           </div>
         </div>
+        <div style="margin-top: 1.5rem;">
+          <canvas id="mini-trend-chart" style="max-height: 150px;"></canvas>
+        </div>
       </div>
 
       <div class="card">
@@ -881,10 +887,119 @@
       }, 30000); // Refresh every 30 seconds
     }
 
+    // Render mini trend chart
+    async function renderMiniTrendChart() {
+      const ctx = document.getElementById('mini-trend-chart');
+      if (!ctx) return;
+
+      try {
+        // Load historical archive data
+        const archiveFiles = ['2025_W41_league.json', '2025_W42_league.json', '2025_W44_league.json'];
+        const historicalData = await Promise.all(
+          archiveFiles.map(file => 
+            fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })
+              .then(r => r.ok ? r.json() : null)
+              .catch(() => null)
+          )
+        );
+
+        // Load current week data
+        const currentResponse = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
+        const currentData = currentResponse.ok ? await currentResponse.json() : null;
+
+        // Filter out failed loads and add current week
+        const allWeeks = [...historicalData.filter(d => d !== null), currentData].filter(d => d);
+        
+        if (allWeeks.length === 0) {
+          ctx.parentElement.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 1rem; font-size: 0.9rem;">No historical data available</p>';
+          return;
+        }
+
+        // Extract data for mini chart
+        const labels = allWeeks.map(w => w.meta?.week_id?.replace('2025_W', 'W') || '?');
+        const participants = allWeeks.map(w => w.meta?.total_participants || 0);
+
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Participants',
+              data: participants,
+              borderColor: '#00ff41',
+              backgroundColor: 'rgba(0, 255, 65, 0.1)',
+              tension: 0.4,
+              fill: true,
+              pointRadius: 3,
+              pointHoverRadius: 5
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                backgroundColor: '#2d2d2d',
+                titleColor: '#00ff41',
+                bodyColor: '#cccccc',
+                borderColor: '#444444',
+                borderWidth: 1,
+                titleFont: {
+                  family: "'Courier New', monospace"
+                },
+                bodyFont: {
+                  family: "'Courier New', monospace"
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: '#cccccc',
+                  font: {
+                    family: "'Courier New', monospace",
+                    size: 10
+                  },
+                  stepSize: 1
+                },
+                grid: {
+                  color: '#444444'
+                }
+              },
+              x: {
+                ticks: {
+                  color: '#cccccc',
+                  font: {
+                    family: "'Courier New', monospace",
+                    size: 10
+                  }
+                },
+                grid: {
+                  color: '#444444'
+                }
+              }
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Failed to render mini chart:', error);
+        ctx.parentElement.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 1rem; font-size: 0.9rem;">Chart unavailable</p>';
+      }
+    }
+
     // Load data when page loads
     document.addEventListener('DOMContentLoaded', () => {
       loadLeagueData();
       startAutoRefresh();
+      
+      // Render mini chart after a short delay
+      setTimeout(() => {
+        renderMiniTrendChart();
+      }, 1000);
     });
   </script>
 </body>

@@ -16,6 +16,9 @@
   <meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
   <meta name="twitter:card" content="summary_large_image" />
   
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-xzkYGx8H6qF7P8qKVJ1RqBLYVmBLKPmEkBZXQqgYOkz/OJ8DFPgJdQYmQmXxBPQp" crossorigin="anonymous"></script>
+  
   <style>
     :root {
       --bg-primary: #1a1a1a;
@@ -470,9 +473,13 @@
           <span class="metric-value" id="current-high-score">-</span>
         </div>
 
-        <div class="chart-placeholder">
-          <p>📊 Performance Chart</p>
-          <p style="margin-top: 0.5rem; font-size: 0.9rem;">Visual trends coming soon</p>
+        <div style="margin-top: 1.5rem;">
+          <canvas id="performance-chart" style="max-height: 300px;"></canvas>
+        </div>
+
+        <h3 style="margin-top: 2rem;">Score Distribution</h3>
+        <div style="margin-top: 1rem;">
+          <canvas id="score-distribution-chart" style="max-height: 300px;"></canvas>
         </div>
       </div>
     </div>
@@ -523,9 +530,8 @@
         <span class="metric-value" id="streak-leaders">-</span>
       </div>
 
-      <div class="chart-placeholder">
-        <p>📊 Engagement Trends Chart</p>
-        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Player activity visualization coming soon</p>
+      <div style="margin-top: 1.5rem;">
+        <canvas id="engagement-chart" style="max-height: 300px;"></canvas>
       </div>
     </div>
 
@@ -714,8 +720,299 @@
       document.getElementById('streak-leaders').textContent = 'N/A';
     }
 
+    // Chart.js configuration for dark theme
+    const chartConfig = {
+      colors: {
+        primary: '#00ff41',
+        secondary: '#ff6b35',
+        tertiary: '#4caf50',
+        danger: '#ff4444',
+        grid: '#444444',
+        text: '#cccccc'
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#cccccc',
+              font: {
+                family: "'Courier New', monospace"
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: '#2d2d2d',
+            titleColor: '#00ff41',
+            bodyColor: '#cccccc',
+            borderColor: '#444444',
+            borderWidth: 1,
+            titleFont: {
+              family: "'Courier New', monospace"
+            },
+            bodyFont: {
+              family: "'Courier New', monospace"
+            }
+          }
+        },
+        scales: {
+          y: {
+            ticks: {
+              color: '#cccccc',
+              font: {
+                family: "'Courier New', monospace"
+              }
+            },
+            grid: {
+              color: '#444444'
+            }
+          },
+          x: {
+            ticks: {
+              color: '#cccccc',
+              font: {
+                family: "'Courier New', monospace"
+              }
+            },
+            grid: {
+              color: '#444444'
+            }
+          }
+        }
+      }
+    };
+
+    // Render performance trends chart
+    async function renderPerformanceChart(leagueData, statusData) {
+      const ctx = document.getElementById('performance-chart');
+      if (!ctx) return;
+
+      // Load historical archive data
+      const archiveFiles = ['2025_W41_league.json', '2025_W42_league.json', '2025_W44_league.json'];
+      const historicalData = await Promise.all(
+        archiveFiles.map(file => 
+          fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+        )
+      );
+
+      // Filter out failed loads and add current week
+      const allWeeks = [...historicalData.filter(d => d !== null), leagueData];
+      
+      // Extract data for charts
+      const labels = allWeeks.map(w => w.meta?.week_id || 'Unknown');
+      const avgScores = allWeeks.map(w => w.statistics?.average_score || 0);
+      const highScores = allWeeks.map(w => w.statistics?.highest_score || 0);
+      const participants = allWeeks.map(w => w.meta?.total_participants || 0);
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Average Score',
+              data: avgScores,
+              borderColor: chartConfig.colors.primary,
+              backgroundColor: 'rgba(0, 255, 65, 0.1)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: 'High Score',
+              data: highScores,
+              borderColor: chartConfig.colors.secondary,
+              backgroundColor: 'rgba(255, 107, 53, 0.1)',
+              tension: 0.4,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          ...chartConfig.options,
+          plugins: {
+            ...chartConfig.options.plugins,
+            title: {
+              display: true,
+              text: 'Performance Trends Over Time',
+              color: chartConfig.colors.primary,
+              font: {
+                family: "'Courier New', monospace",
+                size: 16
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Render engagement trends chart
+    async function renderEngagementChart(leagueData, statusData) {
+      const ctx = document.getElementById('engagement-chart');
+      if (!ctx) return;
+
+      // Load historical archive data
+      const archiveFiles = ['2025_W41_league.json', '2025_W42_league.json', '2025_W44_league.json'];
+      const historicalData = await Promise.all(
+        archiveFiles.map(file => 
+          fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+        )
+      );
+
+      // Filter out failed loads and add current week
+      const allWeeks = [...historicalData.filter(d => d !== null), leagueData];
+      
+      // Extract data for charts
+      const labels = allWeeks.map(w => w.meta?.week_id || 'Unknown');
+      const participants = allWeeks.map(w => w.meta?.total_participants || 0);
+      const submissions = allWeeks.map(w => w.meta?.total_submissions || 0);
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Unique Participants',
+              data: participants,
+              backgroundColor: chartConfig.colors.primary,
+              borderColor: chartConfig.colors.primary,
+              borderWidth: 1
+            },
+            {
+              label: 'Total Submissions',
+              data: submissions,
+              backgroundColor: chartConfig.colors.secondary,
+              borderColor: chartConfig.colors.secondary,
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          ...chartConfig.options,
+          plugins: {
+            ...chartConfig.options.plugins,
+            title: {
+              display: true,
+              text: 'Weekly Participation Trends',
+              color: chartConfig.colors.primary,
+              font: {
+                family: "'Courier New', monospace",
+                size: 16
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Render score distribution chart (histogram)
+    async function renderScoreDistributionChart(leagueData) {
+      const ctx = document.getElementById('score-distribution-chart');
+      if (!ctx) return;
+
+      // Get all scores from current week entries
+      const entries = leagueData.entries || [];
+      if (entries.length === 0) {
+        // Show placeholder if no data
+        ctx.parentElement.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">No score data available for current week</p>';
+        return;
+      }
+
+      const scores = entries.map(e => e.score || 0);
+      
+      // Create score buckets (bins)
+      const minScore = Math.min(...scores);
+      const maxScore = Math.max(...scores);
+      const range = maxScore - minScore;
+      const bucketSize = Math.max(100, Math.ceil(range / 10)); // At least 100 points per bucket
+      const numBuckets = Math.ceil(range / bucketSize) || 1;
+      
+      // Initialize buckets
+      const buckets = Array(numBuckets).fill(0);
+      const bucketLabels = [];
+      
+      for (let i = 0; i < numBuckets; i++) {
+        const start = minScore + (i * bucketSize);
+        const end = start + bucketSize;
+        bucketLabels.push(`${start}-${end}`);
+      }
+      
+      // Fill buckets
+      scores.forEach(score => {
+        const bucketIndex = Math.min(Math.floor((score - minScore) / bucketSize), numBuckets - 1);
+        buckets[bucketIndex]++;
+      });
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: bucketLabels,
+          datasets: [{
+            label: 'Number of Scores',
+            data: buckets,
+            backgroundColor: chartConfig.colors.tertiary,
+            borderColor: chartConfig.colors.tertiary,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          ...chartConfig.options,
+          plugins: {
+            ...chartConfig.options.plugins,
+            title: {
+              display: true,
+              text: 'Score Distribution (Current Week)',
+              color: chartConfig.colors.primary,
+              font: {
+                family: "'Courier New', monospace",
+                size: 16
+              }
+            },
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            ...chartConfig.options.scales,
+            y: {
+              ...chartConfig.options.scales.y,
+              beginAtZero: true,
+              ticks: {
+                ...chartConfig.options.scales.y.ticks,
+                stepSize: 1
+              }
+            }
+          }
+        }
+      });
+    }
+
     // Load data when page loads
-    document.addEventListener('DOMContentLoaded', loadCompetitionStats);
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadCompetitionStats();
+      
+      // Load charts after a short delay to ensure data is loaded
+      setTimeout(async () => {
+        try {
+          const leagueResponse = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
+          const leagueData = await leagueResponse.json();
+          
+          const statusResponse = await fetch(`${API_BASE_URL}/api/league/status`, { cache: 'no-store' }).catch(() => ({ ok: false }));
+          const statusData = statusResponse.ok ? await statusResponse.json() : null;
+          
+          await renderPerformanceChart(leagueData, statusData);
+          await renderEngagementChart(leagueData, statusData);
+          await renderScoreDistributionChart(leagueData);
+        } catch (error) {
+          console.error('Failed to render charts:', error);
+        }
+      }, 500);
+    });
   </script>
 </body>
 </html>
