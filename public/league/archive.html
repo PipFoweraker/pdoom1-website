@@ -723,14 +723,16 @@
 
       // Add click handler to view details (using toast instead of alert)
       card.addEventListener('click', () => {
-        const winnerInfo = winner 
-          ? `Winner: ${winner.player_name}\nScore: ${winner.score.toLocaleString()}`
-          : 'No winner data available';
+        const header = `${meta.week_id} Details`;
+        let body = 'Detailed archive view coming soon!';
         
-        showToast(
-          `${meta.week_id} Details`,
-          `Detailed archive view coming soon!\n\n${winnerInfo}`
-        );
+        if (winner) {
+          body += `<br><br><strong>Winner:</strong> ${winner.player_name}<br><strong>Score:</strong> ${winner.score.toLocaleString()}`;
+        } else {
+          body += '<br><br>No winner data available';
+        }
+        
+        showToast(header, body);
       });
 
       return card;
@@ -743,7 +745,7 @@
       const toastBody = document.getElementById('toast-body');
       
       toastHeader.textContent = header;
-      toastBody.textContent = body;
+      toastBody.innerHTML = body; // Use innerHTML to support HTML formatting
       
       toast.classList.add('show');
       

@@ -17,7 +17,8 @@
   <meta name="twitter:card" content="summary_large_image" />
   
   <!-- Chart.js for data visualization -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-xzkYGx8H6qF7P8qKVJ1RqBLYVmBLKPmEkBZXQqgYOkz/OJ8DFPgJdQYmQmXxBPQp" crossorigin="anonymous"></script>
+  <!-- Note: Integrity hash should be verified against official Chart.js CDN when deploying to production -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
   
   <style>
     :root {
@@ -951,8 +952,60 @@
       const minScore = Math.min(...scores);
       const maxScore = Math.max(...scores);
       const range = maxScore - minScore;
+      
+      // Handle edge case when all scores are identical
+      if (range === 0) {
+        // Show single bar for the score
+        const buckets = [scores.length];
+        const bucketLabels = [minScore.toString()];
+        
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: bucketLabels,
+            datasets: [{
+              label: 'Number of Scores',
+              data: buckets,
+              backgroundColor: chartConfig.colors.tertiary,
+              borderColor: chartConfig.colors.tertiary,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            ...chartConfig.options,
+            plugins: {
+              ...chartConfig.options.plugins,
+              title: {
+                display: true,
+                text: 'Score Distribution (Current Week)',
+                color: chartConfig.colors.primary,
+                font: {
+                  family: "'Courier New', monospace",
+                  size: 16
+                }
+              },
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              ...chartConfig.options.scales,
+              y: {
+                ...chartConfig.options.scales.y,
+                beginAtZero: true,
+                ticks: {
+                  ...chartConfig.options.scales.y.ticks,
+                  stepSize: 1
+                }
+              }
+            }
+          }
+        });
+        return;
+      }
+      
       const bucketSize = Math.max(100, Math.ceil(range / 10)); // At least 100 points per bucket
-      const numBuckets = Math.ceil(range / bucketSize) || 1;
+      const numBuckets = Math.ceil(range / bucketSize);
       
       // Initialize buckets
       const buckets = Array(numBuckets).fill(0);
