@@ -127,21 +127,21 @@ This document summarizes the implementation of enhancements outlined in `/docs/w
 #### Achievement Categories
 
 **Competition Achievements**
-- 🥇 **First Place** - Top rank in any week (Rare)
-- 🥈 **Silver Medal** - 2nd place finish (Uncommon)
-- 🥉 **Bronze Medal** - 3rd place finish (Uncommon)
-- 🏆 **Perfect Week** - Win with 0% doom risk (Epic)
-- 🎯 **High Scorer** - Score > 1000 (Common)
+- [#1] **First Place** - Top rank in any week (Rare)
+- [#2] **Silver Medal** - 2nd place finish (Uncommon)
+- [#3] **Bronze Medal** - 3rd place finish (Uncommon)
+- [***] **Perfect Week** - Win with 0% doom risk (Epic)
+- [**] **High Scorer** - Score > 1000 (Common)
 
 **Participation Achievements**
-- 🔥 **Hot Streak** - 3+ consecutive weeks (Uncommon)
-- 🎪 **Regular** - Participate in 10+ weeks (Rare)
-- 💎 **Veteran** - Participate in 25+ weeks (Epic)
+- [>>>] **Hot Streak** - 3+ consecutive weeks (Uncommon)
+- [+10] **Regular** - Participate in 10+ weeks (Rare)
+- [+25] **Veteran** - Participate in 25+ weeks (Epic)
 
 **Performance Achievements**
-- 🛡️ **Safety First** - Average doom < 20% (Uncommon)
-- 🚀 **Risk Taker** - Win with doom > 50% (Rare)
-- 📈 **Improver** - 5+ rank improvement (Common)
+- [SAFE] **Safety First** - Average doom < 20% (Uncommon)
+- [RISK] **Risk Taker** - Win with doom > 50% (Rare)
+- [UP] **Improver** - 5+ rank improvement (Common)
 
 #### Technical Implementation
 - Achievement definitions in `/assets/data/achievements.json`

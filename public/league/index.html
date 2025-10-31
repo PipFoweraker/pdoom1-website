@@ -694,7 +694,7 @@
         Access historical weekly league data and season archives
       </p>
       <a href="/league/archive.html" class="cta-button" style="display: inline-block; text-decoration: none;">
-        📚 View Archives
+        [ARCHIVE] View Archives
       </a>
     </div>
   </main>
@@ -896,26 +896,26 @@
 
       // Competition achievements
       if (rank === 1) {
-        achievements.push({ icon: '🥇', name: 'First Place', description: 'Top rank in weekly competition' });
+        achievements.push({ icon: '[#1]', name: 'First Place', description: 'Top rank in weekly competition' });
         if (doom === 0) {
-          achievements.push({ icon: '🏆', name: 'Perfect Week', description: 'Win with 0% doom risk' });
+          achievements.push({ icon: '[***]', name: 'Perfect Week', description: 'Win with 0% doom risk' });
         }
         if (doom > 50) {
-          achievements.push({ icon: '🚀', name: 'Risk Taker', description: 'Win with doom risk over 50%' });
+          achievements.push({ icon: '[RISK]', name: 'Risk Taker', description: 'Win with doom risk over 50%' });
         }
       } else if (rank === 2) {
-        achievements.push({ icon: '🥈', name: 'Silver Medal', description: 'Finished in 2nd place' });
+        achievements.push({ icon: '[#2]', name: 'Silver Medal', description: 'Finished in 2nd place' });
       } else if (rank === 3) {
-        achievements.push({ icon: '🥉', name: 'Bronze Medal', description: 'Finished in 3rd place' });
+        achievements.push({ icon: '[#3]', name: 'Bronze Medal', description: 'Finished in 3rd place' });
       }
 
       // Performance achievements
       if (score > 1000) {
-        achievements.push({ icon: '🎯', name: 'High Scorer', description: 'Score over 1000' });
+        achievements.push({ icon: '[**]', name: 'High Scorer', description: 'Score over 1000' });
       }
 
       if (doom < 20 && rank <= 10) {
-        achievements.push({ icon: '🛡️', name: 'Safety First', description: 'Low doom risk' });
+        achievements.push({ icon: '[SAFE]', name: 'Safety First', description: 'Low doom risk' });
       }
 
       return achievements;

@@ -5,7 +5,7 @@
         "id": "first_place",
         "name": "First Place",
         "description": "Achieved top rank in a weekly competition",
-        "icon": "🥇",
+        "icon": "[#1]",
         "rarity": "rare",
         "criteria": { "rank": 1 }
       },
@@ -13,7 +13,7 @@
         "id": "silver_medal",
         "name": "Silver Medal",
         "description": "Finished in 2nd place",
-        "icon": "🥈",
+        "icon": "[#2]",
         "rarity": "uncommon",
         "criteria": { "rank": 2 }
       },
@@ -21,7 +21,7 @@
         "id": "bronze_medal",
         "name": "Bronze Medal",
         "description": "Finished in 3rd place",
-        "icon": "🥉",
+        "icon": "[#3]",
         "rarity": "uncommon",
         "criteria": { "rank": 3 }
       },
@@ -29,7 +29,7 @@
         "id": "perfect_week",
         "name": "Perfect Week",
         "description": "Win with 0% doom risk",
-        "icon": "🏆",
+        "icon": "[***]",
         "rarity": "epic",
         "criteria": { "rank": 1, "final_doom": 0 }
       },
@@ -37,7 +37,7 @@
         "id": "high_scorer",
         "name": "High Scorer",
         "description": "Achieve a score over 1000",
-        "icon": "🎯",
+        "icon": "[**]",
         "rarity": "common",
         "criteria": { "score_min": 1000 }
       }
@@ -47,7 +47,7 @@
         "id": "hot_streak",
         "name": "Hot Streak",
         "description": "Participate in 3+ consecutive weeks",
-        "icon": "🔥",
+        "icon": "[>>>]",
         "rarity": "uncommon",
         "criteria": { "consecutive_weeks": 3 }
       },
@@ -55,7 +55,7 @@
         "id": "regular",
         "name": "Regular",
         "description": "Participate in 10+ weeks",
-        "icon": "🎪",
+        "icon": "[+10]",
         "rarity": "rare",
         "criteria": { "total_weeks": 10 }
       },
@@ -63,7 +63,7 @@
         "id": "veteran",
         "name": "Veteran",
         "description": "Participate in 25+ weeks",
-        "icon": "💎",
+        "icon": "[+25]",
         "rarity": "epic",
         "criteria": { "total_weeks": 25 }
       }
@@ -73,7 +73,7 @@
         "id": "safety_first",
         "name": "Safety First",
         "description": "Average doom risk less than 20%",
-        "icon": "🛡️",
+        "icon": "[SAFE]",
         "rarity": "uncommon",
         "criteria": { "avg_doom_max": 20 }
       },
@@ -81,7 +81,7 @@
         "id": "risk_taker",
         "name": "Risk Taker",
         "description": "Win with doom risk over 50%",
-        "icon": "🚀",
+        "icon": "[RISK]",
         "rarity": "rare",
         "criteria": { "rank": 1, "final_doom_min": 50 }
       },
@@ -89,7 +89,7 @@
         "id": "improver",
         "name": "Improver",
         "description": "Improve rank by 5+ positions in a week",
-        "icon": "📈",
+        "icon": "[UP]",
         "rarity": "common",
         "criteria": { "rank_improvement_min": 5 }
       }

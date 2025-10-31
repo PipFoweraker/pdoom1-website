@@ -498,7 +498,7 @@
       <div class="content-grid">
         <!-- Performance Stats -->
         <div class="section">
-          <h2>📈 Performance Statistics</h2>
+          <h2>[STATS] Performance Statistics</h2>
           
           <h3>Personal Best</h3>
           <div class="stat-grid">
@@ -541,7 +541,7 @@
         <!-- Participation & Records -->
         <div>
           <div class="section">
-            <h2>🎯 Participation</h2>
+            <h2>[PLAY] Participation</h2>
             <div class="stat-grid">
               <div class="stat-box">
                 <div class="stat-box-label">Weeks Played</div>
@@ -555,14 +555,14 @@
           </div>
 
           <div class="section" style="margin-top: 1rem;">
-            <h2>📋 Recent Weeks</h2>
+            <h2>[HIST] Recent Weeks</h2>
             <div class="participation-list" id="participation-list">
               <div class="no-data">No participation data available</div>
             </div>
           </div>
 
           <div class="section" style="margin-top: 1rem;">
-            <h2>🏆 Achievements</h2>
+            <h2>[WINS] Achievements</h2>
             <div id="achievements-container">
               <div class="no-data">No achievements earned yet</div>
             </div>
@@ -744,7 +744,7 @@
       // Competition achievements
       if (data.bestRank === 1) {
         achievements.push({
-          icon: '🥇',
+          icon: '[#1]',
           name: 'First Place',
           description: 'Achieved top rank in a weekly competition',
           rarity: 'rare'
@@ -752,7 +752,7 @@
       }
       if (data.bestRank === 2) {
         achievements.push({
-          icon: '🥈',
+          icon: '[#2]',
           name: 'Silver Medal',
           description: 'Finished in 2nd place',
           rarity: 'uncommon'
@@ -760,7 +760,7 @@
       }
       if (data.bestRank === 3) {
         achievements.push({
-          icon: '🥉',
+          icon: '[#3]',
           name: 'Bronze Medal',
           description: 'Finished in 3rd place',
           rarity: 'uncommon'
@@ -768,7 +768,7 @@
       }
       if (data.bestScore > 1000) {
         achievements.push({
-          icon: '🎯',
+          icon: '[**]',
           name: 'High Scorer',
           description: 'Achieved a score over 1000',
           rarity: 'common'
@@ -778,14 +778,14 @@
       // Participation achievements
       if (data.weeksPlayed >= 25) {
         achievements.push({
-          icon: '💎',
+          icon: '[+25]',
           name: 'Veteran',
           description: 'Participated in 25+ weeks',
           rarity: 'epic'
         });
       } else if (data.weeksPlayed >= 10) {
         achievements.push({
-          icon: '🎪',
+          icon: '[+10]',
           name: 'Regular',
           description: 'Participated in 10+ weeks',
           rarity: 'rare'
@@ -795,7 +795,7 @@
       const currentStreak = calculateStreak(data.weeklyRanks);
       if (currentStreak >= 3) {
         achievements.push({
-          icon: '🔥',
+          icon: '[>>>]',
           name: 'Hot Streak',
           description: `${currentStreak} consecutive weeks`,
           rarity: 'uncommon'
@@ -805,7 +805,7 @@
       // Performance achievements
       if (data.avgDoom < 20) {
         achievements.push({
-          icon: '🛡️',
+          icon: '[SAFE]',
           name: 'Safety First',
           description: 'Average doom risk less than 20%',
           rarity: 'uncommon'
@@ -814,7 +814,7 @@
 
       if (data.lowestDoom === 0 && data.bestRank === 1) {
         achievements.push({
-          icon: '🏆',
+          icon: '[***]',
           name: 'Perfect Week',
           description: 'Won with 0% doom risk',
           rarity: 'epic'
