@@ -340,6 +340,37 @@
       transform: translateX(-4px);
     }
 
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--accent-primary);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.5rem;
+      color: var(--text-primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transform: translateY(150%);
+      transition: transform var(--duration-base) var(--easing);
+      z-index: 1000;
+      max-width: 400px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+    }
+
+    .toast-header {
+      font-weight: bold;
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .toast-body {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
     @media (max-width: 768px) {
       .nav-links {
         display: none;
@@ -360,6 +391,13 @@
 
       .archive-grid {
         grid-template-columns: 1fr;
+      }
+
+      .toast {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+        max-width: none;
       }
     }
   </style>
@@ -483,6 +521,12 @@
     </div>
   </main>
 
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <div class="toast-header" id="toast-header"></div>
+    <div class="toast-body" id="toast-body"></div>
+  </div>
+
   <script>
     // Pagination state
     let currentPage = 1;
@@ -501,10 +545,8 @@
           // Use index file if available
           const index = await indexResponse.json();
           archiveFiles = index.archives.map(a => a.file);
-        } else {
-          // Fallback to hardcoded list
-          archiveFiles = ['2025_W41_league.json', '2025_W42_league.json', '2025_W44_league.json'];
         }
+        // No fallback needed - empty array is fine
 
         // Load all archive files
         const archiveData = await Promise.all(
@@ -679,12 +721,36 @@
         ` : ''}
       `;
 
-      // Add click handler to view details (could expand in future)
+      // Add click handler to view details (using toast instead of alert)
       card.addEventListener('click', () => {
-        alert(`Detailed view for ${meta.week_id} coming soon!\n\nWinner: ${winner?.player_name || 'N/A'}\nScore: ${winner?.score || 0}`);
+        const winnerInfo = winner 
+          ? `Winner: ${winner.player_name}\nScore: ${winner.score.toLocaleString()}`
+          : 'No winner data available';
+        
+        showToast(
+          `${meta.week_id} Details`,
+          `Detailed archive view coming soon!\n\n${winnerInfo}`
+        );
       });
 
       return card;
+    }
+
+    // Show toast notification
+    function showToast(header, body) {
+      const toast = document.getElementById('toast');
+      const toastHeader = document.getElementById('toast-header');
+      const toastBody = document.getElementById('toast-body');
+      
+      toastHeader.textContent = header;
+      toastBody.textContent = body;
+      
+      toast.classList.add('show');
+      
+      // Auto-hide after 4 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
     }
 
     // Show error

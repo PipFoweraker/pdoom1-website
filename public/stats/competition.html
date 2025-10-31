@@ -788,8 +788,19 @@
       const ctx = document.getElementById('performance-chart');
       if (!ctx) return;
 
-      // Load historical archive data
-      const archiveFiles = ['2025_W41_league.json', '2025_W42_league.json', '2025_W44_league.json'];
+      // Load historical archive data dynamically from index
+      let archiveFiles = [];
+      try {
+        const indexResponse = await fetch('/leaderboard/data/weekly/archive/index.json', { cache: 'no-store' });
+        if (indexResponse.ok) {
+          const index = await indexResponse.json();
+          archiveFiles = index.archives.map(a => a.file);
+        }
+      } catch (e) {
+        // Fallback to empty if index not available
+        archiveFiles = [];
+      }
+
       const historicalData = await Promise.all(
         archiveFiles.map(file => 
           fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })
@@ -853,8 +864,19 @@
       const ctx = document.getElementById('engagement-chart');
       if (!ctx) return;
 
-      // Load historical archive data
-      const archiveFiles = ['2025_W41_league.json', '2025_W42_league.json', '2025_W44_league.json'];
+      // Load historical archive data dynamically from index
+      let archiveFiles = [];
+      try {
+        const indexResponse = await fetch('/leaderboard/data/weekly/archive/index.json', { cache: 'no-store' });
+        if (indexResponse.ok) {
+          const index = await indexResponse.json();
+          archiveFiles = index.archives.map(a => a.file);
+        }
+      } catch (e) {
+        // Fallback to empty if index not available
+        archiveFiles = [];
+      }
+
       const historicalData = await Promise.all(
         archiveFiles.map(file => 
           fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })

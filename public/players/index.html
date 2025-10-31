@@ -595,9 +595,8 @@
         if (indexResponse.ok) {
           const index = await indexResponse.json();
           archiveFiles = index.archives.map(a => a.file);
-        } else {
-          archiveFiles = ['2025_W41_league.json', '2025_W42_league.json', '2025_W44_league.json'];
         }
+        // No fallback needed - empty array is fine
 
         // Load all archive data
         const archiveData = await Promise.all(

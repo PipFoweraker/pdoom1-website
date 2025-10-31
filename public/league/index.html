@@ -933,8 +933,14 @@
       if (!ctx) return;
 
       try {
-        // Load historical archive data
-        const archiveFiles = ['2025_W41_league.json', '2025_W42_league.json', '2025_W44_league.json'];
+        // Load historical archive data dynamically from index
+        let archiveFiles = [];
+        const indexResponse = await fetch('/leaderboard/data/weekly/archive/index.json', { cache: 'no-store' }).catch(() => null);
+        if (indexResponse && indexResponse.ok) {
+          const index = await indexResponse.json();
+          archiveFiles = index.archives.map(a => a.file);
+        }
+
         const historicalData = await Promise.all(
           archiveFiles.map(file => 
             fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })
