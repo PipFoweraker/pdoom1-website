@@ -319,6 +319,45 @@
       color: var(--text-muted);
     }
 
+    .achievement-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+    }
+
+    .achievement-badge {
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+      transition: all var(--duration-base) var(--easing);
+      cursor: help;
+    }
+
+    .achievement-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 255, 65, 0.15);
+    }
+
+    .achievement-badge.rare {
+      border-color: var(--accent-primary);
+    }
+
+    .achievement-badge.epic {
+      border-color: #9370db;
+    }
+
+    .achievement-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .achievement-name {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
     @media (max-width: 768px) {
       .nav-links {
         display: none;
@@ -344,6 +383,10 @@
 
       .stat-grid {
         grid-template-columns: 1fr;
+      }
+
+      .achievement-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
       }
     }
   </style>
@@ -516,6 +559,13 @@
               <div class="no-data">No participation data available</div>
             </div>
           </div>
+
+          <div class="section" style="margin-top: 1rem;">
+            <h2>🏆 Achievements</h2>
+            <div id="achievements-container">
+              <div class="no-data">No achievements earned yet</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -655,8 +705,123 @@
       // Display recent weeks
       displayRecentWeeks(data.weeklyRanks);
 
+      // Display achievements
+      displayAchievements(data);
+
       // Render rank chart
       renderRankChart(data.weeklyRanks);
+    }
+
+    // Display achievements
+    function displayAchievements(data) {
+      const container = document.getElementById('achievements-container');
+      const achievements = calculateAchievements(data);
+
+      if (achievements.length === 0) {
+        container.innerHTML = '<div class="no-data">No achievements earned yet</div>';
+        return;
+      }
+
+      container.innerHTML = '<div class="achievement-grid"></div>';
+      const grid = container.querySelector('.achievement-grid');
+
+      achievements.forEach(achievement => {
+        const badge = document.createElement('div');
+        badge.className = `achievement-badge ${achievement.rarity}`;
+        badge.title = achievement.description;
+        badge.innerHTML = `
+          <div class="achievement-icon">${achievement.icon}</div>
+          <div class="achievement-name">${achievement.name}</div>
+        `;
+        grid.appendChild(badge);
+      });
+    }
+
+    // Calculate achievements for player
+    function calculateAchievements(data) {
+      const achievements = [];
+
+      // Competition achievements
+      if (data.bestRank === 1) {
+        achievements.push({
+          icon: '🥇',
+          name: 'First Place',
+          description: 'Achieved top rank in a weekly competition',
+          rarity: 'rare'
+        });
+      }
+      if (data.bestRank === 2) {
+        achievements.push({
+          icon: '🥈',
+          name: 'Silver Medal',
+          description: 'Finished in 2nd place',
+          rarity: 'uncommon'
+        });
+      }
+      if (data.bestRank === 3) {
+        achievements.push({
+          icon: '🥉',
+          name: 'Bronze Medal',
+          description: 'Finished in 3rd place',
+          rarity: 'uncommon'
+        });
+      }
+      if (data.bestScore > 1000) {
+        achievements.push({
+          icon: '🎯',
+          name: 'High Scorer',
+          description: 'Achieved a score over 1000',
+          rarity: 'common'
+        });
+      }
+
+      // Participation achievements
+      if (data.weeksPlayed >= 25) {
+        achievements.push({
+          icon: '💎',
+          name: 'Veteran',
+          description: 'Participated in 25+ weeks',
+          rarity: 'epic'
+        });
+      } else if (data.weeksPlayed >= 10) {
+        achievements.push({
+          icon: '🎪',
+          name: 'Regular',
+          description: 'Participated in 10+ weeks',
+          rarity: 'rare'
+        });
+      }
+
+      const currentStreak = calculateStreak(data.weeklyRanks);
+      if (currentStreak >= 3) {
+        achievements.push({
+          icon: '🔥',
+          name: 'Hot Streak',
+          description: `${currentStreak} consecutive weeks`,
+          rarity: 'uncommon'
+        });
+      }
+
+      // Performance achievements
+      if (data.avgDoom < 20) {
+        achievements.push({
+          icon: '🛡️',
+          name: 'Safety First',
+          description: 'Average doom risk less than 20%',
+          rarity: 'uncommon'
+        });
+      }
+
+      if (data.lowestDoom === 0 && data.bestRank === 1) {
+        achievements.push({
+          icon: '🏆',
+          name: 'Perfect Week',
+          description: 'Won with 0% doom risk',
+          rarity: 'epic'
+        });
+      }
+
+      return achievements;
     }
 
     // Calculate current streak

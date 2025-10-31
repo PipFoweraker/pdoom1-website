@@ -1,0 +1,105 @@
+{
+  "achievement_types": {
+    "competition": {
+      "first_place": {
+        "id": "first_place",
+        "name": "First Place",
+        "description": "Achieved top rank in a weekly competition",
+        "icon": "🥇",
+        "rarity": "rare",
+        "criteria": { "rank": 1 }
+      },
+      "silver_medal": {
+        "id": "silver_medal",
+        "name": "Silver Medal",
+        "description": "Finished in 2nd place",
+        "icon": "🥈",
+        "rarity": "uncommon",
+        "criteria": { "rank": 2 }
+      },
+      "bronze_medal": {
+        "id": "bronze_medal",
+        "name": "Bronze Medal",
+        "description": "Finished in 3rd place",
+        "icon": "🥉",
+        "rarity": "uncommon",
+        "criteria": { "rank": 3 }
+      },
+      "perfect_week": {
+        "id": "perfect_week",
+        "name": "Perfect Week",
+        "description": "Win with 0% doom risk",
+        "icon": "🏆",
+        "rarity": "epic",
+        "criteria": { "rank": 1, "final_doom": 0 }
+      },
+      "high_scorer": {
+        "id": "high_scorer",
+        "name": "High Scorer",
+        "description": "Achieve a score over 1000",
+        "icon": "🎯",
+        "rarity": "common",
+        "criteria": { "score_min": 1000 }
+      }
+    },
+    "participation": {
+      "hot_streak": {
+        "id": "hot_streak",
+        "name": "Hot Streak",
+        "description": "Participate in 3+ consecutive weeks",
+        "icon": "🔥",
+        "rarity": "uncommon",
+        "criteria": { "consecutive_weeks": 3 }
+      },
+      "regular": {
+        "id": "regular",
+        "name": "Regular",
+        "description": "Participate in 10+ weeks",
+        "icon": "🎪",
+        "rarity": "rare",
+        "criteria": { "total_weeks": 10 }
+      },
+      "veteran": {
+        "id": "veteran",
+        "name": "Veteran",
+        "description": "Participate in 25+ weeks",
+        "icon": "💎",
+        "rarity": "epic",
+        "criteria": { "total_weeks": 25 }
+      }
+    },
+    "performance": {
+      "safety_first": {
+        "id": "safety_first",
+        "name": "Safety First",
+        "description": "Average doom risk less than 20%",
+        "icon": "🛡️",
+        "rarity": "uncommon",
+        "criteria": { "avg_doom_max": 20 }
+      },
+      "risk_taker": {
+        "id": "risk_taker",
+        "name": "Risk Taker",
+        "description": "Win with doom risk over 50%",
+        "icon": "🚀",
+        "rarity": "rare",
+        "criteria": { "rank": 1, "final_doom_min": 50 }
+      },
+      "improver": {
+        "id": "improver",
+        "name": "Improver",
+        "description": "Improve rank by 5+ positions in a week",
+        "icon": "📈",
+        "rarity": "common",
+        "criteria": { "rank_improvement_min": 5 }
+      }
+    }
+  },
+  "rarity_colors": {
+    "common": "#cccccc",
+    "uncommon": "#00ff41",
+    "rare": "#4169e1",
+    "epic": "#9370db",
+    "legendary": "#ffd700"
+  }
+}

@@ -819,10 +819,17 @@
         if (doomPercent > 30) riskClass = 'risky';
         if (doomPercent > 50) riskClass = 'dangerous';
 
+        // Calculate achievements for this entry
+        const achievements = getAchievements(entry, rank);
+        const achievementBadges = achievements.map(a => `<span title="${a.name}: ${a.description}" style="font-size: 1.2rem; margin-right: 0.25rem;">${a.icon}</span>`).join('');
+
         row.innerHTML = `
           <td class="rank ${rank <= 3 ? 'top-3 rank-' + rank : ''}">#${rank}</td>
           <td>
-            <div class="player-name">${entry.player_name}</div>
+            <div class="player-name">
+              ${achievementBadges}
+              ${entry.player_name}
+            </div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">${entry.game_mode || 'Unknown'}</div>
           </td>
           <td class="score">${entry.score.toLocaleString()}</td>
@@ -878,6 +885,39 @@
       document.getElementById('standings-loading').style.display = 'none';
       document.getElementById('standings-error').style.display = 'block';
       document.getElementById('league-status').textContent = 'Error Loading Data';
+    }
+
+    // Get achievements for a player entry
+    function getAchievements(entry, rank) {
+      const achievements = [];
+      const score = entry.score || 0;
+      const doom = entry.final_doom || 0;
+
+      // Competition achievements
+      if (rank === 1) {
+        achievements.push({ icon: '🥇', name: 'First Place', description: 'Top rank in weekly competition' });
+        if (doom === 0) {
+          achievements.push({ icon: '🏆', name: 'Perfect Week', description: 'Win with 0% doom risk' });
+        }
+        if (doom > 50) {
+          achievements.push({ icon: '🚀', name: 'Risk Taker', description: 'Win with doom risk over 50%' });
+        }
+      } else if (rank === 2) {
+        achievements.push({ icon: '🥈', name: 'Silver Medal', description: 'Finished in 2nd place' });
+      } else if (rank === 3) {
+        achievements.push({ icon: '🥉', name: 'Bronze Medal', description: 'Finished in 3rd place' });
+      }
+
+      // Performance achievements
+      if (score > 1000) {
+        achievements.push({ icon: '🎯', name: 'High Scorer', description: 'Score over 1000' });
+      }
+
+      if (doom < 20 && rank <= 10) {
+        achievements.push({ icon: '🛡️', name: 'Safety First', description: 'Low doom risk' });
+      }
+
+      return achievements;
     }
 
     // Auto-refresh standings during active competition
