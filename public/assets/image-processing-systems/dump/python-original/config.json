@@ -1,0 +1,56 @@
+{
+  "strip_gps": true,
+  "strip_personal": true,
+  "preserve_copyright": true,
+  "add_metadata": {
+    "copyright": "pdoom1.com",
+    "artist": "pdoom1",
+    "software": "pdoom1-image-processor",
+    "description": "Processed cat image for pdoom1 game and website"
+  },
+  "web_formats": {
+    "webp": {
+      "quality": 85,
+      "method": 6
+    },
+    "webp-high": {
+      "quality": 90,
+      "method": 6
+    },
+    "webp-low": {
+      "quality": 75,
+      "method": 6
+    }
+  },
+  "game_formats": {
+    "png": {
+      "optimize": true,
+      "compress_level": 9
+    },
+    "webp": {
+      "quality": 92,
+      "method": 6
+    },
+    "jpg": {
+      "quality": 90,
+      "optimize": true
+    }
+  },
+  "aspect_ratios": {
+    "square": [1, 1],
+    "wide": [16, 9],
+    "standard": [4, 3],
+    "portrait": [3, 4],
+    "game-ui": [16, 10]
+  },
+  "max_dimensions": {
+    "web-thumbnail": [200, 200],
+    "web-small": [800, 800],
+    "web-medium": [1200, 1200],
+    "web-large": [1920, 1920],
+    "game-small": [256, 256],
+    "game-medium": [512, 512],
+    "game-large": [1024, 1024],
+    "game-ui": [2048, 2048]
+  }
+}
