@@ -184,5 +184,17 @@
       "version-status": "success",
       "stats-status": "success"
     }
+  },
+  {
+    "job": "weekly-league-rollover",
+    "trigger": "schedule",
+    "timestamp": "2025-11-02T23:03:39.594260Z",
+    "status": "success",
+    "details": {
+      "archive-status": "success",
+      "new-week-status": "success",
+      "verify-status": "success",
+      "new-week-id": "2025_W44"
+    }
   }
 ]
