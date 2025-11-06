@@ -110,13 +110,15 @@ npm run integration:test
 
 ## Version Status
 
-**v1.1.1 - CI/CD & ACCESSIBILITY** (Current)
+**v1.1.2 - DASHBOARD & AUTOMATION** (Current)
 - ✅ Auto-deployment: LIVE (deploys on every push to main)
 - ✅ WCAG 2.1 AA compliance: ACHIEVED (4/5 star rating)
-- ✅ Optimized UI: 20% reduced padding for denser layout
-- ✅ GitHub Actions automation: LIVE (4 workflows running)
+- ✅ Enhanced Risk Dashboard: 8 UI improvements (#54) - Interactive world map, AI safety investment graph, event log, calmer aesthetic
+- ✅ Dynamic Version Display: Auto-updates from pdoom1 releases
+- ✅ Documentation Auto-Sync: pdoom1 repo docs sync every 6 hours + on release
+- ✅ Forum Planning: NodeBB implementation plan for self-hosted community (Issue #60)
+- ✅ GitHub Actions automation: LIVE (5 workflows running)
 - ✅ Dynamic front page: DEPLOYED (real-time data loading)
-- ✅ Enhanced monitoring dashboard: OPERATIONAL
 - ✅ Weekly league infrastructure: COMPLETE
 - ✅ Game repository integration: OPERATIONAL
 - ✅ API server with 8 endpoints: FUNCTIONAL
@@ -133,28 +135,40 @@ npm run integration:test
 
 See [API Deployment Guide](docs/02-deployment/API_DEPLOYMENT_GUIDE.md) for setup.
 
-## Next: Phase 2 - pdoom-data Integration
+## Next: Phase 2 - Forum & Community
 
-**Target:** v1.2.0 (December 2025)
+**Target:** v1.2.0 (November-December 2025)
 
-Planned integrations with [pdoom-data](https://github.com/PipFoweraker/pdoom-data):
-- 🎯 **Event log streaming** from game sessions
-- 🏆 **Global leaderboards** with PostgreSQL persistence
-- 📊 **Advanced analytics** and player insights
-- 🔐 **User authentication** (optional accounts)
+**Immediate Priority (Issue #60):**
+- 🏗️ **NodeBB Forum**: Self-hosted at forum.pdoom1.com (replacing Discord)
+- 🎨 **Custom Theming**: Dark theme matching pdoom1.com aesthetic
+- 🔗 **Site Integration**: Forum links, latest posts on homepage
+- 🏆 **Reward System**: In-game rewards for community contributors
+- 📝 **Permanent Archive**: SEO-friendly, human-legible content
 
-See [pdoom-data Integration Plan](docs/03-integrations/pdoom-data-integration-plan.md) for detailed roadmap.
+**Additional v1.2.0 Goals:**
+- 📊 **Analytics Extraction**: DreamHost analytics → repository (Issue #61)
+- 🎯 **Event log streaming** from game sessions (pdoom-data)
+- 🔐 **User authentication** (optional accounts, Steam OAuth)
+
+See [Forum Implementation Plan](docs/FORUM_IMPLEMENTATION_ISSUE.md) and [pdoom-data Integration Plan](docs/03-integrations/pdoom-data-integration-plan.md) for detailed roadmaps.
 
 ## Automation
 
 **GitHub Actions** handle routine maintenance automatically:
 - **Auto-Update Data**: Every 6 hours - updates version info and game stats
+- **Sync pdoom1 Docs**: Every 6 hours + on release - syncs documentation from game repo
 - **Sync Leaderboards**: Daily at 2am UTC - syncs all leaderboard data
 - **Weekly League Rollover**: Sundays at 11pm UTC - starts new competition week
 
 **Monitor at:** [/monitoring/](https://pdoom1.com/monitoring/) - Admin dashboard for system health
 
 See [Automation System Guide](docs/03-integrations/automation-system-guide.md) for details.
+
+**Cross-Repository Automation:**
+- pdoom1 releases trigger automatic doc sync (via repository_dispatch)
+- Version updates propagate to website header automatically
+- See [docs/workflows/TRIGGER_FROM_PDOOM1_REPO.yml](docs/workflows/TRIGGER_FROM_PDOOM1_REPO.yml) for webhook setup
 
 ## Documentation
 
@@ -169,13 +183,18 @@ See [Automation System Guide](docs/03-integrations/automation-system-guide.md) f
 - [Deployment Checklist](docs/02-deployment/weekly-deployment-checklist.md)
 
 ### 📊 Integration & Features
-- [Automation System Guide](docs/03-integrations/automation-system-guide.md) - **NEW**
+- [Automation System Guide](docs/03-integrations/automation-system-guide.md)
 - [API Integration Guide](docs/03-integrations/api-integration-complete.md)
 - [Weekly League Implementation](docs/03-integrations/weekly-league-phase1-complete.md)
 - [Analytics Implementation](docs/ANALYTICS_IMPLEMENTATION.md)
 - [Analytics Setup Guide](docs/ANALYTICS_SETUP.md)
 - [Syndication Setup Guide](docs/SYNDICATION_SETUP.md)
-- [**Syndication User Setup Guide**](docs/SYNDICATION_USER_SETUP_GUIDE.md) ⭐ **START HERE** - Complete step-by-step guide
+- [**Syndication User Setup Guide**](docs/SYNDICATION_USER_SETUP_GUIDE.md) - Complete step-by-step guide
+
+### 🌐 Community & Planning
+- [**Forum Implementation Plan**](docs/FORUM_IMPLEMENTATION_ISSUE.md) ⭐ **NodeBB setup for forum.pdoom1.com** (Issue #60)
+- [**Analytics Extraction**](docs/ANALYTICS_EXTRACTION_ISSUE.md) - DreamHost analytics collation (Issue #61)
+- [Dashboard Improvements](docs/DASHBOARD_IMPROVEMENTS_ISSUE_54.md) - Risk dashboard UI enhancements (Issue #54)
 
 
 ## Automated Systems

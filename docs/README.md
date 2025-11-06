@@ -29,11 +29,18 @@ This documentation covers the complete p(Doom)1 website project - from initial s
 ### 🔗 [03-integrations/](./03-integrations/)
 **External integrations and APIs**
 - **[game-repository-integration.md](./03-integrations/game-repository-integration.md)** - pdoom1 game integration
+- **[automation-system-guide.md](./03-integrations/automation-system-guide.md)** - GitHub Actions automation overview
+- **[CROSS_REPOSITORY_DOCUMENTATION_STRATEGY.md](./03-integrations/CROSS_REPOSITORY_DOCUMENTATION_STRATEGY.md)** - Multi-repo documentation
 - **[design-token-sync-strategy.md](./03-integrations/design-token-sync-strategy.md)** - Design tokens synchronization
 - **[roadmap-sync-strategy.md](./03-integrations/roadmap-sync-strategy.md)** - Roadmap synchronization
 - **[github-issues-integration-plan.md](./03-integrations/github-issues-integration-plan.md)** - GitHub issues integration
 - **[bug-reporting.md](./03-integrations/bug-reporting.md)** - Bug reporting system
-- **[CROSS_REPOSITORY_DOCUMENTATION_STRATEGY.md](./03-integrations/CROSS_REPOSITORY_DOCUMENTATION_STRATEGY.md)** - Multi-repo documentation
+
+### 🌐 [Community & Planning](./FORUM_IMPLEMENTATION_ISSUE.md) ⭐ NEW
+**Forum and community infrastructure**
+- **[FORUM_IMPLEMENTATION_ISSUE.md](./FORUM_IMPLEMENTATION_ISSUE.md)** - NodeBB forum setup plan (Issue #60)
+- **[ANALYTICS_EXTRACTION_ISSUE.md](./ANALYTICS_EXTRACTION_ISSUE.md)** - DreamHost analytics extraction (Issue #61)
+- **[DASHBOARD_IMPROVEMENTS_ISSUE_54.md](./DASHBOARD_IMPROVEMENTS_ISSUE_54.md)** - Risk dashboard enhancements
 
 ### 📦 [04-archive/](./04-archive/)
 **Historical documentation and legacy guides**
@@ -67,12 +74,20 @@ This documentation covers the complete p(Doom)1 website project - from initial s
 **📊 Understand the project ecosystem**
 → [ECOSYSTEM_OVERVIEW.md](./00-getting-started/ECOSYSTEM_OVERVIEW.md)
 
+**🌐 Set up the NodeBB forum**
+→ [FORUM_IMPLEMENTATION_ISSUE.md](./FORUM_IMPLEMENTATION_ISSUE.md)
+
+**📈 Extract and analyze traffic data**
+→ [ANALYTICS_EXTRACTION_ISSUE.md](./ANALYTICS_EXTRACTION_ISSUE.md)
+
 ## 📋 Current Status
 
-- **Website Version**: 0.2.1
-- **Last Updated**: October 9, 2025
-- **Development Phase**: Version-aware deployment testing
+- **Website Version**: v1.1.2
+- **Last Updated**: November 7, 2025
+- **Development Phase**: Forum implementation and community building
 - **Production Status**: Live at https://pdoom1.com
+- **Active Issues**: #60 (NodeBB Forum), #61 (Analytics Extraction)
+- **Recent Completions**: Dashboard UI overhaul (#54), Version auto-sync, Documentation automation
 
 ## 🆘 Need Help?
 
