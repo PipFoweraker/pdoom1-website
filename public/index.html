@@ -101,6 +101,21 @@
 			white-space: nowrap;
 		}
 
+		.version-info {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			opacity: 0.7;
+			white-space: nowrap;
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+		}
+
+		.version-number {
+			color: var(--accent-primary);
+			font-weight: bold;
+		}
+
 		.logo {
 			font-size: 1.3rem;
 			font-weight: bold;
@@ -751,6 +766,10 @@
 			<div class="logo-container">
 				<div class="designer-credit">Pip Foweraker's</div>
 				<a href="#" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
+			</div>
+			<div class="version-info" id="versionInfo">
+				<span class="version-number" id="versionNumber">v0.10.1</span>
+				<span id="versionDate">2025-11-06</span>
 			</div>
 			<ul class="nav-links" role="menubar">
 				<li role="none"><a href="#home" role="menuitem">Game</a></li>
@@ -1525,8 +1544,41 @@ python main.py</pre>
 			});
 		});
 	</script>
-	
-	
+
+	<!-- Load version info dynamically -->
+	<script>
+	async function loadVersionInfo() {
+		try {
+			const response = await fetch('/data/version.json');
+			const data = await response.json();
+
+			if (data.latest_release) {
+				const version = data.latest_release.version;
+				const publishedDate = new Date(data.latest_release.published_at);
+				const formattedDate = publishedDate.toISOString().split('T')[0];
+
+				document.getElementById('versionNumber').textContent = version;
+				document.getElementById('versionDate').textContent = formattedDate;
+
+				// Make it clickable to view release notes
+				const versionInfo = document.getElementById('versionInfo');
+				versionInfo.style.cursor = 'pointer';
+				versionInfo.title = 'View release notes';
+				versionInfo.onclick = () => window.open(data.latest_release.html_url, '_blank');
+			}
+		} catch (error) {
+			console.error('Failed to load version info:', error);
+		}
+	}
+
+	// Load on page ready
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', loadVersionInfo);
+	} else {
+		loadVersionInfo();
+	}
+	</script>
+
 	<!-- Privacy-preserving analytics -->
 	<script src="/assets/js/analytics.js"></script>
 </body>

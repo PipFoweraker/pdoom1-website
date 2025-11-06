@@ -1,12 +1,19 @@
 name: Sync docs from pdoom1
 
 on:
+  # Manual trigger
   workflow_dispatch:
     inputs:
       ref:
         description: Git ref (branch, tag, or SHA) in PipFoweraker/pdoom1
         required: true
         default: main
+  # Auto-trigger on schedule (checks for new releases every 6 hours)
+  schedule:
+    - cron: '0 */6 * * *'
+  # Trigger via repository_dispatch (webhook from pdoom1 repo)
+  repository_dispatch:
+    types: [pdoom1_release, pdoom1_docs_update]
 
 permissions:
   contents: write
@@ -16,28 +23,54 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Checkout main repo
+
+      - name: Determine ref to sync
+        id: get_ref
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "ref=${{ github.event.inputs.ref }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "ref=${{ github.event.client_payload.ref || 'main' }}" >> $GITHUB_OUTPUT
+          else
+            # Get latest release tag
+            LATEST=$(curl -s https://api.github.com/repos/PipFoweraker/pdoom1/releases/latest | jq -r .tag_name)
+            echo "ref=${LATEST:-main}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout pdoom1 repo
         uses: actions/checkout@v4
         with:
           repository: PipFoweraker/pdoom1
-          ref: ${{ github.event.inputs.ref }}
+          ref: ${{ steps.get_ref.outputs.ref }}
           path: _pdoom1_src
-      - name: Copy docs into public/docs/pdoom1/${{ github.event.inputs.ref }}
+      - name: Copy docs into public/docs/pdoom1
         run: |
           set -euo pipefail
-          DEST="public/docs/pdoom1/${{ github.event.inputs.ref }}"
+          REF="${{ steps.get_ref.outputs.ref }}"
+          DEST="public/docs/pdoom1/$REF"
           mkdir -p "$DEST"
           # Copy selected files if they exist
           [ -f _pdoom1_src/README.md ] && cp _pdoom1_src/README.md "$DEST/README.md" || true
           [ -d _pdoom1_src/docs ] && rsync -av --delete _pdoom1_src/docs/ "$DEST/docs/" || true
+
+          # Also create/update a 'latest' symlink or copy
+          LATEST_DEST="public/docs/pdoom1/latest"
+          rm -rf "$LATEST_DEST"
+          cp -r "$DEST" "$LATEST_DEST"
+
       - name: Commit changes
         run: |
+          REF="${{ steps.get_ref.outputs.ref }}"
           if git diff --quiet public/docs; then
-            echo "No changes"
+            echo "No changes to commit"
           else
             git config user.name "github-actions"
             git config user.email "actions@github.com"
             git add public/docs
-            git commit -m "chore(docs): sync pdoom1 docs at ${{ github.event.inputs.ref }}"
+            git commit -m "chore(docs): sync pdoom1 docs at $REF
+
+Triggered by: ${{ github.event_name }}
+Auto-synced documentation from pdoom1 repository."
             git push
+            echo "✅ Documentation synced successfully for $REF"
           fi
