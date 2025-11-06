@@ -1,22 +1,22 @@
 {
   "latest_release": {
-    "version": "0.1.0",
-    "name": "v0.1.0 - stable game engine, otherwise unstable alpha",
-    "published_at": "2025-09-02T05:49:07Z",
-    "html_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/0.1.0",
-    "body": "Slightly overdue release of 0.1.0 as a stable game engine and not much else"
+    "version": "v0.10.1",
+    "name": "v0.10.1 - UX Improvements & First Public Release",
+    "published_at": "2025-11-06T07:08:59Z",
+    "html_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.10.1",
+    "body": "# P(Doom) v0.10.1 - UX Improvements & First Public Release\r\n\r\n**Release Date:** 2025-11-03\r\n**Platform:** Windows 10/11 (64-bit)\r\n**Engine:** Godot 4.5.1\r\n\r\n---\r\n\r\n## \ud83c\udf89 First Official Godot Release!\r\n\r\nThis is the first official release of P(Doom) built with Godot 4.x! The Python/Pygame version (v0.1.0) is now deprecated for players.\r\n\r\n---\r\n\r\n## \u2728 Major Features\r\n\r\n### Critical Fixes\r\n- **\ud83d\udd27 Action Point Tracking Fixed** - Players can no longer overcommit AP beyond their available points\r\n- **\ud83d\udd27 Queue Management** - Clear Queue button now works correctly with case-insensitive phase checking\r\n- **\ud83d\udd27 AP Display** - Shows remaining AP: \"AP: 3 (1 free, 2 queued)\" with color coding\r\n\r\n### UX Improvements\r\n- **\u2705 Visual Queue Controls** - Each queued action has a \"\u2715 Remove\" button\r\n- **\u2705 Danger Warnings** - Alerts when doom >70%, reputation <30, or money <$20k before committing turn\r\n- **\u2705 Better Button States** - Commit Actions button disabled when queue is empty\r\n- **\u2705 Keyboard Shortcuts** - C to clear queue, Space/Enter to commit\r\n- **\u2705 Color-Coded AP** - Green (available), Yellow (low), Red (depleted)\r\n\r\n### Polish\r\n- **\ud83d\udcdd Professional Description** - \"Strategic simulation\" tone replacing \"satirical\"\r\n- **\ud83e\uddf9 Code Quality** - Zero GDScript warnings, clean codebase\r\n- **\ud83d\udcda Organized Docs** - 20 files moved into logical structure\r\n\r\n---\r\n\r\n## \ud83c\udfae Quick Start\r\n\r\n### Windows Users\r\n1. Download `PDoom-v0.10.1-Windows.zip`\r\n2. Extract to a folder\r\n3. Run `PDoom.exe`\r\n4. Play!\r\n\r\n### System Requirements\r\n- **OS:** Windows 10/11 (64-bit)\r\n- **RAM:** 2GB minimum\r\n- **Disk:** 150MB free space\r\n- **Display:** 1280x720 or higher\r\n\r\n---\r\n\r\n## \ud83c\udfaf How to Play\r\n\r\n### Goal\r\nManage an AI safety lab and reach turn 100 with P(Doom) at 0% while staying funded.\r\n\r\n### Controls\r\n- **1-9:** Select actions from the menu\r\n- **C:** Clear action queue\r\n- **Space/Enter:** Commit queued actions and end turn\r\n- **ESC:** Pause/Menu\r\n\r\n### Core Mechanics\r\n1. **Queue Actions** - Select 1-3 actions per turn (uses Action Points)\r\n2. **Manage Resources** - Balance money, compute, research, and reputation\r\n3. **Watch Doom** - Your choices affect P(Doom) - keep it low!\r\n4. **React to Events** - Random events require strategic responses\r\n5. **Compete** - Rival labs advance AI capabilities\r\n\r\n---\r\n\r\n## \ud83d\udccb Full Changelog\r\n\r\n### Fixed\r\n- **CRITICAL:** Action overcommitment bug - AP validation now checks remaining AP\r\n- **CRITICAL:** Clear Queue button always disabled - Fixed case-sensitive phase check\r\n- **CRITICAL:** Committed AP not tracked - Now properly increments when queuing\r\n- GDScript warnings - Renamed shadowing variables, prefixed unused vars\r\n\r\n### Changed\r\n- Button text: \"End Turn\" \u2192 \"Commit Actions (Space)\"\r\n- AP display: Now shows \"AP: 3 (X free, Y queued)\"\r\n- Game description: \"Satirical\" \u2192 \"Strategic simulation\"\r\n- Keyboard shortcut: X \u2192 C for clear queue (avoids conflicts)\r\n\r\n### Added\r\n- **Clear Queue button** with C keyboard shortcut\r\n- **Remove buttons** on individual queue items\r\n- **Danger warnings** before committing risky turns\r\n- **Color-coded AP counter** (green/yellow/red)\r\n- **Better error messages** with actionable suggestions\r\n\r\n### Technical\r\n- Fixed GUT addon compatibility with Godot 4.5.1\r\n- Added remove_queued_action() function to GameManager\r\n- Improved button state management\r\n- Case-insensitive phase checking\r\n\r\n---\r\n\r\n## \ud83d\udc1b Known Issues\r\n\r\n### Non-Critical\r\n- Mac/Linux builds not available yet (high priority for v0.11.0)\r\n- Some advanced keyboard navigation not implemented (#423)\r\n\r\n### Workarounds\r\n- If game doesn't start: Right-click PDoom.exe \u2192 Properties \u2192 Unblock \u2192 Apply\r\n\r\n---\r\n\r\n## \ud83d\udcda Resources\r\n\r\n- **Website:** [pdoom1.com](https://pdoom1.com)\r\n- **GitHub:** [PipFoweraker/pdoom1](https://github.com/PipFoweraker/pdoom1)\r\n- **Player Guide:** [docs/PLAYERGUIDE.md](https://github.com/PipFoweraker/pdoom1/blob/main/docs/PLAYERGUIDE.md)\r\n- **Report Bugs:** [GitHub Issues](https://github.com/PipFoweraker/pdoom1/issues)\r\n\r\n---\r\n\r\n## \ud83d\ude4f Credits\r\n\r\n**Game Design & Development:** Pip Foweraker\r\n**AI Assistant:** Claude (Anthropic) - Code generation and testing\r\n**Engine:** Godot 4.5.1\r\n**Inspiration:** AI Safety community, Manifold Markets\r\n\r\n---\r\n\r\n## \ud83d\udcdc License\r\n\r\nMIT License - See LICENSE file for details\r\n\r\n---\r\n\r\n## \ud83d\udd1c What's Next (v0.11.0)?\r\n\r\n- Mac/Linux builds\r\n- Universal keyboard navigation (#423)\r\n- Employee management screen (#430)\r\n- More polish and QoL improvements\r\n\r\n---\r\n\r\n**Enjoy the game! If you encounter issues, please report them on GitHub.**\r\n\r\n\ud83c\udf10 Visit [pdoom1.com](https://pdoom1.com) for guides and community discussions!\r\n"
   },
   "repository_stats": {
     "stars": 4,
     "forks": 0,
-    "open_issues": 35,
-    "last_updated": "2025-11-03T09:37:52Z"
+    "open_issues": 33,
+    "last_updated": "2025-11-06T11:34:16Z"
   },
-  "last_updated": "2025-11-06T06:11:21.587179",
+  "last_updated": "2025-11-06T12:12:59.971776",
   "game_stats": {
     "baseline_doom_percent": 23,
     "frontier_labs_count": 5,
     "strategic_possibilities": 10000,
-    "last_calculated": "2025-11-06T06:11:21.587173"
+    "last_calculated": "2025-11-06T12:12:59.971766"
   }
 }
