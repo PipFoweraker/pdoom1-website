@@ -6,6 +6,17 @@
 <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 <style>
   * {margin:0;padding:0;box-sizing:border-box;}
+
+  :root {
+    --primary-green: #00ff41;
+    --primary-cyan: #0ff;
+    --primary-orange: #ff9966;
+    --primary-red: #ff4444;
+    --bg-dark: rgba(0,0,0,0.85);
+    --bg-panel: rgba(0,20,10,0.75);
+    --border-glow: rgba(0,255,65,0.3);
+  }
+
   body {
     background:#000;
     color:#ffffff;
@@ -16,38 +27,84 @@
   canvas {position:absolute;top:0;left:0;z-index:1;}
   #container {position:relative;z-index:10;width:100vw;height:100vh;}
 
+  /* Subtle scanline effect for retro terminal feel */
+  #container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 255, 65, 0.03) 0px,
+      rgba(0, 0, 0, 0.02) 1px,
+      rgba(0, 0, 0, 0.02) 2px
+    );
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.3;
+  }
+
   /* Header */
   #header {
     background:rgba(0,0,0,0.75);
     border-bottom:3px solid #00ff41;
     padding:15px 25px;
     display:flex;
-    justify-content:space-between;
+    flex-direction:column;
     align-items:center;
     box-shadow:0 0 30px rgba(0,255,65,0.6);
     backdrop-filter:blur(5px);
   }
 
   #header h1 {
-    font-size:28px;
+    font-size:30px;
     color:#ffffff;
-    text-shadow:0 0 5px #000, 0 0 10px #000, 0 0 20px #00ff41;
-    letter-spacing:4px;
+    text-shadow:0 0 3px #000, 0 0 6px #000, 0 0 10px #00ff41;
+    letter-spacing:3px;
     font-weight:bold;
   }
 
+  #headerSubtitle {
+    font-size:12px;
+    color:#cccccc;
+    margin-top:6px;
+    text-shadow:0 0 2px #000;
+  }
+
+  #headerSubtitle a {
+    color:#00ff41;
+    text-decoration:none;
+    text-shadow:0 0 8px #00ff41;
+    margin:0 8px;
+    transition:all 0.2s;
+  }
+
+  #headerSubtitle a:hover {
+    color:#0ff;
+    text-shadow:0 0 12px #0ff;
+  }
+
+  #headerMeta {
+    display:flex;
+    gap:20px;
+    margin-top:8px;
+    align-items:center;
+  }
+
   #timestamp {
-    font-size:16px;
-    color:#ffffff;
-    text-shadow:0 0 3px #000, 0 0 8px #000, 0 0 15px #0ff;
-    font-weight:bold;
+    font-size:13px;
+    color:#cccccc;
+    text-shadow:0 0 2px #000, 0 0 4px #000;
+    font-weight:normal;
   }
 
   #status {
     font-size:13px;
-    color:#ff6b35;
-    text-shadow:0 0 3px #000, 0 0 8px #000, 0 0 15px #ff6b35;
-    font-weight:bold;
+    color:#ff9966;
+    text-shadow:0 0 2px #000, 0 0 4px #000;
+    font-weight:normal;
   }
 
   /* Warning Lights */
@@ -218,7 +275,7 @@
     gap:15px;
   }
 
-  /* Pie chart - bottom left */
+  /* World map - bottom left */
   #pieContainer {
     background:rgba(0,0,0,0.5);
     border:3px solid #00ff41;
@@ -226,6 +283,43 @@
     padding:15px;
     box-shadow:0 0 30px rgba(0,255,65,0.3);
     backdrop-filter:blur(5px);
+    position:relative;
+  }
+
+  #worldMap {
+    width:100%;
+    height:100%;
+  }
+
+  .map-region {
+    fill:#00ff4133;
+    stroke:#00ff41;
+    stroke-width:1;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+
+  .map-region:hover {
+    fill:#00ff4166;
+    stroke:#0ff;
+    stroke-width:2;
+  }
+
+  .map-region.selected {
+    fill:#ff6b3566;
+    stroke:#ff6b35;
+    stroke-width:2;
+  }
+
+  #mapTitle {
+    position:absolute;
+    top:15px;
+    left:15px;
+    font-size:14px;
+    color:#ffffff;
+    font-weight:bold;
+    text-shadow:0 0 10px #00ff41;
+    pointer-events:none;
   }
 
   /* Text box - bottom right */
@@ -311,47 +405,47 @@
   }
 
   .metric-label {
-    font-size:12px;
-    color:#ffffff;
+    font-size:11px;
+    color:#cccccc;
     opacity:0.95;
     text-transform:uppercase;
-    letter-spacing:1.5px;
+    letter-spacing:1px;
     font-weight:bold;
-    text-shadow:0 0 2px #000, 0 0 5px #000;
+    text-shadow:0 0 2px #000;
   }
 
   .metric-value {
-    font-size:24px;
+    font-size:26px;
     color:#ffffff;
-    text-shadow:0 0 3px #000, 0 0 8px #000, 0 0 20px #00ff41;
-    margin-top:5px;
+    text-shadow:0 0 2px #000, 0 0 4px #000, 0 0 8px #00ff41;
+    margin-top:6px;
     font-weight:bold;
   }
 
   .metric-subtext {
     font-size:11px;
-    color:#cccccc;
-    opacity:0.85;
-    margin-top:3px;
-    text-shadow:0 0 2px #000;
+    color:#999999;
+    opacity:0.9;
+    margin-top:4px;
+    text-shadow:0 0 1px #000;
   }
 
   .warning {
-    color:#ff6b35 !important;
-    text-shadow:0 0 3px #000, 0 0 8px #000, 0 0 20px #ff6b35 !important;
-    border-left-color:#ff6b35 !important;
+    color:#ff9966 !important;
+    text-shadow:0 0 2px #000, 0 0 4px #000, 0 0 8px #ff9966 !important;
+    border-left-color:#ff9966 !important;
   }
 
   .critical {
-    color:#f00 !important;
-    text-shadow:0 0 3px #000, 0 0 8px #000, 0 0 25px #f00 !important;
-    animation:criticalBlink 1s infinite;
-    border-left-color:#f00 !important;
+    color:#ff4444 !important;
+    text-shadow:0 0 2px #000, 0 0 4px #000, 0 0 10px #ff4444 !important;
+    animation:criticalBlink 2s infinite;
+    border-left-color:#ff4444 !important;
   }
 
   @keyframes criticalBlink {
     0%, 50%, 100% {opacity:1;}
-    25%, 75% {opacity:0.7;}
+    25%, 75% {opacity:0.85;}
   }
 
   /* Stock ticker */
@@ -432,7 +526,12 @@
 <div id="container">
   <div id="header">
     <h1>⚠ P(DOOM) DASHBOARD ⚠</h1>
-    <div>
+    <div id="headerSubtitle">
+      <a href="https://github.com/PipFoweraker/pdoom1-data" target="_blank">pdoom1-data</a> |
+      <a href="https://github.com/PipFoweraker/pdoom1-website" target="_blank">website repo</a> |
+      <a href="/" target="_blank">pdoom1 home</a>
+    </div>
+    <div id="headerMeta">
       <div id="status">EXPONENTIAL ESCALATION</div>
       <div id="timestamp"></div>
     </div>
@@ -553,6 +652,12 @@
           <div class="stock-change">+35% YTD</div>
         </div>
       </div>
+
+      <!-- AI Safety Investment Graph -->
+      <div style="margin-top:20px;padding:15px;background:rgba(0,40,20,0.5);border:2px solid #00ff41;border-radius:6px;">
+        <div class="metric-label" style="text-align:center;margin-bottom:10px;">💰 AI SAFETY INVESTMENT</div>
+        <div id="safetyInvestmentGraph" style="width:100%;height:180px;"></div>
+      </div>
     </div>
 
     <!-- Center Column - 3-part layout -->
@@ -564,9 +669,27 @@
 
       <!-- Bottom Row (bottom 1/3) -->
       <div id="bottomRow">
-        <!-- Pie Chart (left half) -->
+        <!-- World Map (left half) -->
         <div id="pieContainer">
-          <div id="pieChart" style="width:100%;height:100%;"></div>
+          <div id="mapTitle">AI Compute by Region</div>
+          <svg id="worldMap" viewBox="0 0 1000 500">
+            <!-- Simplified world map regions -->
+            <g id="mapRegions">
+              <!-- North America -->
+              <path class="map-region" data-region="USA" d="M 100,100 L 280,100 L 280,220 L 100,220 Z" />
+              <!-- Europe -->
+              <path class="map-region" data-region="Europe" d="M 450,80 L 600,80 L 600,200 L 450,200 Z" />
+              <!-- China -->
+              <path class="map-region" data-region="China" d="M 700,120 L 850,120 L 850,240 L 700,240 Z" />
+              <!-- Others (Australia/Rest) -->
+              <path class="map-region" data-region="Others" d="M 750,320 L 900,320 L 900,420 L 750,420 Z" />
+            </g>
+            <!-- Labels -->
+            <text x="190" y="165" fill="#ffffff" font-size="20" text-anchor="middle" font-weight="bold" style="pointer-events:none;text-shadow:0 0 5px #000">USA</text>
+            <text x="525" y="145" fill="#ffffff" font-size="20" text-anchor="middle" font-weight="bold" style="pointer-events:none;text-shadow:0 0 5px #000">EUROPE</text>
+            <text x="775" y="185" fill="#ffffff" font-size="20" text-anchor="middle" font-weight="bold" style="pointer-events:none;text-shadow:0 0 5px #000">CHINA</text>
+            <text x="825" y="375" fill="#ffffff" font-size="18" text-anchor="middle" font-weight="bold" style="pointer-events:none;text-shadow:0 0 5px #000">OTHERS</text>
+          </svg>
         </div>
 
         <!-- Narrative Box (right half) -->
@@ -617,6 +740,16 @@
         <div class="metric-label">Survey Median</div>
         <div class="metric-value">5%</div>
         <div class="metric-subtext">1000+ researchers</div>
+      </div>
+
+      <!-- Manifold Markets -->
+      <div style="margin-top:20px;">
+        <div class="metric-label" style="margin-bottom:12px;">📊 PREDICTION MARKETS</div>
+        <div id="manifoldMarkets">
+          <div class="stock-ticker" style="cursor:pointer;">
+            <div class="stock-name" style="font-size:10px;">Loading markets...</div>
+          </div>
+        </div>
       </div>
 
       <!-- Cat Cam -->
@@ -692,11 +825,11 @@ void main() {
   vec3 criticalColor = vec3(1.0, 0.0, 0.0);
   vec3 baseColor = pdoomLevel < 0.3 ? mix(safeColor, warnColor, pdoomLevel / 0.3) : mix(warnColor, criticalColor, (pdoomLevel - 0.3) / 0.7);
 
-  vec3 color = mix(baseColor * 0.15, baseColor * 0.6, neural * 0.7);
-  color = mix(color, baseColor, neural * neural * 0.5);
-  color *= neural * (0.4 + pdoomLevel * 0.3);
+  vec3 color = mix(baseColor * 0.10, baseColor * 0.4, neural * 0.6);
+  color = mix(color, baseColor, neural * neural * 0.4);
+  color *= neural * (0.3 + pdoomLevel * 0.2);
   color *= smoothstep(1.5, 0.3, length(p));
-  color *= 0.65;  // Increased from 0.45 to make more obvious
+  color *= 0.45;  // Reduced for calmer appearance
 
   if(pdoomLevel > 0.5) {
     float pulse = 0.5 + 0.5 * sin(t * (5.0 + chaos * 3.0));
@@ -915,24 +1048,64 @@ function updatePlots(currentYear) {
     }
   ], layout, {responsive: true, displayModeBar: false});
 
-  // Pie chart - countries' compute contributions
-  Plotly.newPlot('pieChart', [{
-    values: [45, 30, 15, 10],
-    labels: ['USA', 'China', 'Europe', 'Others'],
-    type: 'pie',
-    marker: {
-      colors: ['#00ff41', '#ff6b35', '#0ff', '#f0f']
-    },
-    textfont: {color: '#ffffff', size: 14},
-    hovertemplate: '<b>%{label}</b><br>%{value}% of global compute<extra></extra>'
+  // World map interaction
+  const regionData = {
+    'USA': { compute: 45, labs: ['OpenAI', 'Anthropic', 'Meta'], color: '#00ff41' },
+    'China': { compute: 30, labs: ['Baidu', 'Alibaba', 'Tencent'], color: '#ff6b35' },
+    'Europe': { compute: 15, labs: ['DeepMind', 'Mistral'], color: '#0ff' },
+    'Others': { compute: 10, labs: ['Various'], color: '#f0f' }
+  };
+
+  document.querySelectorAll('.map-region').forEach(region => {
+    region.addEventListener('click', function() {
+      const regionName = this.getAttribute('data-region');
+      const data = regionData[regionName];
+
+      // Clear other selections
+      document.querySelectorAll('.map-region').forEach(r => r.classList.remove('selected'));
+      this.classList.add('selected');
+
+      // Update map title with region info
+      document.getElementById('mapTitle').innerHTML = `
+        <b>${regionName}</b>: ${data.compute}% of AI compute<br>
+        <span style="font-size:11px;opacity:0.8">Major labs: ${data.labs.join(', ')}</span>
+      `;
+    });
+  });
+
+  // AI Safety Investment Graph
+  const safetyInvestmentData = [
+    {year: 2018, investment: 50},
+    {year: 2019, investment: 80},
+    {year: 2020, investment: 150},
+    {year: 2021, investment: 300},
+    {year: 2022, investment: 500},
+    {year: 2023, investment: 800},
+    {year: 2024, investment: 1200},
+    {year: 2025, investment: 1800}
+  ];
+
+  Plotly.newPlot('safetyInvestmentGraph', [{
+    x: safetyInvestmentData.map(d => d.year),
+    y: safetyInvestmentData.map(d => d.investment),
+    mode: 'lines+markers',
+    line: {color: '#00ff41', width: 3},
+    marker: {color: '#00ff41', size: 8},
+    hovertemplate: '<b>%{x}</b><br>$%{y}M invested<extra></extra>'
   }], {
-    title: {text: 'AI Compute by Country', font: {size: 14, color: '#ffffff'}},
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
-    font: {color: '#ffffff'},
-    margin: {l: 10, r: 10, t: 40, b: 10},
-    showlegend: true,
-    legend: {font: {size: 11, color: '#ffffff'}}
+    font: {color: '#ffffff', size: 10},
+    margin: {l: 45, r: 15, t: 10, b: 30},
+    xaxis: {
+      gridcolor: '#ffffff22',
+      tickfont: {size: 10, color: '#ffffff'}
+    },
+    yaxis: {
+      title: {text: '$M USD', font: {size: 10, color: '#ffffff'}},
+      gridcolor: '#ffffff22',
+      tickfont: {size: 10, color: '#ffffff'}
+    }
   }, {responsive: true, displayModeBar: false});
 }
 
@@ -991,12 +1164,98 @@ makeDraggable(document.getElementById('rightPanel'));
 
 updateAll();
 
+/* ========== Event Log Integration ========== */
+async function loadEventLog() {
+  try {
+    const response = await fetch('/data/game-changes.json');
+    const data = await response.json();
+
+    // Get the 3 most recent entries
+    const recentEvents = data.entries.slice(0, 3);
+
+    // Update narrative box with event log
+    const narrativeBox = document.getElementById('narrativeBox');
+    let eventHTML = '<div class="narrative-title">Recent Development Log</div>';
+
+    recentEvents.forEach(event => {
+      eventHTML += `
+        <div class="narrative-text">
+          <span class="highlight">v${event.version}</span> (${event.date}): ${event.summary}
+        </div>
+      `;
+    });
+
+    // Add link to full changelog
+    eventHTML += `
+      <div class="narrative-text" style="margin-top:12px;">
+        <a href="/game-changelog/" target="_blank" class="source-link">View Full Changelog →</a>
+      </div>
+    `;
+
+    narrativeBox.innerHTML = eventHTML;
+  } catch (error) {
+    console.error('Failed to load event log:', error);
+  }
+}
+
+/* ========== Manifold Markets Integration ========== */
+async function loadManifoldMarkets() {
+  try {
+    // Featured AI-related markets (can be updated with real slugs)
+    const marketSlugs = [
+      'will-an-ai-get-gold-on-any-internat',
+      'will-ai-wipe-out-humanity-before-20'
+    ];
+
+    const container = document.getElementById('manifoldMarkets');
+    container.innerHTML = '';
+
+    // Fetch markets from Manifold API
+    for (const slug of marketSlugs) {
+      try {
+        const response = await fetch(`https://api.manifold.markets/v0/slug/${slug}`);
+        const market = await response.json();
+
+        const probability = (market.probability * 100).toFixed(0);
+        const marketDiv = document.createElement('div');
+        marketDiv.className = 'stock-ticker';
+        marketDiv.onclick = () => window.open(market.url, '_blank');
+        marketDiv.innerHTML = `
+          <div class="stock-name" style="font-size:10px;">${market.question.substring(0, 50)}...</div>
+          <div class="stock-price" style="font-size:16px;">${probability}%</div>
+          <div class="stock-change" style="font-size:9px;">Manifold Markets</div>
+        `;
+        container.appendChild(marketDiv);
+      } catch (err) {
+        console.error(`Failed to load market ${slug}:`, err);
+      }
+    }
+
+    // Add fallback if no markets loaded
+    if (container.children.length === 0) {
+      container.innerHTML = `
+        <div class="stock-ticker" onclick="window.open('https://manifold.markets/browse?topic=ai', '_blank')" style="cursor:pointer;">
+          <div class="stock-name" style="font-size:10px;">Browse AI Markets</div>
+          <div class="stock-price" style="font-size:14px;">→</div>
+          <div class="stock-change" style="font-size:9px;">Manifold Markets</div>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Failed to load Manifold Markets:', error);
+  }
+}
+
 /* ========== Timestamp & Cat ========== */
 function updateTimestamp() {
   document.getElementById('timestamp').textContent = new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC';
 }
 updateTimestamp();
 setInterval(updateTimestamp, 1000);
+
+// Load event log and markets on page load
+loadEventLog();
+loadManifoldMarkets();
 
 const catImages = [
   '/assets/pdoom1-office-cat-default.png',
