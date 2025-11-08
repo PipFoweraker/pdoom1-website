@@ -953,13 +953,19 @@ class ProductionAPIServer:
                 return
 
             except Exception as e:
+                import traceback
                 if attempt < max_retries:
                     print(f"⚠️  Database connection failed (attempt {attempt}/{max_retries}): {e}")
+                    print(f"   Error type: {type(e).__name__}")
+                    print(f"   Traceback: {traceback.format_exc()}")
                     print(f"   Retrying in {retry_delay} seconds...")
                     time.sleep(retry_delay)
                     retry_delay *= 2  # Exponential backoff
                 else:
                     print(f"❌ Database initialization failed after {max_retries} attempts: {e}")
+                    print(f"   Error type: {type(e).__name__}")
+                    print(f"   Full traceback:")
+                    traceback.print_exc()
                     sys.exit(1)
 
     def _init_jwt(self):
