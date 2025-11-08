@@ -21,6 +21,7 @@ import json
 import argparse
 import os
 import sys
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
@@ -937,7 +938,6 @@ class ProductionAPIServer:
 
     def _init_database(self):
         """Initialize database connection pool with retry logic."""
-        import time
         max_retries = 5
         retry_delay = 2  # seconds
 
