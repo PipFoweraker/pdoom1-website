@@ -936,18 +936,31 @@ class ProductionAPIServer:
             sys.exit(1)
 
     def _init_database(self):
-        """Initialize database connection pool."""
-        try:
-            self.db_manager = DatabaseManager(self.database_url)
-            self.db_manager.initialize_pool(min_conn=2, max_conn=10)
+        """Initialize database connection pool with retry logic."""
+        import time
+        max_retries = 5
+        retry_delay = 2  # seconds
 
-            # Test connection
-            self.db_manager.execute_query("SELECT 1")
-            print("✅ Database connection successful")
+        for attempt in range(1, max_retries + 1):
+            try:
+                print(f"🔄 Attempting database connection (attempt {attempt}/{max_retries})...")
+                self.db_manager = DatabaseManager(self.database_url)
+                self.db_manager.initialize_pool(min_conn=2, max_conn=10)
 
-        except Exception as e:
-            print(f"❌ Database initialization failed: {e}")
-            sys.exit(1)
+                # Test connection
+                self.db_manager.execute_query("SELECT 1")
+                print("✅ Database connection successful")
+                return
+
+            except Exception as e:
+                if attempt < max_retries:
+                    print(f"⚠️  Database connection failed (attempt {attempt}/{max_retries}): {e}")
+                    print(f"   Retrying in {retry_delay} seconds...")
+                    time.sleep(retry_delay)
+                    retry_delay *= 2  # Exponential backoff
+                else:
+                    print(f"❌ Database initialization failed after {max_retries} attempts: {e}")
+                    sys.exit(1)
 
     def _init_jwt(self):
         """Initialize JWT manager."""
