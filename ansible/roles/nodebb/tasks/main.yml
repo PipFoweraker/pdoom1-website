@@ -1,0 +1,176 @@
+---
+# Main tasks file for NodeBB installation
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install system dependencies
+  apt:
+    name:
+      - git
+      - build-essential
+      - nginx
+      - certbot
+      - python3-certbot-nginx
+      - curl
+      - gnupg2
+      - ca-certificates
+      - lsb-release
+      - ubuntu-keyring
+    state: present
+
+- name: Add MongoDB GPG key
+  apt_key:
+    url: https://www.mongodb.org/static/pgp/server-7.0.asc
+    state: present
+
+- name: Add MongoDB repository
+  apt_repository:
+    repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu {{ ansible_distribution_release }}/mongodb-org/7.0 multiverse"
+    state: present
+    filename: mongodb-org-7.0
+
+- name: Install MongoDB
+  apt:
+    name:
+      - mongodb-org
+    state: present
+    update_cache: yes
+
+- name: Start and enable MongoDB
+  systemd:
+    name: mongod
+    state: started
+    enabled: yes
+
+- name: Install Node.js {{ nodejs_version }} using NodeSource
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_{{ nodejs_version }}.x | bash -
+    apt-get install -y nodejs
+  args:
+    creates: /usr/bin/node
+
+- name: Verify Node.js installation
+  command: node --version
+  register: node_version
+  changed_when: false
+
+- name: Display Node.js version
+  debug:
+    msg: "Node.js version: {{ node_version.stdout }}"
+
+- name: Create NodeBB system user
+  user:
+    name: "{{ nodebb_user }}"
+    system: yes
+    shell: /bin/bash
+    home: "{{ nodebb_install_dir }}"
+    create_home: yes
+
+- name: Clone NodeBB repository
+  git:
+    repo: https://github.com/NodeBB/NodeBB.git
+    dest: "{{ nodebb_install_dir }}"
+    version: "{{ nodebb_version }}"
+    force: no
+  become_user: "{{ nodebb_user }}"
+
+- name: Install NodeBB dependencies
+  npm:
+    path: "{{ nodebb_install_dir }}"
+    production: yes
+  become_user: "{{ nodebb_user }}"
+
+- name: Install PM2 globally
+  npm:
+    name: pm2
+    global: yes
+    state: present
+
+- name: Create NodeBB configuration file
+  template:
+    src: config.json.j2
+    dest: "{{ nodebb_install_dir }}/config.json"
+    owner: "{{ nodebb_user }}"
+    group: "{{ nodebb_group }}"
+    mode: '0600'
+  notify: restart nodebb
+
+- name: Configure nginx for NodeBB
+  template:
+    src: nginx-nodebb.conf.j2
+    dest: /etc/nginx/sites-available/{{ nodebb_domain }}
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload nginx
+
+- name: Enable NodeBB nginx site
+  file:
+    src: /etc/nginx/sites-available/{{ nodebb_domain }}
+    dest: /etc/nginx/sites-enabled/{{ nodebb_domain }}
+    state: link
+  notify: reload nginx
+
+- name: Remove default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: reload nginx
+
+- name: Test nginx configuration
+  command: nginx -t
+  register: nginx_test
+  changed_when: false
+
+- name: Display nginx test result
+  debug:
+    msg: "{{ nginx_test.stderr }}"
+
+- name: Ensure nginx is running
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Check if NodeBB setup has been run
+  stat:
+    path: "{{ nodebb_install_dir }}/config.json"
+  register: nodebb_config
+
+- name: Display setup instructions
+  debug:
+    msg:
+      - "NodeBB has been installed but not yet configured."
+      - "To complete setup, SSH into the server and run:"
+      - "cd {{ nodebb_install_dir }}"
+      - "./nodebb setup"
+      - ""
+      - "You will be prompted for:"
+      - "- URL: {{ nodebb_url }}"
+      - "- Port: {{ nodebb_port }}"
+      - "- Database: mongo"
+      - "- MongoDB host: {{ mongodb_host }}"
+      - "- MongoDB port: {{ mongodb_port }}"
+      - "- Admin username, email, and password"
+  when: not nodebb_config.stat.exists
+
+- name: Create PM2 startup script
+  command: pm2 startup systemd -u {{ nodebb_user }} --hp {{ nodebb_install_dir }}
+  register: pm2_startup
+  changed_when: "'already' not in pm2_startup.stdout"
+
+- name: Display completion message
+  debug:
+    msg:
+      - "=== NodeBB Installation Complete! ==="
+      - ""
+      - "Next manual steps required:"
+      - "1. Run NodeBB setup: cd {{ nodebb_install_dir }} && ./nodebb setup"
+      - "2. Start NodeBB: pm2 start ./nodebb -- start"
+      - "3. Save PM2 config: pm2 save"
+      - "4. Configure SSL: certbot --nginx -d {{ nodebb_domain }}"
+      - ""
+      - "Your forum will be available at: {{ nodebb_url }}"

@@ -1,0 +1,41 @@
+---
+# NodeBB Configuration Variables
+
+# Domain and URL configuration
+nodebb_domain: "forum.pdoom1.com"
+nodebb_url: "https://forum.pdoom1.com"
+
+# NodeBB installation
+nodebb_version: "v3.x"
+nodebb_install_dir: "/opt/nodebb"
+nodebb_port: 4567
+nodebb_bind_address: "127.0.0.1"
+
+# Node.js version
+nodejs_version: "20"
+
+# MongoDB configuration
+mongodb_host: "127.0.0.1"
+mongodb_port: 27017
+mongodb_database: "nodebb"
+
+# Admin user (will be prompted during setup)
+nodebb_admin_username: "admin"
+nodebb_admin_email: "admin@pdoom1.com"
+
+# Email/SMTP configuration (optional - can be configured later via admin panel)
+# smtp_host: ""
+# smtp_port: 587
+# smtp_username: ""
+# smtp_password: ""
+
+# Nginx configuration
+nginx_worker_processes: auto
+nginx_worker_connections: 1024
+
+# SSL/Let's Encrypt
+letsencrypt_email: "admin@pdoom1.com"
+
+# System user
+nodebb_user: "nodebb"
+nodebb_group: "nodebb"

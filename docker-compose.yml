@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nodebb-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nodebb
+      POSTGRES_USER: nodebb
+      POSTGRES_PASSWORD: nodebb123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nodebb-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nodebb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nodebb:
+    image: nodebb/docker:latest
+    container_name: nodebb
+    restart: unless-stopped
+    ports:
+      - "4567:4567"
+    environment:
+      # Database configuration
+      DATABASE: postgres
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: nodebb
+      POSTGRES_USER: nodebb
+      POSTGRES_PASSWORD: nodebb123
+
+      # NodeBB configuration
+      URL: http://208.113.200.215:4567
+      PORT: 4567
+
+      # Admin account (will be created on first run)
+      ADMIN_USERNAME: admin
+      ADMIN_EMAIL: admin@pdoom1.com
+      ADMIN_PASSWORD: ChangeThisPassword123!
+
+      # Optional: Set secret
+      SECRET: 02b01daa097202779c1adc60def9f87b1a6db4605387078ad68c95650756df68
+    volumes:
+      - nodebb_data:/usr/src/app/public/uploads
+      - nodebb_config:/usr/src/app/config
+    networks:
+      - nodebb-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
+  nodebb_data:
+    driver: local
+  nodebb_config:
+    driver: local
+
+networks:
+  nodebb-network:
+    driver: bridge

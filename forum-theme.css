@@ -1,0 +1,102 @@
+/* P(Doom)1 Forum Theme - Synced from main site */
+/* Color scheme from main site */
+:root {
+  --pdoom-primary: #0066cc;
+  --pdoom-secondary: #666666;
+  --pdoom-muted: #999999;
+  --pdoom-available: #0077aa;
+  --pdoom-success: #0a6f2f;
+}
+
+/* Apply color scheme to NodeBB */
+body {
+  font-family: system-ui, sans-serif;
+}
+
+/* Primary accent colors */
+.navbar-default,
+.navbar {
+  background-color: var(--pdoom-primary) !important;
+  border-color: var(--pdoom-primary) !important;
+}
+
+.btn-primary,
+.btn-success,
+a.btn-primary,
+button.btn-primary {
+  background-color: var(--pdoom-primary) !important;
+  border-color: var(--pdoom-primary) !important;
+}
+
+.btn-primary:hover,
+.btn-success:hover {
+  background-color: #0052a3 !important;
+  border-color: #0052a3 !important;
+}
+
+/* Links */
+a {
+  color: var(--pdoom-primary);
+}
+
+a:hover {
+  color: #0052a3;
+}
+
+/* Category cards - match main site card style */
+.category-item,
+.category > ul > li {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* Status badges - match main site status colors */
+.tag,
+.badge {
+  background: #e6f8ff;
+  color: var(--pdoom-available);
+  border-radius: 3px;
+}
+
+/* Success/positive indicators */
+.online,
+.status-online,
+.text-success {
+  color: var(--pdoom-success) !important;
+}
+
+/* Secondary text */
+.text-muted,
+.timeago {
+  color: var(--pdoom-muted) !important;
+}
+
+/* Header branding */
+.header .navbar-brand {
+  font-weight: 700;
+  color: #fff !important;
+}
+
+/* User cards */
+.account-wrapper,
+.users-container .users-box {
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* Topic list highlighting */
+.unread .topic-title {
+  font-weight: 700;
+}
+
+/* CTA buttons - match main site style */
+.composer .btn-primary,
+.topic .btn-primary {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+/* Custom branding reminder */
+/* Update this file when main site colors change */
+/* Located at: C:\Users\gday\Documents\A Local Code\pdoom1-website\forum-theme.css */

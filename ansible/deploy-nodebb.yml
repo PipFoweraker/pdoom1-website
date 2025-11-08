@@ -1,0 +1,19 @@
+---
+- name: Deploy NodeBB Forum
+  hosts: nodebb_servers
+  become: yes
+  gather_facts: yes
+
+  roles:
+    - nodebb
+
+  post_tasks:
+    - name: Display deployment summary
+      debug:
+        msg:
+          - "NodeBB deployment complete!"
+          - "Forum URL: {{ nodebb_url }}"
+          - "Next steps:"
+          - "1. Complete NodeBB setup by running: ./nodebb setup"
+          - "2. Configure SSL with: certbot --nginx -d {{ nodebb_domain }}"
+          - "3. Access admin panel at: {{ nodebb_url }}/admin"

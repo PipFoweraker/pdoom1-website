@@ -1,0 +1,17 @@
+---
+# Handlers for NodeBB role
+
+- name: reload nginx
+  systemd:
+    name: nginx
+    state: reloaded
+
+- name: restart nginx
+  systemd:
+    name: nginx
+    state: restarted
+
+- name: restart nodebb
+  command: pm2 restart nodebb
+  become_user: "{{ nodebb_user }}"
+  ignore_errors: yes
