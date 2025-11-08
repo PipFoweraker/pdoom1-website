@@ -938,8 +938,8 @@ class ProductionAPIServer:
 
     def _init_database(self):
         """Initialize database connection pool with retry logic."""
-        max_retries = 5
-        retry_delay = 2  # seconds
+        max_retries = 15  # More retries to wait for Postgres to fully start
+        retry_delay = 10  # Start with 10 seconds, will grow exponentially
 
         for attempt in range(1, max_retries + 1):
             try:
