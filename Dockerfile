@@ -23,5 +23,5 @@ COPY . .
 EXPOSE 8080
 
 # Start command (Railway will set $PORT environment variable)
-# Use shell form to allow environment variable expansion
-CMD ["sh", "-c", "python3 scripts/api-server-v2.py --production --port ${PORT:-8080}"]
+# The api-server-v2.py already reads PORT from environment, so just run in production mode
+CMD ["python3", "scripts/api-server-v2.py", "--production"]
