@@ -24,4 +24,5 @@ EXPOSE 8080
 
 # Start command (Railway will set $PORT environment variable)
 # The api-server-v2.py already reads PORT from environment, so just run in production mode
-CMD ["python3", "scripts/api-server-v2.py", "--production"]
+# Use -u flag for unbuffered output so we can see errors immediately
+CMD ["python3", "-u", "scripts/api-server-v2.py", "--production"]
