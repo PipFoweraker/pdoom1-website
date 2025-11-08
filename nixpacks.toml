@@ -1,6 +1,3 @@
-[providers]
-python = "3.11"
-
 [phases.setup]
 nixPkgs = ['python311', 'postgresql']
 
