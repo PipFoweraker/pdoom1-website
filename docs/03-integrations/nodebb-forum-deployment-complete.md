@@ -16,6 +16,7 @@
 - **Reverse Proxy**: Nginx (port 80 → 4567)
 - **Containerization**: Docker Compose with persistent volumes
 - **Deployment Method**: Docker (bypassed webpack build issues)
+- **Instance Size**: subsonic (2GB RAM) - resized from 512MB to resolve 503 errors
 
 ### 2. **Integration with Main Site** ✅
 - Added "Forum" link to main site navigation ([public/index.html:779](../public/index.html#L779))
@@ -165,6 +166,7 @@ ssh -i "C:\Users\gday\.ssh\pdoom-website-instance.pem" ubuntu@208.113.200.215 "c
 3. **Nginx reverse proxy** solves firewall issues without opening additional ports
 4. **Document as you go** - [FORUM-SETUP.md](../../FORUM-SETUP.md) created during deployment
 5. **Automation-first mindset** - Ansible playbooks created for future scaling
+6. **Right-size your instances** - Initially deployed on 512MB instance, causing 503 errors due to memory pressure. Resized to 2GB (subsonic) which resolved issues immediately. NodeBB + PostgreSQL requires minimum 1-2GB RAM for stable operation
 
 ---
 

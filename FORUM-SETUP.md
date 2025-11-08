@@ -5,6 +5,7 @@
 **Forum URL (current)**: http://208.113.200.215
 **Admin Panel**: http://208.113.200.215/admin
 **Server IP**: 208.113.200.215
+**Instance Size**: subsonic (2GB RAM)
 **SSH Key**: `C:\Users\gday\.ssh\pdoom-website-instance.pem`
 
 ---
@@ -173,12 +174,32 @@ When handing off to developers:
 
 ## Troubleshooting
 
-### Forum not loading
-```bash
-# Check if containers are running
-ssh -i "C:\Users\gday\.ssh\pdoom-website-instance.pem" ubuntu@208.113.200.215 "sudo docker-compose ps"
+### Forum not loading (503 Error)
 
-# Check logs
+**Common Cause**: Insufficient memory on instance
+
+1. **Check memory usage**:
+```bash
+ssh -i "C:\Users\gday\.ssh\pdoom-website-instance.pem" ubuntu@208.113.200.215 "free -h"
+```
+
+2. **If memory is low (< 1GB free)**, resize instance:
+   - Go to DreamCompute Dashboard → Instances
+   - Select dropdown → "Resize Instance"
+   - Choose larger flavor (subsonic/2GB or supersonic/4GB)
+
+3. **Quick restart** (temporary fix):
+```bash
+ssh -i "C:\Users\gday\.ssh\pdoom-website-instance.pem" ubuntu@208.113.200.215 "cd /home/ubuntu && sudo docker-compose restart"
+```
+
+4. **Check if containers are running**:
+```bash
+ssh -i "C:\Users\gday\.ssh\pdoom-website-instance.pem" ubuntu@208.113.200.215 "sudo docker-compose ps"
+```
+
+5. **Check logs**:
+```bash
 ssh -i "C:\Users\gday\.ssh\pdoom-website-instance.pem" ubuntu@208.113.200.215 "sudo docker logs nodebb --tail 50"
 ```
 

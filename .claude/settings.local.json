@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh pr list:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(gh issue create:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue comment:*)",
+      "Bash(ping:*)",
+      "Bash(dir \"C:\\Users\\gday\\.ssh\\pdoom-website-instance.pem\")",
+      "Bash(ssh:*)",
+      "Bash(powershell:*)",
+      "Bash(dir)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
