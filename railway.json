@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python scripts/api-server.py --production --port $PORT",
+    "startCommand": "python3 scripts/api-server-v2.py --production --port $PORT",
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 30,
     "restartPolicyType": "ON_FAILURE",

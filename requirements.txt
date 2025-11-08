@@ -1,11 +1,31 @@
 # Python requirements for p(Doom)1 Website
-# This project uses Python standard library only for portability
-# No external dependencies required for core functionality
 
-# Note: The API server (scripts/api-server.py) uses only stdlib:
+# ============================================================================
+# API Server v1 (Bridge) - No dependencies
+# ============================================================================
+# The bridge API server (scripts/api-server.py) uses only stdlib:
 # - http.server for HTTP handling
 # - json for data parsing
 # - pathlib for file operations
 # - datetime for timestamps
 
-# If you need to add dependencies in the future, list them here
+# ============================================================================
+# API Server v2 (Production) - PostgreSQL + JWT
+# ============================================================================
+
+# Database
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+
+# Authentication
+PyJWT==2.8.0           # JSON Web Tokens
+
+# Environment configuration
+python-dotenv==1.0.0   # Load .env files
+
+# ============================================================================
+# Optional Dependencies (Future Features)
+# ============================================================================
+
+# redis==5.0.1         # Redis caching (if needed later)
+# requests==2.31.0     # HTTP client for external APIs
+# gunicorn==21.2.0     # Production WSGI server (alternative to stdlib http.server)
