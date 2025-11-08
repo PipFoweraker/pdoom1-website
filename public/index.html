@@ -60,9 +60,15 @@
 			background: var(--bg-primary);
 			color: var(--text-primary);
 			line-height: 1.6;
-			background-image: 
+			background-image:
 				radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.02) 0%, transparent 50%),
-				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
+				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.02) 0%, transparent 50%),
+				linear-gradient(to bottom, rgba(26, 26, 26, 0.95), rgba(26, 26, 26, 0.98) 40%, rgba(26, 26, 26, 1) 60%),
+				url('assets/screenshots/hero-main-office-web.jpg');
+			background-size: 100% 100%, 100% 100%, 100% 100%, cover;
+			background-position: 0 0, 0 0, 0 0, center top;
+			background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+			background-attachment: fixed, fixed, fixed, fixed;
 		}
 
 		header {
@@ -671,22 +677,9 @@
 		function updateGameStatusUI() {
 			const status = window.__PDOOM_STATUS__;
 			if (!status.game) return;
-			
-			// Update hero section with current game info
-			const heroSubtitle = document.querySelector('.hero .subtitle');
-			if (heroSubtitle && status.game.warning) {
-				const warningEl = document.createElement('div');
-				warningEl.style.cssText = 'color: var(--accent-danger); font-weight: bold; margin-top: 1rem; padding: 0.5rem; background: rgba(255, 68, 68, 0.1); border-radius: var(--radius-sm); border: 1px solid var(--accent-danger);';
-				warningEl.innerHTML = `Warning: ${status.game.warning}`;
-				heroSubtitle.parentNode.insertBefore(warningEl, heroSubtitle.nextSibling);
-			}
-			
-			// Update download link with latest release info
-			const ctaButton = document.querySelector('.cta-button');
-			if (ctaButton && status.game.latestRelease) {
-				ctaButton.href = status.game.repository || ctaButton.href;
-				ctaButton.innerHTML = `Download ${status.game.latestRelease.version || 'Latest'} (GitHub)`;
-			}
+
+			// Note: Alpha warning banner removed as game is now stable
+			// Download buttons are now static platform-specific links
 			
 			// Add game status info to the page
 			const aboutSection = document.getElementById('about');
@@ -806,15 +799,24 @@
 			<p class="subtitle">Practice saving the world from deadly AI through bureaucracy</p>
 			<p style="margin-bottom: 0.8rem; color: var(--text-secondary); font-size: 0.95rem;">
 				<span class="status-indicator status-active"></span>
-				Currently in Development - Alpha Release Available
+				Free & Open Source
 			</p>
 
-			<!-- Download Options - Primary CTAs -->
+			<!-- Download Options - Platform-Specific CTAs -->
 			<div class="download-ctas" style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.8rem;">
-				<a href="https://github.com/PipFoweraker/pdoom1/releases" class="cta-button" style="font-size: 1rem; padding: 0.8rem 1.5rem;" target="_blank" rel="noopener">
-					<span class="loading-placeholder">Download 0.1.0 (Latest)</span>
+				<a href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.exe" class="cta-button" style="font-size: 0.95rem; padding: 0.8rem 1.3rem;" target="_blank" rel="noopener">
+					Download for Windows
 				</a>
-				<a href="https://github.com/PipFoweraker/pdoom1" class="cta-button" style="background: var(--accent-secondary); border-color: var(--accent-secondary); font-size: 1rem; padding: 0.8rem 1.5rem;" target="_blank" rel="noopener">
+				<a href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.app.zip" class="cta-button" style="font-size: 0.95rem; padding: 0.8rem 1.3rem;" target="_blank" rel="noopener">
+					Download for macOS
+				</a>
+				<a href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.x86_64" class="cta-button" style="font-size: 0.95rem; padding: 0.8rem 1.3rem;" target="_blank" rel="noopener">
+					Download for Linux
+				</a>
+			</div>
+
+			<div style="text-align: center; margin-bottom: 0.8rem;">
+				<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-secondary); text-decoration: none; font-size: 0.9rem;">
 					View on GitHub →
 				</a>
 			</div>
@@ -960,19 +962,32 @@
 				<!-- Screenshots Tab -->
 				<div class="tab-content" id="screenshots-tab" style="display: none;">
 					<div style="text-align: center; margin-bottom: 1rem;">
-						<img src="assets/screenshot-placeholder-main.svg" alt="p(Doom)1 Main Game Interface" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+						<picture>
+							<source srcset="assets/screenshots/hero-main-office-web.webp" type="image/webp">
+							<img src="assets/screenshots/hero-main-office-web.jpg" alt="p(Doom)1 Main Office Interface - Navigate AI Safety through bureaucracy" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+						</picture>
 					</div>
 					<div class="grid">
 						<div style="text-align: center;">
-							<img src="assets/screenshot-placeholder-gameplay.svg" alt="Resource Management Interface" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
-							<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Resource Management</p>
+							<picture>
+								<source srcset="assets/screenshots/gameplay-office-1-web.webp" type="image/webp">
+								<img src="assets/screenshots/gameplay-office-1-web.jpg" alt="Office Environment - Manage resources and make critical decisions" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+							</picture>
+							<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Office Environment</p>
 						</div>
 						<div style="text-align: center;">
-							<img src="assets/screenshot-placeholder-ui.svg" alt="Research Interface" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+							<picture>
+								<source srcset="assets/screenshots/gameplay-office-2-web.webp" type="image/webp">
+								<img src="assets/screenshots/gameplay-office-2-web.jpg" alt="Computer Interface - Research and development workspace" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+							</picture>
 							<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Research & Development</p>
 						</div>
-						<div style="text-align: center; display: flex; align-items: center; justify-content: center; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px dashed var(--accent-secondary); padding: 2rem;">
-							<small style="color: var(--text-muted);">Event system screenshot coming soon...</small>
+						<div style="text-align: center;">
+							<picture>
+								<source srcset="assets/screenshots/doom-cat-closeup-web.webp" type="image/webp">
+								<img src="assets/screenshots/doom-cat-closeup-web.jpg" alt="Doom Cat - Your AI Safety companion" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+							</picture>
+							<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Meet the Doom Cat</p>
 						</div>
 					</div>
 				</div>
@@ -1058,7 +1073,7 @@ python main.py</pre>
 				<a href="/docs/roadmap.md" class="card roadmap-card" style="text-decoration: none; color: inherit;">
 					<h3>Short term (weeks) 📅</h3>
 					<ul style="margin: 0.8rem 0; padding-left: 1.2rem;">
-						<li>Alpha updates 2-3x weekly</li>
+						<li>Regular feature updates</li>
 						<li>Social media automation</li>
 						<li>Community forum launch</li>
 					</ul>
@@ -1077,12 +1092,12 @@ python main.py</pre>
 		<section class="section" id="help-support">
 			<h2>Help & Support</h2>
 			<p style="color: var(--text-secondary); text-align: center; margin-bottom: 1.5rem;">
-				Need help, found a bug, or want to learn more about AI Safety?
+				Need help, have feedback, or want to learn more about AI Safety?
 			</p>
 			<div class="grid">
 				<div class="card" style="text-align: center;">
-					<h3 style="color: var(--accent-primary);">Report Issues</h3>
-					<p style="margin-bottom: 1rem;">Found a bug or have a suggestion?</p>
+					<h3 style="color: var(--accent-primary);">Share Feedback</h3>
+					<p style="margin-bottom: 1rem;">Have feedback or suggestions?</p>
 					<a href="/issues/" class="cta-button" style="display: inline-block;">Submit Feedback →</a>
 				</div>
 				<div class="card" style="text-align: center;">

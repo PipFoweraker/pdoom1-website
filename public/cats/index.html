@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cat Custodians - p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/cats/" />
+	<meta name="description" content="Meet the cat custodians of p(Doom)1 - immortalized in the game as reward NPCs for community contributors." />
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--border-color: #444444;
+			--radius-sm: 4px;
+			--radius-md: 6px;
+			--radius-lg: 10px;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem 0;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		nav {
+			max-width: 1200px;
+			margin: 0 auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 1.6rem;
+		}
+
+		.logo {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			text-decoration: none;
+			text-shadow: 0 0 10px var(--accent-primary);
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 2rem;
+			list-style: none;
+		}
+
+		.nav-links a {
+			color: var(--text-secondary);
+			text-decoration: none;
+			transition: color 0.3s;
+		}
+
+		.nav-links a:hover {
+			color: var(--accent-primary);
+		}
+
+		main {
+			max-width: 1400px;
+			margin: 0 auto;
+			padding: 2rem 1.6rem;
+		}
+
+		.hero {
+			text-align: center;
+			padding: 3rem 0;
+			background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+			border-radius: var(--radius-lg);
+			margin-bottom: 3rem;
+			border: 1px solid var(--border-color);
+		}
+
+		.hero h1 {
+			font-size: 2.5rem;
+			margin-bottom: 1rem;
+			color: var(--accent-primary);
+			text-shadow: 0 0 20px var(--accent-primary);
+		}
+
+		.hero p {
+			color: var(--text-secondary);
+			font-size: 1.1rem;
+			max-width: 800px;
+			margin: 0 auto;
+		}
+
+		.cat-gallery {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+			gap: 2rem;
+			margin: 2rem 0;
+		}
+
+		.cat-card {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			overflow: hidden;
+			transition: transform 0.3s, border-color 0.3s;
+			cursor: pointer;
+		}
+
+		.cat-card:hover {
+			transform: translateY(-5px);
+			border-color: var(--accent-primary);
+		}
+
+		.cat-image {
+			width: 100%;
+			height: 280px;
+			object-fit: cover;
+			display: block;
+		}
+
+		.cat-info {
+			padding: 1.2rem;
+		}
+
+		.cat-name {
+			font-size: 1.3rem;
+			color: var(--accent-primary);
+			margin-bottom: 0.5rem;
+		}
+
+		.cat-description {
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+			margin-bottom: 1rem;
+		}
+
+		.contributor-link {
+			display: inline-block;
+			color: var(--accent-secondary);
+			text-decoration: none;
+			font-size: 0.85rem;
+			padding: 0.4rem 0.8rem;
+			border: 1px solid var(--accent-secondary);
+			border-radius: var(--radius-sm);
+			transition: all 0.3s;
+		}
+
+		.contributor-link:hover {
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+		}
+
+		.info-section {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 2rem;
+			margin-bottom: 2rem;
+		}
+
+		.info-section h2 {
+			color: var(--accent-secondary);
+			margin-bottom: 1rem;
+		}
+
+		footer {
+			background: var(--bg-secondary);
+			border-top: 2px solid var(--accent-primary);
+			text-align: center;
+			padding: 1.6rem;
+			margin-top: 3rem;
+			color: var(--text-muted);
+		}
+
+		@media (max-width: 768px) {
+			.cat-gallery {
+				grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+				gap: 1.5rem;
+			}
+
+			.hero h1 {
+				font-size: 2rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<nav>
+			<a href="/" class="logo">p(Doom)1</a>
+			<ul class="nav-links">
+				<li><a href="/">Home</a></li>
+				<li><a href="/about/">About</a></li>
+				<li><a href="/cats/">Cat Custodians</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<section class="hero">
+			<h1>Cat Custodians</h1>
+			<p>Meet the feline guardians of AI Safety. These cats have been immortalized in p(Doom)1 as reward NPCs for community contributors.</p>
+		</section>
+
+		<section class="info-section">
+			<h2>About the Cat Custodians</h2>
+			<p style="margin-bottom: 1rem;">In p(Doom)1, community contributors can earn special rewards including having a cat NPC named after them (or their cat!). These loyal felines serve as office companions, providing morale boosts and occasional insights into AI Safety research.</p>
+			<p style="color: var(--text-muted); font-size: 0.9rem;">Want to become a custodian? Check out the <a href="/about/#contributors" style="color: var(--accent-primary);">contributors page</a> to learn how to earn rewards.</p>
+		</section>
+
+		<div class="cat-gallery">
+			<div class="cat-card">
+				<img src="/assets/cats-gallery/web-doom-cat.jpg" alt="Doom Cat - The original AI Safety guardian" class="cat-image" loading="lazy">
+				<div class="cat-info">
+					<h3 class="cat-name">Doom Cat</h3>
+					<p class="cat-description">The original guardian. Watches over the office with an air of existential concern about AGI timelines.</p>
+					<a href="/about/#contributors" class="contributor-link">View Contributors →</a>
+				</div>
+			</div>
+
+			<div class="cat-card">
+				<img src="/assets/cats-gallery/web-arwen.jpg" alt="Arwen - Elegant office cat" class="cat-image" loading="lazy">
+				<div class="cat-info">
+					<h3 class="cat-name">Arwen</h3>
+					<p class="cat-description">Graceful and wise. Often found pondering alignment research papers.</p>
+					<a href="/about/#contributors" class="contributor-link">View Contributors →</a>
+				</div>
+			</div>
+
+			<div class="cat-card">
+				<img src="/assets/cats-gallery/web-arwen-chuck.jpg" alt="Arwen & Chuck - Dynamic duo" class="cat-image" loading="lazy">
+				<div class="cat-info">
+					<h3 class="cat-name">Arwen & Chuck</h3>
+					<p class="cat-description">The dynamic duo. Twice the morale boost, twice the AI Safety insights.</p>
+					<a href="/about/#contributors" class="contributor-link">View Contributors →</a>
+				</div>
+			</div>
+
+			<div class="cat-card">
+				<img src="/assets/cats-gallery/web-chucky.jpg" alt="Chucky - Playful office companion" class="cat-image" loading="lazy">
+				<div class="cat-info">
+					<h3 class="cat-name">Chucky</h3>
+					<p class="cat-description">Energetic and curious. Keeps the office spirits high during long research sessions.</p>
+					<a href="/about/#contributors" class="contributor-link">View Contributors →</a>
+				</div>
+			</div>
+
+			<div class="cat-card">
+				<img src="/assets/cats-gallery/web-luna.jpg" alt="Luna - Nocturnal research assistant" class="cat-image" loading="lazy">
+				<div class="cat-info">
+					<h3 class="cat-name">Luna</h3>
+					<p class="cat-description">Nocturnal guardian. Best late-night coding companion for alignment researchers.</p>
+					<a href="/about/#contributors" class="contributor-link">View Contributors →</a>
+				</div>
+			</div>
+
+			<div class="cat-card">
+				<img src="/assets/cats-gallery/web-mando.jpg" alt="Mando - Strategic thinker" class="cat-image" loading="lazy">
+				<div class="cat-info">
+					<h3 class="cat-name">Mando</h3>
+					<p class="cat-description">Strategic and calculated. Approaches AI Safety with military precision.</p>
+					<a href="/about/#contributors" class="contributor-link">View Contributors →</a>
+				</div>
+			</div>
+
+			<div class="cat-card">
+				<img src="/assets/cats-gallery/web-missy.jpg" alt="Missy - Playful research buddy" class="cat-image" loading="lazy">
+				<div class="cat-info">
+					<h3 class="cat-name">Missy</h3>
+					<p class="cat-description">Charming and affectionate. Reminds everyone that AI Safety research needs joy too.</p>
+					<a href="/about/#contributors" class="contributor-link">View Contributors →</a>
+				</div>
+			</div>
+
+			<div class="cat-card">
+				<img src="/assets/cats-gallery/web-nigel.jpg" alt="Nigel - Distinguished gentleman cat" class="cat-image" loading="lazy">
+				<div class="cat-info">
+					<h3 class="cat-name">Nigel</h3>
+					<p class="cat-description">Distinguished and proper. Insists on formal AI Safety methodology.</p>
+					<a href="/about/#contributors" class="contributor-link">View Contributors →</a>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<footer>
+		<p>&copy; 2025 p(Doom)1. All cats are real and deserve treats.</p>
+		<p style="margin-top: 0.5rem;">
+			<a href="/" style="color: var(--accent-primary);">Home</a> |
+			<a href="/about/" style="color: var(--accent-primary);">About</a> |
+			<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);" target="_blank">GitHub</a>
+		</p>
+	</footer>
+</body>
+</html>

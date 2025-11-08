@@ -6,19 +6,18 @@
     "environment": "production"
   },
   "game": {
-    "status": "alpha",
-    "warning": "SUPER BUGGY ALPHA - Download at your own risk",
+    "status": "stable",
     "repository": "https://github.com/PipFoweraker/pdoom1",
     "latestRelease": {
-      "version": "v0.4.1",
-      "date": "2025-09-13",
+      "version": "v0.10.2",
+      "date": "2025-11-08",
       "downloadUrl": "https://github.com/PipFoweraker/pdoom1/releases/latest",
-      "changelog": "Enhanced leaderboard system, multiple bug fixes"
+      "changelog": "See CHANGELOG.md for details"
     },
     "development": {
-      "phase": "Type annotation completion sprint",
-      "progress": "~85% complete",
-      "nextMilestone": "Steam readiness preparation"
+      "phase": "Ongoing feature development",
+      "progress": "v0.10.2 released",
+      "nextMilestone": "Steam release preparation"
     }
   },
   "api": {
