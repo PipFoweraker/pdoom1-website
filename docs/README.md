@@ -22,6 +22,7 @@ This documentation covers the complete p(Doom)1 website project - from initial s
 ### 🚀 [02-deployment/](./02-deployment/)
 **Deployment and production operations**
 - **[deployment-guide.md](./02-deployment/deployment-guide.md)** - Complete deployment guide
+- **[DREAMHOST_VPS_DEPLOYMENT.md](./deployment/DREAMHOST_VPS_DEPLOYMENT.md)** - Production API server deployment (DreamHost VPS)
 - **[GITHUB_ENVIRONMENT_SETUP.md](./02-deployment/GITHUB_ENVIRONMENT_SETUP.md)** - GitHub environment configuration
 - **[deploy-dreamhost.md](./02-deployment/deploy-dreamhost.md)** - DreamHost-specific deployment
 - **[quick-deploy.md](./02-deployment/quick-deploy.md)** - Emergency deployment procedures
@@ -83,11 +84,12 @@ This documentation covers the complete p(Doom)1 website project - from initial s
 ## 📋 Current Status
 
 - **Website Version**: v1.1.2
-- **Last Updated**: November 7, 2025
-- **Development Phase**: Forum implementation and community building
+- **Last Updated**: November 9, 2025
+- **Development Phase**: Production API integration
 - **Production Status**: Live at https://pdoom1.com
+- **API Server**: Live at https://api.pdoom1.com (deployed Nov 9, 2025)
 - **Active Issues**: #60 (NodeBB Forum), #61 (Analytics Extraction)
-- **Recent Completions**: Dashboard UI overhaul (#54), Version auto-sync, Documentation automation
+- **Recent Completions**: Production API deployment, PostgreSQL setup, SSL configuration
 
 ## 🆘 Need Help?
 
