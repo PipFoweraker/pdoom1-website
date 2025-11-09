@@ -63,12 +63,81 @@
 			background-image:
 				radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
 				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
-				linear-gradient(to bottom, rgba(26, 26, 26, 0.85), rgba(26, 26, 26, 0.92) 30%, rgba(26, 26, 26, 0.97) 50%, rgba(26, 26, 26, 1) 70%),
-				url('assets/screenshots/hero-main-office-web.jpg');
+				linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
+				url('assets/screenshots/hero-bg-800w.webp');
 			background-size: 100% 100%, 100% 100%, 100% 100%, cover;
 			background-position: 0 0, 0 0, 0 0, center 20%;
 			background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
 			background-attachment: fixed, fixed, fixed, fixed;
+		}
+
+		/* Responsive background images - load appropriate size based on screen width */
+		@media (min-width: 801px) {
+			body {
+				background-image:
+					radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+					linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
+					url('assets/screenshots/hero-bg-1200w.webp');
+			}
+		}
+
+		@media (min-width: 1201px) {
+			body {
+				background-image:
+					radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+					linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
+					url('assets/screenshots/hero-bg-1600w.webp');
+			}
+		}
+
+		@media (min-width: 1921px) {
+			body {
+				background-image:
+					radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+					linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
+					url('assets/screenshots/hero-bg-2400w.webp');
+			}
+		}
+
+		/* Fallback for browsers that don't support WebP */
+		@supports not (background-image: url('test.webp')) {
+			body {
+				background-image:
+					radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+					linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
+					url('assets/screenshots/hero-bg-800w.jpg');
+			}
+			@media (min-width: 801px) {
+				body {
+					background-image:
+						radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
+						radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+						linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
+						url('assets/screenshots/hero-bg-1200w.jpg');
+				}
+			}
+			@media (min-width: 1201px) {
+				body {
+					background-image:
+						radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
+						radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+						linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
+						url('assets/screenshots/hero-bg-1600w.jpg');
+				}
+			}
+			@media (min-width: 1921px) {
+				body {
+					background-image:
+						radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
+						radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+						linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
+						url('assets/screenshots/hero-bg-2400w.jpg');
+				}
+			}
 		}
 
 		header {
@@ -965,7 +1034,7 @@
 					<div style="text-align: center; margin-bottom: 1rem;">
 						<picture>
 							<source srcset="assets/screenshots/hero-main-office-web.webp" type="image/webp">
-							<img src="assets/screenshots/hero-main-office-web.jpg" alt="p(Doom)1 Main Office Interface - Navigate AI Safety through bureaucracy" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+							<img src="assets/screenshots/hero-bg-800w.webp" alt="p(Doom)1 Main Office Interface - Navigate AI Safety through bureaucracy" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
 						</picture>
 					</div>
 					<div class="grid">
@@ -1600,3 +1669,4 @@ python main.py</pre>
 	<script src="/assets/js/analytics.js"></script>
 </body>
 </html>
+
