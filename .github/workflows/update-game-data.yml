@@ -1,0 +1,143 @@
+name: Update Game Data Cache
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allow manual trigger
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/update-game-data.yml'
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Fetch and cache game data
+        run: |
+          python - << 'EOF'
+          import requests
+          import json
+          from datetime import datetime
+
+          print("Fetching latest game data...")
+
+          # Fetch version/release data from GitHub API
+          try:
+              print("Fetching GitHub release data...")
+              response = requests.get(
+                  'https://api.github.com/repos/PipFoweraker/pdoom1/releases/latest',
+                  headers={'Accept': 'application/vnd.github.v3+json'},
+                  timeout=10
+              )
+              response.raise_for_status()
+              release_data = response.json()
+
+              # Fetch repository stats
+              print("Fetching repository stats...")
+              repo_response = requests.get(
+                  'https://api.github.com/repos/PipFoweraker/pdoom1',
+                  headers={'Accept': 'application/vnd.github.v3+json'},
+                  timeout=10
+              )
+              repo_response.raise_for_status()
+              repo_data = repo_response.json()
+
+              # Build version.json
+              version_json = {
+                  "latest_release": {
+                      "version": release_data.get("tag_name", "v0.10.2"),
+                      "name": release_data.get("name", "P(Doom) v0.10.2"),
+                      "published_at": release_data.get("published_at", datetime.utcnow().isoformat() + "Z"),
+                      "html_url": release_data.get("html_url", "https://github.com/PipFoweraker/pdoom1/releases/latest"),
+                      "body": release_data.get("body", "See CHANGELOG.md for details.")
+                  },
+                  "repository_stats": {
+                      "stars": repo_data.get("stargazers_count", 0),
+                      "forks": repo_data.get("forks_count", 0),
+                      "open_issues": repo_data.get("open_issues_count", 0),
+                      "last_updated": repo_data.get("updated_at", datetime.utcnow().isoformat() + "Z")
+                  },
+                  "last_updated": datetime.utcnow().isoformat(),
+                  "game_stats": {
+                      "baseline_doom_percent": 23,
+                      "frontier_labs_count": 5,
+                      "strategic_possibilities": 10000,
+                      "last_calculated": datetime.utcnow().isoformat()
+                  }
+              }
+
+              # Write version.json
+              with open('public/data/version.json', 'w') as f:
+                  json.dump(version_json, f, indent=2)
+              print("✓ Updated version.json")
+
+              # Fetch open issues for issues page
+              print("Fetching GitHub issues...")
+              issues_response = requests.get(
+                  'https://api.github.com/repos/PipFoweraker/pdoom1/issues?state=open&per_page=15&sort=updated',
+                  headers={'Accept': 'application/vnd.github.v3+json'},
+                  timeout=10
+              )
+              issues_response.raise_for_status()
+              issues_data = issues_response.json()
+
+              issues_cache = {
+                  "issues": issues_data,
+                  "count": len(issues_data),
+                  "last_updated": datetime.utcnow().isoformat()
+              }
+
+              with open('public/data/issues-cache.json', 'w') as f:
+                  json.dump(issues_cache, f, indent=2)
+              print("✓ Updated issues-cache.json")
+
+              print("\n✓ All data updated successfully!")
+
+          except requests.exceptions.RequestException as e:
+              print(f"Error fetching data: {e}")
+              print("Keeping existing cached data")
+              exit(1)
+          except Exception as e:
+              print(f"Unexpected error: {e}")
+              exit(1)
+          EOF
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code public/data/ || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add public/data/version.json public/data/issues-cache.json
+          git commit -m "chore: Update cached game data [skip ci]
+
+          Auto-updated by GitHub Actions
+          - Latest release info
+          - Repository stats
+          - Open issues cache
+
+          Updated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push

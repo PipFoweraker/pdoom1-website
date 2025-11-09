@@ -503,31 +503,22 @@
 		// GitHub Issues Loader (same as index.html)
 		class GitHubIssuesLoader {
 			constructor() {
-				this.apiUrl = 'https://api.github.com/repos/PipFoweraker/pdoom1/issues';
-				this.cache = null;
-				this.cacheExpiry = 5 * 60 * 1000;
-				this.lastFetch = 0;
+				this.cacheUrl = '/data/issues-cache.json';
 			}
 
 			async fetchIssues() {
-				const now = Date.now();
-				if (this.cache && (now - this.lastFetch < this.cacheExpiry)) {
-					return this.cache;
-				}
-
 				try {
-					const response = await fetch(this.apiUrl + '?state=open&per_page=15&sort=updated', {
-						headers: { 'Accept': 'application/vnd.github.v3+json' }
+					// Fetch from pre-cached data (updated every 6 hours by GitHub Actions)
+					const response = await fetch(this.cacheUrl, {
+						cache: 'no-cache'
 					});
 
-					if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
+					if (!response.ok) throw new Error(`Cache fetch error: ${response.status}`);
 
-					const issues = await response.json();
-					this.cache = issues;
-					this.lastFetch = now;
-					return issues;
+					const cacheData = await response.json();
+					return cacheData.issues || [];
 				} catch (error) {
-					console.warn('Failed to fetch GitHub issues:', error);
+					console.warn('Failed to fetch cached issues:', error);
 					throw error;
 				}
 			}
