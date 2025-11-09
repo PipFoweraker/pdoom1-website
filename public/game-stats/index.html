@@ -145,19 +145,7 @@
 </head>
 <body>
     <header>
-        <a href="/" class="back-link">← Back to Home</a>
-        
-        <!-- Breadcrumb Navigation -->
-        <nav class="breadcrumb" aria-label="breadcrumb">
-            <ol class="breadcrumb-list">
-                <li class="breadcrumb-item">
-                    <a href="/">Home</a>
-                </li>
-                <li class="breadcrumb-item current" aria-current="page">
-                    <span>Game Statistics</span>
-                </li>
-            </ol>
-        </nav>
+        <!-- Navigation loaded by navigation.js -->
     </header>
     
     <div class="container">
@@ -282,5 +270,8 @@
         // Refresh stats every 5 minutes
         setInterval(loadStats, 5 * 60 * 1000);
     </script>
+
+    <!-- Standard Navigation -->
+    <script src="/assets/js/navigation.js"></script>
 </body>
 </html>

@@ -285,21 +285,11 @@
     </style>
 </head>
 <body>
+    <header>
+        <!-- Navigation loaded by navigation.js -->
+    </header>
+
     <div class="container">
-        <a href="/" class="back-link">← Back to Home</a>
-        
-        <!-- Breadcrumb Navigation -->
-        <nav class="breadcrumb" aria-label="breadcrumb">
-            <ol class="breadcrumb-list">
-                <li class="breadcrumb-item">
-                    <a href="/">Home</a>
-                </li>
-                <li class="breadcrumb-item current" aria-current="page">
-                    <span>Developer Blog</span>
-                </li>
-            </ol>
-        </nav>
-        
         <header class="blog-header">
             <h1>Developer Blog</h1>
             <p>Follow our journey building p(Doom)1 - real technical insights, milestone achievements, and transparent development process</p>
@@ -480,5 +470,8 @@
             new DeveloperBlog();
         });
     </script>
+
+    <!-- Standard Navigation -->
+    <script src="/assets/js/navigation.js"></script>
 </body>
 </html>

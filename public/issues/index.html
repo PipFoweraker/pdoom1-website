@@ -314,17 +314,7 @@
 </head>
 <body>
 	<header>
-		<nav role="navigation" aria-label="Main navigation">
-			<div class="logo-container">
-				<a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
-			</div>
-			<ul class="nav-links" role="menubar">
-				<li role="none"><a href="/" role="menuitem">Home</a></li>
-				<li role="none"><a href="/issues/" role="menuitem" aria-current="page">Issues</a></li>
-				<li role="none"><a href="/dashboard/" role="menuitem">Dashboard</a></li>
-				<li role="none"><a href="https://github.com/PipFoweraker/pdoom1" role="menuitem" target="_blank">GitHub</a></li>
-			</ul>
-		</nav>
+		<!-- Navigation loaded by navigation.js -->
 	</header>
 
 	<main role="main">
@@ -726,5 +716,8 @@ ${formData.contact !== 'Anonymous' ? `**Contact:** ${formData.contact}` : ''}
 			}
 		});
 	</script>
+
+	<!-- Standard Navigation -->
+	<script src="/assets/js/navigation.js"></script>
 </body>
 </html>
