@@ -118,19 +118,21 @@ npm run integration:test
 
 ## Version Status
 
-**v1.1.2 - DASHBOARD & AUTOMATION** (Current)
+**v1.2.0 - PRODUCTION API & ANALYTICS** (Current - 2025-11-10)
+- ✅ **Production API**: api.pdoom1.com LIVE with PostgreSQL database
+- ✅ **Game Events API**: 3 new endpoints (/events, /events/{id}, /events/random) (#67)
+- ✅ **Security Hardening**: PyJWT 2.10.1, OWASP Top 10 review, security audit (#68)
+- ✅ **Analytics Extraction**: Automated DreamHost log extraction & archival (#61)
+- ✅ **Comprehensive Documentation**: 3,862 lines (deployment, testing, integration guides)
+- ✅ **GitHub Actions**: 7 workflows (analytics, forum webhook, health checks)
 - ✅ Auto-deployment: LIVE (deploys on every push to main)
 - ✅ WCAG 2.1 AA compliance: ACHIEVED (4/5 star rating)
-- ✅ Enhanced Risk Dashboard: 8 UI improvements (#54) - Interactive world map, AI safety investment graph, event log, calmer aesthetic
+- ✅ Enhanced Risk Dashboard: 8 UI improvements (#54)
 - ✅ Dynamic Version Display: Auto-updates from pdoom1 releases
 - ✅ Documentation Auto-Sync: pdoom1 repo docs sync every 6 hours + on release
-- ✅ Forum Planning: NodeBB implementation plan for self-hosted community (Issue #60)
-- ✅ GitHub Actions automation: LIVE (5 workflows running)
-- ✅ Dynamic front page: DEPLOYED (real-time data loading)
 - ✅ Weekly league infrastructure: COMPLETE
 - ✅ Game repository integration: OPERATIONAL
-- ✅ API server with 8 endpoints: FUNCTIONAL
-- ✅ Production deployment configs: READY
+- ✅ API server with 15 endpoints: FUNCTIONAL
 - ✅ Monitoring & alerting: CONFIGURED
 - ✅ Backup & recovery: DOCUMENTED
 - ✅ Professional codebase: DEPLOYED
@@ -159,7 +161,9 @@ See [DreamHost VPS Deployment Guide](docs/deployment/DREAMHOST_VPS_DEPLOYMENT.md
 - 📝 **Permanent Archive**: SEO-friendly, human-legible content
 
 **Additional v1.2.0 Goals:**
-- 📊 **Analytics Extraction**: DreamHost analytics → repository (Issue #61)
+- ✅ **Analytics Extraction**: DreamHost analytics → repository (Issue #61) - COMPLETE
+- ✅ **Game Events API**: Dynamic event system with 3 endpoints (Issue #67) - COMPLETE
+- ✅ **Security Hardening**: OWASP Top 10 review + fixes (Issue #68) - COMPLETE
 - 🎯 **Event log streaming** from game sessions (pdoom-data)
 - 🔐 **User authentication** (optional accounts, Steam OAuth)
 
