@@ -143,18 +143,18 @@ echo "Step 6: Updating Docker Compose configuration..."
 # Ensure we're in /opt/plausible directory
 cd /opt/plausible
 
-# Verify docker-compose.yml exists
-if [ ! -f "docker-compose.yml" ]; then
-    print_error "docker-compose.yml not found. Repository may not have cloned correctly."
+# Verify compose.yml exists (newer Docker Compose format)
+if [ ! -f "compose.yml" ]; then
+    print_error "compose.yml not found. Repository may not have cloned correctly."
     exit 1
 fi
 
 # Change port from 8000 to 8001 to avoid conflict with API
-sed -i 's/8000:8000/8001:8000/g' docker-compose.yml
+sed -i 's/8000:8000/8001:8000/g' compose.yml
 
 # Use host.docker.internal for PostgreSQL connection
 # This allows Docker container to connect to host's PostgreSQL
-cat >> docker-compose.yml <<'EOF'
+cat >> compose.yml <<'EOF'
 
 # Override network settings to allow host access
 networks:
@@ -168,8 +168,8 @@ echo ""
 echo "Step 7: Starting Plausible..."
 # Ensure we're in /opt/plausible directory
 cd /opt/plausible
-docker-compose pull
-docker-compose up -d
+docker compose pull
+docker compose up -d
 
 # Wait for services to start
 echo "Waiting for services to start (30 seconds)..."
@@ -267,9 +267,9 @@ echo "Database password saved to: /opt/plausible/plausible-conf.env"
 echo ""
 echo "Useful commands:"
 echo "  cd /opt/plausible"
-echo "  docker-compose logs -f    # View logs"
-echo "  docker-compose restart    # Restart"
-echo "  docker-compose down       # Stop"
-echo "  docker-compose up -d      # Start"
+echo "  docker compose logs -f    # View logs"
+echo "  docker compose restart    # Restart"
+echo "  docker compose down       # Stop"
+echo "  docker compose up -d      # Start"
 echo ""
 print_success "All done! 🚀"
