@@ -99,6 +99,8 @@ print_success "PostgreSQL database created"
 
 echo ""
 echo "Step 5: Configuring Plausible..."
+# Ensure we're in /opt/plausible directory
+cd /opt/plausible
 cat > plausible-conf.env <<EOF
 # Plausible Analytics Configuration
 # Generated: $(date)
@@ -138,6 +140,15 @@ print_success "Configuration file created"
 
 echo ""
 echo "Step 6: Updating Docker Compose configuration..."
+# Ensure we're in /opt/plausible directory
+cd /opt/plausible
+
+# Verify docker-compose.yml exists
+if [ ! -f "docker-compose.yml" ]; then
+    print_error "docker-compose.yml not found. Repository may not have cloned correctly."
+    exit 1
+fi
+
 # Change port from 8000 to 8001 to avoid conflict with API
 sed -i 's/8000:8000/8001:8000/g' docker-compose.yml
 
@@ -155,6 +166,8 @@ print_success "Docker Compose configured"
 
 echo ""
 echo "Step 7: Starting Plausible..."
+# Ensure we're in /opt/plausible directory
+cd /opt/plausible
 docker-compose pull
 docker-compose up -d
 
