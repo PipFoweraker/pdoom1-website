@@ -1,0 +1,187 @@
+name: Post GitHub Issue to Forum
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  post-to-forum:
+    runs-on: ubuntu-latest
+    # Only run for new issues or when specific labels are added
+    if: |
+      github.event.action == 'opened' ||
+      (github.event.action == 'labeled' && contains(github.event.label.name, 'forum-post'))
+
+    steps:
+      - name: Check if issue should be posted to forum
+        id: check_labels
+        run: |
+          # Skip auto-created issues (weekly league rollover, etc.)
+          if [[ "${{ contains(github.event.issue.labels.*.name, 'auto-created') }}" == "true" ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Issue has 'auto-created' label, skipping forum post"
+            exit 0
+          fi
+
+          # Skip success markers
+          if [[ "${{ contains(github.event.issue.labels.*.name, 'success') }}" == "true" ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Issue has 'success' label, skipping forum post"
+            exit 0
+          fi
+
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Determine forum category
+        if: steps.check_labels.outputs.skip == 'false'
+        id: category
+        run: |
+          # Map GitHub labels to NodeBB category IDs
+          # TODO: Update these category IDs after NodeBB setup is complete
+
+          if [[ "${{ contains(github.event.issue.labels.*.name, 'bug') }}" == "true" ]]; then
+            echo "cid=1" >> $GITHUB_OUTPUT
+            echo "category_name=Bug Reports" >> $GITHUB_OUTPUT
+          elif [[ "${{ contains(github.event.issue.labels.*.name, 'enhancement') }}" == "true" ]]; then
+            echo "cid=2" >> $GITHUB_OUTPUT
+            echo "category_name=Feature Requests" >> $GITHUB_OUTPUT
+          elif [[ "${{ contains(github.event.issue.labels.*.name, 'question') }}" == "true" ]]; then
+            echo "cid=3" >> $GITHUB_OUTPUT
+            echo "category_name=Questions" >> $GITHUB_OUTPUT
+          else
+            echo "cid=4" >> $GITHUB_OUTPUT
+            echo "category_name=General Discussion" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Format issue for forum
+        if: steps.check_labels.outputs.skip == 'false'
+        id: format
+        run: |
+          # Prepare forum post content
+          TITLE="${{ github.event.issue.title }}"
+
+          # Create forum post body with GitHub issue link
+          cat > post_body.md <<'EOFMARKER'
+          **Original GitHub Issue**: [#${{ github.event.issue.number }}](${{ github.event.issue.html_url }})
+          **Author**: @${{ github.event.issue.user.login }}
+          **Created**: ${{ github.event.issue.created_at }}
+
+          ---
+
+          ${{ github.event.issue.body }}
+
+          ---
+
+          💬 **Discuss this issue on the forum or [view it on GitHub](${{ github.event.issue.html_url }})**
+
+          _This post was automatically created from a GitHub issue._
+          EOFMARKER
+
+          # Save title and body to output
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "Body formatted and saved to post_body.md"
+
+      - name: Post to NodeBB forum
+        if: steps.check_labels.outputs.skip == 'false'
+        id: post_forum
+        env:
+          NODEBB_API_URL: ${{ secrets.NODEBB_API_URL || 'http://208.113.200.215:4567/api/v3' }}
+          NODEBB_API_TOKEN: ${{ secrets.NODEBB_API_TOKEN }}
+        run: |
+          # Read formatted body
+          BODY=$(cat post_body.md)
+
+          # Post to NodeBB via API
+          RESPONSE=$(curl -X POST "${NODEBB_API_URL}/topics" \
+            -H "Authorization: Bearer ${NODEBB_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d @- <<JSONEOF
+          {
+            "cid": ${{ steps.category.outputs.cid }},
+            "title": "${{ steps.format.outputs.title }}",
+            "content": $(echo "$BODY" | jq -Rs .),
+            "tags": ["github", "issue-${{ github.event.issue.number }}"]
+          }
+          JSONEOF
+          )
+
+          echo "NodeBB Response: $RESPONSE"
+
+          # Extract topic ID from response
+          TOPIC_ID=$(echo "$RESPONSE" | jq -r '.topicData.tid // .tid // "unknown"')
+          echo "topic_id=$TOPIC_ID" >> $GITHUB_OUTPUT
+
+          if [[ "$TOPIC_ID" != "unknown" && "$TOPIC_ID" != "null" ]]; then
+            FORUM_URL="${NODEBB_API_URL}/topic/${TOPIC_ID}"
+            echo "forum_url=$FORUM_URL" >> $GITHUB_OUTPUT
+            echo "✅ Successfully posted to forum: $FORUM_URL"
+          else
+            echo "⚠️ Could not determine forum topic ID"
+            echo "forum_url=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add comment to GitHub issue with forum link
+        if: steps.check_labels.outputs.skip == 'false' && steps.post_forum.outputs.topic_id != 'unknown' && steps.post_forum.outputs.topic_id != 'null' && steps.post_forum.outputs.topic_id != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const topicId = '${{ steps.post_forum.outputs.topic_id }}';
+            const forumUrl = '${{ steps.post_forum.outputs.forum_url }}';
+            const categoryName = '${{ steps.category.outputs.category_name }}';
+
+            const commentBody = `
+            ## 💬 Forum Discussion
+
+            This issue has been cross-posted to the **${categoryName}** category on the forum for community discussion.
+
+            🔗 **[Join the discussion on the forum](${forumUrl})**
+
+            ---
+
+            _Automated by GitHub Actions_
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
+
+      - name: Handle errors
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **Automated forum post failed**\n\nThe automated system attempted to cross-post this issue to the forum but encountered an error. A maintainer will handle this manually.\n\n_Error details available in workflow logs._'
+            });
+
+# =============================================================================
+# Configuration Notes
+# =============================================================================
+#
+# Required GitHub Secrets:
+# - NODEBB_API_TOKEN: API token from NodeBB admin panel
+# - NODEBB_API_URL: (optional) NodeBB API base URL, defaults to http://208.113.200.215:4567/api/v3
+#
+# Setup Steps:
+# 1. Log into NodeBB admin panel: http://208.113.200.215/admin
+# 2. Navigate to Settings → API Access
+# 3. Create new API token with write permissions
+# 4. Add token to GitHub repo secrets as NODEBB_API_TOKEN
+# 5. Update category IDs in "Determine forum category" step
+# 6. Test with a test issue labeled 'forum-post'
+#
+# Category ID Mapping (TODO: Update after NodeBB setup):
+# - Bug Reports: cid=1
+# - Feature Requests: cid=2
+# - Questions: cid=3
+# - General Discussion: cid=4
+#
+# =============================================================================
