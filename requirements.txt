@@ -14,10 +14,10 @@
 # ============================================================================
 
 # Database
-psycopg2-binary==2.9.9  # PostgreSQL adapter
+psycopg2-binary==2.9.10  # PostgreSQL adapter (updated 2025-11-10)
 
 # Authentication
-PyJWT==2.8.0           # JSON Web Tokens
+PyJWT==2.10.1           # JSON Web Tokens (security update 2025-11-10)
 
 # Environment configuration
 python-dotenv==1.0.0   # Load .env files

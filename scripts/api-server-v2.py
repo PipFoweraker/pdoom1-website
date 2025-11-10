@@ -57,7 +57,8 @@ except ImportError:
 # Production configuration
 PRODUCTION_CORS_ORIGINS = [
     "https://pdoom1.com",
-    "https://www.pdoom1.com"
+    "https://www.pdoom1.com",
+    "https://api.pdoom1.com"
 ]
 
 # Database connection pool (global)
@@ -149,7 +150,15 @@ class JWTManager:
     """Manages JWT token creation and validation."""
 
     def __init__(self, secret: str):
-        """Initialize with JWT secret."""
+        """Initialize with JWT secret and validate strength."""
+        # Validate JWT secret strength (minimum 256 bits = 64 hex characters)
+        if len(secret) < 64:
+            raise ValueError(
+                f"JWT_SECRET is too weak ({len(secret)} characters). "
+                f"Must be at least 64 characters (256 bits). "
+                f"Generate with: python -c 'import secrets; print(secrets.token_hex(32))'"
+            )
+
         self.secret = secret
         self.algorithm = "HS256"
 
@@ -271,6 +280,17 @@ class ProductionAPIHandler(BaseHTTPRequestHandler):
                 self._handle_league_status()
             elif path == '/api/league/standings':
                 self._handle_league_standings(query_params)
+
+            # Game Events endpoints (public, no auth required)
+            elif path == '/api/events':
+                self._handle_list_events(query_params)
+            elif path.startswith('/api/events/') and path.split('/')[-1] != 'random':
+                event_id = path.split('/')[-1]
+                self._handle_get_event(event_id)
+            elif path == '/api/events/random':
+                self._handle_random_event(query_params)
+
+            # User profile endpoint (requires auth)
             elif path == '/api/users/profile':
                 success, user_data, error = self._verify_request()
                 if not success:
@@ -857,6 +877,298 @@ class ProductionAPIHandler(BaseHTTPRequestHandler):
         except Exception as e:
             print(f"Profile error: {e}")
             self._send_error(500, f"Failed to get profile: {str(e)}")
+
+    # ========================================================================
+    # GAME EVENTS API ENDPOINTS
+    # ========================================================================
+
+    def _handle_list_events(self, query_params: Dict[str, Any]):
+        """
+        Handle GET /api/events - List all active events with optional filtering.
+
+        Query Parameters:
+            - type: Filter by event_type (e.g., 'combat', 'economic')
+            - difficulty: Filter by exact difficulty level (1-10)
+            - difficulty_min: Filter by minimum difficulty
+            - difficulty_max: Filter by maximum difficulty
+            - tags: Comma-separated list of tags (returns events with ANY matching tag)
+            - category: Filter by category
+            - limit: Maximum number of results (default: 50, max: 200)
+            - offset: Pagination offset (default: 0)
+        """
+        try:
+            # Extract and validate query parameters
+            event_type = query_params.get('type', [None])[0]
+            difficulty = query_params.get('difficulty', [None])[0]
+            difficulty_min = query_params.get('difficulty_min', [None])[0]
+            difficulty_max = query_params.get('difficulty_max', [None])[0]
+            tags = query_params.get('tags', [None])[0]
+            category = query_params.get('category', [None])[0]
+            limit = int(query_params.get('limit', ['50'])[0])
+            offset = int(query_params.get('offset', ['0'])[0])
+
+            # Validate limit (prevent abuse)
+            if limit > 200:
+                limit = 200
+            if limit < 1:
+                limit = 1
+
+            # Build WHERE clause dynamically
+            where_clauses = ["is_active = TRUE"]
+            params = []
+
+            if event_type:
+                where_clauses.append("event_type = %s")
+                params.append(event_type)
+
+            if category:
+                where_clauses.append("category = %s")
+                params.append(category)
+
+            if difficulty:
+                where_clauses.append("difficulty = %s")
+                params.append(int(difficulty))
+            else:
+                if difficulty_min:
+                    where_clauses.append("difficulty >= %s")
+                    params.append(int(difficulty_min))
+                if difficulty_max:
+                    where_clauses.append("difficulty <= %s")
+                    params.append(int(difficulty_max))
+
+            if tags:
+                # Convert comma-separated tags to array
+                tag_list = [tag.strip() for tag in tags.split(',')]
+                where_clauses.append("tags && %s")  # Array overlap operator
+                params.append(tag_list)
+
+            where_clause = " AND ".join(where_clauses)
+
+            # Build query
+            query = f"""
+                SELECT
+                    event_id,
+                    name,
+                    description,
+                    event_type,
+                    category,
+                    difficulty,
+                    impact_pdoom,
+                    impact_funding,
+                    parameters,
+                    tags,
+                    created_at,
+                    updated_at
+                FROM game_events
+                WHERE {where_clause}
+                ORDER BY difficulty ASC, created_at DESC
+                LIMIT %s OFFSET %s
+            """
+
+            params.extend([limit, offset])
+
+            results = self.db_manager.execute_query(query, tuple(params))
+
+            # Get total count for pagination
+            count_query = f"""
+                SELECT COUNT(*) as total
+                FROM game_events
+                WHERE {where_clause}
+            """
+            count_result = self.db_manager.execute_query(count_query, tuple(params[:-2]))  # Exclude LIMIT/OFFSET
+            total_count = count_result[0]['total'] if count_result else 0
+
+            # Format response
+            events = []
+            for event in results:
+                events.append({
+                    "event_id": str(event['event_id']),
+                    "name": event['name'],
+                    "description": event['description'],
+                    "event_type": event['event_type'],
+                    "category": event['category'],
+                    "difficulty": event['difficulty'],
+                    "impact_pdoom": float(event['impact_pdoom']) if event['impact_pdoom'] is not None else None,
+                    "impact_funding": float(event['impact_funding']) if event['impact_funding'] is not None else None,
+                    "parameters": event['parameters'],
+                    "tags": event['tags'],
+                    "created_at": event['created_at'].isoformat() if event['created_at'] else None,
+                    "updated_at": event['updated_at'].isoformat() if event['updated_at'] else None
+                })
+
+            response = {
+                "status": "success",
+                "data": {
+                    "events": events,
+                    "pagination": {
+                        "total": total_count,
+                        "limit": limit,
+                        "offset": offset,
+                        "returned": len(events)
+                    }
+                },
+                "timestamp": datetime.now().isoformat() + "Z"
+            }
+
+            self._send_json_response(200, response)
+
+        except ValueError as e:
+            self._send_error(400, f"Invalid parameter: {str(e)}")
+        except Exception as e:
+            print(f"List events error: {e}")
+            self._send_error(500, f"Failed to list events: {str(e)}")
+
+    def _handle_get_event(self, event_id: str):
+        """
+        Handle GET /api/events/{event_id} - Get a single event by ID.
+        """
+        try:
+            query = """
+                SELECT
+                    event_id,
+                    name,
+                    description,
+                    event_type,
+                    category,
+                    difficulty,
+                    impact_pdoom,
+                    impact_funding,
+                    parameters,
+                    tags,
+                    source,
+                    created_at,
+                    updated_at,
+                    is_active
+                FROM game_events
+                WHERE event_id = %s
+            """
+
+            result = self.db_manager.execute_query(query, (event_id,))
+
+            if not result:
+                self._send_error(404, "Event not found")
+                return
+
+            event = result[0]
+
+            # Return event even if inactive (for admin purposes)
+            # Game clients should filter based on is_active
+            response = {
+                "status": "success",
+                "data": {
+                    "event_id": str(event['event_id']),
+                    "name": event['name'],
+                    "description": event['description'],
+                    "event_type": event['event_type'],
+                    "category": event['category'],
+                    "difficulty": event['difficulty'],
+                    "impact_pdoom": float(event['impact_pdoom']) if event['impact_pdoom'] is not None else None,
+                    "impact_funding": float(event['impact_funding']) if event['impact_funding'] is not None else None,
+                    "parameters": event['parameters'],
+                    "tags": event['tags'],
+                    "source": event['source'],
+                    "is_active": event['is_active'],
+                    "created_at": event['created_at'].isoformat() if event['created_at'] else None,
+                    "updated_at": event['updated_at'].isoformat() if event['updated_at'] else None
+                },
+                "timestamp": datetime.now().isoformat() + "Z"
+            }
+
+            self._send_json_response(200, response)
+
+        except Exception as e:
+            print(f"Get event error: {e}")
+            self._send_error(500, f"Failed to get event: {str(e)}")
+
+    def _handle_random_event(self, query_params: Dict[str, Any]):
+        """
+        Handle GET /api/events/random - Get a random event matching optional criteria.
+
+        Query Parameters:
+            - type: Filter by event_type
+            - difficulty_min: Minimum difficulty
+            - difficulty_max: Maximum difficulty
+            - tags: Comma-separated list of tags
+        """
+        try:
+            event_type = query_params.get('type', [None])[0]
+            difficulty_min = query_params.get('difficulty_min', [None])[0]
+            difficulty_max = query_params.get('difficulty_max', [None])[0]
+            tags = query_params.get('tags', [None])[0]
+
+            # Build WHERE clause
+            where_clauses = ["is_active = TRUE"]
+            params = []
+
+            if event_type:
+                where_clauses.append("event_type = %s")
+                params.append(event_type)
+
+            if difficulty_min:
+                where_clauses.append("difficulty >= %s")
+                params.append(int(difficulty_min))
+
+            if difficulty_max:
+                where_clauses.append("difficulty <= %s")
+                params.append(int(difficulty_max))
+
+            if tags:
+                tag_list = [tag.strip() for tag in tags.split(',')]
+                where_clauses.append("tags && %s")
+                params.append(tag_list)
+
+            where_clause = " AND ".join(where_clauses)
+
+            query = f"""
+                SELECT
+                    event_id,
+                    name,
+                    description,
+                    event_type,
+                    category,
+                    difficulty,
+                    impact_pdoom,
+                    impact_funding,
+                    parameters,
+                    tags
+                FROM game_events
+                WHERE {where_clause}
+                ORDER BY RANDOM()
+                LIMIT 1
+            """
+
+            result = self.db_manager.execute_query(query, tuple(params))
+
+            if not result:
+                self._send_error(404, "No events match the specified criteria")
+                return
+
+            event = result[0]
+
+            response = {
+                "status": "success",
+                "data": {
+                    "event_id": str(event['event_id']),
+                    "name": event['name'],
+                    "description": event['description'],
+                    "event_type": event['event_type'],
+                    "category": event['category'],
+                    "difficulty": event['difficulty'],
+                    "impact_pdoom": float(event['impact_pdoom']) if event['impact_pdoom'] is not None else None,
+                    "impact_funding": float(event['impact_funding']) if event['impact_funding'] is not None else None,
+                    "parameters": event['parameters'],
+                    "tags": event['tags']
+                },
+                "timestamp": datetime.now().isoformat() + "Z"
+            }
+
+            self._send_json_response(200, response)
+
+        except ValueError as e:
+            self._send_error(400, f"Invalid parameter: {str(e)}")
+        except Exception as e:
+            print(f"Random event error: {e}")
+            self._send_error(500, f"Failed to get random event: {str(e)}")
 
     def _send_json_response(self, status_code: int, data: Dict[str, Any]):
         """Send a JSON response with proper headers."""

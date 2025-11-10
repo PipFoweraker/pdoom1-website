@@ -96,6 +96,8 @@ npm run integration:test
 
 ## API Endpoints
 
+**Production API**: `https://api.pdoom1.com` (deployed on DreamHost VPS)
+
 ### Core Endpoints
 - `GET /api/health` - Server health check
 - `GET /api/status` - Integration status
@@ -103,10 +105,16 @@ npm run integration:test
 - `GET /api/leaderboards/current` - Current leaderboard
 - `GET /api/leaderboards/seed/{seed}` - Seed-specific data
 
-### Weekly League Endpoints (NEW)
+### Weekly League Endpoints
 - `GET /api/league/current` - Current weekly league
 - `GET /api/league/status` - League system status
 - `GET /api/league/standings` - Weekly standings
+
+### Game Events Endpoints (NEW - 2025-11-10)
+- `GET /api/events` - List all active events (with filtering)
+  - Query params: `?type=combat`, `?difficulty_min=3&difficulty_max=7`, `?tags=boss,crisis`, `?limit=50&offset=0`
+- `GET /api/events/{event_id}` - Get single event details
+- `GET /api/events/random` - Get random event (with optional filters)
 
 ## Version Status
 
@@ -127,13 +135,17 @@ npm run integration:test
 - ✅ Backup & recovery: DOCUMENTED
 - ✅ Professional codebase: DEPLOYED
 
-### Production Deployment Options
-- **Railway** (recommended): One-click deployment with free tier
+### Production Deployment
+
+**✅ LIVE**: Production API deployed on DreamHost VPS at `https://api.pdoom1.com` (Nov 2025)
+
+**Alternative Deployment Options**:
+- **Railway**: One-click deployment with free tier
 - **Render**: Auto-deploy from GitHub with generous free tier
 - **Heroku**: Classic platform with robust tooling
-- **Self-hosted**: Full control on VPS
+- **Self-hosted**: Full control on VPS (current deployment)
 
-See [API Deployment Guide](docs/02-deployment/API_DEPLOYMENT_GUIDE.md) for setup.
+See [DreamHost VPS Deployment Guide](docs/deployment/DREAMHOST_VPS_DEPLOYMENT.md) for production setup details.
 
 ## Next: Phase 2 - Forum & Community
 
