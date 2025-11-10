@@ -1,0 +1,144 @@
+name: Extract DreamHost Analytics
+
+on:
+  schedule:
+    # Run monthly on the 1st at 3am UTC
+    - cron: '0 3 1 * *'
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      days:
+        description: 'Number of days to extract'
+        required: false
+        default: '30'
+      month:
+        description: 'Specific month (YYYY-MM, optional)'
+        required: false
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PDOOM_SSH_KEY }}" > ~/.ssh/pdoom-website-instance.pem
+          chmod 600 ~/.ssh/pdoom-website-instance.pem
+          ssh-keyscan -H 208.113.200.215 >> ~/.ssh/known_hosts
+
+      - name: Extract analytics
+        run: |
+          # Determine parameters
+          if [ -n "${{ github.event.inputs.month }}" ]; then
+            MONTH_ARG="--month ${{ github.event.inputs.month }}"
+          else
+            MONTH_ARG=""
+          fi
+
+          if [ -n "${{ github.event.inputs.days }}" ]; then
+            DAYS_ARG="--days ${{ github.event.inputs.days }}"
+          else
+            # Default: extract last month
+            LAST_MONTH=$(date -d "last month" +%Y-%m)
+            MONTH_ARG="--month ${LAST_MONTH}"
+            DAYS_ARG=""
+          fi
+
+          # Run extraction
+          python scripts/extract_analytics.py \
+            --ssh-key ~/.ssh/pdoom-website-instance.pem \
+            ${MONTH_ARG} ${DAYS_ARG} \
+            --report
+
+      - name: Create summary file
+        run: |
+          # Generate summary of all analytics files
+          python - <<'EOF'
+          import json
+          from pathlib import Path
+          from datetime import datetime
+
+          analytics_dir = Path("public/data/analytics/dreamhost")
+          all_files = sorted(analytics_dir.glob("*.json"))
+
+          summary = {
+              "generated_at": datetime.now().isoformat(),
+              "total_files": len(all_files),
+              "files": []
+          }
+
+          total_visitors = 0
+          total_views = 0
+
+          for file_path in all_files:
+              try:
+                  with open(file_path) as f:
+                      data = json.load(f)
+
+                  file_info = {
+                      "filename": file_path.name,
+                      "period_start": data.get("metadata", {}).get("period_start"),
+                      "period_end": data.get("metadata", {}).get("period_end"),
+                      "unique_visitors": data.get("summary", {}).get("total_unique_visitors", 0),
+                      "page_views": data.get("summary", {}).get("total_page_views", 0)
+                  }
+
+                  summary["files"].append(file_info)
+                  total_visitors += file_info["unique_visitors"]
+                  total_views += file_info["page_views"]
+
+              except Exception as e:
+                  print(f"Warning: Could not process {file_path.name}: {e}")
+
+          summary["totals"] = {
+              "total_unique_visitors": total_visitors,
+              "total_page_views": total_views
+          }
+
+          # Save summary
+          with open(analytics_dir / "summary.json", "w") as f:
+              json.dump(summary, f, indent=2)
+
+          print(f"Summary created: {len(all_files)} files processed")
+          EOF
+
+      - name: Commit analytics data
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add public/data/analytics/
+          git diff --staged --quiet || git commit -m "chore: Update analytics data $(date -u +%Y-%m-%d)"
+          git push
+
+      - name: Create issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '⚠️ Analytics extraction failed',
+              body: `The automated analytics extraction workflow failed on ${new Date().toISOString().split('T')[0]}.\n\nPlease check the [workflow logs](${context.payload.repository.html_url}/actions/runs/${context.runId}) for details.\n\n**Action Required**: Manual extraction may be needed.\n\n_Automated by GitHub Actions_`,
+              labels: ['automation', 'analytics', 'needs-attention']
+            });
+
+# =============================================================================
+# Required GitHub Secrets:
+# - PDOOM_SSH_KEY: SSH private key for DreamHost VPS
+#
+# Manual Trigger:
+#   1. Go to Actions tab
+#   2. Select "Extract DreamHost Analytics"
+#   3. Click "Run workflow"
+#   4. Optional: Specify days or month
+# =============================================================================
