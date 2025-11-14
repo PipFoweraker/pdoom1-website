@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-11-07T06:05:36.838157",
-  "duration_seconds": 0.05485,
+  "timestamp": "2025-11-14T06:05:37.699580",
+  "duration_seconds": 0.062676,
   "total_tests": 11,
   "passed_tests": 11,
   "failed_tests": 0,
@@ -12,77 +12,77 @@
       "test": "Main Index File",
       "passed": true,
       "message": "\u2713 Found: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/index.html",
-      "timestamp": "2025-11-07T06:05:36.783340",
+      "timestamp": "2025-11-14T06:05:37.636939",
       "is_warning": false
     },
     {
       "test": "Config File",
       "passed": true,
       "message": "\u2713 Found: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/config.json",
-      "timestamp": "2025-11-07T06:05:36.783348",
+      "timestamp": "2025-11-14T06:05:37.636949",
       "is_warning": false
     },
     {
       "test": "Version Data",
       "passed": true,
       "message": "\u2713 Found: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/data/version.json",
-      "timestamp": "2025-11-07T06:05:36.783353",
+      "timestamp": "2025-11-14T06:05:37.636956",
       "is_warning": false
     },
     {
       "test": "Changelog Data",
       "passed": true,
       "message": "\u2713 Found: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/data/changes.json",
-      "timestamp": "2025-11-07T06:05:36.783356",
+      "timestamp": "2025-11-14T06:05:37.636961",
       "is_warning": false
     },
     {
       "test": "Config JSON",
       "passed": true,
       "message": "\u2713 Valid JSON: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/config.json",
-      "timestamp": "2025-11-07T06:05:36.783418",
+      "timestamp": "2025-11-14T06:05:37.637049",
       "is_warning": false
     },
     {
       "test": "Version JSON",
       "passed": true,
       "message": "\u2713 Valid JSON: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/data/version.json",
-      "timestamp": "2025-11-07T06:05:36.783482",
+      "timestamp": "2025-11-14T06:05:37.637103",
       "is_warning": false
     },
     {
       "test": "Changes JSON",
       "passed": true,
       "message": "\u2713 Valid JSON: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../public/data/changes.json",
-      "timestamp": "2025-11-07T06:05:36.783509",
+      "timestamp": "2025-11-14T06:05:37.637143",
       "is_warning": false
     },
     {
       "test": "Version Update Script",
       "passed": true,
       "message": "\u2713 Script compiles: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../scripts/update-version-info.py",
-      "timestamp": "2025-11-07T06:05:36.811169",
+      "timestamp": "2025-11-14T06:05:37.668610",
       "is_warning": false
     },
     {
       "test": "Stats Calculation Script",
       "passed": true,
       "message": "\u2713 Script compiles: /home/runner/work/pdoom1-website/pdoom1-website/scripts/../scripts/calculate-game-stats.py",
-      "timestamp": "2025-11-07T06:05:36.838033",
+      "timestamp": "2025-11-14T06:05:37.699460",
       "is_warning": false
     },
     {
       "test": "Version Data Structure",
       "passed": true,
       "message": "\u2713 All required fields present",
-      "timestamp": "2025-11-07T06:05:36.838138",
+      "timestamp": "2025-11-14T06:05:37.699560",
       "is_warning": false
     },
     {
       "test": "Data Freshness",
       "passed": true,
       "message": "\u2713 Data is 0 days old",
-      "timestamp": "2025-11-07T06:05:36.838150",
+      "timestamp": "2025-11-14T06:05:37.699572",
       "is_warning": false
     }
   ],
