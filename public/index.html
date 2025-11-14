@@ -23,6 +23,9 @@
 	<link rel="preconnect" href="https://stampy.ai">
 	<link rel="dns-prefetch" href="https://stampy.ai">
 
+	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.js"></script>
+
 	<style>
 		:root {
 			/* Color scheme inspired by typical pygame/terminal aesthetics */
@@ -877,13 +880,13 @@ t	.hero {
 
 			<!-- Download Options - Platform-Specific CTAs -->
 			<div class="download-ctas" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.4rem;">
-				<a href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.exe" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+				<a id="download-windows" href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.exe" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for Windows
 				</a>
-				<a href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.app.zip" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+				<a id="download-macos" href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.app.zip" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for macOS
 				</a>
-				<a href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.x86_64" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+				<a id="download-linux" href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.x86_64" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for Linux
 				</a>
 			</div>
@@ -1514,7 +1517,71 @@ python main.py</pre>
 		// Load version info when page loads
 		document.addEventListener('DOMContentLoaded', () => {
 			loadVersionInfo();
+			setupDownloadTracking();
 		});
+
+		// Track download button clicks with Plausible Analytics
+		function setupDownloadTracking() {
+			// Get current version from version.json (loaded by loadVersionInfo)
+			let currentVersion = 'v0.10.2'; // Default fallback
+
+			// Try to extract version from button text or use default
+			const versionMatch = document.querySelector('.version-number')?.textContent;
+			if (versionMatch) {
+				currentVersion = versionMatch.trim();
+			}
+
+			// Track Windows downloads
+			const windowsBtn = document.getElementById('download-windows');
+			if (windowsBtn) {
+				windowsBtn.addEventListener('click', function() {
+					if (window.plausible) {
+						plausible('Download', {
+							props: {
+								version: currentVersion,
+								platform: 'Windows',
+								file: 'PDoom.exe'
+							}
+						});
+					}
+					console.log('Download tracked: Windows', currentVersion);
+				});
+			}
+
+			// Track macOS downloads
+			const macosBtn = document.getElementById('download-macos');
+			if (macosBtn) {
+				macosBtn.addEventListener('click', function() {
+					if (window.plausible) {
+						plausible('Download', {
+							props: {
+								version: currentVersion,
+								platform: 'macOS',
+								file: 'PDoom.app.zip'
+							}
+						});
+					}
+					console.log('Download tracked: macOS', currentVersion);
+				});
+			}
+
+			// Track Linux downloads
+			const linuxBtn = document.getElementById('download-linux');
+			if (linuxBtn) {
+				linuxBtn.addEventListener('click', function() {
+					if (window.plausible) {
+						plausible('Download', {
+							props: {
+								version: currentVersion,
+								platform: 'Linux',
+								file: 'PDoom.x86_64'
+							}
+						});
+					}
+					console.log('Download tracked: Linux', currentVersion);
+				});
+			}
+		}
 	</script>
 
 	<script>
