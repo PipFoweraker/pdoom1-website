@@ -1,6 +1,89 @@
 {
   "issues": [
     {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/456",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/456/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/456/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/456/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/456",
+      "id": 3631406604,
+      "node_id": "I_kwDOPVWa587Yct4M",
+      "number": 456,
+      "title": "No Limit on Action Queue Size",
+      "user": {
+        "login": "tegabeta",
+        "id": 88699266,
+        "node_id": "MDQ6VXNlcjg4Njk5MjY2",
+        "avatar_url": "https://avatars.githubusercontent.com/u/88699266?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/tegabeta",
+        "html_url": "https://github.com/tegabeta",
+        "followers_url": "https://api.github.com/users/tegabeta/followers",
+        "following_url": "https://api.github.com/users/tegabeta/following{/other_user}",
+        "gists_url": "https://api.github.com/users/tegabeta/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/tegabeta/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/tegabeta/subscriptions",
+        "organizations_url": "https://api.github.com/users/tegabeta/orgs",
+        "repos_url": "https://api.github.com/users/tegabeta/repos",
+        "events_url": "https://api.github.com/users/tegabeta/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/tegabeta/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [
+        {
+          "id": 9227754225,
+          "node_id": "LA_kwDOPVWa588AAAACJgRa8Q",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/ui-ux",
+          "name": "ui-ux",
+          "color": "bfd4f2",
+          "default": false,
+          "description": "User interface and user experience"
+        }
+      ],
+      "state": "open",
+      "locked": false,
+      "assignee": null,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2025-11-17T01:33:22Z",
+      "updated_at": "2025-11-17T01:33:22Z",
+      "closed_at": null,
+      "author_association": "COLLABORATOR",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "body": "While testing action selection, I see that the Action Queue has no upper limit. I am able to add 16 events to the queue, at which point the AQ becomes too long and hides the list of Actions from the screen. The Message Log recognises an Error (Not enough AP), but the Action Queue does not reflect this. I think the Action Queue should only contain possible actions, and not show error related actions, as to avoid UI-UX issues and gameplay confusion.\n\n<img width=\"1920/8\" height=\"1026/8\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/2414402a-ece6-4b47-925d-1c7ffc157d44\" />\n\n<img width=\"1920/8\" height=\"1024/8\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/b8ee6957-b3cf-4c63-aad8-58f75da5960f\" />",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/456/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/456/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null
+    },
+    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/455",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/455/labels{/name}",
@@ -1464,91 +1547,8 @@
       "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/400/timeline",
       "performed_via_github_app": null,
       "state_reason": null
-    },
-    {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/413",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/413/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/413/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/413/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/413",
-      "id": 3502037301,
-      "node_id": "I_kwDOPVWa587QvNk1",
-      "number": 413,
-      "title": "Public Opinion System Logic Issues",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 9551925250,
-          "node_id": "LA_kwDOPVWa588AAAACOVbQAg",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/godot-bridge-logic",
-          "name": "godot-bridge-logic",
-          "color": "0075ca",
-          "default": false,
-          "description": "Game logic issue in Python bridge layer"
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignee": null,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2025-10-10T09:16:15Z",
-      "updated_at": "2025-10-30T03:14:42Z",
-      "closed_at": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "body": "# Public Opinion System Logic Issues\n\n## Description\nPublic opinion system has multiple logic and integration issues affecting game mechanics.\n\n## Affected Tests\n- `test_public_opinion_system.py::TestPublicOpinion::test_serialization`\n- `test_public_opinion_system.py::TestMediaSystem::test_get_available_actions`\n- `test_public_opinion_system.py::TestMediaSystem::test_press_release_action`\n\n## Error Details\n```\nAssertionError: 67.0 != 65.0\nTypeError: 'Mock' object is not iterable\nAssertionError: expected call not found.\nExpected: _add('money', -50000)\nActual: _add('reputation', 0)\n```\n\n## Root Cause\n1. Public opinion serialization values don't match expected (67.0 vs 65.0)\n2. Mock objects not properly configured for iteration\n3. Press release action not calling correct resource modification (_add money vs reputation)\n\n## Expected Behavior\n- Public opinion should serialize to expected values\n- Media system should return iterable actions list\n- Press release should deduct money ($50,000) as expected\n\n## Investigation Areas\n1. Public opinion calculation and serialization logic\n2. Media system action enumeration\n3. Press release action implementation\n4. Resource modification calls and parameters\n\n## Priority\nMedium - Affects public opinion game mechanics\n\n## Labels\n- bug\n- public-opinion\n- media-system\n- game-mechanics\n- serialization\n- testing\n",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/413/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/413/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null
     }
   ],
   "count": 15,
-  "last_updated": "2025-11-17T00:04:19.809351"
+  "last_updated": "2025-11-17T06:01:45.666605"
 }
