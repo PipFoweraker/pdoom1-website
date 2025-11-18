@@ -1010,5 +1010,17 @@
       "version-status": "success",
       "stats-status": "success"
     }
+  },
+  {
+    "job": "sync-leaderboards",
+    "trigger": "schedule",
+    "timestamp": "2025-11-18T02:30:03.332604Z",
+    "status": "failure",
+    "details": {
+      "sync-all-status": "failure",
+      "sync-weekly-status": "failure",
+      "export-status": "skipped",
+      "verify-status": "failure"
+    }
   }
 ]
