@@ -1,6 +1,107 @@
 {
   "issues": [
     {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/458",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/458/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/458/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/458/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/458",
+      "id": 3642359915,
+      "node_id": "I_kwDOPVWa587ZGgBr",
+      "number": 458,
+      "title": "Soft-Lock Returned: Event Popups disappear when clicking other icons",
+      "user": {
+        "login": "tegabeta",
+        "id": 88699266,
+        "node_id": "MDQ6VXNlcjg4Njk5MjY2",
+        "avatar_url": "https://avatars.githubusercontent.com/u/88699266?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/tegabeta",
+        "html_url": "https://github.com/tegabeta",
+        "followers_url": "https://api.github.com/users/tegabeta/followers",
+        "following_url": "https://api.github.com/users/tegabeta/following{/other_user}",
+        "gists_url": "https://api.github.com/users/tegabeta/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/tegabeta/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/tegabeta/subscriptions",
+        "organizations_url": "https://api.github.com/users/tegabeta/orgs",
+        "repos_url": "https://api.github.com/users/tegabeta/repos",
+        "events_url": "https://api.github.com/users/tegabeta/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/tegabeta/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [
+        {
+          "id": 9028221041,
+          "node_id": "LA_kwDOPVWa588AAAACGh-4cQ",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/bug",
+          "name": "bug",
+          "color": "d73a4a",
+          "default": true,
+          "description": "Something isn't working"
+        },
+        {
+          "id": 9227754225,
+          "node_id": "LA_kwDOPVWa588AAAACJgRa8Q",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/ui-ux",
+          "name": "ui-ux",
+          "color": "bfd4f2",
+          "default": false,
+          "description": "User interface and user experience"
+        },
+        {
+          "id": 9551925441,
+          "node_id": "LA_kwDOPVWa588AAAACOVbQwQ",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/event-system",
+          "name": "event-system",
+          "color": "c5def5",
+          "default": false,
+          "description": "Event system issues"
+        }
+      ],
+      "state": "open",
+      "locked": false,
+      "assignee": null,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2025-11-19T11:46:44Z",
+      "updated_at": "2025-11-19T11:46:44Z",
+      "closed_at": null,
+      "author_association": "COLLABORATOR",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "body": "When an Event pops up, clicking any other icon results in the popup disappearing. With no way to retrieve the Event popup, the game is soft locked. I think all other actions should be unavailable with an event occurs. Could be a simple translucent layer greying out of the game screen behind the popup? \n\n<img width=\"1920\" height=\"1080\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/1d842514-a3a4-456d-ac46-1b8eeeb0af61\" />\n",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/458/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/458/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null
+    },
+    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/434",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/434/labels{/name}",
@@ -1344,81 +1445,8 @@
       "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/424/timeline",
       "performed_via_github_app": null,
       "state_reason": null
-    },
-    {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/416",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/416/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/416/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/416/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/416",
-      "id": 3502037459,
-      "node_id": "I_kwDOPVWa587QvNnT",
-      "number": 416,
-      "title": "Enhancement: Technical Debt Visualization System",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [],
-      "state": "open",
-      "locked": false,
-      "assignee": null,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2025-10-10T09:16:19Z",
-      "updated_at": "2025-10-10T09:16:19Z",
-      "closed_at": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "body": "# Enhancement: Technical Debt Visualization System\n\n**Priority**: Medium-High  \n**Epic**: Research & Quality Systems  \n**Estimated Effort**: 1-2 sessions\n\n## Overview\nImplement comprehensive UI visualization for the technical debt system introduced in v0.4.0, providing players clear feedback on research quality decisions and long-term project health.\n\n## Current State\n- Technical debt system exists in game logic (Rush Research adds debt, Quality Research reduces debt)\n- No player-facing visualization of debt levels or impact\n- Limited feedback on the consequences of research quality choices\n\n## Proposed Features\n\n### 1. Technical Debt Meter\n- **Visual Indicator**: Progress bar or meter showing current technical debt level\n- **Color Coding**: Green (low debt) -> Yellow (moderate) -> Red (high debt)\n- **Placement**: Integrate into main UI resource panel alongside money, doom, reputation\n- **Tooltips**: Hover details explaining current debt impact\n\n### 2. Research Project Tracking\n- **Active Projects Panel**: Show ongoing research initiatives with quality indicators\n- **Project History**: Track completed research with quality ratings\n- **Debt Attribution**: Show which projects contributed to current technical debt\n- **Visual Timeline**: Research progress and quality decisions over time\n\n### 3. Debt Impact Visualization\n- **Performance Penalties**: Show how technical debt affects research effectiveness\n- **Risk Indicators**: Visual warnings when debt levels become problematic\n- **Compound Effects**: Illustrate how debt accumulates and impacts future work\n- **Recovery Pathways**: Highlight available debt reduction options\n\n### 4. Strategic Planning Tools\n- **Debt Projection**: Preview technical debt changes from proposed research actions\n- **Quality Comparison**: Side-by-side comparison of research approach impacts\n- **Optimization Hints**: Suggest optimal research strategies based on current debt\n- **Long-term Planning**: Show projected outcomes of different research approaches\n\n## Technical Implementation\n\n### UI Integration Points\n- **Main Resource Panel**: Add technical debt meter alongside existing resources\n- **Research Dialog Enhancement**: Show debt impact for each research option\n- **Activity Log Integration**: Enhanced messages for debt-related events\n- **Tooltip System**: Detailed explanations accessible via hover/right-click\n\n### Data Visualization\n- **Real-time Updates**: Debt meter updates immediately as research completes\n- **Historical Tracking**: Store and display debt level changes over time\n- **Trend Analysis**: Show debt trajectory and warn of concerning trends\n- **Comparative Metrics**: Compare current debt to game averages or optimal levels\n\n### Enhanced Research Dialog\n- **Debt Impact Preview**: Show projected debt change for each research option\n- **Risk Assessment**: Visual indicators for high-debt research choices\n- **Debt Recovery Options**: Highlight Quality Research when debt is high\n- **Strategic Recommendations**: Context-aware suggestions for research approach\n\n## User Experience Goals\n\n### Immediate Feedback\n- Players instantly understand the consequences of research quality choices\n- Clear visual connection between rushed research and long-term problems\n- Obvious pathways for debt recovery and quality improvement\n\n### Strategic Depth  \n- Technical debt becomes a meaningful strategic consideration\n- Players balance short-term research speed against long-term project health\n- Quality Research becomes an obviously valuable investment when debt is high\n\n### Educational Value\n- System teaches players about real-world software development trade-offs\n- Illustrates the importance of methodical research and quality processes\n- Shows compound effects of technical decisions over time\n\n## Implementation Phases\n\n### Phase 1: Basic Debt Meter\n- Add technical debt resource to main UI\n- Basic color-coded progress bar\n- Simple tooltips with current debt level\n\n### Phase 2: Research Dialog Integration  \n- Show debt impact in Research Options dialog\n- Visual indicators for debt-increasing/reducing research\n- Preview projected debt changes\n\n### Phase 3: Advanced Visualization\n- Research project tracking panel\n- Historical debt trend visualization\n- Strategic planning and optimization tools\n\n### Phase 4: Polish & Enhancement\n- Smooth animations for debt changes\n- Advanced tooltips with detailed explanations\n- Integration with achievement and milestone systems\n\n## Success Metrics\n- Increased usage of Quality Research when technical debt is high\n- Players making informed trade-offs between research speed and quality\n- Reduced confusion about research system mechanics\n- Positive player feedback on system clarity and strategic depth\n\n## Technical Considerations\n- **Performance**: Efficient rendering of debt visualization elements\n- **Accessibility**: Color-blind friendly visualization with text alternatives\n- **Responsive Design**: Debt meter adapts to different screen sizes\n- **Data Persistence**: Technical debt data saved/loaded with game state\n\n## Future Extensions\n- **Team Morale Impact**: Technical debt affects staff happiness and productivity\n- **Investor Concerns**: High technical debt impacts funding opportunities\n- **Competitor Analysis**: Compare your technical debt to AI lab opponents\n- **Research Automation**: Technical debt affects the effectiveness of automated research tools\n",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/416/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/416/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null
     }
   ],
   "count": 15,
-  "last_updated": "2025-11-19T06:01:30.448642"
+  "last_updated": "2025-11-19T12:01:50.331425"
 }
