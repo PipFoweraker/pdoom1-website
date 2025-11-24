@@ -7,6 +7,94 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2025-11-24
+
+### Added - Quote Provenance Infrastructure
+
+**Visual Provenance System**
+- **Provenance Badges**: Color-coded badges on all 1028 event detail pages
+  - 🟠 Orange: "⚠️ Placeholder - Needs Real Quote" (default)
+  - 🔵 Blue: "ℹ️ Summary (Not Direct Quote)"
+  - 🟢 Green: "✓ Verified Quote" (with source attribution)
+  - 🔘 Gray: "N/A" (not applicable)
+- **Source Attribution**: Verified quotes display author, date, and clickable source links
+- **Quote Suggestion Button**: "💡 Found a Real Quote? Suggest it here" on every event page
+
+**Community Contribution Workflow**
+- **Quote Suggestion Form** (`/events/suggest-quote.html`)
+  - Pre-populates event ID from query parameters
+  - Collects all required metadata (quote, author, source URL, date, platform, context)
+  - Generates structured GitHub issues for review
+  - Provides proper JSON metadata for easy integration
+- **Contribution Guide** (`/docs/CONTRIBUTING_TO_EVENTS.html`)
+  - Player/contributor-friendly guide (380 lines)
+  - High-priority events list for quote mining
+  - Quote quality guidelines (what to submit/avoid)
+  - Where to find quotes (LessWrong, EA Forum, Scott Alexander, Twitter)
+  - Recognition system for contributors
+
+**Analytics & Tracking**
+- **Quote Quality Statistics** in `events-sync-summary.json`:
+  - `events_with_real_quotes` (currently 0)
+  - `events_with_summaries` (0)
+  - `events_with_placeholders` (1028)
+  - `completion_percentage` (0.0%)
+  - Q1/Q2/End-year goals (50/100/300 quotes)
+- Daily automatic updates via GitHub Actions
+
+**Metadata Infrastructure**
+- **`reaction_provenance` field** supports:
+  - `type`: "real_quote", "human_summary", "placeholder", "not_applicable"
+  - Full attribution (author, source, date, platform, context)
+  - Simple string format for quick tagging
+  - Complex object format for detailed provenance
+- **Event Filtering Schema**: `event_status` field for newsletter exclusion
+- **Newsletter Tagging Script** (`scripts/metadata/tag_newsletters.py`)
+
+### Changed
+
+**Events System**
+- **Enhanced sync-events.py**: Now tracks quote quality and generates provenance badges
+- **Regenerated all 1028 event HTML pages** with placeholder badges
+- **Updated events index banner**: Clear call-to-action for community contributions
+- **Compacted vertical spacing**: Reduced padding/margins by ~50% across all event pages
+
+**UI Improvements**
+- **Table View**: Events browser now uses compact table instead of cards (better for 1000+ events)
+- **Bulk Selection**: Works with table rows for systematic review
+
+### Documentation
+
+**New Technical Documentation** (1800+ lines total)
+- `docs/QUOTE_DATABASE_SCHEMA.md` (460 lines)
+  - Complete metadata specification
+  - Quote selection criteria
+  - Migration phases
+  - Game integration plans
+  - Future multi-quote database design
+- `docs/EVENT_METADATA_SPECIFICATION.md` (440 lines)
+  - Full metadata field definitions
+  - Implementation phases
+  - Website integration patterns
+- `docs/EVENT_FILTERING_SUMMARY.md` (260 lines)
+  - Quick reference guide
+  - Execution workflows
+  - Current state summary
+- `docs/CONTRIBUTING_TO_EVENTS.md` (380 lines)
+  - Contributor guide (Markdown source)
+- `IMPLEMENTATION_SUMMARY.md` (260 lines)
+  - Executive summary for stakeholders
+
+### Impact
+
+- **Baseline Established**: 0 real quotes, 1028 placeholders tracked
+- **Infrastructure Complete**: Ready for systematic quote mining from LessWrong, EA Forum, Twitter, blogs
+- **Community-Ready**: Easy contribution workflow for non-technical users
+- **LLM-Friendly**: Clear schemas and patterns for AI-assisted curation
+- **Analytics-Driven**: Progress tracking toward 30% coverage by end 2025
+
+---
+
 ## [1.1.1] - 2025-10-30
 
 ### Added - CI/CD & Accessibility
