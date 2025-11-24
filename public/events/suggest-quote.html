@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Suggest Real Quote | p(Doom)1 Events</title>
+	<link rel="canonical" href="https://pdoom1.com/events/suggest-quote.html" />
+	<meta name="description" content="Help improve event data by suggesting real quotes from researchers and media" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #999999;
+			--accent-primary: #ff6b35;
+			--accent-secondary: #ffb347;
+			--accent-danger: #ff5252;
+			--success-color: #4caf50;
+			--border-color: #555555;
+			--radius-md: 8px;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+			min-height: 100vh;
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem;
+		}
+
+		nav .breadcrumb {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+		}
+
+		nav .breadcrumb a {
+			color: var(--accent-secondary);
+			text-decoration: none;
+		}
+
+		nav .breadcrumb a:hover {
+			text-decoration: underline;
+		}
+
+		main {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 2rem 1rem;
+		}
+
+		.page-header {
+			text-align: center;
+			margin-bottom: 2rem;
+		}
+
+		.page-header h1 {
+			color: var(--accent-primary);
+			font-size: 2.5rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.page-header p {
+			color: var(--text-secondary);
+			font-size: 1.1rem;
+		}
+
+		.info-box {
+			background: linear-gradient(135deg, var(--bg-secondary), rgba(76, 175, 80, 0.1));
+			border: 1px solid var(--success-color);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.info-box h2 {
+			color: var(--success-color);
+			margin-bottom: 1rem;
+			font-size: 1.3rem;
+		}
+
+		.info-box ul {
+			margin-left: 1.5rem;
+			color: var(--text-secondary);
+		}
+
+		.info-box li {
+			margin-bottom: 0.5rem;
+		}
+
+		.form-section {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 2rem;
+			margin-bottom: 2rem;
+		}
+
+		.form-section h2 {
+			color: var(--accent-secondary);
+			margin-bottom: 1.5rem;
+			font-size: 1.5rem;
+		}
+
+		.form-group {
+			margin-bottom: 1.5rem;
+		}
+
+		.form-group label {
+			display: block;
+			color: var(--accent-primary);
+			font-weight: bold;
+			margin-bottom: 0.5rem;
+			font-size: 0.95rem;
+		}
+
+		.form-group input,
+		.form-group select,
+		.form-group textarea {
+			width: 100%;
+			padding: 0.75rem;
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: 4px;
+			color: var(--text-primary);
+			font-size: 1rem;
+			font-family: inherit;
+		}
+
+		.form-group textarea {
+			resize: vertical;
+			min-height: 100px;
+		}
+
+		.form-group input:focus,
+		.form-group select:focus,
+		.form-group textarea:focus {
+			outline: none;
+			border-color: var(--accent-primary);
+		}
+
+		.form-group small {
+			display: block;
+			color: var(--text-muted);
+			margin-top: 0.25rem;
+			font-size: 0.85rem;
+		}
+
+		.reaction-type {
+			display: flex;
+			gap: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.reaction-type label {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			color: var(--text-secondary);
+			cursor: pointer;
+			font-weight: normal;
+		}
+
+		.reaction-type input[type="radio"] {
+			width: auto;
+			accent-color: var(--accent-primary);
+		}
+
+		.submit-button {
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+			border: none;
+			padding: 1rem 2rem;
+			font-size: 1.1rem;
+			font-weight: bold;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: transform 0.3s, background 0.3s;
+			width: 100%;
+		}
+
+		.submit-button:hover {
+			background: var(--accent-primary);
+			transform: translateY(-2px);
+		}
+
+		.event-preview {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: 4px;
+			padding: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.event-preview h3 {
+			color: var(--accent-secondary);
+			margin-bottom: 0.5rem;
+			font-size: 1.1rem;
+		}
+
+		.event-preview p {
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+		}
+
+		footer {
+			background: var(--bg-secondary);
+			border-top: 2px solid var(--accent-primary);
+			text-align: center;
+			padding: 2rem 1rem;
+			margin-top: 4rem;
+			color: var(--text-muted);
+		}
+
+		footer a {
+			color: var(--accent-primary);
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<nav>
+			<div class="breadcrumb">
+				<a href="/">Home</a> / <a href="/events/">Events</a> / Suggest Real Quote
+			</div>
+		</nav>
+	</header>
+
+	<main>
+		<div class="page-header">
+			<h1>💡 Suggest a Real Quote</h1>
+			<p>Help improve event data by sourcing real reactions from researchers, media, and the community</p>
+		</div>
+
+		<div class="info-box">
+			<h2>✓ Good Quote Sources</h2>
+			<ul>
+				<li><strong>LessWrong</strong> - Posts, comments from AI safety researchers</li>
+				<li><strong>EA Forum</strong> - Effective altruism community discussions</li>
+				<li><strong>Twitter/X</strong> - Public reactions from researchers and experts</li>
+				<li><strong>Blog Posts</strong> - Scott Alexander, Rob Miles, AI Impacts, etc.</li>
+				<li><strong>News Articles</strong> - Fortune, TechCrunch, MIT Tech Review, etc.</li>
+				<li><strong>Academic Papers</strong> - Citations and commentary on events</li>
+			</ul>
+		</div>
+
+		<div id="event-preview" class="event-preview" style="display: none;">
+			<h3>Event</h3>
+			<p id="event-title">Loading...</p>
+		</div>
+
+		<form class="form-section" id="quote-form">
+			<h2>Quote Details</h2>
+
+			<div class="form-group">
+				<label for="event-id">Event ID</label>
+				<input type="text" id="event-id" name="event-id" required>
+				<small>The ID of the event you want to suggest a quote for</small>
+			</div>
+
+			<div class="form-group">
+				<label>Reaction Type</label>
+				<div class="reaction-type">
+					<label>
+						<input type="radio" name="reaction-type" value="safety_researcher" checked>
+						🔬 Safety Researcher Reaction
+					</label>
+					<label>
+						<input type="radio" name="reaction-type" value="media">
+						📰 Media Reaction
+					</label>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="quote-text">Quote Text</label>
+				<textarea id="quote-text" name="quote-text" required placeholder="Enter the exact quote..."></textarea>
+				<small>Copy the exact quote from the source - don't paraphrase</small>
+			</div>
+
+			<div class="form-group">
+				<label for="author">Author / Source Name</label>
+				<input type="text" id="author" name="author" required placeholder="e.g., Eliezer Yudkowsky, Fortune Magazine">
+				<small>Who said/wrote this?</small>
+			</div>
+
+			<div class="form-group">
+				<label for="source-url">Source URL</label>
+				<input type="url" id="source-url" name="source-url" required placeholder="https://...">
+				<small>Direct link to the quote (LessWrong post, tweet, article, etc.)</small>
+			</div>
+
+			<div class="form-group">
+				<label for="date">Date</label>
+				<input type="date" id="date" name="date" required>
+				<small>When was this quote published?</small>
+			</div>
+
+			<div class="form-group">
+				<label for="platform">Platform</label>
+				<select id="platform" name="platform" required>
+					<option value="">Select platform...</option>
+					<option value="lesswrong">LessWrong</option>
+					<option value="ea_forum">EA Forum</option>
+					<option value="twitter">Twitter/X</option>
+					<option value="blog">Blog Post</option>
+					<option value="news">News Article</option>
+					<option value="academic">Academic Paper</option>
+					<option value="other">Other</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="context">Context (Optional)</label>
+				<textarea id="context" name="context" placeholder="Any additional context about the quote..."></textarea>
+				<small>E.g., "Comment on LessWrong thread about FTX collapse"</small>
+			</div>
+
+			<div class="form-group">
+				<label for="submitter-name">Your Name (Optional)</label>
+				<input type="text" id="submitter-name" name="submitter-name" placeholder="Your name or username">
+				<small>So we can credit you if the quote is accepted</small>
+			</div>
+
+			<button type="submit" class="submit-button">📤 Submit Quote Suggestion</button>
+		</form>
+	</main>
+
+	<footer>
+		<p>&copy; 2025 p(Doom)1 | <a href="https://github.com/PipFoweraker/pdoom1">GitHub</a></p>
+		<p style="margin-top: 0.5rem; font-size: 0.9rem;">Event data from <a href="https://github.com/PipFoweraker/pdoom-data" target="_blank">pdoom-data</a></p>
+	</footer>
+
+	<script>
+		// Parse event ID from URL
+		const urlParams = new URLSearchParams(window.location.search);
+		const eventId = urlParams.get('event');
+
+		if (eventId) {
+			document.getElementById('event-id').value = eventId;
+			loadEventPreview(eventId);
+		}
+
+		async function loadEventPreview(eventId) {
+			try {
+				const response = await fetch('/data/events.json');
+				const events = await response.json();
+				const event = events[eventId];
+
+				if (event) {
+					document.getElementById('event-preview').style.display = 'block';
+					document.getElementById('event-title').textContent = `${event.title} (${event.year})`;
+				}
+			} catch (error) {
+				console.error('Failed to load event preview:', error);
+			}
+		}
+
+		// Form submission
+		document.getElementById('quote-form').addEventListener('submit', function(e) {
+			e.preventDefault();
+
+			const formData = {
+				event_id: document.getElementById('event-id').value,
+				reaction_type: document.querySelector('input[name="reaction-type"]:checked').value,
+				quote_text: document.getElementById('quote-text').value,
+				author: document.getElementById('author').value,
+				source_url: document.getElementById('source-url').value,
+				date: document.getElementById('date').value,
+				platform: document.getElementById('platform').value,
+				context: document.getElementById('context').value,
+				submitter_name: document.getElementById('submitter-name').value
+			};
+
+			// Build GitHub issue URL
+			const issueTitle = encodeURIComponent(`Quote Suggestion: ${formData.event_id} - ${formData.reaction_type}`);
+			const issueBody = encodeURIComponent(
+				`# Quote Suggestion\n\n` +
+				`**Event ID**: ${formData.event_id}\n` +
+				`**Reaction Type**: ${formData.reaction_type === 'safety_researcher' ? 'Safety Researcher' : 'Media'}\n\n` +
+				`## Quote\n\n` +
+				`> ${formData.quote_text}\n\n` +
+				`**Author**: ${formData.author}\n` +
+				`**Source**: ${formData.source_url}\n` +
+				`**Date**: ${formData.date}\n` +
+				`**Platform**: ${formData.platform}\n\n` +
+				`${formData.context ? `**Context**: ${formData.context}\n\n` : ''}` +
+				`${formData.submitter_name ? `**Submitted by**: ${formData.submitter_name}\n\n` : ''}` +
+				`---\n\n` +
+				`## Suggested Metadata\n\n` +
+				`\`\`\`json\n` +
+				`{\n` +
+				`  "reaction_provenance": {\n` +
+				`    "${formData.reaction_type}_reaction": {\n` +
+				`      "type": "real_quote",\n` +
+				`      "source": "${formData.source_url}",\n` +
+				`      "author": "${formData.author}",\n` +
+				`      "date": "${formData.date}",\n` +
+				`      "platform": "${formData.platform}"${formData.context ? `,\n      "context": "${formData.context}"` : ''}\n` +
+				`    }\n` +
+				`  }\n` +
+				`}\n` +
+				`\`\`\`\n`
+			);
+
+			const githubUrl = `https://github.com/PipFoweraker/pdoom-data/issues/new?labels=quote-suggestion,metadata,events&title=${issueTitle}&body=${issueBody}`;
+
+			// Open GitHub issue in new tab
+			window.open(githubUrl, '_blank');
+
+			// Show success message
+			alert('Opening GitHub issue form in new tab. Thank you for your contribution!');
+		});
+	</script>
+</body>
+</html>

@@ -264,6 +264,69 @@
 			text-decoration: underline;
 		}
 
+		.provenance-badge {
+			display: inline-block;
+			padding: 0.25rem 0.6rem;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			font-weight: bold;
+			margin-left: 0.5rem;
+			vertical-align: middle;
+		}
+
+		.provenance-placeholder {
+			background: rgba(255, 152, 0, 0.2);
+			border: 1px solid #ff9800;
+			color: #ff9800;
+		}
+
+		.provenance-summary {
+			background: rgba(33, 150, 243, 0.2);
+			border: 1px solid #2196f3;
+			color: #2196f3;
+		}
+
+		.provenance-real {
+			background: rgba(76, 175, 80, 0.2);
+			border: 1px solid #4caf50;
+			color: #4caf50;
+		}
+
+		.quote-source {
+			display: block;
+			margin-top: 0.5rem;
+			font-size: 0.85rem;
+			color: var(--text-muted);
+		}
+
+		.quote-source a {
+			color: var(--accent-secondary);
+			text-decoration: none;
+		}
+
+		.quote-source a:hover {
+			text-decoration: underline;
+		}
+
+		.suggest-quote-button {
+			display: inline-block;
+			margin-top: 0.75rem;
+			padding: 0.5rem 1rem;
+			background: rgba(255, 107, 53, 0.1);
+			border: 1px solid var(--accent-secondary);
+			border-radius: 4px;
+			color: var(--accent-secondary);
+			text-decoration: none;
+			font-size: 0.85rem;
+			transition: all 0.3s;
+		}
+
+		.suggest-quote-button:hover {
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+			transform: translateY(-2px);
+		}
+
 		.contribute-section {
 			background: linear-gradient(135deg, var(--bg-secondary), rgba(255, 107, 53, 0.1));
 			border: 1px solid var(--accent-secondary);
@@ -374,13 +437,23 @@
 
 			<div class="quote">
 				<span class="quote-label">🔬 Safety Researcher Reaction:</span>
+				<span class="provenance-badge provenance-placeholder">⚠️ Placeholder - Needs Real Quote</span>
+				<br>
 				"Interesting perspective on safety challenges"
+				
 			</div>
 
 			<div class="quote">
 				<span class="quote-label">📰 Media Reaction:</span>
+				<span class="provenance-badge provenance-placeholder">⚠️ Placeholder - Needs Real Quote</span>
+				<br>
 				"Discussed in AI safety community"
+				
 			</div>
+
+			<a href="/events/suggest-quote.html?event=alignmentforum_874c8d8911638768" class="suggest-quote-button">
+				💡 Found a Real Quote? Suggest it here
+			</a>
 		</div>
 
 		<div class="section">

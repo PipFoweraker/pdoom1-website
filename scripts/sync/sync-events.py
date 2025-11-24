@@ -72,6 +72,33 @@ def load_events_from_pdoom_data(pdoom_data_path: Path) -> Dict[str, Any]:
     return events
 
 
+def should_include_event(event: Dict[str, Any]) -> bool:
+    """Filter events for website display based on event_status metadata"""
+    status = event.get('event_status', 'included')
+
+    # Exclude newsletters and explicitly excluded events
+    if status in ['newsletter_archive', 'excluded']:
+        return False
+
+    # Include all others (included, review_needed)
+    return True
+
+
+def filter_events(events: Dict[str, Any]) -> Dict[str, Any]:
+    """Filter out excluded events"""
+    filtered = {
+        event_id: event
+        for event_id, event in events.items()
+        if should_include_event(event)
+    }
+
+    excluded_count = len(events) - len(filtered)
+    if excluded_count > 0:
+        log(f"Filtered out {excluded_count} excluded/newsletter events")
+
+    return filtered
+
+
 def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
     """Generate HTML for individual event detail page"""
 
@@ -132,6 +159,47 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
     impacts_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events,game-balance&title=Metadata%3A%20Change%20impacts%20for%20{quote(event_id)}&body=Event%3A%20{quote(event['title'])}%0A%0ACurrent%20impacts%3A%20{len(event['impacts'])}%20game%20variable%20changes%0A%0ASuggested%20changes%3A%20%0A-%20Variable%3A%20%0A-%20Change%3A%20%0A%0AReason%3A%20"
 
     pdoom_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events,game-balance&title=Metadata%3A%20Change%20p(doom)%20impact%20for%20{quote(event_id)}&body=Event%3A%20{quote(event['title'])}%0A%0ACurrent%20p(doom)%20impact%3A%20{event.get('pdoom_impact', 'null')}%0A%0ASuggested%20p(doom)%20impact%3A%20%0A%0AReason%3A%20"
+
+    # Build reaction provenance badges and source info
+    def build_reaction_html(reaction_text: str, reaction_key: str) -> str:
+        """Build HTML for a reaction with provenance badge and source link"""
+        provenance = event.get('reaction_provenance', {})
+        reaction_prov = provenance.get(reaction_key, 'placeholder')
+
+        # Handle simple string format
+        if isinstance(reaction_prov, str):
+            prov_type = reaction_prov
+            prov_data = {}
+        else:
+            prov_type = reaction_prov.get('type', 'placeholder')
+            prov_data = reaction_prov
+
+        # Build badge HTML
+        badge_html = ""
+        source_html = ""
+
+        if prov_type == "placeholder":
+            badge_html = '<span class="provenance-badge provenance-placeholder">⚠️ Placeholder - Needs Real Quote</span>'
+        elif prov_type == "human_summary":
+            badge_html = '<span class="provenance-badge provenance-summary">ℹ️ Summary (Not Direct Quote)</span>'
+            if prov_data.get('sources'):
+                sources = prov_data['sources'] if isinstance(prov_data['sources'], list) else [prov_data['sources']]
+                source_links = ', '.join([f'<a href="{s}" target="_blank" rel="noopener">source</a>' for s in sources])
+                source_html = f'<span class="quote-source">Summarized from: {source_links}</span>'
+        elif prov_type == "real_quote":
+            badge_html = '<span class="provenance-badge provenance-real">✓ Verified Quote</span>'
+            if prov_data.get('source'):
+                author = prov_data.get('author', 'Unknown')
+                date = prov_data.get('date', '')
+                date_text = f" ({date})" if date else ""
+                source_html = f'<span class="quote-source">— {author}{date_text} (<a href="{prov_data["source"]}" target="_blank" rel="noopener">source</a>)</span>'
+        elif prov_type == "not_applicable":
+            badge_html = '<span class="provenance-badge" style="opacity: 0.5;">N/A</span>'
+
+        return badge_html, source_html
+
+    safety_badge, safety_source = build_reaction_html(event['safety_researcher_reaction'], 'safety_researcher_reaction')
+    media_badge, media_source = build_reaction_html(event['media_reaction'], 'media_reaction')
 
     html_content = f"""<!DOCTYPE html>
 <html lang="en-AU">
@@ -399,6 +467,69 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 			text-decoration: underline;
 		}}
 
+		.provenance-badge {{
+			display: inline-block;
+			padding: 0.25rem 0.6rem;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			font-weight: bold;
+			margin-left: 0.5rem;
+			vertical-align: middle;
+		}}
+
+		.provenance-placeholder {{
+			background: rgba(255, 152, 0, 0.2);
+			border: 1px solid #ff9800;
+			color: #ff9800;
+		}}
+
+		.provenance-summary {{
+			background: rgba(33, 150, 243, 0.2);
+			border: 1px solid #2196f3;
+			color: #2196f3;
+		}}
+
+		.provenance-real {{
+			background: rgba(76, 175, 80, 0.2);
+			border: 1px solid #4caf50;
+			color: #4caf50;
+		}}
+
+		.quote-source {{
+			display: block;
+			margin-top: 0.5rem;
+			font-size: 0.85rem;
+			color: var(--text-muted);
+		}}
+
+		.quote-source a {{
+			color: var(--accent-secondary);
+			text-decoration: none;
+		}}
+
+		.quote-source a:hover {{
+			text-decoration: underline;
+		}}
+
+		.suggest-quote-button {{
+			display: inline-block;
+			margin-top: 0.75rem;
+			padding: 0.5rem 1rem;
+			background: rgba(255, 107, 53, 0.1);
+			border: 1px solid var(--accent-secondary);
+			border-radius: 4px;
+			color: var(--accent-secondary);
+			text-decoration: none;
+			font-size: 0.85rem;
+			transition: all 0.3s;
+		}}
+
+		.suggest-quote-button:hover {{
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+			transform: translateY(-2px);
+		}}
+
 		.contribute-section {{
 			background: linear-gradient(135deg, var(--bg-secondary), rgba(255, 107, 53, 0.1));
 			border: 1px solid var(--accent-secondary);
@@ -491,13 +622,23 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 
 			<div class="quote">
 				<span class="quote-label">🔬 Safety Researcher Reaction:</span>
+				{safety_badge}
+				<br>
 				"{event['safety_researcher_reaction']}"
+				{safety_source}
 			</div>
 
 			<div class="quote">
 				<span class="quote-label">📰 Media Reaction:</span>
+				{media_badge}
+				<br>
 				"{event['media_reaction']}"
+				{media_source}
 			</div>
+
+			<a href="/events/suggest-quote.html?event={event_id}" class="suggest-quote-button">
+				💡 Found a Real Quote? Suggest it here
+			</a>
 		</div>
 
 		<div class="section">
@@ -642,7 +783,10 @@ def main():
     ensure_directories()
 
     # Load events
-    events = load_events_from_pdoom_data(args.pdoom_data_path)
+    all_events = load_events_from_pdoom_data(args.pdoom_data_path)
+
+    # Filter events (exclude newsletters and explicitly excluded)
+    events = filter_events(all_events)
 
     # Generate individual event detail pages
     log("Generating event detail pages...")
@@ -670,10 +814,41 @@ def main():
     log(f"Events data: {DATA_DIR / 'events.json'}")
     log(f"Event pages: {EVENTS_DIR}/*.html")
 
+    # Analyze quote quality
+    def get_provenance_type(event: Dict[str, Any], reaction_key: str) -> str:
+        """Get the provenance type for a reaction"""
+        prov = event.get('reaction_provenance', {}).get(reaction_key, 'placeholder')
+        if isinstance(prov, str):
+            return prov
+        return prov.get('type', 'placeholder')
+
+    quote_stats = {
+        'real_quotes': 0,
+        'human_summaries': 0,
+        'placeholders': 0,
+        'not_applicable': 0
+    }
+
+    for event in events.values():
+        safety_type = get_provenance_type(event, 'safety_researcher_reaction')
+        media_type = get_provenance_type(event, 'media_reaction')
+
+        # Count based on "best" provenance type for the event
+        if safety_type == 'real_quote' or media_type == 'real_quote':
+            quote_stats['real_quotes'] += 1
+        elif safety_type == 'human_summary' or media_type == 'human_summary':
+            quote_stats['human_summaries'] += 1
+        elif safety_type == 'not_applicable' and media_type == 'not_applicable':
+            quote_stats['not_applicable'] += 1
+        else:
+            quote_stats['placeholders'] += 1
+
     # Create summary report
     summary = {
         "sync_timestamp": datetime.now().isoformat(),
-        "total_events": len(events),
+        "total_events_in_source": len(all_events),
+        "included_events": len(events),
+        "excluded_events": len(all_events) - len(events),
         "categories": len(set(e['category'] for e in events.values())),
         "events_by_rarity": {
             rarity: len([e for e in events.values() if e['rarity'] == rarity])
@@ -682,7 +857,23 @@ def main():
         "year_range": [
             min(e['year'] for e in events.values()),
             max(e['year'] for e in events.values())
-        ]
+        ],
+        "event_status_breakdown": {
+            "newsletter_archive": len([e for e in all_events.values() if e.get('event_status') == 'newsletter_archive']),
+            "excluded": len([e for e in all_events.values() if e.get('event_status') == 'excluded']),
+            "review_needed": len([e for e in events.values() if e.get('event_status') == 'review_needed']),
+            "included": len([e for e in events.values() if e.get('event_status', 'included') == 'included'])
+        },
+        "quote_quality_stats": {
+            "events_with_real_quotes": quote_stats['real_quotes'],
+            "events_with_summaries": quote_stats['human_summaries'],
+            "events_with_placeholders": quote_stats['placeholders'],
+            "events_not_applicable": quote_stats['not_applicable'],
+            "completion_percentage": round((quote_stats['real_quotes'] / len(events)) * 100, 1) if len(events) > 0 else 0.0,
+            "goal_q1_2025": 50,
+            "goal_q2_2025": 100,
+            "goal_end_2025": 300
+        }
     }
 
     summary_file = DATA_DIR / "events-sync-summary.json"

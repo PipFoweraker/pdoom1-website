@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Contributing to Events | p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/docs/CONTRIBUTING_TO_EVENTS.html" />
+	<meta name="description" content="Help improve p(Doom)1 event data by contributing real quotes from researchers and media" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #999999;
+			--accent-primary: #ff6b35;
+			--accent-secondary: #ffb347;
+			--success-color: #4caf50;
+			--warning-color: #ff9800;
+			--info-color: #2196f3;
+			--border-color: #555555;
+			--radius-md: 8px;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem;
+		}
+
+		nav .breadcrumb {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+		}
+
+		nav .breadcrumb a {
+			color: var(--accent-secondary);
+			text-decoration: none;
+		}
+
+		nav .breadcrumb a:hover {
+			text-decoration: underline;
+		}
+
+		main {
+			max-width: 900px;
+			margin: 0 auto;
+			padding: 2rem 1rem;
+		}
+
+		h1 {
+			color: var(--accent-primary);
+			font-size: 2.5rem;
+			margin-bottom: 1rem;
+			text-align: center;
+		}
+
+		h2 {
+			color: var(--accent-secondary);
+			margin-top: 2rem;
+			margin-bottom: 1rem;
+			font-size: 1.8rem;
+			border-bottom: 2px solid var(--border-color);
+			padding-bottom: 0.5rem;
+		}
+
+		h3 {
+			color: var(--accent-primary);
+			margin-top: 1.5rem;
+			margin-bottom: 0.75rem;
+			font-size: 1.3rem;
+		}
+
+		p {
+			margin-bottom: 1rem;
+			color: var(--text-secondary);
+		}
+
+		a {
+			color: var(--accent-secondary);
+			text-decoration: none;
+		}
+
+		a:hover {
+			text-decoration: underline;
+		}
+
+		ul, ol {
+			margin-left: 2rem;
+			margin-bottom: 1rem;
+			color: var(--text-secondary);
+		}
+
+		li {
+			margin-bottom: 0.5rem;
+		}
+
+		code {
+			background: var(--bg-tertiary);
+			padding: 0.2rem 0.4rem;
+			border-radius: 3px;
+			font-family: 'Courier New', monospace;
+			font-size: 0.9rem;
+			color: var(--accent-secondary);
+		}
+
+		pre {
+			background: var(--bg-tertiary);
+			padding: 1rem;
+			border-radius: var(--radius-md);
+			overflow-x: auto;
+			margin-bottom: 1rem;
+			border: 1px solid var(--border-color);
+		}
+
+		pre code {
+			background: none;
+			padding: 0;
+		}
+
+		.badge {
+			display: inline-block;
+			padding: 0.25rem 0.6rem;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			font-weight: bold;
+			margin: 0 0.25rem;
+		}
+
+		.badge-placeholder {
+			background: rgba(255, 152, 0, 0.2);
+			border: 1px solid #ff9800;
+			color: #ff9800;
+		}
+
+		.badge-summary {
+			background: rgba(33, 150, 243, 0.2);
+			border: 1px solid #2196f3;
+			color: #2196f3;
+		}
+
+		.badge-real {
+			background: rgba(76, 175, 80, 0.2);
+			border: 1px solid #4caf50;
+			color: #4caf50;
+		}
+
+		.info-box {
+			background: linear-gradient(135deg, var(--bg-secondary), rgba(76, 175, 80, 0.1));
+			border: 1px solid var(--success-color);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.info-box h3 {
+			color: var(--success-color);
+			margin-top: 0;
+		}
+
+		.warning-box {
+			background: linear-gradient(135deg, var(--bg-secondary), rgba(255, 152, 0, 0.1));
+			border: 1px solid var(--warning-color);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.warning-box h3 {
+			color: var(--warning-color);
+			margin-top: 0;
+		}
+
+		.priority-box {
+			background: linear-gradient(135deg, var(--bg-secondary), rgba(255, 107, 53, 0.1));
+			border: 1px solid var(--accent-primary);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.priority-box h3 {
+			color: var(--accent-primary);
+			margin-top: 0;
+		}
+
+		.cta-button {
+			display: inline-block;
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+			padding: 0.75rem 1.5rem;
+			border-radius: 4px;
+			font-weight: bold;
+			margin: 0.5rem 0.5rem 0.5rem 0;
+			transition: transform 0.3s;
+			text-decoration: none;
+		}
+
+		.cta-button:hover {
+			transform: translateY(-2px);
+			text-decoration: none;
+		}
+
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1rem;
+			margin: 2rem 0;
+		}
+
+		.stat-card {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 1rem;
+			text-align: center;
+		}
+
+		.stat-number {
+			font-size: 2rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			display: block;
+			margin-bottom: 0.5rem;
+		}
+
+		.stat-label {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+		}
+
+		footer {
+			background: var(--bg-secondary);
+			border-top: 2px solid var(--accent-primary);
+			text-align: center;
+			padding: 2rem 1rem;
+			margin-top: 4rem;
+			color: var(--text-muted);
+		}
+
+		.intro {
+			text-align: center;
+			font-size: 1.1rem;
+			color: var(--text-secondary);
+			margin-bottom: 2rem;
+			padding: 1rem;
+			background: var(--bg-secondary);
+			border-radius: var(--radius-md);
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin: 1rem 0;
+		}
+
+		th, td {
+			padding: 0.75rem;
+			text-align: left;
+			border-bottom: 1px solid var(--border-color);
+		}
+
+		th {
+			background: var(--bg-tertiary);
+			color: var(--accent-primary);
+			font-weight: bold;
+		}
+
+		td {
+			color: var(--text-secondary);
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<nav>
+			<div class="breadcrumb">
+				<a href="/">Home</a> / <a href="/events/">Events</a> / Contributing Guide
+			</div>
+		</nav>
+	</header>
+
+	<main>
+		<h1>Contributing to Events Data</h1>
+
+		<div class="intro">
+			<p><strong>Welcome!</strong> This guide explains how you can help improve the p(Doom)1 event timeline by contributing real quotes, fixing metadata, and curating event quality.</p>
+		</div>
+
+		<h2>📊 Quick Overview</h2>
+
+		<p>The p(Doom)1 timeline contains <strong>1028 events</strong> tracking the history of AI safety research, funding crises, technical breakthroughs, and policy developments. Many events currently have <strong>placeholder reactions</strong> that need to be replaced with real quotes from researchers and media.</p>
+
+		<div class="stats-grid">
+			<div class="stat-card">
+				<span class="stat-number">1028</span>
+				<span class="stat-label">Total Events</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-number">~949</span>
+				<span class="stat-label">Need Real Quotes</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-number">~28</span>
+				<span class="stat-label">Have Summaries</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-number">0</span>
+				<span class="stat-label">Real Quotes (Yet!)</span>
+			</div>
+		</div>
+
+		<div class="info-box">
+			<h3>✅ Your contribution matters because:</h3>
+			<ul>
+				<li>Real quotes make events more authentic and engaging</li>
+				<li>Proper sourcing creates a historical record</li>
+				<li>Better metadata improves the game experience</li>
+				<li>Community curation ensures quality</li>
+			</ul>
+		</div>
+
+		<h2>🎯 What Needs Help?</h2>
+
+		<h3>🟠 Placeholder Quotes (~949 events)</h3>
+
+		<p>Most events show this badge: <span class="badge badge-placeholder">⚠️ Placeholder - Needs Real Quote</span></p>
+
+		<p><strong>Example placeholder quote:</strong></p>
+		<blockquote style="background: var(--bg-tertiary); padding: 1rem; border-left: 4px solid var(--warning-color); margin: 1rem 0; font-style: italic;">
+			"Critical insights for the field"
+		</blockquote>
+
+		<p><strong>What we need:</strong></p>
+		<blockquote style="background: var(--bg-tertiary); padding: 1rem; border-left: 4px solid var(--success-color); margin: 1rem 0;">
+			Real quotes from LessWrong, EA Forum, Twitter, blogs, or news articles
+		</blockquote>
+
+		<h3>🔵 Human Summaries (~28 events)</h3>
+
+		<p>Some events show: <span class="badge badge-summary">ℹ️ Summary (Not Direct Quote)</span></p>
+
+		<p><strong>These are better than placeholders</strong> but could still be upgraded to real sourced quotes when available.</p>
+
+		<h3>🟢 Real Quotes (0 events - we're just starting!)</h3>
+
+		<p>Our goal: <span class="badge badge-real">✓ Verified Quote</span></p>
+
+		<p><strong>Example of what we want:</strong></p>
+		<blockquote style="background: var(--bg-tertiary); padding: 1rem; border-left: 4px solid var(--success-color); margin: 1rem 0;">
+			"This is the worst funding crisis in EA history"<br>
+			<span style="color: var(--text-muted); font-size: 0.9rem;">— Scott Alexander (2022-11-16) (<a href="#">source</a>)</span>
+		</blockquote>
+
+		<h2>🚀 How to Contribute</h2>
+
+		<h3>Option 1: Suggest a Real Quote (Easiest!)</h3>
+
+		<ol>
+			<li><strong>Browse the <a href="/events/">Events Timeline</a></strong></li>
+			<li><strong>Click on an event</strong> you know about</li>
+			<li><strong>Look for the placeholder/summary badges</strong> in the Reactions section</li>
+			<li><strong>Click "💡 Found a Real Quote? Suggest it here"</strong></li>
+			<li><strong>Fill out the form</strong> with the quote, author, source link, and date</li>
+			<li><strong>Submit</strong> - it creates a GitHub issue for review</li>
+		</ol>
+
+		<div class="info-box">
+			<h3>✅ Good sources to check:</h3>
+			<ul>
+				<li><a href="https://lesswrong.com" target="_blank">LessWrong</a> - AI safety researcher discussions</li>
+				<li><a href="https://forum.effectivealtruism.org" target="_blank">EA Forum</a> - Effective altruism community</li>
+				<li><a href="https://astralcodexten.substack.com" target="_blank">Scott Alexander's blog</a> - ACX coverage of AI safety</li>
+				<li><strong>Twitter/X</strong> - Real-time reactions from researchers</li>
+				<li><strong>News articles</strong> - Fortune, MIT Tech Review, TechCrunch, etc.</li>
+			</ul>
+		</div>
+
+		<h3>Option 2: Fix Event Metadata</h3>
+
+		<p>If you notice errors in categories, tags, rarities, or game impacts:</p>
+
+		<ol>
+			<li><strong>Click the event detail page</strong></li>
+			<li><strong>Scroll to "🏷️ Event Metadata" section</strong></li>
+			<li><strong>Click "→ Suggest different [category/rarity/tags]"</strong></li>
+			<li><strong>Opens GitHub issue</strong> - explain what should change and why</li>
+		</ol>
+
+		<h3>Option 3: Bulk Review (Advanced)</h3>
+
+		<p>If you're familiar with the AI safety landscape:</p>
+
+		<ol>
+			<li><strong>Use the <a href="/events/">Events Browser</a></strong> table view</li>
+			<li><strong>Filter by category</strong> (e.g., "funding_catastrophe")</li>
+			<li><strong>Select multiple events</strong> with checkboxes</li>
+			<li><strong>Click "Bulk Suggest Metadata"</strong></li>
+			<li><strong>Review events systematically</strong> by topic area</li>
+		</ol>
+
+		<h2>✅ Quote Quality Guidelines</h2>
+
+		<div class="info-box">
+			<h3>✅ Good Quotes</h3>
+			<p><strong>Safety Researcher Reactions:</strong></p>
+			<ul>
+				<li>Direct quotes from known AI safety researchers</li>
+				<li>Comments on LessWrong, EA Forum with author attribution</li>
+				<li>Blog posts analyzing the event's impact</li>
+				<li>Conference presentations or papers citing the event</li>
+			</ul>
+			<p><strong>Media Reactions:</strong></p>
+			<ul>
+				<li>Headlines from major publications (Fortune, MIT Tech Review)</li>
+				<li>Excerpts from news articles covering the event</li>
+				<li>Public statements from organizations</li>
+				<li>Social media reactions from verified accounts</li>
+			</ul>
+		</div>
+
+		<div class="warning-box">
+			<h3>❌ Bad Quotes</h3>
+			<p><strong>Don't submit:</strong></p>
+			<ul>
+				<li>Paraphrased or summarized content (unless it's your own summary)</li>
+				<li>Anonymous sources or unverified accounts</li>
+				<li>Private messages or non-public communications</li>
+				<li>Quotes taken out of context</li>
+				<li>Dead links or paywalled content</li>
+			</ul>
+		</div>
+
+		<h3>📋 Required Information</h3>
+
+		<p>When suggesting a quote, you <strong>must</strong> provide:</p>
+		<ul>
+			<li>✅ <strong>Quote text</strong> - The exact words (no paraphrasing)</li>
+			<li>✅ <strong>Author</strong> - Who said/wrote it</li>
+			<li>✅ <strong>Source URL</strong> - Direct link to the quote</li>
+			<li>✅ <strong>Date</strong> - When it was published</li>
+			<li>✅ <strong>Platform</strong> - LessWrong, Twitter, blog, news, etc.</li>
+		</ul>
+
+		<p><strong>Optional but helpful:</strong></p>
+		<ul>
+			<li>Context (e.g., "Comment on LessWrong thread about FTX collapse")</li>
+			<li>Your name (for credit if quote is accepted)</li>
+		</ul>
+
+		<h2>🎯 High-Priority Events</h2>
+
+		<div class="priority-box">
+			<h3>Top 10 Priority Events</h3>
+			<p>These events have significant historical importance and would benefit most from real quotes:</p>
+			<ol>
+				<li><strong>FTX Future Fund Collapse (2022)</strong> - Massive AI safety funding loss</li>
+				<li><strong>OpenAI Fires Sam Altman (2023)</strong> - Leadership crisis</li>
+				<li><strong>GPT-4 Release (2023)</strong> - Major capability advance</li>
+				<li><strong>Anthropic's Constitutional AI (2022)</strong> - Technical breakthrough</li>
+				<li><strong>AI Safety Camp Events</strong> - Community building</li>
+				<li><strong>DeepMind's AlphaFold (2020)</strong> - Capability demonstration</li>
+				<li><strong>EU AI Act Passage (2024)</strong> - Policy milestone</li>
+				<li><strong>MIRI Research Program Changes</strong> - Institutional shifts</li>
+				<li><strong>Pause Giant AI Experiments Letter (2023)</strong> - Public awareness</li>
+				<li><strong>Superintelligence Book Release (2014)</strong> - Field foundation</li>
+			</ol>
+		</div>
+
+		<h3>📍 Where to Find Quotes</h3>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Source</th>
+					<th>What to Look For</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><strong>Scott Alexander (ACX)</strong></td>
+					<td>Covers major AI safety events in blog posts. Check archives for event dates ± 2 weeks</td>
+				</tr>
+				<tr>
+					<td><strong>LessWrong</strong></td>
+					<td>Search for event title or organization name. Check "Alignment Forum" tag for technical events</td>
+				</tr>
+				<tr>
+					<td><strong>Twitter/X</strong></td>
+					<td>Search for event name + "AI safety". Check @elonmusk, @sama, @ESYudkowsky, @DarioAmodei</td>
+				</tr>
+				<tr>
+					<td><strong>News Archives</strong></td>
+					<td>Google News search with date range. Fortune, MIT Tech Review, TechCrunch AI sections</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h2>📝 Review Process</h2>
+
+		<h3>After You Submit</h3>
+
+		<ol>
+			<li><strong>GitHub issue created</strong> with your quote suggestion</li>
+			<li><strong>Maintainer reviews</strong> for accuracy and quality</li>
+			<li><strong>Quote verified</strong> - checks source is valid and quote is accurate</li>
+			<li><strong>Metadata updated</strong> in pdoom-data repository</li>
+			<li><strong>Website regenerated</strong> - your contribution goes live!</li>
+			<li><strong>Credit given</strong> (if you provided your name)</li>
+		</ol>
+
+		<h3>Timeline</h3>
+		<ul>
+			<li><strong>Quick reviews</strong>: 24-48 hours for straightforward quotes</li>
+			<li><strong>Complex reviews</strong>: Up to 1 week for verification</li>
+			<li><strong>Batch updates</strong>: Website regenerates daily or on-demand</li>
+		</ul>
+
+		<h2>📈 Statistics & Progress</h2>
+
+		<div class="stats-grid">
+			<div class="stat-card">
+				<span class="stat-number">1028</span>
+				<span class="stat-label">Total Events</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-number">0</span>
+				<span class="stat-label">Real Quotes</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-number">~28</span>
+				<span class="stat-label">Summaries</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-number">~949</span>
+				<span class="stat-label">Placeholders</span>
+			</div>
+		</div>
+
+		<h3>🎯 Goals</h3>
+		<ul>
+			<li><strong>Q1 2025</strong>: 50 real quotes (5% coverage)</li>
+			<li><strong>Q2 2025</strong>: 100 real quotes (10% coverage)</li>
+			<li><strong>End 2025</strong>: 300+ real quotes (30% coverage)</li>
+		</ul>
+
+		<h2>❓ Questions</h2>
+
+		<h3>Why are there so many placeholders?</h3>
+		<p>The 949 alignment research events were imported from a database that didn't include reaction quotes. We're now working with the community to source real reactions from the literature.</p>
+
+		<h3>Can I suggest multiple quotes for one event?</h3>
+		<p>Yes! Major events often have multiple notable reactions. Submit them separately and we'll track them all. In the future, we may implement a quote carousel for events with multiple high-quality reactions.</p>
+
+		<h3>What if I don't have a GitHub account?</h3>
+		<p>You can email quotes to <a href="mailto:team@pdoom1.com">team@pdoom1.com</a> with the subject "Event Quote Suggestion". Include all the required information (quote, author, source, date).</p>
+
+		<h3>Will my contributions appear in the game?</h3>
+		<p>Yes! Real quotes will be used in:</p>
+		<ul>
+			<li>Event card displays when events are drawn</li>
+			<li>Historical timeline view in the game</li>
+			<li>Character dialogue and commentary</li>
+			<li>Event notifications and logs</li>
+		</ul>
+
+		<h2>🙏 Recognition</h2>
+
+		<p>We deeply appreciate all contributors who help build this historical record of AI safety. Quality contributions will be:</p>
+
+		<ul>
+			<li>✅ <strong>Credited</strong> in the event metadata (if you provide your name)</li>
+			<li>✅ <strong>Listed</strong> on a future Contributors page</li>
+			<li>✅ <strong>Tracked</strong> in statistics and leaderboards</li>
+			<li>✅ <strong>Used</strong> to improve both the website and game</li>
+		</ul>
+
+		<p style="text-align: center; margin: 2rem 0; font-size: 1.2rem; font-weight: bold;">
+			Thank you for helping preserve the history of AI safety research!
+		</p>
+
+		<div style="text-align: center; margin: 3rem 0;">
+			<a href="/events/" class="cta-button">📅 Browse Events Timeline</a>
+			<a href="/events/suggest-quote.html" class="cta-button">💡 Suggest a Quote</a>
+			<a href="https://github.com/PipFoweraker/pdoom-data" class="cta-button" target="_blank">📂 View Source Data</a>
+		</div>
+
+		<hr style="border: none; border-top: 2px solid var(--border-color); margin: 3rem 0;">
+
+		<p style="color: var(--text-muted); text-align: center;">
+			<strong>Technical docs for developers:</strong> See <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/QUOTE_DATABASE_SCHEMA.md">Quote Database Schema</a>
+		</p>
+	</main>
+
+	<footer>
+		<p>&copy; 2025 p(Doom)1 | <a href="https://github.com/PipFoweraker/pdoom1">GitHub</a></p>
+		<p style="margin-top: 0.5rem; font-size: 0.9rem;">Event data from <a href="https://github.com/PipFoweraker/pdoom-data" target="_blank">pdoom-data</a></p>
+	</footer>
+</body>
+</html>
