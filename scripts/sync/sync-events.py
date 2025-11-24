@@ -99,6 +99,53 @@ def filter_events(events: Dict[str, Any]) -> Dict[str, Any]:
     return filtered
 
 
+def sanitize_urls_in_text(text: str) -> str:
+    """Convert HTTP URLs to HTTPS where safe to do so"""
+    import re
+
+    # Known safe HTTP -> HTTPS conversions
+    safe_conversions = {
+        'http://rohinshah.com': 'https://rohinshah.com',
+        'http://redwoodresearch.org': 'https://redwoodresearch.org',
+        'http://aitracker.org': 'https://aitracker.org',
+        'http://arxiv.org': 'https://arxiv.org',
+        'http://lesswrong.com': 'https://lesswrong.com',
+        'http://www.lesswrong.com': 'https://www.lesswrong.com',
+        'http://forum.effectivealtruism.org': 'https://forum.effectivealtruism.org',
+        'http://eepurl.com': 'https://eepurl.com',
+        'http://alignment-newsletter.libsyn.com': 'https://alignment-newsletter.libsyn.com',
+        'http://www.cs.umd.edu': 'https://www.cs.umd.edu',
+        'http://amazon.com': 'https://amazon.com',
+        'http://acritch.com': 'https://acritch.com',
+        'http://proceedings.mlr.press': 'https://proceedings.mlr.press',
+        'http://www.jackspencer.org': 'https://www.jackspencer.org',
+    }
+
+    result = text
+    for http_url, https_url in safe_conversions.items():
+        result = result.replace(http_url, https_url)
+
+    return result
+
+
+def sanitize_event_urls(event: Dict[str, Any]) -> Dict[str, Any]:
+    """Sanitize URLs throughout an event object"""
+    # Sanitize description
+    if 'description' in event:
+        event['description'] = sanitize_urls_in_text(event['description'])
+
+    # Sanitize reactions
+    for reaction_key in ['safety_researcher_reaction', 'media_reaction']:
+        if reaction_key in event:
+            event[reaction_key] = sanitize_urls_in_text(event[reaction_key])
+
+    # Sanitize sources
+    if 'sources' in event:
+        event['sources'] = [sanitize_urls_in_text(s) for s in event['sources']]
+
+    return event
+
+
 def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
     """Generate HTML for individual event detail page"""
 
@@ -787,6 +834,18 @@ def main():
 
     # Filter events (exclude newsletters and explicitly excluded)
     events = filter_events(all_events)
+
+    # Sanitize HTTP URLs to HTTPS
+    log("Sanitizing HTTP URLs to HTTPS...")
+    url_changes = 0
+    for event_id, event in events.items():
+        before = json.dumps(event)
+        events[event_id] = sanitize_event_urls(event)
+        after = json.dumps(events[event_id])
+        if before != after:
+            url_changes += 1
+    if url_changes > 0:
+        log(f"Sanitized URLs in {url_changes} events")
 
     # Generate individual event detail pages
     log("Generating event detail pages...")

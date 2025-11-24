@@ -67,10 +67,7 @@ jobs:
             git config user.name "github-actions"
             git config user.email "actions@github.com"
             git add public/docs
-            git commit -m "chore(docs): sync pdoom1 docs at $REF
-
-Triggered by: ${{ github.event_name }}
-Auto-synced documentation from pdoom1 repository."
+            git commit -m "chore(docs): sync pdoom1 docs at $REF - Triggered by: ${{ github.event_name }}"
             git push
             echo "✅ Documentation synced successfully for $REF"
           fi
