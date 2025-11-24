@@ -1,6 +1,79 @@
 {
   "issues": [
     {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/463",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/463/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/463/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/463/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/463",
+      "id": 3658495101,
+      "node_id": "I_kwDOPVWa587aEDR9",
+      "number": 463,
+      "title": "Automate PDoom-Windows.zip creation in release workflow",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [],
+      "state": "open",
+      "locked": false,
+      "assignee": null,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2025-11-24T11:40:20Z",
+      "updated_at": "2025-11-24T11:40:20Z",
+      "closed_at": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "body": "## Problem\n\nThe v0.10.4 release had `PDoom.exe` and `PDoom.pck` as separate files, but the website links to `PDoom-Windows.zip` which didn't exist. This caused 404 errors for Windows downloads.\n\n## Hotfix Applied\n\nManually created `PDoom-Windows.zip` containing both files and uploaded to v0.10.4 release. Downloads now work.\n\n## Permanent Solution Needed\n\nThe GitHub Actions release workflow should automatically:\n\n1. After building Windows artifacts, package them:\n   ```bash\n   zip PDoom-Windows.zip PDoom.exe PDoom.pck\n   ```\n\n2. Upload `PDoom-Windows.zip` to the release (not separate .exe/.pck files)\n\n## Specification\n\nSee [Download Links Specification](https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/DOWNLOAD_LINKS_SPECIFICATION.md) which documents:\n- Required filename: `PDoom-Windows.zip`\n- Must contain: `PDoom.exe` + `PDoom.pck` (and any DLLs if needed)\n- Website expects: `/releases/latest/download/PDoom-Windows.zip`\n\n## Action Items\n\n- [ ] Update `.github/workflows/` release workflow\n- [ ] Add zip packaging step after Windows build\n- [ ] Test on next release\n- [ ] Consider if DLL files are also needed in the zip\n\n## Related\n\n- pdoom1-website issue: Download link returned 404\n- Hotfix commit: Manually uploaded PDoom-Windows.zip to v0.10.4",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/463/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/463/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null
+    },
+    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/460",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/460/labels{/name}",
@@ -1393,91 +1466,8 @@
       "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/413/timeline",
       "performed_via_github_app": null,
       "state_reason": null
-    },
-    {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/424",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/424/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/424/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/424/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/424",
-      "id": 3502038054,
-      "node_id": "I_kwDOPVWa587QvNwm",
-      "number": 424,
-      "title": "Refactor Unmanaged Employee Productivity System",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 9551925250,
-          "node_id": "LA_kwDOPVWa588AAAACOVbQAg",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/godot-bridge-logic",
-          "name": "godot-bridge-logic",
-          "color": "0075ca",
-          "default": false,
-          "description": "Game logic issue in Python bridge layer"
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignee": null,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2025-10-10T09:16:30Z",
-      "updated_at": "2025-10-30T03:14:36Z",
-      "closed_at": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "body": "# Refactor Unmanaged Employee Productivity System\n\n## Issue Summary\nThe current unmanaged employee productivity penalty system has poor user experience and architectural issues that need to be addressed.\n\n## Current Problems\n\n### 1. **Poor User Experience**\n- ERROR Employees become unproductive immediately with no warning\n- ERROR Red X visual indicators appear suddenly without explanation\n- ERROR No clear mechanism for players to understand or fix the issue\n- ERROR No progressive warning system before penalties kick in\n\n### 2. **Architectural Issues**\n- ERROR Logic scattered across multiple files (`game_state.py`, `ui.py`, `ui_new/layouts/three_column.py`)\n- ERROR Complex productivity calculations mixed with visual rendering\n- ERROR Inconsistent implementation between UI systems\n- ERROR Hard to maintain and modify\n\n### 3. **Current System Functions to Refactor**\n\n#### Core Logic (src/core/game_state.py)\n```python\n# Functions that need architectural review:\n_update_employee_productivity()          # Line ~1311 - Core productivity calculation\nget_researcher_productivity_effects()    # Multiple calls - Researcher-specific logic\n```\n\n#### Employee Data Structure Issues\n```python\n# Current employee blob structure has UI-specific fields mixed with game logic:\n{\n    'productivity': 0.0,                 # Game logic\n    'unproductive_reason': None,         # UI-specific field in game data\n    'productive_action_bonus': 1.0,      # Game logic\n    # ... other mixed concerns\n}\n```\n\n#### Visual Rendering (ui.py, ui_new/layouts/three_column.py)\n- Red slash rendering logic embedded in UI rendering functions\n- Inconsistent visual feedback between old and new UI systems\n\n## Proposed Solution Architecture\n\n### 1. **Separate Concerns**\n```\nGame Logic Layer (src/core/):\n? Employee productivity calculations\n? Management capacity rules\n? Penalty application\n\nUI Feedback Layer (src/ui/):\n? Warning system (tooltips, notifications)\n? Progressive visual indicators\n? Management action suggestions\n\nEvent System Layer (src/events/):\n? Management capacity warnings\n? Productivity decline notifications\n? Tutorial integration for new players\n```\n\n### 2. **Improved User Experience Flow**\n\n#### Phase 1: Early Warning (at 8 employees)\n- ? Yellow tooltip warning: 'Consider hiring management staff'\n- NOTE Event message: 'Your team is growing! Management will help maintain productivity.'\n\n#### Phase 2: Approaching Limit (at 9 employees)\n- ? Orange notification: 'Management capacity reached. New hires may be less productive.'\n- IDEA Action suggestion: 'Hire Admin Staff or promote experienced employees'\n\n#### Phase 3: Over Limit (10+ employees)\n- ? Clear notification: 'Unmanaged employees are 50% less productive'\n- TOOLS Specific remediation options presented\n- CHART Clear productivity impact shown in tooltips\n\n### 3. **Clean Architecture Implementation**\n\n#### New Structure:\n```python\n# src/core/management/productivity_system.py\nclass ProductivitySystem:\n    def calculate_employee_productivity(self, employee, management_context)\n    def get_management_capacity(self, admin_staff, experienced_employees)\n    def apply_productivity_penalties(self, employees, management_capacity)\n\n# src/ui/management/management_feedback.py  \nclass ManagementFeedback:\n    def show_management_warnings(self, current_staff, management_capacity)\n    def render_productivity_indicators(self, employees)\n    def suggest_management_actions(self, context)\n\n# src/events/management_events.py\nclass ManagementEvents:\n    def trigger_capacity_warning(self, staff_count)\n    def show_productivity_tutorial(self, player_context)\n```\n\n## Implementation Plan\n\n### Phase 1: Remove Confusing Visuals OK\n- [x] Remove red X/slash indicators from employee blobs\n- [x] Keep core productivity penalty mechanic functional\n- [x] Preserve existing game balance\n\n### Phase 2: Implement Warning System\n- [ ] Add progressive warning tooltips at 8, 9, 10+ employees\n- [ ] Create management capacity calculation service\n- [ ] Add tutorial integration for new players\n\n### Phase 3: Refactor Architecture  \n- [ ] Extract productivity logic to dedicated system\n- [ ] Separate UI feedback from game logic\n- [ ] Implement consistent behavior across UI systems\n\n### Phase 4: Enhanced Management Tools\n- [ ] Add management dashboard/overlay\n- [ ] Provide clear remediation actions\n- [ ] Show productivity impact in real-time\n\n## Success Criteria\n\n### User Experience\n- OK Players understand why productivity penalties occur\n- OK Clear warning system before penalties apply\n- OK Obvious paths to remedy management issues\n- OK Progressive feedback rather than sudden changes\n\n### Code Quality\n- OK Clear separation between game logic and UI\n- OK Consistent implementation across UI systems\n- OK Easy to maintain and extend\n- OK Well-tested productivity calculations\n\n## Files Affected\n\n### Core Changes\n- `src/core/game_state.py` - Extract productivity logic\n- `src/core/management/` - New management system (to be created)\n\n### UI Changes  \n- `ui.py` - Remove red cross rendering, add warning tooltips\n- `ui_new/layouts/three_column.py` - Consistent with main UI\n- `src/ui/management/` - New feedback system (to be created)\n\n### Event Integration\n- `src/events/` - Management-related events and tutorials\n\n## Related Issues\n- Addresses user confusion about sudden productivity drops\n- Improves new player onboarding for management mechanics\n- Establishes pattern for other complex game systems\n\n## Priority\n**High** - Affects core gameplay experience and player retention\n\n---\n*Created: September 11, 2025*  \n*Status: Planning*  \n*Labels: enhancement, architecture, user-experience, management-system*\n",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/424/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/424/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null
     }
   ],
   "count": 15,
-  "last_updated": "2025-11-24T06:02:11.022896"
+  "last_updated": "2025-11-24T12:01:48.665317"
 }
