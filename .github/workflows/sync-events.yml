@@ -1,0 +1,81 @@
+name: Sync Events from pdoom-data
+
+on:
+  schedule:
+    # Run daily at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Allow manual trigger
+  repository_dispatch:
+    types: [events-updated] # Can be triggered from pdoom-data repo
+
+jobs:
+  sync-events:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout website repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Clone pdoom-data repository
+        run: |
+          cd ..
+          git clone https://github.com/PipFoweraker/pdoom-data.git
+          echo "✅ Cloned pdoom-data repository"
+
+      - name: Clone pdoom1 repository (for icons)
+        run: |
+          cd ..
+          git clone https://github.com/PipFoweraker/pdoom1.git
+          echo "✅ Cloned pdoom1 repository"
+
+      - name: Sync events
+        run: |
+          python scripts/sync/sync-events.py \
+            --pdoom-data-path ../pdoom-data \
+            --pdoom1-path ../pdoom1 \
+            --sync-icons
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code public/events/ public/data/events.json public/assets/icons/ || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add public/events/ public/data/events.json public/assets/icons/
+          git add public/data/events-sync-summary.json
+          git commit -m "chore: Sync events from pdoom-data [skip ci]
+
+          Auto-synced game events and icons from:
+          - pdoom-data repository (event data)
+          - pdoom1 repository (game icons)
+
+          Synced: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+          This update includes:
+          - Event detail pages
+          - Events index data
+          - Game icons for events"
+          git push
+
+      - name: Create summary
+        if: always()
+        run: |
+          if [ -f public/data/events-sync-summary.json ]; then
+            echo "## Events Sync Summary" >> $GITHUB_STEP_SUMMARY
+            cat public/data/events-sync-summary.json | python -m json.tool >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Sync summary not generated" >> $GITHUB_STEP_SUMMARY
+          fi

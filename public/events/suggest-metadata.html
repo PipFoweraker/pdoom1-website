@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Suggest Event Metadata | p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/events/suggest-metadata.html" />
+	<meta name="description" content="Help improve p(Doom)1 event metadata - suggest changes to categories, rarity, tags, game impacts, and more." />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+		}
+
+		header {
+			background: rgba(45, 45, 45, 0.95);
+			backdrop-filter: blur(10px);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 0.8rem 0;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		nav {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 0 1rem;
+		}
+
+		.breadcrumb {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+		}
+
+		.breadcrumb a {
+			color: var(--accent-primary);
+			text-decoration: none;
+		}
+
+		main {
+			max-width: 900px;
+			margin: 2rem auto;
+			padding: 0 1rem;
+		}
+
+		.page-header {
+			text-align: center;
+			margin-bottom: 3rem;
+		}
+
+		.page-header h1 {
+			font-size: 2.5rem;
+			color: var(--accent-primary);
+			margin-bottom: 1rem;
+			text-shadow: 0 0 20px var(--accent-primary);
+		}
+
+		.page-header p {
+			color: var(--text-secondary);
+			font-size: 1.1rem;
+		}
+
+		.section {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 2rem;
+			margin-bottom: 2rem;
+		}
+
+		.section h2 {
+			color: var(--accent-secondary);
+			margin-bottom: 1rem;
+			font-size: 1.5rem;
+		}
+
+		.form-group {
+			margin-bottom: 1.5rem;
+		}
+
+		label {
+			display: block;
+			color: var(--accent-primary);
+			margin-bottom: 0.5rem;
+			font-weight: bold;
+		}
+
+		select, textarea, input[type="text"], input[type="number"] {
+			width: 100%;
+			padding: 0.8rem;
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: 4px;
+			color: var(--text-primary);
+			font-family: inherit;
+			font-size: 1rem;
+		}
+
+		select:focus, textarea:focus, input:focus {
+			outline: none;
+			border-color: var(--accent-primary);
+			box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.2);
+		}
+
+		.help-text {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+			margin-top: 0.5rem;
+		}
+
+		.current-value {
+			background: var(--bg-tertiary);
+			padding: 1rem;
+			border-radius: 4px;
+			margin-bottom: 1rem;
+			border-left: 4px solid var(--accent-primary);
+		}
+
+		.current-value-label {
+			color: var(--accent-primary);
+			font-weight: bold;
+			display: block;
+			margin-bottom: 0.5rem;
+		}
+
+		.current-value-content {
+			color: var(--text-secondary);
+		}
+
+		.button-group {
+			display: flex;
+			gap: 1rem;
+			margin-top: 2rem;
+		}
+
+		.cta-button {
+			flex: 1;
+			display: inline-block;
+			background: var(--accent-primary);
+			color: var(--bg-primary);
+			padding: 1rem 2rem;
+			text-decoration: none;
+			border-radius: 4px;
+			font-weight: bold;
+			text-align: center;
+			cursor: pointer;
+			border: none;
+			font-family: inherit;
+			font-size: 1rem;
+			transition: transform 0.3s, box-shadow 0.3s;
+		}
+
+		.cta-button:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0, 255, 65, 0.3);
+		}
+
+		.cta-button.secondary {
+			background: var(--bg-tertiary);
+			color: var(--text-primary);
+		}
+
+		.info-banner {
+			background: linear-gradient(135deg, var(--bg-secondary), rgba(0, 255, 65, 0.05));
+			border: 1px solid var(--accent-primary);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.info-banner h2 {
+			color: var(--accent-primary);
+			margin-bottom: 0.8rem;
+		}
+
+		.metadata-preview {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: 4px;
+			padding: 1rem;
+			margin-top: 1rem;
+		}
+
+		.metadata-preview h3 {
+			color: var(--accent-secondary);
+			margin-bottom: 0.8rem;
+		}
+
+		.checkbox-group {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		.checkbox-item {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.checkbox-item input[type="checkbox"] {
+			width: auto;
+		}
+
+		footer {
+			background: var(--bg-secondary);
+			border-top: 2px solid var(--accent-primary);
+			text-align: center;
+			padding: 2rem 1rem;
+			margin-top: 4rem;
+			color: var(--text-muted);
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<nav>
+			<div class="breadcrumb">
+				<a href="/">Home</a> / <a href="/events/">Events</a> / Suggest Metadata
+			</div>
+		</nav>
+	</header>
+
+	<main>
+		<div class="page-header">
+			<h1>📝 Suggest Event Metadata</h1>
+			<p>Help improve p(Doom)1 event metadata. Your suggestions help make the game more accurate and balanced.</p>
+		</div>
+
+		<div class="info-banner">
+			<h2>How This Works</h2>
+			<p>1. Select an event from the dropdown</p>
+			<p>2. Review current metadata and suggest changes</p>
+			<p>3. Click "Generate GitHub Issue" to create a pre-filled issue in pdoom-data</p>
+			<p>4. The maintainers will review and merge if approved</p>
+		</div>
+
+		<div class="section">
+			<h2>1️⃣ Select Event</h2>
+			<div class="form-group">
+				<label for="event-select">Event</label>
+				<select id="event-select">
+					<option value="">-- Select an event --</option>
+				</select>
+				<p class="help-text">Choose the event you want to suggest metadata changes for</p>
+			</div>
+		</div>
+
+		<div id="metadata-form" style="display: none;">
+			<div class="section">
+				<h2>2️⃣ Current Metadata</h2>
+				<div id="current-metadata">
+					<!-- Populated by JavaScript -->
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>3️⃣ Suggest Changes</h2>
+
+				<div class="form-group">
+					<label for="category-suggestion">Category</label>
+					<div class="current-value">
+						<span class="current-value-label">Current:</span>
+						<span class="current-value-content" id="current-category">--</span>
+					</div>
+					<select id="category-suggestion">
+						<option value="">-- No change --</option>
+						<option value="funding_catastrophe">💸 Funding Catastrophe</option>
+						<option value="organizational_crisis">🏢 Organizational Crisis</option>
+						<option value="technical_research_breakthrough">🔬 Technical Research Breakthrough</option>
+						<option value="institutional_decay">⚠️ Institutional Decay</option>
+						<option value="policy_development">📜 Policy Development</option>
+						<option value="public_awareness">📢 Public Awareness</option>
+						<option value="capability_advance">🚀 Capability Advance</option>
+						<option value="alignment_breakthrough">🎯 Alignment Breakthrough</option>
+						<option value="governance_milestone">⚖️ Governance Milestone</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="rarity-suggestion">Rarity</label>
+					<div class="current-value">
+						<span class="current-value-label">Current:</span>
+						<span class="current-value-content" id="current-rarity">--</span>
+					</div>
+					<select id="rarity-suggestion">
+						<option value="">-- No change --</option>
+						<option value="common">⚪ Common</option>
+						<option value="rare">🔵 Rare</option>
+						<option value="legendary">✨ Legendary</option>
+					</select>
+					<p class="help-text">Common: Happens frequently | Rare: Occasional | Legendary: Very rare, high impact</p>
+				</div>
+
+				<div class="form-group">
+					<label for="tags-suggestion">Tags (comma-separated)</label>
+					<div class="current-value">
+						<span class="current-value-label">Current:</span>
+						<span class="current-value-content" id="current-tags">--</span>
+					</div>
+					<input type="text" id="tags-suggestion" placeholder="e.g., cryptocurrency, effective_altruism, funding_crisis">
+					<p class="help-text">Add or remove tags. Use underscores for multi-word tags.</p>
+				</div>
+
+				<div class="form-group">
+					<label for="pdoom-suggestion">p(Doom) Impact</label>
+					<div class="current-value">
+						<span class="current-value-label">Current:</span>
+						<span class="current-value-content" id="current-pdoom">--</span>
+					</div>
+					<input type="number" id="pdoom-suggestion" min="-50" max="50" placeholder="e.g., 5">
+					<p class="help-text">Direct change to p(doom) percentage (-50 to +50). Leave empty for no direct impact.</p>
+				</div>
+
+				<div class="form-group">
+					<label>Game Impacts to Suggest</label>
+					<div class="current-value">
+						<span class="current-value-label">Current impacts:</span>
+						<div class="current-value-content" id="current-impacts">--</div>
+					</div>
+					<div class="checkbox-group" id="impact-checkboxes">
+						<div class="checkbox-item">
+							<input type="checkbox" id="impact-cash" value="cash">
+							<label for="impact-cash" style="margin: 0; font-weight: normal;">💰 Cash</label>
+						</div>
+						<div class="checkbox-item">
+							<input type="checkbox" id="impact-reputation" value="reputation">
+							<label for="impact-reputation" style="margin: 0; font-weight: normal;">⭐ Reputation</label>
+						</div>
+						<div class="checkbox-item">
+							<input type="checkbox" id="impact-stress" value="stress">
+							<label for="impact-stress" style="margin: 0; font-weight: normal;">😰 Stress</label>
+						</div>
+						<div class="checkbox-item">
+							<input type="checkbox" id="impact-research" value="research">
+							<label for="impact-research" style="margin: 0; font-weight: normal;">🔬 Research</label>
+						</div>
+						<div class="checkbox-item">
+							<input type="checkbox" id="impact-papers" value="papers">
+							<label for="impact-papers" style="margin: 0; font-weight: normal;">📄 Papers</label>
+						</div>
+						<div class="checkbox-item">
+							<input type="checkbox" id="impact-vibey_doom" value="vibey_doom">
+							<label for="impact-vibey_doom" style="margin: 0; font-weight: normal;">☢️ Vibey Doom</label>
+						</div>
+					</div>
+					<textarea id="impact-details" rows="4" placeholder="Describe suggested impact changes (e.g., 'Should decrease cash by -80 instead of -50')" style="margin-top: 1rem;"></textarea>
+				</div>
+
+				<div class="form-group">
+					<label for="reason">Reason for Changes</label>
+					<textarea id="reason" rows="5" placeholder="Explain why these changes would improve the event metadata..." required></textarea>
+					<p class="help-text">Help maintainers understand your reasoning</p>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>4️⃣ Submit Suggestion</h2>
+				<p style="color: var(--text-muted); margin-bottom: 1rem;">
+					Choose how to submit your suggestion:
+				</p>
+				<div class="button-group">
+					<button type="button" class="cta-button secondary" onclick="resetForm()">↺ Reset Form</button>
+					<button type="button" class="cta-button" onclick="generateGitHubIssue()">🚀 GitHub Issue (Preferred)</button>
+					<button type="button" class="cta-button secondary" onclick="sendViaEmail()">📧 Email (No GitHub Account)</button>
+				</div>
+				<p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem; text-align: center;">
+					Don't have a GitHub account? Use the email option to send your suggestion directly.
+				</p>
+			</div>
+		</div>
+	</main>
+
+	<footer>
+		<p>&copy; 2025 p(Doom)1 | <a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">GitHub</a></p>
+		<p style="margin-top: 0.5rem; font-size: 0.9rem;">Event data from <a href="https://github.com/PipFoweraker/pdoom-data" target="_blank" style="color: var(--accent-secondary);">pdoom-data</a></p>
+	</footer>
+
+	<script>
+		let eventsData = {};
+		let selectedEvent = null;
+
+		// Load events on page load
+		async function loadEvents() {
+			try {
+				const response = await fetch('/data/events.json');
+				eventsData = await response.json();
+
+				const select = document.getElementById('event-select');
+				const events = Object.entries(eventsData).sort((a, b) =>
+					a[1].title.localeCompare(b[1].title)
+				);
+
+				events.forEach(([id, event]) => {
+					const option = document.createElement('option');
+					option.value = id;
+					option.textContent = `${event.title} (${event.year})`;
+					select.appendChild(option);
+				});
+
+				// Check if event ID in URL query params
+				const urlParams = new URLSearchParams(window.location.search);
+				const eventId = urlParams.get('event');
+				if (eventId && eventsData[eventId]) {
+					select.value = eventId;
+					loadEventMetadata(eventId);
+				}
+			} catch (error) {
+				console.error('Error loading events:', error);
+				alert('Could not load events. Please run npm run events:sync first.');
+			}
+		}
+
+		// Event selection handler
+		document.getElementById('event-select').addEventListener('change', function() {
+			const eventId = this.value;
+			if (eventId) {
+				loadEventMetadata(eventId);
+			} else {
+				document.getElementById('metadata-form').style.display = 'none';
+			}
+		});
+
+		function loadEventMetadata(eventId) {
+			selectedEvent = eventsData[eventId];
+			if (!selectedEvent) return;
+
+			// Show form
+			document.getElementById('metadata-form').style.display = 'block';
+
+			// Populate current values
+			document.getElementById('current-category').textContent = selectedEvent.category.replace(/_/g, ' ').toUpperCase();
+			document.getElementById('current-rarity').textContent = selectedEvent.rarity.toUpperCase();
+			document.getElementById('current-tags').textContent = selectedEvent.tags.join(', ');
+			document.getElementById('current-pdoom').textContent = selectedEvent.pdoom_impact !== null ? selectedEvent.pdoom_impact : 'No direct impact';
+
+			// Show current impacts
+			const impactsHtml = selectedEvent.impacts.map(impact => {
+				const sign = impact.change > 0 ? '+' : '';
+				return `<div>${sign}${impact.change} ${impact.variable.replace(/_/g, ' ')}</div>`;
+			}).join('');
+			document.getElementById('current-impacts').innerHTML = impactsHtml;
+
+			// Scroll to form
+			document.getElementById('metadata-form').scrollIntoView({ behavior: 'smooth' });
+		}
+
+		function buildSuggestionText() {
+			const eventId = document.getElementById('event-select').value;
+			const categoryChange = document.getElementById('category-suggestion').value;
+			const rarityChange = document.getElementById('rarity-suggestion').value;
+			const tagsChange = document.getElementById('tags-suggestion').value;
+			const pdoomChange = document.getElementById('pdoom-suggestion').value;
+			const impactDetails = document.getElementById('impact-details').value;
+			const reason = document.getElementById('reason').value.trim();
+
+			// Build suggestion text
+			let text = `Event: ${selectedEvent.title}\n`;
+			text += `Event ID: ${eventId}\n\n`;
+			text += `CURRENT METADATA\n`;
+			text += `- Category: ${selectedEvent.category}\n`;
+			text += `- Rarity: ${selectedEvent.rarity}\n`;
+			text += `- Tags: ${selectedEvent.tags.join(', ')}\n`;
+			text += `- p(Doom) Impact: ${selectedEvent.pdoom_impact !== null ? selectedEvent.pdoom_impact : 'null'}\n`;
+			text += `- Game Impacts: ${selectedEvent.impacts.length} variable changes\n\n`;
+
+			text += `SUGGESTED CHANGES\n`;
+
+			if (categoryChange) {
+				text += `- Category: Change to ${categoryChange}\n`;
+			}
+			if (rarityChange) {
+				text += `- Rarity: Change to ${rarityChange}\n`;
+			}
+			if (tagsChange) {
+				text += `- Tags: ${tagsChange}\n`;
+			}
+			if (pdoomChange) {
+				text += `- p(Doom) Impact: Change to ${pdoomChange}\n`;
+			}
+			if (impactDetails) {
+				text += `- Game Impacts:\n${impactDetails}\n`;
+			}
+
+			text += `\nREASON\n${reason}\n\n`;
+			text += `---\nSubmitted via pdoom1.com/events/suggest-metadata.html`;
+
+			return text;
+		}
+
+		function generateGitHubIssue() {
+			if (!selectedEvent) {
+				alert('Please select an event first');
+				return;
+			}
+
+			const reason = document.getElementById('reason').value.trim();
+			if (!reason) {
+				alert('Please provide a reason for the changes');
+				document.getElementById('reason').focus();
+				return;
+			}
+
+			// Track analytics event
+			if (window.plausible) {
+				plausible('Metadata Suggestion', {
+					props: {
+						method: 'comprehensive_form',
+						submission: 'github'
+					}
+				});
+			}
+
+			const eventId = document.getElementById('event-select').value;
+			const text = buildSuggestionText();
+
+			// Build GitHub issue body (markdown format)
+			let body = text.replace(/CURRENT METADATA/, '## Current Metadata')
+			              .replace(/SUGGESTED CHANGES/, '## Suggested Changes')
+			              .replace(/REASON/, '## Reason');
+
+			// Encode for URL
+			const title = `Metadata: Comprehensive review for ${eventId}`;
+			const labels = 'metadata,events';
+
+			const issueUrl = `https://github.com/PipFoweraker/pdoom-data/issues/new?` +
+				`labels=${encodeURIComponent(labels)}&` +
+				`title=${encodeURIComponent(title)}&` +
+				`body=${encodeURIComponent(body)}`;
+
+			// Open in new window
+			window.open(issueUrl, '_blank');
+		}
+
+		function sendViaEmail() {
+			if (!selectedEvent) {
+				alert('Please select an event first');
+				return;
+			}
+
+			const reason = document.getElementById('reason').value.trim();
+			if (!reason) {
+				alert('Please provide a reason for the changes');
+				document.getElementById('reason').focus();
+				return;
+			}
+
+			// Track analytics event
+			if (window.plausible) {
+				plausible('Metadata Suggestion', {
+					props: {
+						method: 'comprehensive_form',
+						submission: 'email'
+					}
+				});
+			}
+
+			const eventId = document.getElementById('event-select').value;
+			const text = buildSuggestionText();
+
+			// Create mailto link
+			const subject = `Event Metadata Suggestion: ${eventId}`;
+			const body = text;
+
+			// Email address for suggestions (update this to your preferred email)
+			const email = 'team@pdoom1.com';
+
+			const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+			// Open email client
+			window.location.href = mailtoUrl;
+		}
+
+		function resetForm() {
+			document.getElementById('category-suggestion').value = '';
+			document.getElementById('rarity-suggestion').value = '';
+			document.getElementById('tags-suggestion').value = '';
+			document.getElementById('pdoom-suggestion').value = '';
+			document.getElementById('impact-details').value = '';
+			document.getElementById('reason').value = '';
+
+			document.querySelectorAll('#impact-checkboxes input[type="checkbox"]').forEach(cb => {
+				cb.checked = false;
+			});
+		}
+
+		// Initialize
+		document.addEventListener('DOMContentLoaded', loadEvents);
+	</script>
+</body>
+</html>

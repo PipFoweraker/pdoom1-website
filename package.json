@@ -33,6 +33,9 @@
     "deploy:prepare": "npm run sync:all && npm run test:all && echo 'Ready for deployment!'",
     "deploy:prep-weekly": "python scripts/prepare-weekly-deployment.py",
     "deploy:check": "python scripts/prepare-weekly-deployment.py --check-only",
-    "deploy:quick-check": "python scripts/prepare-weekly-deployment.py --quick"
+    "deploy:quick-check": "python scripts/prepare-weekly-deployment.py --quick",
+    "events:sync": "python scripts/sync/sync-events.py --sync-icons",
+    "events:sync-data-only": "python scripts/sync/sync-events.py",
+    "icons:sync": "python scripts/sync/sync-game-icons.py"
   }
 }

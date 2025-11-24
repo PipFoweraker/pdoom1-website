@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Game Events | p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/events/" />
+	<meta name="description" content="Explore all timeline events in p(Doom)1 - from FTX collapse to AI alignment breakthroughs. Browse, filter, and suggest modifications to in-game events." />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+		}
+
+		header {
+			background: rgba(45, 45, 45, 0.95);
+			backdrop-filter: blur(10px);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 0.8rem 0;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		nav {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 0 1rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.logo {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			text-decoration: none;
+			text-shadow: 0 0 10px var(--accent-primary);
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 1rem;
+			list-style: none;
+		}
+
+		.nav-links a {
+			color: var(--text-secondary);
+			text-decoration: none;
+			transition: color 0.3s;
+			padding: 0.5rem;
+		}
+
+		.nav-links a:hover {
+			color: var(--accent-primary);
+		}
+
+		main {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 2rem 1rem;
+		}
+
+		.page-header {
+			text-align: center;
+			margin-bottom: 3rem;
+		}
+
+		.page-header h1 {
+			font-size: 2.5rem;
+			color: var(--accent-primary);
+			margin-bottom: 1rem;
+			text-shadow: 0 0 20px var(--accent-primary);
+		}
+
+		.page-header p {
+			color: var(--text-secondary);
+			font-size: 1.1rem;
+			max-width: 800px;
+			margin: 0 auto 2rem;
+		}
+
+		.contribute-banner {
+			background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+			border: 1px solid var(--accent-secondary);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			margin-bottom: 3rem;
+			text-align: center;
+		}
+
+		.contribute-banner h2 {
+			color: var(--accent-secondary);
+			margin-bottom: 0.8rem;
+		}
+
+		.contribute-banner p {
+			margin-bottom: 1rem;
+		}
+
+		.contribute-banner .cta-button {
+			display: inline-block;
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+			padding: 0.8rem 1.5rem;
+			text-decoration: none;
+			border-radius: 4px;
+			font-weight: bold;
+			margin: 0.5rem;
+			transition: transform 0.3s;
+		}
+
+		.contribute-banner .cta-button:hover {
+			transform: translateY(-2px);
+		}
+
+		.filters {
+			background: var(--bg-secondary);
+			padding: 1.5rem;
+			border-radius: var(--radius-md);
+			margin-bottom: 2rem;
+			border: 1px solid var(--border-color);
+		}
+
+		.filter-group {
+			margin-bottom: 1rem;
+		}
+
+		.filter-group label {
+			display: block;
+			color: var(--accent-primary);
+			margin-bottom: 0.5rem;
+			font-weight: bold;
+		}
+
+		.filter-buttons {
+			display: flex;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+		}
+
+		.filter-btn {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			color: var(--text-secondary);
+			padding: 0.5rem 1rem;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: all 0.3s;
+			font-family: inherit;
+		}
+
+		.filter-btn:hover {
+			border-color: var(--accent-primary);
+			color: var(--accent-primary);
+		}
+
+		.filter-btn.active {
+			background: var(--accent-primary);
+			color: var(--bg-primary);
+			border-color: var(--accent-primary);
+		}
+
+		.search-box {
+			width: 100%;
+			padding: 0.8rem;
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: 4px;
+			color: var(--text-primary);
+			font-family: inherit;
+			font-size: 1rem;
+		}
+
+		.search-box:focus {
+			outline: none;
+			border-color: var(--accent-primary);
+		}
+
+		.events-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+			gap: 1.5rem;
+			margin-top: 2rem;
+		}
+
+		.event-card {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			transition: all 0.3s;
+			cursor: pointer;
+			position: relative;
+		}
+
+		.event-card:hover {
+			transform: translateY(-5px);
+			border-color: var(--accent-primary);
+			box-shadow: 0 4px 12px rgba(0, 255, 65, 0.2);
+		}
+
+		.event-icon {
+			width: 64px;
+			height: 64px;
+			margin-bottom: 1rem;
+			border-radius: 8px;
+			background: var(--bg-tertiary);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 2rem;
+		}
+
+		.event-category {
+			display: inline-block;
+			background: var(--bg-tertiary);
+			color: var(--accent-secondary);
+			padding: 0.25rem 0.75rem;
+			border-radius: 3px;
+			font-size: 0.75rem;
+			font-weight: bold;
+			text-transform: uppercase;
+			margin-bottom: 0.8rem;
+			border: 1px solid var(--accent-secondary);
+		}
+
+		.event-title {
+			color: var(--accent-primary);
+			font-size: 1.2rem;
+			margin-bottom: 0.5rem;
+			font-weight: bold;
+		}
+
+		.event-year {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+			margin-bottom: 0.8rem;
+		}
+
+		.event-description {
+			color: var(--text-secondary);
+			margin-bottom: 1rem;
+			line-height: 1.5;
+		}
+
+		.event-tags {
+			display: flex;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+			margin-bottom: 1rem;
+		}
+
+		.event-tag {
+			background: var(--bg-primary);
+			color: var(--text-muted);
+			padding: 0.2rem 0.6rem;
+			border-radius: 3px;
+			font-size: 0.75rem;
+		}
+
+		.event-rarity {
+			position: absolute;
+			top: 1rem;
+			right: 1rem;
+			font-size: 1.2rem;
+		}
+
+		.rarity-common { opacity: 0.6; }
+		.rarity-rare { opacity: 0.9; }
+		.rarity-legendary {
+			animation: pulse-legendary 2s infinite;
+		}
+
+		@keyframes pulse-legendary {
+			0%, 100% { opacity: 1; transform: scale(1); }
+			50% { opacity: 0.8; transform: scale(1.1); }
+		}
+
+		.event-impacts {
+			display: flex;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+			margin-top: 1rem;
+			padding-top: 1rem;
+			border-top: 1px solid var(--border-color);
+		}
+
+		.impact-badge {
+			background: var(--bg-tertiary);
+			padding: 0.3rem 0.6rem;
+			border-radius: 3px;
+			font-size: 0.75rem;
+			display: flex;
+			align-items: center;
+			gap: 0.3rem;
+		}
+
+		.impact-positive {
+			color: var(--success-color);
+		}
+
+		.impact-negative {
+			color: var(--accent-danger);
+		}
+
+		.loading {
+			text-align: center;
+			padding: 3rem;
+			color: var(--text-muted);
+		}
+
+		.stats-bar {
+			display: flex;
+			justify-content: space-around;
+			background: var(--bg-secondary);
+			padding: 1.5rem;
+			border-radius: var(--radius-md);
+			margin-bottom: 2rem;
+			border: 1px solid var(--border-color);
+		}
+
+		.stat-item {
+			text-align: center;
+		}
+
+		.stat-number {
+			font-size: 2rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			display: block;
+		}
+
+		.stat-label {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+		}
+
+		.bulk-toolbar {
+			background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+			border-radius: var(--radius-md);
+			padding: 1rem 1.5rem;
+			margin-bottom: 1.5rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+		}
+
+		.bulk-info {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
+
+		.bulk-select-all {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			cursor: pointer;
+			color: white;
+			font-weight: bold;
+		}
+
+		.bulk-select-all input[type="checkbox"] {
+			width: 20px;
+			height: 20px;
+			cursor: pointer;
+		}
+
+		.bulk-actions {
+			display: flex;
+			gap: 0.75rem;
+		}
+
+		.event-card {
+			position: relative;
+		}
+
+		.event-checkbox {
+			position: absolute;
+			top: 0.75rem;
+			left: 0.75rem;
+			z-index: 10;
+		}
+
+		.event-checkbox input[type="checkbox"] {
+			width: 22px;
+			height: 22px;
+			cursor: pointer;
+			accent-color: var(--accent-primary);
+		}
+
+		.event-card.selected {
+			outline: 3px solid var(--accent-primary);
+			outline-offset: -3px;
+		}
+
+		footer {
+			background: var(--bg-secondary);
+			border-top: 2px solid var(--accent-primary);
+			text-align: center;
+			padding: 2rem 1rem;
+			margin-top: 4rem;
+			color: var(--text-muted);
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<nav>
+			<a href="/" class="logo">p(Doom)1</a>
+			<ul class="nav-links">
+				<li><a href="/">Home</a></li>
+				<li><a href="/events/">Events</a></li>
+				<li><a href="/leaderboard/">Leaderboard</a></li>
+				<li><a href="/game-stats/">Stats</a></li>
+				<li><a href="/docs/">Docs</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<div class="page-header">
+			<h1>📅 Game Events Timeline</h1>
+			<p>Explore real-world AI safety events that shape the game. From funding catastrophes to breakthrough discoveries, each event impacts your strategy.</p>
+		</div>
+
+		<!-- Contribution Banner -->
+		<div class="contribute-banner">
+			<h2>🤝 Help Improve Event Data</h2>
+			<p>Events are sourced from pdoom-data and transformed for gameplay. Found an error? Want to suggest a new event or modification?</p>
+			<a href="/events/suggest-metadata.html" class="cta-button">📝 Suggest Metadata Changes</a>
+			<a href="https://github.com/PipFoweraker/pdoom-data/issues/new" class="cta-button" target="_blank">Suggest New Event</a>
+			<a href="https://github.com/PipFoweraker/pdoom1/issues/new?labels=events" class="cta-button" target="_blank">Report Game Issue</a>
+		</div>
+
+		<!-- Stats Bar -->
+		<div class="stats-bar">
+			<div class="stat-item">
+				<span class="stat-number" id="total-events">...</span>
+				<span class="stat-label">Total Events</span>
+			</div>
+			<div class="stat-item">
+				<span class="stat-number" id="categories-count">...</span>
+				<span class="stat-label">Categories</span>
+			</div>
+			<div class="stat-item">
+				<span class="stat-number" id="legendary-count">...</span>
+				<span class="stat-label">Legendary Events</span>
+			</div>
+			<div class="stat-item">
+				<span class="stat-number" id="latest-year">...</span>
+				<span class="stat-label">Latest Event Year</span>
+			</div>
+		</div>
+
+		<!-- Filters -->
+		<div class="filters">
+			<div class="filter-group">
+				<label>🔍 Search Events</label>
+				<input type="text" class="search-box" id="search-box" placeholder="Search by title, description, tags...">
+			</div>
+
+			<div class="filter-group">
+				<label>📁 Category</label>
+				<div class="filter-buttons" id="category-filters">
+					<button class="filter-btn active" data-filter="all">All</button>
+					<button class="filter-btn" data-filter="funding_catastrophe">💸 Funding Catastrophe</button>
+					<button class="filter-btn" data-filter="organizational_crisis">🏢 Organizational Crisis</button>
+					<button class="filter-btn" data-filter="technical_research_breakthrough">🔬 Research Breakthrough</button>
+					<button class="filter-btn" data-filter="institutional_decay">⚠️ Institutional Decay</button>
+				</div>
+			</div>
+
+			<div class="filter-group">
+				<label>⭐ Rarity</label>
+				<div class="filter-buttons" id="rarity-filters">
+					<button class="filter-btn active" data-filter="all">All</button>
+					<button class="filter-btn" data-filter="common">Common</button>
+					<button class="filter-btn" data-filter="rare">Rare</button>
+					<button class="filter-btn" data-filter="legendary">Legendary ✨</button>
+				</div>
+			</div>
+
+			<div class="filter-group">
+				<label>📅 Year Range</label>
+				<div class="filter-buttons" id="year-filters">
+					<button class="filter-btn active" data-filter="all">All</button>
+					<button class="filter-btn" data-filter="2016-2020">2016-2020</button>
+					<button class="filter-btn" data-filter="2021-2023">2021-2023</button>
+					<button class="filter-btn" data-filter="2024+">2024+</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Bulk Actions Toolbar -->
+		<div class="bulk-toolbar" id="bulk-toolbar" style="display: none;">
+			<div class="bulk-info">
+				<label class="bulk-select-all">
+					<input type="checkbox" id="select-all-checkbox">
+					<span id="selection-count">0 selected</span>
+				</label>
+			</div>
+			<div class="bulk-actions">
+				<button class="cta-button secondary" onclick="clearSelection()">Clear Selection</button>
+				<button class="cta-button" onclick="bulkSuggestMetadata()">📝 Suggest Metadata for Selected</button>
+			</div>
+		</div>
+
+		<!-- Events Grid -->
+		<div id="events-container">
+			<div class="loading">Loading events...</div>
+		</div>
+	</main>
+
+	<footer>
+		<p>&copy; 2025 p(Doom)1 | <a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">GitHub</a> | <a href="/privacy/" style="color: var(--accent-primary);">Privacy</a></p>
+		<p style="margin-top: 0.5rem; font-size: 0.9rem;">Events data from <a href="https://github.com/PipFoweraker/pdoom-data" target="_blank" style="color: var(--accent-secondary);">pdoom-data</a></p>
+	</footer>
+
+	<script>
+		// TODO: This will be populated by sync script
+		let eventsData = {};
+		let filteredEvents = {};
+		let currentFilters = {
+			category: 'all',
+			rarity: 'all',
+			year: 'all',
+			search: ''
+		};
+
+		// Category icons mapping
+		const categoryIcons = {
+			'funding_catastrophe': '💸',
+			'organizational_crisis': '🏢',
+			'technical_research_breakthrough': '🔬',
+			'institutional_decay': '⚠️',
+			'policy_development': '📜',
+			'public_awareness': '📢',
+			'capability_advance': '🚀',
+			'alignment_breakthrough': '🎯',
+			'governance_milestone': '⚖️'
+		};
+
+		const rarityEmoji = {
+			'common': '⚪',
+			'rare': '🔵',
+			'legendary': '✨'
+		};
+
+		// Load events from data file
+		async function loadEvents() {
+			try {
+				const response = await fetch('/data/events.json');
+				if (!response.ok) {
+					throw new Error('Events data not yet synced');
+				}
+				eventsData = await response.json();
+				filteredEvents = { ...eventsData };
+				updateStats();
+				renderEvents();
+			} catch (error) {
+				console.error('Error loading events:', error);
+				document.getElementById('events-container').innerHTML = `
+					<div class="loading">
+						<p>⚠️ Events data not yet synced from pdoom-data repository.</p>
+						<p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+							Run <code style="background: var(--bg-tertiary); padding: 0.2rem 0.5rem; border-radius: 3px;">npm run sync:events</code> to populate event data.
+						</p>
+						<p style="margin-top: 1rem;">
+							<a href="https://github.com/PipFoweraker/pdoom-data" target="_blank" style="color: var(--accent-primary);">View pdoom-data repository →</a>
+						</p>
+					</div>
+				`;
+			}
+		}
+
+		function updateStats() {
+			const events = Object.values(eventsData);
+			const categories = new Set(events.map(e => e.category)).size;
+			const legendary = events.filter(e => e.rarity === 'legendary').length;
+			const latestYear = Math.max(...events.map(e => e.year));
+
+			document.getElementById('total-events').textContent = events.length;
+			document.getElementById('categories-count').textContent = categories;
+			document.getElementById('legendary-count').textContent = legendary;
+			document.getElementById('latest-year').textContent = latestYear;
+		}
+
+		function filterEvents() {
+			const events = Object.entries(eventsData);
+
+			filteredEvents = Object.fromEntries(
+				events.filter(([id, event]) => {
+					// Category filter
+					if (currentFilters.category !== 'all' && event.category !== currentFilters.category) {
+						return false;
+					}
+
+					// Rarity filter
+					if (currentFilters.rarity !== 'all' && event.rarity !== currentFilters.rarity) {
+						return false;
+					}
+
+					// Year filter
+					if (currentFilters.year !== 'all') {
+						if (currentFilters.year === '2016-2020' && (event.year < 2016 || event.year > 2020)) return false;
+						if (currentFilters.year === '2021-2023' && (event.year < 2021 || event.year > 2023)) return false;
+						if (currentFilters.year === '2024+' && event.year < 2024) return false;
+					}
+
+					// Search filter
+					if (currentFilters.search) {
+						const searchLower = currentFilters.search.toLowerCase();
+						const matchesTitle = event.title.toLowerCase().includes(searchLower);
+						const matchesDescription = event.description.toLowerCase().includes(searchLower);
+						const matchesTags = event.tags.some(tag => tag.toLowerCase().includes(searchLower));
+
+						if (!matchesTitle && !matchesDescription && !matchesTags) {
+							return false;
+						}
+					}
+
+					return true;
+				})
+			);
+
+			renderEvents();
+		}
+
+		function renderEvents() {
+			const container = document.getElementById('events-container');
+			const events = Object.values(filteredEvents);
+
+			if (events.length === 0) {
+				container.innerHTML = '<div class="loading">No events match your filters. Try adjusting your search criteria.</div>';
+				return;
+			}
+
+			// Sort by year (descending) then by rarity
+			events.sort((a, b) => {
+				if (b.year !== a.year) return b.year - a.year;
+				const rarityOrder = { 'legendary': 3, 'rare': 2, 'common': 1 };
+				return rarityOrder[b.rarity] - rarityOrder[a.rarity];
+			});
+
+			const grid = document.createElement('div');
+			grid.className = 'events-grid';
+
+			events.forEach(event => {
+				const card = createEventCard(event);
+				grid.appendChild(card);
+			});
+
+			container.innerHTML = '';
+			container.appendChild(grid);
+		}
+
+		function createEventCard(event) {
+			const card = document.createElement('div');
+			card.className = 'event-card';
+			card.dataset.eventId = event.id;
+
+			const icon = categoryIcons[event.category] || '📌';
+			const rarity = rarityEmoji[event.rarity] || '⚪';
+
+			// Calculate impact summary
+			const impactsHTML = event.impacts.slice(0, 5).map(impact => {
+				const sign = impact.change > 0 ? '+' : '';
+				const colorClass = impact.change > 0 ? 'impact-positive' : 'impact-negative';
+				return `<span class="impact-badge"><span class="${colorClass}">${sign}${impact.change}</span> ${impact.variable}</span>`;
+			}).join('');
+
+			card.innerHTML = `
+				<div class="event-checkbox">
+					<input type="checkbox" data-event-id="${event.id}" onclick="event.stopPropagation(); toggleEventSelection('${event.id}')">
+				</div>
+				<div class="event-rarity rarity-${event.rarity}">${rarity}</div>
+				<div class="event-icon">${icon}</div>
+				<div class="event-category">${event.category.replace(/_/g, ' ')}</div>
+				<h3 class="event-title">${event.title}</h3>
+				<div class="event-year">📅 ${event.year}</div>
+				<p class="event-description">${event.description.substring(0, 150)}${event.description.length > 150 ? '...' : ''}</p>
+				<div class="event-tags">
+					${event.tags.slice(0, 4).map(tag => `<span class="event-tag">#${tag}</span>`).join('')}
+				</div>
+				<div class="event-impacts">
+					${impactsHTML}
+					${event.impacts.length > 5 ? `<span class="impact-badge">+${event.impacts.length - 5} more</span>` : ''}
+				</div>
+			`;
+
+			// Click handler for card (not checkbox)
+			card.onclick = (e) => {
+				if (!e.target.matches('input[type="checkbox"]')) {
+					window.location.href = `/events/${event.id}.html`;
+				}
+			};
+
+			return card;
+		}
+
+		// Setup filter buttons
+		function setupFilters() {
+			document.querySelectorAll('#category-filters .filter-btn').forEach(btn => {
+				btn.addEventListener('click', () => {
+					document.querySelectorAll('#category-filters .filter-btn').forEach(b => b.classList.remove('active'));
+					btn.classList.add('active');
+					currentFilters.category = btn.dataset.filter;
+					filterEvents();
+				});
+			});
+
+			document.querySelectorAll('#rarity-filters .filter-btn').forEach(btn => {
+				btn.addEventListener('click', () => {
+					document.querySelectorAll('#rarity-filters .filter-btn').forEach(b => b.classList.remove('active'));
+					btn.classList.add('active');
+					currentFilters.rarity = btn.dataset.filter;
+					filterEvents();
+				});
+			});
+
+			document.querySelectorAll('#year-filters .filter-btn').forEach(btn => {
+				btn.addEventListener('click', () => {
+					document.querySelectorAll('#year-filters .filter-btn').forEach(b => b.classList.remove('active'));
+					btn.classList.add('active');
+					currentFilters.year = btn.dataset.filter;
+					filterEvents();
+				});
+			});
+
+			document.getElementById('search-box').addEventListener('input', (e) => {
+				currentFilters.search = e.target.value;
+				filterEvents();
+			});
+		}
+
+		// Bulk selection functionality
+		let selectedEvents = new Set();
+
+		function toggleEventSelection(eventId) {
+			const checkbox = document.querySelector(`input[data-event-id="${eventId}"]`);
+			const card = document.querySelector(`.event-card[data-event-id="${eventId}"]`);
+
+			if (checkbox.checked) {
+				selectedEvents.add(eventId);
+				card.classList.add('selected');
+			} else {
+				selectedEvents.delete(eventId);
+				card.classList.remove('selected');
+			}
+
+			updateBulkToolbar();
+		}
+
+		function updateBulkToolbar() {
+			const toolbar = document.getElementById('bulk-toolbar');
+			const count = document.getElementById('selection-count');
+			const selectAllCheckbox = document.getElementById('select-all-checkbox');
+
+			count.textContent = `${selectedEvents.size} selected`;
+
+			if (selectedEvents.size > 0) {
+				toolbar.style.display = 'flex';
+			} else {
+				toolbar.style.display = 'none';
+			}
+
+			// Update select-all checkbox state
+			const allCheckboxes = document.querySelectorAll('.event-checkbox input[type="checkbox"]');
+			selectAllCheckbox.checked = allCheckboxes.length > 0 && selectedEvents.size === allCheckboxes.length;
+			selectAllCheckbox.indeterminate = selectedEvents.size > 0 && selectedEvents.size < allCheckboxes.length;
+		}
+
+		function clearSelection() {
+			selectedEvents.clear();
+			document.querySelectorAll('.event-checkbox input[type="checkbox"]').forEach(cb => cb.checked = false);
+			document.querySelectorAll('.event-card').forEach(card => card.classList.remove('selected'));
+			updateBulkToolbar();
+		}
+
+		function bulkSuggestMetadata() {
+			if (selectedEvents.size === 0) {
+				alert('Please select at least one event first');
+				return;
+			}
+
+			// Track analytics event
+			if (window.plausible) {
+				plausible('Bulk Metadata Suggestion', {
+					props: {
+						event_count: selectedEvents.size,
+						method: 'bulk_selection'
+					}
+				});
+			}
+
+			// Get selected event details
+			const events = Array.from(selectedEvents).map(id => {
+				const event = eventsData[id];
+				return {
+					id: id,
+					title: event.title,
+					year: event.year,
+					category: event.category,
+					rarity: event.rarity
+				};
+			});
+
+			// Create bulk suggestion text
+			let body = `# Bulk Metadata Suggestion for ${events.length} Events\n\n`;
+			body += `## Selected Events\n\n`;
+			events.forEach((e, i) => {
+				body += `${i + 1}. **${e.title}** (${e.year})\n`;
+				body += `   - ID: \`${e.id}\`\n`;
+				body += `   - Category: ${e.category}\n`;
+				body += `   - Rarity: ${e.rarity}\n\n`;
+			});
+			body += `## Proposed Changes\n\n`;
+			body += `<!-- Describe what metadata changes you'd like to apply to these events -->\n\n`;
+			body += `**Category Change:**\n- [ ] Change all to: _______\n\n`;
+			body += `**Rarity Change:**\n- [ ] Change all to: _______\n\n`;
+			body += `**Tags to Add:**\n- [ ] Add tags: _______\n\n`;
+			body += `**Game Impact Adjustments:**\n- [ ] Describe impact changes: _______\n\n`;
+			body += `**p(Doom) Impact:**\n- [ ] Set to: _______\n\n`;
+			body += `## Reason\n\n`;
+			body += `<!-- Explain why these changes would improve the event metadata -->\n\n`;
+			body += `---\n`;
+			body += `Submitted via bulk selection on pdoom1.com/events/`;
+
+			const title = `Bulk Metadata: ${events.length} events`;
+			const labels = 'metadata,events,bulk-suggestion';
+
+			const issueUrl = `https://github.com/PipFoweraker/pdoom-data/issues/new?` +
+				`labels=${encodeURIComponent(labels)}&` +
+				`title=${encodeURIComponent(title)}&` +
+				`body=${encodeURIComponent(body)}`;
+
+			// Open GitHub issue
+			window.open(issueUrl, '_blank');
+		}
+
+		// Select all functionality
+		document.addEventListener('DOMContentLoaded', () => {
+			document.getElementById('select-all-checkbox').addEventListener('change', function() {
+				const checkboxes = document.querySelectorAll('.event-checkbox input[type="checkbox"]');
+
+				if (this.checked) {
+					// Select all visible events
+					checkboxes.forEach(cb => {
+						if (!cb.checked) {
+							cb.checked = true;
+							toggleEventSelection(cb.dataset.eventId);
+						}
+					});
+				} else {
+					// Deselect all
+					clearSelection();
+				}
+			});
+		});
+
+		// Initialize
+		document.addEventListener('DOMContentLoaded', () => {
+			setupFilters();
+			loadEvents();
+		});
+	</script>
+</body>
+</html>
