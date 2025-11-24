@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Auto-update version info and changelog reminder
+echo "📝 Pre-commit hook: Checking for version updates..."
+
+# Check if this is a feature/fix commit (not chore/docs)
+COMMIT_MSG_FILE=".git/COMMIT_EDITMSG"
+if [ -f "$COMMIT_MSG_FILE" ]; then
+    COMMIT_TYPE=$(head -n 1 "$COMMIT_MSG_FILE" | grep -oE '^(feat|fix):')
+
+    if [ ! -z "$COMMIT_TYPE" ]; then
+        echo "⚠️  REMINDER: This is a $COMMIT_TYPE commit."
+        echo "   Have you:"
+        echo "   1. Updated package.json version? (npm version patch/minor/major)"
+        echo "   2. Updated CHANGELOG.md with changes?"
+        echo ""
+        echo "   Press Enter to continue or Ctrl+C to cancel..."
+        read -r
+    fi
+fi

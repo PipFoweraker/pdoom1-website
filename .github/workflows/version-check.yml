@@ -1,0 +1,62 @@
+name: Version & Changelog Check
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - main
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Check if version/changelog should be updated
+        id: check
+        run: |
+          # Get commit messages since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            echo "No previous tags found, skipping check"
+            exit 0
+          fi
+
+          # Check for feat: or fix: commits
+          FEATURE_COMMITS=$(git log $LAST_TAG..HEAD --oneline | grep -E '^[a-f0-9]+ (feat|fix):' || true)
+
+          if [ ! -z "$FEATURE_COMMITS" ]; then
+            echo "::warning::Found feature/fix commits since last tag:"
+            echo "$FEATURE_COMMITS"
+
+            # Check if package.json version changed
+            git diff $LAST_TAG..HEAD package.json | grep -q '"version"' || {
+              echo "::error::package.json version not updated for feature/fix commits"
+              exit 1
+            }
+
+            # Check if CHANGELOG.md changed
+            git diff $LAST_TAG..HEAD --name-only | grep -q 'CHANGELOG.md' || {
+              echo "::error::CHANGELOG.md not updated for feature/fix commits"
+              exit 1
+            }
+
+            echo "✅ Version and changelog properly updated"
+          fi
+
+      - name: Comment on PR (if applicable)
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              body: '⚠️ **Version Check Failed**\n\nThis PR contains `feat:` or `fix:` commits but:\n- [ ] `package.json` version not updated\n- [ ] `CHANGELOG.md` not updated\n\nPlease run `npm version patch/minor/major` and update the changelog.'
+            })
