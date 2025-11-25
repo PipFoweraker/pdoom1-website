@@ -1,12 +1,12 @@
 {
-  "sync_timestamp": "2025-11-24T22:56:23.097901",
-  "total_events_in_source": 1028,
-  "included_events": 1028,
+  "sync_timestamp": "2025-11-25T03:28:53.625352",
+  "total_events_in_source": 28,
+  "included_events": 28,
   "excluded_events": 0,
-  "categories": 6,
+  "categories": 4,
   "events_by_rarity": {
-    "common": 546,
-    "rare": 478,
+    "common": 20,
+    "rare": 4,
     "legendary": 4
   },
   "year_range": [
@@ -17,12 +17,12 @@
     "newsletter_archive": 0,
     "excluded": 0,
     "review_needed": 0,
-    "included": 1028
+    "included": 28
   },
   "quote_quality_stats": {
     "events_with_real_quotes": 0,
     "events_with_summaries": 0,
-    "events_with_placeholders": 1028,
+    "events_with_placeholders": 28,
     "events_not_applicable": 0,
     "completion_percentage": 0.0,
     "goal_q1_2025": 50,
