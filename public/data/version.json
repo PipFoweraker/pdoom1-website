@@ -1,22 +1,22 @@
 {
   "latest_release": {
-    "version": "v0.10.5",
-    "name": "P(Doom) v0.10.5",
-    "published_at": "2025-11-24T22:21:08Z",
-    "html_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.10.5",
-    "body": "Release v0.10.5\n\nSee CHANGELOG.md for details.\n\n## Build Information\n\n- **Commit:** `06479a2081d8ac1c9f6b01c1a3a60ba7975fd038`\n- **Data Hash:** ``\n- **Manifest Hash:** `485c0613b3ec844d440b0e3b95fdafccc3db7fb67342e4477a65144ddbe3027b`\n- **Engine:** Godot 4.5.1\n"
+    "version": "v0.10.6",
+    "name": "P(Doom) v0.10.6",
+    "published_at": "2025-11-25T06:14:12Z",
+    "html_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.10.6",
+    "body": "Release v0.10.6\n\nSee CHANGELOG.md for details.\n\n## Build Information\n\n- **Commit:** `c75fb420764dca598d4df5e1db4f8ecfea7d9e2c`\n- **Data Hash:** ``\n- **Manifest Hash:** `bb658aa5d2a76d806ed71846f9077c08b38345bcfbd39725ffd2a9e0eadcd004`\n- **Engine:** Godot 4.5.1\n"
   },
   "repository_stats": {
     "stars": 5,
     "forks": 1,
-    "open_issues": 25,
-    "last_updated": "2025-11-25T06:07:28Z"
+    "open_issues": 26,
+    "last_updated": "2025-11-25T10:38:47Z"
   },
-  "last_updated": "2025-11-25T06:11:49.484219",
+  "last_updated": "2025-11-25T12:01:45.242267",
   "game_stats": {
     "baseline_doom_percent": 23,
     "frontier_labs_count": 5,
     "strategic_possibilities": 10000,
-    "last_calculated": "2025-11-25T06:11:49.484213"
+    "last_calculated": "2025-11-25T12:01:45.242268"
   }
 }
