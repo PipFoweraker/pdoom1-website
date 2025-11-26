@@ -1,6 +1,98 @@
 {
   "issues": [
     {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/465",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/465/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/465/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/465/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/465",
+      "id": 3666284403,
+      "node_id": "I_kwDOPVWa587ahw9z",
+      "number": 465,
+      "title": "Expand mechanics documentation coverage",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [
+        {
+          "id": 9028221046,
+          "node_id": "LA_kwDOPVWa588AAAACGh-4dg",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/documentation",
+          "name": "documentation",
+          "color": "0075ca",
+          "default": true,
+          "description": "Improvements or additions to documentation"
+        },
+        {
+          "id": 9028221058,
+          "node_id": "LA_kwDOPVWa588AAAACGh-4gg",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/enhancement",
+          "name": "enhancement",
+          "color": "a2eeef",
+          "default": true,
+          "description": "New feature or request"
+        }
+      ],
+      "state": "open",
+      "locked": false,
+      "assignee": null,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2025-11-26T07:47:07Z",
+      "updated_at": "2025-11-26T07:47:07Z",
+      "closed_at": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "body": "## Overview\nBuild out comprehensive player-facing mechanics documentation for additional game systems.\n\n## Context\n- Automated documentation workflow is now in place (#186 foundation work)\n- System extracts game values from code and keeps docs in sync\n- Currently only reputation.md exists as a stub\n\n## Mechanics to Document\n\n### Priority 1 (Core Systems)\n- [ ] **funding.md** - Fundraising, investor relationships, financial management\n  - Track money resource from game_state.gd\n  - Document funding actions from actions.gd\n  - Link to Issue #395 (Advanced Funding Relationship System)\n\n- [ ] **doom.md** - P(Doom) mechanics and mitigation strategies  \n  - Extract doom value and thresholds\n  - Document doom sources and modifiers\n  - Explain victory/loss conditions\n\n- [ ] **personnel.md** - Hiring, researchers, team management\n  - Document researcher types and traits\n  - Manager capacity limits\n  - Burnout and productivity mechanics\n\n### Priority 2 (Supporting Systems)\n- [ ] **research.md** - Research generation and breakthroughs\n  - Compute \u2192 research conversion\n  - Paper publication mechanics\n  - Research quality system (if/when implemented from Issue #429)\n\n- [ ] **resources.md** - Core resource overview\n  - Money, compute, research, papers\n  - Action points (AP) system\n  - Stationery and other consumables\n\n- [ ] **events.md** - Random events and rival actions\n  - Event probabilities and triggers\n  - Response strategies\n  - Rival lab mechanics\n\n### Priority 3 (Advanced Systems)\n- [ ] **upgrades.md** - Purchasable upgrades system (from Issue #429)\n- [ ] **technical-debt.md** - Technical debt mechanics (from Issue #429)\n\n## Technical Requirements\n\n### For Each Mechanic Page\n1. **Auto-generated data section** using `generate_mechanics_docs.py`\n2. **Current mechanics** - How it works in v0.10.x\n3. **Strategic guidance** - When/how to use\n4. **Planned enhancements** - Link to related issues\n5. **Related systems** - Cross-references to other mechanics\n\n### Automation Updates Needed\nUpdate `scripts/generate_mechanics_docs.py`:\n- Add extraction methods for each mechanic\n- Add update methods for each .md file\n- Enhance parsing for action costs, event data, etc.\n\n### CI Integration\nThe existing `.github/workflows/docs-sync.yml` will automatically:\n- Validate all mechanics docs stay in sync\n- Export to website format\n- Generate artifacts for preview\n\n## Implementation Pattern\n\nFor each new mechanic (example: funding.md):\n\n1. **Create stub markdown**:\n```bash\ntouch docs/mechanics/funding.md\n```\n\n2. **Add to generator** (`scripts/generate_mechanics_docs.py`):\n```python\n\"funding\": MechanicData(\n    name=\"funding\",\n    constants={k: v for k, v in game_state_constants.items() if k == \"money\"},\n    description=\"Funding & Investors System\",\n    related_files=[\"godot/scripts/core/game_state.gd\"],\n    last_updated=datetime.now().isoformat()\n)\n```\n\n3. **Add update method**:\n```python\ndef update_funding_doc(self, mechanic_data: MechanicData):\n    # Similar to update_reputation_doc()\n```\n\n4. **Run generator**:\n```bash\npython scripts/generate_mechanics_docs.py\n```\n\n5. **Write narrative content** around auto-generated data\n\n## Success Criteria\n- [ ] All Priority 1 mechanics documented\n- [ ] Auto-generated data sections for each\n- [ ] Cross-references between related mechanics\n- [ ] Website export includes all new pages\n- [ ] CI validates all mechanics stay in sync\n\n## Benefits\n- **Players**: Comprehensive, accurate game reference\n- **Developers**: Documentation maintains itself\n- **Website**: Rich content for pdoom1.com\n- **Issues**: Better context for future enhancements\n\n## Related\n- Foundation: This session's work on reputation.md\n- Issue #186: Public Opinion & Media System (in progress)\n- Issue #395: Advanced Funding Relationship System\n- Issue #429: Research Quality, Technical Debt, Upgrades\n- Issue #437: Automated Blog Publishing (similar pattern)\n\n---\n\n**Estimated Effort**: 3-4 hours (all Priority 1 mechanics)\n**Depends On**: Reputation mechanics workflow (completed)\n**Blocks**: Website mechanics section deployment",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/465/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/465/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null
+    },
+    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/464",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/464/labels{/name}",
@@ -1255,81 +1347,8 @@
       "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/415/timeline",
       "performed_via_github_app": null,
       "state_reason": null
-    },
-    {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/411",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/411/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/411/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/411/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/411",
-      "id": 3502037146,
-      "node_id": "I_kwDOPVWa587QvNia",
-      "number": 411,
-      "title": "Multi-Turn Action Delegation System",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [],
-      "state": "open",
-      "locked": false,
-      "assignee": null,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2025-10-10T09:16:12Z",
-      "updated_at": "2025-10-10T09:16:12Z",
-      "closed_at": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "body": "# Multi-Turn Action Delegation System\n\n## Summary\n**PRIORITY: MEDIUM** - Implement multi-turn action sequences that allow delegation of decision-making to staff/managers, creating more strategic AP management.\n\n## Strategic Context\n- **Goal**: Enable complex actions like 'advertise -> receive applicants -> interview -> hire'\n- **Benefit**: Reduces micro-management while adding strategic depth\n- **Timeline**: Beta phase enhancement (post-alpha)\n\n## Vision\nPlayers can initiate longer-term actions that unfold over multiple turns:\n1. **Recruitment Process**: Advertise (1 AP) -> Get applicants (2 turns) -> Interview (1 AP) -> Decision\n2. **Research Projects**: Start research (2 AP) -> Progress updates (3 turns) -> Results  \n3. **Marketing Campaigns**: Launch campaign (1 AP) -> Market response (4 turns) -> Reputation effects\n\n## Current State Analysis\n- **Action system**: Single-turn immediate effects (`actions.py`)\n- **Staff system**: Static productivity bonuses (`game_state.py`)  \n- **Manager system**: Basic unproductivity prevention\n- **AP system**: Turn-based allocation with staff bonuses\n\n## Proposed Architecture\n\n### Core Components\n1. **ActionQueue System**: Track multi-turn action progression\n2. **DelegationManager**: Handle staff-managed action decisions  \n3. **ActionTemplate System**: Define multi-stage action patterns\n4. **ProgressTracker**: Show player status of ongoing actions\n\n### Implementation Plan\n\n#### Phase 1: Action Queue Foundation\n```python\nclass MultiTurnAction:\n    def __init__(self, action_type, stages, delegated_to=None):\n        self.stages = stages  # List of action stages\n        self.current_stage = 0\n        self.delegated_to = delegated_to  # Staff member handling\n        \nclass ActionQueue:\n    def __init__(self):\n        self.active_actions = []\n    \n    def process_turn(self, game_state):\n        # Advance all active multi-turn actions\n        for action in self.active_actions:\n            action.advance_stage(game_state)\n```\n\n#### Phase 2: Delegation System\n```python\nclass DelegationManager:\n    def can_delegate(self, action_type, staff_member):\n        # Check if staff has skills for action\n        \n    def delegate_decision(self, action, options, staff_member):\n        # Staff makes decision based on AI/rules\n```\n\n#### Phase 3: UI Integration\n- **Action Queue Display**: Show progress of ongoing actions\n- **Delegation Interface**: Assign actions to specific staff\n- **Progress Notifications**: Turn-by-turn updates on action status\n\n## Example Action Flows\n\n### Recruitment (3-4 turns)\n1. **T1**: Player spends 1 AP to 'Post Job Advertisement'\n2. **T2-T3**: Applications arrive (automatic)  \n3. **T4**: Manager reviews applications (if delegated) OR player chooses (1 AP)\n4. **T5**: Hiring decision executed\n\n### Research Project (5-7 turns)\n1. **T1**: Player spends 2 AP to 'Start Research Project'\n2. **T2-T5**: Research progresses (automatic updates)\n3. **T6**: Results available, player decides on publication/secrecy (1 AP)\n4. **T7**: Effects applied to game state\n\n## Integration Points\n- **File**: `src/core/game_state.py` - Add ActionQueue to GameState\n- **File**: `actions.py` - Define multi-turn action templates  \n- **File**: `ui.py` - Add action queue display components\n- **File**: `src/systems/delegation.py` - New delegation management system\n\n## Success Criteria\n- [ ] Players can initiate multi-turn actions\n- [ ] Actions progress automatically each turn  \n- [ ] Staff can be assigned to handle action decisions\n- [ ] UI clearly shows action queue status\n- [ ] Delegated actions reduce player micro-management\n- [ ] AP costs are front-loaded appropriately\n\n## Technical Challenges\n1. **Save/Load**: Persist action queue state\n2. **Balance**: Ensure delegated actions aren't overpowered\n3. **UI Space**: Display action progress without clutter\n4. **AI Logic**: Smart delegation decisions by AI staff\n\n## Dependencies\n- **Staff Management System**: Requires improved staff skill system\n- **Action Framework**: May need action system refactor\n- **Manager System**: Enhanced manager capabilities\n\n## Priority: MEDIUM\n**Effort**: 1-2 weeks (significant system addition)\n**Impact**: Major gameplay depth enhancement  \n**Risk**: Medium (complex system with many interactions)\n**Timeline**: Beta phase (after alpha stability)\n",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/411/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/411/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null
     }
   ],
   "count": 15,
-  "last_updated": "2025-11-26T06:01:43.380391"
+  "last_updated": "2025-11-26T12:01:52.073890"
 }
