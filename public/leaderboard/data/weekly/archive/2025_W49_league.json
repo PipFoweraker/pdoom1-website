@@ -2,7 +2,7 @@
   "meta": {
     "week_id": "2025_W49",
     "season": "2025_Q4",
-    "generated": "2025-12-07T23:03:40.063846Z",
+    "generated": "2025-12-07T14:00:55.787166Z",
     "game_version": "v0.4.1",
     "competition_type": "weekly_league",
     "start_date": "2025-12-01T00:00:00",
@@ -21,7 +21,7 @@
     "start_timestamp": "2025-12-01T00:00:00",
     "end_timestamp": "2025-12-07T23:59:59",
     "days_remaining": 0,
-    "hours_remaining": 0,
+    "hours_remaining": 9,
     "is_current": true,
     "season": "2025_Q4"
   },
@@ -31,5 +31,7 @@
     "average_score": 0.0,
     "total_games": 0,
     "unique_players": 0
-  }
+  },
+  "archived_at": "2025-12-07T23:03:40.009859Z",
+  "archive_status": "completed"
 }
