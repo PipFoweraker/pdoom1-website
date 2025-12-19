@@ -1,6 +1,76 @@
 {
   "issues": [
     {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/496",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/496/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/496/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/496/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/pull/496",
+      "id": 3745977234,
+      "node_id": "PR_kwDOPVWa5865vnfU",
+      "number": 496,
+      "title": "docs: Expand mechanics documentation (Issue #465)",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [],
+      "state": "open",
+      "locked": false,
+      "assignee": null,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2025-12-19T04:27:34Z",
+      "updated_at": "2025-12-19T04:27:34Z",
+      "closed_at": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "draft": false,
+      "pull_request": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/pulls/496",
+        "html_url": "https://github.com/PipFoweraker/pdoom1/pull/496",
+        "diff_url": "https://github.com/PipFoweraker/pdoom1/pull/496.diff",
+        "patch_url": "https://github.com/PipFoweraker/pdoom1/pull/496.patch",
+        "merged_at": null
+      },
+      "body": "## Summary\n- Add `docs/mechanics/funding.md` - fundraising, investors, money sinks, compute\n- Add `docs/mechanics/doom.md` - P(Doom) mechanics, momentum system, doom sources\n- Add `docs/mechanics/personnel.md` - hiring, specializations, traits, burnout\n- Update `docs/mechanics/README.md` - fix status table, victory/loss conditions\n- Regenerate data cache via `generate_mechanics_docs.py`\n\nAll values extracted from game source code (`game_state.gd`, `doom_system.gd`, `researcher.gd`, `actions.gd`). Documentation follows the existing `reputation.md` pattern with auto-generated game data tables.\n\nCloses #465\n\n## Test plan\n- [x] All markdown renders correctly\n- [x] Links to source files are valid (relative paths)\n- [x] Auto-generated data tables match game values\n- [x] README status table updated to reflect new docs\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/496/reactions",
+        "total_count": 1,
+        "+1": 1,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/496/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null
+    },
+    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/493",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/493/labels{/name}",
@@ -383,98 +453,6 @@
         "eyes": 0
       },
       "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/490/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null
-    },
-    {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/488",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/488/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/488/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/488/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/488",
-      "id": 3725516115,
-      "node_id": "I_kwDOPVWa587eDt1T",
-      "number": 488,
-      "title": "Add unit tests for DoomSystem",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 9028221070,
-          "node_id": "LA_kwDOPVWa588AAAACGh-4jg",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/good%20first%20issue",
-          "name": "good first issue",
-          "color": "7057ff",
-          "default": true,
-          "description": "Good for newcomers"
-        },
-        {
-          "id": 9227753593,
-          "node_id": "LA_kwDOPVWa588AAAACJgRYeQ",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/testing",
-          "name": "testing",
-          "color": "0052cc",
-          "default": false,
-          "description": "Issues related to test suite and testing infrastructure"
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignee": null,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2025-12-13T05:18:30Z",
-      "updated_at": "2025-12-13T05:18:30Z",
-      "closed_at": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "body": "## Problem\n\nThe `doom_system.gd` is a core game system but lacks dedicated unit tests. Other core systems like `game_state.gd` and `turn_manager.gd` have tests in `godot/tests/unit/`.\n\n## Solution\n\n1. Create `godot/tests/unit/test_doom_system.gd`\n2. Follow the pattern from existing test files (e.g., `test_game_state.gd`)\n3. Test key functions:\n   - `calculate_doom_change()`\n   - `apply_doom_modifier()`\n   - Doom clamping (0-100 range)\n\n## Files to create\n\n- `godot/tests/unit/test_doom_system.gd`\n\n## Reference files\n\n- `godot/scripts/core/doom_system.gd` (the system to test)\n- `godot/tests/unit/test_game_state.gd` (test pattern example)\n\n## Acceptance criteria\n\n- [ ] At least 5 test cases covering core doom functionality\n- [ ] Tests pass when run with GUT framework\n- [ ] Tests follow existing naming conventions\n\n---\n\n**Good first issue** - Great way to learn the codebase through testing. See [CONTRIBUTING.md](docs/developer/CONTRIBUTING.md) to get started.",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/488/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/488/timeline",
       "performed_via_github_app": null,
       "state_reason": null
     },
@@ -1248,5 +1226,5 @@
     }
   ],
   "count": 15,
-  "last_updated": "2025-12-19T00:04:29.634228"
+  "last_updated": "2025-12-19T06:01:38.029995"
 }
