@@ -1,17 +1,5 @@
 [
   {
-    "job": "sync-leaderboards",
-    "trigger": "schedule",
-    "timestamp": "2025-12-02T02:31:18.059383Z",
-    "status": "failure",
-    "details": {
-      "sync-all-status": "failure",
-      "sync-weekly-status": "failure",
-      "export-status": "skipped",
-      "verify-status": "failure"
-    }
-  },
-  {
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2025-12-02T06:11:54.694015Z",
@@ -1039,6 +1027,18 @@
     "details": {
       "version-status": "success",
       "stats-status": "success"
+    }
+  },
+  {
+    "job": "weekly-league-rollover",
+    "trigger": "schedule",
+    "timestamp": "2025-12-21T23:03:46.781899Z",
+    "status": "success",
+    "details": {
+      "archive-status": "success",
+      "new-week-status": "success",
+      "verify-status": "success",
+      "new-week-id": "2025_W51"
     }
   }
 ]
