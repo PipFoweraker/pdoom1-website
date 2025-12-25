@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Adversarial GLUE: A Multi-Task Benchmark for Robustness Evaluation of Language Models | p(Doom)1 Events</title>
+	<link rel="canonical" href="https://pdoom1.com/events/arxiv_5249c85b08bb42ca.html" />
+	<meta name="description" content="1 Introduction
+---------------" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+			margin: 0;
+			padding: 0;
+		}
+
+		header {
+			background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem 0;
+		}
+
+		nav {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 0 1rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.breadcrumb {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+		}
+
+		.breadcrumb a {
+			color: var(--accent-primary);
+			text-decoration: none;
+		}
+
+		main {
+			max-width: 900px;
+			margin: 2rem auto;
+			padding: 0 1rem;
+		}
+
+		.event-header {
+			background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 2rem;
+			margin-bottom: 2rem;
+		}
+
+		.event-icon {
+			font-size: 4rem;
+			margin-bottom: 1rem;
+		}
+
+		.event-title {
+			font-size: 2.5rem;
+			color: var(--accent-primary);
+			margin-bottom: 1rem;
+		}
+
+		.event-meta {
+			display: flex;
+			gap: 1.5rem;
+			flex-wrap: wrap;
+			margin-bottom: 1.5rem;
+			font-size: 0.95rem;
+		}
+
+		.meta-item {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.category-badge {
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+			padding: 0.3rem 0.8rem;
+			border-radius: 4px;
+			font-weight: bold;
+			text-transform: uppercase;
+			font-size: 0.85rem;
+		}
+
+		.rarity-badge {
+			background: var(--bg-tertiary);
+			color: var(--text-primary);
+			padding: 0.3rem 0.8rem;
+			border-radius: 4px;
+			border: 1px solid var(--border-color);
+		}
+
+		.section {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.section h2 {
+			color: var(--accent-secondary);
+			margin-bottom: 1rem;
+			font-size: 1.5rem;
+		}
+
+		.description {
+			font-size: 1.1rem;
+			line-height: 1.8;
+			color: var(--text-secondary);
+		}
+
+		.impacts-table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		.impacts-table th {
+			background: var(--bg-tertiary);
+			padding: 0.8rem;
+			text-align: left;
+			color: var(--accent-primary);
+			border-bottom: 2px solid var(--border-color);
+		}
+
+		.impacts-table td {
+			padding: 0.8rem;
+			border-bottom: 1px solid var(--border-color);
+		}
+
+		.impact-positive {
+			color: var(--success-color);
+			font-weight: bold;
+		}
+
+		.impact-negative {
+			color: var(--accent-danger);
+			font-weight: bold;
+		}
+
+		.quote {
+			background: var(--bg-tertiary);
+			border-left: 4px solid var(--accent-primary);
+			padding: 1rem 1.5rem;
+			margin: 1.5rem 0;
+			font-style: italic;
+		}
+
+		.quote-label {
+			font-weight: bold;
+			color: var(--accent-primary);
+			font-style: normal;
+			display: block;
+			margin-bottom: 0.5rem;
+		}
+
+		.sources {
+			list-style: none;
+			padding: 0;
+		}
+
+		.sources li {
+			margin-bottom: 0.8rem;
+		}
+
+		.sources a {
+			color: var(--accent-primary);
+			text-decoration: none;
+			word-break: break-all;
+		}
+
+		.sources a:hover {
+			text-decoration: underline;
+		}
+
+		.tags {
+			display: flex;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+		}
+
+		.tag {
+			background: var(--bg-primary);
+			padding: 0.4rem 0.8rem;
+			border-radius: 4px;
+			font-size: 0.9rem;
+			color: var(--text-muted);
+		}
+
+		.metadata-section {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.metadata-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 1rem;
+			margin-top: 1rem;
+		}
+
+		.metadata-item {
+			background: var(--bg-tertiary);
+			padding: 1rem;
+			border-radius: 4px;
+			border: 1px solid var(--border-color);
+		}
+
+		.metadata-label {
+			font-weight: bold;
+			color: var(--accent-primary);
+			font-size: 0.85rem;
+			display: block;
+			margin-bottom: 0.5rem;
+		}
+
+		.metadata-value {
+			color: var(--text-secondary);
+			font-size: 0.95rem;
+		}
+
+		.suggest-link {
+			display: inline-block;
+			margin-top: 0.5rem;
+			color: var(--accent-secondary);
+			text-decoration: none;
+			font-size: 0.85rem;
+			transition: color 0.3s;
+		}
+
+		.suggest-link:hover {
+			color: var(--accent-primary);
+			text-decoration: underline;
+		}
+
+		.provenance-badge {
+			display: inline-block;
+			padding: 0.25rem 0.6rem;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			font-weight: bold;
+			margin-left: 0.5rem;
+			vertical-align: middle;
+		}
+
+		.provenance-placeholder {
+			background: rgba(255, 152, 0, 0.2);
+			border: 1px solid #ff9800;
+			color: #ff9800;
+		}
+
+		.provenance-summary {
+			background: rgba(33, 150, 243, 0.2);
+			border: 1px solid #2196f3;
+			color: #2196f3;
+		}
+
+		.provenance-real {
+			background: rgba(76, 175, 80, 0.2);
+			border: 1px solid #4caf50;
+			color: #4caf50;
+		}
+
+		.quote-source {
+			display: block;
+			margin-top: 0.5rem;
+			font-size: 0.85rem;
+			color: var(--text-muted);
+		}
+
+		.quote-source a {
+			color: var(--accent-secondary);
+			text-decoration: none;
+		}
+
+		.quote-source a:hover {
+			text-decoration: underline;
+		}
+
+		.suggest-quote-button {
+			display: inline-block;
+			margin-top: 0.75rem;
+			padding: 0.5rem 1rem;
+			background: rgba(255, 107, 53, 0.1);
+			border: 1px solid var(--accent-secondary);
+			border-radius: 4px;
+			color: var(--accent-secondary);
+			text-decoration: none;
+			font-size: 0.85rem;
+			transition: all 0.3s;
+		}
+
+		.suggest-quote-button:hover {
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+			transform: translateY(-2px);
+		}
+
+		.contribute-section {
+			background: linear-gradient(135deg, var(--bg-secondary), rgba(255, 107, 53, 0.1));
+			border: 1px solid var(--accent-secondary);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			text-align: center;
+		}
+
+		.cta-button {
+			display: inline-block;
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+			padding: 0.8rem 1.5rem;
+			text-decoration: none;
+			border-radius: 4px;
+			font-weight: bold;
+			margin: 0.5rem;
+			transition: transform 0.3s;
+		}
+
+		.cta-button:hover {
+			transform: translateY(-2px);
+		}
+
+		footer {
+			background: var(--bg-secondary);
+			border-top: 2px solid var(--accent-primary);
+			text-align: center;
+			padding: 2rem 1rem;
+			margin-top: 4rem;
+			color: var(--text-muted);
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<nav>
+			<div class="breadcrumb">
+				<a href="/">Home</a> / <a href="/events/">Events</a> / Adversarial GLUE: A Multi-Task Benchmark for Robustness Evaluation of Language Models
+			</div>
+		</nav>
+	</header>
+
+	<main>
+		<div class="event-header">
+			<div class="event-icon">🔬</div>
+			<h1 class="event-title">Adversarial GLUE: A Multi-Task Benchmark for Robustness Evaluation of Language Models</h1>
+
+			<div class="event-meta">
+				<div class="meta-item">
+					<span>📅</span>
+					<span><strong>2021</strong></span>
+				</div>
+				<div class="meta-item">
+					<span class="category-badge">technical research breakthrough</span>
+				</div>
+				<div class="meta-item">
+					<span class="rarity-badge">🔵 Rare</span>
+				</div>
+			</div>
+
+			<div class="tags">
+				
+			</div>
+		</div>
+
+		<div class="section">
+			<h2>📖 Description</h2>
+			<p class="description">1 Introduction
+---------------</p>
+		</div>
+
+		<div class="section">
+			<h2>📊 Game Impacts</h2>
+			<table class="impacts-table">
+				<thead>
+					<tr>
+						<th>Variable</th>
+						<th>Change</th>
+						<th>Condition</th>
+					</tr>
+				</thead>
+				<tbody>
+					
+				<tr>
+					<td>Research</td>
+					<td class="impact-positive">+15</td>
+					<td>Always</td>
+				</tr>
+		
+				<tr>
+					<td>Papers</td>
+					<td class="impact-positive">+10</td>
+					<td>Always</td>
+				</tr>
+		
+				<tr>
+					<td>Vibey Doom</td>
+					<td class="impact-positive">+3</td>
+					<td>Always</td>
+				</tr>
+		
+				</tbody>
+			</table>
+		</div>
+
+		<div class="section">
+			<h2>💭 Reactions</h2>
+
+			<div class="quote">
+				<span class="quote-label">🔬 Safety Researcher Reaction:</span>
+				<span class="provenance-badge provenance-placeholder">⚠️ Placeholder - Needs Real Quote</span>
+				<br>
+				"Important contribution to the field"
+				
+			</div>
+
+			<div class="quote">
+				<span class="quote-label">📰 Media Reaction:</span>
+				<span class="provenance-badge provenance-placeholder">⚠️ Placeholder - Needs Real Quote</span>
+				<br>
+				"Academic research release"
+				
+			</div>
+
+			<a href="/events/suggest-quote.html?event=arxiv_5249c85b08bb42ca" class="suggest-quote-button">
+				💡 Found a Real Quote? Suggest it here
+			</a>
+		</div>
+
+		<div class="section">
+			<h2>🔗 Sources</h2>
+			<ul class="sources">
+				<li><a href="https://arxiv.org/abs/2111.02840" target="_blank" rel="noopener">[1] https://arxiv.org/abs/2111.02840</a></li>
+				
+			</ul>
+		</div>
+
+		<div class="metadata-section">
+			<h2>🏷️ Event Metadata</h2>
+			<p style="color: var(--text-muted); margin-bottom: 1rem;">
+				Think this event's metadata could be improved? Suggest changes to category, rarity, tags, game impacts, or p(doom) effects.
+			</p>
+
+			<div class="metadata-grid">
+				<div class="metadata-item">
+					<span class="metadata-label">📁 Category</span>
+					<span class="metadata-value">Technical Research Breakthrough</span>
+					<a href="https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20category%20for%20arxiv_5249c85b08bb42ca&body=Event%3A%20Adversarial%20GLUE%3A%20A%20Multi-Task%20Benchmark%20for%20Robustness%20Evaluation%20of%20Language%20Models%0A%0ACurrent%20category%3A%20technical_research_breakthrough%0A%0ASuggested%20category%3A%20%0A%0AReason%3A%20" class="suggest-link" target="_blank">→ Suggest different category</a>
+				</div>
+
+				<div class="metadata-item">
+					<span class="metadata-label">⭐ Rarity</span>
+					<span class="metadata-value">🔵 Rare</span>
+					<a href="https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20rarity%20for%20arxiv_5249c85b08bb42ca&body=Event%3A%20Adversarial%20GLUE%3A%20A%20Multi-Task%20Benchmark%20for%20Robustness%20Evaluation%20of%20Language%20Models%0A%0ACurrent%20rarity%3A%20rare%0A%0ASuggested%20rarity%3A%20%0A%0AReason%3A%20" class="suggest-link" target="_blank">→ Suggest different rarity</a>
+				</div>
+
+				<div class="metadata-item">
+					<span class="metadata-label">🏷️ Tags (0)</span>
+					<span class="metadata-value"></span>
+					<a href="https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20tags%20for%20arxiv_5249c85b08bb42ca&body=Event%3A%20Adversarial%20GLUE%3A%20A%20Multi-Task%20Benchmark%20for%20Robustness%20Evaluation%20of%20Language%20Models%0A%0ACurrent%20tags%3A%20%0A%0ASuggested%20tags%3A%20%0A%0AReason%3A%20" class="suggest-link" target="_blank">→ Suggest tag changes</a>
+				</div>
+
+				<div class="metadata-item">
+					<span class="metadata-label">📊 Game Impacts (3)</span>
+					<span class="metadata-value">3 variable changes</span>
+					<a href="https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events,game-balance&title=Metadata%3A%20Change%20impacts%20for%20arxiv_5249c85b08bb42ca&body=Event%3A%20Adversarial%20GLUE%3A%20A%20Multi-Task%20Benchmark%20for%20Robustness%20Evaluation%20of%20Language%20Models%0A%0ACurrent%20impacts%3A%203%20game%20variable%20changes%0A%0ASuggested%20changes%3A%20%0A-%20Variable%3A%20%0A-%20Change%3A%20%0A%0AReason%3A%20" class="suggest-link" target="_blank">→ Suggest impact changes</a>
+				</div>
+
+				<div class="metadata-item">
+					<span class="metadata-label">☢️ p(Doom) Impact</span>
+					<span class="metadata-value">No direct impact</span>
+					<a href="https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events,game-balance&title=Metadata%3A%20Change%20p(doom)%20impact%20for%20arxiv_5249c85b08bb42ca&body=Event%3A%20Adversarial%20GLUE%3A%20A%20Multi-Task%20Benchmark%20for%20Robustness%20Evaluation%20of%20Language%20Models%0A%0ACurrent%20p(doom)%20impact%3A%20None%0A%0ASuggested%20p(doom)%20impact%3A%20%0A%0AReason%3A%20" class="suggest-link" target="_blank">→ Suggest p(doom) change</a>
+				</div>
+
+				<div class="metadata-item">
+					<span class="metadata-label">📝 General Metadata</span>
+					<span class="metadata-value">Year, description, reactions</span>
+					<a href="/events/suggest-metadata.html?event=arxiv_5249c85b08bb42ca" class="suggest-link">→ Comprehensive review</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="contribute-section">
+			<h2>🤝 Found an Issue?</h2>
+			<p>This event data is sourced from the pdoom-data repository. If you notice errors or want to suggest improvements:</p>
+			<a href="https://github.com/PipFoweraker/pdoom-data/issues/new?title=Event%20Issue:%20arxiv_5249c85b08bb42ca" class="cta-button" target="_blank">GitHub Issue (Preferred)</a>
+			<a href="mailto:team@pdoom1.com?subject=Event%20Data%20Issue:%20arxiv_5249c85b08bb42ca&body=Event:%20Adversarial%20GLUE%3A%20A%20Multi-Task%20Benchmark%20for%20Robustness%20Evaluation%20of%20Language%20Models%0A%0AWhat's wrong:%20%0A%0ASuggested fix:%20" class="cta-button">📧 Email (No GitHub)</a>
+		</div>
+
+		<div style="text-align: center; margin-top: 2rem;">
+			<a href="/events/" style="color: var(--accent-primary); text-decoration: none;">← Back to All Events</a>
+		</div>
+	</main>
+
+	<footer>
+		<p>&copy; 2025 p(Doom)1 | <a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">GitHub</a></p>
+		<p style="margin-top: 0.5rem; font-size: 0.9rem;">Event data from <a href="https://github.com/PipFoweraker/pdoom-data" target="_blank" style="color: var(--accent-secondary);">pdoom-data</a></p>
+	</footer>
+</body>
+</html>
