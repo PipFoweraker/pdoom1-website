@@ -2,7 +2,7 @@
   "meta": {
     "week_id": "2026_W01",
     "season": "2025_Q4",
-    "generated": "2026-01-04T23:03:48.301087Z",
+    "generated": "2026-01-04T14:01:00.874879Z",
     "game_version": "v0.4.1",
     "competition_type": "weekly_league",
     "start_date": "2025-12-29T00:00:00",
@@ -21,7 +21,7 @@
     "start_timestamp": "2025-12-29T00:00:00",
     "end_timestamp": "2026-01-04T23:59:59",
     "days_remaining": 0,
-    "hours_remaining": 0,
+    "hours_remaining": 9,
     "is_current": true,
     "season": "2025_Q4"
   },
@@ -31,5 +31,7 @@
     "average_score": 0.0,
     "total_games": 0,
     "unique_players": 0
-  }
+  },
+  "archived_at": "2026-01-04T23:03:48.245424Z",
+  "archive_status": "completed"
 }
