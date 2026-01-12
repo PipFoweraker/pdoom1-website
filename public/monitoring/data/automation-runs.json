@@ -2,16 +2,6 @@
   {
     "job": "auto-update-data",
     "trigger": "schedule",
-    "timestamp": "2025-12-23T12:13:57.262219Z",
-    "status": "success",
-    "details": {
-      "version-status": "success",
-      "stats-status": "success"
-    }
-  },
-  {
-    "job": "auto-update-data",
-    "trigger": "schedule",
     "timestamp": "2025-12-23T18:11:45.604683Z",
     "status": "success",
     "details": {
@@ -1041,6 +1031,16 @@
       "new-week-status": "success",
       "verify-status": "success",
       "new-week-id": "2026_W02"
+    }
+  },
+  {
+    "job": "auto-update-data",
+    "trigger": "schedule",
+    "timestamp": "2026-01-12T00:36:44.573307Z",
+    "status": "success",
+    "details": {
+      "version-status": "success",
+      "stats-status": "success"
     }
   }
 ]
