@@ -1,17 +1,5 @@
 [
   {
-    "job": "weekly-league-rollover",
-    "trigger": "schedule",
-    "timestamp": "2025-12-28T23:03:44.548312Z",
-    "status": "success",
-    "details": {
-      "archive-status": "success",
-      "new-week-status": "success",
-      "verify-status": "success",
-      "new-week-id": "2025_W52"
-    }
-  },
-  {
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2025-12-29T00:37:07.639715Z",
@@ -1043,6 +1031,16 @@
       "sync-weekly-status": "failure",
       "export-status": "skipped",
       "verify-status": "failure"
+    }
+  },
+  {
+    "job": "auto-update-data",
+    "trigger": "schedule",
+    "timestamp": "2026-01-17T06:10:58.835931Z",
+    "status": "success",
+    "details": {
+      "version-status": "success",
+      "stats-status": "success"
     }
   }
 ]
