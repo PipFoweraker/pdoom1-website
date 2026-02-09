@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-02-09T00:44:00.406810Z",
+  "last_updated": "2026-02-09T02:57:13.116510Z",
   "jobs": {
     "auto-update-data": {
       "last_run": "2026-02-09T00:44:00.406810Z",
@@ -10,12 +10,12 @@
       "failure_count": 0
     },
     "sync-leaderboards": {
-      "last_run": "2026-02-08T02:58:20.571391Z",
+      "last_run": "2026-02-09T02:57:13.116510Z",
       "last_success": null,
-      "last_failure": "2026-02-08T02:58:20.571391Z",
-      "total_runs": 101,
+      "last_failure": "2026-02-09T02:57:13.116510Z",
+      "total_runs": 102,
       "success_count": 0,
-      "failure_count": 101
+      "failure_count": 102
     },
     "weekly-league-rollover": {
       "last_run": "2026-02-08T23:07:09.355126Z",
