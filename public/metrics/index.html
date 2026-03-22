@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Metrics - p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/metrics/" />
+	<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+	<meta name="description" content="Honest early telemetry for p(Doom)1 — what we track, why we track it, and what the numbers look like so far." />
+	<meta name="author" content="p(Doom)1" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="p(Doom)1" />
+	<meta property="og:title" content="Metrics - p(Doom)1" />
+	<meta property="og:description" content="Honest early telemetry for p(Doom)1 — transparent, privacy-respecting, aggregate-only traction data." />
+	<meta property="og:url" content="https://pdoom1.com/metrics/" />
+	<meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #888888;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-sm: 4px;
+			--radius-md: 6px;
+			--radius-lg: 10px;
+			--border-width: 1px;
+			--shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+			--duration-fast: 150ms;
+			--duration-base: 300ms;
+			--easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+			background-image: 
+				radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.02) 0%, transparent 50%),
+				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem 0;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		main {
+			max-width: 1100px;
+			margin: 0 auto;
+			padding: 4rem 2rem;
+		}
+
+		.hero {
+			text-align: center;
+			margin-bottom: 4rem;
+		}
+
+		.hero h1 {
+			font-size: 3rem;
+			color: var(--accent-primary);
+			text-shadow: 0 0 20px var(--accent-primary);
+			margin-bottom: 1rem;
+		}
+
+		.hero p {
+			font-size: 1.2rem;
+			color: var(--text-secondary);
+			max-width: 700px;
+			margin: 0 auto;
+		}
+
+		/* ── Transparency banner ── */
+		.transparency-banner {
+			background: linear-gradient(135deg, rgba(0,255,65,0.08), rgba(255,107,53,0.05));
+			border: 1px solid var(--accent-primary);
+			border-radius: var(--radius-lg);
+			padding: 2rem;
+			margin-bottom: 3rem;
+		}
+
+		.transparency-banner h2 {
+			color: var(--accent-primary);
+			margin-bottom: 1rem;
+			font-size: 1.4rem;
+		}
+
+		.transparency-banner p {
+			color: var(--text-secondary);
+			margin-bottom: 0.75rem;
+		}
+
+		.transparency-banner p:last-child {
+			margin-bottom: 0;
+		}
+
+		.privacy-pills {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.6rem;
+			margin-top: 1.25rem;
+		}
+
+		.pill {
+			background: rgba(0,255,65,0.12);
+			border: 1px solid rgba(0,255,65,0.4);
+			color: var(--accent-primary);
+			padding: 0.3rem 0.85rem;
+			border-radius: 20px;
+			font-size: 0.82rem;
+			font-weight: bold;
+		}
+
+		/* ── Metric cards ── */
+		.metrics-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+			gap: 1.5rem;
+			margin-bottom: 3rem;
+		}
+
+		.metric-card {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 2rem 1.5rem;
+			text-align: center;
+			transition: border-color var(--duration-base) var(--easing),
+			            box-shadow var(--duration-base) var(--easing);
+		}
+
+		.metric-card:hover {
+			border-color: var(--accent-primary);
+			box-shadow: 0 0 16px rgba(0,255,65,0.15);
+		}
+
+		.metric-icon {
+			font-size: 2rem;
+			margin-bottom: 0.75rem;
+		}
+
+		.metric-value {
+			font-size: 2.8rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			text-shadow: 0 0 10px rgba(0,255,65,0.4);
+			display: block;
+			margin-bottom: 0.4rem;
+			line-height: 1;
+		}
+
+		.metric-label {
+			font-size: 1rem;
+			color: var(--text-secondary);
+			margin-bottom: 0.5rem;
+			font-weight: bold;
+		}
+
+		.metric-note {
+			font-size: 0.82rem;
+			color: var(--text-muted);
+			line-height: 1.4;
+		}
+
+		.metric-source {
+			display: inline-block;
+			margin-top: 0.75rem;
+			font-size: 0.75rem;
+			color: var(--accent-secondary);
+			border: 1px solid rgba(255,107,53,0.3);
+			border-radius: var(--radius-sm);
+			padding: 0.15rem 0.5rem;
+		}
+
+		/* ── Sections ── */
+		.section {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 2rem;
+			margin-bottom: 2.5rem;
+		}
+
+		.section h2 {
+			color: var(--accent-primary);
+			font-size: 1.6rem;
+			margin-bottom: 1.5rem;
+			padding-bottom: 0.5rem;
+			border-bottom: 1px solid var(--border-color);
+		}
+
+		.section h3 {
+			color: var(--accent-secondary);
+			margin-bottom: 0.75rem;
+			margin-top: 1.5rem;
+			font-size: 1.1rem;
+		}
+
+		.section h3:first-child {
+			margin-top: 0;
+		}
+
+		.section p {
+			color: var(--text-secondary);
+			margin-bottom: 0.75rem;
+		}
+
+		.section p:last-child {
+			margin-bottom: 0;
+		}
+
+		/* ── Tracking table ── */
+		.tracking-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 1rem;
+			font-size: 0.92rem;
+		}
+
+		.tracking-table th {
+			text-align: left;
+			padding: 0.6rem 0.75rem;
+			color: var(--accent-primary);
+			border-bottom: 1px solid var(--border-color);
+			font-weight: bold;
+		}
+
+		.tracking-table td {
+			padding: 0.6rem 0.75rem;
+			color: var(--text-secondary);
+			border-bottom: 1px solid rgba(68,68,68,0.5);
+			vertical-align: top;
+		}
+
+		.tracking-table tr:last-child td {
+			border-bottom: none;
+		}
+
+		.tracking-table tr:hover td {
+			background: rgba(255,255,255,0.02);
+		}
+
+		.tag-yes {
+			color: var(--accent-primary);
+			font-weight: bold;
+		}
+
+		.tag-partial {
+			color: var(--accent-secondary);
+			font-weight: bold;
+		}
+
+		/* ── Roadmap list ── */
+		.roadmap-list {
+			list-style: none;
+			padding: 0;
+			margin-top: 0.5rem;
+		}
+
+		.roadmap-list li {
+			color: var(--text-secondary);
+			padding: 0.4rem 0;
+			padding-left: 1.5rem;
+			position: relative;
+			border-bottom: 1px dotted rgba(68,68,68,0.4);
+		}
+
+		.roadmap-list li:last-child {
+			border-bottom: none;
+		}
+
+		.roadmap-list li::before {
+			content: '▸';
+			color: var(--accent-primary);
+			position: absolute;
+			left: 0;
+		}
+
+		.roadmap-list li.done {
+			color: var(--text-muted);
+			text-decoration: line-through;
+		}
+
+		.roadmap-list li.done::before {
+			content: '✓';
+			color: var(--success-color);
+		}
+
+		/* ── Opt-out widget ── */
+		.optout-widget {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			margin-top: 1.5rem;
+		}
+
+		.optout-widget p {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+			margin-bottom: 1rem;
+		}
+
+		.optout-btn {
+			background: transparent;
+			border: 1px solid var(--accent-secondary);
+			color: var(--accent-secondary);
+			padding: 0.5rem 1.25rem;
+			border-radius: var(--radius-sm);
+			cursor: pointer;
+			font-family: inherit;
+			font-size: 0.9rem;
+			transition: background var(--duration-fast), color var(--duration-fast);
+		}
+
+		.optout-btn:hover {
+			background: var(--accent-secondary);
+			color: var(--bg-primary);
+		}
+
+		.optout-status {
+			margin-top: 0.75rem;
+			font-size: 0.85rem;
+			color: var(--text-muted);
+			min-height: 1.2em;
+		}
+
+		/* ── Footer ── */
+		footer {
+			text-align: center;
+			padding: 2rem;
+			color: var(--text-muted);
+			font-size: 0.85rem;
+			border-top: 1px solid var(--border-color);
+			margin-top: 2rem;
+		}
+
+		footer a {
+			color: var(--accent-primary);
+			text-decoration: none;
+		}
+
+		footer a:hover {
+			text-decoration: underline;
+		}
+
+		/* ── Responsive ── */
+		@media (max-width: 768px) {
+			.hero h1 {
+				font-size: 2rem;
+			}
+
+			.metrics-grid {
+				grid-template-columns: 1fr 1fr;
+			}
+
+			.tracking-table th:nth-child(3),
+			.tracking-table td:nth-child(3) {
+				display: none;
+			}
+		}
+
+		@media (max-width: 480px) {
+			main {
+				padding: 2rem 1rem;
+			}
+
+			.metrics-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Navigation loaded by navigation.js -->
+	</header>
+
+	<main>
+		<section class="hero">
+			<h1>Metrics</h1>
+			<p>Honest early telemetry — what we track, why we track it, and what the numbers look like so far</p>
+		</section>
+
+		<!-- ── Transparency note ── -->
+		<div class="transparency-banner" role="note" aria-label="Privacy and transparency statement">
+			<h2>What we're tracking and why</h2>
+			<p>
+				p(Doom)1 is a small independent project. We track aggregate signals to understand whether the game is
+				actually reaching people who care about AI Safety — not to profile individual users.
+				All metrics are <strong>aggregate-only</strong>: no personal data, no cross-site tracking, no cookies.
+			</p>
+			<p>
+				We use <a href="https://plausible.io" target="_blank" rel="noopener" style="color:var(--accent-primary)">Plausible Analytics</a>
+				(self-hosted on <code>analytics.pdoom1.com</code>), which is open-source, GDPR-compliant, and publishes
+				only anonymous, aggregated counts. You can opt out at any time using the button below.
+			</p>
+			<div class="privacy-pills" role="list" aria-label="Privacy features">
+				<span class="pill" role="listitem">No cookies</span>
+				<span class="pill" role="listitem">No personal data</span>
+				<span class="pill" role="listitem">No cross-site tracking</span>
+				<span class="pill" role="listitem">GDPR compliant</span>
+				<span class="pill" role="listitem">Respects DNT</span>
+				<span class="pill" role="listitem">Opt-out available</span>
+				<span class="pill" role="listitem">Open-source analytics</span>
+			</div>
+		</div>
+
+		<!-- ── Live metric cards ── -->
+		<section aria-labelledby="traction-heading">
+			<h2 id="traction-heading" style="color:var(--accent-primary);margin-bottom:1.5rem;font-size:1.8rem;">
+				Traction at a glance
+			</h2>
+			<div class="metrics-grid">
+
+				<div class="metric-card">
+					<div class="metric-icon" aria-hidden="true">📥</div>
+					<span class="metric-value" id="val-downloads">—</span>
+					<div class="metric-label">Game Downloads</div>
+					<div class="metric-note">All platforms combined (Windows, macOS, Linux). Tracked as file-download events via Plausible.</div>
+					<span class="metric-source">Plausible · file-downloads</span>
+				</div>
+
+				<div class="metric-card">
+					<div class="metric-icon" aria-hidden="true">🌐</div>
+					<span class="metric-value" id="val-visitors">—</span>
+					<div class="metric-label">Unique Visitors (30d)</div>
+					<div class="metric-note">Unique visitors in the last 30 days. No cookies — Plausible counts uniques via a daily-rotating IP+User-Agent hash that cannot identify individuals across sessions.</div>
+					<span class="metric-source">Plausible · unique visitors</span>
+				</div>
+
+				<div class="metric-card">
+					<div class="metric-icon" aria-hidden="true">🏆</div>
+					<span class="metric-value" id="val-leaderboard">—</span>
+					<div class="metric-label">Leaderboard Entries</div>
+					<div class="metric-note">Total anonymous scores submitted to the global leaderboard. Each entry is a completed game run.</div>
+					<span class="metric-source">Leaderboard data</span>
+				</div>
+
+				<div class="metric-card">
+					<div class="metric-icon" aria-hidden="true">⭐</div>
+					<span class="metric-value" id="val-github-stars">—</span>
+					<div class="metric-label">GitHub Stars</div>
+					<div class="metric-note">Stars on the public repository — a proxy for developer interest and bookmark-style approval.</div>
+					<span class="metric-source">GitHub API</span>
+				</div>
+
+				<div class="metric-card">
+					<div class="metric-icon" aria-hidden="true">🍴</div>
+					<span class="metric-value" id="val-github-forks">—</span>
+					<div class="metric-label">GitHub Forks</div>
+					<div class="metric-note">People who have forked the repository to explore or contribute to the project.</div>
+					<span class="metric-source">GitHub API</span>
+				</div>
+
+				<div class="metric-card">
+					<div class="metric-icon" aria-hidden="true">🐛</div>
+					<span class="metric-value" id="val-issues">—</span>
+					<div class="metric-label">Open Issues</div>
+					<div class="metric-note">Active bug reports and feature requests on GitHub — a signal of an engaged player community.</div>
+					<span class="metric-source">GitHub API</span>
+				</div>
+
+			</div>
+		</section>
+
+		<!-- ── What we track table ── -->
+		<section class="section" aria-labelledby="tracking-heading">
+			<h2 id="tracking-heading">What we track</h2>
+
+			<table class="tracking-table" aria-label="Metrics tracking overview">
+				<thead>
+					<tr>
+						<th>Signal</th>
+						<th>Tool / Source</th>
+						<th>Why it matters</th>
+						<th>Live?</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Page views &amp; unique visitors</td>
+						<td>Plausible Analytics</td>
+						<td>Understand reach and which content resonates</td>
+						<td><span class="tag-yes">✓ Yes</span></td>
+					</tr>
+					<tr>
+						<td>Game file downloads (Windows / macOS / Linux)</td>
+						<td>Plausible file-downloads extension</td>
+						<td>Primary conversion metric — are people actually playing?</td>
+						<td><span class="tag-yes">✓ Yes</span></td>
+					</tr>
+					<tr>
+						<td>Outbound link clicks</td>
+						<td>Plausible outbound-links extension</td>
+						<td>Which external resources (research papers, GitHub) people explore</td>
+						<td><span class="tag-yes">✓ Yes</span></td>
+					</tr>
+					<tr>
+						<td>Leaderboard entries</td>
+						<td>Leaderboard JSON data</td>
+						<td>Confirmed game completions and returning players</td>
+						<td><span class="tag-yes">✓ Yes</span></td>
+					</tr>
+					<tr>
+						<td>GitHub stars / forks / issues</td>
+						<td>GitHub public API</td>
+						<td>Developer and open-source community interest</td>
+						<td><span class="tag-yes">✓ Yes</span></td>
+					</tr>
+					<tr>
+						<td>Forum registrations &amp; posts</td>
+						<td>Self-hosted forum</td>
+						<td>Community depth beyond casual visits</td>
+						<td><span class="tag-partial">~ Partial</span></td>
+					</tr>
+					<tr>
+						<td>Bug reports submitted</td>
+						<td>GitHub Issues form</td>
+						<td>Quality signal — engaged players report problems</td>
+						<td><span class="tag-partial">~ Partial</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+
+		<!-- ── What we do NOT track ── -->
+		<section class="section" aria-labelledby="not-tracking-heading">
+			<h2 id="not-tracking-heading">What we do not track</h2>
+			<p>We will never collect or store:</p>
+			<ul class="roadmap-list" style="margin-top:0.75rem;">
+				<li>Individual user identifiers or persistent cookies</li>
+				<li>In-game session data, save files, or playtime per person</li>
+				<li>Email addresses, names, or any personally identifiable information</li>
+				<li>Device fingerprints, cross-site behaviour, or advertising IDs</li>
+				<li>Location data beyond country-level (already anonymised by Plausible)</li>
+			</ul>
+		</section>
+
+		<!-- ── Roadmap ── -->
+		<section class="section" aria-labelledby="roadmap-heading">
+			<h2 id="roadmap-heading">Measurement roadmap</h2>
+			<p>Signals we plan to add as the project grows:</p>
+
+			<h3>Near-term</h3>
+			<ul class="roadmap-list">
+				<li class="done">Plausible page-view tracking on all pages</li>
+				<li class="done">File-download events for game releases</li>
+				<li class="done">Outbound link click tracking</li>
+				<li>Public Plausible dashboard (read-only share link)</li>
+				<li>Weekly automated metrics digest in the Dev Blog</li>
+			</ul>
+
+			<h3>Medium-term</h3>
+			<ul class="roadmap-list">
+				<li>In-game opt-in crash reporting (aggregate only)</li>
+				<li>Session-length distribution (no individual IDs)</li>
+				<li>Which game ending players reach most often</li>
+				<li>Forum engagement metrics (posts per week, active topics)</li>
+			</ul>
+
+			<h3>Long-term</h3>
+			<ul class="roadmap-list">
+				<li>Pre/post survey on AI Safety knowledge (voluntary, anonymous)</li>
+				<li>Grant progress milestones linked to measured traction</li>
+				<li>Open data export — all aggregate metrics published as JSON</li>
+			</ul>
+		</section>
+
+		<!-- ── Opt-out ── -->
+		<section class="section" aria-labelledby="optout-heading">
+			<h2 id="optout-heading">Your privacy controls</h2>
+			<p>
+				Plausible respects your browser's
+				<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/DNT" target="_blank" rel="noopener" style="color:var(--accent-primary)">Do Not Track</a>
+				header automatically. You can also opt out of our site-level event tracking below.
+				This sets a local preference in your browser — no account required.
+			</p>
+			<div class="optout-widget">
+				<p>Your current status: <strong id="optout-current-status">checking…</strong></p>
+				<button class="optout-btn" id="optout-toggle" type="button" aria-live="polite">Loading…</button>
+				<div class="optout-status" id="optout-message" aria-live="polite"></div>
+			</div>
+			<p style="margin-top:1rem;">
+				For full details see our <a href="/privacy/" style="color:var(--accent-primary)">Privacy Policy</a>.
+			</p>
+		</section>
+	</main>
+
+	<footer>
+		<p>
+			Metrics updated in real-time where possible.
+			Questions? <a href="/issues/">Open an issue</a> or visit
+			<a href="https://github.com/PipFoweraker/pdoom1" target="_blank" rel="noopener">GitHub</a>.
+		</p>
+	</footer>
+
+	<!-- Standard Navigation -->
+	<script src="/assets/js/navigation.js"></script>
+
+	<script>
+	(function () {
+		'use strict';
+
+		/* ── GitHub stats ── */
+		async function fetchGitHubStats() {
+			try {
+				const res = await fetch('https://api.github.com/repos/PipFoweraker/pdoom1');
+				if (!res.ok) return;
+				const data = await res.json();
+				setMetric('val-github-stars', data.stargazers_count);
+				setMetric('val-github-forks', data.forks_count);
+				setMetric('val-issues', data.open_issues_count);
+			} catch (_) {
+				// Network blocked or rate-limited — leave dashes
+			}
+		}
+
+		/* ── Leaderboard entries ── */
+		async function fetchLeaderboardCount() {
+			try {
+				const res = await fetch('/data/leaderboard.json');
+				if (!res.ok) return;
+				const data = await res.json();
+				const entries = Array.isArray(data) ? data.length
+					: (data.entries ? data.entries.length : null);
+				if (entries !== null) setMetric('val-leaderboard', entries);
+			} catch (_) {
+				// File not available
+			}
+		}
+
+		/* ── Helper ── */
+		function setMetric(id, value) {
+			const el = document.getElementById(id);
+			if (!el) return;
+			const n = Number(value);
+			el.textContent = isNaN(n) ? '—' : n.toLocaleString();
+		}
+
+		/* ── Opt-out UI ── */
+		function initOptOut() {
+			const OPT_OUT_KEY = 'pdoom1_analytics_optout';
+			const statusEl = document.getElementById('optout-current-status');
+			const btnEl = document.getElementById('optout-toggle');
+			const msgEl = document.getElementById('optout-message');
+
+			function isOptedOut() {
+				try { return localStorage.getItem(OPT_OUT_KEY) === 'true'; } catch (_) { return false; }
+			}
+
+			function render() {
+				const out = isOptedOut();
+				if (statusEl) statusEl.textContent = out ? 'Opted out ✓' : 'Participating (default)';
+				if (btnEl) btnEl.textContent = out ? 'Opt back in' : 'Opt out of analytics';
+			}
+
+			if (btnEl) {
+				btnEl.addEventListener('click', function () {
+					try {
+						if (isOptedOut()) {
+							localStorage.removeItem(OPT_OUT_KEY);
+							if (msgEl) msgEl.textContent = "You've opted back in. Thank you!";
+						} else {
+							localStorage.setItem(OPT_OUT_KEY, 'true');
+							if (msgEl) msgEl.textContent = 'Done — no further events will be tracked in this browser.';
+						}
+					} catch (_) {
+						if (msgEl) msgEl.textContent = 'Could not save preference (localStorage unavailable).';
+					}
+					render();
+				});
+			}
+
+			render();
+		}
+
+		/* ── Boot ── */
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', boot);
+		} else {
+			boot();
+		}
+
+		function boot() {
+			fetchGitHubStats();
+			fetchLeaderboardCount();
+			initOptOut();
+		}
+	})();
+	</script>
+</body>
+</html>
