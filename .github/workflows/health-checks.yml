@@ -22,7 +22,6 @@ permissions:
 jobs:
   health-check:
     runs-on: ubuntu-latest
-    environment: production
     
     steps:
       - name: Checkout repository
