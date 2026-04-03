@@ -85,13 +85,16 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action [League Manager]"
 
-          if git diff --quiet; then
+          # Stage all relevant changes first (catches new/untracked files too)
+          git add public/leaderboard/data/weekly/
+          git add public/monitoring/data/ || true
+          git add scripts/weekly-league-config.json || true
+
+          # Check if there are staged changes (covers modified tracked files AND new files)
+          if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
-
-          git add public/leaderboard/data/weekly/
-          git add public/monitoring/data/ || true
 
           git commit -m "Weekly League Rollover: ${{ steps.new-week.outputs.new_week }}
 
@@ -103,6 +106,8 @@ jobs:
 
           [automated] [weekly-league]"
 
+          # Pull before push to handle any concurrent commits to the branch
+          git pull --rebase origin ${{ github.ref_name }} || (git rebase --abort && exit 1)
           git push
 
       - name: Create success notification issue
