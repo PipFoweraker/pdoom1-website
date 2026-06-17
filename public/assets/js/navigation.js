@@ -35,6 +35,7 @@
 					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
 					<ul class="dropdown-menu" role="menu">
 						<li role="none"><a href="/about/" role="menuitem">About</a></li>
+						<li role="none"><a href="/metrics/" role="menuitem">Metrics</a></li>
 						<li role="none"><a href="/resources/" role="menuitem">AI Safety Resources</a></li>
 						<li role="none"><a href="/docs/roadmap.md" role="menuitem">Roadmap</a></li>
 						<li role="none"><a href="/docs/" role="menuitem">Documentation</a></li>
