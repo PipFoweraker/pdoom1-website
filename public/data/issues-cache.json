@@ -1,16 +1,16 @@
 {
   "issues": [
     {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/534",
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/541",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/534/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/534/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/534/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/534",
-      "id": 4756875187,
-      "node_id": "I_kwDOPVWa588AAAABG4gnsw",
-      "number": 534,
-      "title": "Full unit suite hangs in turn-manager event-resolution tests (headless GUT)",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/541/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/541/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/541/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/541",
+      "id": 4774056823,
+      "node_id": "I_kwDOPVWa588AAAABHI5Tdw",
+      "number": 541,
+      "title": "Difficulty AP modifier is a no-op (max_action_points set but start_turn ignores it)",
       "user": {
         "login": "PipFoweraker",
         "id": 77564415,
@@ -41,6 +41,15 @@
           "color": "d73a4a",
           "default": true,
           "description": "Something isn't working"
+        },
+        {
+          "id": 9227753930,
+          "node_id": "LA_kwDOPVWa588AAAACJgRZyg",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/game-mechanics",
+          "name": "game-mechanics",
+          "color": "0e8a16",
+          "default": false,
+          "description": "Core game logic and mechanics"
         }
       ],
       "state": "open",
@@ -48,8 +57,8 @@
       "assignees": [],
       "milestone": null,
       "comments": 0,
-      "created_at": "2026-06-27T05:05:12Z",
-      "updated_at": "2026-06-27T05:05:12Z",
+      "created_at": "2026-06-30T05:42:45Z",
+      "updated_at": "2026-06-30T05:42:45Z",
       "closed_at": null,
       "assignee": null,
       "author_association": "OWNER",
@@ -65,10 +74,10 @@
         "blocking": 0,
         "total_blocking": 0
       },
-      "body": "## Summary\nThe full `godot/tests/unit` GUT suite **hangs and never completes** when run headless via `gut_cmdln.gd -gdir=res://tests/unit`. It stalls in the **turn-manager event-resolution tests**: the last test marker emitted is `test_resolve_event_transitions_to_action_selection`, after which the log fills with an unterminating flood of historical-event (`hist_arxiv_*`) VerificationTracker output and never reaches GUT totals.\n\n## Pre-existing \u2014 NOT a regression\nReproduced on a clean pre-change baseline (before the #500 work), so it is not introduced by recent feature work.\n\n## Impact\n- Blocks any \"full unit suite green\" CI gate.\n- Individual files run fine: `test_research_quality` + `test_risk_system` = 45/45; `test_game_state` + `test_actions` + `test_doom_system` = 72/72. The hang is localized to the turn-manager / event-resolution path.\n\n## Repro\n```\ngodot --headless --path godot --script res://addons/gut/gut_cmdln.gd -gdir=res://tests/unit -gexit\n```\nStalls around line ~4962 of output, in the `test_resolve_event_*` block of `test_turn_manager.gd`.\n\n## Likely cause (unconfirmed)\nA turn-processing / event-resolution test appears to drive turn(s) that cascade through the historical-event deck without a bound, or awaits a signal that never resolves headlessly. Suggest isolating `test_turn_manager.gd` and bisecting the `test_resolve_event_*` cases.\n\n## Adjacent gotcha\nFresh worktrees also need a one-time `godot --headless --path godot --import` to build the class cache, or GUT fails earlier with misleading `class_name ... not declared` parse errors.\n",
+      "body": "## Found during #538\n`game_manager._apply_difficulty_settings()` sets `state.max_action_points = 4` (Easy) / `= 2` (Hard), and #540 added the `max_action_points` property to `GameState` so it no longer **crashes** on those difficulties.\n\n**But `TurnManager.start_turn()` computes AP from a hardcoded base** (`var max_ap = 3 + int(total_staff * 0.5)`) and never reads `state.max_action_points`. So the difficulty AP modifier currently does **nothing** \u2014 Easy and Hard give the same per-turn AP as Standard.\n\n## Decision needed (balance)\nTwo options:\n1. **Wire it:** `start_turn` base AP from `state.max_action_points` instead of hardcoded 3 \u2192 Easy gives +1 AP/turn, Hard \u22121. (Existing AP tests still pass since default is 3.) This is the apparent original intent (`debug_overlay.gd` already reads `max_action_points` as the AP cap).\n2. **Remove the dead assignments** if difficulty shouldn't affect AP.\n\n~1-line either way; flagging as a design/balance call rather than fixing blind.",
       "closed_by": null,
       "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/534/reactions",
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/541/reactions",
         "total_count": 0,
         "+1": 0,
         "-1": 0,
@@ -79,7 +88,7 @@
         "rocket": 0,
         "eyes": 0
       },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/534/timeline",
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/541/timeline",
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
@@ -1605,5 +1614,5 @@
     }
   ],
   "count": 15,
-  "last_updated": "2026-06-30T00:24:23.975295"
+  "last_updated": "2026-06-30T07:09:55.410989"
 }
