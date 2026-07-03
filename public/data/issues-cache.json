@@ -1,16 +1,16 @@
 {
   "issues": [
     {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/547",
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/548",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/547/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/547/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/547/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/pull/547",
-      "id": 4791593837,
-      "node_id": "PR_kwDOPVWa587s-n7h",
-      "number": 547,
-      "title": "fix: player-facing consistency - bug-report keybind + canonical domain",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/548/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/548/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/548/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/pull/548",
+      "id": 4798851401,
+      "node_id": "PR_kwDOPVWa587tWS5S",
+      "number": 548,
+      "title": "docs: game-design canon (draft) + ADRs + README correctness",
       "user": {
         "login": "PipFoweraker",
         "id": 77564415,
@@ -38,24 +38,24 @@
       "assignees": [],
       "milestone": null,
       "comments": 1,
-      "created_at": "2026-07-02T05:38:23Z",
-      "updated_at": "2026-07-02T05:38:27Z",
+      "created_at": "2026-07-02T23:25:32Z",
+      "updated_at": "2026-07-02T23:25:35Z",
       "closed_at": null,
       "assignee": null,
       "author_association": "OWNER",
       "active_lock_reason": null,
       "draft": false,
       "pull_request": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/pulls/547",
-        "html_url": "https://github.com/PipFoweraker/pdoom1/pull/547",
-        "diff_url": "https://github.com/PipFoweraker/pdoom1/pull/547.diff",
-        "patch_url": "https://github.com/PipFoweraker/pdoom1/pull/547.patch",
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/pulls/548",
+        "html_url": "https://github.com/PipFoweraker/pdoom1/pull/548",
+        "diff_url": "https://github.com/PipFoweraker/pdoom1/pull/548.diff",
+        "patch_url": "https://github.com/PipFoweraker/pdoom1/pull/548.patch",
         "merged_at": null
       },
-      "body": "Decision **H** from the consistency audit (PR #543 review). Fixes drifted player-facing constants:\n\n- **`godot/scripts/ui/bug_report_panel.gd`**: the in-panel privacy + contributors links pointed at `pdoom.net`; corrected to the canonical **`pdoom1.com`** (confirmed 2026-06).\n- **`godot/data/patch_notes.json`**: the What's New entries claimed bug reporting via **F8** \u2014 but there's no `F8` input action in `project.godot`; the reporter actually opens on **`\\` (backslash) or `N`** (`main_ui.gd:204`). Corrected.\n\n## Notes\n- These files live in `godot/` \u2014 the area your `feat/ui-player-experience` branch touches. Pip confirmed not mid-QA; kept edits minimal (link/string only) to keep any future merge trivial. Based on current `main` (`c4d289f`, incl. your #546 QA checklist).\n- **Prevention (follow-up, not in this PR):** the root pattern is player-facing constants (keybind, domain, version) hardcoded in many places. Tracked for (a) a drift-linter that flags stale keybind/domain claims, and (b) centralizing these into a single constants source.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "body": "Folds the last consistency-audit branch into `main`. Three things, one of which is merge-critical:\n\n## Contents\n\n1. **README correctness (merge-ready)** \u2014 dead `docs/user-guide/` links repointed to real docs; bug-report keybind `F8` \u2192 `\\`/`N`. **These fixes currently exist only on this branch \u2014 `main`'s README still shows the wrong keybind + dead links until this merges.**\n2. **ADRs (merge-ready)** \u2014 `docs/adr/` records the three cross-era decisions (develop retirement, win-condition, pygame\u2192Godot) in immutable Nygard format, so the time-axis drift that motivated this audit can't silently recur.\n3. **`docs/GAME_DESIGN_CANON.md` (draft)** \u2014 the single source of truth for \"what the game is\": goal, win/lose (code-verified), survival-spine framing, identity ranking, harms taxonomy, tone. Marked `status: canonical-draft`; two sections still hold `[PIP]` placeholders you were going to fill (\u00a71 one-paragraph pitch, \u00a74 tone statement) + the \u00a72 \"apex-victory rarity\" dial.\n\n## Merge options\n- **Merge as-is** to fold everything (the draft canon is honestly labelled; it can finish evolving on `main`). Recommended \u2014 it also unblocks the stranded README fixes.\n- **Or** tell me and I'll split: land README + ADRs now (clean), keep the canon as a WIP branch until you've done the \u00a71/\u00a74 pass.\n\n_Last of the documentation/CI consistency audit._",
       "closed_by": null,
       "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/547/reactions",
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/548/reactions",
         "total_count": 0,
         "+1": 0,
         "-1": 0,
@@ -66,7 +66,7 @@
         "rocket": 0,
         "eyes": 0
       },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/547/timeline",
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/548/timeline",
       "performed_via_github_app": null,
       "state_reason": null
     },
@@ -1414,5 +1414,5 @@
     }
   ],
   "count": 15,
-  "last_updated": "2026-07-02T18:27:55.141809"
+  "last_updated": "2026-07-03T00:22:28.629576"
 }
