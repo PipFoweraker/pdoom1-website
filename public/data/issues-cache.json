@@ -634,99 +634,6 @@
       "pinned_comment": null
     },
     {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/561",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/561/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/561/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/561/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/561",
-      "id": 4812638442,
-      "node_id": "I_kwDOPVWa588AAAABHtsI6g",
-      "number": 561,
-      "title": "Hiring: interpretability/capability researchers can't be hired; per-spec hiring is legacy-smell",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 9028221041,
-          "node_id": "LA_kwDOPVWa588AAAACGh-4cQ",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/bug",
-          "name": "bug",
-          "color": "d73a4a",
-          "default": true,
-          "description": "Something isn't working"
-        },
-        {
-          "id": 9227753930,
-          "node_id": "LA_kwDOPVWa588AAAACJgRZyg",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/game-mechanics",
-          "name": "game-mechanics",
-          "color": "0e8a16",
-          "default": false,
-          "description": "Core game logic and mechanics"
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2026-07-05T11:28:43Z",
-      "updated_at": "2026-07-05T11:28:43Z",
-      "closed_at": null,
-      "assignee": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "body": "Playtest #560: `hire_interpretability_researcher` definitely broken, capabilities possibly. Blocks building the core scientist->research->papers->doom loop (a 'fundamental' that stopped comprehensive testing). Per-specialization hire actions are a legacy smell \u2014 should be modular. Fix hiring for all specs + consider consolidating.",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/561/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/561/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null,
-      "pinned_comment": null
-    },
-    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/545",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/545/labels{/name}",
@@ -1337,8 +1244,101 @@
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
+    },
+    {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/506",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/506/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/506/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/506/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/506",
+      "id": 3759580948,
+      "node_id": "I_kwDOPVWa587gFqcU",
+      "number": 506,
+      "title": "chore: Clean up GDScript warnings and style issues",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [
+        {
+          "id": 9028221070,
+          "node_id": "LA_kwDOPVWa588AAAACGh-4jg",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/good%20first%20issue",
+          "name": "good first issue",
+          "color": "7057ff",
+          "default": true,
+          "description": "Good for newcomers"
+        },
+        {
+          "id": 9998569368,
+          "node_id": "LA_kwDOPVWa588AAAACU_YPmA",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/worktree:infrastructure",
+          "name": "worktree:infrastructure",
+          "color": "C2E0C6",
+          "default": false,
+          "description": "Infrastructure work - pdoom1-infrastructure worktree"
+        }
+      ],
+      "state": "open",
+      "locked": false,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2025-12-24T08:09:22Z",
+      "updated_at": "2026-02-03T03:52:23Z",
+      "closed_at": null,
+      "assignee": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "body": "## Summary\nDuring QA testing, a number of GDScript warnings were observed in the Godot debugger console. These don't cause runtime errors but should be cleaned up for code quality.\n\n## Warnings to address\nFrom the debugger output:\n\n- **Integer division warnings** - Multiple instances of `Integer division. Decimal part will be discarded.`\n- **Unused local variables** - Variables declared but never used:\n  - `event_type`\n  - `start_result`\n  - `turn_result`\n  - `event_id`\n  - `research_label` (shadowing)\n  - `current_money`\n  - `panel`\n- **Ternary operator type mismatch** - `Values of the ternary operator are not mutually compatible`\n- **Unused parameter** - `doom_percentage` in `update_doom_level()`\n- **Iterator naming conflict** - `seed` iterator has same name as built-in function\n\n## Acceptance Criteria\n- [ ] All GDScript warnings resolved or intentionally suppressed with comments\n- [ ] No new warnings introduced\n- [ ] Game still functions correctly after changes\n\n## Notes\nThese are style/quality issues only - the game runs fine with these warnings present.",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/506/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/506/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null,
+      "pinned_comment": null
     }
   ],
   "count": 15,
-  "last_updated": "2026-07-09T18:32:35.183662"
+  "last_updated": "2026-07-10T00:22:54.743599"
 }
