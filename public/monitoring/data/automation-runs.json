@@ -1,17 +1,5 @@
 [
   {
-    "job": "sync-leaderboards",
-    "trigger": "schedule",
-    "timestamp": "2026-06-24T02:59:57.238566Z",
-    "status": "failure",
-    "details": {
-      "sync-all-status": "failure",
-      "sync-weekly-status": "failure",
-      "export-status": "skipped",
-      "verify-status": "failure"
-    }
-  },
-  {
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2026-06-24T07:22:42.903723Z",
@@ -1039,6 +1027,16 @@
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2026-07-13T07:17:45.394186Z",
+    "status": "success",
+    "details": {
+      "version-status": "success",
+      "stats-status": "success"
+    }
+  },
+  {
+    "job": "auto-update-data",
+    "trigger": "schedule",
+    "timestamp": "2026-07-13T12:56:03.031853Z",
     "status": "success",
     "details": {
       "version-status": "success",
