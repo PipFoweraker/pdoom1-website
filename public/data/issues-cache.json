@@ -1,16 +1,16 @@
 {
   "issues": [
     {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/637",
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/638",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/637/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/637/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/637/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/pull/637",
-      "id": 4878554263,
-      "node_id": "PR_kwDOPVWa587xUKJx",
-      "number": 637,
-      "title": "balance: L1 month-cycle sweep \u2014 data + memo (no constants changed)",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/638/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/638/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/638/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/pull/638",
+      "id": 4880735531,
+      "node_id": "PR_kwDOPVWa587xbGJH",
+      "number": 638,
+      "title": "balance: L1 recalibration \u2014 dials 1-4 applied + iteration log",
       "user": {
         "login": "PipFoweraker",
         "id": 77564415,
@@ -38,24 +38,24 @@
       "assignees": [],
       "milestone": null,
       "comments": 0,
-      "created_at": "2026-07-13T23:40:10Z",
-      "updated_at": "2026-07-14T01:23:31Z",
+      "created_at": "2026-07-14T07:10:41Z",
+      "updated_at": "2026-07-14T07:10:41Z",
       "closed_at": null,
       "assignee": null,
       "author_association": "OWNER",
       "active_lock_reason": null,
       "draft": true,
       "pull_request": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/pulls/637",
-        "html_url": "https://github.com/PipFoweraker/pdoom1/pull/637",
-        "diff_url": "https://github.com/PipFoweraker/pdoom1/pull/637.diff",
-        "patch_url": "https://github.com/PipFoweraker/pdoom1/pull/637.patch",
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/pulls/638",
+        "html_url": "https://github.com/PipFoweraker/pdoom1/pull/638",
+        "diff_url": "https://github.com/PipFoweraker/pdoom1/pull/638.diff",
+        "patch_url": "https://github.com/PipFoweraker/pdoom1/pull/638.patch",
         "merged_at": null
       },
-      "body": "## What\n\nStructured bot sweep over the **new L1 month cycle** (PR #636), plus the balance memo it feeds. **Changes no balance constants** \u2014 it measures and recommends.\n\n- **Harness:** `godot/tests/manual/test_l1_month_sweep.gd` \u2014 72 deterministic runs (6 plan/response policies) driven synchronously through the real `MonthController` playback (plan commit \u2192 day-tick playback \u2192 auto-pause-on-window \u2192 boundary). Follows the `test_exploit_sweep.gd` pattern (lives in `tests/manual`, so `--quick`/CI skip it). Unlike `test_month_button_path.gd` it does **not** clamp doom.\n- **Memo:** `docs/balance/L1_SWEEP_2026-07-13.md` \u2014 results tables, findings vs the standing questions, three lived-experience narratives, a \"dials to consider\" table (RECOMMENDATIONS only), repro appendix.\n- **Raw data:** `docs/balance/L1_sweep_runs.csv` \u2014 full per-run record.\n\n## Headline finding\n\n**No policy \u2014 including do-nothing \u2014 survives even the first plan-month.** All 72 runs die of doom at **workday-tick 2\u201315** (median 4\u20139), while the first calendar plan-month is **~23 ticks** long. The month cadence L1 just built is currently *unreachable*: the player never gets a second planning decision.\n\nThe dominant doom source is **rival-lab pressure billed per day-tick** (+5\u2026+20 doom/tick from 3 rivals), *not* `doom.base_per_turn`. The magnitudes were sized for the pre-L1 strategic turn and now bill **~23\u00d7/fiction-month** \u2014 the \"event/doom density per month re-denomination\" ADR-0009 \u00a7Consequences flagged is **still open**.\n\n## Numbers (see memo for full tables)\n\n| Policy | median death-tick | doom slope | root-cause |\n|---|---|---|---|\n| reserve_heavy | 9 | 7.0/tick | doom 8 |\n| safety_lean | 8 | 7.8/tick | doom 8 |\n| do_nothing | 6 | 10.3/tick | doom 10 |\n| random_walk | 6 | 12.7/tick | doom 27 / **ledger 3** |\n| loan_desperation | 6 | 14.4/tick | **ledger 8** |\n| greedy_overcommit | 4 | 16.7/tick | doom 8 |\n\n- **Beats do-nothing?** Only weakly \u2014 safety/reserve survive ~50% longer, but the margin is 2\u20133 ticks against a ~23-tick month. The doom slope swamps every strategic choice.\n- **Ledger bites?** Yes, hard \u2014 `loan_desperation` is **8/8 ledger-rooted** (corrected EE-8 classifier: surface *doom*, root *ledger*). A single DEFER mints a `desperation_payroll` bill that converts to **+99\u2026+143 doom in one tick** \u2014 a one-click death.\n- **Reserve pays?** No \u2014 Attention (20/mo) is ~6\u00d7 oversupplied vs window demand (~3), so the crisp-reserve gamble has no teeth.\n- **Window budget** (`window_demand_budget = 3`) is correct and *binding* (surplus windows downgrade to feed \u2014 the #630 fix works).\n\n## \u26a0\ufe0f Wiring bug surfaced (documented, NOT fixed \u2014 #636 code untouched)\n\n`MonthController.resolve_current_window(response)` (`month_controller.gd:151`, the four-verb path) **pops the window off the queue *before* `WindowResolver.resolve` validates payment and never re-pushes on failure** \u2014 so `handle_reserve` with an empty reserve silently discards the window (no effect, no charge). `resolve_current_window_option` (`:165`) guards correctly (pops only on success). Impact is **latent**: the shipped v1 dialog uses the option-path, so this bites only the future plan-screen UI. The sweep tripped it twice and worked around it with a logged force-drop. Recommend aligning the two paths when the plan screen lands.\n\n## Test / repro\n\n`--import` pass then: `-s res://addons/gut/gut_cmdln.gd -gdir=res://tests/manual -gselect=test_l1_month_sweep.gd -gexit`. 72 runs, ~3 s, deterministic per `(seed, policy)` (bot RNG seeded by `hash(seed|policy)`, recorded per run). GUT: 1 test, passing.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "body": "## What\n\nRecalibrates L1 month-cycle balance. The #637 overnight sweep proved **no policy survived even one plan-month** \u2014 rival/base/researcher/ledger magnitudes were all sized for the pre-L1 *strategic turn* but bill ~22\u00d7/month under the day-tick cadence (ADR-0009). This applies Pip's ruled dials 1-4 (dial 5 / Attention explicitly out of scope) across 5 measured 72-run sweeps, then merges `main`.\n\n**Final (72-run sweep, on the merge with main), median months survived:**\n\n| policy | median | target | verdict |\n|---|---|---|---|\n| do_nothing | **14** | 12-18 | \u2705 |\n| safety_lean | **20** | 1.5-2.5\u00d7 do_nothing | \ud83d\udfe0 1.43\u00d7 near-miss |\n| reserve_heavy | **19** | 1.5-2.5\u00d7 | \ud83d\udfe0 1.36\u00d7 near-miss |\n| random_walk | **6** | between do_nothing & safety | \u274c below (self-harms ~40%) |\n| greedy_overcommit | **5** | faster, not sub-month | \u2705 |\n| loan_desperation | **4** | mid-range, ledger-rooted | \ud83d\udfe1 8/8 ledger \u2713, pace low-mid |\n\n`MORTALITY_CHECK: max 45 mo, 0 immortal \u2192 PASS` (ADR-0002). A single DEFER is survivable (loan default capped +15 doom/tick, rolled over months).\n\n## Two load-bearing findings (Pip veto-first)\n\n1. **The ledger's doom teeth were INERT** \u2014 `_step_resolve_doom` overwrites `state.doom = doom_system.current_doom` every tick, clobbering the ledger's direct doom writes (probe-confirmed: a bill computing `doom: 104.8` moved actual doom ~0). #637's \"one-click +143 doom\" never landed; loan_desperation's \"ledger deaths\" were rival-doom deaths the classifier merely *labelled* ledger. Fixed surgically (ledger doom now routes through `doom_system`, capped + rolled).\n2. **Safety's beats-passive margin is bankruptcy/variance-bound**, not doom-bound \u2014 bumping the safety coefficient +25% didn't move the median; merging `main`'s event economy did (1.1\u00d7\u21921.4\u00d7). The 1.5-2.5\u00d7 target wants the money/hiring economy, not a doom dial.\n\n## Scope note\n\nThe #637 dial table named only *rivals+base* (dial 1) and *DEFER\u2192payroll* (dial 3). Measurement showed the re-denomination artifact also pervades **player researcher/unproductive doom** (dial-1 completion) and **ledger fuses/interest/exposure** (dial-3 completion); the targets are unreachable without them. Each is flagged as a separate veto item in the memo. **Dial 5 (Attention) untouched.**\n\n## Read\n\n`docs/balance/L1_CALIBRATION_2026-07-14.md` \u2014 targets (labelled \"veto these first\"), per-iteration log, final-constants yes/no checklist, results vs #637, three re-narrated lived experiences, open questions.\n\n## Notes\n- All directly-affected unit suites pass (doom_system, ledger\u00d73, death_attribution, turn_manager, loss_legibility, salary_cadence, month_controller, events, risk_system). Stale magic-number assertions reworked to read Balance. Full suite is slow now (games last ~50\u00d7 longer) but not failing. CI is hollow (#629) \u2014 validated locally.\n- Draft: constants await Pip's veto pass (checklist in the memo).\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
       "closed_by": null,
       "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/637/reactions",
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/638/reactions",
         "total_count": 0,
         "+1": 0,
         "-1": 0,
@@ -66,7 +66,7 @@
         "rocket": 0,
         "eyes": 0
       },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/637/timeline",
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/638/timeline",
       "performed_via_github_app": null,
       "state_reason": null
     },
@@ -1308,16 +1308,16 @@
       "pinned_comment": null
     },
     {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/590",
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/622",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/590/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/590/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/590/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/590",
-      "id": 4860430991,
-      "node_id": "I_kwDOPVWa588AAAABIbRKjw",
-      "number": 590,
-      "title": "Test suite: 14 order-dependent failures in full local run (singleton leakage), invisible to CI",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/622/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/622/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/622/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/622",
+      "id": 4866050668,
+      "node_id": "I_kwDOPVWa588AAAABIgoKbA",
+      "number": 622,
+      "title": "Build lane L10 \u00b7 main_ui decomposition: extract-before set + let-die map",
       "user": {
         "login": "PipFoweraker",
         "id": 77564415,
@@ -1339,33 +1339,14 @@
         "user_view_type": "public",
         "site_admin": false
       },
-      "labels": [
-        {
-          "id": 9028221041,
-          "node_id": "LA_kwDOPVWa588AAAACGh-4cQ",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/bug",
-          "name": "bug",
-          "color": "d73a4a",
-          "default": true,
-          "description": "Something isn't working"
-        },
-        {
-          "id": 9227753593,
-          "node_id": "LA_kwDOPVWa588AAAACJgRYeQ",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/testing",
-          "name": "testing",
-          "color": "0052cc",
-          "default": false,
-          "description": "Issues related to test suite and testing infrastructure"
-        }
-      ],
+      "labels": [],
       "state": "open",
       "locked": false,
       "assignees": [],
       "milestone": null,
-      "comments": 3,
-      "created_at": "2026-07-11T04:02:35Z",
-      "updated_at": "2026-07-12T23:52:25Z",
+      "comments": 0,
+      "created_at": "2026-07-12T08:38:25Z",
+      "updated_at": "2026-07-12T08:38:25Z",
       "closed_at": null,
       "assignee": null,
       "author_association": "OWNER",
@@ -1381,10 +1362,10 @@
         "blocking": 0,
         "total_blocking": 0
       },
-      "body": "Surfaced by #582/#589: once the stale-load-error mask was removed, a FULL local GUT run (`python scripts/run_godot_tests.py`) shows ~14 failures in test_game_manager.gd (13) + test_turn_manager.gd (1) \u2014 difficulty money (Easy asserts 367500, gets 225000), a $25k salary deduction, and signal/turn-flow timing. **CI's Unit Tests gate passes** (main + #589 green), so these are order-dependent, not caught in CI's mode. Almost certainly singleton/state leakage between tests (GameConfig.difficulty etc.) rather than game bugs \u2014 difficulty modifiers verifiably work in-game (#585). Fix: proper per-test isolation (reset GameConfig/singletons in before_each/after_each); then confirm whether any are genuine regressions vs pure test artifacts.",
+      "body": "**Authority:** `docs/TECH_DEBT_REGISTER.md` \u00a7L10 + `WORKSHOP_2_BUILD_LANES.md` \u00a7L10. **Start now \u2014 parallel-safe.** main_ui.gd is 3,786 lines of imperatively-built dialogs; follow the existing child-widget mount pattern (`research_quality_selector.gd` et al).\n\nExtract NOW (turn-model-independent), in order:\n1. **`event_dialog.gd`** (:2975-3223) \u2014 FIRST; L1's response windows reuse exactly this presenter\n2. `ledger_screen.gd` (:1857-1985) \u2014 zero turn/AP coupling\n3. `employee_panel.gd` (:3304-3582) \u2014 becomes L2's per-person assignment surface\n4. `submenu_chrome.gd` (:1088-1195) \u2014 shared dialog positioning/styling\n\nSever while extracting: direct state writes `main_ui.gd:535` (queued_actions) and `:1524-1526` (hire queue/candidate pool); delete the 8\u00d7 duplicated affordability pre-checks (trust `select_action`'s error signal).\n\n**LET-DIE \u2014 do not extract, polish, or fix:** command/queue/reserve-AP/commit-plan zone (:397-544), queued-actions viz (:2866-2974), `_calculate_queued_costs`, AP-affordability half of the action bar (:909-928). The L1/L2 plan screen replaces these; new screens are NEW scenes speaking only to GameManager's API.\n\nDomain dialogs (hiring/fundraising/financing/publicity/strategic/travel/operations) extract DURING L2/L3 when their AP triggers die \u2014 not now.\n\n**Session kickoff prompt:** \"Read docs/TECH_DEBT_REGISTER.md \u00a7L10. Extract the four before-set modules in order; behavior-preserving; never touch the LET-DIE list.\"\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
       "closed_by": null,
       "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/590/reactions",
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/622/reactions",
         "total_count": 0,
         "+1": 0,
         "-1": 0,
@@ -1395,12 +1376,12 @@
         "rocket": 0,
         "eyes": 0
       },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/590/timeline",
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/622/timeline",
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
     }
   ],
   "count": 15,
-  "last_updated": "2026-07-14T06:38:54.004218"
+  "last_updated": "2026-07-14T12:23:01.924877"
 }
