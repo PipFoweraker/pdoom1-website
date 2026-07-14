@@ -837,8 +837,8 @@ t	.hero {
 				<a href="#" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
 			</div>
 			<div class="version-info" id="versionInfo">
-				<span class="version-number" id="versionNumber">v0.10.1</span>
-				<span id="versionDate">2025-11-06</span>
+				<span class="version-number" id="versionNumber">v0.11.0</span>
+				<span id="versionDate">2025-12-07</span>
 			</div>
 			<ul class="nav-links" role="menubar">
 				<li role="none"><a href="#home" role="menuitem">Game</a></li>
@@ -846,7 +846,7 @@ t	.hero {
 				<li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
 				<li role="none"><a href="/game-stats/" role="menuitem">Stats</a></li>
 				<li role="none"><a href="/dashboard/" role="menuitem">Risk Dashboard</a></li>
-				<li role="none"><a href="http://208.113.200.215" role="menuitem" target="_blank">Forum</a></li>
+				<!-- Forum link hidden until forum.pdoom1.com (DNS + HTTPS) is live -->
 				<li role="none" class="dropdown">
 					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
 					<ul class="dropdown-menu" role="menu">
@@ -901,7 +901,7 @@ t	.hero {
 
 			<!-- Steam Badge - Commented out until available
 			<div style="text-align: center; margin-top: 1rem;">
-				<a href="https://store.steampowered.com/app/XXXXX/pdoom1" target="_blank" rel="noopener" style="text-decoration: none;">
+				<a href="#TODO-real-steam-appid-before-uncommenting" target="_blank" rel="noopener" style="text-decoration: none;">
 					<div style="display: inline-block; padding: 12px 24px; background: #171a21; border: 1px solid #2a475e; border-radius: 4px; color: #ffffff; font-family: 'Motiva Sans', Arial, sans-serif; font-size: 14px; transition: all 0.2s ease; cursor: pointer;">
 						<div style="display: flex; align-items: center; gap: 8px;">
 							<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -1525,7 +1525,7 @@ python main.py</pre>
 		// Track download button clicks with Plausible Analytics
 		function setupDownloadTracking() {
 			// Get current version from version.json (loaded by loadVersionInfo)
-			let currentVersion = 'v0.10.2'; // Default fallback
+			let currentVersion = 'v0.11.0'; // Default fallback
 
 			// Try to extract version from button text or use default
 			const versionMatch = document.querySelector('.version-number')?.textContent;

@@ -20,7 +20,7 @@
 				<li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
 				<li role="none"><a href="/game-stats/" role="menuitem">Stats</a></li>
 				<li role="none"><a href="/dashboard/" role="menuitem">Risk Dashboard</a></li>
-				<li role="none"><a href="http://208.113.200.215" role="menuitem" target="_blank" rel="noopener">Forum</a></li>
+				<!-- Forum link hidden until forum.pdoom1.com (DNS + HTTPS) is live -->
 				<li role="none" class="dropdown">
 					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
 					<ul class="dropdown-menu" role="menu">
