@@ -206,13 +206,19 @@ jobs:
         run: |
           echo "Checking HTTPS usage..."
           
-          # Check that we're not using HTTP for external resources, excluding XML namespaces
-          if grep -r "http://" public/ \
+          # Check that our AUTHORED pages don't use insecure HTTP. Excludes:
+          # - XML namespaces / localhost
+          # - Auto-generated event pages and events.json, which quote external
+          #   citation URLs (arxiv/distill/author homepages) that are genuinely
+          #   http:// upstream and not ours to change.
+          if grep -rI "http://" public/ \
             | grep -v "localhost" \
             | grep -v "127.0.0.1" \
             | grep -v "xmlns=" \
             | grep -v "www.w3.org" \
-            | grep -v "sitemaps.org" ; then
+            | grep -v "sitemaps.org" \
+            | grep -v "public/events/" \
+            | grep -v "public/data/events.json" ; then
             echo "⚠️  HTTP URLs found - should use HTTPS"
             exit 1
           fi
