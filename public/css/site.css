@@ -1,7 +1,11 @@
 :root {
-  --accent-primary: #0066cc;
-  --text-secondary: #666666;
-  --text-muted: #999999;
+  /* Dark-theme fallbacks. This file loads LAST, so these OVERRIDE each page's
+     own :root -- they must match the terminal palette, not fight it. Previously
+     these were light-theme values (#0066cc blue, #666/#999 greys), which turned
+     every page WITHOUT a runtime token loader (i.e. all ~2200 event pages) blue. */
+  --accent-primary: #00ff41;
+  --text-secondary: #cccccc;
+  --text-muted: #aaaaaa;
 }
 
 .summary-toggle {
@@ -35,10 +39,12 @@
 }
 
 .card {
-  background: #fff;
+  /* No background/shadow here on purpose: each page's own dark .card governs.
+     This file previously forced `background:#fff`, which whited-out the feature
+     cards (and any .card) on the dark terminal theme. Loaded last, it won the
+     cascade over the inline dark rule. See public/index.html About > Features. */
   padding: 1rem;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .status {
