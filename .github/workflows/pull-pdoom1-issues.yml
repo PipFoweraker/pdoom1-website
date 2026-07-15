@@ -18,6 +18,8 @@ jobs:
         with:
           node-version: '20'
       - name: Generate Markdown
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           node scripts/generate_pdoom1_issues_md.js
       - name: Commit changes
