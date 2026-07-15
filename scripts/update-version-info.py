@@ -109,6 +109,51 @@ def update_version_data() -> Dict[str, Any]:
     return version_data
 
 
+def sync_status_json(version_data: Dict[str, Any]) -> None:
+    """Keep public/data/status.json's game release block in sync with the canonical
+    release so it can't drift from version.json. Only refreshes the game release facts
+    and timestamp; it does NOT touch website.version (that is a separate, deliberate bump).
+    Guarded so a failed GitHub fetch (which falls back to a stale placeholder) cannot
+    clobber status.json: a real release URL contains '/releases/tag/'."""
+    release = version_data['latest_release']
+    html_url = release.get('html_url', '')
+    if '/tag/' not in html_url:
+        print('Skipping status.json sync (release lookup used fallback, not a real release)')
+        return
+
+    status_file = os.path.join(DATA_DIR, 'status.json')
+    if not os.path.exists(status_file):
+        return
+
+    try:
+        with open(status_file, 'r', encoding='utf-8') as f:
+            status = json.load(f)
+    except Exception as e:
+        print(f"Warning: could not read status.json, skipping sync: {e}")
+        return
+
+    published = release.get('published_at') or ''
+    release_date = published.split('T')[0] if published else ''
+
+    game = status.setdefault('game', {})
+    latest = game.setdefault('latestRelease', {})
+    latest['version'] = release['version']
+    if release_date:
+        latest['date'] = release_date
+    latest.setdefault(
+        'downloadUrl',
+        f'https://github.com/{REPO_OWNER}/{REPO_NAME}/releases/latest',
+    )
+    latest.setdefault('changelog', 'See CHANGELOG.md for details')
+    game.setdefault('development', {})['progress'] = f"{release['version']} released"
+    game['lastUpdated'] = datetime.now().isoformat()
+
+    with open(status_file, 'w', encoding='utf-8') as f:
+        json.dump(status, f, indent=2)
+
+    print(f"✓ Synced status.json game release to {release['version']}")
+
+
 def update_download_links(version_data: Dict[str, Any]) -> None:
     """Update download links in index.html to use dynamic version"""
     index_file = os.path.join(os.path.dirname(__file__), '..', 'public', 'index.html')
@@ -145,6 +190,7 @@ def update_download_links(version_data: Dict[str, Any]) -> None:
 if __name__ == '__main__':
     try:
         version_data = update_version_data()
+        sync_status_json(version_data)
         update_download_links(version_data)
         print('Version update complete!')
     except Exception as error:

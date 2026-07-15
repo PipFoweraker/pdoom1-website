@@ -1,5 +1,11 @@
 name: Weekly League Reset
 
+# CANONICAL weekly league rollover workflow.
+# Merged (2026-07-14) with the former weekly-league-rollover.yml, which ran the same
+# archive+new-week 9h later every Sunday and caused a double-rollover. This is now the
+# single scheduled workflow; it also emits the monitoring log and a failure alert issue
+# that the old rollover workflow provided.
+
 on:
   # Monday at 14:00 UTC = Monday 00:00 AEST (standard time)
   # Note: During daylight saving (Oct-Apr), Monday 00:00 AEDT = Sunday 13:00 UTC
@@ -20,6 +26,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   reset_weekly_league:
@@ -50,6 +57,7 @@ jobs:
           python scripts/weekly-league-manager.py --status
 
       - name: Archive previous week
+        id: archive
         if: github.event.inputs.archive_previous != 'false'
         run: |
           echo "📦 Archiving previous week..."
@@ -62,27 +70,44 @@ jobs:
           echo "✅ New seed generated: $NEW_SEED"
 
       - name: Start new weekly league
+        id: new-week
         run: |
           echo "🚀 Starting new weekly league..."
-          
+
           if [ "${{ github.event.inputs.force_reset }}" = "true" ]; then
             echo "⚠️  Force reset enabled"
             python scripts/weekly-league-manager.py --new-week --force || exit 1
           else
             python scripts/weekly-league-manager.py --new-week || exit 1
           fi
-          
+
+          NEW_WEEK=$(python scripts/weekly-league-manager.py --status | grep "CURRENT_WEEK:" | awk '{print $2}')
+          echo "new_week=$NEW_WEEK" >> $GITHUB_OUTPUT
           echo "✅ New weekly league started successfully"
 
       - name: Verify new league status
+        id: verify
         run: |
           echo "🔍 Verifying new league status:"
           python scripts/weekly-league-manager.py --status
-          
+
           # Check standings (should be empty for new week)
           echo ""
           echo "📊 New week standings:"
           python scripts/weekly-league-manager.py --standings
+
+      - name: Log automation run
+        if: always()
+        run: |
+          echo "Logging league rollover to monitoring..."
+          python scripts/log-automation-run.py \
+            --job "weekly-league-rollover" \
+            --archive-status "${{ steps.archive.outcome }}" \
+            --new-week-status "${{ steps.new-week.outcome }}" \
+            --verify-status "${{ steps.verify.outcome }}" \
+            --new-week-id "${{ steps.new-week.outputs.new_week }}" \
+            --trigger "${{ github.event_name }}"
+        continue-on-error: true
 
       - name: Sync game data
         run: |
@@ -202,3 +227,36 @@ jobs:
           echo ""
           echo "Players may already be expecting new league!"
           echo "Time-sensitive - resolve ASAP"
+
+      - name: Create failure alert issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🚨 Weekly League Rollover FAILED - Requires Attention`;
+            const body = `
+            ## Weekly League Rollover Failed
+
+            **Workflow Run:** ${{ github.run_id }}
+            **Timestamp:** ${new Date().toUTCString()}
+
+            ### Required Actions
+            1. Review workflow logs: [Link](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            2. Check current league status: \`npm run league:status\`
+            3. Manual rollover if needed:
+               \`\`\`bash
+               npm run league:archive
+               npm run league:new-week
+               \`\`\`
+            4. Verify system health: \`npm run integration:test\`
+
+            **Priority:** HIGH - Weekly competition may be stalled
+            This issue was automatically created and requires immediate attention.
+            `;
+
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['automation', 'weekly-league', 'bug', 'high-priority', 'auto-created']
+            });
