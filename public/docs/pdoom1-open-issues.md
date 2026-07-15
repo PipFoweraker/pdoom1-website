@@ -1,39 +1,56 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2025-09-09T00:00:00Z UTC (manual snapshot)
+Generated: 2026-07-15T07:00:07.188Z UTC
 
-- [#245](https://github.com/PipFoweraker/pdoom1/issues/245) Post-Rebase Test Failures: 5 Functional Issues Requiring Investigation  | labels: bug | milestone:  | updated: 2025-09-09T06:16:52Z
-- [#244](https://github.com/PipFoweraker/pdoom1/issues/244) Complete ASCII Compliance: Clean Unicode from Documentation Files  | labels: documentation, enhancement | milestone:  | updated: 2025-09-09T06:05:28Z
-- [#240](https://github.com/PipFoweraker/pdoom1/issues/240) UI Interaction Issues: Button clicks and spacebar not working consistently  | labels:  | milestone:  | updated: 2025-09-07T22:05:21Z
-- [#239](https://github.com/PipFoweraker/pdoom1/issues/239) (0.3) Enhancement - improve welcome and exit terminal messages  | labels: enhancement, ui-ux, configuration, priority-medium | milestone: 0.3.0 | updated: 2025-09-05T23:53:35Z
-- [#236](https://github.com/PipFoweraker/pdoom1/issues/236) (Design) Create a schema to aallow for end game states based off Manifold market outcomes  | labels: enhancement | milestone: 1.0.0 | updated: 2025-09-05T22:36:13Z
-- [#235](https://github.com/PipFoweraker/pdoom1/issues/235) Add external AI safety links and references  | labels: documentation, enhancement, ui-ux, tutorial | milestone: 0.5.0 | updated: 2025-09-05T22:34:11Z
-- [#232](https://github.com/PipFoweraker/pdoom1/issues/232) Drop Python 3.8 Support Initiative  | labels: enhancement, priority-high, technical-debt | milestone: Technical Debt Cleanup | updated: 2025-09-04T23:27:29Z
-- [#227](https://github.com/PipFoweraker/pdoom1/issues/227) Action Points System Validation Issues  | labels: bug, testing, game-mechanics, priority-medium, technical-debt | milestone: Technical Debt Cleanup | updated: 2025-09-04T23:15:03Z
-- [#226](https://github.com/PipFoweraker/pdoom1/issues/226) Sound System Default Configuration Issues  | labels: bug, enhancement, testing, audio, priority-medium | milestone: Technical Debt Cleanup | updated: 2025-09-08T22:05:20Z
-- [#222](https://github.com/PipFoweraker/pdoom1/issues/222) (0.5) alliance meetings / voting systems, maybe once every 6 months?  | labels: enhancement, question | milestone: 0.5.0 | updated: 2025-09-04T21:50:59Z
-- [#221](https://github.com/PipFoweraker/pdoom1/issues/221) Add event of 4 September of 1234 password exposure  | labels: enhancement | milestone:  | updated: 2025-09-04T13:21:24Z
-- [#220](https://github.com/PipFoweraker/pdoom1/issues/220) (Meta) (Dev) Solve for GPG for this signing things properly  | labels: documentation, enhancement | milestone: 0.3.0 | updated: 2025-09-04T12:03:07Z
-- [#216](https://github.com/PipFoweraker/pdoom1/issues/216) Art assets & web counterparts.  | labels: enhancement, help wanted | milestone: 0.3.0 | updated: 2025-09-05T01:06:26Z
-- [#215](https://github.com/PipFoweraker/pdoom1/issues/215) Acknowledge contributors.  | labels: documentation | milestone: 0.3.0 | updated: 2025-09-04T10:15:39Z
-- [#214](https://github.com/PipFoweraker/pdoom1/issues/214) Poor contrast UI  | labels: documentation, enhancement | milestone: 0.3.0 | updated: 2025-09-04T21:41:59Z
-- [#213](https://github.com/PipFoweraker/pdoom1/issues/213) Sound settings need inprovements  | labels: bug, documentation | milestone: 0.3.0 | updated: 2025-09-04T10:15:38Z
-- [#212](https://github.com/PipFoweraker/pdoom1/issues/212) It would be nice to have some window managment  | labels: documentation, enhancement | milestone: 0.3.0 | updated: 2025-09-04T10:15:38Z
-- [#211](https://github.com/PipFoweraker/pdoom1/issues/211) Game crashes out given unexpected inputs.  | labels: bug, documentation, enhancement | milestone: 0.3.0 | updated: 2025-09-04T10:15:37Z
-- [#197](https://github.com/PipFoweraker/pdoom1/issues/197) (0.1)  Enhanced Personnel System with Specialist Researchers  | labels: enhancement | milestone: 0.1.0 | updated: 2025-08-20T09:48:33Z
-- [#196](https://github.com/PipFoweraker/pdoom1/issues/196) (0.5.0) complexity settings  | labels: enhancement | milestone: 0.5.0 | updated: 2025-09-04T09:07:56Z
-- [#194](https://github.com/PipFoweraker/pdoom1/issues/194) (0.2) Alliances and diplomacy  | labels: enhancement | milestone: 0.2.0 | updated: 2025-09-04T21:47:22Z
-- [#191](https://github.com/PipFoweraker/pdoom1/issues/191) (0.2) whistleblowing and leaks  | labels: enhancement | milestone: 0.2.0 | updated: 2025-08-20T09:43:36Z
-- [#189](https://github.com/PipFoweraker/pdoom1/issues/189) (0.2) Enhancement - player management depth  | labels: enhancement | milestone: 0.2.0 | updated: 2025-08-20T09:42:53Z
-- [#188](https://github.com/PipFoweraker/pdoom1/issues/188) (0.2) Enhancement - geopolitics  | labels: enhancement | milestone: 0.2.0 | updated: 2025-08-20T09:42:23Z
-- [#187](https://github.com/PipFoweraker/pdoom1/issues/187) (0.2) Enhancement - regulations  | labels: enhancement | milestone: 0.2.0 | updated: 2025-08-20T09:42:05Z
-- [#186](https://github.com/PipFoweraker/pdoom1/issues/186) (0.2) Enhancement - public opinion and media system  | labels: enhancement | milestone: 0.2.0 | updated: 2025-08-20T09:41:34Z
-- [#185](https://github.com/PipFoweraker/pdoom1/issues/185) Fireable staff  | labels: enhancement | milestone: 0.1.0 | updated: 2025-08-20T09:39:18Z
-- [#184](https://github.com/PipFoweraker/pdoom1/issues/184) (enhancement) office cat  | labels: enhancement | milestone: 0.1.0 | updated: 2025-09-04T10:59:40Z
-- [#183](https://github.com/PipFoweraker/pdoom1/issues/183) (enhancement) purchase office stationery  | labels: enhancement | milestone: 0.1.0 | updated: 2025-08-20T09:37:18Z
-- [#179](https://github.com/PipFoweraker/pdoom1/issues/179) (enhancement) add classic HR problems to the events list  | labels: enhancement | milestone: 0.1.0 | updated: 2025-08-20T09:32:44Z
-- [#178](https://github.com/PipFoweraker/pdoom1/issues/178) Improve UI such that it more closely resembles Starcraft 2 in functionality if not aesthetic  | labels: enhancement | milestone: 0.1.0 | updated: 2025-08-28T10:06:24Z
-- [#18](https://github.com/PipFoweraker/pdoom1/issues/18) Windowing and tiling design inspired by Gwern's JavaScript behaviors  | labels: enhancement | milestone: 0.1.0 | updated: 2022-04-05T00:58:04Z
+| # | Title | Labels | Milestone | Updated | Link |
+|---:|-------|--------|-----------|---------|------|
+| 622 | Build lane L10 · main_ui decomposition: extract-before set + let-die map |  |  | 2026-07-12 08:38:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/622) |
+| 621 | Build lane L9 · Balance surface + data externalization (defs→JSON, Balance autoload) |  |  | 2026-07-12 08:38:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/621) |
+| 619 | Build lane L8 · Achievements skeleton (observer-only) |  |  | 2026-07-12 08:23:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/619) |
+| 615 | Build lane L4 · Event taxonomy + ledger intake (ADR-0012) |  |  | 2026-07-12 08:23:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/615) |
+| 614 | Build lane L3 · Adoption, papers, conferences (ADR-0010, ADR-0014) |  |  | 2026-07-12 08:22:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/614) |
+| 613 | Build lane L2 · Effort economy: founder hours, staff lanes, managers (ADR-0011) |  |  | 2026-07-12 08:22:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/613) |
+| 608 | Architecture smell: two GameManager instances (scene-local + autoload); 'ready' prints twice | technical-debt |  | 2026-07-12 08:26:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/608) |
+| 603 | Popups: fanfare needs a dimming backdrop (events leak under it); bug-report 'thanks' Submit still clickable | bug, ui-ux |  | 2026-07-12 00:50:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/603) |
+| 602 | Navigation audit + universal principle (ESC/back consistency, mirrored toggle keys, unreachable Employee screen) | ui-ux |  | 2026-07-12 00:50:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/602) |
+| 601 | Ledger UX: layout wrong/cramped, L-to-close, critical-due popup, distinct warning colour | bug, ui-ux |  | 2026-07-12 00:50:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/601) |
+| 600 | Dev overlays (DEV MODE + F3) can't read live game state; 29 runtime errors; nudge/advance-turn wiring | bug |  | 2026-07-12 00:50:31 | [link](https://github.com/PipFoweraker/pdoom1/issues/600) |
+| 595 | Audit strategic options/events/buttons that cost but have no meaningful game impact | game-mechanics |  | 2026-07-11 08:46:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/595) |
+| 579 | Balance/design from session 2 (workshop #2): events depth, upgrade rebalance, compute economy, investor-pressure frequency | enhancement, game-mechanics, post-launch |  | 2026-07-10 04:06:37 | [link](https://github.com/PipFoweraker/pdoom1/issues/579) |
+| 578 | Legibility pass (buildable soon): doom blow-by-blow, ledger/overlay discoverability, researcher info, event fanfare | enhancement, ui-ux |  | 2026-07-10 04:06:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/578) |
+| 577 | UI jitter on hover/button; layout realignment when new actions (Strategic moves) appear | bug, ui-ux |  | 2026-07-10 04:06:33 | [link](https://github.com/PipFoweraker/pdoom1/issues/577) |
+| 575 | Keyboard input routing: hire-screen number keys dead + bug-report text field intercepted by global hotkeys | bug, ui-ux |  | 2026-07-10 04:06:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/575) |
+| 574 | Playtest design ideas: payroll depth, donor base, accounting-software introduces the ledger | enhancement, game-mechanics, post-launch |  | 2026-07-10 05:02:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/574) |
+| 567 | Event dialog keyboard: choice keys mismatch shown buttons ('key index out of range') | bug, ui-ux |  | 2026-07-05 11:28:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/567) |
+| 565 | Travel/Conferences only reachable by hotkey T, absent from menus | ui-ux |  | 2026-07-05 11:28:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/565) |
+| 545 | Cross-repo sync: careful cleanup pass (pdoom1 -> pdoom1-website / pdoom-data) |  |  | 2026-07-01 01:54:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/545) |
+| 531 | ci: bump deprecated Node-20 GitHub Actions (checkout/setup-python/setup-node/upload-artifact) |  |  | 2026-06-27 03:09:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/531) |
+| 529 | Revisit terminal/CRT texture aesthetic (parked art package) | enhancement, ui-ux, worktree:player-experience |  | 2026-06-26 06:14:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/529) |
+| 528 | Lab Ledger: player-facing review page with insight-gated 'redacted' risk zone | enhancement |  | 2026-06-26 05:42:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/528) |
+| 526 | Track down the CSIRO/Data61 retro Win3-style web UI project |  |  | 2026-06-15 10:31:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/526) |
+| 520 | QA: Test Doom System & Victory Conditions | good first issue, qa-testing |  | 2026-02-03 03:52:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/520) |
+| 519 | QA: Test Accessibility Features section | good first issue, qa-testing |  | 2026-02-03 03:52:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/519) |
+| 518 | QA: Test Events System section | good first issue, qa-testing |  | 2026-02-03 03:52:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/518) |
+| 517 | QA: Test Debug & Developer Tools section | good first issue, qa-testing |  | 2026-02-03 03:52:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/517) |
+| 516 | QA: Test Core Gameplay Flow section | good first issue, qa-testing |  | 2026-02-03 03:52:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/516) |
+| 514 | Character Creation System (Point Allocation) | enhancement, game-mechanics, post-launch, worktree:dialogue |  | 2026-07-13 11:30:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/514) |
+| 511 | Add visual highlight effect for newly available actions | worktree:player-experience |  | 2026-07-13 11:30:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/511) |
+| 508 | Add hero art/images to event popup options | worktree:player-experience |  | 2026-07-13 11:30:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/508) |
+| 506 | chore: Clean up GDScript warnings and style issues | good first issue, worktree:infrastructure |  | 2026-02-03 03:52:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/506) |
+| 500 | Research Quality System (Rushed/Standard/Thorough) | enhancement, game-mechanics, post-launch, worktree:new-mechanics |  | 2026-07-13 11:30:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/500) |
+| 476 | Progressive finance and software management system | enhancement, worktree:dialogue |  | 2026-07-13 11:30:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/476) |
+| 475 | Comprehensive upgrades system overhaul | worktree:dialogue |  | 2026-07-13 11:30:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/475) |
+| 473 | Character creation and lab setup point allocation system | worktree:dialogue |  | 2026-07-13 11:30:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/473) |
+| 471 | Office cosmetic shopping system | worktree:new-mechanics |  | 2026-07-13 11:29:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/471) |
+| 470 | Visual office representation on screen | worktree:new-mechanics |  | 2026-07-13 11:29:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/470) |
+| 467 | Employee living and office environment outfitting system | worktree:new-mechanics |  | 2026-07-13 11:29:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/467) |
+| 437 | Automated Blog Publishing From Data Lake Events & Commits | documentation, enhancement, pdoom-website, worktree:infrastructure |  | 2026-07-13 11:30:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/437) |
+| 433 | Extract 2018-2019 timeline from Alignment Research Dataset | pdoom-data, worktree:infrastructure |  | 2026-07-13 11:29:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/433) |
+| 236 | (Design) Create a schema to aallow for end game states based off Manifold market outcomes | enhancement, worktree:dialogue | Future Releases | 2026-07-13 11:30:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/236) |
+| 188 | (0.2) Enhancement - geopolitics | enhancement, worktree:new-mechanics | Future Releases | 2026-01-15 11:55:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/188) |
+| 187 | (0.2) Enhancement - regulations | enhancement, worktree:new-mechanics | Future Releases | 2026-01-15 11:55:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/187) |
+| 186 | (0.2) Enhancement - public opinion and media system | enhancement, worktree:new-mechanics | Future Releases | 2026-01-15 11:55:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/186) |
+
 
 ---
 Source: `PipFoweraker/pdoom1` via GitHub CLI.
