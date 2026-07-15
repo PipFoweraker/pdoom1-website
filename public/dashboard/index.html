@@ -1219,6 +1219,10 @@ async function loadManifoldMarkets() {
         const response = await fetch(`https://api.manifold.markets/v0/slug/${slug}`);
         const market = await response.json();
 
+        if (!market || !Number.isFinite(market.probability)) {
+          console.warn(`Manifold market ${slug}: no probability field, skipping`);
+          continue;
+        }
         const probability = (market.probability * 100).toFixed(0);
         const marketDiv = document.createElement('div');
         marketDiv.className = 'stock-ticker';

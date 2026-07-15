@@ -1481,7 +1481,52 @@ python main.py</pre>
 		
 		// GitHub Issues section removed - now on dedicated /issues/ page
 		// Load and update homepage game stats + download button labels
-		async function loadGameStats() {
+		
+			// --- injected by bugfix_pass_20260715.py: populate the status cards ---
+			// These spans had NO populator and sat on "Loading..." forever.
+			// Fill from /data/version.json; the league card has no endpoint yet, so
+			// derive the ISO week client-side and dash the rest.
+			function _isoWeek(d) {
+				const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+				const day = t.getUTCDay() || 7;
+				t.setUTCDate(t.getUTCDate() + 4 - day);
+				const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+				return Math.ceil((((t - yearStart) / 86400000) + 1) / 7);
+			}
+			function _setStatus(id, val) {
+				const el = document.getElementById(id);
+				if (!el) return;
+				el.textContent = (val === null || val === undefined || val === '') ? '\u2014' : val;
+				el.classList.remove('loading-placeholder');
+			}
+			async function populateStatusCards() {
+				try {
+					const res = await fetch('/data/version.json', { cache: 'no-store' });
+					if (!res.ok) throw new Error('version.json ' + res.status);
+					const v = await res.json();
+					_setStatus('current-version-display', v.latest_release && v.latest_release.version);
+					_setStatus('release-date', v.latest_release && v.latest_release.published_at
+						? v.latest_release.published_at.slice(0, 10) : null);
+					_setStatus('open-issues-count', v.repository_stats && v.repository_stats.open_issues);
+					_setStatus('last-update-time', v.last_updated
+						? new Date(v.last_updated).toLocaleDateString(undefined,
+							{ year: 'numeric', month: 'short', day: 'numeric' }) : null);
+					const now = new Date();
+					_setStatus('current-week-display',
+						now.getUTCFullYear() + '_W' + String(_isoWeek(now)).padStart(2, '0'));
+					_setStatus('week-time-remaining', null);
+					_setStatus('league-participants', null);
+				} catch (e) {
+					console.warn('populateStatusCards failed:', e);
+					document.querySelectorAll('.loading-placeholder').forEach(el => {
+						el.textContent = '\u2014';
+						el.classList.remove('loading-placeholder');
+					});
+				}
+			}
+			// --- end injected block ---
+
+			async function loadGameStats() {
 			try {
 				const response = await fetch('/data/version.json', { cache: 'no-store' });
 				const versionData = await response.json();
@@ -1519,6 +1564,7 @@ python main.py</pre>
 		// Load version info when page loads
 		document.addEventListener('DOMContentLoaded', () => {
 			loadGameStats();
+				populateStatusCards();
 			setupDownloadTracking();
 		});
 
