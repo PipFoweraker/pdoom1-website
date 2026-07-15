@@ -1,10 +1,29 @@
 {
   "posts": [
     {
+      "filename": "2026-07-15-ui-before-snapshot.md",
+      "title": "Where the site stands, before the refresh",
+      "date": "2026-07-15",
+      "tags": [
+        "website",
+        "ui",
+        "design",
+        "dev-notes"
+      ],
+      "summary": "A deliberate 'before' snapshot of pdoom1.com at the start of a UI refresh - what's working (the Risk Dashboard), what reads as dated (blanket monospace, no shared layout spine), and the correctness bugs fixed the same day.",
+      "commit": "426e7b6",
+      "featured": false
+    },
+    {
       "filename": "2025-10-09-website-development-sprint-complete-v0-2-0.md",
       "title": "Website Development Sprint Complete: v0.2.0 Major Enhancement",
       "date": "2025-10-09",
-      "tags": ["website", "milestone", "ui", "infrastructure"],
+      "tags": [
+        "website",
+        "milestone",
+        "ui",
+        "infrastructure"
+      ],
       "summary": "Completed comprehensive 6-hour development sprint delivering major website enhancements across three phases: game asset integration, blog system overhaul, and UI polish. Transformed the website from a basic landing page into a professional developer showcase.",
       "commit": "f675ac2",
       "featured": true
@@ -13,7 +32,13 @@
       "filename": "2025-10-09-architecture-revolution-monolith-to-modular.md",
       "title": "Architecture Revolution: From Monolith to Modular Excellence",
       "date": "2025-10-09",
-      "tags": ["milestone", "architecture", "refactoring", "type-annotation", "engineering"],
+      "tags": [
+        "milestone",
+        "architecture",
+        "refactoring",
+        "type-annotation",
+        "engineering"
+      ],
       "summary": "A comprehensive look at our systematic approach to breaking down 4,235+ line monoliths into clean, maintainable modules - featuring real metrics and engineering insights from the trenches",
       "commit": "beae890",
       "featured": false
@@ -22,79 +47,124 @@
       "filename": "2025-09-15-ui-monolith-breakdown-complete.md",
       "title": "UI Monolith Breakdown Complete - Architecture Transformation",
       "date": "2025-09-15",
-      "tags": ["milestone", "architecture", "ui", "refactoring"],
+      "tags": [
+        "milestone",
+        "architecture",
+        "ui",
+        "refactoring"
+      ],
       "summary": "Completed systematic breakdown of 4,235-line UI monolith into 8 specialized modules, achieving 37.1% reduction with zero functionality regression",
       "commit": "4c615f3"
     },
     {
       "filename": "2025-09-15-multi-repository-integration-complete.md",
-      "title": "Multi-Repository Integration System Complete", 
+      "title": "Multi-Repository Integration System Complete",
       "date": "2025-09-15",
-      "tags": ["infrastructure", "automation", "versioning"],
+      "tags": [
+        "infrastructure",
+        "automation",
+        "versioning"
+      ],
       "summary": "Completed comprehensive multi-repository integration system establishing professional automation and documentation management across pdoom1, pdoom1-website, and pdoom-data repositories",
       "commit": "139ef35"
     },
     {
       "filename": "2025-09-15-monolith-breakdown-tutorial-extraction.md",
       "title": "Monolith Breakdown: Tutorial Extraction & Legacy Cleanup",
-      "date": "2025-09-15", 
-      "tags": ["refactoring", "ui", "cleanup"],
+      "date": "2025-09-15",
+      "tags": [
+        "refactoring",
+        "ui",
+        "cleanup"
+      ],
       "summary": "Extracted 486 lines of tutorial functions, removed 151 lines of legacy code, and fixed critical hover tooltips bug"
     },
     {
       "filename": "2025-09-14-deployment-infrastructure-complete.md",
       "title": "p(Doom)1 Website Release - Deployment Infrastructure Complete",
       "date": "2025-09-14",
-      "tags": ["milestone", "infrastructure", "deployment"],
+      "tags": [
+        "milestone",
+        "infrastructure",
+        "deployment"
+      ],
       "summary": "Successfully implemented and documented the complete deployment pipeline for the p(Doom)1 website with GitHub Actions workflow"
     },
     {
-      "filename": "2025-09-14-deterministic-rng-complete.md", 
+      "filename": "2025-09-14-deterministic-rng-complete.md",
       "title": "Deterministic RNG Foundation Complete",
       "date": "2025-09-14",
-      "tags": ["architecture", "deterministic", "rng"],
+      "tags": [
+        "architecture",
+        "deterministic",
+        "rng"
+      ],
       "summary": "268-line comprehensive system for competitive gaming with enhanced deterministic RNG and community challenge features"
     },
     {
       "filename": "2025-09-13-enhanced-leaderboard-system-v0-4-1.md",
       "title": "Enhanced Leaderboard System v0.4.1",
-      "date": "2025-09-13", 
-      "tags": ["release", "leaderboard", "ui"],
+      "date": "2025-09-13",
+      "tags": [
+        "release",
+        "leaderboard",
+        "ui"
+      ],
       "summary": "Enhanced leaderboard system with improved scoring, display features, and competitive gaming infrastructure"
     },
     {
       "filename": "2025-09-11-debug-console-system.md",
       "title": "Debug Console System Implementation",
       "date": "2025-09-11",
-      "tags": ["debug", "tools", "development"],
+      "tags": [
+        "debug",
+        "tools",
+        "development"
+      ],
       "summary": "Implemented comprehensive debug console system for enhanced development and troubleshooting capabilities"
     },
     {
       "filename": "2025-09-11-v0-3-0-consolidated-release.md",
       "title": "v0.3.0 Consolidated Release - Major Bug Fixes & Infrastructure",
       "date": "2025-09-11",
-      "tags": ["release", "hotfix", "infrastructure"],
+      "tags": [
+        "release",
+        "hotfix",
+        "infrastructure"
+      ],
       "summary": "Consolidated release featuring critical bug fixes, infrastructure improvements, and enhanced development tooling"
     },
     {
       "filename": "2025-09-10-version-0-2-12-release.md",
       "title": "P(Doom) v0.2.12 Release: Development Infrastructure Enhancement",
       "date": "2025-09-10",
-      "tags": ["release", "infrastructure", "type-annotation"],
+      "tags": [
+        "release",
+        "infrastructure",
+        "type-annotation"
+      ],
       "summary": "Major infrastructure milestone featuring comprehensive type annotations and automated blog system implementation"
     },
     {
       "filename": "2025-09-10-type-annotation-sprint.md",
       "title": "Type Annotation Sprint: Major Codebase Quality Enhancement",
       "date": "2025-09-10",
-      "tags": ["type-annotation", "sprint", "quality"],
+      "tags": [
+        "type-annotation",
+        "sprint",
+        "quality"
+      ],
       "summary": "Intensive type annotation sprint achieving 85-90% coverage across core modules with significant pylance error reduction"
     },
     {
       "filename": "2025-09-10-major-type-annotation-milestone.md",
       "title": "Major Type Annotation Milestone - 4,235 Lines Annotated",
       "date": "2025-09-10",
-      "tags": ["milestone", "type-annotation", "ui"],
+      "tags": [
+        "milestone",
+        "type-annotation",
+        "ui"
+      ],
       "summary": "Achieved major milestone with complete type annotation of ui.py (4,235 lines) and significant progress on game_state.py"
     }
   ]
