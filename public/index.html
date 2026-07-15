@@ -1480,8 +1480,8 @@ python main.py</pre>
 		});
 		
 		// GitHub Issues section removed - now on dedicated /issues/ page
-		// Load and update version information
-		async function loadVersionInfo() {
+		// Load and update homepage game stats + download button labels
+		async function loadGameStats() {
 			try {
 				const response = await fetch('/data/version.json', { cache: 'no-store' });
 				const versionData = await response.json();
@@ -1510,7 +1510,7 @@ python main.py</pre>
 					}
 				});
 				
-				.log('Version info updated:', versionData.latest_release.version);
+				console.log('Version info updated:', versionData.latest_release.version);
 			} catch (error) {
 				console.warn('Could not load version info:', error);
 			}
@@ -1518,7 +1518,7 @@ python main.py</pre>
 		
 		// Load version info when page loads
 		document.addEventListener('DOMContentLoaded', () => {
-			loadVersionInfo();
+			loadGameStats();
 			setupDownloadTracking();
 		});
 

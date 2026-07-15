@@ -11,8 +11,8 @@
 			<div class="logo-container">
 				<a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
 				<span class="version-badge" id="versionBadge">
-					<span class="version-number" id="versionNumber">v0.10.2</span>
-					<span id="versionDate">2025-11-08</span>
+					<span class="version-number" id="versionNumber">v0.11.0</span>
+					<span id="versionDate">2025-12-07</span>
 				</span>
 			</div>
 			<ul class="nav-links" role="menubar">
@@ -123,10 +123,38 @@
 		});
 	}
 
+	// Update the nav version badge from the canonical version.json so every page
+	// using this injected nav reflects the current game release (instead of the
+	// hardcoded fallback above). Silently no-ops if the badge or file is absent.
+	async function updateNavVersion() {
+		const numberEl = document.getElementById('versionNumber');
+		const dateEl = document.getElementById('versionDate');
+		if (!numberEl && !dateEl) return;
+		try {
+			const response = await fetch('/data/version.json', { cache: 'no-store' });
+			if (!response.ok) return;
+			const data = await response.json();
+			const release = data.latest_release || {};
+			if (numberEl && release.version) {
+				numberEl.textContent = release.version;
+			}
+			if (dateEl && release.published_at) {
+				dateEl.textContent = release.published_at.split('T')[0];
+			}
+		} catch (e) {
+			// Keep the hardcoded fallback on any failure.
+		}
+	}
+
+	function init() {
+		initNavigation();
+		updateNavVersion();
+	}
+
 	// Run when DOM is ready
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initNavigation);
+		document.addEventListener('DOMContentLoaded', init);
 	} else {
-		initNavigation();
+		init();
 	}
 })();
