@@ -2,7 +2,7 @@
   "provider": "plausible",
   "enabled": true,
   "dataDomain": "pdoom1.com",
-  "scriptUrl": "https://plausible.io/js/script.js",
+  "scriptUrl": "https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js",
   "privacyFeatures": {
     "noCookies": true,
     "noPersonalData": true,
