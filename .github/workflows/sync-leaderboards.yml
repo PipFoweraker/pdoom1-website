@@ -125,39 +125,34 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const title = `🔄 Leaderboard Sync Failed - ${new Date().toISOString().split('T')[0]}`;
-            const body = `
-            ## Leaderboard Sync Failure
-
-            **Workflow Run:** ${{ github.run_id }}
-            **Timestamp:** ${new Date().toUTCString()}
-
-            ### Status
-            - Integration Check: ${{ steps.check-integration.outcome }}
-            - Sync All: ${{ steps.sync-all.outcome }}
-            - Sync Weekly: ${{ steps.sync-weekly.outcome }}
-            - Data Verification: ${{ steps.verify.outcome }}
-
-            ### Likely Causes
-            - Game repository not accessible
-            - Data format changes
-            - File permission issues
-            - Network connectivity problems
-
-            ### Required Actions
-            1. Review workflow logs: [Link](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            2. Check game integration: \`npm run game:status\`
-            3. Verify game repository is accessible
-            4. Manual sync if needed: \`npm run game:sync-all\`
-
-            **Priority:** Medium - Leaderboard data may be stale
-            This issue was automatically created by the sync workflow.
-            `;
-
-            github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: ['automation', 'leaderboard', 'sync-failure', 'auto-created']
+            // De-duplicated alert: one rolling issue (fixed title, no date), comment on repeats.
+            const title = '🔄 Leaderboard sync failing';
+            const label = 'sync-failure';
+            const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            const body = [
+              '## Leaderboard sync failure',
+              '',
+              `all: ${{ steps.sync-all.outcome }} | weekly: ${{ steps.sync-weekly.outcome }} | verify: ${{ steps.verify.outcome }}`,
+              `Run: ${runUrl}`,
+              '',
+              'Likely: game repo inaccessible, data-format change, or the game->website uplift (see the uplift tracking issue).',
+              '',
+              '_Single rolling issue -- reused, not duplicated, per run._'
+            ].join('\n');
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
             });
+            const found = existing.data.find(i => i.title === title);
+            if (found) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: found.number,
+                body: `Still failing as of ${new Date().toUTCString()}.\n\nRun: ${runUrl}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ['automation', 'leaderboard', label],
+              });
+            }
