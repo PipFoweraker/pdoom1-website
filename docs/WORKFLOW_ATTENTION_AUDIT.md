@@ -11,8 +11,8 @@ every failing run (no de-dup).
 |---|---|---|---|---|
 | `weekly-league-rollover.yml` | (removed) | **YES (35 spam issues)** | n/a | ✅ Fixed 2026-07-14 (deleted; now logs to /monitoring/, `weekly-league-reset.yml` alerts only on failure) |
 | `health-checks.yml` | every 6h | no | **NO → date-in-title, 4 dupes/day** | ✅ Fixed 2026-07-16 (de-dup pattern retrofitted) |
-| `auto-update-data.yml` | every 6h | no | **NO** | ⚠️ TODO: retrofit de-dup (highest remaining dupe risk) |
-| `sync-leaderboards.yml` | daily | no | **NO** | ⚠️ TODO: retrofit de-dup |
+| `auto-update-data.yml` | every 6h | no | **NO** | ✅ Fixed 2026-07-16 (de-dup retrofitted) |
+| `sync-leaderboards.yml` | daily | no | **NO** | ✅ Fixed 2026-07-16 (de-dup retrofitted) |
 | `extract-analytics.yml` | monthly | no | **NO** | low risk (monthly), retrofit when convenient |
 | `data-contract-validation.yml` | daily | no | **YES** | ✅ New; reference implementation |
 
@@ -43,6 +43,6 @@ if (found) {
 Reference implementations: `health-checks.yml` and `data-contract-validation.yml`.
 
 ## Next
-- Retrofit de-dup into `auto-update-data.yml` and `sync-leaderboards.yml` (same pattern).
-- Consider a shared composite action (`.github/actions/rolling-alert`) so de-dup is DRY
-  rather than copy-pasted — do this once a 3rd workflow needs it.
+- `extract-analytics.yml` (monthly, low risk) is the only remaining non-deduped alert.
+- Now that 3 workflows share the pattern, consider a shared composite action
+  (`.github/actions/rolling-alert`) so de-dup is DRY rather than copy-pasted.
