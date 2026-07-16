@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-15T18:38:17.188Z UTC
+Generated: 2026-07-16T00:50:32.935Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 648 | Check Godot port for team_player uncapped-stacking exploit + poaching rate (salvaged from pre-Godot notes) |  |  | 2026-07-15 22:31:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/648) |
 | 622 | Build lane L10 · main_ui decomposition: extract-before set + let-die map |  |  | 2026-07-12 08:38:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/622) |
 | 621 | Build lane L9 · Balance surface + data externalization (defs→JSON, Balance autoload) |  |  | 2026-07-12 08:38:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/621) |
 | 619 | Build lane L8 · Achievements skeleton (observer-only) |  |  | 2026-07-12 08:23:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/619) |
