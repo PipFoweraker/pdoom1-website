@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Blog - p(Doom)1</title>
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <meta name="description" content="p(Doom)1 developer blog post." />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="p(Doom)1" />
+    <meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="stylesheet" href="/assets/css/game-integration.css">
+    <link rel="stylesheet" href="/assets/css/ui-enhancements.css">
+
+    <!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
+    <script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+    <script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+    <style>
+        :root {
+            --bg-primary: #1a1a1a; --bg-secondary: #2d2d2d; --bg-tertiary: #3d3d3d;
+            --text-primary: #ffffff; --text-secondary: #cccccc; --text-muted: #888888;
+            --accent-primary: #00ff41; --accent-secondary: #ff6b35; --border-color: #444444;
+            --radius-sm: 4px; --radius-md: 6px; --radius-lg: 10px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-primary); color: var(--text-primary); line-height: 1.65;
+            font-family: 'Courier New', monospace; }
+        .container { max-width: 820px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+        .post-nav { margin-bottom: 2rem; }
+        .post-nav a { color: var(--accent-secondary); text-decoration: none; font-size: 0.9rem; }
+        .post-nav a:hover { text-decoration: underline; }
+        article { background: var(--bg-secondary); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); padding: 2.2rem; }
+        article h1 { color: var(--accent-primary); font-size: 2rem; line-height: 1.25;
+            margin: 0 0 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.8rem; }
+        article h2 { color: var(--accent-primary); font-size: 1.4rem; margin: 2rem 0 0.8rem; }
+        article h3 { color: var(--text-primary); font-size: 1.15rem; margin: 1.6rem 0 0.6rem; }
+        article p { margin: 0 0 1rem; color: var(--text-secondary); }
+        article a { color: var(--accent-secondary); }
+        article strong { color: var(--text-primary); }
+        article ul, article ol { margin: 0 0 1rem 1.4rem; color: var(--text-secondary); }
+        article li { margin: 0.3rem 0; }
+        article img { max-width: 100%; height: auto; display: block; margin: 1.2rem 0;
+            border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+        article code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+            border-radius: 3px; font-size: 0.9em; }
+        article pre { background: var(--bg-primary); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 1rem; overflow-x: auto; margin: 0 0 1rem; }
+        article pre code { background: none; padding: 0; }
+        article blockquote { border-left: 3px solid var(--accent-primary); margin: 0 0 1rem;
+            padding: 0.2rem 0 0.2rem 1rem; color: var(--text-muted); font-style: italic; }
+        article hr { border: none; border-top: 1px solid var(--border-color); margin: 1.6rem 0; }
+        .post-error { color: var(--accent-secondary); text-align: center; padding: 3rem 1rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="post-nav"><a href="/blog/">&larr; All dev-blog posts</a></div>
+        <article id="post"><p class="post-error">Loading post&hellip;</p></article>
+    </div>
+    <script>
+        // Minimal, dependency-free Markdown renderer. Covers the subset used by
+        // p(Doom)1 dev-blog posts: headings, bold/italic, links, images, inline
+        // code, fenced code, lists, blockquotes, hr, paragraphs. Content is our
+        // own trusted markdown; HTML is escaped before formatting for safety.
+        function escapeHtml(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        function inline(text) {
+            let t = escapeHtml(text);
+            // images before links (both use bracket syntax)
+            t = t.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g,
+                '<img src="$2" alt="$1" loading="lazy" decoding="async">');
+            t = t.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,
+                '<a href="$2" rel="noopener">$1</a>');
+            t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+            t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            t = t.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+            t = t.replace(/(^|[^_])_([^_\n]+)_/g, '$1<em>$2</em>');
+            return t;
+        }
+        function renderMarkdown(md) {
+            const lines = md.replace(/\r\n/g, '\n').split('\n');
+            const out = [];
+            let i = 0, listType = null, para = [];
+            const flushPara = () => { if (para.length) { out.push('<p>' + inline(para.join(' ')) + '</p>'); para = []; } };
+            const closeList = () => { if (listType) { out.push(listType === 'ul' ? '</ul>' : '</ol>'); listType = null; } };
+            while (i < lines.length) {
+                const line = lines[i];
+                // fenced code block
+                if (/^```/.test(line)) {
+                    flushPara(); closeList();
+                    const buf = []; i++;
+                    while (i < lines.length && !/^```/.test(lines[i])) { buf.push(lines[i]); i++; }
+                    i++; // skip closing fence
+                    out.push('<pre><code>' + escapeHtml(buf.join('\n')) + '</code></pre>');
+                    continue;
+                }
+                const h = line.match(/^(#{1,6})\s+(.*)$/);
+                if (h) { flushPara(); closeList(); const n = h[1].length; out.push('<h' + n + '>' + inline(h[2]) + '</h' + n + '>'); i++; continue; }
+                if (/^\s*(---+|\*\*\*+)\s*$/.test(line)) { flushPara(); closeList(); out.push('<hr>'); i++; continue; }
+                const bq = line.match(/^>\s?(.*)$/);
+                if (bq) { flushPara(); closeList(); out.push('<blockquote>' + inline(bq[1]) + '</blockquote>'); i++; continue; }
+                const ul = line.match(/^\s*[-*]\s+(.*)$/);
+                const ol = line.match(/^\s*\d+\.\s+(.*)$/);
+                if (ul) { flushPara(); if (listType !== 'ul') { closeList(); out.push('<ul>'); listType = 'ul'; } out.push('<li>' + inline(ul[1]) + '</li>'); i++; continue; }
+                if (ol) { flushPara(); if (listType !== 'ol') { closeList(); out.push('<ol>'); listType = 'ol'; } out.push('<li>' + inline(ol[1]) + '</li>'); i++; continue; }
+                if (/^\s*$/.test(line)) { flushPara(); closeList(); i++; continue; }
+                para.push(line.trim()); i++;
+            }
+            flushPara(); closeList();
+            return out.join('\n');
+        }
+        (async function () {
+            const el = document.getElementById('post');
+            const params = new URLSearchParams(location.search);
+            let file = params.get('p') || '';
+            // allow only a safe .md filename in the /blog/ folder (no path traversal)
+            if (!/^[\w.-]+\.md$/.test(file)) {
+                el.innerHTML = '<p class="post-error">Post not found. <a href="/blog/">Back to the blog &rarr;</a></p>';
+                return;
+            }
+            try {
+                const res = await fetch('/blog/' + file, { cache: 'no-store' });
+                if (!res.ok) throw new Error(res.status);
+                const md = await res.text();
+                el.innerHTML = renderMarkdown(md);
+                const h1 = el.querySelector('h1');
+                if (h1) document.title = h1.textContent + ' - p(Doom)1 Dev Blog';
+            } catch (e) {
+                el.innerHTML = '<p class="post-error">Could not load this post. <a href="/blog/">Back to the blog &rarr;</a></p>';
+            }
+        })();
+    </script>
+</body>
+</html>
