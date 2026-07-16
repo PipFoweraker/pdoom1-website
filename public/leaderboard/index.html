@@ -681,6 +681,7 @@
     <div class="page-header">
       <h1>Leaderboard</h1>
       <p class="subtitle">Top players in the AI Safety Strategy Game</p>
+      <div id="data-status-banner" style="display:none; margin-top:1rem; padding:0.9rem 1.1rem; border-radius:var(--radius-md); border:1px solid var(--accent-secondary); background:rgba(255,107,53,0.08); color:var(--text-primary); font-size:0.9rem; text-align:left;"></div>
       <div id="seed-info" style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 0.9rem;">
         <div><strong>Seed:</strong> <span id="current-seed">-</span></div>
         <div><strong>Economic Model:</strong> <span id="economic-model">-</span></div>
@@ -794,24 +795,41 @@
         const response = await fetch('data/leaderboard.json', { cache: 'no-store' });
         const data = await response.json();
         
+        applyDataStatus(data);
         displayStats(data);
         displayLeaderboard(data);
-        
-        // Hide loading, show table
+
+        // Hide loading, show table (hide the empty table pre-launch)
         document.getElementById('loading').style.display = 'none';
-        document.getElementById('leaderboard-table').style.display = 'table';
-        
+        document.getElementById('leaderboard-table').style.display =
+          (data.entries && data.entries.length) ? 'table' : 'none';
+
       } catch (error) {
         console.error('Failed to load leaderboard:', error);
         document.getElementById('loading').innerHTML = 'Failed to load leaderboard data';
       }
     }
-    
+
+    // Honesty banner: never present pre-launch/legacy data as live. Self-heals when
+    // ingest_scores.py publishes real deployed-version scores (data_status: "live").
+    function applyDataStatus(data) {
+      const banner = document.getElementById('data-status-banner');
+      if (!banner) return;
+      const status = (data && data.data_status) || 'live';
+      if (status === 'live') { banner.style.display = 'none'; return; }
+      const ver = (data.meta && data.meta.game_version) || '';
+      banner.innerHTML = (status === 'pre-launch')
+        ? `&#9432; <strong>Leaderboards launch with the next release.</strong> No competitive scores are recorded yet &mdash; the live board (${ver}) arrives when in-game score submission ships.`
+        : `&#9432; <strong>Showing sample / pre-release data</strong> &mdash; not live competitive results.`;
+      banner.style.display = 'block';
+    }
+
     function displayStats(data) {
-      const totalPlayers = new Set(data.entries.map(entry => entry.player_name)).size;
-      const totalGames = data.entries.length;
-      const avgScore = Math.round(data.entries.reduce((sum, entry) => sum + entry.score, 0) / totalGames);
-      const avgDoom = (data.entries.reduce((sum, entry) => sum + entry.final_doom, 0) / totalGames).toFixed(1);
+      const entries = data.entries || [];
+      const totalPlayers = new Set(entries.map(entry => entry.player_name)).size;
+      const totalGames = entries.length;
+      const avgScore = totalGames ? Math.round(entries.reduce((sum, entry) => sum + entry.score, 0) / totalGames) : 0;
+      const avgDoom = totalGames ? (entries.reduce((sum, entry) => sum + (entry.final_doom || 0), 0) / totalGames).toFixed(1) : '0.0';
       
       document.getElementById('total-players').textContent = totalPlayers.toLocaleString();
       document.getElementById('total-games').textContent = totalGames.toLocaleString();
