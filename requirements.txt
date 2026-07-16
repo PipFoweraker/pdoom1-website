@@ -23,6 +23,12 @@ PyJWT==2.10.1           # JSON Web Tokens (security update 2025-11-10)
 python-dotenv==1.0.0   # Load .env files
 
 # ============================================================================
+# Data contract validation (scripts/validate_data.py, CI)
+# ============================================================================
+jsonschema==4.26.0     # JSON Schema validation of data seams (schemas/*.schema.json)
+Pillow>=10.0.0         # Image optimization (optimize-screenshots.py, blog assets)
+
+# ============================================================================
 # Optional Dependencies (Future Features)
 # ============================================================================
 

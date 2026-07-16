@@ -309,6 +309,19 @@
             </div>
         </div>
 
+        <!-- Integration Health Section (data contracts + cross-repo drift) -->
+        <div class="recent-checks" style="margin-top: 3rem;">
+            <h2>🔗 Integration Health</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                Data-seam contracts (events + leaderboard) and cross-repo drift.
+                <strong>FAIL</strong> = broken, alerts; <strong>WARN</strong> = drift worth a glance, no alert.
+                Source: <code>scripts/validate_data.py</code> &rarr; <code>/data/integration-health.json</code>.
+            </p>
+            <div id="integration-health">
+                Loading integration health...
+            </div>
+        </div>
+
         <!-- Automation Status Section -->
         <div class="recent-checks" style="margin-top: 3rem;">
             <h2>🤖 Automation Status</h2>
@@ -653,6 +666,34 @@
             alert('Manual trigger feature requires GitHub Actions workflow_dispatch.\n\nTo manually rollover:\n1. Run: npm run league:archive\n2. Run: npm run league:new-week\n\nOr visit GitHub Actions and run "Weekly League Rollover" workflow.');
         }
         
+        async function updateIntegrationHealth() {
+            const container = document.getElementById('integration-health');
+            try {
+                const res = await fetch('/data/integration-health.json', { cache: 'no-store' });
+                if (!res.ok) throw new Error(res.status);
+                const h = await res.json();
+                const color = s => s === 'FAIL' ? '#ff4444' : (s === 'WARN' ? '#ffb000' : '#00ff41');
+                const badge = s => `<span style="color:${color(s)};font-weight:bold;">${s}</span>`;
+                const rows = (h.checks || []).map(c => `
+                    <div style="display:flex;gap:0.75rem;padding:0.35rem 0;border-bottom:1px solid var(--border-color);flex-wrap:wrap;">
+                        <span style="min-width:52px;">${badge(c.status)}</span>
+                        <span style="min-width:190px;color:var(--text-primary);">${c.name}</span>
+                        <span style="color:var(--text-muted);flex:1;">${c.detail || ''}</span>
+                    </div>`).join('');
+                const s = h.summary || {};
+                container.innerHTML = `
+                    <div style="margin-bottom:0.75rem;">
+                        Overall: ${badge(h.overall_status)} &nbsp;
+                        <span style="color:var(--text-muted);">
+                            ${s.fail||0} fail &middot; ${s.warn||0} warn &middot; ${s.ok||0} ok
+                            &nbsp;|&nbsp; checked ${h.generated ? new Date(h.generated).toLocaleString() : 'n/a'}
+                        </span>
+                    </div>${rows}`;
+            } catch (e) {
+                container.innerHTML = '<span style="color:var(--text-muted);">integration-health.json not available yet (populated by the Data Contract Validation workflow).</span>';
+            }
+        }
+
         async function refreshData() {
             if (refreshing) return;
             
@@ -669,7 +710,8 @@
                     updateGitHubStatus(),
                     updateRecentChecks(),
                     updateAutomationStatus(),
-                    updateLeagueStatus()
+                    updateLeagueStatus(),
+                    updateIntegrationHealth()
                 ]);
 
                 document.getElementById('last-updated').textContent = `Last updated: ${new Date().toLocaleString()}`;

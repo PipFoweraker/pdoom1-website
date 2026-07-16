@@ -1,0 +1,105 @@
+name: Data Contract Validation
+
+# Validates the data seams (events + leaderboard) against schemas/ and runs
+# semantic integrity/drift checks (scripts/validate_data.py). FAIL-severity breaks
+# CI and opens ONE de-duplicated alert issue; WARN-severity is surfaced on the
+# /monitoring/ dashboard only (no alert -- conserve attention).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/data/events.json'
+      - 'public/leaderboard/data/**'
+      - 'schemas/**'
+      - 'scripts/validate_data.py'
+  pull_request:
+    paths:
+      - 'public/data/events.json'
+      - 'public/leaderboard/data/**'
+      - 'schemas/**'
+      - 'scripts/validate_data.py'
+  schedule:
+    - cron: '0 6 * * *'   # daily 06:00 UTC -- catches drift even with no commits
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  validate:
+    name: Validate data contracts
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.run.outputs.status }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install validation deps
+        run: pip install --quiet jsonschema==4.26.0
+      - name: Run validation
+        id: run
+        run: |
+          set +e
+          python scripts/validate_data.py
+          code=$?
+          echo "status=$([ $code -eq 0 ] && echo pass || echo fail)" >> "$GITHUB_OUTPUT"
+          exit $code
+
+      # Keep the dashboard's health snapshot fresh (schedule/main only).
+      - name: Commit integration-health.json
+        if: always() && (github.event_name == 'schedule' || github.event_name == 'push')
+        run: |
+          if ! git diff --quiet public/data/integration-health.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add public/data/integration-health.json
+            git commit -m "chore: refresh integration-health.json [skip ci]"
+            git push
+          fi
+
+  alert:
+    name: Alert on failure (de-duplicated)
+    needs: validate
+    if: failure() && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open or update the single data-contract issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🔴 Data contract validation failing';
+            const label = 'data-contract';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              'Automated data-contract validation reported a **FAIL**.',
+              '',
+              `Run: ${runUrl}`,
+              '',
+              'This means a data seam broke its schema, contains encoding corruption, or is self-contradictory.',
+              'Reproduce locally: `python scripts/validate_data.py`.',
+              '',
+              '_This is a single rolling issue -- it is reused, not duplicated, per run._'
+            ].join('\n');
+
+            // Find an existing open issue (reuse, never spam N issues).
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 10,
+            });
+            const found = existing.data.find(i => i.title === title);
+            if (found) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: found.number,
+                body: `Still failing as of ${new Date().toUTCString()}.\n\nRun: ${runUrl}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label, 'automation', 'priority:high'],
+              });
+            }

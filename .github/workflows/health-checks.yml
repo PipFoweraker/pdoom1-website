@@ -97,38 +97,38 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const title = `🚨 Health Check Failed - ${new Date().toISOString().split('T')[0]}`;
-            const body = `
-            ## Health Check Failure Report
-            
-            **Workflow:** ${{ github.workflow }}
-            **Run ID:** ${{ github.run_id }}
-            **Commit:** ${{ github.sha }}
-            **Branch:** ${{ github.ref_name }}
-            **Triggered by:** ${{ github.event_name }}
-            
-            ### Failed Steps
-            One or more health checks have failed. Please check the workflow logs for details.
-            
-            ### Next Steps
-            1. Review the workflow logs: [Link to run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            2. Check which scripts are failing
-            3. Verify data integrity
-            4. Test deployment process manually if needed
-            
-            ### Auto-generated Alert
-            This issue was automatically created by the health check workflow.
-            
-            **Priority:** High - Deployment process integrity compromised
-            `;
-            
-            github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: ['bug', 'deployment', 'automated-alert', 'high-priority']
+            // De-duplicated alert: reuse ONE rolling issue (fixed title, no date),
+            // comment on repeats. A 6-hourly job must never spawn N duplicate issues.
+            const title = '🚨 Health checks failing';
+            const label = 'automated-alert';
+            const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            const body = [
+              '## Health check failure',
+              '',
+              'One or more health checks failed. Review the run logs and verify data/deploy integrity.',
+              '',
+              `Run: ${runUrl}`,
+              `Commit: ${{ github.sha }} on ${{ github.ref_name }}`,
+              '',
+              '_Single rolling issue -- reused, not duplicated, per run._'
+            ].join('\n');
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
             });
+            const found = existing.data.find(i => i.title === title);
+            if (found) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: found.number,
+                body: `Still failing as of ${new Date().toUTCString()}.\n\nRun: ${runUrl}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ['bug', 'deployment', label, 'high-priority'],
+              });
+            }
             
   deployment-simulation:
     runs-on: ubuntu-latest
