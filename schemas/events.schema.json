@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pdoom1.com/schemas/events.schema.json",
+  "title": "p(Doom)1 events map",
+  "description": "Contract for public/data/events.json. Object keyed by event id. SOURCE OF TRUTH: pdoom-data (generated via scripts/sync/sync-events.py). Consumed by the website (event pages/timeline) and the game. Any producer that changes these shapes must update this schema in the same change.",
+  "type": "object",
+  "minProperties": 1,
+  "additionalProperties": { "$ref": "#/$defs/event" },
+  "$defs": {
+    "event": {
+      "type": "object",
+      "required": ["id", "title", "year", "category", "description", "impacts", "sources", "tags", "rarity", "safety_researcher_reaction", "media_reaction"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "year": { "type": "integer", "minimum": 1950, "maximum": 2100 },
+        "category": {
+          "description": "Strict enum on purpose: adding a category is a deliberate contract change, not a silent one.",
+          "enum": ["funding_catastrophe", "organizational_crisis", "technical_research_breakthrough", "institutional_decay"]
+        },
+        "description": { "type": "string" },
+        "impacts": { "type": "array", "description": "Game-adaptation field (see DATA_SPLIT.md)." },
+        "sources": { "type": "array", "items": { "type": "string" } },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "rarity": {
+          "description": "Game-adaptation field. Strict enum.",
+          "enum": ["common", "rare", "legendary"]
+        },
+        "pdoom_impact": { "type": ["number", "null"], "description": "Game-adaptation field; usually null." },
+        "safety_researcher_reaction": { "type": "string" },
+        "media_reaction": { "type": "string" },
+        "source_id": { "type": "string" }
+      }
+    }
+  }
+}

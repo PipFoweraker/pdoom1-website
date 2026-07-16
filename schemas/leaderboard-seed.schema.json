@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pdoom1.com/schemas/leaderboard-seed.schema.json",
+  "title": "p(Doom)1 per-seed leaderboard",
+  "description": "Contract for public/leaderboard/data/seed_leaderboard_*.json. PRODUCER: game leaderboard export. CONSUMER: website leaderboard pages. The `entry` def is shared with the weekly schema -- it is the game->website score-submission contract.",
+  "type": "object",
+  "required": ["meta", "seed", "entries"],
+  "additionalProperties": true,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["generated"],
+      "additionalProperties": true,
+      "properties": {
+        "generated": { "type": "string", "format": "date-time" },
+        "game_version": { "type": "string" },
+        "total_players": { "type": "integer", "minimum": 0 },
+        "export_source": { "type": "string" }
+      }
+    },
+    "seed": { "type": "string", "minLength": 1 },
+    "economic_model": { "type": "string" },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "description": "One score submission. THE game->website contract: the game produces these, the website displays them unchanged.",
+      "required": ["score", "player_name", "date"],
+      "additionalProperties": true,
+      "properties": {
+        "score": { "type": "number" },
+        "player_name": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "date": { "type": "string" },
+        "level_reached": { "type": "integer", "minimum": 0 },
+        "game_mode": { "type": "string" },
+        "duration_seconds": { "type": "number", "minimum": 0 },
+        "entry_uuid": { "type": "string" },
+        "final_doom": { "type": "number" },
+        "final_money": { "type": "number" },
+        "final_staff": { "type": "number" },
+        "final_reputation": { "type": "number" },
+        "final_compute": { "type": "number" }
+      }
+    }
+  }
+}

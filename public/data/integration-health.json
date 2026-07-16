@@ -1,0 +1,61 @@
+{
+  "generated": "2026-07-16T02:47:00.068824+00:00",
+  "overall_status": "WARN",
+  "summary": {
+    "fail": 0,
+    "warn": 2,
+    "ok": 8
+  },
+  "checks": [
+    {
+      "name": "schema:events",
+      "status": "OK",
+      "detail": "valid"
+    },
+    {
+      "name": "schema:league_weekly",
+      "status": "OK",
+      "detail": "valid"
+    },
+    {
+      "name": "schema:league_seed",
+      "status": "OK",
+      "detail": "valid"
+    },
+    {
+      "name": "encoding:events",
+      "status": "OK",
+      "detail": "no mojibake"
+    },
+    {
+      "name": "encoding:league_weekly",
+      "status": "OK",
+      "detail": "no mojibake"
+    },
+    {
+      "name": "league:freshness",
+      "status": "OK",
+      "detail": "generated 3.1 days ago"
+    },
+    {
+      "name": "league:current_week",
+      "status": "WARN",
+      "detail": "week 2026_W28 is marked is_current but ended 3.1 days ago -- rollover cadence off"
+    },
+    {
+      "name": "league:version_drift",
+      "status": "WARN",
+      "detail": "leaderboard game_version=v0.4.1 but deployed game=v0.11.0 -- export stamping stale version"
+    },
+    {
+      "name": "league:integrity",
+      "status": "OK",
+      "detail": "0 entries, 0 unique players consistent"
+    },
+    {
+      "name": "seed_leaderboards:parse",
+      "status": "OK",
+      "detail": "15 files parse OK"
+    }
+  ]
+}

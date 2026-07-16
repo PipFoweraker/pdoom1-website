@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pdoom1.com/schemas/leaderboard-weekly.schema.json",
+  "title": "p(Doom)1 weekly league (current.json)",
+  "description": "Contract for public/leaderboard/data/weekly/current.json. PRODUCER: the game's leaderboard export (scripts/export-leaderboard-bridge.py + weekly-league-reset workflow). CONSUMER: website leaderboard/league pages. This is the seam behind issue #126 (rollover false-positives) -- semantic freshness/version/integrity checks live in scripts/validate_data.py, not here.",
+  "type": "object",
+  "required": ["meta", "seed", "week_info", "entries", "statistics"],
+  "additionalProperties": true,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["week_id", "generated", "competition_type"],
+      "additionalProperties": true,
+      "properties": {
+        "week_id": { "type": "string", "pattern": "^[0-9]{4}_W[0-9]{2}$" },
+        "season": { "type": "string" },
+        "generated": { "type": "string", "format": "date-time" },
+        "game_version": { "type": "string" },
+        "competition_type": { "type": "string" },
+        "total_participants": { "type": "integer", "minimum": 0 },
+        "total_submissions": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "seed": { "type": "string", "minLength": 1 },
+    "economic_model": { "type": "string" },
+    "week_info": {
+      "type": "object",
+      "required": ["week_id", "year", "week_number", "is_current"],
+      "additionalProperties": true,
+      "properties": {
+        "week_id": { "type": "string", "pattern": "^[0-9]{4}_W[0-9]{2}$" },
+        "year": { "type": "integer" },
+        "week_number": { "type": "integer", "minimum": 1, "maximum": 53 },
+        "is_current": { "type": "boolean" }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "leaderboard-seed.schema.json#/$defs/entry" }
+    },
+    "statistics": {
+      "type": "object",
+      "required": ["highest_score", "unique_players"],
+      "additionalProperties": true,
+      "properties": {
+        "highest_score": { "type": "number" },
+        "average_score": { "type": "number" },
+        "total_games": { "type": "integer", "minimum": 0 },
+        "unique_players": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
