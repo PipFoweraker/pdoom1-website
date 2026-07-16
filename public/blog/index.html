@@ -406,7 +406,7 @@
                         <div class="post-header">
                             <div>
                                 <h2 class="post-title">
-                                    <a href="/blog/${post.filename}">${post.title}</a>
+                                    <a href="/blog/post.html?p=${encodeURIComponent(post.filename)}">${post.title}</a>
                                 </h2>
                                 <div class="post-meta">
                                     <span class="post-date">${this.formatDate(post.date)}</span>
@@ -418,7 +418,7 @@
                         <p class="post-summary">${post.summary || 'Development update - click to read more about the technical progress and implementation details.'}</p>
                         
                         <div class="post-actions">
-                            <a href="/blog/${post.filename}" class="read-more">Read Full Post →</a>
+                            <a href="/blog/post.html?p=${encodeURIComponent(post.filename)}" class="read-more">Read Full Post →</a>
                             ${commit}
                         </div>
                     </article>
