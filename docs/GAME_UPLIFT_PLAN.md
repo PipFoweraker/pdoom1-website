@@ -81,6 +81,26 @@ The version-of-truth fix (everything reads `version.txt`; delete the hardcoded
 `Bootstrap_v0.4.1` / `0.6.0`) is a prerequisite for B and A and is a clean, isolated
 game-side change — good first handoff task.
 
+## Built on the website side (2026-07-16) — the connection point is ready
+
+Everything that doesn't touch the game is done, so the game handoff is a small last step:
+
+- **`scripts/ingest_scores.py`** — the website-side receiver/publisher. Given
+  contract-conforming `seed_leaderboard_*.json`, it validates every entry, aggregates
+  into the `leaderboard.json` the page needs (which didn't exist → page was broken),
+  and **stamps the real deployed version** from `version.json` (fixing the drift at
+  publish time). It only publishes entries whose `game_version` matches the deployed
+  version — so it's **self-healing**: the day the game exports real v0.11.0 scores, the
+  board goes live automatically, no code change. Proven by `scripts/test_ingest_scores.py`.
+- **Honesty (Option C) — shipped.** Leaderboard + league pages now show a banner and an
+  honest "pre-launch" state instead of presenting synthetic/legacy data as live (and the
+  league no longer shows an ended week as "🔴 LIVE"). Driven by `data_status`, so it
+  self-clears when real data lands. `leaderboard.json` is published in the pre-launch state.
+
+So the game's remaining job shrinks to: **deliver `entry`-conforming scores** (via an
+export file or an ingestion endpoint) stamped with `version.txt`. Our side validates +
+publishes. The delivery target format is `schemas/leaderboard-seed.schema.json`.
+
 ## Immediate handoff tasks for the game repo (when your build is pushed)
 - [ ] Make the score export read `version.txt` for `game_version`; delete hardcoded
       `Bootstrap_v0.4.1` (api_format.py) and `0.6.0` (website-version-api.py).

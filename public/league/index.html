@@ -569,6 +569,7 @@
       <h1>Weekly League</h1>
       <p class="subtitle">Compete for the top spot in this week's challenge</p>
       <div class="status-badge" id="league-status">Loading...</div>
+      <div id="data-status-banner" style="display:none; margin-top:1rem; padding:0.9rem 1.1rem; border-radius:var(--radius-md); border:1px solid var(--accent-secondary); background:rgba(255,107,53,0.08); color:var(--text-primary); font-size:0.9rem; text-align:left;"></div>
     </div>
 
     <!-- Current Week Information -->
@@ -750,13 +751,34 @@
 
     // Display league data
     function displayLeagueData(data) {
+      // Truthful liveness: a week is only LIVE if it's current, hasn't ended, AND has
+      // real entries. The stored is_current flag can lag (an ended week left marked
+      // current) -- don't take it at face value.
+      const wi = data.week_info || {};
+      const entries = data.entries || [];
+      const end = wi.end_timestamp ? new Date(wi.end_timestamp) : null;
+      const ended = end ? (end.getTime() < Date.now()) : false;
+      const trulyLive = !!wi.is_current && !ended && entries.length > 0;
+
+      const banner = document.getElementById('data-status-banner');
+      if (banner) {
+        if (trulyLive) {
+          banner.style.display = 'none';
+        } else {
+          banner.innerHTML = entries.length === 0
+            ? `&#9432; <strong>The weekly league opens with the next release.</strong> No live competition is running yet &mdash; in-game score submission is being wired up.`
+            : `&#9432; <strong>Showing a past / sample week</strong> &mdash; not a live competition.`;
+          banner.style.display = 'block';
+        }
+      }
+
       // Update league status
       const statusBadge = document.getElementById('league-status');
-      if (data.week_info && data.week_info.is_current) {
+      if (trulyLive) {
         statusBadge.textContent = '🔴 LIVE - Active Competition';
         statusBadge.classList.add('active');
       } else {
-        statusBadge.textContent = 'Week Ended';
+        statusBadge.textContent = ended ? 'Week Ended' : 'Not yet live';
         statusBadge.classList.remove('active');
       }
 
