@@ -871,7 +871,7 @@
       const ctx = document.getElementById('rank-chart');
       if (!ctx) return;
 
-      const labels = weeklyRanks.map(w => w.week.replace('2025_W', 'W'));
+      const labels = weeklyRanks.map(w => w.week.replace(/^\d{4}_W/, 'W'));
       const ranks = weeklyRanks.map(w => w.rank);
 
       new Chart(ctx, {

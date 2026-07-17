@@ -29,7 +29,7 @@
 
 	<style>
 		:root {
-			/* Color scheme inspired by typical pygame/terminal aesthetics */
+			/* Color scheme inspired by terminal aesthetics */
 			--bg-primary: #1a1a1a;
 			--bg-secondary: #2d2d2d;
 			--bg-tertiary: #3d3d3d;
@@ -939,7 +939,7 @@ t	.hero {
 				</a>
 				<a href="/frontier-labs/" class="stat-link" role="img" aria-label="Number of frontier labs in model" style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 0.4rem; text-align: center;">
 					<div class="stat">
-						<span class="stat-number loading-number" aria-hidden="true" style="font-size: 2rem; color: var(--accent-primary);">7</span>
+						<span class="stat-number loading-number" aria-hidden="true" style="font-size: 2rem; color: var(--accent-primary);">5</span>
 						<span class="stat-label" style="font-size: 0.9rem; color: var(--text-muted);">Frontier Labs</span>
 					</div>
 				</a>
@@ -1077,10 +1077,10 @@ t	.hero {
 							<h3>System Requirements</h3>
 							<p style="margin-bottom: 0.8rem;"><strong>Minimum:</strong></p>
 							<ul style="color: var(--text-secondary); margin: 0 0 1rem 1.2rem; line-height: 1.8;">
-								<li>Python 3.8+ (for source builds)</li>
-								<li>pygame library</li>
-								<li>~50MB disk space</li>
+								<li>64-bit Windows, macOS, or Linux</li>
+								<li>Native build &mdash; no runtime to install</li>
 								<li>Basic graphics support</li>
+								<li>Built with Godot 4.5.1</li>
 							</ul>
 							<p style="margin-bottom: 0.5rem;"><strong>Platforms:</strong></p>
 							<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -1091,13 +1091,11 @@ t	.hero {
 						</div>
 						<div class="card">
 							<h3>Quick Installation</h3>
-							<p style="margin-bottom: 0.8rem;">For source builds:</p>
+							<p style="margin-bottom: 0.8rem;">Download the build for your platform from the buttons above &mdash; no installation, no runtime needed.</p>
 <pre style="background: var(--bg-primary); padding: 0.8rem; border-radius: var(--radius-sm); overflow-x: auto; color: var(--accent-primary); font-size: 0.85rem; line-height: 1.4; margin: 0;">git clone https://github.com/PipFoweraker/pdoom1.git
-cd pdoom1
-pip install -r requirements.txt
-python main.py</pre>
+# then open the project in Godot 4.5.1 to run from source</pre>
 							<p style="margin-top: 0.8rem; font-size: 0.85rem; color: var(--text-muted);">
-								Or download the pre-built executable for instant play!
+								Pre-built downloads are the easiest way to play.
 							</p>
 						</div>
 					</div>
