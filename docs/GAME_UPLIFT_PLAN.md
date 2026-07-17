@@ -1,5 +1,23 @@
 # Game → website score uplift: scouting findings + plan
 
+> **SETTLED (2026-07-17) by pdoom1 PR #679** — `docs/strategy/BACKEND_AND_DATA_ARCHITECTURE.md`.
+> The fragmentation this doc flagged is resolved: **one PHP score API behind a frozen v1 HTTP
+> contract; no parallel score paths.** What that means for *this* repo:
+> - **We are a READ-ONLY consumer.** Read scores via the API's `GET` (CORS-enabled) or the
+>   `board_<seed>__<version>.json` files. **Do not stand up a second score store** — our
+>   `ingest_scores.py` is a read *cache/snapshot* publisher, not authoritative.
+> - **The contract is frozen** and mirrored in `schemas/leaderboard-seed.schema.json` (`$defs.entry`)
+>   + `schemas/leaderboard-api.schema.json` (GET/board/POST shapes). Entry = `score, doom_integral,
+>   player_name, date, level_reached, game_mode, duration_seconds, entry_uuid, baseline_*`. Sort:
+>   score DESC, doom_integral DESC (ADR-0002). `final_*` are legacy-only.
+> - **Deploy collision RESOLVED:** the API lives on a separate subdomain (`api.pdoom1.com`), not under
+>   the static site's `rsync --delete` root (`pdoom1.com` → `$DH_PATH`) — different dirs, no clobber.
+>   Read path is config-driven via `config.json.scoreApi` (empty until the host is finalized).
+> - **Open (for Pip + agents):** final host/subdomain; whether we read `board_*.json` off-disk
+>   (needs co-location) or via `GET` (CORS, host-agnostic — the likely default for a static site).
+>
+> The historical scouting below stands as the record of *why* the uplift was broken.
+
 Scouted `pdoom1` @ `origin/main` (abbe277, 2026-07-16) in a read-only worktree, 2026-07-16.
 
 ## Finding: there is no working uplift today

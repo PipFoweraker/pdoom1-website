@@ -60,12 +60,13 @@ jobs:
           echo "status=success" >> $GITHUB_OUTPUT
         continue-on-error: true
 
-      - name: Export leaderboard data
+      - name: Publish leaderboard snapshot (validated, honest)
         id: export
         if: github.event.inputs.sync_type == 'full'
         run: |
-          echo "Running full leaderboard export..."
-          python scripts/export-leaderboard-bridge.py --refresh
+          echo "Publishing leaderboard.json via the real pipeline..."
+          pip install --quiet jsonschema==4.26.0 || true
+          python scripts/ingest_scores.py
           echo "status=success" >> $GITHUB_OUTPUT
         continue-on-error: true
 

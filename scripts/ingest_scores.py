@@ -17,8 +17,11 @@ seed_leaderboard_*.json -- validated against schemas/leaderboard-seed.schema.jso
   4. sets an honest `data_status`: "live" | "pre-launch" | "legacy",
   5. recomputes weekly/current.json statistics for internal consistency.
 
-Whatever eventually delivers real entries -- an ingestion API (Option A) or a rebuilt
-Godot export (Option B) -- drops conforming seed files here and this publishes them.
+Per the FROZEN v1 contract (pdoom1 PR #679), scores live in the PHP score API and the
+website is a READ-ONLY consumer -- so this is a read *cache/snapshot* publisher, never an
+authoritative store. It aggregates conforming seed/board files (later: pulled from the
+API's GET) into a static snapshot for the fast static site. Entries are sorted per
+ADR-0002 (score DESC, doom_integral DESC).
 
 Test/dev seeds (test*, party*, demo*, final-verification*, natural-game-over*) are
 EXCLUDED by default so fixtures are never shown as real scores. --include-tests overrides.
@@ -131,7 +134,9 @@ def main():
         if valid_here:
             seeds_used.append(d.get("seed") or Path(f).stem)
 
-    merged = sorted(entries.values(), key=lambda e: e.get("score", 0), reverse=True)
+    # ADR-0002 order (frozen v1 contract): score (turns) DESC, then doom_integral DESC.
+    merged = sorted(entries.values(),
+                    key=lambda e: (e.get("score", 0), e.get("doom_integral", 0)), reverse=True)
 
     # Honest status: nothing published -> pre-launch; published via --include-legacy -> legacy.
     if not merged:

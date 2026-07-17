@@ -8,12 +8,19 @@ field rename turns CI red instead of silently shipping a `NaN` / broken page to 
 | Schema | Seam | Producer | Consumer |
 |---|---|---|---|
 | `events.schema.json` | historical events | pdoom-data → `sync-events.py` | website event pages/timeline |
-| `leaderboard-seed.schema.json` | per-seed scores (`entry` = the score-submission contract) | game leaderboard export | website leaderboard |
-| `leaderboard-weekly.schema.json` | weekly league `current.json` | game export + `weekly-league-reset.yml` | website league page |
+| `leaderboard-seed.schema.json` | score `entry` (**FROZEN v1**) + legacy per-seed file | PHP score API (pdoom1) | website (read-only) |
+| `leaderboard-api.schema.json` | the score API read surfaces: `GET` response, on-disk `board_*.json`, `POST` ack | PHP score API | website (read-only) |
+| `leaderboard-weekly.schema.json` | weekly league `current.json` | weekly-league-reset.yml | website league page |
 
-The website validates the projection it *receives* via `scripts/validate_data.py`
-(schema + semantic checks: encoding, freshness, version drift, referential integrity).
-That's the defensive half — the consumer guarding the boundary it controls.
+**Score contract is SETTLED + FROZEN (pdoom1 PR #679, `docs/strategy/BACKEND_AND_DATA_ARCHITECTURE.md`):**
+one PHP score API, one frozen v1 HTTP contract, no parallel score paths. The website is a
+**read-only consumer** — it reads via the API `GET` (CORS) or the `board_<seed>__<version>.json`
+files; it never writes scores. `leaderboard-seed.schema.json#/$defs/entry` mirrors the frozen entry
+exactly; `leaderboard-api.schema.json` mirrors the GET/board/POST shapes. Changes are versioned
+(`/v2/...`), never silent.
+
+The website validates what it *receives* via `scripts/validate_data.py` (schema + semantic checks:
+encoding, freshness, version drift, referential integrity) — the consumer guarding its boundary.
 
 ## Game-side (producer) validation — drop-in for the `pdoom1` repo
 

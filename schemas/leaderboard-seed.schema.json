@@ -28,22 +28,26 @@
   "$defs": {
     "entry": {
       "type": "object",
-      "description": "One score submission. THE game->website contract: the game produces these, the website displays them unchanged.",
-      "required": ["score", "player_name", "date"],
+      "description": "One score entry. FROZEN v1 contract -- pdoom1 docs/strategy/BACKEND_AND_DATA_ARCHITECTURE.md (PR #679). The game POSTs these to the PHP score API; the website reads them unchanged. Changes are versioned (/v2/...), never silent. Whitelisted fields only (the API drops the rest).",
+      "required": ["score", "player_name"],
       "additionalProperties": true,
       "properties": {
-        "score": { "type": "number" },
+        "score": { "type": "number", "description": "turns survived; PRIMARY sort DESC (ADR-0002)" },
+        "doom_integral": { "type": "number", "description": "integral of p(doom) over the run; TIEBREAK sort DESC (ADR-0002)" },
         "player_name": { "type": "string", "minLength": 1, "maxLength": 64 },
         "date": { "type": "string" },
         "level_reached": { "type": "integer", "minimum": 0 },
         "game_mode": { "type": "string" },
         "duration_seconds": { "type": "number", "minimum": 0 },
-        "entry_uuid": { "type": "string" },
-        "final_doom": { "type": "number" },
-        "final_money": { "type": "number" },
-        "final_staff": { "type": "number" },
-        "final_reputation": { "type": "number" },
-        "final_compute": { "type": "number" }
+        "entry_uuid": { "type": "string", "description": "idempotency key for POST de-dup" },
+        "baseline_score": { "type": "number" },
+        "baseline_doom_integral": { "type": "number" },
+
+        "final_doom": { "type": "number", "description": "LEGACY (pre-ADR-0002 snapshot); absent in v1 data" },
+        "final_money": { "type": "number", "description": "LEGACY" },
+        "final_staff": { "type": "number", "description": "LEGACY" },
+        "final_reputation": { "type": "number", "description": "LEGACY" },
+        "final_compute": { "type": "number", "description": "LEGACY" }
       }
     }
   }
