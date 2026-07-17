@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pdoom1.com/schemas/leaderboard-api.schema.json",
+  "title": "p(Doom)1 score API -- frozen v1 read surfaces",
+  "description": "The two read surfaces of the frozen v1 score contract (pdoom1 PR #679, docs/strategy/BACKEND_AND_DATA_ARCHITECTURE.md). Base: https://<host>/score_api.php (host TBD -- api.pdoom1.com subdomain now). The website is a READ-ONLY consumer; it never writes scores.",
+  "$defs": {
+    "get_response": {
+      "description": "GET ?seed=<s>&version=<v>&limit=<n> -> this. entries sorted score DESC, doom_integral DESC.",
+      "type": "object",
+      "required": ["ok", "seed", "version", "entries"],
+      "additionalProperties": true,
+      "properties": {
+        "ok": { "type": "boolean" },
+        "seed": { "type": "string" },
+        "version": { "type": "string" },
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "leaderboard-seed.schema.json#/$defs/entry" }
+        }
+      }
+    },
+    "board_file": {
+      "description": "On-disk board_<seed>__<version>.json is a bare JSON ARRAY of entries (score DESC, doom_integral DESC), readable directly if co-located.",
+      "type": "array",
+      "items": { "$ref": "leaderboard-seed.schema.json#/$defs/entry" }
+    },
+    "post_ack": {
+      "description": "POST (X-PDoom-Token header) -> this. Idempotent on entry_uuid. (Website never POSTs; documented for completeness.)",
+      "type": "object",
+      "required": ["ok"],
+      "additionalProperties": true,
+      "properties": {
+        "ok": { "type": "boolean" },
+        "added": { "type": "boolean" },
+        "rank": { "type": "integer" },
+        "duplicate": { "type": "boolean" }
+      }
+    }
+  }
+}
