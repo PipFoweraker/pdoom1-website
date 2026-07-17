@@ -882,13 +882,15 @@ t	.hero {
 
 			<!-- Download Options - Platform-Specific CTAs -->
 			<div class="download-ctas" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.4rem;">
-				<a id="download-windows" href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom-Windows.zip" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+				<!-- hrefs default to the release PAGE (never 404s on any asset naming);
+				     resolveDownloads() upgrades them to direct per-platform asset URLs. -->
+				<a id="download-windows" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for Windows
 				</a>
-				<a id="download-macos" href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.app.zip" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+				<a id="download-macos" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for macOS
 				</a>
-				<a id="download-linux" href="https://github.com/PipFoweraker/pdoom1/releases/latest/download/PDoom.x86_64" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+				<a id="download-linux" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for Linux
 				</a>
 			</div>
@@ -1560,10 +1562,35 @@ t	.hero {
 		}
 		
 		// Load version info when page loads
+		// Upgrade the platform download buttons from the safe release-page baseline to
+		// direct per-platform asset URLs, resolved from the latest release. Robust to any
+		// asset naming; on rate-limit/offline it silently keeps the working release-page href.
+		async function resolveDownloads() {
+			const platforms = {
+				'download-windows': /win/i,
+				'download-macos': /mac|osx|darwin|\.app|\.dmg/i,
+				'download-linux': /linux|x86_64|\.appimage/i
+			};
+			const isBuild = /\.(zip|dmg|appimage|x86_64|exe|tar\.gz)$/i;
+			try {
+				const res = await fetch('https://api.github.com/repos/PipFoweraker/pdoom1/releases/latest',
+					{ headers: { 'Accept': 'application/vnd.github+json' } });
+				if (!res.ok) return; // rate-limited/offline -> keep release-page baseline
+				const assets = (await res.json()).assets || [];
+				for (const [id, rx] of Object.entries(platforms)) {
+					const el = document.getElementById(id);
+					if (!el) continue;
+					const asset = assets.find(a => rx.test(a.name) && isBuild.test(a.name));
+					if (asset) el.href = asset.browser_download_url;
+				}
+			} catch (_) { /* keep baseline */ }
+		}
+
 		document.addEventListener('DOMContentLoaded', () => {
 			loadGameStats();
 				populateStatusCards();
 			setupDownloadTracking();
+			resolveDownloads();
 		});
 
 		// Track download button clicks with Plausible Analytics
