@@ -987,7 +987,7 @@
         }
 
         // Extract data for mini chart
-        const labels = allWeeks.map(w => w.meta?.week_id?.replace('2025_W', 'W') || '?');
+        const labels = allWeeks.map(w => w.meta?.week_id?.replace(/^\d{4}_W/, 'W') || '?');
         const participants = allWeeks.map(w => w.meta?.total_participants || 0);
 
         new Chart(ctx, {
