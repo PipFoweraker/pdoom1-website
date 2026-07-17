@@ -429,25 +429,39 @@
 					return;
 				}
 				
-				// Production API submission
-				button.textContent = 'Submitting...';
-				const base = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.apiBase) || '';
-				const url = (base ? base.replace(/\/$/, '') : '') + '/api/report-bug';
-				const res = await fetch(url, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(bugData)
-				});
-				if (!res.ok) throw new Error('Failed to submit');
-				button.textContent = '[OK] Report Submitted!';
-				button.style.background = 'var(--success-color)';
-				setTimeout(() => {
-					button.textContent = originalText;
+				// Bug reports -> pdoom1 GitHub issues (backend decision). Try a configured
+				// server-side endpoint (config.bugApi) first; else / on failure open a
+				// pre-filled GitHub issue the reporter confirms. Never lose a report.
+				const cfg = window.__PDOOM_CONFIG__ || {};
+				const bugApi = (cfg.bugApi || '').replace(/\/$/, '');
+				const ghUrl = 'https://github.com/PipFoweraker/pdoom1/issues/new?title='
+					+ encodeURIComponent(bugData.title || 'Bug report')
+					+ '&body=' + encodeURIComponent(
+						(bugData.description || '') +
+						'\n\n---\nType: ' + (bugData.type || 'bug') +
+						(bugData.email ? '\nReporter: ' + bugData.email : '') +
+						'\n_(filed via the website bug form)_');
+				let submitted = false;
+				if (bugApi) {
+					button.textContent = 'Submitting...';
+					try {
+						const res = await fetch(bugApi, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(bugData) });
+						submitted = res.ok;
+					} catch (_) { submitted = false; }
+				}
+				if (submitted) {
+					button.textContent = '[OK] Report Submitted!';
+					button.style.background = 'var(--success-color)';
+					setTimeout(() => { button.textContent = originalText; button.style.background = ''; e.target.reset(); button.disabled = false; }, 3000);
+				} else {
+					window.open(ghUrl, '_blank', 'noopener');
+					button.textContent = 'Continue on GitHub \u2192';
 					button.style.background = '';
-					e.target.reset();
-					button.disabled = false;
-				}, 3000);
-				
+					let fb = document.getElementById('bug-fallback');
+					if (!fb) { fb = document.createElement('p'); fb.id = 'bug-fallback'; fb.style.cssText = 'margin-top:0.8rem; font-size:0.9rem; color: var(--text-secondary);'; button.insertAdjacentElement('afterend', fb); }
+					fb.innerHTML = 'Your report opens as a pre-filled <a href="' + ghUrl + '" target="_blank" rel="noopener" style="color: var(--accent-primary); font-weight:bold;">GitHub issue &rarr;</a> &mdash; click "Submit new issue" there to finish. (A free GitHub account is needed.)';
+					setTimeout(() => { button.textContent = originalText; button.disabled = false; }, 4000);
+				}
 			} catch (err) {
 				button.textContent = '[ERROR] Submit Failed';
 				button.style.background = 'var(--accent-danger)';
