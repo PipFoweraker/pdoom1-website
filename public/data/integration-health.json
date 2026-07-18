@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-17T06:53:25.397183+00:00",
+  "generated": "2026-07-18T06:44:33.654044+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -35,12 +35,12 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 4.3 days ago"
+      "detail": "generated 5.3 days ago"
     },
     {
       "name": "league:current_week",
       "status": "WARN",
-      "detail": "week 2026_W28 is marked is_current but ended 4.3 days ago -- rollover cadence off"
+      "detail": "week 2026_W28 is marked is_current but ended 5.3 days ago -- rollover cadence off"
     },
     {
       "name": "league:version_drift",
