@@ -1,9 +1,11 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-18T06:55:21.064Z UTC
+Generated: 2026-07-18T12:33:46.910Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 703 | Playtest v0.11.0: defeat-pacing drag + hiring pipeline feels gappy (coalesce/de-branch) |  |  | 2026-07-18 07:57:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/703) |
+| 700 | Local Leaderboard.add_score does not dedupe by entry_uuid (remote PHP does) |  |  | 2026-07-18 07:05:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/700) |
 | 648 | Check Godot port for team_player uncapped-stacking exploit + poaching rate (salvaged from pre-Godot notes) |  |  | 2026-07-15 22:31:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/648) |
 | 622 | Build lane L10 · main_ui decomposition: extract-before set + let-die map |  |  | 2026-07-12 08:38:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/622) |
 | 621 | Build lane L9 · Balance surface + data externalization (defs→JSON, Balance autoload) |  |  | 2026-07-12 08:38:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/621) |
