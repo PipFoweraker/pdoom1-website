@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-19T00:55:22.228Z UTC
+Generated: 2026-07-19T07:07:04.972Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 707 | UI consistency sweep after asset promotion + office-sim integration (level-2 visual pass) |  |  | 2026-07-19 06:28:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/707) |
 | 703 | Playtest v0.11.0: defeat-pacing drag + hiring pipeline feels gappy (coalesce/de-branch) |  |  | 2026-07-18 07:57:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/703) |
 | 700 | Local Leaderboard.add_score does not dedupe by entry_uuid (remote PHP does) |  |  | 2026-07-18 07:05:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/700) |
 | 648 | Check Godot port for team_player uncapped-stacking exploit + poaching rate (salvaged from pre-Godot notes) |  |  | 2026-07-15 22:31:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/648) |
