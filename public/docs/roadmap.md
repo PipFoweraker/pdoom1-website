@@ -11,8 +11,9 @@ Website work has its own page: [Website roadmap](website-roadmap.md).
 1. **Private alpha (v0.11) -- we are here.** Friends-and-family Windows build
    with the full core loop, hiring pipeline, honest defeat screens, and the
    world leaderboard.
-2. **Public alpha -- itch.io, free.** First-contact polish, onboarding, and
-   the share loop, then the doors open.
+2. **Public alpha -- free.** First-contact polish, onboarding, and the share
+   loop, then the doors open. (How it will be distributed -- direct download,
+   a storefront page, or a playable web build -- is still being decided.)
 3. **Beta -- Steam "coming soon" page.** Wishlists start compounding while
    the mid and late game get built in.
 4. **1.0.**
@@ -21,7 +22,7 @@ Website work has its own page: [Website roadmap](website-roadmap.md).
 
 | Quarter | Version | Theme |
 |---|---|---|
-| Q3 2026 | v0.12 | **First Contact** -- public itch alpha, onboarding and first-launch help, shareable runs ("beat my seed"), world leaderboard switched on |
+| Q3 2026 | v0.12 | **First Contact** -- public alpha, onboarding and first-launch help, shareable runs ("beat my seed"), world leaderboard switched on |
 | Q4 2026 | v0.13 | **Rivals and News** -- rival labs become a visible strategic surface: intel panel, capability race, a News feed with detail you earn |
 | Q1 2027 | v0.14 | **The World Shoots Back** -- rivals fight back past a threshold; the Liability Ledger becomes fully player-facing; monthly world-updates begin flowing from real-world AI events |
 | Q2 2027 | v0.15 | **Beta / Steam Coming Soon** -- Steam page and wishlists, press kit, character creation, a full balance pass |
@@ -32,7 +33,9 @@ they exist to be steered, not to be marketing.
 
 ## Cadence
 
-Leagues and content updates run **monthly**: a curated world-update, balance
-adjustments, and a refreshed challenge board each month. Weekly output is
-limited to lightweight generated artifacts (challenge seeds). Runs are
-deterministic per seed, so every board compares fairly.
+Leagues, content updates, and releases run **monthly**: a point release, a
+curated world-update, balance adjustments, and a refreshed challenge board
+each league month. The quarterly versions above are theme milestones, not
+the release cadence. Weekly output is limited to lightweight generated
+artifacts (challenge seeds). Runs are deterministic per seed, so every
+board compares fairly.
