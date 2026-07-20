@@ -1,9 +1,15 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-20T07:21:10.188Z UTC
+Generated: 2026-07-20T12:57:26.870Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 724 | Cross-repo sync: fold player-guide mapping into the #545 cleanup pass |  |  | 2026-07-20 09:08:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/724) |
+| 723 | Website: publish the player guide to pdoom1.com with pdoom1 -> website sync |  |  | 2026-07-20 09:08:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/723) |
+| 722 | Onboarding: opt-in Tutorial Mode (relaunchable guided steps) |  |  | 2026-07-20 09:08:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/722) |
+| 721 | Onboarding: data-driven contextual hints (Factorio-style show-once triggers) |  |  | 2026-07-20 09:08:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/721) |
+| 720 | Onboarding: first-launch help layer skeleton (settings flag + dismissible overlay) |  |  | 2026-07-20 09:08:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/720) |
+| 719 | Docs: correct PLAYERGUIDE tutorial claims to match the Godot build (SSOT declaration) |  |  | 2026-07-20 09:59:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/719) |
 | 714 | Perf: turn-1 / early-days processing feels slow (watch-and-track) |  |  | 2026-07-20 05:22:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/714) |
 | 707 | UI consistency sweep after asset promotion + office-sim integration (level-2 visual pass) |  |  | 2026-07-19 06:28:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/707) |
 | 703 | Playtest v0.11.0: defeat-pacing drag + hiring pipeline feels gappy (coalesce/de-branch) |  |  | 2026-07-18 07:57:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/703) |
