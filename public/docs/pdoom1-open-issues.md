@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-20T00:56:08.932Z UTC
+Generated: 2026-07-20T07:21:10.188Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 714 | Perf: turn-1 / early-days processing feels slow (watch-and-track) |  |  | 2026-07-20 05:22:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/714) |
 | 707 | UI consistency sweep after asset promotion + office-sim integration (level-2 visual pass) |  |  | 2026-07-19 06:28:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/707) |
 | 703 | Playtest v0.11.0: defeat-pacing drag + hiring pipeline feels gappy (coalesce/de-branch) |  |  | 2026-07-18 07:57:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/703) |
 | 700 | Local Leaderboard.add_score does not dedupe by entry_uuid (remote PHP does) |  |  | 2026-07-18 07:05:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/700) |
