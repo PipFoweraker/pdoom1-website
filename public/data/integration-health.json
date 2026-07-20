@@ -1,10 +1,10 @@
 {
-  "generated": "2026-07-19T06:56:55.939193+00:00",
+  "generated": "2026-07-20T07:12:53.581208+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 2,
-    "ok": 8
+    "warn": 1,
+    "ok": 9
   },
   "checks": [
     {
@@ -35,12 +35,12 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 6.3 days ago"
+      "detail": "generated 0.7 days ago"
     },
     {
       "name": "league:current_week",
-      "status": "WARN",
-      "detail": "week 2026_W28 is marked is_current but ended 6.3 days ago -- rollover cadence off"
+      "status": "OK",
+      "detail": "week 2026_W29 current"
     },
     {
       "name": "league:version_drift",
