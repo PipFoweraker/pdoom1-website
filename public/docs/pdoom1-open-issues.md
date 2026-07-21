@@ -1,10 +1,12 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-21T07:08:29.418Z UTC
+Generated: 2026-07-21T12:44:27.929Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
-| 756 | art wiring: promote scene-wave-2 primaries (office backdrop, leaderboard records room, event-genre map) |  | v0.12 -- First Contact | 2026-07-21 06:25:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/756) |
+| 763 | Nomenclature + pacing: strategic-options unlock expressed at month grain; align fanfare hero |  |  | 2026-07-21 09:21:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/763) |
+| 762 | REGRESSION: most action icons render as placeholder (only safety audit + strategic show) |  | v0.12 -- First Contact | 2026-07-21 09:21:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/762) |
+| 758 | Session agenda: Friday 2026-07-24 (decisions + conversations queue) |  |  | 2026-07-21 09:03:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/758) |
 | 755 | UI: theme the event popup / dialog buttons (still default grey after menu theme) |  | v0.12 -- First Contact | 2026-07-21 04:49:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/755) |
 | 753 | chore: docs typographic ASCII cleanup (em-dashes, box-drawing) -- low priority |  |  | 2026-07-21 04:23:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/753) |
 | 745 | Art tooling: compare-and-contrast mode for kept assets (batch style reviews) |  |  | 2026-07-20 22:49:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/745) |
