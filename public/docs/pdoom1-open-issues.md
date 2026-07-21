@@ -1,20 +1,26 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-20T18:53:29.924Z UTC
+Generated: 2026-07-21T00:52:50.047Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
-| 724 | Cross-repo sync: fold player-guide mapping into the #545 cleanup pass |  |  | 2026-07-20 09:08:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/724) |
-| 723 | Website: publish the player guide to pdoom1.com with pdoom1 -> website sync |  |  | 2026-07-20 09:08:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/723) |
-| 722 | Onboarding: opt-in Tutorial Mode (relaunchable guided steps) |  |  | 2026-07-20 09:08:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/722) |
-| 721 | Onboarding: data-driven contextual hints (Factorio-style show-once triggers) |  |  | 2026-07-20 09:08:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/721) |
-| 720 | Onboarding: first-launch help layer skeleton (settings flag + dismissible overlay) |  |  | 2026-07-20 09:08:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/720) |
-| 719 | Docs: correct PLAYERGUIDE tutorial claims to match the Godot build (SSOT declaration) |  |  | 2026-07-20 09:59:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/719) |
+| 745 | Art tooling: compare-and-contrast mode for kept assets (batch style reviews) |  |  | 2026-07-20 22:49:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/745) |
+| 744 | Enforcement: no emoji / non-ASCII in game UI strings + repo-wide hard rule |  | v0.12 -- First Contact | 2026-07-20 22:49:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/744) |
+| 743 | UI: shared menu Theme resource (menu_theme.tres) + retire pre-palette code colors |  | v0.12 -- First Contact | 2026-07-20 22:49:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/743) |
+| 735 | Leaderboard: enable remote board + hardening minimums |  | v0.12 -- First Contact | 2026-07-20 20:38:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/735) |
+| 734 | Game-over share: copy result + seed one-liner |  | v0.12 -- First Contact | 2026-07-20 20:38:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/734) |
+| 733 | COMMIT THE MONTH advances an empty month instead of erroring |  | v0.12 -- First Contact | 2026-07-20 20:38:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/733) |
+| 724 | Cross-repo sync: fold player-guide mapping into the #545 cleanup pass |  | v0.13 -- Rivals and News | 2026-07-20 20:38:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/724) |
+| 723 | Website: publish the player guide to pdoom1.com with pdoom1 -> website sync |  | v0.13 -- Rivals and News | 2026-07-20 20:38:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/723) |
+| 722 | Onboarding: opt-in Tutorial Mode (relaunchable guided steps) |  | v0.13 -- Rivals and News | 2026-07-20 20:38:33 | [link](https://github.com/PipFoweraker/pdoom1/issues/722) |
+| 721 | Onboarding: data-driven contextual hints (Factorio-style show-once triggers) |  | v0.12 -- First Contact | 2026-07-20 20:38:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/721) |
+| 720 | Onboarding: first-launch help layer skeleton (settings flag + dismissible overlay) |  | v0.12 -- First Contact | 2026-07-20 20:38:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/720) |
+| 719 | Docs: correct PLAYERGUIDE tutorial claims to match the Godot build (SSOT declaration) |  | v0.12 -- First Contact | 2026-07-20 20:38:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/719) |
 | 714 | Perf: turn-1 / early-days processing feels slow (watch-and-track) |  |  | 2026-07-20 05:22:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/714) |
 | 707 | UI consistency sweep after asset promotion + office-sim integration (level-2 visual pass) |  |  | 2026-07-19 06:28:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/707) |
 | 703 | Playtest v0.11.0: defeat-pacing drag + hiring pipeline feels gappy (coalesce/de-branch) |  |  | 2026-07-18 07:57:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/703) |
 | 700 | Local Leaderboard.add_score does not dedupe by entry_uuid (remote PHP does) |  |  | 2026-07-18 07:05:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/700) |
-| 648 | Check Godot port for team_player uncapped-stacking exploit + poaching rate (salvaged from pre-Godot notes) |  |  | 2026-07-15 22:31:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/648) |
+| 648 | Check Godot port for team_player uncapped-stacking exploit + poaching rate (salvaged from pre-Godot notes) |  | v0.13 -- Rivals and News | 2026-07-20 20:38:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/648) |
 | 622 | Build lane L10 · main_ui decomposition: extract-before set + let-die map |  |  | 2026-07-12 08:38:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/622) |
 | 621 | Build lane L9 · Balance surface + data externalization (defs→JSON, Balance autoload) |  |  | 2026-07-12 08:38:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/621) |
 | 619 | Build lane L8 · Achievements skeleton (observer-only) |  |  | 2026-07-12 08:23:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/619) |
@@ -35,7 +41,6 @@ Generated: 2026-07-20T18:53:29.924Z UTC
 | 567 | Event dialog keyboard: choice keys mismatch shown buttons ('key index out of range') | bug, ui-ux |  | 2026-07-05 11:28:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/567) |
 | 565 | Travel/Conferences only reachable by hotkey T, absent from menus | ui-ux |  | 2026-07-05 11:28:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/565) |
 | 545 | Cross-repo sync: careful cleanup pass (pdoom1 -> pdoom1-website / pdoom-data) |  |  | 2026-07-01 01:54:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/545) |
-| 531 | ci: bump deprecated Node-20 GitHub Actions (checkout/setup-python/setup-node/upload-artifact) |  |  | 2026-06-27 03:09:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/531) |
 | 529 | Revisit terminal/CRT texture aesthetic (parked art package) | enhancement, ui-ux, worktree:player-experience |  | 2026-06-26 06:14:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/529) |
 | 528 | Lab Ledger: player-facing review page with insight-gated 'redacted' risk zone | enhancement |  | 2026-06-26 05:42:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/528) |
 | 526 | Track down the CSIRO/Data61 retro Win3-style web UI project |  |  | 2026-06-15 10:31:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/526) |
