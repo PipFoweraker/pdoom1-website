@@ -1,4 +1,5 @@
 ---
+draft: true   # unpublished: never appeared in index.json. Flip to publish.
 title: "Type Annotation: Events.py TypedDict Complete"
 date: "2025-09-14"
 tags: ["type-annotations", "typescript", "events", "typeddict", "pylance", "phase-2"]

@@ -86,12 +86,17 @@ All leaderboard data follows a standardized JSON schema with game metadata, play
 # Export game data to website
 python scripts/game-integration.py --export
 
-# Start API server
-python scripts/api-server.py --port 8081
+# Ingest published board JSON into the site's leaderboard data
+python scripts/ingest_scores.py
 
 # Test integration
 python scripts/test-integration.py --quick
 ```
+
+> The website does not run its own score API. Scores live behind one PHP
+> endpoint owned by the game side (`score_api.php`), and this site is a
+> read-only consumer of it -- either via its GET contract or by reading the
+> published `board_<seed>__<version>.json` files directly.
 
 ## Privacy & Fair Play
 

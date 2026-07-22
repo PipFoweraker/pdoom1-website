@@ -1,0 +1,98 @@
+name: Sync design notes from pdoom1
+
+# Publishes the game's Architecture Decision Records as player-facing pages at
+# /design-notes/. Replaces the parked raw-docs dump in sync-pdoom1-docs.yml:
+# this reads ONLY docs/game-design/decisions/ADR-*.md, scrubs internal process
+# markers (HTML comments, session attributions, TODOs), and renders real HTML
+# in the site's terminal palette rather than shipping raw .md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref in PipFoweraker/pdoom1 to render
+        required: false
+        default: main
+  schedule:
+    # Twice daily. The ADRs change at workshop cadence, not continuously.
+    - cron: '0 7,19 * * *'
+  repository_dispatch:
+    types: [pdoom1_release, pdoom1_docs_update]
+
+permissions:
+  contents: write
+
+concurrency:
+  # A scheduled run and a release webhook can collide; the later one wins rather
+  # than both racing to push.
+  group: sync-design-notes
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout website
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Resolve game ref
+        id: ref
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            REF="${{ github.event.inputs.ref }}"
+          elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            REF="${{ github.event.client_payload.ref }}"
+          else
+            REF=""
+          fi
+          # Fall back to the latest release tag, then to main. jq yields the
+          # string "null" (not empty) when there is no release, so test for both.
+          if [ -z "$REF" ] || [ "$REF" = "null" ]; then
+            REF=$(curl -sS https://api.github.com/repos/PipFoweraker/pdoom1/releases/latest | jq -r '.tag_name // empty')
+          fi
+          if [ -z "$REF" ] || [ "$REF" = "null" ]; then
+            REF=main
+          fi
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+          echo "Rendering ADRs from pdoom1@$REF"
+
+      - name: Checkout pdoom1
+        uses: actions/checkout@v4
+        with:
+          repository: PipFoweraker/pdoom1
+          ref: ${{ steps.ref.outputs.ref }}
+          path: _pdoom1_src
+
+      - name: Render design notes
+        run: python scripts/sync/sync-design-notes.py --source _pdoom1_src
+
+      # The leak check lives inside sync-design-notes.py (assert_clean), which
+      # raises and exits non-zero rather than writing a page whose body still
+      # carries an authoring note or session attribution. It is scoped to the
+      # rendered ADR content, not the whole document -- the page template
+      # legitimately contains HTML comments, and an earlier grep-based guard
+      # here flagged those instead of real leaks.
+      #
+      # The scrubber is exercised locally by scripts/test-design-notes.py.
+
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          # Stage before testing: these files are frequently new/untracked, and
+          # `git diff` alone cannot see untracked paths. That exact mistake made
+          # sync-pdoom1-docs.yml report success while committing nothing.
+          git add -A public/design-notes
+          if git diff --cached --quiet -- public/design-notes; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(design-notes): render ADRs from pdoom1@${{ steps.ref.outputs.ref }}"
+            git push
+          fi

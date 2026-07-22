@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0013 — Financing instruments &amp; the cost-of-debt engine | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0013-cost-of-debt-engine.html" />
+	<meta name="description" content="Flat 25%/turn loans were a day-cadence artifact (ADR-0009) and a placeholder (DQ-8). With DEFER routing through the Ledger (ADR-0009/0012), loan terms and " />
+	<meta property="og:title" content="ADR-0013 — Financing instruments &amp; the cost-of-debt engine | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="Flat 25%/turn loans were a day-cadence artifact (ADR-0009) and a placeholder (DQ-8). With DEFER routing through the Ledger (ADR-0009/0012), loan terms and " />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0013-cost-of-debt-engine.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0013 — Financing instruments &amp; the cost-of-debt engine</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED (shape; numbers owed to the sweep) &middot; <strong>Decided:</strong> 2026-07-12</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED (shape; numbers owed to the sweep)</li>
+<li><strong>Date:</strong> 2026-07-12</li>
+</ul>
+<h2>Context</h2>
+<p>Flat 25%/turn loans were a day-cadence artifact (ADR-0009) and a placeholder (DQ-8). With DEFER routing through the Ledger (ADR-0009/0012), loan terms and defer carrying-costs need one pricing engine, or the two halves of the flagship drift apart.</p>
+<h2>Decision</h2>
+<p><strong>One pricing engine for all liabilities</strong> (loans, defers, funding-with-strings), taking these arguments at Pip's weights:</p>
+<ul>
+<li><strong>Org type — major.</strong> Set at character/org creation; ties directly to building early-game agency into setup (DQ-4 adjacent; "the opening is a commitment device").</li>
+<li><strong>Counterparty / stakeholder risk &amp; interest — major.</strong> Who you owe changes what it costs (VC, government, philanthropist, rival's proxy — counterparty dread lives here, ADR-0007 register).</li>
+<li><strong>Reputation — typed.</strong> Safety-rep and finance-rep price debt <em>differently</em>, and reputation affects grants, equity raises, and loans through different channels (ADR-0010 typed attention, applied to capital).</li>
+<li><strong>Hype — scoped to the raise's purpose.</strong> Fundraising is purpose-tagged and the hype cycle prices the purpose; <strong>no internal earmarked budgets</strong> (rejected as fiddly — granularity lives in the raise, not the spend).</li>
+<li><strong>Existing ledger load — minor direct</strong>, mostly indirect through reputation and counterparty appetite.</li>
+</ul>
+<p><strong>Instruments beyond debt</strong> (all Ledger objects):</p>
+<ul>
+<li><strong>Equity</strong> (for-profits): early capital comes on good terms but eats equity — and equity is a more valuable bargaining chip mid/late game. Selling cheap early is a priced regret.</li>
+<li><strong>Board seats</strong> (nonprofits' equity-approximate): cash for seats that <em>curtail the player's options in voting mechanisms</em> (hard dependency on DQ-7 governance design).</li>
+<li><strong>Research-agenda narrowing</strong>: cash for scope — the funder's strings constrain which workstreams are legal.</li>
+</ul>
+<p><strong>The early-game curve, stated as design intent:</strong> pure philanthropy is starved — the first thing players feel is the difficulty of getting enough cash in the door from any purely philanthropic approach. Trading (equity, agenda, capabilities work) buys speed — reputation and publication pipelines spike faster — and bills against <strong>late-game optionality</strong> (the capabilities route compromises later government/political influence). Financing is "every mitigation is a loan" applied to itself.</p>
+<h2>Beacons served / violated</h2>
+<ul>
+<li><strong>Rams #6:</strong> an honest cost-of-capital function — org type, counterparty, reputation, purpose — instead of a flat magic number.</li>
+<li><strong>MaRo Interaction:</strong> capital now interlocks with reputation (typed), hype, governance (board seats), and the rival race.</li>
+<li>The PoE exponential-difficulty ladder gets its mechanism: compounding early trades <em>are</em> the difficulty curve (ADR-0003 thesis, now with a pricing engine).</li>
+</ul>
+<h2>Interaction contract</h2>
+<p>Reads/writes: <strong>Ledger</strong> (all instruments are entries), <strong>reputation</strong> (typed, both directions), <strong>hype cycle</strong> (purpose pricing), <strong>char/org creation</strong> (org type; DQ-4), <strong>governance/voting</strong> (board seats curtail votes — DQ-7 now has a customer), <strong>rival pipeline</strong> (funding starvation cascade, ADR-0012).</p>
+<h2>Rejected alternatives</h2>
+<ul>
+<li><strong>Flat rates:</strong> day-cadence placeholder, dies with ADR-0009.</li>
+<li><strong>Internal earmarked budgets</strong> (money "for" things): fiddly; purpose granularity lives in the raise.</li>
+<li><strong>Separate pricing for loans vs defers:</strong> one engine or the flagship forks.</li>
+</ul>
+<h2>Consequences / open questions</h2>
+<ul>
+<li><strong>Numbers owed to the sweep</strong> (DQ-8): rate curves per org type/counterparty, equity dilution schedule, board-seat prices. Instrument root-cause death attribution first (ADR-0012) or tuning is blind.</li>
+<li><strong>DQ-7 (governance)</strong> is now load-bearing twice over: the board-seat instrument needs the voting mechanics it curtails.</li>
+<li>Equity model granularity (cap table vs a single dilution scalar) — start scalar (Rams #10), upgrade only if bargaining-chip play demands it.</li>
+<li>Character/org setup design (org type as the pricing engine's biggest input) — feeds the early-game agency thread.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

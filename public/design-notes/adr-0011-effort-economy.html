@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0011 — The effort economy: founder hours, staff lanes, manager compression | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0011-effort-economy.html" />
+	<meta name="description" content="Current build: one global AP pool, spent instantly; staff add to the pool; researchers are single-function; banking exists but does nothing. The sweep&#x27;s di" />
+	<meta property="og:title" content="ADR-0011 — The effort economy: founder hours, staff lanes, manager compression | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="Current build: one global AP pool, spent instantly; staff add to the pool; researchers are single-function; banking exists but does nothing. The sweep&#x27;s di" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0011-effort-economy.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0011 — The effort economy: founder hours, staff lanes, manager compression</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED (shape); researcher archetype roster content owed (DQ-15) &middot; <strong>Decided:</strong> 2026-07-12</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED (shape); researcher archetype roster content owed (DQ-15)</li>
+<li><strong>Date:</strong> 2026-07-12</li>
+</ul>
+<h2>Context</h2>
+<p>Current build: one global AP pool, spent instantly; staff add to the pool; researchers are single-function; banking exists but does nothing. The sweep's diagnosis in mechanism terms: one fungible currency + state-independent payoffs ⇒ constant-policy argmax (<code>safety_lean</code>) dominates. Pip's rulings across beats 1–2: banking is dead (ADR-0009); <em>"I have never been around unassigned workers before, because there's always been a backlog"</em>; <em>"each new employee is kinda cutting down the time I need to do other things"</em>; managers <em>"stop employees from annoying me with employee things."</em></p>
+<h2>Decision</h2>
+<ol>
+<li><strong>No global AP pool.</strong> The pool illusion dies; staff never add founder AP.</li>
+<li><strong>Founder hours</strong> (sacred, roughly fixed per month — canon since ADR-0008): spent on <strong>doors</strong> (stakeholder face-time; which rooms you're in locks strategic paths), <strong>approvals</strong> (hires, direction rulings — "approve this salary," not paperwork clicks), <strong>audits</strong> (skip-level ground-truthing), and <strong>reserve</strong> (instant-speed firefighting, ADR-0009).</li>
+<li><strong>Staff effort is per-person</strong>, assigned at plan speed to workstreams from a backlog. <strong>Idle staff don't exist; unmanaged staff do</strong> — unassigned researchers self-direct per their agenda (whose ordering of the backlog wins?).</li>
+<li><strong>Workstreams</strong> run multi-month and produce artifacts (papers, systems, campaigns) — ADR-0009's no-instant-strategy rule, cashed out.</li>
+<li><strong>Managers are interrupt shields with agenda riders:</strong> they absorb their team's class of response windows (ADR-0009 economy), compress the plan screen (team → allocation a <strong>Celine's-law channel</strong> — an inward SA channel with fidelity loss. The sim never lies; <em>characters do</em>. Skip-level audits (founder hours) re-ground truth. Folds ADR-0008's deferred inward-SA into existing SA machinery.
+<ul>
+<li>standing policy; members visually housed under the manager), and report upward via</li>
+</ul></li>
+<li><strong>Ops/admin staff reduce the founder-price of routine actions</strong> and automate whole classes over time (endpoint: 2037 vignette's "payroll is automated").</li>
+<li><strong>The dual-use lane is priced:</strong> capabilities work pays money/compute/hype and bills doom (with ADR-0010's typed attention: accel VCs fund reckless success).</li>
+<li><strong>Researcher model (shape):</strong> <em>lane preference</em> (fictionalized real agendas — e.g. interpretability, evals, theory/agent-foundations, governance) × <em>appetites</em> (compute, prestige/first-author, mentees, money, mission purity — <strong>promises made to retain staff are ledger entries</strong>) × rare <em>quirk riders</em> (philosophical stances, secret successionist — an exposure-event genre reusing ADR-0003 machinery, not a lane).</li>
+</ol>
+<h2>Beacons served / violated</h2>
+<ul>
+<li><strong>Rams #10:</strong> managers reuse the window economy + SA channels; quirks reuse exposure events; banking deleted; no new player-facing currency — typed effort is a <em>split</em> of an existing one.</li>
+<li><strong>MaRo Interaction:</strong> typed lanes force a portfolio; with ADR-0010, the constant policy is structurally unavailable, not merely under-rewarded.</li>
+<li><strong>Honest:</strong> "nobody wants to bring the boss bad news" — late-discovered doom via rosy reporting mirrors the real failure mode.</li>
+</ul>
+<h2>Interaction contract</h2>
+<p>Reads/writes: <strong>response windows</strong> (ADR-0009 — manager value denominated there), <strong>SA</strong> (inward channel, fidelity, audits), <strong>Liability Ledger</strong> (agenda riders, retention promises, dual-use bills), <strong>reputation</strong> (per-person, ADR-0010 — hires are reputation seeds who recruit juniors), <strong>replay/exploit-finder</strong> (assignment policies join the policy space).</p>
+<h2>Rejected alternatives</h2>
+<ul>
+<li><strong>Global pool with staff as AP-adders:</strong> sweep-proven degenerate; also violates founder-hours canon.</li>
+<li><strong>Idle unassigned staff:</strong> no such thing ("there's always a backlog").</li>
+<li><strong>Managers as output multipliers:</strong> rejected — their value is founder-attention arbitrage, not throughput.</li>
+<li><strong>Soft reserve fallback:</strong> already rejected in ADR-0009.</li>
+</ul>
+<h2>Consequences / open questions</h2>
+<ul>
+<li><strong>DQ-15:</strong> researcher archetype roster — Pip to author 3–5 vignette-style archetypes (lane / unmanaged drift / appetite / optional quirk).</li>
+<li>Plan-screen redesign: assignment UI, manager housing, team-satisfaction report replacing per-member detail under management.</li>
+<li>Retention/morale stays minimal v1: appetites bite through promises (ledger) and departure riders, not a mood sim (ADR-0008 register: "bother," not HR gravity).</li>
+<li>Sweep target: a managed portfolio must beat every constant line; new bot policy axes (assignment + response + publish/socialize).</li>
+<li>Balance seam: founder-hour prices for doors/audits/approvals are the new tuning surface — they set the whole game's attention economy.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

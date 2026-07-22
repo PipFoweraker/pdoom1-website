@@ -1,4 +1,5 @@
 ---
+draft: true   # unpublished: never appeared in index.json. Flip to publish.
 title: "Hotfix Batch: Mac TypeError + GameClock Bounds + Dialog UX"
 date: "2025-09-15"
 tags: ["hotfix", "mac-bug", "type-safety", "gameclock", "batch-deployment", "critical-fixes"]

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0017 -- Anti-hollow test strategy (load-time smoke + property-based invariants) | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0017-anti-hollow-test-strategy.html" />
+	<meta name="description" content="Two real failures on 2026-07-17 share one root cause -- tests that pass without exercising the thing they claim to protect (call it a &quot;hollow&quot; test):" />
+	<meta property="og:title" content="ADR-0017 -- Anti-hollow test strategy (load-time smoke + property-based invariants) | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="Two real failures on 2026-07-17 share one root cause -- tests that pass without exercising the thing they claim to protect (call it a &quot;hollow&quot; test):" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0017-anti-hollow-test-strategy.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0017 -- Anti-hollow test strategy (load-time smoke + property-based invariants)</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED &middot; <strong>Decided:</strong> 2026-07-17</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED</li>
+<li><strong>Date:</strong> 2026-07-17</li>
+</ul>
+<h2>Context</h2>
+<p>Two real failures on 2026-07-17 share one root cause -- <strong>tests that pass without exercising the thing they claim to protect</strong> (call it a "hollow" test):</p>
+<ol>
+<li><strong>Hollow CI (fixed as #640).</strong> The gate reported GREEN while running ZERO tests: a cold Godot class cache made GUT <code>quit(0)</code> before parsing a single test. Nobody noticed for a while. The suite's <em>pass</em> was uncorrelated with the code's health.</li>
+</ol>
+<ol>
+<li><strong>The parse-error-that-broke-the-game</strong> (fixed on <code>feat/hiring-phase-b-pipeline</code>, commit a2de3a7). A one-line GDScript parse error in <code>scripts/ui/main_ui.gd</code> made the ENTIRE script fail to load, so the game would not start -- yet <strong>436 unit tests passed</strong>, because the fast unit suite exercises core / GameManager logic and <strong>never loads the UI script</strong>. The thing that broke (script load) was never touched by any test, so no test could fail.</li>
+</ol>
+<p>Back in January, Pip's housemate (an ML expert) gave three pieces of advice that today vindicates:</p>
+<ul>
+<li>(a) some unit tests should be <strong>property-based</strong> (assert an invariant over a distribution of inputs, not one hand-picked case);</li>
+<li>(b) <strong>write the tests before the code</strong>;</li>
+<li>(c) <strong>"let me see some of them fail."</strong> A test you have never watched fail is untrustworthy -- you cannot distinguish it from a hollow one.</li>
+</ul>
+<p>This ADR credits that advice and turns it into standing practice.</p>
+<h3>What the pre-uplift suite can and cannot catch</h3>
+<p>CAN catch (well-covered):</p>
+<ul>
+<li>Core engine logic: resource math, turn loop, events, finance, ledger, doom.</li>
+<li>Engine determinism and replay soundness (ADR-0006): <code>tests/unit/simulation</code> re-simulates recorded input logs and checks the (turns, doom_integral, hash) reproduce. This tier is genuinely strong.</li>
+<li>Save/load snapshot fidelity for one hand-built mid-game state.</li>
+</ul>
+<p>CANNOT catch (the gaps this ADR closes):</p>
+<ul>
+<li><strong>Load-time breakage of any script no test imports.</strong> The whole <code>scripts/ui</code> surface (main_ui.gd, panels, screens) is loaded only when a <em>scene</em> is instantiated. The fast unit tests never instantiate scenes, so a parse error there is invisible. <code>run_godot_tests.py</code>'s <code>--quit</code> syntax check boots only the main menu scene (<code>welcome.tscn</code>); the import pass builds the class cache but its exit is only checked for cache <em>existence</em>, not per-script parse success. So a parse error off the welcome-boot path passes the entire gate.</li>
+<li><strong>Whole-space invariants.</strong> Single-seed tests can pass while a different region of the seed space boots into an unplayable / game-over / NaN state.</li>
+</ul>
+<h3>Where hollow tests can still hide</h3>
+<ul>
+<li>Any assertion against a value the test itself constructs but the <em>product</em> never loads (the main_ui.gd class of bug).</li>
+<li>Tests with no floor on how much they exercised -- e.g. a directory-walking test that silently finds zero files still "passes." (Guarded here with <code>MIN_*</code> floors.)</li>
+</ul>
+<h2>Decision</h2>
+<p>Adopt three standing practices, and add the tests that embody them:</p>
+<ol>
+<li><strong>A "nothing is hollow at load time" smoke test</strong> in the fast gate (<code>tests/unit/test_smoke_load_all.gd</code>). It <code>load()</code>s every project <code>.gd</code> under <code>scripts/</code> and <code>autoload/</code>, instantiates every <code>.tscn</code> under <code>scenes/</code>, asserts every declared autoload singleton is present, and instantiates the <code>main.tscn</code> chain specifically. A parse/load error turns the gate RED and names the file. This is the direct guard against failure #2. It is cheap (scripts are already imported; <code>instantiate()</code> does not enter the SceneTree, so <code>_ready()</code> side effects stay dormant), so it stays in the required fast gate.</li>
+</ol>
+<ol>
+<li><strong>Property-based invariant tests</strong> that assert over a <em>deterministically-generated distribution</em> of seeds, not one case: alive, finite/sane resources, at least one affordable action. distribution, (i) the engine is byte-identical across two runs of the same seed, (ii) a recorded replay reproduces the run's hash+score (ADR-0006, READ not weakened), (iii) save/load round-trips to a deep-equal state.
+<ul>
+<li><code>tests/unit/test_property_boot_invariants.gd</code> (fast): for any seed (64 generated
+<ul>
+<li>8 awkward edge seeds), a fresh <code>GameState</code> boots to an ACTIONABLE state --</li>
+</ul></li>
+<li><code>tests/unit/simulation/test_property_determinism.gd</code> (slow tier): over a seed</li>
+</ul></li>
+</ol>
+<ol>
+<li><strong>Red-first discipline (write-the-test-before-the-code, item b + c).</strong> Every new invariant test in this ADR was watched FAIL with its target bug present before being accepted -- see the counterfactual table. New behavioural tests should likewise be demonstrated to fail against the unfixed code, at least once, in the PR that introduces them.</li>
+</ol>
+<h3>Counterfactual: which practice would have caught today's failures</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Failure</th><th>Caught by</th><th>How</th></tr></thead>
+<tbody>
+<tr><td>#1 hollow CI (zero tests ran)</td><td>already fixed in #640 (JUnit floor + manifest); this ADR's <code>MIN_*</code> floors extend the same "silence is failure" principle into individual tests</td><td>a suite that runs nothing now fails; a walk that finds nothing now fails</td></tr>
+<tr><td>#2 main_ui.gd parse error</td><td>smoke test <code>test_all_scripts_compile</code></td><td><code>load("res://scripts/ui/main_ui.gd")</code> returns null on parse error -&gt; RED, naming the file</td></tr>
+</tbody></table></div>
+<p>Demonstrated (red-first proof, all reverted after observation):</p>
+<div class="table-scroll"><table>
+<thead><tr><th>New test</th><th>Bug reintroduced</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td><code>test_all_scripts_compile</code></td><td>one-line parse error appended to <code>main_ui.gd</code></td><td>RED. Critically, <strong>419/420 other fast-gate tests still PASSED</strong> -- reproducing "the game will not start yet the suite is green." Only the direct script-<code>load()</code> check caught it; scene-instantiation did NOT (a scene loads with a null script attached), which is why the smoke test loads every <code>.gd</code> directly rather than relying on instantiation.</td></tr>
+<tr><td>boot-invariant sweep</td><td><code>money = 0.0</code> in <code>GameState.reset()</code></td><td>RED across the ENTIRE seed distribution ("positive money" failed for every sampled seed).</td></tr>
+<tr><td>determinism property</td><td><code>state.money += Time.get_ticks_usec() % 13</code> in <code>TurnManager.execute_turn()</code></td><td>RED (byte-different final states between two runs of the same seed).</td></tr>
+<tr><td>save/load property</td><td>drop <code>money</code> on restore (<code>restore_state</code>)</td><td>RED (round-trip deep-equal fails for the sampled seeds).</td></tr>
+</tbody></table></div>
+<h2>Beacons served / violated</h2>
+<ul>
+<li><strong>Rams 6 (honest):</strong> a green gate now means the boot surface actually loads -- the signal stops lying, extending #640's honesty from "tests ran" to "the product loads."</li>
+<li><strong>Rams 10 (as little design as possible):</strong> no new framework; reuses GUT, the existing determinism/replay infra, and the existing two-tier runner.</li>
+<li>Cost: a few seconds added to the fast gate (whole-tree load) and ~1-2 min to the already-slow, non-blocking simulation tier. Judged worth it against a class of bug that ships an unstartable game past a green gate.</li>
+</ul>
+<h2>Interaction contract</h2>
+<ul>
+<li><strong>Reads:</strong> every <code>scripts/**.gd</code>, <code>autoload/**.gd</code>, <code>scenes/**.tscn</code>; the <code>[autoload]</code> list in <code>project.godot</code>; <code>BaselineSimulator</code>, <code>VerificationTracker</code>, <code>ReplaySimulator</code>, <code>SaveLoad</code>, <code>GameState</code>, <code>TurnManager</code>.</li>
+<li><strong>Writes:</strong> nothing in the engine. Adds test files only; determinism/replay (ADR-0006) is READ and verified, never modified. (&gt;=2 systems touched: satisfied.)</li>
+</ul>
+<h2>Rejected alternatives</h2>
+<ul>
+<li><strong>Rely on the runner's <code>--quit</code> syntax check / import pass.</strong> Rejected: <code>--quit</code> boots only <code>welcome.tscn</code>; the import pass is checked for cache existence, not per-script parse success. Both were green while main_ui.gd was broken.</li>
+<li><strong>Instantiate scenes only (skip direct script loads).</strong> Rejected empirically: a scene whose attached script fails to parse still instantiates (with a null script), so <code>main.tscn.instantiate()</code> did NOT go red on the injected parse error. Loading every <code>.gd</code> directly is the reliable catch; scene instantiation is a complementary bonus for structural breakage.</li>
+<li><strong>A separate full headless game boot as the smoke test.</strong> Rejected as too slow / side-effecting (timers, audio, threads) for the required fast gate; the load + instantiate sweep gets the same parse-error coverage cheaply.</li>
+<li><strong>Put the property tests only in the fast gate.</strong> Rejected: the determinism/replay properties run full games; they belong in the non-blocking simulation tier. Only the cheap boot-invariant property (construction only) is in the fast gate.</li>
+</ul>
+<h2>Consequences / open questions</h2>
+<ul>
+<li>The fast gate now fails if ANY project script fails to compile, even one no other test uses. This is the point.</li>
+<li><code>MIN_SCRIPTS</code> / <code>MIN_SCENES</code> floors in the smoke test will need bumping as the tree grows; they are deliberately loose (guard against a hollow walk, not a tight census).</li>
+<li>Open: extend property coverage to save/load of adversarial mid-game states (currently a short deterministic horizon); consider a headless "play N turns via the real GameManager signal path" integration smoke to cover UI-to-engine wiring, which the load-time smoke does not exercise.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

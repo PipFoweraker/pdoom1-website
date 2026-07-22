@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>p(Doom)1 dev blog</title>
+    <link>https://pdoom1.com/blog/</link>
+    <description>Development notes from p(Doom)1 - a satirical strategy game about managing an AI safety lab.</description>
+    <language>en-AU</language>
+    <lastBuildDate>Wed, 15 Jul 2026 12:00:00 +0000</lastBuildDate>
+    <atom:link href="https://pdoom1.com/blog/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Where the site stands, before the refresh</title>
+      <link>https://pdoom1.com/blog/post.html?p=2026-07-15-ui-before-snapshot.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2026-07-15-ui-before-snapshot.md</guid>
+      <pubDate>Wed, 15 Jul 2026 12:00:00 +0000</pubDate>
+      <description>A deliberate 'before' snapshot of pdoom1.com at the start of a UI refresh - what's working (the Risk Dashboard), what reads as dated (blanket monospace, no shared layout spine), and the correctness bugs fixed the same day.</description>
+      <category>website</category>
+      <category>ui</category>
+      <category>design</category>
+      <category>dev-notes</category>
+    </item>
+    <item>
+      <title>Website Development Sprint Complete: v0.2.0 Major Enhancement</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-10-09-website-development-sprint-complete-v0-2-0.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-10-09-website-development-sprint-complete-v0-2-0.md</guid>
+      <pubDate>Thu, 09 Oct 2025 12:00:00 +0000</pubDate>
+      <description>Completed comprehensive 6-hour development sprint delivering major website enhancements across three phases: game asset integration, blog system overhaul, and UI polish. Transformed the website from a basic landing page into a professional developer showcase.</description>
+      <category>website</category>
+      <category>milestone</category>
+      <category>ui</category>
+      <category>infrastructure</category>
+    </item>
+    <item>
+      <title>Architecture Revolution: From Monolith to Modular Excellence</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-10-09-architecture-revolution-monolith-to-modular.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-10-09-architecture-revolution-monolith-to-modular.md</guid>
+      <pubDate>Thu, 09 Oct 2025 12:00:00 +0000</pubDate>
+      <description>A comprehensive look at our systematic approach to breaking down 4,235+ line monoliths into clean, maintainable modules - featuring real metrics and engineering insights from the trenches</description>
+      <category>milestone</category>
+      <category>architecture</category>
+      <category>refactoring</category>
+      <category>type-annotation</category>
+      <category>engineering</category>
+    </item>
+    <item>
+      <title>UI Monolith Breakdown Complete - Architecture Transformation</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-15-ui-monolith-breakdown-complete.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-15-ui-monolith-breakdown-complete.md</guid>
+      <pubDate>Mon, 15 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Completed systematic breakdown of 4,235-line UI monolith into 8 specialized modules, achieving 37.1% reduction with zero functionality regression</description>
+      <category>milestone</category>
+      <category>architecture</category>
+      <category>ui</category>
+      <category>refactoring</category>
+      <category>v0.7.0</category>
+    </item>
+    <item>
+      <title>Multi-Repository Integration System Complete</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-15-multi-repository-integration-complete.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-15-multi-repository-integration-complete.md</guid>
+      <pubDate>Mon, 15 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Completed comprehensive multi-repository integration system establishing professional automation and documentation management across pdoom1, pdoom1-website, and pdoom-data repositories with zero-manual-overhead release process.</description>
+      <category>automation</category>
+      <category>versioning</category>
+      <category>documentation</category>
+      <category>architecture</category>
+      <category>github-actions</category>
+    </item>
+    <item>
+      <title>Monolith Breakdown: Tutorial Extraction &amp; Legacy Cleanup</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-15-monolith-breakdown-tutorial-extraction.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-15-monolith-breakdown-tutorial-extraction.md</guid>
+      <pubDate>Mon, 15 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Extracted 486 lines of tutorial functions, removed 151 lines of legacy code, and fixed critical hover tooltips bug</description>
+      <category>refactoring</category>
+      <category>monolith-breakdown</category>
+      <category>ui</category>
+      <category>cleanup</category>
+      <category>modular-architecture</category>
+    </item>
+    <item>
+      <title>Complete Deterministic RNG System v0.6.0</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-14-deterministic-rng-complete.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-14-deterministic-rng-complete.md</guid>
+      <pubDate>Sun, 14 Sep 2025 12:00:00 +0000</pubDate>
+      <description>MAJOR MILESTONE: Transform P(Doom) into fully deterministic competitive gaming platform with perfect reproducibility</description>
+      <category>milestone</category>
+      <category>deterministic</category>
+      <category>competitive</category>
+      <category>rng</category>
+      <category>v0.6.0</category>
+    </item>
+    <item>
+      <title>p(Doom)1 Website Release - Deployment Infrastructure Complete</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-14-deployment-infrastructure-complete.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-14-deployment-infrastructure-complete.md</guid>
+      <pubDate>Sun, 14 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Successfully implemented and documented the complete deployment pipeline for the p(Doom)1 website with GitHub Actions workflow</description>
+      <category>milestone</category>
+      <category>infrastructure</category>
+      <category>deployment</category>
+    </item>
+    <item>
+      <title>Enhanced Leaderboard System v0.4.1: Seed Competition</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-13-enhanced-leaderboard-system-v0-4-1.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-13-enhanced-leaderboard-system-v0-4-1.md</guid>
+      <pubDate>Sat, 13 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Major competitive gaming milestone: seed-specific leaderboards, lab name integration, bootstrap economic model, and comprehensive session tracking</description>
+      <category>milestone</category>
+      <category>leaderboard</category>
+      <category>bootstrap-economics</category>
+      <category>ui</category>
+      <category>competition</category>
+    </item>
+    <item>
+      <title>P(Doom) v0.3.0: Consolidated Feature Release</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-11-v0-3-0-consolidated-release.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-11-v0-3-0-consolidated-release.md</guid>
+      <pubDate>Thu, 11 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Major consolidated release featuring longtermist 5-digit year dates, accessibility framework, comprehensive bug sweep plan, and systematic branch merge for alpha readiness</description>
+      <category>milestone</category>
+      <category>release</category>
+      <category>longtermist</category>
+      <category>accessibility</category>
+      <category>alpha</category>
+      <category>consolidation</category>
+    </item>
+    <item>
+      <title>Debug Console System</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-11-debug-console-system.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-11-debug-console-system.md</guid>
+      <pubDate>Thu, 11 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Added real-time debug console with backtick toggle for game state monitoring</description>
+      <category>debug</category>
+      <category>ui</category>
+      <category>development</category>
+    </item>
+    <item>
+      <title>P(Doom) v0.2.12: Development Infrastructure</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-10-version-0-2-12-release.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-10-version-0-2-12-release.md</guid>
+      <pubDate>Wed, 10 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Major version release featuring comprehensive type annotations and development tooling infrastructure</description>
+      <category>release</category>
+      <category>milestone</category>
+      <category>type-annotations</category>
+      <category>infrastructure</category>
+      <category>quality</category>
+    </item>
+    <item>
+      <title>Type Annotation Sprint: game_state.py Near Completion</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-10-type-annotation-sprint.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-10-type-annotation-sprint.md</guid>
+      <pubDate>Wed, 10 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Completed 85-90% of game_state.py type annotations with 25+ methods annotated across core systems</description>
+      <category>type-annotations</category>
+      <category>pylance</category>
+      <category>code-quality</category>
+      <category>monoliths</category>
+    </item>
+    <item>
+      <title>Major Type Annotation Milestone: UI and GameState Complete</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-10-major-type-annotation-milestone.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-10-major-type-annotation-milestone.md</guid>
+      <pubDate>Wed, 10 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Completed comprehensive type annotations for ui.py and 60% of game_state.py, resolving 1,100-1,600 pylance issues</description>
+      <category>milestone</category>
+      <category>type-annotations</category>
+      <category>infrastructure</category>
+      <category>code-quality</category>
+    </item>
+  </channel>
+</rss>

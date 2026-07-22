@@ -1,7 +1,14 @@
 // Netlify Function: syndicate-x
 // Posts blog/changelog updates to X (Twitter) using API v2
 
+const { requireAuth } = require('./_auth');
+
 exports.handler = async function handler(event) {
+  // Auth FIRST -- before parsing, before touching credentials. These endpoints
+  // are publicly reachable and post to real accounts.
+  const denied = requireAuth(event);
+  if (denied) return denied;
+
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {

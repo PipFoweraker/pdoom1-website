@@ -1,0 +1,58 @@
+[title] Privacy & Analytics - p(Doom)1
+[meta@description] Privacy policy and analytics opt-out for p(Doom)1 website. Learn about our privacy-preserving analytics and how to opt out.
+[meta@og:title] Privacy & Analytics - p(Doom)1
+[meta@og:description] Privacy policy and analytics opt-out for the p(Doom)1 website.
+[text] Pip Foweraker's p(Doom)1
+[li] About
+[li] Blog
+[li] Leaderboard
+[li] Docs
+[h1] Privacy & Analytics
+[p] Our commitment to privacy-preserving analytics
+[h2] Privacy-First Analytics
+[p] At p(Doom)1, we believe in respecting your privacy while understanding how our website is used. We use Plausible Analytics, a privacy-first analytics service that helps us improve the website without compromising your privacy.
+[h4] 🚫 No Cookies
+[p] We don't use cookies or persistent identifiers.
+[h4] 🔒 No Personal Data
+[p] We never collect personally identifiable information.
+[h4] ✅ GDPR Compliant
+[p] Fully compliant with privacy regulations by design.
+[h4] 🌍 Respects DNT
+[p] We honor Do Not Track browser settings.
+[h2] What We Collect
+[p] We collect only aggregate, anonymous information to understand website usage:
+[li] Page views: Which pages are visited (no user identification)
+[li] Referrers: Where visitors come from (e.g., search engines, social media)
+[li] Browser & OS: General browser and operating system information
+[li] Device type: Desktop, mobile, or tablet (no device fingerprinting)
+[h3] What We DON'T Collect
+[li] ❌ IP addresses (anonymized immediately)
+[li] ❌ Cookies or local storage (except for opt-out preference)
+[li] ❌ Personal information (names, emails, etc.)
+[li] ❌ Cross-site tracking data
+[li] ❌ Fingerprinting data
+[h2] Opt-Out Controls
+[p] You can opt out of analytics at any time. Your preference is stored locally and will persist across visits. You can also opt back in if you change your mind.
+[h3] Current Analytics Status
+[text] Checking status...
+[p] Loading your preferences...
+[button] Opt Out of Analytics
+[button] Opt Back In
+[p] Note: If you have Do Not Track enabled in your browser, analytics are automatically disabled regardless of this setting.
+[h2] Data Retention
+[p] All analytics data is automatically deleted after 90 days. We don't retain long-term tracking data or build user profiles.
+[h2] Analytics Provider
+[p] We use Plausible Analytics, an open-source, privacy-focused analytics platform. Plausible is:
+[li] Open source and auditable
+[li] Can be self-hosted for full data ownership
+[li] Lightweight and fast (<1KB script)
+[li] Does not use cookies or track users across sites
+[li] GDPR, CCPA, and PECR compliant
+[h3] Alternative Providers
+[p] We evaluated several privacy-preserving analytics solutions including:
+[li] Plausible: Our chosen solution (lightweight, open-source)
+[li] Umami: Self-hosted option with similar privacy features
+[li] Simple Analytics: Privacy-focused with carbon-conscious hosting
+[p] All three options are privacy-preserving and GDPR-compliant. We chose Plausible for its simplicity, open-source nature, and excellent documentation.
+[h2] Questions?
+[p] If you have any questions about our privacy practices or analytics implementation, please check our GitHub repository or contact us through the issue tracker.

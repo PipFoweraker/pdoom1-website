@@ -39,6 +39,7 @@
     .status.available { background: #4caf50; color: #000; }
     .status.synced { background: #2196f3; color: #fff; }
     .status.local { background: #ff9800; color: #000; }
+    .status.offsite { background: #6d6d6d; color: #fff; }
   </style>
   <link rel="stylesheet" href="/css/site.css">
   <script>
@@ -61,11 +62,11 @@
 
     <div class="doc-section">
       <h2>Game Documentation</h2>
-      <p style="color: var(--text-muted); margin-bottom: 1rem;">Core game documentation synced from the main repository.</p>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">Core project documentation. Badges show which files are auto-synced from the main repository.</p>
       <ul class="doc-list">
         <li>
           <a href="DEV_NOTES.md">Developer Notes</a>
-          <span class="status synced">Auto-synced</span>
+          <span class="status local">Website-only</span>
         </li>
         <li>
           <a href="pdoom1-open-issues.md">Open Issues & Tasks</a>
@@ -73,7 +74,7 @@
         </li>
         <li>
           <a href="roadmap.md">Development Roadmap</a>
-          <span class="status synced">Auto-synced</span>
+          <span class="status local">Website-only</span>
         </li>
         <li>
           <a href="steam-readiness.md">Steam Release Preparation</a>
@@ -84,31 +85,31 @@
 
     <div class="doc-section">
       <h2><span aria-hidden="true">[Web]</span> Website Documentation</h2>
-      <p style="color: var(--text-muted); margin-bottom: 1rem;">Documentation specific to this website and its infrastructure.</p>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">Documentation specific to this website and its infrastructure. These files live in the website repository, not on this site, so the links open GitHub.</p>
       <ul class="doc-list">
         <li>
-          <a href="../docs/deployment-guide.md">Deployment Guide</a>
-          <span class="status available">Complete</span>
+          <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/02-deployment/deployment-guide.md">Deployment Guide</a>
+          <span class="status offsite">On GitHub</span>
         </li>
         <li>
-          <a href="../docs/cli-deployment.md">CLI Deployment Commands</a>
-          <span class="status available">Complete</span>
+          <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/02-deployment/cli-deployment.md">CLI Deployment Commands</a>
+          <span class="status offsite">On GitHub</span>
         </li>
         <li>
-          <a href="../docs/game-repository-integration.md">Game Repository Integration</a>
-          <span class="status available">Complete</span>
+          <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/03-integrations/game-repository-integration.md">Game Repository Integration</a>
+          <span class="status offsite">On GitHub</span>
         </li>
         <li>
-          <a href="../docs/quick-deploy.md">Quick Deploy Reference</a>
-          <span class="status available">Complete</span>
+          <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/02-deployment/quick-deploy.md">Quick Deploy Reference</a>
+          <span class="status offsite">On GitHub</span>
         </li>
         <li>
-          <a href="../docs/roadmap-sync-strategy.md">Roadmap Synchronization Strategy</a>
-          <span class="status available">Complete</span>
+          <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/03-integrations/roadmap-sync-strategy.md">Roadmap Synchronization Strategy</a>
+          <span class="status offsite">On GitHub</span>
         </li>
         <li>
-          <a href="../docs/03-integrations/design-token-sync-strategy.md">Design Token Synchronization</a>
-          <span class="status available">Complete</span>
+          <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/03-integrations/design-token-sync-strategy.md">Design Token Synchronization</a>
+          <span class="status offsite">On GitHub</span>
         </li>
       </ul>
     </div>
@@ -130,12 +131,12 @@
           <span class="status available">API Data</span>
         </li>
         <li>
-          <a href="../docs/03-integrations/weekly-league-implementation.md">Weekly League System</a>
-          <span class="status planned">Coming Soon</span>
+          <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/03-integrations/weekly-league-implementation.md">Weekly League System</a>
+          <span class="status offsite">On GitHub</span>
         </li>
         <li>
-          <a href="../docs/01-development/score-submission-guide.md">Score Submission API</a>
-          <span class="status available">Developer Guide</span>
+          <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/01-development/score-submission-guide.md">Score Submission API</a>
+          <span class="status offsite">On GitHub</span>
         </li>
       </ul>
     </div>

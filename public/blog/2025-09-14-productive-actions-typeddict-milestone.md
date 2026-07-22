@@ -1,4 +1,5 @@
 ---
+draft: true   # unpublished: never appeared in index.json. Flip to publish.
 title: "Type Annotation: Productive Actions TypedDict"
 date: "2025-09-14"
 tags: ["type-annotations", "typeddict", "employee-actions", "method-chains", "pylance", "phase-2-milestone"]

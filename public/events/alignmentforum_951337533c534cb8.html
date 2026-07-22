@@ -14,18 +14,27 @@ planning agent which has three safety interlocks.*" />
 	<link rel="stylesheet" href="/css/site.css">
 	<style>
 		:root {
-			--bg-primary: #1a1a1a;
-			--bg-secondary: #2d2d2d;
-			--bg-tertiary: #3d3d3d;
-			--text-primary: #ffffff;
-			--text-secondary: #cccccc;
-			--text-muted: #aaaaaa;
-			--accent-primary: #00ff41;
-			--accent-secondary: #ff6b35;
-			--accent-danger: #ff4444;
-			--border-color: #444444;
-			--success-color: #4caf50;
+			/* Palette derived from the game's shipped art: amber-dominant CRT chrome
+			   with a teal counterpoint over warm near-black. Green is demoted to
+			   --phosphor (OK-state / terminal flourish only), matching
+			   godot/scripts/ui/terminal_theme.gd: amber = PLAN register, green = WATCH. */
+			--bg-primary: #12100F;
+			--bg-secondary: #1C1917;
+			--bg-tertiary: #262220;
+			--text-primary: #E9F2F2;
+			--text-secondary: #CFC7BB;
+			--text-muted: #A79E92;
+			--accent-primary: #F6A800;
+			--accent-secondary: #2FD4C2;
+			--accent-danger: #E2524A;
+			--border-color: #3A342E;
+			--success-color: #4FB37A;
 			--radius-md: 6px;
+			/* extended semantic tokens */
+			--border-strong: #574E44;
+			--accent-alt: #2FD4C2;
+			--phosphor: #5BE87A;
+			--warning: #E9752E;
 		}
 
 		body {
@@ -38,7 +47,7 @@ planning agent which has three safety interlocks.*" />
 		}
 
 		header {
-			background: rgba(45, 45, 45, 0.95);
+			background: rgba(28, 25, 23, 0.95);
 			border-bottom: 2px solid var(--accent-primary);
 			padding: 1rem 0;
 		}
@@ -158,7 +167,8 @@ planning agent which has three safety interlocks.*" />
 		}
 
 		.impact-positive {
-			color: var(--success-color);
+			/* phosphor = the demoted terminal green, kept for live OK-state readouts */
+			color: var(--phosphor);
 			font-weight: bold;
 		}
 
@@ -275,22 +285,25 @@ planning agent which has three safety interlocks.*" />
 			vertical-align: middle;
 		}
 
+		/* Tint alpha is 0.12, not 0.20: the badge text sits on the *blended* tint,
+		   and at 0.20 the warning variant only reaches 4.36:1 (WCAG AA fail).
+		   At 0.12 the three variants measure 4.97 / 7.55 / 5.61. */
 		.provenance-placeholder {
-			background: rgba(255, 152, 0, 0.2);
-			border: 1px solid #ff9800;
-			color: #ff9800;
+			background: rgba(233, 117, 46, 0.12);
+			border: 1px solid var(--warning);
+			color: var(--warning);
 		}
 
 		.provenance-summary {
-			background: rgba(33, 150, 243, 0.2);
-			border: 1px solid #2196f3;
-			color: #2196f3;
+			background: rgba(47, 212, 194, 0.12);
+			border: 1px solid var(--accent-alt);
+			color: var(--accent-alt);
 		}
 
 		.provenance-real {
-			background: rgba(76, 175, 80, 0.2);
-			border: 1px solid #4caf50;
-			color: #4caf50;
+			background: rgba(79, 179, 122, 0.12);
+			border: 1px solid var(--success-color);
+			color: var(--success-color);
 		}
 
 		.quote-source {
@@ -313,7 +326,7 @@ planning agent which has three safety interlocks.*" />
 			display: inline-block;
 			margin-top: 0.75rem;
 			padding: 0.5rem 1rem;
-			background: rgba(255, 107, 53, 0.1);
+			background: rgba(47, 212, 194, 0.1);
 			border: 1px solid var(--accent-secondary);
 			border-radius: 4px;
 			color: var(--accent-secondary);
@@ -329,7 +342,7 @@ planning agent which has three safety interlocks.*" />
 		}
 
 		.contribute-section {
-			background: linear-gradient(135deg, var(--bg-secondary), rgba(255, 107, 53, 0.1));
+			background: linear-gradient(135deg, var(--bg-secondary), rgba(47, 212, 194, 0.1));
 			border: 1px solid var(--accent-secondary);
 			border-radius: var(--radius-md);
 			padding: 1.5rem;

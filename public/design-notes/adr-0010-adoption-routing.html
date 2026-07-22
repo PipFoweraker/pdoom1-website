@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0010 — Adoption routing (soft-with-teeth): doom bends where work is adopted | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0010-adoption-routing.html" />
+	<meta name="description" content="The exploit sweep&#x27;s dominant line (safety_lean, basement safety-spam, median 37 turns vs 7 for passive) exists because safety research bends doom directly," />
+	<meta property="og:title" content="ADR-0010 — Adoption routing (soft-with-teeth): doom bends where work is adopted | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="The exploit sweep&#x27;s dominant line (safety_lean, basement safety-spam, median 37 turns vs 7 for passive) exists because safety research bends doom directly," />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0010-adoption-routing.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0010 — Adoption routing (soft-with-teeth): doom bends where work is adopted</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED &middot; <strong>Decided:</strong> 2026-07-12</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED</li>
+<li><strong>Date:</strong> 2026-07-12</li>
+</ul>
+<h2>Context</h2>
+<p>The exploit sweep's dominant line (<code>safety_lean</code>, basement safety-spam, median 37 turns vs 7 for passive) exists because safety research bends doom <strong>directly, privately, and state-independently</strong> — papers are decorative, conferences float disconnected. Pip's paper taxonomy (this session): papers raise awareness, build the <em>writer's</em> reputation, speed follow-on work, and get <strong>adopted</strong> — into government policy or frontier-lab practice, including rivals'. Pip's normative ground, verbatim:</p>
+<blockquote><em>"people voluntarily adopting good actions will generate the space for better actions to come about, and this is how small and middle power players can affect things — norm and market setting"</em></blockquote>
+<h2>Decision</h2>
+<p><strong>Soft-with-teeth routing:</strong></p>
+<ol>
+<li><strong>Your own lab's doom contribution is basement-fixable.</strong> Private safety work makes <em>your</em> lab safer, no adoption required. (Honest: you really can secure your own shop in private.)</li>
+<li><strong>World/rival doom — the majority share (#562 rival scaling) — bends only through adoption:</strong> research → paper → socialization (conferences, summits, direct stakeholder work) → adoption by labs and/or governments → doom bends. Unadopted world-facing research is a PDF.</li>
+<li><strong>Reputation is per-person and per-org</strong>, and attention is <em>typed</em>: safety successes attract interviews/grants/safety applicants; reckless capability moves attract accel VC money. Both directions are priced, neither is forbidden (the dual-use temptation is a design feature — see DESIGN_PHILOSOPHY, tension/tradeoffs).</li>
+<li>Papers additionally speed follow-on work (tech-tree effect) and unlock mitigations.</li>
+<li><strong>Event-horizon guardrail (lore):</strong> the player's influence over other labs becomes substantial mostly <em>after</em> the run crosses the real-world event horizon — the game never implies real labs do the truly weird late-game stuff. (WORLD_AND_LORE.)</li>
+</ol>
+<h2>Beacons served / violated</h2>
+<ul>
+<li><strong>Rams #6 (honest):</strong> the mechanic <em>is</em> Pip's real-world theory of change — norm and market setting by small/middle powers. Structure, not numbers; don't patch it for freshness (per the philosophy doc's load-bearing-structure rule).</li>
+<li><strong>MaRo Interaction:</strong> research, reputation, conferences, and rivals now interlock; the social layer stops being decoration.</li>
+<li>Kills the dominant line <strong>by construction</strong>: basement-spam can't reach the dominant doom mass, so no payoff buff to safety-spam can restore it.</li>
+</ul>
+<h2>Interaction contract</h2>
+<p>Reads/writes: <strong>rival-doom pipeline</strong> (#562 — rival share must dominate the integral for teeth), <strong>reputation</strong> (per-person + per-org, new read/write), <strong>conference/travel</strong> (promoted from flavor to load-bearing — the socialization step), <strong>Liability Ledger</strong> (funding-with-strings, promises), <strong>SA</strong> (awareness essays raise it), <strong>exploit-finder</strong> (new sweep target: publish-and-socialize must beat basement-spam).</p>
+<h2>Rejected alternatives</h2>
+<ul>
+<li><strong>Strong routing</strong> (ALL safety value requires adoption): less honest — you can privately secure your own lab — and it needlessly breaks the existing own-lab safety architecture.</li>
+<li><strong>Status quo</strong> (direct doom reduction): sweep-proven degenerate.</li>
+</ul>
+<h2>Consequences / open questions</h2>
+<ul>
+<li>Safety research splits: <strong>internal hardening</strong> (own-lab, private) vs <strong>publishable agendas</strong> (world-facing, adoption-routed).</li>
+<li>Conference/travel design (agenda item 4) is promoted: it's now the mandatory middle of the value chain, not garnish.</li>
+<li>Balance verification target for the next sweep: rival/world doom share must dominate the integral, or the teeth are cosmetic.</li>
+<li>Adoption <em>by whom</em> needs a counterparty model — overlaps ADR-0007 alliances and DQ-9 receivables; design together.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

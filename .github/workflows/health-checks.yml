@@ -22,7 +22,13 @@ permissions:
 jobs:
   health-check:
     runs-on: ubuntu-latest
-    
+    # Job-level permissions replace the workflow-level block, so issues:write is
+    # repeated here for the "Create issue on failure" step. contents:write is
+    # needed to commit the refreshed health data (see "Commit refreshed health data").
+    permissions:
+      contents: write
+      issues: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,7 +64,91 @@ jobs:
         run: |
           echo "Running full health check suite..."
           python scripts/health-check.py
-          
+
+      # scripts/health-check.py writes public/data/health-check-results.json, but
+      # /monitoring/ reads public/data/health-check.json and expects a different
+      # shape. Nothing used to bridge the two, so the published file was frozen at
+      # 2025-09-30 while the page presented it as current health. This step
+      # regenerates it every run AND strips absolute filesystem paths -- the old
+      # published file leaked the maintainer's local Windows directory layout.
+      - name: Publish sanitised health data for /monitoring/
+        run: |
+          python - <<'PYEOF'
+          import json, os, posixpath, re, sys
+
+          SRC = "public/data/health-check-results.json"
+          DST = "public/data/health-check.json"
+
+          SEP = chr(92)  # backslash, spelled this way so it survives YAML/heredoc quoting
+          TOPLEVEL = r"(?:public|scripts|api|docs|tools|ansible|netlify|\.github)"
+          KEEP = re.compile(r"(?:^|/)(" + TOPLEVEL + r"/.*)$")
+          LEAKY = re.compile(r"(?:[A-Za-z]:[/" + SEP + SEP + r"]|/home/|/Users/|/root/|/mnt/|/var/folders/)")
+          # Resolve "a/b/../c" so the repo-relative tail is findable, then drop any
+          # absolute prefix sitting in front of a repo top-level directory. Handled
+          # before word-splitting so directory names containing spaces are removed
+          # whole rather than leaving a fragment behind.
+          DOTDOT = re.compile(r"/[^/]+/\.\./")
+          PREFIX = re.compile(r"(?:(?<=^)|(?<=\s))(?:[A-Za-z]:)?/(?:[^/]*/)*?(?=" + TOPLEVEL + r"/)")
+
+          def sanitize_token(tok):
+              if "/" not in tok and SEP not in tok:
+                  return tok
+              t = posixpath.normpath(tok.replace(SEP, "/"))
+              m = KEEP.search(t)
+              if m:
+                  return m.group(1)
+              if LEAKY.search(t) or t.startswith("/"):
+                  return posixpath.basename(t) or "<path>"
+              return t
+
+          def sanitize(text):
+              if not isinstance(text, str):
+                  return text
+              t = text.replace(SEP, "/")
+              prev = None
+              while prev != t:
+                  prev = t
+                  t = DOTDOT.sub("/", t)
+              t = PREFIX.sub("", t)
+              return " ".join(sanitize_token(tok) for tok in t.split(" "))
+
+          if not os.path.exists(SRC):
+              print("ERROR: " + SRC + " not found; health-check.py did not run", file=sys.stderr)
+              sys.exit(1)
+          with open(SRC, encoding="utf-8") as fh:
+              raw = json.load(fh)
+
+          results = [{
+              "test": r.get("test"),
+              "passed": bool(r.get("passed")),
+              "message": sanitize(r.get("message", "")),
+              "timestamp": r.get("timestamp"),
+              "is_warning": bool(r.get("is_warning")),
+          } for r in raw.get("results", [])]
+
+          out = {
+              "last_check": raw.get("timestamp"),
+              "generated_by": "scripts/health-check.py via .github/workflows/health-checks.yml",
+              "overall_status": raw.get("overall_status"),
+              "total_tests": raw.get("total_tests", len(results)),
+              "passed": raw.get("passed_tests", sum(1 for r in results if r["passed"])),
+              "failed": raw.get("failed_tests", sum(1 for r in results if not r["passed"])),
+              "warnings": [sanitize(w) for w in raw.get("warnings_details", [])],
+              "results": results,
+              "failed_tests": [sanitize(f) for f in raw.get("failed_test_details", [])],
+          }
+
+          blob = json.dumps(out, indent=2, ensure_ascii=False)
+          leak = LEAKY.search(blob)
+          if leak:
+              print("ERROR: absolute local path survived sanitisation: " + repr(leak.group(0)), file=sys.stderr)
+              sys.exit(1)
+
+          with open(DST, "w", encoding="utf-8") as fh:
+              fh.write(blob + "\n")
+          print("Wrote " + DST + " (last_check=" + str(out["last_check"]) + ")")
+          PYEOF
+
       - name: Test package.json scripts
         run: |
           echo "Testing npm scripts..."
@@ -81,7 +171,31 @@ jobs:
           test -f public/game-stats/index.html || exit 1
           test -f package.json || exit 1
           echo "✓ Website structure is intact"
-          
+
+      # The artifact upload below keeps a 30-day forensic copy, but an artifact is
+      # not readable by the website. Without this commit, /data/health-check.json
+      # never changes and /monitoring/ shows stale data forever. Restricted to
+      # schedule/manual runs so PR and push runs never write to the repo.
+      - name: Commit refreshed health data
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action [Health Checks]"
+
+          if git diff --quiet -- public/data/health-check.json; then
+            echo "No change in health-check.json"
+            exit 0
+          fi
+
+          git add public/data/health-check.json
+          # No [skip ci]: a push made with GITHUB_TOKEN cannot trigger workflows
+          # anyway, and if this is ever switched to a PAT the deploy SHOULD run so
+          # the refreshed file actually reaches pdoom1.com. The commit step above is
+          # gated to schedule/manual runs, so this cannot loop.
+          git commit -m "chore(monitoring): refresh health-check.json"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
       - name: Upload health check results
         uses: actions/upload-artifact@v4
         if: always()

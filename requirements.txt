@@ -1,31 +1,20 @@
 # Python requirements for p(Doom)1 Website
-
-# ============================================================================
-# API Server v1 (Bridge) - No dependencies
-# ============================================================================
-# The bridge API server (scripts/api-server.py) uses only stdlib:
-# - http.server for HTTP handling
-# - json for data parsing
-# - pathlib for file operations
-# - datetime for timestamps
-
-# ============================================================================
-# API Server v2 (Production) - PostgreSQL + JWT
-# ============================================================================
-
-# Database
-psycopg2-binary==2.9.10  # PostgreSQL adapter (updated 2025-11-10)
-
-# Authentication
-PyJWT==2.10.1           # JSON Web Tokens (security update 2025-11-10)
-
-# Environment configuration
-python-dotenv==1.0.0   # Load .env files
+#
+# This site is statically generated and deployed by rsync; nothing here runs in
+# production. These are the dependencies of the build/sync/validation scripts.
+#
+# Removed 2026-07-22: psycopg2-binary, PyJWT and python-dotenv, which existed
+# only for scripts/api-server-v2.py (a website-owned Postgres score store).
+# pdoom1 PR #679 settled that scores live behind ONE PHP API owned by the game
+# side and that this repo is a read-only consumer, so both API servers and their
+# migrations were deleted. None of those three packages were installed locally
+# or imported by any surviving script.
 
 # ============================================================================
 # Data contract validation (scripts/validate_data.py, CI)
 # ============================================================================
 jsonschema==4.26.0     # JSON Schema validation of data seams (schemas/*.schema.json)
+PyYAML>=6.0            # Blog post front matter (scripts/build-blog-index.py)
 Pillow>=10.0.0         # Image optimization (optimize-screenshots.py, blog assets)
 
 # ============================================================================
@@ -34,4 +23,3 @@ Pillow>=10.0.0         # Image optimization (optimize-screenshots.py, blog asset
 
 # redis==5.0.1         # Redis caching (if needed later)
 # requests==2.31.0     # HTTP client for external APIs
-# gunicorn==21.2.0     # Production WSGI server (alternative to stdlib http.server)

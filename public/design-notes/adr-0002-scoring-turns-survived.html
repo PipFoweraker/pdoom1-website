@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0002 — Scoring: turns survived, lexicographic doom-integral tiebreak, flows only | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0002-scoring-turns-survived.html" />
+	<meta name="description" content="The implemented score formula — (100−doom)×1000 + papers×5000 + researchers×2000 + turn×500 + money×0.1 + 50,000 victory bonus (doom&lt;20) — was scaffolding " />
+	<meta property="og:title" content="ADR-0002 — Scoring: turns survived, lexicographic doom-integral tiebreak, flows only | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="The implemented score formula — (100−doom)×1000 + papers×5000 + researchers×2000 + turn×500 + money×0.1 + 50,000 victory bonus (doom&lt;20) — was scaffolding " />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0002-scoring-turns-survived.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0002 — Scoring: turns survived, lexicographic doom-integral tiebreak, flows only</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED (Pip, in-session) &middot; <strong>Decided:</strong> 2026-07-04</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED (Pip, in-session)</li>
+<li><strong>Date:</strong> 2026-07-04</li>
+</ul>
+<h2>Context</h2>
+<p>The implemented score formula — <code>(100−doom)×1000 + papers×5000 + researchers×2000 + turn×500 + money×0.1 + 50,000 victory bonus (doom&lt;20)</code> — was scaffolding built to test the end-game screen, never a design statement (Pip, this session). It existed in three copies (<code>godot/scripts/ui/game_over_screen.gd</code>, <code>godot/scripts/core/baseline_simulator.gd</code>, <code>pdoom1-website/scripts/verification_logic.py</code>), a standing sync hazard the code comments already worried about. It also contradicted the design philosophy twice: the money term paid players to hoard (an <strong>anti-sink</strong>, directly worsening the source-rich/sink-poor disease), and the victory bonus implied a win condition in a game whose thesis is that you cannot win, only buy time.</p>
+<h2>Decision</h2>
+<ol>
+<li><strong>The composite formula is dead in all three locations</strong>, including the victory bonus. There is no victory condition.</li>
+<li><strong>Score is lexicographic: turns survived strictly dominant; doom-integral tiebreak.</strong> Each turn survived, the engine accrues <code>100 − doom</code> into the tiebreaker (area under the survival curve, "doom-years averted"). No blended constant — no stewardship total can ever outrank a survived turn. Display: <strong>"Turn 14 · 862"</strong>.</li>
+<li><strong>Flows only, never stocks.</strong> Score may never value anything the player <em>holds at death</em> (money, papers, researchers, reputation). Any end-state stock term is an anti-sink. Future score terms must be per-turn or per-event flows through world state; if a proposed term is a stock at death, it is rejected on sight.</li>
+<li><strong>The engine is the sole scoring authority.</strong> Score accrues per-turn inside the sim, so headless replay recomputes it for free. Other repos treat score as opaque — the website formula in <code>verification_logic.py</code> is deleted, not synced.</li>
+<li><strong>Boards are keyed by <code>(seed, game_version)</code>.</strong> Balance patches naturally rotate the meta; old scores never lie about the current game. Score-formula changes are patch content.</li>
+<li><strong>Post-mortem reveal only.</strong> No live score ticker; the run is played on the world's terms (doom, instruments), and the death screen is where accounting happens.</li>
+</ol>
+<h2>Requirement created: the mortality guarantee</h2>
+<p>With no victory condition, nothing formally ends a stabilized game, and lexicographic turns-scoring with immortal runs is a broken leaderboard. <strong>Some pressure must grow without bound</strong> so every run ends and turn counts stay finite and meaningful. Natural candidate: compounding Liability Ledger interest (ADR-0003); escalating wave amplitude and rising base doom are alternates. The mechanism is open; the requirement is not.</p>
+<h2>Beacons served</h2>
+<ul>
+<li>Rams #10: the formula is two integers and a comparison rule.</li>
+<li>Rams #6: the tiebreaker is literally the area under the doom trend graph the game already ships — the score display and the instrument are the same object.</li>
+<li>MaRo Interaction: every sink becomes a score pump routed through the sim (money only becomes score by being spent on things that change the world), so scoring powers the sink architecture instead of fighting it.</li>
+<li>Philosophy fit: survival time is the score and must be skill-legible; turn counts as PoE-style badges with community milestone semantics ("I got to turn 20").</li>
+</ul>
+<h2>Rejected alternatives</h2>
+<ul>
+<li><strong>Composite/weighted formula</strong> — anti-sink, illegible, sync-hazardous (see Context).</li>
+<li><strong>Pure doom-integral (K=0)</strong> — undervalues wretched late-game survival; Pip's ruling: the reward for early prep is holding off the pivotal crunch longer, so desperate turns at doom 97 must pay full turn value.</li>
+<li><strong>Blended per-turn constant (score += (100−doom) + K)</strong> — subsumed by lexicographic, which removes the tuning dial entirely.</li>
+<li><strong>Humans-alive-at-end as a score term</strong> — double-counts the integral; retained as <em>presentation</em> of the integral only (see WORLD_AND_LORE).</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>
