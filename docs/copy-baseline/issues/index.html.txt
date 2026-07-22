@@ -1,0 +1,55 @@
+[title] Issues & Feedback - p(Doom)1
+[meta@description] Report bugs, request features, and see what we're working on. Help improve p(Doom)1 with your feedback.
+[h1] Issues & Feedback
+[p] Help us improve p(Doom)1 by reporting bugs, requesting features, or providing feedback
+[text] Report an Issue View Known Issues GitHub Issues →
+[h2] Submit Feedback
+[p] Tell us what's wrong or what could be better. We respect your privacy - only the information you provide will be shared.
+[label] Issue Type *
+[option] Select type...
+[option] 🐛 Bug Report
+[option] ✨ Feature Request
+[option] 💬 General Feedback
+[option] ❓ Question
+[text] What kind of feedback are you providing?
+[label] Title *
+[input@placeholder] Brief description of the issue
+[text] Short, descriptive title (max 100 characters)
+[label] Description *
+[textarea@placeholder] Describe what happened, what you expected, and any steps to reproduce the issue...
+[text] Please be as detailed as possible. Include steps to reproduce if reporting a bug.
+[label] Game Version
+[input@placeholder] e.g., v0.5.0 or 'latest from GitHub'
+[text] Which version were you using when you encountered this?
+[label] Contact (Optional)
+[input@placeholder] Email, Discord username, or leave blank for anonymous
+[text] Privacy Note: This is optional. We'll only use this to follow up if needed. Your contact info won't be posted publicly.
+[h4] 🔒 Privacy Promise
+[p] Your feedback will be shared with GitHub Issues and our community forum. Only the issue details you provide above will be posted publicly. Contact information is stored separately and never shared publicly. You can submit anonymously.
+[p] Note: We're currently setting up our community forum and automated forum posting — stay tuned!
+[button] Submit Feedback
+[h2] Known Issues & Development Status
+[p] Live updates from our development repository. See what we're working on and known issues.
+[text] Loading issues from GitHub... Connecting to development repository
+[h3] Connection Failed
+[p] Unable to connect to GitHub API. This might be due to:
+[li] Temporary GitHub API limits
+[li] Network connectivity issues
+[li] High traffic periods
+[p] You can still view issues directly on GitHub:
+[text] View on GitHub →
+[button] Retry Loading
+[text] 0 open issues - Last updated: - View All on GitHub
+[button] Refresh
+[h2] Other Ways to Connect
+[h3] 💬 Community Forum
+[p] Discuss strategies, share stories, and connect with other players on our community forum.
+[p] Coming soon — we're setting up the forum at a permanent home.
+[h3] 📧 Direct Contact
+[p] For private concerns or business inquiries:
+[p] team@pdoom1.com
+[h3] 🔗 Social & Code
+[p] Follow development and contribute directly:
+[text] GitHub Repository → Dev Blog →
+[p] © 2025 pdoom1. For fun, education, and satire only.
+[p] Home | Docs | GitHub

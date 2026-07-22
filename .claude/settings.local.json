@@ -10,7 +10,11 @@
       "Bash(dir \"C:\\Users\\gday\\.ssh\\pdoom-website-instance.pem\")",
       "Bash(ssh:*)",
       "Bash(powershell:*)",
-      "Bash(dir)"
+      "Bash(dir)",
+      "Bash(python scripts/snapshot-copy.py --out docs/copy-baseline)",
+      "Bash(python scripts/snapshot-copy.py --check)",
+      "Bash(python -c ' *)",
+      "Bash(git checkout *)"
     ],
     "deny": [],
     "ask": []

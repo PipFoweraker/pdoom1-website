@@ -1,0 +1,34 @@
+[title] System Monitoring - p(Doom)1
+[meta@description] System health monitoring and deployment status for p(Doom)1 website and infrastructure.
+[text] ← Back to Home
+[h1] System Monitoring
+[p] Admin & Operations Dashboard - Infrastructure monitoring and automation status
+[text] Website Status
+[li] StatusChecking...
+[li] Response Time--
+[li] Last Check--
+[text] Deployment Status
+[li] Last Deploy--
+[li] Version--
+[li] Health Score--
+[text] Data Freshness
+[li] Version Data--
+[li] Game Stats--
+[li] Next Update--
+[text] GitHub Integration
+[li] API Status--
+[li] Open Issues--
+[li] Last Release--
+[h2] 🔗 Integration Health
+[p] Data-seam contracts (events + leaderboard) and cross-repo drift. FAIL = broken, alerts; WARN = drift worth a glance, no alert. Source: scripts/validate_data.py → /data/integration-health.json.
+[text] Loading integration health...
+[h2] 🤖 Automation Status
+[p] GitHub Actions automated tasks - scheduled jobs running infrastructure updates
+[text] Loading automation status...
+[h2] 🏆 Weekly League Management
+[text] Loading league status...
+[button] Manually Trigger League Rollover
+[h2] Recent Health Checks
+[text] Loading health check history...
+[button] Refresh All Data
+[text] Last updated: Loading...
