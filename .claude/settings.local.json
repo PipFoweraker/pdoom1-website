@@ -51,7 +51,11 @@
       "Bash(curl -s https://pdoom1.com/data/test-report.json)",
       "Bash(curl -s https://pdoom1.com/data/health-check-results.json)",
       "Bash(grep -o \"C:[^\\\\\"]\\\\{0,70\\\\}\\\\|/home/runner[^\\\\\"]\\\\{0,50\\\\}\")",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(git commit *)",
+      "Bash(gh run *)",
+      "Bash(gh secret *)",
+      "Bash(gh variable *)"
     ],
     "deny": [],
     "ask": []

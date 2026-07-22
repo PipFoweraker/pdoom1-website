@@ -1,0 +1,67 @@
+name: Generate blog feeds
+
+# Keeps public/blog/feed.xml and atom.xml in step with public/blog/index.json.
+#
+# A feed that silently stops updating is worse than no feed: subscribers see
+# nothing and assume the project is dead, and nobody notices because the failure
+# is invisible from our side. So this runs on every change to the blog data and
+# also verifies on PRs.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/blog/index.json'
+      - 'public/blog/*.md'
+      - 'scripts/generate-feeds.py'
+  pull_request:
+    paths:
+      - 'public/blog/index.json'
+      - 'public/blog/*.md'
+      - 'scripts/generate-feeds.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-feeds-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  feeds:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # On a PR, only verify -- never push to someone's branch.
+      - name: Verify feeds are current
+        if: github.event_name == 'pull_request'
+        run: |
+          python scripts/generate-feeds.py --check
+
+      - name: Regenerate feeds
+        if: github.event_name != 'pull_request'
+        run: python scripts/generate-feeds.py
+
+      - name: Commit
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          # Stage before testing for changes: `git diff` alone cannot see
+          # untracked files, and feed.xml/atom.xml are new on first run. That
+          # exact mistake made another workflow here report success while
+          # committing nothing for months.
+          git add -A public/blog/feed.xml public/blog/atom.xml
+          if git diff --cached --quiet -- public/blog/feed.xml public/blog/atom.xml; then
+            echo "Feeds already current"
+          else
+            git commit -m "chore(blog): regenerate feeds"
+            git push
+          fi

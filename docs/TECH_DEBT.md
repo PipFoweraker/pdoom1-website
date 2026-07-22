@@ -70,6 +70,48 @@ it is to a developer.
 
 ---
 
+## E-0. TAGGED FOR PIP / pdoom-data uplift — do NOT delete
+
+### The 1,000 "orphaned" alignmentforum event pages are not orphans
+
+Initially scoped for deletion as dead weight. **Tracing them to source reversed
+that conclusion.** Recorded here in full because the wrong call would have
+destroyed the only published surface for a live dataset.
+
+What is actually true:
+
+| fact | evidence |
+|---|---|
+| 1,000 pages under `public/events/alignmentforum_*.html`, 15.8 MB | file count |
+| **All 1,000 exist in pdoom-data**, with full content | `pdoom-data/data/serveable/api/timeline_events/alignment_research/alignment_research_events.json` — 1,000 entries, 1.2 MB, each with title, description, impacts, sources, tags, rarity, pdoom_impact, and both reaction fields |
+| **None of them appear in `all_events.json`** | that file holds 1,194 events: 1,129 `arxiv`, 37 `distill`, and a handful of others. Zero `alignmentforum` |
+| The sync only ever reads `all_events.json` | `scripts/sync/sync-events.py:61` |
+| Nothing on the site links them | sampled 20, no inbound references; the sitemap contains no event pages at all |
+
+So pdoom-data maintains **two** event collections and the website sync knows
+about one. The 1,000 pages are the only place the alignment_research dataset is
+published, and they are no longer regenerated or updated by anything.
+
+**This is a decision, not a cleanup.** Either:
+
+- **(a)** extend `sync-events.py` to also ingest
+  `alignment_research/alignment_research_events.json`, bringing the 1,000 pages
+  back under management (they would then be regenerated, rethemed and validated
+  like every other event page); or
+- **(b)** deliberately retire the dataset from the website and delete the pages
+  as a conscious editorial choice.
+
+Deleting them *without* making that choice would silently drop 1,000 pages of
+curated content whose source is alive and well. Pip is uplifting pdoom-data next
+week; this belongs to that work.
+
+**Also flagged upstream:** `pdoom-data/.../timeline_events/manifest.json` claims
+`"total_events": 28`, which matches neither the 1,194 in `all_events.json` nor
+the 1,000 in `alignment_research`. That manifest is stale and should not be
+trusted by anything.
+
+---
+
 ## E. Known-and-deliberate (do not "fix" without reading the reason)
 
 - **`public/css/site.css` loads LAST on ~2,203 pages** and wins the cascade. Every rule in it must be dark-palette-correct. It has caused a sitewide whiteout once. The file carries a comment explaining this; keep it.

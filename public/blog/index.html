@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Developer Blog - p(Doom)1</title>
     <link rel="canonical" href="https://pdoom1.com/blog/" />
+    <!-- Feed autodiscovery: this is what lets a reader's app find the feed from
+         the page URL alone, with no signup and no data collected from them. -->
+    <link rel="alternate" type="application/rss+xml" title="p(Doom)1 dev blog (RSS)" href="/blog/feed.xml" />
+    <link rel="alternate" type="application/atom+xml" title="p(Doom)1 dev blog (Atom)" href="/blog/atom.xml" />
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
     <meta name="description" content="Behind-the-scenes development blog for p(Doom)1 - Follow our journey building an AI Safety strategy game with real technical insights, milestone achievements, and transparency." />
     <meta name="author" content="p(Doom)1 Development Team" />
@@ -61,6 +65,22 @@
             text-shadow: var(--game-retro-glow);
         }
         
+        .feed-links {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-top: 0.75rem;
+        }
+
+        .feed-links a {
+            color: var(--accent-primary, #00ff41);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .feed-links a:hover {
+            text-decoration: underline;
+        }
+
         .blog-header p {
             font-size: 1.2rem;
             color: var(--text-secondary);
@@ -296,7 +316,11 @@
         <header class="blog-header">
             <h1>Developer Blog</h1>
             <p>Follow our journey building p(Doom)1 - real technical insights, milestone achievements, and transparent development process</p>
-            
+            <p class="feed-links">
+                Subscribe by feed &mdash; no account, no email, nothing collected:
+                <a href="/blog/feed.xml">RSS</a> &middot; <a href="/blog/atom.xml">Atom</a>
+            </p>
+
             <div class="blog-stats">
                 <div class="stat-item">
                     <div class="stat-number" id="total-posts">Loading...</div>
