@@ -14,7 +14,11 @@
       "Bash(python scripts/snapshot-copy.py --out docs/copy-baseline)",
       "Bash(python scripts/snapshot-copy.py --check)",
       "Bash(python -c ' *)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(python scripts/check-stale-facts.py)",
+      "Bash(python -)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m 'feat: detector for hardcoded facts that rot \\(versions, dates, asserted numbers\\) *)"
     ],
     "deny": [],
     "ask": []
