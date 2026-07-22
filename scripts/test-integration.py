@@ -8,7 +8,6 @@ and website systems to ensure everything is working correctly.
 Usage:
     python scripts/test-integration.py                    # Run all tests
     python scripts/test-integration.py --leaderboard      # Test leaderboard only
-    python scripts/test-integration.py --api              # Test API only
     python scripts/test-integration.py --quick            # Quick smoke tests
 """
 
@@ -124,38 +123,12 @@ class IntegrationTestSuite:
         
         return True
     
-    def test_api_server(self) -> bool:
-        """Test the API server functionality."""
-        print("\n🚀 Testing API Server...")
-        
-        # Test 1: API script exists
-        api_script = self.base_dir / "scripts" / "api-server.py"
-        if api_script.exists():
-            self.log_result("API Script Exists", True, str(api_script))
-        else:
-            self.log_result("API Script Exists", False, "Script file not found")
-            return False
-        
-        # Test 2: Find free port functionality
-        try:
-            from scripts.api_server import find_free_port
-            free_port = find_free_port(9000)  # Start from 9000 to avoid conflicts
-            self.log_result("Port Discovery", True, f"Found port {free_port}")
-        except Exception as e:
-            self.log_result("Port Discovery", False, str(e))
-            return False
-        
-        # Test 3: API server class can be imported
-        try:
-            from scripts.api_server import GameIntegrationAPIServer
-            server = GameIntegrationAPIServer(port=free_port)
-            self.log_result("API Server Import", True, "Server class loaded")
-        except Exception as e:
-            self.log_result("API Server Import", False, str(e))
-            return False
-        
-        return True
-    
+    # test_api_server() removed 2026-07-22 along with scripts/api-server.py.
+    # pdoom1 PR #679 settled that scores live behind ONE PHP API owned by the
+    # game side and that this repo must not stand up a second score store, so
+    # there is no longer a website-hosted API server to test. The read path is
+    # covered by scripts/test_ingest_scores.py instead.
+
     def test_data_consistency(self) -> bool:
         """Test data consistency across the system."""
         print("\n📊 Testing Data Consistency...")
@@ -227,7 +200,7 @@ class IntegrationTestSuite:
             "public/data/status.json",
             "scripts/health-check.py",
             "scripts/export-leaderboard-bridge.py",
-            "scripts/api-server.py"
+            "scripts/ingest_scores.py"
         ]
         
         for file_path in required_files:
@@ -295,8 +268,7 @@ class IntegrationTestSuite:
             ("File Structure", self.test_file_structure),
             ("Data Consistency", self.test_data_consistency),
             ("Health Check Integration", self.test_health_check_integration),
-            ("Leaderboard Bridge", self.test_leaderboard_bridge),
-            ("API Server", self.test_api_server)
+            ("Leaderboard Bridge", self.test_leaderboard_bridge)
         ]
         
         all_passed = True
@@ -366,8 +338,6 @@ def main():
     parser = argparse.ArgumentParser(description="p(Doom)1 Integration Test Suite")
     parser.add_argument("--leaderboard", action="store_true", 
                        help="Test leaderboard integration only")
-    parser.add_argument("--api", action="store_true",
-                       help="Test API server only")
     parser.add_argument("--quick", action="store_true",
                        help="Run quick smoke tests")
     parser.add_argument("--report", action="store_true",
@@ -380,8 +350,6 @@ def main():
     try:
         if args.leaderboard:
             success = suite.test_leaderboard_bridge()
-        elif args.api:
-            success = suite.test_api_server()
         elif args.quick:
             success = suite.run_quick_tests()
         else:
