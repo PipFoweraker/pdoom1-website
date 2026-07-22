@@ -431,6 +431,25 @@
             if (age < 1440) return `${Math.floor(age / 60)}h ago`;
             return `${Math.floor(age / 1440)}d ago`;
         }
+
+        // Spelled-out age, for places where a reader needs to judge whether what
+        // they are looking at is current health or a historical snapshot.
+        function formatAgeLong(timestamp) {
+            if (!timestamp) return 'age unknown';
+            const ms = new Date() - new Date(timestamp);
+            if (!isFinite(ms) || isNaN(ms)) return 'age unknown';
+            const ago = (n, unit) => `${n} ${unit}${n === 1 ? '' : 's'} ago`;
+            const mins = ms / 60000;
+            if (mins < 60) return ago(Math.max(0, Math.floor(mins)), 'minute');
+            if (mins < 1440) return ago(Math.floor(mins / 60), 'hour');
+            const days = Math.floor(mins / 1440);
+            if (days < 60) return ago(days, 'day');
+            return ago(Math.floor(days / 30), 'month');
+        }
+
+        // health-checks.yml is scheduled every 6 hours. Anything older than four
+        // missed runs is reported as stale rather than presented as live health.
+        const HEALTH_STALE_AFTER_HOURS = 24;
         
         async function updateWebsiteStatus() {
             try {
@@ -537,19 +556,50 @@
             if (healthData && healthData.results) {
                 const recentChecks = healthData.results.slice(-10).reverse();
 
-                container.innerHTML = recentChecks.map(check => {
+                // Never present a snapshot as current health without saying when it
+                // was taken -- this file is a committed artefact, not a live probe.
+                const ts = healthData.last_check;
+                const ageHours = ts ? (new Date() - new Date(ts)) / 3600000 : Infinity;
+                const stale = !(ageHours < HEALTH_STALE_AFTER_HOURS);
+                const when = ts ? new Date(ts).toLocaleString() : 'unknown';
+                let noteText = '';
+                if (!ts) {
+                    noteText = 'This snapshot carries no timestamp, so its age cannot be verified. Treat it as unknown rather than current.';
+                } else if (stale) {
+                    noteText = 'Scheduled health checks run every 6 hours. These results are older than that, so they describe a past state and not the current health of the site.';
+                }
+                const note = noteText
+                    ? `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">${noteText}</div>`
+                    : '';
+
+                const banner = `
+                    <div class="check-item">
+                        <div>
+                            <div class="check-name">Last checked: ${when} (${formatAgeLong(ts)})</div>
+                            ${note}
+                        </div>
+                        <span class="check-status ${stale ? 'warn' : 'pass'}">${stale ? 'STALE' : 'CURRENT'}</span>
+                    </div>
+                `;
+
+                container.innerHTML = banner + recentChecks.map(check => {
                     const statusClass = check.passed ? 'pass' : (check.is_warning ? 'warn' : 'fail');
                     const statusText = check.passed ? 'PASS' : (check.is_warning ? 'WARN' : 'FAIL');
 
                     return `
-                        <div class="check-item">
+                        <div class="check-item"${stale ? ' style="opacity: 0.6;"' : ''}>
                             <span class="check-name">${check.test}</span>
                             <span class="check-status ${statusClass}">${statusText}</span>
                         </div>
                     `;
                 }).join('');
             } else {
-                container.innerHTML = '<div class="check-item"><span class="check-name">No health check data available</span></div>';
+                container.innerHTML = `
+                    <div class="check-item">
+                        <span class="check-name">No health check data available</span>
+                        <span class="check-status warn">NO DATA</span>
+                    </div>
+                `;
             }
         }
 

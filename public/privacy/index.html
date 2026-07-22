@@ -318,7 +318,7 @@
 				</div>
 				<div class="feature-item">
 					<h4>🔒 No Personal Data</h4>
-					<p>We never collect personally identifiable information.</p>
+					<p>Our analytics never collect personally identifiable information.</p>
 				</div>
 				<div class="feature-item">
 					<h4>✅ GDPR Compliant</h4>
@@ -326,7 +326,7 @@
 				</div>
 				<div class="feature-item">
 					<h4>🌍 Respects DNT</h4>
-					<p>We honor Do Not Track browser settings.</p>
+					<p>If your browser sends Do Not Track, we tell the tracker to ignore your visits. That check runs on our main pages, so a visit landing straight on an event page may be counted first.</p>
 				</div>
 			</div>
 		</section>
@@ -339,6 +339,7 @@
 				<li><strong>Referrers:</strong> Where visitors come from (e.g., search engines, social media)</li>
 				<li><strong>Browser & OS:</strong> General browser and operating system information</li>
 				<li><strong>Device type:</strong> Desktop, mobile, or tablet (no device fingerprinting)</li>
+				<li><strong>Approximate location:</strong> Country level, worked out from your IP address at the moment of the request (the IP itself is never stored)</li>
 			</ul>
 			
 			<h3>What We DON'T Collect</h3>
@@ -349,6 +350,12 @@
 				<li>❌ Cross-site tracking data</li>
 				<li>❌ Fingerprinting data</li>
 			</ul>
+			<p>
+				<strong>That covers analytics only.</strong> If you use one of our forms or email us, we receive
+				whatever you choose to send, including any contact details you add. Bug and issue reports filed
+				through the site can end up in a public GitHub issue, so don't put anything in them you wouldn't
+				want published.
+			</p>
 		</section>
 
 		<section class="section">
@@ -381,8 +388,10 @@
 		<section class="section">
 			<h2>Data Retention</h2>
 			<p>
-				All analytics data is automatically deleted after <strong>90 days</strong>. We don't retain
-				long-term tracking data or build user profiles.
+				Analytics data is kept <strong>indefinitely</strong> — there is no automatic deletion after a
+				fixed period. We keep it so we can compare traffic across years. It holds no names, emails or
+				IP addresses, and the hash Plausible uses to count repeat visits is regenerated daily, so
+				visits can't be joined up across days into a user profile.
 			</p>
 		</section>
 
@@ -390,12 +399,14 @@
 			<h2>Analytics Provider</h2>
 			<p>
 				We use <a href="https://plausible.io/" target="_blank" rel="noopener" style="color: var(--accent-primary);">Plausible Analytics</a>,
-				an open-source, privacy-focused analytics platform. Plausible is:
+				an open-source, privacy-focused analytics platform. We run our own copy of it on our own server
+				at <code>analytics.pdoom1.com</code>, so your data is never sent to Plausible's hosted service or
+				to any other analytics company. Plausible is:
 			</p>
 			<ul>
 				<li>Open source and auditable</li>
-				<li>Can be self-hosted for full data ownership</li>
-				<li>Lightweight and fast (&lt;1KB script)</li>
+				<li>Self-hosted by us, for full data ownership</li>
+				<li>Lightweight and fast (~5KB script)</li>
 				<li>Does not use cookies or track users across sites</li>
 				<li>GDPR, CCPA, and PECR compliant</li>
 			</ul>

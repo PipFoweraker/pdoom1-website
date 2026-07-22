@@ -30,6 +30,7 @@ class WeeklyLeagueManager:
     
     def __init__(self):
         self.website_dir = Path(__file__).parent.parent
+        self.version_file = self.website_dir / "public" / "data" / "version.json"
         self.league_data_dir = self.website_dir / "public" / "leaderboard" / "data" / "weekly"
         self.current_league_file = self.league_data_dir / "current.json"
         self.archive_dir = self.league_data_dir / "archive"
@@ -62,6 +63,30 @@ class WeeklyLeagueManager:
             "created": datetime.now().isoformat()
         }
     
+    def get_game_version(self) -> str:
+        """Read the deployed game version from public/data/version.json.
+
+        Raises rather than falling back to a literal. A weekly board is keyed
+        (seed, game_version), so stamping a stale version here creates a board that
+        the shipped client cannot submit to: players would submit scores and see
+        nothing appear, with no error raised anywhere. Failing here is far cheaper
+        than publishing a league nobody can enter.
+        """
+        try:
+            with open(self.version_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+        except Exception as e:
+            raise RuntimeError(
+                f"Cannot read {self.version_file} for the game version: {e}"
+            )
+        version = (data.get("latest_release") or {}).get("version")
+        if not version:
+            raise RuntimeError(
+                f"{self.version_file} has no latest_release.version -- refusing to "
+                "guess a game version for a new weekly league"
+            )
+        return version
+
     def save_config(self):
         """Save configuration to file."""
         try:
@@ -168,9 +193,11 @@ class WeeklyLeagueManager:
         """Start a new weekly league competition."""
         week_info = self.get_current_week_info()
         new_seed = self.generate_weekly_seed(week_info)
-        
+        game_version = self.get_game_version()
+
         print(f"NEW WEEK: Starting new weekly league for {week_info['week_id']}")
         print(f"SEED: Generated seed: {new_seed}")
+        print(f"GAME_VERSION: {game_version}")
         print(f"PERIOD: {week_info['start_date']} to {week_info['end_date']}")
         
         # Archive current week if it exists
@@ -184,7 +211,7 @@ class WeeklyLeagueManager:
                 "week_id": week_info['week_id'],
                 "season": self.config["current_season"],
                 "generated": datetime.now().isoformat() + "Z",
-                "game_version": "v0.4.1",
+                "game_version": game_version,
                 "competition_type": "weekly_league",
                 "start_date": week_info['start_timestamp'],
                 "end_date": week_info['end_timestamp'],
@@ -192,7 +219,9 @@ class WeeklyLeagueManager:
                 "total_submissions": 0
             },
             "seed": new_seed,
-            "economic_model": "Bootstrap_v0.4.1",
+            # "Bootstrap_v0.4.1" was a legacy-pygame concept; the current Godot client
+            # exports no economic model, so claiming one would be inventing a fact.
+            "economic_model": "unknown",
             "week_info": week_info,
             "entries": [],
             "statistics": {

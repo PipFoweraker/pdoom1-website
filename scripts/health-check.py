@@ -7,10 +7,22 @@ Validates critical files, data integrity, and system dependencies
 
 import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime
 from typing import Dict, Any, List, Optional
+
+# This script prints emoji. On Windows the console defaults to cp1252 and the
+# first print raises UnicodeEncodeError, aborting the run before any check
+# executes. That failure is not academic: the resulting traceback -- which
+# names the interpreter's own encodings/cp1252.py -- is what leaked an absolute
+# local path into public/data/test-report.json, served publicly from pdoom1.com.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
 
 
 class HealthChecker:
@@ -22,16 +34,43 @@ class HealthChecker:
         self.warnings: List[str] = []
         self.start_time = datetime.now()
         
-        # Define critical paths
-        self.base_dir = os.path.join(os.path.dirname(__file__), '..')
+        # Define critical paths. Resolved, so rel() below can always compute a
+        # repo-relative form.
+        self.base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         self.public_dir = os.path.join(self.base_dir, 'public')
         self.data_dir = os.path.join(self.public_dir, 'data')
-    
+
+    def rel(self, filepath: str) -> str:
+        """Repo-relative form of a path, for use in any message we might publish.
+
+        This output has been served publicly from pdoom1.com, and absolute paths
+        leaked the maintainer's OS username and local directory layout
+        (e.g. "C:\\Users\\<name>\\Documents\\A Local Code\\...") as well as CI
+        runner paths. Never interpolate a raw filepath into a result message --
+        call this instead.
+        """
+        try:
+            return os.path.relpath(os.path.abspath(filepath), self.base_dir).replace('\\', '/')
+        except (ValueError, TypeError):
+            # Different drive on Windows, or a non-path string.
+            return os.path.basename(str(filepath))
+
+    # Absolute paths in free text we did not construct (subprocess output,
+    # exception strings). Belt and braces alongside rel().
+    _ABS_PATH = re.compile(
+        r"([A-Za-z]:[\\/][^\s'\"]+|/(?:home|Users|root|mnt|var/folders)/[^\s'\"]+)")
+
+    @classmethod
+    def scrub(cls, text: str) -> str:
+        """Replace any absolute path in arbitrary text with its basename."""
+        return cls._ABS_PATH.sub(lambda m: os.path.basename(m.group(0).rstrip('\\/')),
+                                 str(text))
+
     def log_result(self, test_name: str, passed: bool, message: str = "", is_warning: bool = False) -> None:
         """Log a test result"""
         if is_warning:
             self.warnings.append(f"{test_name}: {message}")
-        
+
         result: Dict[str, Any] = {
             'test': test_name,
             'passed': passed,
@@ -48,48 +87,57 @@ class HealthChecker:
     def test_file_exists(self, filepath: str, test_name: str) -> bool:
         """Test if a critical file exists"""
         exists = os.path.exists(filepath)
-        self.log_result(test_name, exists, 
-                       f"✓ Found: {filepath}" if exists else f"✗ Missing: {filepath}")
+        shown = self.rel(filepath)
+        self.log_result(test_name, exists,
+                       f"✓ Found: {shown}" if exists else f"✗ Missing: {shown}")
         return exists
-    
+
     def test_json_valid(self, filepath: str, test_name: str) -> bool:
         """Test if a JSON file is valid"""
+        shown = self.rel(filepath)
         try:
             if not os.path.exists(filepath):
-                self.log_result(test_name, False, f"File not found: {filepath}")
+                self.log_result(test_name, False, f"File not found: {shown}")
                 return False
-                
+
             with open(filepath, 'r', encoding='utf-8') as f:
                 json.load(f)
-            self.log_result(test_name, True, f"✓ Valid JSON: {filepath}")
+            self.log_result(test_name, True, f"✓ Valid JSON: {shown}")
             return True
         except json.JSONDecodeError as e:
-            self.log_result(test_name, False, f"Invalid JSON: {filepath} - {e}")
+            self.log_result(test_name, False, f"Invalid JSON: {shown} - {e}")
             return False
         except Exception as e:
-            self.log_result(test_name, False, f"Error reading {filepath}: {e}")
+            self.log_result(test_name, False, f"Error reading {shown}: {e}")
             return False
     
     def test_script_executable(self, script_path: str, test_name: str) -> bool:
         """Test if a script can be executed"""
+        shown = self.rel(script_path)
         try:
             if not os.path.exists(script_path):
-                self.log_result(test_name, False, f"Script not found: {script_path}")
+                self.log_result(test_name, False, f"Script not found: {shown}")
                 return False
-            
+
             # Test Python script syntax
-            result = subprocess.run([sys.executable, '-m', 'py_compile', script_path], 
+            result = subprocess.run([sys.executable, '-m', 'py_compile', script_path],
                                   capture_output=True, text=True, timeout=30)
-            
+
             if result.returncode == 0:
-                self.log_result(test_name, True, f"✓ Script compiles: {script_path}")
+                self.log_result(test_name, True, f"✓ Script compiles: {shown}")
                 return True
             else:
-                self.log_result(test_name, False, f"Compilation error: {result.stderr}")
+                # A traceback carries the interpreter's own install path (this is
+                # how "C:/Users/<name>/AppData/Local/Programs/Python/..." reached
+                # the public site). Report only the final line, path-scrubbed.
+                detail = (result.stderr or "").strip().splitlines()
+                detail = detail[-1] if detail else "unknown error"
+                self.log_result(test_name, False,
+                                f"Compilation error in {shown}: {self.scrub(detail)}")
                 return False
-                
+
         except subprocess.TimeoutExpired:
-            self.log_result(test_name, False, f"Script compilation timeout: {script_path}")
+            self.log_result(test_name, False, f"Script compilation timeout: {shown}")
             return False
         except Exception as e:
             self.log_result(test_name, False, f"Error testing script: {e}")

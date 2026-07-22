@@ -1,11 +1,22 @@
+/* Shared site stylesheet.
+
+   CASCADE NOTE (measured 2026-07-22 across all 2,224 HTML files):
+   this file is linked AFTER the page's inline <style> on exactly 2 pages
+   (public/index.html, public/docs/index.html), where its same-specificity
+   rules WIN; on the other 2,201 it is linked BEFORE and loses. Either way,
+   every rule here must be dark-palette-correct -- a light-theme literal in
+   this file previously whited-out cards sitewide.
+
+   Palette: amber CRT chrome + teal counterpoint over warm near-black,
+   derived from the game's shipped art. Green is demoted to --phosphor
+   (OK-state / terminal flourish), not brand chrome. */
+
 :root {
-  /* Dark-theme fallbacks. This file loads LAST, so these OVERRIDE each page's
-     own :root -- they must match the terminal palette, not fight it. Previously
-     these were light-theme values (#0066cc blue, #666/#999 greys), which turned
-     every page WITHOUT a runtime token loader (i.e. all ~2200 event pages) blue. */
-  --accent-primary: #00ff41;
-  --text-secondary: #cccccc;
-  --text-muted: #aaaaaa;
+  /* Dark-theme fallbacks. These OVERRIDE the inline :root on the two pages
+     above, so they must equal public/design/tokens.json, not fight it. */
+  --accent-primary: #F6A800;
+  --text-secondary: #CFC7BB;
+  --text-muted: #A79E92;
 }
 
 .summary-toggle {
@@ -27,7 +38,10 @@
   display: inline-block;
   text-decoration: none;
   background: var(--accent-primary);
-  color: #fff;
+  /* Was `color: #fff`, i.e. white on the brand accent -- 1.34:1 on the old
+     green and 1.90:1 on amber, both far below WCAG AA. Dark ink on the amber
+     measures 9.51:1. */
+  color: var(--bg-primary, #12100F);
   padding: 0.5rem 1rem;
   border-radius: 4px;
 }
@@ -53,14 +67,18 @@
   border-radius: 3px;
 }
 
+/* These two were pale light-theme chips (#e6f8ff/#0077aa, #eef7e6/#0a6f2f).
+   Because this file wins on public/docs/index.html, they were overriding that
+   page's own dark chips and rendering as light patches on a dark page.
+   Dark ink on the saturated chip: 7.28:1 (success) / 10.23:1 (teal). */
 .status.available {
-  background: #e6f8ff;
-  color: #0077aa;
+  background: #4FB37A;
+  color: #12100F;
 }
 
 .status.synced {
-  background: #eef7e6;
-  color: #0a6f2f;
+  background: #2FD4C2;
+  color: #12100F;
 }
 
 .newsletter-input {
@@ -72,4 +90,3 @@
 .newsletter-form {
   margin-top: 1rem;
 }
-

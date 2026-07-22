@@ -1,5 +1,7 @@
 {
+  "_note": "Documentation only. No page or script loads this file; the Plausible tag is hardcoded in each page's <head>. Keep it in sync with public/privacy/index.html by hand.",
   "provider": "plausible",
+  "selfHosted": true,
   "enabled": true,
   "dataDomain": "pdoom1.com",
   "scriptUrl": "https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js",
@@ -7,11 +9,11 @@
     "noCookies": true,
     "noPersonalData": true,
     "gdprCompliant": true,
-    "dataRetention": "90 days",
+    "dataRetention": "indefinite (Plausible Community Edition has no automatic expiry; no retention job is configured)",
     "optOutAvailable": true
   },
   "notes": {
-    "selfHosting": "For self-hosted deployment, update scriptUrl to your own Plausible instance",
+    "selfHosting": "Already self-hosted: Plausible Community Edition runs on our own VPS and serves both the script above and the dashboard at https://analytics.pdoom1.com",
     "alternatives": {
       "umami": "https://umami.is/docs/install",
       "simpleAnalytics": "https://www.simpleanalytics.com/"
