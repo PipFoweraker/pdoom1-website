@@ -53,6 +53,17 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = REPO_ROOT / "public"
 DEFAULT_BASELINE = REPO_ROOT / "docs" / "copy-baseline"
 
+# The site's copy is full of non-ASCII (arrows, em dashes, the warning sign on
+# the dashboard). On Windows the console defaults to cp1252 and printing a diff
+# containing any of them raises UnicodeEncodeError, killing the run partway
+# through -- which looks like the tool crashing rather than the terminal being
+# unable to render a character. Force UTF-8 and degrade unprintables instead.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 # Content of these elements is never shown to a reader as prose.
 SKIP_CONTENT = {"script", "style", "noscript", "svg", "template"}
 
