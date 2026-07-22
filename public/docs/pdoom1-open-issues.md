@@ -1,11 +1,14 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-21T18:43:22.142Z UTC
+Generated: 2026-07-22T00:51:39.833Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 771 | Doom gauge: percentage labels overlap (27.2% renders over 27%) |  | v0.12 -- First Contact | 2026-07-22 00:24:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/771) |
+| 770 | Office floor iteration 2: sprite/prop scale + wider right-hand floorspace |  | v0.12 -- First Contact | 2026-07-22 00:24:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/770) |
+| 768 | Icons: submit paper, attend conference, send delegate unmapped (+ widen resolution test) |  | v0.12 -- First Contact | 2026-07-21 23:09:42 | [link](https://github.com/PipFoweraker/pdoom1/issues/768) |
+| 767 | Modal discipline: hire screen (and modals generally) must block interaction behind them |  | v0.12 -- First Contact | 2026-07-21 23:09:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/767) |
 | 763 | Nomenclature + pacing: strategic-options unlock expressed at month grain; align fanfare hero |  |  | 2026-07-21 09:21:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/763) |
-| 762 | REGRESSION: most action icons render as placeholder (only safety audit + strategic show) |  | v0.12 -- First Contact | 2026-07-21 09:21:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/762) |
 | 758 | Session agenda: Friday 2026-07-24 (decisions + conversations queue) |  |  | 2026-07-21 09:03:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/758) |
 | 755 | UI: theme the event popup / dialog buttons (still default grey after menu theme) |  | v0.12 -- First Contact | 2026-07-21 04:49:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/755) |
 | 753 | chore: docs typographic ASCII cleanup (em-dashes, box-drawing) -- low priority |  |  | 2026-07-21 04:23:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/753) |
@@ -19,8 +22,8 @@ Generated: 2026-07-21T18:43:22.142Z UTC
 | 721 | Onboarding: data-driven contextual hints (Factorio-style show-once triggers) |  | v0.12 -- First Contact | 2026-07-20 20:38:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/721) |
 | 720 | Onboarding: first-launch help layer skeleton (settings flag + dismissible overlay) |  | v0.12 -- First Contact | 2026-07-20 20:38:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/720) |
 | 714 | Perf: turn-1 / early-days processing feels slow (watch-and-track) |  |  | 2026-07-20 05:22:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/714) |
-| 707 | UI consistency sweep after asset promotion + office-sim integration (level-2 visual pass) |  |  | 2026-07-19 06:28:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/707) |
-| 703 | Playtest v0.11.0: defeat-pacing drag + hiring pipeline feels gappy (coalesce/de-branch) |  |  | 2026-07-18 07:57:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/703) |
+| 707 | UI consistency sweep after asset promotion + office-sim integration (level-2 visual pass) |  |  | 2026-07-21 23:09:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/707) |
+| 703 | Playtest v0.11.0: defeat-pacing drag + hiring pipeline feels gappy (coalesce/de-branch) |  |  | 2026-07-21 23:09:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/703) |
 | 700 | Local Leaderboard.add_score does not dedupe by entry_uuid (remote PHP does) |  |  | 2026-07-18 07:05:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/700) |
 | 648 | Check Godot port for team_player uncapped-stacking exploit + poaching rate (salvaged from pre-Godot notes) |  | v0.13 -- Rivals and News | 2026-07-20 20:38:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/648) |
 | 622 | Build lane L10 · main_ui decomposition: extract-before set + let-die map |  |  | 2026-07-12 08:38:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/622) |
@@ -31,7 +34,7 @@ Generated: 2026-07-21T18:43:22.142Z UTC
 | 613 | Build lane L2 · Effort economy: founder hours, staff lanes, managers (ADR-0011) |  |  | 2026-07-12 08:22:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/613) |
 | 608 | Architecture smell: two GameManager instances (scene-local + autoload); 'ready' prints twice | technical-debt |  | 2026-07-12 08:26:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/608) |
 | 603 | Popups: fanfare needs a dimming backdrop (events leak under it); bug-report 'thanks' Submit still clickable | bug, ui-ux |  | 2026-07-12 00:50:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/603) |
-| 602 | Navigation audit + universal principle (ESC/back consistency, mirrored toggle keys, unreachable Employee screen) | ui-ux |  | 2026-07-21 04:49:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/602) |
+| 602 | Navigation audit + universal principle (ESC/back consistency, mirrored toggle keys, unreachable Employee screen) | ui-ux |  | 2026-07-21 23:09:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/602) |
 | 601 | Ledger UX: layout wrong/cramped, L-to-close, critical-due popup, distinct warning colour | bug, ui-ux |  | 2026-07-12 00:50:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/601) |
 | 600 | Dev overlays (DEV MODE + F3) can't read live game state; 29 runtime errors; nudge/advance-turn wiring | bug |  | 2026-07-21 04:49:42 | [link](https://github.com/PipFoweraker/pdoom1/issues/600) |
 | 595 | Audit strategic options/events/buttons that cost but have no meaningful game impact | game-mechanics |  | 2026-07-11 08:46:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/595) |
@@ -57,7 +60,7 @@ Generated: 2026-07-21T18:43:22.142Z UTC
 | 506 | chore: Clean up GDScript warnings and style issues | good first issue, worktree:infrastructure |  | 2026-02-03 03:52:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/506) |
 | 500 | Research Quality System (Rushed/Standard/Thorough) | enhancement, game-mechanics, post-launch, worktree:new-mechanics |  | 2026-07-13 11:30:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/500) |
 | 476 | Progressive finance and software management system | enhancement, worktree:dialogue |  | 2026-07-13 11:30:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/476) |
-| 475 | Comprehensive upgrades system overhaul | worktree:dialogue |  | 2026-07-13 11:30:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/475) |
+| 475 | Comprehensive upgrades system overhaul | worktree:dialogue |  | 2026-07-21 23:09:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/475) |
 | 473 | Character creation and lab setup point allocation system | worktree:dialogue |  | 2026-07-13 11:30:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/473) |
 | 471 | Office cosmetic shopping system | worktree:new-mechanics |  | 2026-07-13 11:29:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/471) |
 | 470 | Visual office representation on screen | worktree:new-mechanics |  | 2026-07-13 11:29:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/470) |
