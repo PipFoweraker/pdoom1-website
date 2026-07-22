@@ -199,10 +199,12 @@ jobs:
           
           echo "✅ League data verification passed"
 
-      - name: Test API endpoints (if available)
-        run: |
-          echo "🧪 Testing API endpoints..."
-          python scripts/api-server.py --test || echo "⚠️  API test failed (non-critical)"
+      # "Test API endpoints" step removed 2026-07-22 along with scripts/api-server.py.
+      # It ran `api-server.py --test || echo "non-critical"` -- a test that had never
+      # passed (it crashed on a UnicodeEncodeError before reaching an assertion),
+      # with its failure swallowed by design. pdoom1 PR #679 settled that the website
+      # is a READ-ONLY consumer of one PHP score API and must not stand up a second
+      # score store, so the server it exercised is gone.
 
   notify_failure:
     name: Notify on Failure

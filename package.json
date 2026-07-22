@@ -16,8 +16,6 @@
     "update:stats": "python scripts/calculate-game-stats.py",
     "sync:all": "python scripts/update-version-info.py && python scripts/calculate-game-stats.py",
     "export:leaderboard": "python scripts/export-leaderboard-bridge.py --refresh",
-    "api:server": "python scripts/api-server.py --find-port",
-    "api:test": "python scripts/api-server.py --test",
     "game:setup": "python scripts/game-integration.py --setup",
     "game:export": "python scripts/game-integration.py --export",
     "game:status": "python scripts/game-integration.py --status",

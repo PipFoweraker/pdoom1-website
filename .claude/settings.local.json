@@ -10,7 +10,16 @@
       "Bash(dir \"C:\\Users\\gday\\.ssh\\pdoom-website-instance.pem\")",
       "Bash(ssh:*)",
       "Bash(powershell:*)",
-      "Bash(dir)"
+      "Bash(dir)",
+      "Bash(python -c \"print\\(repr\\(open\\('vercel.json','rb'\\).read\\(\\)\\)\\)\")",
+      "Bash(set -e)",
+      "Bash(git rm *)",
+      "Bash(python -)",
+      "Bash(python -c \"import json;json.load\\(open\\('package.json'\\)\\);print\\('package.json OK'\\)\")",
+      "Bash(python *)",
+      "Bash(PYTHONIOENCODING=utf-8 python scripts/test-integration.py --quick)",
+      "Bash(git stash *)",
+      "Bash(git add *)"
     ],
     "deny": [],
     "ask": []
