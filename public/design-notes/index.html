@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Design Notes | p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/" />
+	<meta name="description" content="The architecture decision records p(Doom)1 is built from - why the game works the way it does." />
+	<meta property="og:title" content="Design Notes | p(Doom)1" />
+	<meta property="og:description" content="The architecture decision records p(Doom)1 is built from - why the game works the way it does." />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>Design Notes</h1>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+		<p>Every significant design decision in p(Doom)1 is written down before it is built. 17 of those records are published here.</p>
+		<ul class="card-list">
+			<li><a href="/design-notes/adr-0001-spending-buys-sight.html">ADR-0001 — Situational Awareness as the primary sink (&quot;spending buys sight&quot;)</a><p>P(Doom)1 is source-rich and sink-poor: money and reputation accumulate faster than anything competes to spend them, which is mechanically identical to being vulnerable to simple dominant-strategy exploits. We need sinks ...</p></li>
+			<li><a href="/design-notes/adr-0002-scoring-turns-survived.html">ADR-0002 — Scoring: turns survived, lexicographic doom-integral tiebreak, flows only</a><p>The implemented score formula — (100−doom)×1000 + papers×5000 + researchers×2000 + turn×500 + money×0.1 + 50,000 victory bonus (doom&lt;20) — was scaffolding built to test the end-game screen, never a design statement (Pip,...</p></li>
+			<li><a href="/design-notes/adr-0003-liability-ledger.html">ADR-0003 — The Liability Ledger (two-sided): every mitigation is a loan</a><p>Pip&#x27;s generative image (preserved because the chain is the idea): &quot;like taking out a credit card to save the mortgage, then taking a job as a lobbyist to pay off the credit card, then lobbying to weaken financial regulat...</p></li>
+			<li><a href="/design-notes/adr-0004-sa-channels-lead-time.html">ADR-0004 — SA amended: channels with provenance, lead-time semantics, decision-flip test</a><p>ADR-0001 proposed &quot;spending buys sight&quot; as the flagship sink. The workshop stress-tested it against Pip&#x27;s peak verb — &quot;triaging in a race against death&quot; — and against the realization: &quot;I am used to thinking about the gam...</p></li>
+			<li><a href="/design-notes/adr-0005-emergent-waves-seed-schedules.html">ADR-0005 — Emergent doom waves: author causes, never outcomes; seed = RNG + schedule</a><p>Doom arrives in waves. The fork: authored waves (designed timings — pacing guaranteed, sim partly theater) vs emergent waves (arising from opponent behavior plus the player&#x27;s accumulated ledger — pure, attributable, paci...</p></li>
+			<li><a href="/design-notes/adr-0006-replay-artifact-backend.html">ADR-0006 — The replay string is the canonical run artifact; backend wiring order</a><p></p></li>
+			<li><a href="/design-notes/adr-0007-alliances-third-client.html">ADR-0007 — Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight)</a><p></p></li>
+			<li><a href="/design-notes/adr-0008-deferrals-and-rejections.html">ADR-0008 — Deferrals, folds, and rejections (the negative space of workshop #1)</a><p></p></li>
+			<li><a href="/design-notes/adr-0009-plan-months-two-speeds.html">ADR-0009 — Turn structure: plan-months, two decision speeds, day as resolution tick</a><p>Workshop #1&#x27;s intent was a week-based planning loop; the build drifted to day-turns with the week surviving only as display (game_state.gd TURNS_PER_WEEK, &quot;Day 3/5&quot; HUD). The drift&#x27;s real shape: decisions attached to the...</p></li>
+			<li><a href="/design-notes/adr-0010-adoption-routing.html">ADR-0010 — Adoption routing (soft-with-teeth): doom bends where work is adopted</a><p>The exploit sweep&#x27;s dominant line (safety_lean, basement safety-spam, median 37 turns vs 7 for passive) exists because safety research bends doom directly, privately, and state-independently — papers are decorative, conf...</p></li>
+			<li><a href="/design-notes/adr-0011-effort-economy.html">ADR-0011 — The effort economy: founder hours, staff lanes, manager compression</a><p>Current build: one global AP pool, spent instantly; staff add to the pool; researchers are single-function; banking exists but does nothing. The sweep&#x27;s diagnosis in mechanism terms: one fungible currency + state-indepen...</p></li>
+			<li><a href="/design-notes/adr-0012-event-response-taxonomy.html">ADR-0012 — Event response taxonomy: un-snoozable, deferrable, expiring</a><p>ADR-0009 gave every response window a DEFER option routing through the Ledger. Left uniform, DEFER becomes a universal snooze button and the reserve-vs-greed gamble loses its sting (why hold reserve when everything waits...</p></li>
+			<li><a href="/design-notes/adr-0013-cost-of-debt-engine.html">ADR-0013 — Financing instruments &amp; the cost-of-debt engine</a><p>Flat 25%/turn loans were a day-cadence artifact (ADR-0009) and a placeholder (DQ-8). With DEFER routing through the Ledger (ADR-0009/0012), loan terms and defer carrying-costs need one pricing engine, or the two halves o...</p></li>
+			<li><a href="/design-notes/adr-0014-conferences-presence-location.html">ADR-0014 — Conferences, presence, and minimal location</a><p>ADR-0010 made socialization the mandatory middle of the research→adoption value chain with no ruling on what attending is. Pip&#x27;s rulings, this beat, with one ambition flagged: &quot;Part of me wants to make a conference atten...</p></li>
+			<li><a href="/design-notes/adr-0015-no-printed-doom-deltas.html">ADR-0015 — No printed doom deltas: doom is computed from world state</a><p>The current build carries literal doom bumps on event/action definitions (legacy of the prototype engine). Pip&#x27;s ruling: &quot;hardcoding doom counters into things seems really like a legacy design philosophy and as we get so...</p></li>
+			<li><a href="/design-notes/adr-0016-league-metabolism.html">ADR-0016 — League metabolism: the game trails reality by one month</a><p>The scouting beat&#x27;s variance question (&quot;what does a veteran re-scout per run?&quot;) was answered by moving the variance out of the seed and into time. Pip: &quot;i&#x27;m considering making the leagues and associated patches that long...</p></li>
+			<li><a href="/design-notes/adr-0017-anti-hollow-test-strategy.html">ADR-0017 -- Anti-hollow test strategy (load-time smoke + property-based invariants)</a><p>Two real failures on 2026-07-17 share one root cause -- tests that pass without exercising the thing they claim to protect (call it a &quot;hollow&quot; test):</p></li>
+		</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

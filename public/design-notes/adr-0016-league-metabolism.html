@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0016 — League metabolism: the game trails reality by one month | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0016-league-metabolism.html" />
+	<meta name="description" content="The scouting beat&#x27;s variance question (&quot;what does a veteran re-scout per run?&quot;) was answered by moving the variance out of the seed and into time. Pip: &quot;i&#x27;" />
+	<meta property="og:title" content="ADR-0016 — League metabolism: the game trails reality by one month | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="The scouting beat&#x27;s variance question (&quot;what does a veteran re-scout per run?&quot;) was answered by moving the variance out of the seed and into time. Pip: &quot;i&#x27;" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0016-league-metabolism.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0016 — League metabolism: the game trails reality by one month</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED (shape; pipeline build + league-notes format owed) &middot; <strong>Decided:</strong> 2026-07-13</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED (shape; pipeline build + league-notes format owed)</li>
+<li><strong>Date:</strong> 2026-07-13</li>
+</ul>
+<h2>Context</h2>
+<p>The scouting beat's variance question ("what does a veteran re-scout per run?") was answered by moving the variance out of the seed and into time. Pip: <em>"i'm considering making the leagues and associated patches that long as well - that means I can run the game a month behind real time, update real world events into the engine, balance patch, test, and deploy in a way that doesn't demand my full-time attention."</em></p>
+<p>Pip's mature-cycle articulation: <em>"collect real world events, suggestions on papers etc, value shifts from previous month's run of data, patch the game once a month and load the event logs into the game, the game's 'real time turn' progresses forward a month, a new seed is generated for seed-racers, and the league launches fresh with notes etc."</em></p>
+<h2>Decision</h2>
+<ol>
+<li><strong>Monthly league cycle.</strong> Each real month: collect real-world events/papers/data shifts → author a <strong>world-update pack</strong> (ADR-0005 schedule entries, fed from the pdoom-data repositories) → the game's real-time frontier advances one month → new baseline seed(s) generated → league launches with notes.</li>
+<li><strong>Run-start stays 2017</strong> (ADR-0009 anchor holds; Pip ~80% on this fork). Fixed real history is the shared macro map — Factorio-mode openings accepted at the macro grain; per-seed variance lives in the <strong>micro-social layer</strong> (hire pool, contacts, meetup yields). SC2 model: known map pool, scout the opponent's build; the pool rotates monthly. <em>Parked experiment (the other ~20%): a "jump in at present-month" mode that runs 2017→present as baseline.</em></li>
+<li><strong>Cadences decoupled: world-updates ≠ balance patches.</strong> World-updates are monthly, light, expected — a "mild lore and sprint refresh." Balance patches are slower and legible-event-grade (philosophy canon: patches are the community heartbeat, argued about, never ambient weather). Real material is <em>always</em> welcome into pdoom-data; mechanics impact can lag at its own speed.</li>
+<li><strong>One month per baseline seed is the explore-exploit window</strong> — allows a few full playthroughs of a 6–8 hr decent run before rotation. Pip: timing "feels about right."</li>
+<li><strong>The ops constraint is a design input.</strong> The pipeline must run at ≤1 day/week of founder effort sustained: LLM-drafted world-update packs reviewed and submitted to Pip; junior-dev offload path if funding lands. Pip: <em>"this can't take up more than 1 day a week of effort over long periods of time without it going public and actually having engagement pretty darn soon."</em></li>
+</ol>
+<h2>Beacons served / violated</h2>
+<ul>
+<li><strong>Rams #6 (honest):</strong> the game is tethered to the real race — each league, another month of the actual timeline enters the engine. Candidate third structural claim (alongside no-win and adoption-routing); not yet ratified as never-patch canon.</li>
+<li><strong>Rams #10:</strong> world-update packs reuse ADR-0005's schedule format and the L9 data externalization; no new engine system — the league is a content cadence plus a frontier config value.</li>
+<li><strong>MaRo Surprise/Discovery:</strong> monthly rotation, not seed randomness, is the veteran freshness engine.</li>
+</ul>
+<h2>Interaction contract</h2>
+<p>Reads/writes: <strong>ADR-0005 seed schedules</strong> (packs are schedule entries; pdoom-data is the feedstock — EE-6 promoted, this is its customer), <strong>ADR-0009 fiction anchors</strong> (2017 start reaffirmed), <strong>ADR-0006 replay/versioning</strong> (runs are per-league artifacts; DQ-3 cross-version boards become league UX), <strong>L9 Balance separation</strong> (balance constants and world packs are distinct data surfaces on distinct cadences).</p>
+<h2>Rejected alternatives</h2>
+<ul>
+<li><strong>Run-start rides the leagues</strong> (start ~present-day): loses the 2017 arc and the village-era early fiction. Rejected for the default mode; survives only as the parked present-month experiment.</li>
+<li><strong>Monolithic monthly world+balance patch:</strong> ambient-noise patches violate the patch-as-heartbeat philosophy. Decoupled instead.</li>
+<li><strong>Per-seed macro world regeneration</strong> (Civ-style map variance): fiction can't tolerate it (2017 start is semi-historical) and Pip doesn't need it — Factorio-mode accepted.</li>
+</ul>
+<h2>Amendments (2026-07-13, handover round)</h2>
+<ul>
+<li><strong>League baseline = one seed</strong> (possibly one seed with a few variants — the elegant home for the parked present-month mode). One seed is promoted by default; players can generate and share their own — <strong>anyone can host a mini-league by posting a baseline seed.</strong> Community structure from seed-sharing, no new infrastructure.</li>
+<li><strong>Canon-ness ruled ~75%</strong> — bake deeply into config. Pip's reason: without the reality-tether the game drifts from its guiding star as "a tool / scenario builder / argument fosterer."</li>
+</ul>
+<h2>Consequences / open questions</h2>
+<ul>
+<li><strong>Pipeline build</strong> (EE-6 promoted): structured monthly world-diff format an agent can draft and Pip approves. Estimate 1–2 days/month once built; the sustainability risk is real (solo liveops decay) — treat the pipeline as a product feature, not an aspiration.</li>
+<li>League-notes format, seed-racer norms, what happens to in-flight runs at rollover (per-league artifacts suggest: they finish on their league's version).</li>
+<li>Engagement dependency named by Pip: the cadence only pays if the game is public with real players "pretty darn soon" — sequencing pressure on L1..Ln.</li>
+<li>The fixed 2017→present history grows by a month every league — the macro opening gets <em>longer</em> over time. Watch for opening fatigue; the parked present-month mode is the relief valve if it bites.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

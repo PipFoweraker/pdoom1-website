@@ -1,19 +1,38 @@
 name: Sync docs from pdoom1
 
+# PARKED 2026-07-22. Superseded by sync-design-notes.yml -- do NOT re-enable the
+# schedule as written.
+#
+# Two problems, one of which was hiding the other:
+#
+#   1. The commit step tested `git diff --quiet public/docs`, which only sees
+#      TRACKED files. Everything this job writes under public/docs/pdoom1/ is
+#      new and untracked, so the test always passed, it always printed "No
+#      changes to commit", and it committed nothing -- while reporting SUCCESS
+#      on a 6-hourly schedule for months. public/docs/pdoom1 has never existed
+#      in this repository. (Fixed below: stage first, then test the index.)
+#
+#   2. Fixing (1) alone would have been an own-goal. The copy step is an
+#      unfiltered `rsync` of the game repo's entire docs/ tree: 395 files, of
+#      which 169 are docs/archive/ -- internal session handoffs, pre-workshop
+#      dev logs, superseded design notes -- published as raw, unrendered .md
+#      that browsers download rather than display.
+#
+# The curated replacement is scripts/sync/sync-design-notes.py, which reads only
+# docs/game-design/decisions/ADR-*.md, scrubs internal process markers, and
+# renders real HTML in the site palette.
+#
+# If you ever want the broader docs tree public, add an explicit allowlist here
+# (NOT an archive/ denylist -- new internal directories would leak by default).
+
 on:
-  # Manual trigger
+  # Manual only. See the note above before re-enabling any automatic trigger.
   workflow_dispatch:
     inputs:
       ref:
         description: Git ref (branch, tag, or SHA) in PipFoweraker/pdoom1
         required: true
         default: main
-  # Auto-trigger on schedule (checks for new releases every 6 hours)
-  schedule:
-    - cron: '0 */6 * * *'
-  # Trigger via repository_dispatch (webhook from pdoom1 repo)
-  repository_dispatch:
-    types: [pdoom1_release, pdoom1_docs_update]
 
 permissions:
   contents: write
@@ -61,13 +80,20 @@ jobs:
       - name: Commit changes
         run: |
           REF="${{ steps.get_ref.outputs.ref }}"
-          if git diff --quiet public/docs; then
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          # `git add` BEFORE testing for changes. The previous version ran
+          # `git diff --quiet public/docs`, which only inspects TRACKED files --
+          # and everything this job writes under public/docs/pdoom1/ is new and
+          # untracked. So the test always passed, always printed "No changes to
+          # commit", and never committed. This workflow reported success on a
+          # 6-hourly schedule for months while public/docs/pdoom1 never once
+          # existed in the repository. Staging first makes the check honest.
+          git add -A public/docs
+          if git diff --cached --quiet -- public/docs; then
             echo "No changes to commit"
           else
-            git config user.name "github-actions"
-            git config user.email "actions@github.com"
-            git add public/docs
             git commit -m "chore(docs): sync pdoom1 docs at $REF - Triggered by: ${{ github.event_name }}"
             git push
-            echo "✅ Documentation synced successfully for $REF"
+            echo "Documentation synced successfully for $REF"
           fi

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0003 — The Liability Ledger (two-sided): every mitigation is a loan | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0003-liability-ledger.html" />
+	<meta name="description" content="Pip&#x27;s generative image (preserved because the chain is the idea): &quot;like taking out a credit card to save the mortgage, then taking a job as a lobbyist to p" />
+	<meta property="og:title" content="ADR-0003 — The Liability Ledger (two-sided): every mitigation is a loan | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="Pip&#x27;s generative image (preserved because the chain is the idea): &quot;like taking out a credit card to save the mortgage, then taking a job as a lobbyist to p" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0003-liability-ledger.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0003 — The Liability Ledger (two-sided): every mitigation is a loan</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED as design; build first among the new systems &middot; <strong>Decided:</strong> 2026-07-04</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED as design; build first among the new systems</li>
+<li><strong>Date:</strong> 2026-07-04</li>
+</ul>
+<h2>Context</h2>
+<p>Pip's generative image (preserved because the chain <em>is</em> the idea): <em>"like taking out a credit card to save the mortgage, then taking a job as a lobbyist to pay off the credit card, then lobbying to weaken financial regulation on AI firms which then leads to an increase in AI driven fraud which then funds Antagonist_Lab"</em> — plus <em>"the first waves of doom might be easier to beat down but require some kinds of sacrifice where you get diminishing returns."</em></p>
+<p>Doom arrives in waves (ADR-0005). Each wave can be beaten down, but every suppression lever generates a liability that feeds a later wave or weakens a later lever. The adversary "adapts" — not via a difficulty slider, but because <strong>the player's own ledger is the difficulty curve.</strong></p>
+<h2>Decision</h2>
+<p>One system — a ledger of trades that pay now and bill later — absorbing four issue-list items that were previously separate: loan repayment, funding-with-strings, the governance→bribery→blackmail cascade, and reputation-as-spendable.</p>
+<p><strong>Entry shape (design-level, not code):</strong> a liability has a <em>source</em> (what trade created it), a <em>currency</em> (what it bills in: money, reputation, governance, doom), a <em>fuse</em> (when it bills), an <em>interest profile</em> (how it grows), a <em>secrecy flag</em>, and a <em>side</em>.</p>
+<p><strong>The ledger is two-sided:</strong></p>
+<ul>
+<li><strong>Payables</strong> — what you owe. Debt service, strings on funding, corroded governance, secrets that can be exposed.</li>
+<li><strong>Receivables</strong> — favors and pledges owed <em>to you</em>, held <strong>per-actor</strong>. <strong>Influence is not a resource</strong> (decided by Pip): there is no global influence number; there is leverage over <em>this</em> lab, a favor owed by <em>that</em> actor. Reputation remains the only global social currency. Receivables carry <strong>counterparty risk</strong> — a pledge is not a vote until cast (see ADR-0007).</li>
+</ul>
+<p><strong>Secrecy and exposure:</strong> entries flagged <code>secret</code> can be <em>exposed</em> by rival actions or scheduled causes; exposure converts them into reputation/governance damage or a blackmail offer — which is itself a new liability, continuing the chain. Blackmail is ledger <strong>content</strong> (one event type), not a system.</p>
+<p><strong>Desperation levers are the catch-up system:</strong> within-run recovery options exist but are priced as desperation, never offered as rubber-banding — every claw-back trades a visible resource for a corrosive liability (the payroll coinflip → governance ↓ → bribery vulnerability → blackmail chain). Catch-up and tragedy-generation are the same mechanism. There is no other catch-up: runs are short-median, and the next run is the catch-up.</p>
+<p><strong>Staff ride on this system:</strong> staff are AP-leverage with liability riders (ADR-0008) — a disgruntled ex-researcher is a secret entry, a whistleblower is an exposure event, a manager is insurance that shortens fuses on people-liabilities.</p>
+<h2>What this system delivers structurally</h2>
+<ul>
+<li><strong>The exponential turn ladder:</strong> turn 15 is hard because of everything you did to reach turn 12 — deep runs are exactly as heroic as the PoE-badge philosophy needs.</li>
+<li><strong>Death attributability:</strong> your killer is traceable through your own ledger — "this is the bill for turn 2," manufactured structurally rather than scripted.</li>
+<li><strong>Skill expression:</strong> debt portfolio selection and sequencing — which liabilities you take, in what order, which you repay before the fuse burns. Triage-in-time.</li>
+<li><strong>The mortality guarantee candidate</strong> (ADR-0002): compounding interest ensures no immortal runs.</li>
+</ul>
+<h2>Boundary conditions (the failure modes to design against)</h2>
+<ul>
+<li>If every fix breeds a bigger problem, the game degenerates into an inevitability queue. Liabilities must be <strong>heterogeneous</strong>: different fuses, different currencies, some repayable, some only transformable.</li>
+<li>A disciplined player must genuinely be able to run a <strong>lean ledger at the cost of tempo</strong> — the clean-hands path must exist even if it rarely tops boards.</li>
+<li><strong>No parallel economy.</strong> The ledger reads/writes existing resources (money, reputation, governance, AP, doom) only. If an implementation needs a new player-facing currency, it has left the design.</li>
+</ul>
+<h2>Beacons served / violated</h2>
+<ul>
+<li>Serves: MaRo Interaction (reads/writes ≥4 existing resources), Inertia (fuses are clocks), Surprise (exposures, defections), Catch-Up (desperation levers). Rams #10 (four issues, one mechanic).</li>
+<li>At risk: Rams #5 (ledger UI must not become a spreadsheet — visibility of your own ledger can itself be partial; see inward-SA deferral, ADR-0008).</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

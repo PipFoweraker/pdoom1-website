@@ -27,7 +27,11 @@
   display: inline-block;
   text-decoration: none;
   background: var(--accent-primary);
-  color: #fff;
+  /* Dark text on the bright accent, NOT white. White on #00ff41 is 1.37:1 --
+     a WCAG failure at any size. The event-page template already redefines
+     .cta-button with a dark foreground and so was never affected; every
+     hand-written page inherited the unreadable version from here. */
+  color: #1a1a1a;
   padding: 0.5rem 1rem;
   border-radius: 4px;
 }
@@ -53,14 +57,17 @@
   border-radius: 3px;
 }
 
+/* Dark-theme status pills. These were the last two light-theme literals left
+   in this file after the whiteout fix -- pale blue/green chips on a dark
+   terminal page. This file loads LAST on ~2,203 pages, so they won. */
 .status.available {
-  background: #e6f8ff;
-  color: #0077aa;
+  background: rgba(0, 255, 65, 0.12);
+  color: #00ff41;
 }
 
 .status.synced {
-  background: #eef7e6;
-  color: #0a6f2f;
+  background: rgba(76, 175, 80, 0.15);
+  color: #7bd77f;
 }
 
 .newsletter-input {

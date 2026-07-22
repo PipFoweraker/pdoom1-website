@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0015 — No printed doom deltas: doom is computed from world state | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0015-no-printed-doom-deltas.html" />
+	<meta name="description" content="The current build carries literal doom bumps on event/action definitions (legacy of the prototype engine). Pip&#x27;s ruling: &quot;hardcoding doom counters into thi" />
+	<meta property="og:title" content="ADR-0015 — No printed doom deltas: doom is computed from world state | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="The current build carries literal doom bumps on event/action definitions (legacy of the prototype engine). Pip&#x27;s ruling: &quot;hardcoding doom counters into thi" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0015-no-printed-doom-deltas.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0015 — No printed doom deltas: doom is computed from world state</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED (Pip confirmed 2026-07-13); intermediary vocabulary owed (DQ-21) &middot; <strong>Decided:</strong> 2026-07-13</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED (Pip confirmed 2026-07-13); intermediary vocabulary owed (DQ-21)</li>
+<li><strong>Date:</strong> 2026-07-13</li>
+</ul>
+<h2>Context</h2>
+<p>The current build carries literal doom bumps on event/action definitions (legacy of the prototype engine). Pip's ruling: <em>"hardcoding doom counters into things seems really like a legacy design philosophy and as we get sophisticated things should defer to, like, having impacts on things that have impacts on doom so we move more towards downstream effects rather than single source-destination number bumps."</em></p>
+<p>Timing evidence: the 2026-07-13 death-attribution finding showed accounting breaks exactly where causality goes indirect (debt deaths mis-filed as doom/cash; <code>desperation_spam</code> 3→16 ledger deaths corrected). The L6 root-cause classifier now follows chains — the instrument that makes indirection safe exists.</p>
+<h2>Decision</h2>
+<ol>
+<li><strong>No action or event definition carries a literal doom field.</strong> Effects target intermediary world-state variables (e.g. lab capability, deployment pressure, governance quality, public salience — v1 vocabulary owed, DQ-21); doom is computed from world state each day tick.</li>
+<li><strong>The intermediary vocabulary is curated.</strong> Adding an intermediary is an ADR-grade act — the restraint working-rule extends: a new intermediary must prove it can't be a read/write on existing ones.</li>
+<li><strong>Guard rule: no unattributable doom.</strong> Every doom-affecting intermediary must be reachable by the L6 attribution chain; indirection may never produce "I don't know what killed me" (ADR-0004 lead-time/legibility).</li>
+<li><strong>The doom function is structure; intermediary pricing is numbers.</strong> The function is patched rarely and publicly (it is the game's executable thesis about AI risk — the community can argue with it the way they argue balance patches); event/action magnitudes on intermediaries are the freely-tuned layer. MtG framing: events are cards, the doom function is the rules.</li>
+<li><strong>Migration:</strong> the L9 Balance data schema deprecates direct doom fields; the L1 re-denomination pass (ADR-0009 consequence) performs the conversion; exploit sweeps are the regression instrument.</li>
+</ol>
+<h2>Beacons served / violated</h2>
+<ul>
+<li><strong>Rams #6 (honest):</strong> mirrors reality — nothing "adds doom" directly; things change capabilities, incentives, and governance, which change hazard.</li>
+<li><strong>Rams #10 (as little design as possible):</strong> N scattered doom dials collapse to K shared intermediaries + one function, K ≪ N.</li>
+<li><strong>MaRo Interaction:</strong> shared intermediaries make mechanics read/write each other for free — an event boosting deployment pressure interacts with everything else touching deployment pressure, instead of owning a private pipe to doom.</li>
+</ul>
+<h2>Interaction contract</h2>
+<p>Reads/writes: <strong>ADR-0005</strong> (extends author-causes-never-outcomes from designer discipline to schema discipline), <strong>L9 Balance schema</strong> (field deprecation), <strong>L6 attribution</strong> (must traverse intermediaries — the guard's enforcement point), <strong>exploit-finder</strong> (regression on migration; future sweeps tune intermediary prices), <strong>ADR-0013 cost-of-debt</strong> (debt cascades route through intermediaries, matching the corrected death-attribution picture).</p>
+<h2>Rejected alternatives</h2>
+<ul>
+<li><strong>Status quo (per-definition doom deltas):</strong> distributed hardcoding — dozens of tuning sites, exploit surface everywhere, zero cross-event interaction, and attribution can only say "this event had +2 printed on it."</li>
+<li><strong>Hybrid (some direct, some routed):</strong> rejected — exceptions erode the guard rule and make the schema dishonest about where doom comes from.</li>
+</ul>
+<h2>Consequences / open questions</h2>
+<ul>
+<li><strong>DQ-21:</strong> v1 intermediary vocabulary — starter set + semantics, needed before the L1 data conversion.</li>
+<li>Doom-function form (level vs hazard-rate composition) — design with DQ-21.</li>
+<li>Balance levers get coarser by design: you fix an overtuned event by changing its intermediary magnitudes (its stats), never by editing the rules. Known cost, accepted.</li>
+<li>Single-point-of-failure risk: if the doom function is wrong, everything is wrong. Mitigation: it's one inspectable function (arguable, testable), and sweeps regress it.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

@@ -1,16 +1,34 @@
 name: Post GitHub Issue to Forum
 
+# ISSUES TRIGGER REMOVED 2026-07-22. This fired on EVERY issue opened, hung for
+# ~132s trying to reach 208.113.200.215:4567 (firewalled), failed, then tried to
+# post a "forum post failed" warning comment onto your issue and got 403 because
+# the job has no `permissions: issues: write`. 0 successes across all runs.
+#
+# Two things must be true before restoring the trigger:
+#   1. forum.pdoom1.com must resolve. It currently has NO DNS record, even though
+#      NodeBB IS live and serving on port 80 of 208.113.200.215 with no hostname
+#      and no TLS. NODEBB_API_TOKEN / NODEBB_API_URL are also unset.
+#   2. The category IDs below are still TODO placeholders.
+#
+# Restoring the trigger WITHOUT fixing the permissions would be worse than today:
+# it would succeed at stamping a scary automated warning banner onto every issue.
 on:
-  issues:
-    types: [opened, labeled]
+  workflow_dispatch: {}
+
+permissions:
+  # The failure handler comments on the issue; without this it 403s and the
+  # failure goes unreported -- which is how 50 failures stayed invisible.
+  contents: read
+  issues: write
 
 jobs:
   post-to-forum:
     runs-on: ubuntu-latest
-    # Only run for new issues or when specific labels are added
-    if: |
-      github.event.action == 'opened' ||
-      (github.event.action == 'labeled' && contains(github.event.label.name, 'forum-post'))
+    # The previous guard tested github.event.action for 'opened'/'labeled'.
+    # With only workflow_dispatch left, that context is empty and the job would
+    # silently skip every manual run -- a trap for whoever fixes the DNS and
+    # tries to test. Removed rather than left to mislead.
 
     steps:
       - name: Check if issue should be posted to forum
