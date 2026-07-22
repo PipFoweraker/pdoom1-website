@@ -1,9 +1,17 @@
 name: Sync Airtable to JSON
 
+# SCHEDULE REMOVED 2026-07-22. This ran every 6 hours and failed 1,264 times
+# consecutively -- it has never once succeeded. The run log prints the env block
+# with `AIRTABLE_API_KEY:` blank: the four AIRTABLE_* secrets were never set, and
+# there is no Airtable base behind this. Four red X's a day for an integration
+# that does not exist is the alert-fatigue generator that will mask a real
+# failure during the alpha.
+#
+# Note also that scripts/sync_airtable.py syncs BLOG/CHANGELOG rows, not
+# contributor data -- the "Contributor CRM" framing in issue #70 is aspirational.
+# Delete this workflow and the script unless an Airtable base actually appears.
 on:
   workflow_dispatch: {}
-  schedule:
-    - cron: '0 */6 * * *'
 
 permissions:
   contents: write

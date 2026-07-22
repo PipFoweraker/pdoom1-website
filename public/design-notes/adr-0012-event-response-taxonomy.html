@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0012 — Event response taxonomy: un-snoozable, deferrable, expiring | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0012-event-response-taxonomy.html" />
+	<meta name="description" content="ADR-0009 gave every response window a DEFER option routing through the Ledger. Left uniform, DEFER becomes a universal snooze button and the reserve-vs-gre" />
+	<meta property="og:title" content="ADR-0012 — Event response taxonomy: un-snoozable, deferrable, expiring | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="ADR-0009 gave every response window a DEFER option routing through the Ledger. Left uniform, DEFER becomes a universal snooze button and the reserve-vs-gre" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0012-event-response-taxonomy.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0012 — Event response taxonomy: un-snoozable, deferrable, expiring</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED &middot; <strong>Decided:</strong> 2026-07-12</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED</li>
+<li><strong>Date:</strong> 2026-07-12</li>
+</ul>
+<h2>Context</h2>
+<p>ADR-0009 gave every response window a DEFER option routing through the Ledger. Left uniform, DEFER becomes a universal snooze button and the reserve-vs-greed gamble loses its sting (why hold reserve when everything waits?). Pip's ruling drew the taxonomy from real-world texture: some things wait expensively, some don't wait at all, and some correctly get no response.</p>
+<h2>Decision</h2>
+<p>Four event classes:</p>
+<ol>
+<li><strong>Un-snoozable</strong> — the window closes this turn: HANDLE (reserve or cannibalize) or IGNORE at list price; DEFER is not for sale. Pip's classes: <strong>movement of people across state borders; emergency services; threat of legal action; scenario/story events.</strong> This class is what keeps reserve worth holding.</li>
+<li><strong>Deferrable</strong> — DEFER mints a Ledger entry with a carrying cost priced per-event by the ADR-0013 engine.</li>
+<li><strong>Standing offers</strong> — open for N turns, then expire to a natural no-engage (possible reputation loss where a response was expected). Expiry mints <strong>no</strong> ledger entry — the offer simply evaporates.</li>
+<li><strong>No-action-correct</strong> — some events legitimately deserve nothing. Taking no action is not always a mistake, and the game must not punish it uniformly.</li>
+</ol>
+<p><strong>The infinite to-do list is diegetic.</strong> Standing offers and deferrals may accumulate past what the UI foregrounds; items falling out of visibility is a <em>real phenomenon being modeled</em>, not a UI bug. Pip, verbatim: <em>"Doom Arrives With Your To-Do List Being Infinitely Long Still is a real possibility that I'm not shy of playing into."</em></p>
+<p><strong>The ledger's kill path is a cascade, not a death screen.</strong> Entries are called due; if you can't pay, consequences execute: unpaid staff work on for a period suffering damage → leave → work lost/abandoned → severe reputation penalties → credit lockout → funding starvation → rival pulls ahead → doom spikes. The ledger doesn't kill you — it feeds you to the thing that does, legibly. Register: <strong>tragedy</strong> ("I saw it coming"), which requires the player to have had a <em>real chance</em> to raise money in the interim — hence:</p>
+<p><strong>Fundraising has lead time.</strong> Money lands turns after the raise begins (ADR-0009's duration rule applied to cash). Core tension named: <strong>spiky-in, smooth-out</strong> cash flow, with cash as the game's most fungible resource.</p>
+<h2>Beacons served / violated</h2>
+<ul>
+<li><strong>Rams #6 (honest):</strong> the taxonomy mirrors real deferability; the infinite backlog is played straight instead of hidden.</li>
+<li><strong>Rams #10:</strong> standing offers and no-action events need no ledger machinery at all; only true deferrals touch the flagship.</li>
+<li><strong>MaRo Interaction:</strong> un-snoozables make reserve (ADR-0009) and event content interlock; the cascade chains ledger → staff → reputation → funding → rival → doom.</li>
+</ul>
+<h2>Interaction contract</h2>
+<p>Reads/writes: <strong>response windows</strong> (ADR-0009), <strong>Ledger</strong> (defer intake + called-due cascade), <strong>reputation</strong> (expiry losses, default penalties), <strong>staff</strong> (unpaid-work damage, departures, abandoned work), <strong>rival pipeline</strong> (funding starvation → rival lead), <strong>ADR-0013 pricing engine</strong> (carrying costs).</p>
+<h2>Rejected alternatives</h2>
+<ul>
+<li><strong>Universal DEFER</strong> (everything snoozable): kills the reserve gamble.</li>
+<li><strong>Ledger death as its own game-over type:</strong> rejected — defaults cascade into the existing doom/cash deaths through legible intermediate wreckage.</li>
+<li><strong>Expiry-as-liability</strong> (expired offers mint entries): rejected — evaporation is the honest model for most offers, and the ledger should carry <em>chosen</em> debts.</li>
+</ul>
+<h2>Consequences / open questions</h2>
+<ul>
+<li><strong>Event content schema:</strong> class field, expiry N, response-expected flag, carrying-cost hook.</li>
+<li><strong>Exploit-finder must attribute deaths to root-cause chains</strong> — a doom death downstream of a default is a <em>ledger</em> death for balance accounting; "dies of doom" currently hides the cascade. Instrument before tuning.</li>
+<li><strong>UI (backlog'd):</strong> per-resource per-turn delta indicators; event-log improvement — the one human ledger-death specimen (turn 23) was low-resolution because the player couldn't see the spiral; legibility work is what makes future specimens usable.</li>
+<li>Class shares per era (how much of the event stream is un-snoozable) — a tuning surface, sweep-driven.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0004 — SA amended: channels with provenance, lead-time semantics, decision-flip test | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0004-sa-channels-lead-time.html" />
+	<meta name="description" content="ADR-0001 proposed &quot;spending buys sight&quot; as the flagship sink. The workshop stress-tested it against Pip&#x27;s peak verb — &quot;triaging in a race against death&quot; — " />
+	<meta property="og:title" content="ADR-0004 — SA amended: channels with provenance, lead-time semantics, decision-flip test | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="ADR-0001 proposed &quot;spending buys sight&quot; as the flagship sink. The workshop stress-tested it against Pip&#x27;s peak verb — &quot;triaging in a race against death&quot; — " />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0004-sa-channels-lead-time.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0004 — SA amended: channels with provenance, lead-time semantics, decision-flip test</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED — this amends and accepts ADR-0001; build second, after ADR-0003 &middot; <strong>Decided:</strong> 2026-07-04</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED — this amends and accepts ADR-0001; build second, after ADR-0003</li>
+<li><strong>Date:</strong> 2026-07-04</li>
+</ul>
+<h2>Context</h2>
+<p>ADR-0001 proposed "spending buys sight" as the flagship sink. The workshop stress-tested it against Pip's peak verb — <em>"triaging in a race against death"</em> — and against the realization: <em>"I am used to thinking about the game with universal powers as god mode / admin, whereas the player mostly starts ignorant about the world the same way a fresh spawn in Tarkov / fresh game of Civilization / entirely fresh run of some Roguelike."</em> The hypothesis survives, amended in four ways.</p>
+<h2>Amendments</h2>
+<h3>1. Simulate everything; gate only the view</h3>
+<p>The world-model always runs at full fidelity — every rival lab, every doom source, computed every turn exactly as the admin-mode intuition imagines. SA purchases never add simulation; they only remove blindfolds from state that already exists. The discovered/undiscovered opponent mechanic already works this way; this generalizes it. Implementation is therefore UI gating plus per-source visibility flags, not a subsystem.</p>
+<h3>2. SA is not a meter; it is channels with provenance</h3>
+<p>Espionage-sight, alliance-sight, media-sight, research-sight — each reveals overlapping but non-identical slices of the same sim, each priced in a different currency, each with side effects (espionage corrodes governance and burns alliance standing; alliance-sight is slow, public, and obligates you via ledger entries; media-sight is cheap and noisy). Channel investment is a <strong>build-identity axis</strong> — the run's founding-location choice.</p>
+<h3>3. Lead-time semantics: the game must explain your death before it kills you</h3>
+<p>From Pip: <em>"Ideally the late game will bring with it some forcing of understanding onto the player as to how they're going to lose (modulo their efforts to stop it?)"</em> — so doom sources become legible <strong>for free as they become lethal</strong>. What SA purchases buy is not exclusive truth but <strong>lead time</strong>: everyone eventually sees the thing killing them; paying means seeing it while you can still act. This resolves the deduction-vs-triage tension: sight serves triage, not puzzle pleasure.</p>
+<h3>4. The acceptance test is decision-flip rate</h3>
+<p>ADR-0001's constraint ("every unit of sight must open a decision") was too weak for a triage game. Sharpened: <strong>the fraction of reveals that change the player's next action or reorder their priorities.</strong> A reveal that confirms the existing plan feels like a tax; a reveal that flips the plan feels like the game. Instrument playtests (log declared-intent-before-reveal vs action-after-reveal); kill any SA feature whose flip rate stays low. This is a falsifiable design criterion — measure it, don't eyeball it.</p>
+<h2>The honesty boundary (Papers, Please register)</h2>
+<p>Conspiracy-tinged weirdness lives in the <strong>provenance of information, never in the sim lying about itself</strong>: redacted documents, cranks who are occasionally right, a source who might be a plant — all on-theme, because real AI-race epistemics look like that. Instruments may be <em>fallible</em> (rival info ops are thematically perfect), but the game must be honest about <em>how</em> they can be fooled, and counter-intelligence is its own purchase. Rams #6 applied one level up: honest about dishonesty.</p>
+<h2>Beacons</h2>
+<p>As ADR-0001, plus: the lead-time rule protects against the one loss-feeling Pip did not choose ("I still don't know what killed me" — horror), while preserving the one he did (tragedy: "I saw it coming and couldn't stop it").</p>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

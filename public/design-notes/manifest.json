@@ -1,0 +1,144 @@
+{
+  "count": 17,
+  "generated_by": "scripts/sync/sync-design-notes.py",
+  "records": [
+    {
+      "date": "2026-07-04",
+      "id": "ADR-0001-spending-buys-sight",
+      "scrubbed_items": 2,
+      "slug": "adr-0001-spending-buys-sight",
+      "status": "ACCEPTED, as amended by ADR-0004 (channels/provenance, lead-time",
+      "title": "ADR-0001 \u2014 Situational Awareness as the primary sink (\"spending buys sight\")"
+    },
+    {
+      "date": "2026-07-04",
+      "id": "ADR-0002-scoring-turns-survived",
+      "scrubbed_items": 1,
+      "slug": "adr-0002-scoring-turns-survived",
+      "status": "ACCEPTED (Pip, in-session)",
+      "title": "ADR-0002 \u2014 Scoring: turns survived, lexicographic doom-integral tiebreak, flows only"
+    },
+    {
+      "date": "2026-07-04",
+      "id": "ADR-0003-liability-ledger",
+      "scrubbed_items": 1,
+      "slug": "adr-0003-liability-ledger",
+      "status": "ACCEPTED as design; build first among the new systems",
+      "title": "ADR-0003 \u2014 The Liability Ledger (two-sided): every mitigation is a loan"
+    },
+    {
+      "date": "2026-07-04",
+      "id": "ADR-0004-sa-channels-lead-time",
+      "scrubbed_items": 1,
+      "slug": "adr-0004-sa-channels-lead-time",
+      "status": "ACCEPTED \u2014 this amends and accepts ADR-0001; build second, after ADR-0003",
+      "title": "ADR-0004 \u2014 SA amended: channels with provenance, lead-time semantics, decision-flip test"
+    },
+    {
+      "date": "2026-07-04",
+      "id": "ADR-0005-emergent-waves-seed-schedules",
+      "scrubbed_items": 1,
+      "slug": "adr-0005-emergent-waves-seed-schedules",
+      "status": "ACCEPTED",
+      "title": "ADR-0005 \u2014 Emergent doom waves: author causes, never outcomes; seed = RNG + schedule"
+    },
+    {
+      "date": "2026-07-04",
+      "id": "ADR-0006-replay-artifact-backend",
+      "scrubbed_items": 1,
+      "slug": "adr-0006-replay-artifact-backend",
+      "status": "ACCEPTED",
+      "title": "ADR-0006 \u2014 The replay string is the canonical run artifact; backend wiring order"
+    },
+    {
+      "date": "2026-07-04",
+      "id": "ADR-0007-alliances-third-client",
+      "scrubbed_items": 1,
+      "slug": "adr-0007-alliances-third-client",
+      "status": "ACCEPTED as design; build **third**, strictly after ADR-0003 and ADR-0004",
+      "title": "ADR-0007 \u2014 Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight)"
+    },
+    {
+      "date": "2026-07-04",
+      "id": "ADR-0008-deferrals-and-rejections",
+      "scrubbed_items": 1,
+      "slug": "adr-0008-deferrals-and-rejections",
+      "status": "ACCEPTED \u2014 negative decisions recorded so they survive",
+      "title": "ADR-0008 \u2014 Deferrals, folds, and rejections (the negative space of workshop #1)"
+    },
+    {
+      "date": "2026-07-12",
+      "id": "ADR-0009-plan-months-two-speeds",
+      "scrubbed_items": 1,
+      "slug": "adr-0009-plan-months-two-speeds",
+      "status": "ACCEPTED",
+      "title": "ADR-0009 \u2014 Turn structure: plan-months, two decision speeds, day as resolution tick"
+    },
+    {
+      "date": "2026-07-12",
+      "id": "ADR-0010-adoption-routing",
+      "scrubbed_items": 1,
+      "slug": "adr-0010-adoption-routing",
+      "status": "ACCEPTED",
+      "title": "ADR-0010 \u2014 Adoption routing (soft-with-teeth): doom bends where work is adopted"
+    },
+    {
+      "date": "2026-07-12",
+      "id": "ADR-0011-effort-economy",
+      "scrubbed_items": 1,
+      "slug": "adr-0011-effort-economy",
+      "status": "ACCEPTED (shape); researcher archetype roster content owed (DQ-15)",
+      "title": "ADR-0011 \u2014 The effort economy: founder hours, staff lanes, manager compression"
+    },
+    {
+      "date": "2026-07-12",
+      "id": "ADR-0012-event-response-taxonomy",
+      "scrubbed_items": 1,
+      "slug": "adr-0012-event-response-taxonomy",
+      "status": "ACCEPTED",
+      "title": "ADR-0012 \u2014 Event response taxonomy: un-snoozable, deferrable, expiring"
+    },
+    {
+      "date": "2026-07-12",
+      "id": "ADR-0013-cost-of-debt-engine",
+      "scrubbed_items": 1,
+      "slug": "adr-0013-cost-of-debt-engine",
+      "status": "ACCEPTED (shape; numbers owed to the sweep)",
+      "title": "ADR-0013 \u2014 Financing instruments & the cost-of-debt engine"
+    },
+    {
+      "date": "2026-07-12",
+      "id": "ADR-0014-conferences-presence-location",
+      "scrubbed_items": 1,
+      "slug": "adr-0014-conferences-presence-location",
+      "status": "ACCEPTED (v1 shape; yields/numbers owed to the sweep)",
+      "title": "ADR-0014 \u2014 Conferences, presence, and minimal location"
+    },
+    {
+      "date": "2026-07-13",
+      "id": "ADR-0015-no-printed-doom-deltas",
+      "scrubbed_items": 1,
+      "slug": "adr-0015-no-printed-doom-deltas",
+      "status": "ACCEPTED (Pip confirmed 2026-07-13); intermediary vocabulary owed (DQ-21)",
+      "title": "ADR-0015 \u2014 No printed doom deltas: doom is computed from world state"
+    },
+    {
+      "date": "2026-07-13",
+      "id": "ADR-0016-league-metabolism",
+      "scrubbed_items": 1,
+      "slug": "adr-0016-league-metabolism",
+      "status": "ACCEPTED (shape; pipeline build + league-notes format owed)",
+      "title": "ADR-0016 \u2014 League metabolism: the game trails reality by one month"
+    },
+    {
+      "date": "2026-07-17",
+      "id": "ADR-0017-anti-hollow-test-strategy",
+      "scrubbed_items": 1,
+      "slug": "adr-0017-anti-hollow-test-strategy",
+      "status": "ACCEPTED",
+      "title": "ADR-0017 -- Anti-hollow test strategy (load-time smoke + property-based invariants)"
+    }
+  ],
+  "source_path": "docs/game-design/decisions",
+  "source_repo": "PipFoweraker/pdoom1"
+}

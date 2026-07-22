@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0006 — The replay string is the canonical run artifact; backend wiring order | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0006-replay-artifact-backend.html" />
+	<meta name="description" content="ADR-0006 — The replay string is the canonical run artifact; backend wiring order" />
+	<meta property="og:title" content="ADR-0006 — The replay string is the canonical run artifact; backend wiring order | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="ADR-0006 — The replay string is the canonical run artifact; backend wiring order" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0006-replay-artifact-backend.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0006 — The replay string is the canonical run artifact; backend wiring order</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED &middot; <strong>Decided:</strong> 2026-07-04</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED</li>
+<li><strong>Date:</strong> 2026-07-04</li>
+</ul>
+<h2>Context (what archaeology found)</h2>
+<p>The backend is ~80% built, not aspirational. Survived the Godot migration: seeded deterministic RNG through <code>godot/scripts/core/game_state.gd</code>; a fully implemented cumulative SHA-256 hash chain in <code>godot/autoload/verification_tracker.gd</code> (partially wired — <code>record_rng_outcome</code> live, <code>record_action</code> tests-only, final hash printed at game-over "for future leaderboard integration"); local per-seed JSON leaderboard (<code>godot/scripts/leaderboard.gd</code>); headless <code>baseline_simulator.gd</code>. In <code>pdoom1-website</code>: <code>api-server-v2.py</code> with <code>POST /api/scores/submit</code>, per-seed boards, JWT, Postgres migrations incl. verification-hash schema, plausibility checks — with static per-seed JSON boards on Netlify as the actually-deployed artifact. <code>pdoom1-webclient</code> has a TypeScript port of the tracker and an empty <code>src/api/</code>.</p>
+<p><strong>The correction:</strong> the "run any input string through a verifier" memory describes the full input-string replay design (<code>docs/REPLAY_VERIFICATION_SYSTEM.md</code>) — the one component never built in either era. A hash chain proves the client computed a self-consistent transcript; it does <strong>not</strong> prove the transcript describes a legal game. Only re-simulation from inputs verifies.</p>
+<h2>Decision</h2>
+<p><strong>The input-string replay is the canonical run artifact — anti-cheat, share format, and bug-repro format in one object.</strong> Rationale beyond anti-cheat: the community philosophy (<em>"only the vastness of the design space will be what stops a determined player just brute-forcing their way to a high score… although I would laud the initiative!"</em>) makes verification the only law — coherent only if runs are replayable. And the "best loss" (inventing an opening the ladder adopts) requires openings to be <strong>shareable to be adoptable</strong>: the replay string is chess PGN — paste-able, forum-postable, verifiable text. The pygame-era compact command-string format (<code>docs/technical/ COMMAND_STRING_CONTROLLER.md</code>) is the starting point for serialization.</p>
+<p><strong>Two-tier verification:</strong> hash chain stays as the cheap fingerprint for casual submission; headless re-simulation (Godot, as <code>baseline_simulator.gd</code> proves viable) backs disputed and top scores. For the ~30-nerd community, static-JSON boards plus a submit path are sufficient; <strong>the Postgres apparatus stays parked.</strong></p>
+<h2>Wiring order (implementation lane)</h2>
+<ol>
+<li>Wire <code>record_action</code> into the live action pipeline (currently tests-only).</li>
+<li>Serialize runs to the command-string format (seed + version + action string).</li>
+<li>Import-and-replay path (load a string, re-simulate, compare final hash/score).</li>
+<li>Submission to the static JSON boards (Netlify path already deployed).</li>
+<li>(Parked) Postgres API server; revisit only if community scale demands it.</li>
+</ol>
+<h2>Consequences</h2>
+<ul>
+<li>Scores keyed <code>(seed, game_version)</code> (ADR-0002) are exactly what replay needs: a replay is only valid against its version's engine.</li>
+<li>Bots and brute-forcers are players, not cheaters, provided their runs verify. Tool- assisted play is welcomed culture, not a threat model.</li>
+<li><code>pdoom1-ui</code> (empty directory) is deletion-candidate debris; <code>pdoom1-webclient</code> integration is out of scope until the Godot path is wired.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

@@ -1604,56 +1604,51 @@ t	.hero {
 				currentVersion = versionMatch.trim();
 			}
 
-			// Track Windows downloads
-			const windowsBtn = document.getElementById('download-windows');
-			if (windowsBtn) {
-				windowsBtn.addEventListener('click', function() {
-					if (window.plausible) {
-						plausible('Download', {
-							props: {
-								version: currentVersion,
-								platform: 'Windows',
-								file: 'PDoom-Windows.zip'
-							}
-						});
+			// The download buttons point at github.com, so the click leaves our
+			// analytics behind: GitHub reports asset download counts but no
+			// referrer. That makes the click event the ONLY place a download can
+			// ever be joined to the channel that produced it, so the source
+			// travels with the event rather than relying on session stitching.
+			function attributionProps() {
+				const params = new URLSearchParams(location.search);
+				const utmSource = params.get('utm_source');
+				let referrer = 'direct';
+				if (utmSource) {
+					referrer = 'utm:' + utmSource;
+				} else if (document.referrer) {
+					try {
+						referrer = new URL(document.referrer).hostname;
+					} catch (e) {
+						referrer = 'unknown';
 					}
-					console.log('Download tracked: Windows', currentVersion);
-				});
+				}
+				return {
+					source: referrer,
+					campaign: params.get('utm_campaign') || 'none'
+				};
 			}
 
-			// Track macOS downloads
-			const macosBtn = document.getElementById('download-macos');
-			if (macosBtn) {
-				macosBtn.addEventListener('click', function() {
-					if (window.plausible) {
-						plausible('Download', {
-							props: {
-								version: currentVersion,
-								platform: 'macOS',
-								file: 'PDoom.app.zip'
-							}
-						});
-					}
-					console.log('Download tracked: macOS', currentVersion);
-				});
-			}
+			const TARGETS = [
+				{ id: 'download-windows', platform: 'Windows', file: 'PDoom-Windows.zip' },
+				{ id: 'download-macos',   platform: 'macOS',   file: 'PDoom.app.zip' },
+				{ id: 'download-linux',   platform: 'Linux',   file: 'PDoom.x86_64' }
+			];
 
-			// Track Linux downloads
-			const linuxBtn = document.getElementById('download-linux');
-			if (linuxBtn) {
-				linuxBtn.addEventListener('click', function() {
+			TARGETS.forEach(function(target) {
+				const btn = document.getElementById(target.id);
+				if (!btn) return;
+				btn.addEventListener('click', function() {
 					if (window.plausible) {
 						plausible('Download', {
-							props: {
+							props: Object.assign({
 								version: currentVersion,
-								platform: 'Linux',
-								file: 'PDoom.x86_64'
-							}
+								platform: target.platform,
+								file: target.file
+							}, attributionProps())
 						});
 					}
-					console.log('Download tracked: Linux', currentVersion);
 				});
-			}
+			});
 		}
 	</script>
 

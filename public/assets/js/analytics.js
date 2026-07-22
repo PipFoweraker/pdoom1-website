@@ -1,132 +1,124 @@
 /**
- * Privacy-Preserving Analytics Integration
- * 
- * This module provides a lightweight, privacy-first analytics solution
- * for the p(Doom)1 website. It uses Plausible Analytics by default.
- * 
- * Features:
- * - No cookies
- * - No personal data collection
- * - GDPR compliant by default
- * - Respects Do Not Track
- * - Easy opt-out mechanism
+ * Analytics consent shim for the p(Doom)1 website.
+ *
+ * IMPORTANT -- this file does NOT load an analytics script, and must not.
+ * The tracker is the self-hosted Plausible tag hardcoded into every page's
+ * <head>:
+ *     https://analytics.pdoom1.com/js/script.<extensions>.js
+ *
+ * History (the bug this file used to be): this module injected a SECOND
+ * tracker from plausible.io (the CLOUD service, where pdoom1.com is not a
+ * registered site). Plausible's tracker overwrites window.plausible on load,
+ * so whichever script landed last won. Roughly half the time the cloud one
+ * won and every custom event -- crucially the Download events on the
+ * homepage -- was posted to plausible.io and silently discarded. Pageviews
+ * were unaffected because each tracker fires its own before being clobbered.
+ * Do not reintroduce script injection here.
+ *
+ * What this file DOES do is own the opt-out, by driving the one flag the real
+ * tracker reads on every call: localStorage.plausible_ignore === 'true'.
+ * The previous code wrote a different key (pdoom1_analytics_optout), so the
+ * privacy page's opt-out button set a flag nothing consumed.
  */
 
-(function() {
+(function () {
   'use strict';
 
-  const ANALYTICS_CONFIG = {
-    enabled: true,
-    dataDomain: 'pdoom1.com',
-    scriptUrl: 'https://plausible.io/js/script.js',
-    optOutKey: 'pdoom1_analytics_optout'
-  };
+  // The key the Plausible tracker itself checks. Non-negotiable -- it is
+  // defined by the tracker, not by us.
+  var PLAUSIBLE_IGNORE_KEY = 'plausible_ignore';
 
-  /**
-   * Check if user has opted out of analytics
-   */
-  function hasOptedOut() {
+  // Our own record of an EXPLICIT user choice. Kept separate from the key
+  // above so that a Do-Not-Track-derived opt-out can be undone when the
+  // browser stops sending DNT, while an explicit opt-out persists.
+  var EXPLICIT_OPTOUT_KEY = 'pdoom1_analytics_optout';
+
+  function read(key) {
     try {
-      return localStorage.getItem(ANALYTICS_CONFIG.optOutKey) === 'true';
+      return localStorage.getItem(key);
+    } catch (e) {
+      return null; // Private mode / storage disabled.
+    }
+  }
+
+  function write(key, value) {
+    try {
+      if (value === null) {
+        localStorage.removeItem(key);
+      } else {
+        localStorage.setItem(key, value);
+      }
+      return true;
     } catch (e) {
       return false;
     }
   }
 
-  /**
-   * Check if Do Not Track is enabled
-   */
   function isDNTEnabled() {
-    return navigator.doNotTrack === '1' || 
+    return navigator.doNotTrack === '1' ||
            navigator.doNotTrack === 'yes' ||
            window.doNotTrack === '1';
   }
 
-  /**
-   * Initialize analytics if user hasn't opted out
-   */
-  function initAnalytics() {
-    // Respect user preferences
-    if (hasOptedOut()) {
-      console.log('[Analytics] User has opted out - analytics disabled');
-      return;
-    }
+  function hasExplicitlyOptedOut() {
+    return read(EXPLICIT_OPTOUT_KEY) === 'true';
+  }
 
-    // Respect Do Not Track
-    if (isDNTEnabled()) {
-      console.log('[Analytics] Do Not Track enabled - analytics disabled');
-      return;
-    }
-
-    // Load Plausible script
-    if (ANALYTICS_CONFIG.enabled) {
-      const script = document.createElement('script');
-      script.defer = true;
-      script.setAttribute('data-domain', ANALYTICS_CONFIG.dataDomain);
-      script.src = ANALYTICS_CONFIG.scriptUrl;
-      
-      script.onerror = function() {
-        console.warn('[Analytics] Failed to load analytics script');
-      };
-      
-      document.head.appendChild(script);
-      console.log('[Analytics] Privacy-preserving analytics initialized');
-    }
+  function isOptedOut() {
+    return hasExplicitlyOptedOut() || isDNTEnabled();
   }
 
   /**
-   * Opt out of analytics
+   * Reconcile the tracker's flag with the current intent. Runs on every page
+   * load, BEFORE the deferred <head> tracker executes -- this script is a
+   * plain (non-deferred) tag, so it runs during parse while deferred scripts
+   * wait for parsing to finish. That ordering is what makes honouring DNT
+   * real rather than decorative: the flag is set before the pageview fires.
    */
+  function sync() {
+    if (isOptedOut()) {
+      write(PLAUSIBLE_IGNORE_KEY, 'true');
+    } else if (read(PLAUSIBLE_IGNORE_KEY) === 'true') {
+      // Only clear a flag we would have set ourselves; if the visitor opted
+      // out explicitly, hasExplicitlyOptedOut() above already kept it set.
+      write(PLAUSIBLE_IGNORE_KEY, null);
+    }
+  }
+
   function optOut() {
-    try {
-      localStorage.setItem(ANALYTICS_CONFIG.optOutKey, 'true');
-      console.log('[Analytics] Successfully opted out');
-      return true;
-    } catch (e) {
-      console.error('[Analytics] Failed to opt out:', e);
-      return false;
-    }
+    var ok = write(EXPLICIT_OPTOUT_KEY, 'true');
+    sync();
+    return ok;
   }
 
-  /**
-   * Opt back in to analytics
-   */
   function optIn() {
-    try {
-      localStorage.removeItem(ANALYTICS_CONFIG.optOutKey);
-      console.log('[Analytics] Successfully opted in');
-      return true;
-    } catch (e) {
-      console.error('[Analytics] Failed to opt in:', e);
-      return false;
-    }
+    var ok = write(EXPLICIT_OPTOUT_KEY, null);
+    sync();
+    return ok;
   }
 
   /**
-   * Track custom event (if Plausible is loaded)
+   * Fire a custom event through the real (self-hosted) tracker.
+   * No-ops safely if the visitor opted out or the tracker was blocked.
    */
   function trackEvent(eventName, props) {
-    if (hasOptedOut() || isDNTEnabled()) {
-      return;
+    if (isOptedOut()) {
+      return false;
     }
-
-    if (typeof window.plausible !== 'undefined') {
-      window.plausible(eventName, { props: props });
+    if (typeof window.plausible === 'function') {
+      window.plausible(eventName, { props: props || {} });
+      return true;
     }
+    return false;
   }
 
-  // Expose public API
   window.pdoom1Analytics = {
     optOut: optOut,
     optIn: optIn,
-    hasOptedOut: hasOptedOut,
+    hasOptedOut: isOptedOut,
+    isDNTEnabled: isDNTEnabled,
     trackEvent: trackEvent
   };
 
-  // Initialize on DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAnalytics);
-  } else {
-    initAnalytics();
-  }
+  sync();
 })();

@@ -2,8 +2,20 @@ name: Weekly Scheduled Deployment
 
 on:
   # Scheduled deployment: Every Friday at 06:00 UTC (16:00 AEST/17:00 AEDT)
-  schedule:
-    - cron: '0 6 * * 5'  # Friday at 06:00 UTC
+  # SCHEDULE REMOVED 2026-07-22 -- manual dispatch only. Two reasons:
+  #
+  #  1. The dry-run guard cannot work on a schedule. Every deploy step is gated
+  #     on `if: github.event.inputs.dry_run != 'true'`, but `github.event.inputs`
+  #     is EMPTY for a `schedule` event, so the expression is always true. The
+  #     Friday 06:00 UTC run therefore performed a real, unattended
+  #     `rsync -avz --delete` to production (line ~220) while presenting itself
+  #     as guarded. A safety check that silently inverts on one trigger is worse
+  #     than no safety check.
+  #  2. It was redundant. auto-deploy-on-push.yml already rsyncs public/ to
+  #     DreamHost on every push to main and is green.
+  #
+  # If you restore a schedule, first replace every `github.event.inputs.X`
+  # reference with `inputs.X` (which respects declared defaults) and re-verify.
   
   # Manual trigger for testing or emergency deployments
   workflow_dispatch:

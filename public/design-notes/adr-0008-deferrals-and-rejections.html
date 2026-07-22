@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0008 — Deferrals, folds, and rejections (the negative space of workshop #1) | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0008-deferrals-and-rejections.html" />
+	<meta name="description" content="ADR-0008 — Deferrals, folds, and rejections (the negative space of workshop #1)" />
+	<meta property="og:title" content="ADR-0008 — Deferrals, folds, and rejections (the negative space of workshop #1) | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="ADR-0008 — Deferrals, folds, and rejections (the negative space of workshop #1)" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0008-deferrals-and-rejections.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--bg-tertiary: #3d3d3d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--text-muted: #aaaaaa;
+			--accent-primary: #00ff41;
+			--accent-secondary: #ff6b35;
+			--accent-danger: #ff4444;
+			--border-color: #444444;
+			--success-color: #4caf50;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0008 — Deferrals, folds, and rejections (the negative space of workshop #1)</h1>
+		<div class="meta"><strong>Status:</strong> ACCEPTED — negative decisions recorded so they survive &middot; <strong>Decided:</strong> 2026-07-04</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> ACCEPTED — negative decisions recorded so they survive</li>
+<li><strong>Date:</strong> 2026-07-04</li>
+</ul>
+<p>Deferrals are sequenced, not shelved; each carries its revisit trigger. Rejections are final unless a future session explicitly reopens them.</p>
+<h2>Folded (the idea lives, the system dies)</h2>
+<ul>
+<li><strong>Geopolitics</strong> → deflated into the <strong>cause library</strong> (ADR-0005): "export controls lapse," "national AI initiative funds rival_lab," "treaty conference convenes" are schedule entries fed by <code>pdoom-data</code>, zero new engine systems. <em>Line to hold:</em> the moment someone proposes persistent geopolitical <strong>state</strong> (relations meters, a world map), that is the isolated-system trap; it waits until the content version demonstrably runs out of expressive room.</li>
+<li><strong>Standalone management depth</strong> → staff are <strong>AP-leverage with liability riders</strong> (ADR-0003). Pip's ruling, preserved: <em>"these are the resources by which you get things done, given your tiny manual amount of hours per week (action points), you're going to hire costly humans who come with their own problems, bother."</em> Canon established: <strong>AP are the founder's personal hours</strong> — the one resource that never scales. Disgruntled ex-staff are secret ledger entries; whistleblowers are exposure events; managers are insurance shortening fuses on people-liabilities. Tone register for personnel problems: mild exasperation ("bother"), not HR-simulator gravity. <em>Revisit:</em> only if ledger-borne staff texture proves insufficient in playtests.</li>
+<li><strong>Blackmail</strong> → one exposure-event genre on secret ledger entries (ADR-0003), not a system.</li>
+</ul>
+<h2>Deferred (real, but sequenced behind the core)</h2>
+<ul>
+<li><strong>Inward SA</strong> (rivals running discovery on <em>your</em> ledger as a mirrored system): defer until the Ledger and outward SA prove out. The cheap version (secret entries + exposure events) ships with ADR-0003 and covers the hooks blackmail actually needs.</li>
+<li><strong>Player-chosen challenge modifiers at run start</strong> (PoE map mods / Balatro stakes): parked. Friction with lexicographic turns-scoring (you can't pay someone extra turns for hard mode) — would need separate boards or prestige flair per modifier set. <em>Revisit:</em> when the community exists and asks for it.</li>
+<li><strong>Office cosmetics / employee environment</strong>: parked as soft flavor money-sinks, available whenever a gentle sink is needed. No design work owed.</li>
+</ul>
+<h2>Rejected (final)</h2>
+<ul>
+<li><strong>Player-triggered disasters</strong> (SimCity disaster-menu style): hardness is baked into engine/seed settings, never a player-facing trigger. (Pip, explicitly.)</li>
+<li><strong>Victory condition / victory bonus</strong>: there is no winning, only time bought (ADR-0002).</li>
+<li><strong>Influence as a global resource</strong>: influence is the receivables column of the ledger, per-actor (ADR-0007).</li>
+<li><strong>Score terms valuing end-state stocks</strong>: anti-sinks, rejected on sight (ADR-0002).</li>
+</ul>
+<h2>Deliberately open (not deferred — undecided on purpose)</h2>
+<ul>
+<li><strong>Wall-clock pacing targets</strong> (median-death minutes; deep-run hours): held open by Pip pending playtests of the new systems. Constraints already fixed: the distribution is long-tailed ("several hundred turns" as the deep-run tail, median deaths early and cheap); dying at turn 25 must cost minutes, not hours; the early game must carry founding-location strategic weight <em>and</em> be fast to replay for experienced hands. <em>Revisit trigger:</em> after first playtests of Ledger + scoring rewire.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

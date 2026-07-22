@@ -1,10 +1,30 @@
 name: Extract DreamHost Analytics
 
+# PARKED 2026-07-22 -- do not re-enable the schedule without fixing the target.
+#
+# This workflow ran monthly from 2025-12 to 2026-07 and FAILED 8 out of 8 times,
+# silently: the `Create issue on failure` step could not report, because the job
+# lacked `issues: write` (fixed below), so nothing ever surfaced.
+#
+# Two independent faults:
+#   1. secrets.PDOOM_SSH_KEY is unset -- the setup step writes an empty .pem,
+#      so every scp fails and the script exits 1 with "No logs fetched".
+#   2. More fundamental: scripts/extract_analytics.py targets ubuntu@208.113.200.215,
+#      the DreamCompute VPS (forum + analytics + api). pdoom1.com is served from
+#      DreamHost SHARED hosting at 173.236.253.218. The VPS nginx logs therefore
+#      cannot contain pdoom1.com pageviews at all -- fixing the SSH key would
+#      still yield nothing. See CLAUDE.md "two different hosting targets".
+#
+# Replacement: pull from the self-hosted Plausible Stats API and commit a JSON
+# snapshot to public/data/analytics/. That also gives a git-versioned second copy
+# of the history, hedging the fact that the VPS has no backups. Needs a Plausible
+# API key first.
+#
+# Left on workflow_dispatch so the extraction logic stays runnable for the forum
+# VPS, which IS the host it can legitimately read.
+
 on:
-  schedule:
-    # Run monthly on the 1st at 3am UTC
-    - cron: '0 3 1 * *'
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:  # Manual only -- see the note above.
     inputs:
       days:
         description: 'Number of days to extract'
@@ -13,6 +33,13 @@ on:
       month:
         description: 'Specific month (YYYY-MM, optional)'
         required: false
+
+# Without issues:write the "Create issue on failure" step below dies with
+# "Resource not accessible by integration" -- which is exactly how 8 consecutive
+# failures went unnoticed. A failure handler that cannot report is worse than none.
+permissions:
+  contents: write
+  issues: write
 
 jobs:
   extract:
