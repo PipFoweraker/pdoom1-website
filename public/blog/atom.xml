@@ -50,16 +50,19 @@
     <category term="architecture" />
     <category term="ui" />
     <category term="refactoring" />
+    <category term="v0.7.0" />
   </entry>
   <entry>
     <title>Multi-Repository Integration System Complete</title>
     <link href="https://pdoom1.com/blog/post.html?p=2025-09-15-multi-repository-integration-complete.md" />
     <id>urn:pdoom1:blog:2025-09-15-multi-repository-integration-complete.md</id>
     <updated>2025-09-15T12:00:00Z</updated>
-    <summary>Completed comprehensive multi-repository integration system establishing professional automation and documentation management across pdoom1, pdoom1-website, and pdoom-data repositories</summary>
-    <category term="infrastructure" />
+    <summary>Completed comprehensive multi-repository integration system establishing professional automation and documentation management across pdoom1, pdoom1-website, and pdoom-data repositories with zero-manual-overhead release process.</summary>
     <category term="automation" />
     <category term="versioning" />
+    <category term="documentation" />
+    <category term="architecture" />
+    <category term="github-actions" />
   </entry>
   <entry>
     <title>Monolith Breakdown: Tutorial Extraction &amp; Legacy Cleanup</title>
@@ -68,8 +71,22 @@
     <updated>2025-09-15T12:00:00Z</updated>
     <summary>Extracted 486 lines of tutorial functions, removed 151 lines of legacy code, and fixed critical hover tooltips bug</summary>
     <category term="refactoring" />
+    <category term="monolith-breakdown" />
     <category term="ui" />
     <category term="cleanup" />
+    <category term="modular-architecture" />
+  </entry>
+  <entry>
+    <title>Complete Deterministic RNG System v0.6.0</title>
+    <link href="https://pdoom1.com/blog/post.html?p=2025-09-14-deterministic-rng-complete.md" />
+    <id>urn:pdoom1:blog:2025-09-14-deterministic-rng-complete.md</id>
+    <updated>2025-09-14T12:00:00Z</updated>
+    <summary>MAJOR MILESTONE: Transform P(Doom) into fully deterministic competitive gaming platform with perfect reproducibility</summary>
+    <category term="milestone" />
+    <category term="deterministic" />
+    <category term="competitive" />
+    <category term="rng" />
+    <category term="v0.6.0" />
   </entry>
   <entry>
     <title>p(Doom)1 Website Release - Deployment Infrastructure Complete</title>
@@ -82,73 +99,72 @@
     <category term="deployment" />
   </entry>
   <entry>
-    <title>Deterministic RNG Foundation Complete</title>
-    <link href="https://pdoom1.com/blog/post.html?p=2025-09-14-deterministic-rng-complete.md" />
-    <id>urn:pdoom1:blog:2025-09-14-deterministic-rng-complete.md</id>
-    <updated>2025-09-14T12:00:00Z</updated>
-    <summary>268-line comprehensive system for competitive gaming with enhanced deterministic RNG and community challenge features</summary>
-    <category term="architecture" />
-    <category term="deterministic" />
-    <category term="rng" />
-  </entry>
-  <entry>
-    <title>Enhanced Leaderboard System v0.4.1</title>
+    <title>Enhanced Leaderboard System v0.4.1: Seed Competition</title>
     <link href="https://pdoom1.com/blog/post.html?p=2025-09-13-enhanced-leaderboard-system-v0-4-1.md" />
     <id>urn:pdoom1:blog:2025-09-13-enhanced-leaderboard-system-v0-4-1.md</id>
     <updated>2025-09-13T12:00:00Z</updated>
-    <summary>Enhanced leaderboard system with improved scoring, display features, and competitive gaming infrastructure</summary>
-    <category term="release" />
+    <summary>Major competitive gaming milestone: seed-specific leaderboards, lab name integration, bootstrap economic model, and comprehensive session tracking</summary>
+    <category term="milestone" />
     <category term="leaderboard" />
+    <category term="bootstrap-economics" />
     <category term="ui" />
+    <category term="competition" />
   </entry>
   <entry>
-    <title>Debug Console System Implementation</title>
-    <link href="https://pdoom1.com/blog/post.html?p=2025-09-11-debug-console-system.md" />
-    <id>urn:pdoom1:blog:2025-09-11-debug-console-system.md</id>
-    <updated>2025-09-11T12:00:00Z</updated>
-    <summary>Implemented comprehensive debug console system for enhanced development and troubleshooting capabilities</summary>
-    <category term="debug" />
-    <category term="tools" />
-    <category term="development" />
-  </entry>
-  <entry>
-    <title>v0.3.0 Consolidated Release - Major Bug Fixes &amp; Infrastructure</title>
+    <title>P(Doom) v0.3.0: Consolidated Feature Release</title>
     <link href="https://pdoom1.com/blog/post.html?p=2025-09-11-v0-3-0-consolidated-release.md" />
     <id>urn:pdoom1:blog:2025-09-11-v0-3-0-consolidated-release.md</id>
     <updated>2025-09-11T12:00:00Z</updated>
-    <summary>Consolidated release featuring critical bug fixes, infrastructure improvements, and enhanced development tooling</summary>
+    <summary>Major consolidated release featuring longtermist 5-digit year dates, accessibility framework, comprehensive bug sweep plan, and systematic branch merge for alpha readiness</summary>
+    <category term="milestone" />
     <category term="release" />
-    <category term="hotfix" />
-    <category term="infrastructure" />
+    <category term="longtermist" />
+    <category term="accessibility" />
+    <category term="alpha" />
+    <category term="consolidation" />
   </entry>
   <entry>
-    <title>P(Doom) v0.2.12 Release: Development Infrastructure Enhancement</title>
+    <title>Debug Console System</title>
+    <link href="https://pdoom1.com/blog/post.html?p=2025-09-11-debug-console-system.md" />
+    <id>urn:pdoom1:blog:2025-09-11-debug-console-system.md</id>
+    <updated>2025-09-11T12:00:00Z</updated>
+    <summary>Added real-time debug console with backtick toggle for game state monitoring</summary>
+    <category term="debug" />
+    <category term="ui" />
+    <category term="development" />
+  </entry>
+  <entry>
+    <title>P(Doom) v0.2.12: Development Infrastructure</title>
     <link href="https://pdoom1.com/blog/post.html?p=2025-09-10-version-0-2-12-release.md" />
     <id>urn:pdoom1:blog:2025-09-10-version-0-2-12-release.md</id>
     <updated>2025-09-10T12:00:00Z</updated>
-    <summary>Major infrastructure milestone featuring comprehensive type annotations and automated blog system implementation</summary>
+    <summary>Major version release featuring comprehensive type annotations and development tooling infrastructure</summary>
     <category term="release" />
+    <category term="milestone" />
+    <category term="type-annotations" />
     <category term="infrastructure" />
-    <category term="type-annotation" />
-  </entry>
-  <entry>
-    <title>Type Annotation Sprint: Major Codebase Quality Enhancement</title>
-    <link href="https://pdoom1.com/blog/post.html?p=2025-09-10-type-annotation-sprint.md" />
-    <id>urn:pdoom1:blog:2025-09-10-type-annotation-sprint.md</id>
-    <updated>2025-09-10T12:00:00Z</updated>
-    <summary>Intensive type annotation sprint achieving 85-90% coverage across core modules with significant pylance error reduction</summary>
-    <category term="type-annotation" />
-    <category term="sprint" />
     <category term="quality" />
   </entry>
   <entry>
-    <title>Major Type Annotation Milestone - 4,235 Lines Annotated</title>
+    <title>Type Annotation Sprint: game_state.py Near Completion</title>
+    <link href="https://pdoom1.com/blog/post.html?p=2025-09-10-type-annotation-sprint.md" />
+    <id>urn:pdoom1:blog:2025-09-10-type-annotation-sprint.md</id>
+    <updated>2025-09-10T12:00:00Z</updated>
+    <summary>Completed 85-90% of game_state.py type annotations with 25+ methods annotated across core systems</summary>
+    <category term="type-annotations" />
+    <category term="pylance" />
+    <category term="code-quality" />
+    <category term="monoliths" />
+  </entry>
+  <entry>
+    <title>Major Type Annotation Milestone: UI and GameState Complete</title>
     <link href="https://pdoom1.com/blog/post.html?p=2025-09-10-major-type-annotation-milestone.md" />
     <id>urn:pdoom1:blog:2025-09-10-major-type-annotation-milestone.md</id>
     <updated>2025-09-10T12:00:00Z</updated>
-    <summary>Achieved major milestone with complete type annotation of ui.py (4,235 lines) and significant progress on game_state.py</summary>
+    <summary>Completed comprehensive type annotations for ui.py and 60% of game_state.py, resolving 1,100-1,600 pylance issues</summary>
     <category term="milestone" />
-    <category term="type-annotation" />
-    <category term="ui" />
+    <category term="type-annotations" />
+    <category term="infrastructure" />
+    <category term="code-quality" />
   </entry>
 </feed>

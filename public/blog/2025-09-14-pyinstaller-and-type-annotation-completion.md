@@ -1,4 +1,5 @@
 ---
+draft: true   # unpublished: never appeared in index.json. Flip to publish.
 title: "PyInstaller Distribution & Major Type Annotation Milestone"
 date: "2025-09-14"
 tags: ["distribution", "type-annotations", "pyinstaller", "infrastructure"]

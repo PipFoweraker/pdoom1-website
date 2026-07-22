@@ -1,4 +1,5 @@
 ---
+draft: true   # unpublished: never appeared in index.json. Flip to publish.
 title: "MILESTONE: Complete Type Annotation for src/ui/menus.py"
 date: "2025-09-14"
 tags: ["type-annotation", "milestone", "ui", "menus", "systematic-improvement"]

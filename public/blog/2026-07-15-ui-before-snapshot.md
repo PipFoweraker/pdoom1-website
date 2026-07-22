@@ -1,3 +1,10 @@
+---
+title: "Where the site stands, before the refresh"
+date: "2026-07-15"
+tags: ["website", "ui", "design", "dev-notes"]
+summary: "A deliberate 'before' snapshot of pdoom1.com at the start of a UI refresh - what's working (the Risk Dashboard), what reads as dated (blanket monospace, no shared layout spine), and the correctness bugs fixed the same day."
+commit: "426e7b6"
+---
 # Where the site stands, before the refresh
 
 **Date**: 2026-07-15

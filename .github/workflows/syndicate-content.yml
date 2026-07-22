@@ -1,301 +1,113 @@
 name: Content Syndication
 
+# INBOUND AUTOMATED, OUTBOUND HUMAN-GATED.
+#
+# Syncing content INTO the site is automatic. Publishing words OUT into the
+# world is a decision a person makes. This workflow therefore has two halves
+# that never run together:
+#
+#   PREPARE (automatic, when a post is published)
+#     Drafts per-platform copy into content/syndication/<slug>.json and commits
+#     it. Posts NOTHING. The draft carries "approved": false.
+#
+#   PUBLISH (manual dispatch only, and defaults to a dry run)
+#     Posts EXACTLY the copy in the file, and only for drafts a human has set
+#     "approved": true on. Writes posted_at back so nothing goes out twice.
+#
+# Because the draft is a committed file, git history is the audit trail of what
+# went out, when, and who approved it.
+#
+# What the previous version did, for the record: it posted automatically on push
+# to main, and re-implemented the copy formatting inline in bash rather than
+# calling scripts/syndication-helpers.js -- so two divergent formatters existed
+# and the bash one, which leaked its own YAML indentation into the post body,
+# was the one that would have run. It also had no auth on the endpoints it
+# called. All three are gone.
+
 on:
-  # Trigger on blog/changelog updates
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
-      - 'public/blog/**/*.md'
-      - 'public/changelog/**/*.md'
-      - 'public/game-changelog/**/*.md'
-      - 'public/website-changelog/**/*.md'
-  
-  # Manual trigger for testing
+      - 'public/blog/index.json'
+
   workflow_dispatch:
     inputs:
-      content_path:
-        description: 'Path to content file to syndicate'
-        required: true
-        default: 'public/blog/2025-10-09-website-development-sprint-complete-v0-2-0.md'
-      dry_run:
-        description: 'Dry run (do not actually post)'
+      publish:
+        description: 'Actually post approved drafts (leave false for a dry run)'
         type: boolean
         default: false
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: syndicate-content
+  cancel-in-progress: false   # never interrupt a run that may be mid-post
 
 jobs:
-  syndicate:
-    name: Syndicate Content to Social Media
+  prepare:
+    name: Draft copy for review
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          fetch-depth: 2  # Need previous commit to detect changes
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+          python-version: '3.11'
+
+      - name: Draft copy for the latest post
+        run: python scripts/prepare-syndication.py --latest
+
+      - name: Commit the draft
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          # Stage before testing: a new draft is untracked, and `git diff`
+          # alone cannot see untracked files.
+          git add -A content/syndication
+          if git diff --cached --quiet -- content/syndication; then
+            echo "No new draft to commit"
+          else
+            git commit -m "chore(syndication): draft copy for review (not posted)"
+            git push
+          fi
+
+      - name: Explain what happens next
+        run: |
+          echo "::notice::Draft written to content/syndication/. NOTHING was posted."
+          echo "::notice::Edit the copy, set approved to true, commit, then run this workflow manually with publish=true."
+
+  publish:
+    name: Post approved drafts
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          node-version: '18'
-      
-      - name: Detect changed content files
-        id: detect
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            # Manual trigger - use provided path
-            echo "files=${{ github.event.inputs.content_path }}" >> $GITHUB_OUTPUT
-          else
-            # Automatic trigger - detect changed files
-            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- 'public/blog/*.md' 'public/*-changelog/*.md' | tr '\n' ' ')
-            echo "files=$CHANGED_FILES" >> $GITHUB_OUTPUT
-          fi
-          
-      - name: Extract content metadata
-        id: extract
-        run: |
-          FILES="${{ steps.detect.outputs.files }}"
-          
-          if [ -z "$FILES" ]; then
-            echo "No content files to syndicate"
-            echo "skip=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
-          # Process first file (in case multiple files changed)
-          FILE=$(echo "$FILES" | awk '{print $1}')
-          
-          if [ ! -f "$FILE" ]; then
-            echo "File not found: $FILE"
-            echo "skip=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
-          # Extract metadata from markdown
-          TITLE=$(grep -m 1 "^# " "$FILE" | sed 's/^# //')
-          DATE=$(grep -m 1 "Date.*:" "$FILE" | sed 's/.*: *//' | sed 's/\*\*//' | xargs)
-          SUMMARY=$(awk '/^## Summary/{flag=1;next}/^##/{flag=0}flag' "$FILE" | head -n 3 | tr '\n' ' ' | xargs)
-          
-          # Generate URL
-          FILENAME=$(basename "$FILE")
-          SLUG=$(echo "$FILENAME" | sed 's/^\d\{4\}-\d\{2\}-\d\{2\}-//' | sed 's/\.md$//')
-          
-          if [[ "$FILE" == *"/blog/"* ]]; then
-            # Must match generateBlogUrl() in scripts/syndication-helpers.js.
-            # post.html reads the FILENAME from ?p=; the old /blog/#$SLUG
-            # anchor matches no element and stranded readers on the index.
-            URL="https://pdoom1.com/blog/post.html?p=$FILENAME"
-          elif [[ "$FILE" == *"/changelog/"* ]]; then
-            URL="https://pdoom1.com/changelog/#$SLUG"
-          else
-            URL="https://pdoom1.com/"
-          fi
-          
-          # Truncate summary if needed
-          if [ ${#SUMMARY} -gt 200 ]; then
-            SUMMARY="${SUMMARY:0:197}..."
-          fi
-          
-          # Format post text for each platform
-          BLUESKY_TEXT="🎮 $TITLE
+          python-version: '3.11'
 
-          $SUMMARY
-
-          🔗 $URL"
-          
-          TWITTER_TEXT="🎮 $TITLE
-
-          $SUMMARY
-
-          $URL"
-          
-          LINKEDIN_TEXT="$TITLE
-
-          $SUMMARY
-
-          Read more: $URL
-
-          #gamedev #indiegame #python"
-          
-          # Output for next steps
-          echo "title=$TITLE" >> $GITHUB_OUTPUT
-          echo "url=$URL" >> $GITHUB_OUTPUT
-          echo "summary=$SUMMARY" >> $GITHUB_OUTPUT
-          echo "skip=false" >> $GITHUB_OUTPUT
-          
-          # Save full text to files for posting
-          echo "$BLUESKY_TEXT" > /tmp/bluesky.txt
-          echo "$TWITTER_TEXT" > /tmp/twitter.txt
-          echo "$LINKEDIN_TEXT" > /tmp/linkedin.txt
-          
-          echo "✅ Extracted metadata:"
-          echo "  Title: $TITLE"
-          echo "  URL: $URL"
-          echo "  Summary: ${SUMMARY:0:100}..."
-      
-      - name: Post to Bluesky
-        if: steps.extract.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
+      - name: Post approved drafts
         env:
+          # SYNDICATION_TOKEN must ALSO exist in the Netlify site environment.
+          # Setting only the GitHub secret yields a green workflow and a 401
+          # from every function.
+          SYNDICATION_TOKEN: ${{ secrets.SYNDICATION_TOKEN }}
           NETLIFY_SITE_URL: ${{ secrets.NETLIFY_SITE_URL }}
-          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
-          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+          DRY_RUN: ${{ github.event.inputs.publish != 'true' }}
+        run: python scripts/post-syndication.py
+
+      - name: Record what was posted
+        if: github.event.inputs.publish == 'true'
         run: |
-          BLUESKY_TEXT=$(cat /tmp/bluesky.txt)
-          
-          if [ -z "$NETLIFY_SITE_URL" ] || [ -z "$BLUESKY_HANDLE" ] || [ -z "$BLUESKY_APP_PASSWORD" ]; then
-            echo "⚠️  Bluesky credentials not configured, skipping"
-            exit 0
-          fi
-          
-          echo "📱 Posting to Bluesky..."
-          
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$NETLIFY_SITE_URL/.netlify/functions/syndicate-bluesky" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"title\": \"${{ steps.extract.outputs.title }}\",
-              \"text\": $(echo "$BLUESKY_TEXT" | jq -Rs .),
-              \"url\": \"${{ steps.extract.outputs.url }}\"
-            }")
-          
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          BODY=$(echo "$RESPONSE" | head -n-1)
-          
-          if [ "$HTTP_CODE" = "200" ]; then
-            echo "✅ Posted to Bluesky successfully"
+          set -euo pipefail
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A content/syndication
+          if git diff --cached --quiet -- content/syndication; then
+            echo "Nothing to record"
           else
-            echo "⚠️  Bluesky post failed (HTTP $HTTP_CODE): $BODY"
+            git commit -m "chore(syndication): record posted_at"
+            git push
           fi
-      
-      - name: Post to Discord
-        if: steps.extract.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
-        env:
-          NETLIFY_SITE_URL: ${{ secrets.NETLIFY_SITE_URL }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          if [ -z "$NETLIFY_SITE_URL" ] || [ -z "$DISCORD_WEBHOOK_URL" ]; then
-            echo "⚠️  Discord webhook not configured, skipping"
-            exit 0
-          fi
-          
-          echo "💬 Posting to Discord..."
-          
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$NETLIFY_SITE_URL/.netlify/functions/syndicate-discord" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"title\": \"${{ steps.extract.outputs.title }}\",
-              \"text\": \"${{ steps.extract.outputs.summary }}\",
-              \"url\": \"${{ steps.extract.outputs.url }}\",
-              \"tags\": [\"blog\", \"update\"]
-            }")
-          
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          BODY=$(echo "$RESPONSE" | head -n-1)
-          
-          if [ "$HTTP_CODE" = "200" ]; then
-            echo "✅ Posted to Discord successfully"
-          else
-            echo "⚠️  Discord post failed (HTTP $HTTP_CODE): $BODY"
-          fi
-      
-      - name: Post to Twitter/X
-        if: steps.extract.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
-        env:
-          NETLIFY_SITE_URL: ${{ secrets.NETLIFY_SITE_URL }}
-          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
-          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
-          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
-          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
-        run: |
-          TWITTER_TEXT=$(cat /tmp/twitter.txt)
-          
-          if [ -z "$NETLIFY_SITE_URL" ] || [ -z "$TWITTER_API_KEY" ]; then
-            echo "⚠️  Twitter credentials not configured, skipping"
-            exit 0
-          fi
-          
-          echo "🐦 Posting to Twitter/X..."
-          
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$NETLIFY_SITE_URL/.netlify/functions/syndicate-x" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"text\": $(echo "$TWITTER_TEXT" | jq -Rs .)
-            }")
-          
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          BODY=$(echo "$RESPONSE" | head -n-1)
-          
-          if [ "$HTTP_CODE" = "200" ]; then
-            echo "✅ Posted to Twitter/X successfully"
-          else
-            echo "⚠️  Twitter/X post failed (HTTP $HTTP_CODE): $BODY"
-          fi
-      
-      - name: Post to LinkedIn
-        if: steps.extract.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
-        env:
-          NETLIFY_SITE_URL: ${{ secrets.NETLIFY_SITE_URL }}
-          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
-          LINKEDIN_ORG_ID: ${{ secrets.LINKEDIN_ORG_ID }}
-        run: |
-          LINKEDIN_TEXT=$(cat /tmp/linkedin.txt)
-          
-          if [ -z "$NETLIFY_SITE_URL" ] || [ -z "$LINKEDIN_ACCESS_TOKEN" ]; then
-            echo "⚠️  LinkedIn credentials not configured, skipping"
-            exit 0
-          fi
-          
-          echo "💼 Posting to LinkedIn..."
-          
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$NETLIFY_SITE_URL/.netlify/functions/syndicate-linkedin" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"title\": \"${{ steps.extract.outputs.title }}\",
-              \"text\": $(echo "$LINKEDIN_TEXT" | jq -Rs .),
-              \"url\": \"${{ steps.extract.outputs.url }}\"
-            }")
-          
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          BODY=$(echo "$RESPONSE" | head -n-1)
-          
-          if [ "$HTTP_CODE" = "200" ]; then
-            echo "✅ Posted to LinkedIn successfully"
-          else
-            echo "⚠️  LinkedIn post failed (HTTP $HTTP_CODE): $BODY"
-          fi
-      
-      - name: Dry run summary
-        if: github.event.inputs.dry_run == 'true'
-        run: |
-          echo "🔍 DRY RUN - No posts were made"
-          echo ""
-          echo "Would have posted:"
-          echo "  Title: ${{ steps.extract.outputs.title }}"
-          echo "  URL: ${{ steps.extract.outputs.url }}"
-          echo ""
-          echo "Bluesky text:"
-          cat /tmp/bluesky.txt || echo "(not generated)"
-          echo ""
-          echo "Twitter text:"
-          cat /tmp/twitter.txt || echo "(not generated)"
-          echo ""
-          echo "LinkedIn text:"
-          cat /tmp/linkedin.txt || echo "(not generated)"
-      
-      - name: Syndication summary
-        if: steps.extract.outputs.skip != 'true'
-        run: |
-          echo "🎉 Content syndication completed!"
-          echo ""
-          echo "📄 Content: ${{ steps.extract.outputs.title }}"
-          echo "🔗 URL: ${{ steps.extract.outputs.url }}"
-          echo ""
-          echo "Platforms targeted:"
-          echo "  - Bluesky (pdoom1)"
-          echo "  - Discord (alpha channel)"
-          echo "  - Twitter/X"
-          echo "  - LinkedIn (company page)"
-          echo ""
-          echo "Check individual steps above for platform-specific results."

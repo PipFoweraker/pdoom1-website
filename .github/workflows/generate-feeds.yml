@@ -1,4 +1,4 @@
-name: Generate blog feeds
+name: Blog index and feeds
 
 # Keeps public/blog/feed.xml and atom.xml in step with public/blog/index.json.
 #
@@ -38,15 +38,27 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: pip install --quiet PyYAML
+
+      # Runs on PRs too: catches a post using a table (which renders literal
+      # pipe characters at the reader) or missing front matter, BEFORE merge.
+      - name: Validate posts and render check
+        run: |
+          python scripts/build-blog-index.py --check
+          node scripts/test-blog-render.js
+
       # On a PR, only verify -- never push to someone's branch.
       - name: Verify feeds are current
         if: github.event_name == 'pull_request'
         run: |
           python scripts/generate-feeds.py --check
 
-      - name: Regenerate feeds
+      - name: Regenerate index and feeds
         if: github.event_name != 'pull_request'
-        run: python scripts/generate-feeds.py
+        run: |
+          python scripts/build-blog-index.py
+          python scripts/generate-feeds.py
 
       - name: Commit
         if: github.event_name != 'pull_request'
@@ -58,10 +70,10 @@ jobs:
           # untracked files, and feed.xml/atom.xml are new on first run. That
           # exact mistake made another workflow here report success while
           # committing nothing for months.
-          git add -A public/blog/feed.xml public/blog/atom.xml
-          if git diff --cached --quiet -- public/blog/feed.xml public/blog/atom.xml; then
+          git add -A public/blog/feed.xml public/blog/atom.xml public/blog/index.json
+          if git diff --cached --quiet -- public/blog/feed.xml public/blog/atom.xml public/blog/index.json; then
             echo "Feeds already current"
           else
-            git commit -m "chore(blog): regenerate feeds"
+            git commit -m "chore(blog): regenerate index and feeds"
             git push
           fi

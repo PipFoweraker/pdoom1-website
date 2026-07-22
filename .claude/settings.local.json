@@ -69,7 +69,8 @@
       "Bash(gh api *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://pdoom1-website-app.netlify.app/)",
       "Bash(curl -s -X POST -H \"Content-Type: application/json\" -d '{\"title\":\"t\",\"text\":\"x\",\"url\":\"u\"}' -w \" [%{http_code}]\" https://pdoom1-website-app.netlify.app/.netlify/functions/syndicate-bluesky)",
-      "Bash(curl -s -X POST -H \"Content-Type: application/json\" -d '{}' -w \" [%{http_code}]\" https://pdoom1-website-app.netlify.app/.netlify/functions/syndicate-x)"
+      "Bash(curl -s -X POST -H \"Content-Type: application/json\" -d '{}' -w \" [%{http_code}]\" https://pdoom1-website-app.netlify.app/.netlify/functions/syndicate-x)",
+      "Bash(DRY_RUN=false python scripts/post-syndication.py)"
     ],
     "deny": [],
     "ask": []
