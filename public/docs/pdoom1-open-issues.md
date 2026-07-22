@@ -1,13 +1,15 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-22T00:51:39.833Z UTC
+Generated: 2026-07-22T07:09:17.257Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 777 | In-game screenshot flow: make [ capture the dev-blog default |  |  | 2026-07-22 06:52:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/777) |
+| 775 | Release branching model for v0.12+: hotpatch discipline, impulse stash, Jira-compatible tracking |  | v0.12 -- First Contact | 2026-07-22 06:04:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/775) |
+| 773 | enforce_standards: ASCII auto-transliteration sweeps the WHOLE TREE as unstaged churn during pre-commit |  |  | 2026-07-22 05:40:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/773) |
 | 771 | Doom gauge: percentage labels overlap (27.2% renders over 27%) |  | v0.12 -- First Contact | 2026-07-22 00:24:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/771) |
 | 770 | Office floor iteration 2: sprite/prop scale + wider right-hand floorspace |  | v0.12 -- First Contact | 2026-07-22 00:24:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/770) |
 | 768 | Icons: submit paper, attend conference, send delegate unmapped (+ widen resolution test) |  | v0.12 -- First Contact | 2026-07-21 23:09:42 | [link](https://github.com/PipFoweraker/pdoom1/issues/768) |
-| 767 | Modal discipline: hire screen (and modals generally) must block interaction behind them |  | v0.12 -- First Contact | 2026-07-21 23:09:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/767) |
 | 763 | Nomenclature + pacing: strategic-options unlock expressed at month grain; align fanfare hero |  |  | 2026-07-21 09:21:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/763) |
 | 758 | Session agenda: Friday 2026-07-24 (decisions + conversations queue) |  |  | 2026-07-21 09:03:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/758) |
 | 755 | UI: theme the event popup / dialog buttons (still default grey after menu theme) |  | v0.12 -- First Contact | 2026-07-21 04:49:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/755) |
@@ -26,7 +28,7 @@ Generated: 2026-07-22T00:51:39.833Z UTC
 | 703 | Playtest v0.11.0: defeat-pacing drag + hiring pipeline feels gappy (coalesce/de-branch) |  |  | 2026-07-21 23:09:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/703) |
 | 700 | Local Leaderboard.add_score does not dedupe by entry_uuid (remote PHP does) |  |  | 2026-07-18 07:05:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/700) |
 | 648 | Check Godot port for team_player uncapped-stacking exploit + poaching rate (salvaged from pre-Godot notes) |  | v0.13 -- Rivals and News | 2026-07-20 20:38:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/648) |
-| 622 | Build lane L10 · main_ui decomposition: extract-before set + let-die map |  |  | 2026-07-12 08:38:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/622) |
+| 622 | Build lane L10 · main_ui decomposition: extract-before set + let-die map |  |  | 2026-07-22 06:09:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/622) |
 | 621 | Build lane L9 · Balance surface + data externalization (defs→JSON, Balance autoload) |  |  | 2026-07-12 08:38:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/621) |
 | 619 | Build lane L8 · Achievements skeleton (observer-only) |  |  | 2026-07-12 08:23:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/619) |
 | 615 | Build lane L4 · Event taxonomy + ledger intake (ADR-0012) |  |  | 2026-07-12 08:23:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/615) |
