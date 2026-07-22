@@ -1,9 +1,11 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-22T12:46:04.586Z UTC
+Generated: 2026-07-22T18:39:27.952Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 802 | In-game music controller (mute/skip/next) + more track variety; expose the doom-triggered rotation |  |  | 2026-07-22 13:29:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/802) |
+| 801 | Onboarding: narrative cold-open + first-turn direction (playtest #1: 'lots of info, not a lot of direction') |  |  | 2026-07-22 13:29:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/801) |
 | 800 | In-game bug reporter (F8) does not transmit -- reports die on player's local disk, confirmation text lies |  |  | 2026-07-22 12:44:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/800) |
 | 799 | Launch call: anonymous install ping + remote update check (one request, two jobs) | priority:high, ship:hotpatch-48h |  | 2026-07-22 12:21:49 | [link](https://github.com/PipFoweraker/pdoom1/issues/799) |
 | 798 | Put 'Buy Compute' under an operations-style submenu (action grouping) | ship:hotpatch-48h |  | 2026-07-22 11:58:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/798) |
