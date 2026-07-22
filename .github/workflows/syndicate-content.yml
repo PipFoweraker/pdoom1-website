@@ -84,7 +84,10 @@ jobs:
           SLUG=$(echo "$FILENAME" | sed 's/^\d\{4\}-\d\{2\}-\d\{2\}-//' | sed 's/\.md$//')
           
           if [[ "$FILE" == *"/blog/"* ]]; then
-            URL="https://pdoom1.com/blog/#$SLUG"
+            # Must match generateBlogUrl() in scripts/syndication-helpers.js.
+            # post.html reads the FILENAME from ?p=; the old /blog/#$SLUG
+            # anchor matches no element and stranded readers on the index.
+            URL="https://pdoom1.com/blog/post.html?p=$FILENAME"
           elif [[ "$FILE" == *"/changelog/"* ]]; then
             URL="https://pdoom1.com/changelog/#$SLUG"
           else

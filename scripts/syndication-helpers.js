@@ -56,9 +56,12 @@ function extractBlogMetadata(filePath) {
  * @returns {string} - Full URL to blog post
  */
 function generateBlogUrl(filename, baseUrl = 'https://pdoom1.com') {
-  // Extract slug from filename (remove date prefix and .md extension)
-  const slug = filename.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '');
-  return `${baseUrl}/blog/#${slug}`;
+  // Posts are rendered client-side by post.html, which reads the FILENAME from
+  // the ?p= query parameter -- see public/blog/index.html where the cards are
+  // built. The previous form was `/blog/#<slug>`, an anchor that matches no
+  // element on the blog index, so every syndicated link would have dumped the
+  // reader on the index page with no indication of which post was meant.
+  return `${baseUrl}/blog/post.html?p=${encodeURIComponent(filename)}`;
 }
 
 /**

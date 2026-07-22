@@ -81,8 +81,28 @@
             t = t.replace(/(^|[^_])_([^_\n]+)_/g, '$1<em>$2</em>');
             return t;
         }
+        // Posts carry YAML front matter (title/date/tags/summary/commit) between
+        // --- fences. Without stripping it, the opening --- is read as a
+        // horizontal rule and the whole YAML block is rendered as a paragraph --
+        // so the first thing a reader saw was
+        //   title: "..." date: "..." tags: [...] summary: "..."
+        // on 10 of the 14 published posts. The metadata is already displayed
+        // from index.json, so it is dropped here rather than parsed.
+        function stripFrontMatter(md) {
+            const text = md.replace(/^﻿/, '');
+            if (!/^\s*---\s*$/.test(text.split('\n')[0] || '')) return text;
+            const lines = text.split('\n');
+            for (let i = 1; i < lines.length; i++) {
+                if (/^\s*---\s*$/.test(lines[i])) {
+                    return lines.slice(i + 1).join('\n').replace(/^\n+/, '');
+                }
+            }
+            // Unterminated fence: leave the document alone rather than eat it.
+            return text;
+        }
+
         function renderMarkdown(md) {
-            const lines = md.replace(/\r\n/g, '\n').split('\n');
+            const lines = stripFrontMatter(md).replace(/\r\n/g, '\n').split('\n');
             const out = [];
             let i = 0, listType = null, para = [];
             const flushPara = () => { if (para.length) { out.push('<p>' + inline(para.join(' ')) + '</p>'); para = []; } };

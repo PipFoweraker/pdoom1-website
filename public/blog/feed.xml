@@ -63,6 +63,16 @@
       <category>versioning</category>
     </item>
     <item>
+      <title>Monolith Breakdown: Tutorial Extraction &amp; Legacy Cleanup</title>
+      <link>https://pdoom1.com/blog/post.html?p=2025-09-15-monolith-breakdown-tutorial-extraction.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2025-09-15-monolith-breakdown-tutorial-extraction.md</guid>
+      <pubDate>Mon, 15 Sep 2025 12:00:00 +0000</pubDate>
+      <description>Extracted 486 lines of tutorial functions, removed 151 lines of legacy code, and fixed critical hover tooltips bug</description>
+      <category>refactoring</category>
+      <category>ui</category>
+      <category>cleanup</category>
+    </item>
+    <item>
       <title>p(Doom)1 Website Release - Deployment Infrastructure Complete</title>
       <link>https://pdoom1.com/blog/post.html?p=2025-09-14-deployment-infrastructure-complete.md</link>
       <guid isPermaLink="false">pdoom1-blog-2025-09-14-deployment-infrastructure-complete.md</guid>

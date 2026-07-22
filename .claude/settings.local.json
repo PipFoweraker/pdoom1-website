@@ -55,7 +55,21 @@
       "Bash(git commit *)",
       "Bash(gh run *)",
       "Bash(gh secret *)",
-      "Bash(gh variable *)"
+      "Bash(gh variable *)",
+      "Bash(git push *)",
+      "Bash(gh pr *)",
+      "Bash(curl -s -o /dev/null -w \"pdoom1.com/api/report-bug -> %{http_code}\\\\n\" -X POST https://pdoom1.com/api/report-bug)",
+      "Bash(curl -s -o /dev/null -w \"pdoom1.com/.netlify/functions/syndicate-bluesky -> %{http_code}\\\\n\" -X POST https://pdoom1.com/.netlify/functions/syndicate-bluesky)",
+      "Bash(curl -s -o /dev/null -w \"blog/post.html?p=missing -> %{http_code}\\\\n\" \"https://pdoom1.com/blog/post.html?p=2025-09-15-monolith-breakdown-tutorial-extraction.md\")",
+      "Bash(curl -s -o /dev/null -w \"the missing .md itself -> %{http_code}\\\\n\" \"https://pdoom1.com/blog/2025-09-15-monolith-breakdown-tutorial-extraction.md\")",
+      "Bash(curl -s -o /dev/null -w \"/dev-notes/ -> %{http_code}\\\\n\" https://pdoom1.com/dev-notes/)",
+      "Bash(curl -s -o /dev/null -w \"/docs/DEV_NOTES.md -> %{http_code}\\\\n\" https://pdoom1.com/docs/DEV_NOTES.md)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://pdoom1.netlify.app/)",
+      "Bash(curl -s -X POST -H \"Content-Type: application/json\" -d '{}' https://pdoom1.netlify.app/.netlify/functions/syndicate-bluesky -w \" [%{http_code}]\")",
+      "Bash(gh api *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://pdoom1-website-app.netlify.app/)",
+      "Bash(curl -s -X POST -H \"Content-Type: application/json\" -d '{\"title\":\"t\",\"text\":\"x\",\"url\":\"u\"}' -w \" [%{http_code}]\" https://pdoom1-website-app.netlify.app/.netlify/functions/syndicate-bluesky)",
+      "Bash(curl -s -X POST -H \"Content-Type: application/json\" -d '{}' -w \" [%{http_code}]\" https://pdoom1-website-app.netlify.app/.netlify/functions/syndicate-x)"
     ],
     "deny": [],
     "ask": []
