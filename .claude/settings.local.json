@@ -50,7 +50,10 @@
       "Bash(git checkout *)",
       "Bash(git add *)",
       "Bash(bash \"C:/Users/gday/AppData/Local/Temp/claude/D--Local-Code-pdoom1-website/1cf6b9b4-ed62-4ce2-bf0f-fd17de989978/scratchpad/guard.sh\")",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --title 'Alpha readiness: fix analytics event loss, WCAG failures, unguarded prod deploy; add /design-notes' --body ' *)",
+      "Bash(gh pr *)"
     ],
     "deny": [],
     "ask": []

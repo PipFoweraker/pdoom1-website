@@ -322,15 +322,14 @@
 					<div id="description-error" class="error-message" role="alert" aria-live="polite"></div>
 				</div>
 
-				<div class="form-group">
-					<label for="user-email">Email (Optional)</label>
-					<input type="email" id="user-email" name="email" 
-						   placeholder="your.email@example.com"
-						   aria-describedby="email-help email-error"
-						   autocomplete="email">
-					<div id="email-help" class="form-help">Only used for follow-up questions. Not stored or shared.</div>
-					<div id="email-error" class="error-message" role="alert" aria-live="polite"></div>
-				</div>
+				<!-- Email field removed 2026-07-22. It was labelled "Not stored or
+				     shared", but the only working submit path pastes the form into a
+				     PUBLIC GitHub issue -- so an address typed here was published on
+				     the issue tracker, contradicting this page's own promise and
+				     /privacy/'s "we never collect personally identifiable
+				     information". Follow-up now happens on the GitHub issue thread,
+				     where the reporter controls what they disclose. Do not
+				     reintroduce a contact field without a private sink to put it in. -->
 
 				<div class="form-group">
 					<label for="bug-attachment">Attach Log/File (Optional)</label>
@@ -375,7 +374,6 @@
 					title: formData.get('title'),
 					type: formData.get('type') || 'bug',
 					description: formData.get('description'),
-					email: formData.get('email') || '',
 					source: 'web'
 				};
 				
@@ -434,13 +432,26 @@
 				// pre-filled GitHub issue the reporter confirms. Never lose a report.
 				const cfg = window.__PDOOM_CONFIG__ || {};
 				const bugApi = (cfg.bugApi || '').replace(/\/$/, '');
-				const ghUrl = 'https://github.com/PipFoweraker/pdoom1/issues/new?title='
-					+ encodeURIComponent(bugData.title || 'Bug report')
-					+ '&body=' + encodeURIComponent(
-						(bugData.description || '') +
-						'\n\n---\nType: ' + (bugData.type || 'bug') +
-						(bugData.email ? '\nReporter: ' + bugData.email : '') +
-						'\n_(filed via the website bug form)_');
+
+				// Target the ISSUE FORM, not a blank issue. The game repo sets
+				// blank_issues_enabled:false, so /issues/new?title=&body= redirects
+				// to /issues/new/choose and DROPS the prefill -- the reporter would
+				// have had to retype everything. Issue Forms prefill by field id, so
+				// these keys must match .github/ISSUE_TEMPLATE/bug_report.yml in
+				// PipFoweraker/pdoom1: description, steps, version, platform.
+				const ghParams = new URLSearchParams({
+					template: 'bug_report.yml',
+					title: bugData.title || 'Bug report',
+					description: (bugData.description || '') +
+						'\n\n_(filed via the website bug form; type: ' +
+						(bugData.type || 'bug') + ')_'
+					// Deliberately no `version` prefill: this form has no version
+					// field, and stamping the latest release would be wrong for
+					// anyone on an older build -- a confidently wrong version is
+					// worse for triage than a blank the issue form will ask for.
+				});
+				const ghUrl = 'https://github.com/PipFoweraker/pdoom1/issues/new?'
+					+ ghParams.toString();
 				let submitted = false;
 				if (bugApi) {
 					button.textContent = 'Submitting...';
