@@ -5,3 +5,8 @@ __pycache__/
 *.pyc
 public/data/version.json
 scripts/game-integration-config.json
+
+# Claude Code machine-local settings (permissions granted on this machine).
+# The .local suffix means per-machine by convention; tracking it makes every
+# permission grant a merge conflict.
+.claude/settings.local.json
