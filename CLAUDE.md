@@ -21,6 +21,17 @@ rediscovery. Keep it high-signal; add gotchas that cost real time.
 - **Lesson:** before concluding a visual bug "needs a live browser," grep ALL stylesheets
   in cascade order (`site.css` last) — the winning rule is usually findable statically.
 
+## Server access (SSH) — two different hosting targets, don't confuse them
+- **pdoom1.com static site** = DreamHost **shared hosting**. Deployed ONLY via the Actions
+  rsync workflows; the shell user/host exist as GitHub secrets (`DH_HOST`/`DH_USER`) and are
+  not readable back from GitHub — recover them via DreamHost Panel → Users → Manage Users.
+- **forum.pdoom1.com VPS** (DreamCompute; NodeBB + nginx; also the log source for
+  `scripts/extract_analytics.py`): `ssh -i ~/.ssh/pdoom-website-instance.pem ubuntu@208.113.200.215`
+  Source of truth: `ansible/inventories/production.ini`. (Verified 2026-07-22.)
+- The CVTas VPS is a different machine (`208.113.128.121`) — key filenames are similar, IPs are not.
+- Pip's cross-repo server index: `coordination/SERVER_ACCESS_REFERENCE.md` in the local
+  Code folder (local-only, not in any git repo).
+
 ## Deploy
 - Push to `main` → **"Auto-Deploy to DreamHost on Push"** (~20s). Production = pdoom1.com.
 - Use branch + PR (Pip's default). Every PR gets a Netlify **deploy-preview** — verify
