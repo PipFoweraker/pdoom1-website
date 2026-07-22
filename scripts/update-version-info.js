@@ -47,11 +47,27 @@ function fetchGitHubData(endpoint) {
 }
 
 /**
+ * Whatever version.json currently says. Used to preserve, never to invent.
+ */
+function readExistingVersionJson() {
+    try {
+        const versionFile = path.join(DATA_DIR, 'version.json');
+        const parsed = JSON.parse(fs.readFileSync(versionFile, 'utf8'));
+        return (parsed && typeof parsed === 'object') ? parsed : {};
+    } catch (error) {
+        return {};
+    }
+}
+
+/**
  * Get latest release information
  */
 async function getLatestRelease() {
     try {
         const release = await fetchGitHubData(`/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest`);
+        if (!release || !(release.tag_name || release.name)) {
+            throw new Error('release payload has no tag_name or name');
+        }
         return {
             version: release.tag_name || release.name,
             name: release.name,
@@ -61,14 +77,19 @@ async function getLatestRelease() {
         };
     } catch (error) {
         console.warn('Could not fetch latest release:', error.message);
-        // Fallback to current version if API fails
-        return {
-            version: 'v0.4.1',
-            name: 'Latest Release',
-            published_at: new Date().toISOString(),
-            html_url: `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases`,
-            body: 'Latest development version'
-        };
+        // This value is written straight into version.json, which every page treats as
+        // the source of truth. A literal fallback here would overwrite a correct
+        // version with an ancient one at exactly the moment nobody is watching.
+        // Keep whatever is already on disk; if there is nothing, stop.
+        const existing = readExistingVersionJson().latest_release;
+        if (existing && existing.version) {
+            console.warn(`Preserving existing version ${existing.version}`);
+            return existing;
+        }
+        throw new Error(
+            'Could not fetch the latest release and no usable latest_release exists in ' +
+            'version.json. Refusing to write a guessed version.'
+        );
     }
 }
 
@@ -86,12 +107,17 @@ async function getRepoStats() {
         };
     } catch (error) {
         console.warn('Could not fetch repo stats:', error.message);
-        return {
-            stars: 0,
-            forks: 0,
-            open_issues: 0,
-            last_updated: new Date().toISOString()
-        };
+        // Same rule as the release lookup: zeroes are a claim ("this project has no
+        // stars"), not an absence of one. Preserve the last known-good stats.
+        const existing = readExistingVersionJson().repository_stats;
+        if (existing && Object.keys(existing).length) {
+            console.warn('Preserving existing repository_stats');
+            return existing;
+        }
+        throw new Error(
+            'Could not fetch repository stats and none exist in version.json. ' +
+            'Refusing to publish zeroes as if they were measured.'
+        );
     }
 }
 

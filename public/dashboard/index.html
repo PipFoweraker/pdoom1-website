@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>P(DOOM) DASHBOARD – AI Existential Risk Monitor</title>
 	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
@@ -515,6 +516,176 @@
     text-shadow:0 0 2px #000, 0 0 5px #000, 0 0 10px #00ff41;
   }
 
+  /* ==========================================================
+     Site navigation (injected into the page header element by navigation.js).
+     This page loads no shared stylesheet, so the nav is styled
+     here, in the site's dark terminal palette.
+     ========================================================== */
+  body > header {
+    background:#2d2d2d;
+    border-bottom:2px solid #00ff41;
+    padding:0.6rem 1rem;
+    position:relative;
+    z-index:300;
+    flex:none;
+  }
+  body > header nav {
+    max-width:1400px;
+    margin:0 auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    flex-wrap:wrap;
+  }
+  body > header .logo {
+    font-size:1.2rem;
+    font-weight:bold;
+    color:#00ff41;
+    text-decoration:none;
+    text-shadow:0 0 10px #00ff41;
+  }
+  body > header .version-badge {font-size:10px;color:#999999;display:block;}
+  body > header .nav-links {display:flex;gap:0.5rem;list-style:none;flex-wrap:wrap;}
+  body > header .nav-links a {
+    color:#ffffff;
+    text-decoration:none;
+    padding:0.35rem 0.7rem;
+    font-size:13px;
+    border:1px solid transparent;
+    border-radius:4px;
+  }
+  body > header .nav-links a:hover {color:#00ff41;border-color:#00ff41;}
+  body > header .dropdown {position:relative;}
+  body > header .dropdown-toggle {cursor:pointer;}
+  body > header .dropdown-menu {
+    position:absolute;
+    top:100%;
+    right:0;
+    background:#2d2d2d;
+    border:1px solid #444444;
+    border-radius:4px;
+    opacity:0;
+    visibility:hidden;
+    min-width:170px;
+    z-index:1000;
+    list-style:none;
+    padding:0.4rem 0;
+    margin:0;
+  }
+  body > header .dropdown:hover .dropdown-menu,
+  body > header .dropdown.open .dropdown-menu {opacity:1;visibility:visible;}
+  body > header .dropdown-menu a {display:block;padding:0.4rem 0.8rem;border:none;}
+
+  /* ==========================================================
+     Calibration notice + staleness markers.
+     Palette: --bg-secondary #2d2d2d, --accent-secondary #ff6b35,
+     --accent-primary #00ff41, --border-color #444444.
+     ========================================================== */
+  #calibrationNotice {
+    flex:none;
+    background:#2d2d2d;
+    border-top:2px solid #ff6b35;
+    border-bottom:2px solid #ff6b35;
+    box-shadow:0 0 25px rgba(255,107,53,0.35);
+    padding:10px 20px;
+    text-align:center;
+    position:relative;
+    z-index:260;
+  }
+  #calibrationNotice .cal-stamp {
+    display:inline-block;
+    border:2px dashed #ff6b35;
+    border-radius:4px;
+    color:#ff6b35;
+    font-size:15px;
+    font-weight:bold;
+    letter-spacing:3px;
+    padding:4px 14px;
+    text-shadow:0 0 2px #000, 0 0 10px rgba(255,107,53,0.7);
+  }
+  #calibrationNotice .cal-sub {
+    font-size:11px;
+    color:#ffffff;
+    opacity:0.9;
+    margin-top:6px;
+    line-height:1.5;
+    max-width:1100px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  #calibrationNotice .cal-sub b {color:#ff6b35;}
+  #calibrationNotice .cal-sub .live-word {color:#00ff41;}
+
+  .stale-tag, .live-tag, .toy-tag {
+    display:inline-block;
+    font-size:9px;
+    font-weight:bold;
+    letter-spacing:1px;
+    line-height:1.4;
+    padding:1px 5px;
+    border-radius:3px;
+    vertical-align:middle;
+    margin-right:5px;
+    text-shadow:none;
+    white-space:nowrap;
+  }
+  .stale-tag {color:#ff6b35;border:1px solid #ff6b35;}
+  .toy-tag   {color:#ff6b35;border:1px dashed #ff6b35;}
+  .live-tag  {color:#00ff41;border:1px solid #00ff41;}
+
+  .panel-note {
+    font-size:10px;
+    line-height:1.5;
+    color:#cccccc;
+    background:#2d2d2d;
+    border:1px solid #444444;
+    border-left:4px solid #ff6b35;
+    border-radius:4px;
+    padding:7px 9px;
+    margin:0 0 14px 0;
+    text-transform:none;
+    letter-spacing:0;
+  }
+  .panel-note b {color:#ff6b35;}
+
+  .as-of {
+    display:block;
+    font-size:10px;
+    color:#ff6b35;
+    margin-top:3px;
+    text-shadow:0 0 2px #000;
+  }
+
+  /* Layout: let the header/notice take their natural height instead of
+     the old hardcoded 75px offset, so nothing gets clipped. */
+  body {display:flex;flex-direction:column;height:100vh;}
+  #container {flex:1;min-height:0;height:auto;width:100%;display:flex;flex-direction:column;}
+  #mainGrid {flex:1;min-height:0;height:auto;}
+
+  /* Small screens: the fixed 340px columns and the floating control
+     panel are unusable on a phone, so stack everything. */
+  @media (max-width:900px) {
+    body {overflow:auto;height:auto;}
+    #container {height:auto;}
+    #mainGrid {grid-template-columns:1fr;grid-template-rows:auto;height:auto;}
+    #leftPanel, #rightPanel, #centerColumn {grid-column:1;grid-row:auto;}
+    #centerColumn {grid-template-rows:auto auto;}
+    #graphContainer {min-height:320px;}
+    #bottomRow {grid-template-columns:1fr;}
+    #pieContainer {min-height:230px;}
+    #narrativeBox {min-height:200px;}
+    .panel {cursor:default;}
+    #controls, #warningLights {
+      position:static;
+      min-width:0;
+      width:auto;
+      margin:0 15px 15px 15px;
+      cursor:default;
+    }
+    #calibrationNotice .cal-stamp {font-size:12px;letter-spacing:1px;}
+  }
+
   /* Scrollbar */
   ::-webkit-scrollbar {width:10px;}
   ::-webkit-scrollbar-track {background:rgba(0,10,5,0.5);border-radius:5px;}
@@ -523,6 +694,10 @@
 </style>
 </head>
 <body>
+
+<header>
+  <!-- Navigation loaded by navigation.js -->
+</header>
 
 <canvas id="shader"></canvas>
 
@@ -540,12 +715,31 @@
     </div>
   </div>
 
+  <!-- Calibration notice: this instrument is frozen, and says so. -->
+  <div id="calibrationNotice" role="note">
+    <div class="cal-stamp">INSUFFICIENT SITUATIONAL AWARENESS TO JUDGE</div>
+    <div class="cal-sub">
+      <b>INSTRUMENT UNCALIBRATED.</b> Last known good: <b>October 2025</b>. Every panel marked
+      <span class="stale-tag">OLD</span> is frozen at that date and has not been refreshed since — read it as history, not as now.
+      Panels marked <span class="toy-tag">TOY MODEL</span> are invented arithmetic, not forecasts.
+      Only <span class="live-tag">LIVE</span> panels fetch current data.
+      In p(Doom)1, seeing the true state of the world costs money. This dashboard has not paid.
+    </div>
+  </div>
+
   <!-- Warning Lights -->
   <div id="warningLights"></div>
 
   <!-- Controls -->
   <div id="controls">
-    <div class="control-title">⚙ SIMULATION CONTROLS</div>
+    <div class="control-title">⚙ SIMULATION CONTROLS <span class="toy-tag">TOY MODEL</span></div>
+
+    <div class="panel-note">
+      <b>These sliders do not measure anything.</b> They feed an invented formula that this page
+      makes up on the spot — P(doom) here is 0.02 × e^(0.4 × (year − 2020)), reduced by whatever
+      you dial in. No expert, paper or dataset produced these numbers, and the
+      <b>Adjusted P(doom)</b> below is illustrative only. Drag them for the vibes, not the forecast.
+    </div>
 
     <div class="slider-group">
       <div class="slider-label">
@@ -597,69 +791,90 @@
   <div id="mainGrid">
     <!-- Left Panel -->
     <div id="leftPanel" class="panel">
-      <div class="panel-title">CURRENT STATUS</div>
+      <div class="panel-title">STATUS AS OF OCT 2025</div>
+
+      <div class="panel-note">
+        <b>Frozen panel.</b> Nothing below has been updated since October 2025.
+        Figures tagged <span class="toy-tag">TOY MODEL</span> are this page's own invented curve.
+      </div>
 
       <div class="metric-group warning">
-        <div class="metric-label">P(doom) Base</div>
+        <div class="metric-label"><span class="toy-tag">TOY MODEL</span> P(doom) Base</div>
         <div class="metric-value warning" id="currentPdoom">12.1%</div>
-        <div class="metric-subtext">Exponential trajectory</div>
+        <div class="metric-subtext">Exponential trajectory
+          <span class="as-of">Made-up formula driven by the Year slider — not a measurement</span>
+        </div>
       </div>
 
       <div class="metric-group">
-        <div class="metric-label">Latest Model</div>
+        <div class="metric-label"><span class="stale-tag">OLD</span> Frontier Model (Oct 2025)</div>
         <div class="metric-value">GPT-5</div>
         <div class="metric-subtext">
           <a href="https://openai.com" target="_blank" class="source-link">Aug 2025 • 5×10²⁶ FLOPS</a>
+          <span class="as-of">Was the frontier as of Oct 2025. Later models are not tracked here.</span>
         </div>
       </div>
 
       <div class="metric-group warning">
-        <div class="metric-label">Compute Doubling</div>
+        <div class="metric-label"><span class="stale-tag">OLD</span> Compute Doubling</div>
         <div class="metric-value warning">5.6 mo</div>
         <div class="metric-subtext">
           <a href="https://epochai.org" target="_blank" class="source-link">Epoch AI estimate</a>
+          <span class="as-of">Estimate as of Oct 2025 — check Epoch AI for the current figure</span>
         </div>
       </div>
 
       <div class="metric-group critical">
-        <div class="metric-label">2027 Projection</div>
+        <div class="metric-label"><span class="toy-tag">TOY MODEL</span> 2027 Projection</div>
         <div class="metric-value critical" id="projection2027">36%</div>
-        <div class="metric-subtext">Current trajectory</div>
+        <div class="metric-subtext">Current trajectory
+          <span class="as-of">Output of the invented curve above — nobody forecasts this</span>
+        </div>
       </div>
 
       <!-- AI Company Stocks -->
       <div style="margin-top:20px;">
-        <div class="metric-label" style="margin-bottom:12px;">💹 AI STOCKS</div>
+        <div class="metric-label" style="margin-bottom:12px;"><span class="stale-tag">OLD</span> 💹 AI STOCKS</div>
+
+        <div class="panel-note">
+          <b>Not live prices.</b> These four numbers were typed in by hand around October 2025 and
+          have never updated. Whatever the market is doing today, it is not this. Click through to
+          Yahoo Finance for the real quote.
+        </div>
 
         <div class="stock-ticker" onclick="window.open('https://finance.yahoo.com/quote/NVDA', '_blank')">
           <div class="stock-name">NVIDIA (NVDA)</div>
-          <div class="stock-price">$201</div>
-          <div class="stock-change">+34% YTD</div>
+          <div class="stock-price"><span class="stale-tag">OCT 2025</span> $201</div>
+          <div class="stock-change">+34% YTD as of Oct 2025 &middot; not live</div>
         </div>
 
         <div class="stock-ticker" onclick="window.open('https://finance.yahoo.com/quote/MSFT', '_blank')">
           <div class="stock-name">Microsoft (MSFT)</div>
-          <div class="stock-price">$542</div>
-          <div class="stock-change">+28% YTD</div>
+          <div class="stock-price"><span class="stale-tag">OCT 2025</span> $542</div>
+          <div class="stock-change">+28% YTD as of Oct 2025 &middot; not live</div>
         </div>
 
         <div class="stock-ticker" onclick="window.open('https://finance.yahoo.com/quote/GOOGL', '_blank')">
           <div class="stock-name">Alphabet (GOOGL)</div>
-          <div class="stock-price">$165</div>
-          <div class="stock-change">+32% YTD</div>
+          <div class="stock-price"><span class="stale-tag">OCT 2025</span> $165</div>
+          <div class="stock-change">+32% YTD as of Oct 2025 &middot; not live</div>
         </div>
 
         <div class="stock-ticker" onclick="window.open('https://finance.yahoo.com/quote/META', '_blank')">
           <div class="stock-name">Meta (META)</div>
-          <div class="stock-price">$584</div>
-          <div class="stock-change">+35% YTD</div>
+          <div class="stock-price"><span class="stale-tag">OCT 2025</span> $584</div>
+          <div class="stock-change">+35% YTD as of Oct 2025 &middot; not live</div>
         </div>
       </div>
 
       <!-- AI Safety Investment Graph -->
       <div style="margin-top:20px;padding:15px;background:rgba(0,40,20,0.5);border:2px solid #00ff41;border-radius:6px;">
-        <div class="metric-label" style="text-align:center;margin-bottom:10px;">💰 AI SAFETY INVESTMENT</div>
+        <div class="metric-label" style="text-align:center;margin-bottom:10px;"><span class="stale-tag">OLD</span> 💰 AI SAFETY INVESTMENT</div>
         <div id="safetyInvestmentGraph" style="width:100%;height:180px;"></div>
+        <div class="panel-note" style="margin:10px 0 0 0;">
+          Hand-entered series, 2018&ndash;2025, ballpark figures with no cited source and no updates
+          since. Treat the shape as a sketch, not the numbers as data.
+        </div>
       </div>
     </div>
 
@@ -674,7 +889,7 @@
       <div id="bottomRow">
         <!-- World Map (left half) -->
         <div id="pieContainer">
-          <div id="mapTitle">AI Compute by Region</div>
+          <div id="mapTitle"><span class="stale-tag">OLD</span> AI Compute by Region (rough shares, Oct 2025)</div>
           <svg id="worldMap" viewBox="0 0 1000 500">
             <!-- Simplified world map regions -->
             <g id="mapRegions">
@@ -697,15 +912,15 @@
 
         <!-- Narrative Box (right half) -->
         <div id="narrativeBox">
-          <div class="narrative-title">Current Situation Analysis</div>
+          <div class="narrative-title"><span class="stale-tag">OLD</span> Situation Analysis, October 2025</div>
           <div class="narrative-text">
-            As of <span class="highlight">October 2025</span>, AI training compute has scaled exponentially with a doubling time of just <span class="highlight">5.6 months</span> (<a href="https://epochai.org/blog/compute-trends" target="_blank" class="source-link">Epoch AI</a>). The latest frontier model, GPT-5, was trained at <span class="highlight">5×10²⁶ FLOPS</span> — representing a 1592× increase over <a href="https://arxiv.org/abs/2005.14165" target="_blank" class="source-link">GPT-3</a> from 2020.
+            As of <span class="highlight">October 2025</span> — the last time this instrument was calibrated — AI training compute had scaled exponentially with a doubling time of just <span class="highlight">5.6 months</span> (<a href="https://epochai.org/blog/compute-trends" target="_blank" class="source-link">Epoch AI</a>). The frontier model at that date, GPT-5, was trained at <span class="highlight">5×10²⁶ FLOPS</span> — representing a 1592× increase over <a href="https://arxiv.org/abs/2005.14165" target="_blank" class="source-link">GPT-3</a> from 2020. Nothing released after October 2025 appears anywhere on this page.
           </div>
           <div class="narrative-text">
-            Expert consensus on P(doom) ranges from <span class="highlight">5% (median)</span> to over 95% for pessimists like <a href="https://en.wikipedia.org/wiki/Eliezer_Yudkowsky" target="_blank" class="source-link">Eliezer Yudkowsky</a>. The current trajectory suggests P(doom) could reach <span class="highlight">36% by 2027</span> if scaling continues unchecked (<a href="https://pauseai.info/pdoom" target="_blank" class="source-link">PauseAI compilation</a>).
+            Expert estimates of P(doom) compiled by then ranged from <span class="highlight">5% (median)</span> to over 95% for pessimists like <a href="https://en.wikipedia.org/wiki/Eliezer_Yudkowsky" target="_blank" class="source-link">Eliezer Yudkowsky</a> (<a href="https://pauseai.info/pdoom" target="_blank" class="source-link">PauseAI compilation</a>). The <span class="highlight">36% by 2027</span> shown elsewhere on this dashboard is <span class="highlight">not</span> from that compilation and is not anybody's forecast: it is the output of the toy exponential the sliders drive.
           </div>
           <div class="narrative-text">
-            Three major factors could reduce risk: increased AI safety research funding, international coordination on development pace, and stronger regulatory frameworks. Current levels remain <span class="highlight">insufficient</span> relative to the scale of the challenge (<a href="https://www.anthropic.com" target="_blank" class="source-link">Anthropic safety research</a>).
+            Three major factors could reduce risk: increased AI safety research funding, international coordination on development pace, and stronger regulatory frameworks. At that October 2025 snapshot, levels remained <span class="highlight">insufficient</span> relative to the scale of the challenge (<a href="https://www.anthropic.com" target="_blank" class="source-link">Anthropic safety research</a>).
           </div>
         </div>
       </div>
@@ -713,41 +928,52 @@
 
     <!-- Right Panel -->
     <div id="rightPanel" class="panel">
-      <div class="panel-title">EXPERT CONSENSUS</div>
+      <div class="panel-title">EXPERT CONSENSUS <span class="stale-tag">OLD</span></div>
+
+      <div class="panel-note">
+        <b>Figures as compiled in October 2025</b>, from the
+        <a href="https://pauseai.info/pdoom" target="_blank" class="source-link">PauseAI P(doom) compilation</a>
+        and public statements up to that date. People revise these estimates; this panel does not.
+        None of the five numbers below should be read as what that person says today.
+      </div>
 
       <div class="metric-group critical" onclick="window.open('https://en.wikipedia.org/wiki/Eliezer_Yudkowsky', '_blank')" style="cursor:pointer;">
         <div class="metric-label">E. Yudkowsky</div>
         <div class="metric-value critical">>95%</div>
-        <div class="metric-subtext">MIRI Founder</div>
+        <div class="metric-subtext">MIRI Founder <span class="as-of">estimate as of Oct 2025</span></div>
       </div>
 
       <div class="metric-group warning" onclick="window.open('https://en.wikipedia.org/wiki/Yoshua_Bengio', '_blank')" style="cursor:pointer;">
         <div class="metric-label">Y. Bengio</div>
         <div class="metric-value warning">50%</div>
-        <div class="metric-subtext">Nobel Laureate</div>
+        <div class="metric-subtext">Nobel Laureate <span class="as-of">estimate as of Oct 2025</span></div>
       </div>
 
       <div class="metric-group warning" onclick="window.open('https://www.anthropic.com/company', '_blank')" style="cursor:pointer;">
         <div class="metric-label">D. Amodei</div>
         <div class="metric-value warning">25%</div>
-        <div class="metric-subtext">Anthropic CEO</div>
+        <div class="metric-subtext">Anthropic CEO <span class="as-of">estimate as of Oct 2025</span></div>
       </div>
 
       <div class="metric-group warning" onclick="window.open('https://en.wikipedia.org/wiki/Geoffrey_Hinton', '_blank')" style="cursor:pointer;">
         <div class="metric-label">G. Hinton</div>
         <div class="metric-value warning">10-20%</div>
-        <div class="metric-subtext">Nobel Laureate</div>
+        <div class="metric-subtext">Nobel Laureate <span class="as-of">estimate as of Oct 2025</span></div>
       </div>
 
       <div class="metric-group" onclick="window.open('https://pauseai.info/pdoom', '_blank')" style="cursor:pointer;">
         <div class="metric-label">Survey Median</div>
         <div class="metric-value">5%</div>
-        <div class="metric-subtext">1000+ researchers</div>
+        <div class="metric-subtext">1000+ researchers <span class="as-of">survey median as of Oct 2025</span></div>
       </div>
 
       <!-- Manifold Markets -->
       <div style="margin-top:20px;">
-        <div class="metric-label" style="margin-bottom:12px;">📊 PREDICTION MARKETS</div>
+        <div class="metric-label" style="margin-bottom:12px;"><span class="live-tag">LIVE</span> 📊 PREDICTION MARKETS</div>
+        <div class="panel-note" style="border-left-color:#00ff41;">
+          Fetched from the <a href="https://manifold.markets" target="_blank" class="source-link">Manifold Markets</a>
+          API when you loaded this page. These probabilities are current; almost nothing else here is.
+        </div>
         <div id="manifoldMarkets">
           <div class="stock-ticker" style="cursor:pointer;">
             <div class="stock-name" style="font-size:10px;">Loading markets...</div>
@@ -758,7 +984,7 @@
       <!-- Cat Cam -->
       <div id="catCam">
         <div class="metric-label" style="text-align:center;margin-bottom:10px;">🐱 CAT CAM</div>
-        <img id="catImage" src="/assets/pdoom1-office-cat-default.png" alt="Cat">
+        <img id="catImage" src="/assets/pdoom1-office-cat-default.png" alt="Cat" loading="lazy" decoding="async">
         <div id="catStatus">Status: Monitoring</div>
       </div>
     </div>
@@ -1070,7 +1296,7 @@ function updatePlots(currentYear) {
 
       // Update map title with region info
       document.getElementById('mapTitle').innerHTML = `
-        <b>${regionName}</b>: ${data.compute}% of AI compute<br>
+        <b>${regionName}</b>: ${data.compute}% of AI compute <span style="font-size:10px;color:#ff6b35">[OLD &middot; rough share, Oct 2025]</span><br>
         <span style="font-size:11px;opacity:0.8">Major labs: ${data.labs.join(', ')}</span>
       `;
     });
@@ -1146,6 +1372,7 @@ function makeDraggable(element) {
 
   function elementDrag(e) {
     e.preventDefault();
+    element.dataset.moved = '1';   // stop auto-positioning once the user takes over
     pos1 = pos3 - e.clientX;
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
@@ -1164,6 +1391,27 @@ function makeDraggable(element) {
 makeDraggable(document.getElementById('controls'));
 makeDraggable(document.getElementById('leftPanel'));
 makeDraggable(document.getElementById('rightPanel'));
+
+/* The floating overlays used to be pinned to a hardcoded 80px, which was the
+   height of the old header. There is now a site nav and a calibration notice
+   above them, so measure the chrome instead of guessing -- otherwise the
+   overlays cover the notice, which is the one thing that must stay visible. */
+function positionOverlays() {
+  const chrome = ['header', '#header', '#calibrationNotice']
+    .map(sel => document.querySelector(sel))
+    .filter(Boolean)
+    .reduce((h, el) => h + el.getBoundingClientRect().height, 0);
+  const top = Math.round(chrome + 12) + 'px';
+  ['controls', 'warningLights'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.dataset.moved) el.style.top = top;
+  });
+}
+positionOverlays();
+window.addEventListener('load', positionOverlays);
+window.addEventListener('resize', positionOverlays);
+// navigation.js injects the nav asynchronously; re-measure once it has.
+setTimeout(positionOverlays, 300);
 
 updateAll();
 
@@ -1255,7 +1503,8 @@ async function loadManifoldMarkets() {
 
 /* ========== Timestamp & Cat ========== */
 function updateTimestamp() {
-  document.getElementById('timestamp').textContent = new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC';
+  // Clock, not data freshness -- the panels below are frozen at Oct 2025.
+  document.getElementById('timestamp').textContent = new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC (wall clock, not data age)';
 }
 updateTimestamp();
 setInterval(updateTimestamp, 1000);
@@ -1275,5 +1524,8 @@ setInterval(() => {
   document.getElementById('catStatus').textContent = 'Status: ' + ['Observing...', 'Concerned', 'Monitoring'][Math.floor(Math.random() * 3)];
 }, 8000);
 </script>
+
+<!-- Standard Navigation -->
+<script src="/assets/js/navigation.js"></script>
 </body>
 </html>

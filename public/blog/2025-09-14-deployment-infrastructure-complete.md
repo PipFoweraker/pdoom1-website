@@ -1,3 +1,9 @@
+---
+title: "p(Doom)1 Website Release - Deployment Infrastructure Complete"
+date: "2025-09-14"
+tags: ["milestone", "infrastructure", "deployment"]
+summary: "Successfully implemented and documented the complete deployment pipeline for the p(Doom)1 website with GitHub Actions workflow"
+---
 # p(Doom)1 Website Release - Deployment Infrastructure Complete
 
 *September 14, 2025*

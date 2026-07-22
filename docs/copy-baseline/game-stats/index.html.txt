@@ -1,0 +1,13 @@
+[title] Game Statistics - p(Doom)1
+[meta@description] Game statistics and metrics for p(Doom)1 - AI Safety Strategy Game. Strategic possibilities, baseline doom calculations, and frontier lab tracking.
+[h1] Game Statistics
+[text] 23% Baseline Doom Weekly calculated baseline p(doom) percentage representing current AI safety landscape assessment 5 Frontier Labs Number of AI frontier organizations actively mentioned in our resources and tracked in the game 10k+ Strategic Possibilities Calculated potential strategic combinations and decision paths available in the game -- Open Issues Current number of open issues in the main game repository -- GitHub Stars Community engagement metric from the main game repository -- Days Since Release Number of days since the last stable game release
+[h2] Calculation Methodology
+[p] These statistics are calculated using various automated methods and data sources:
+[text] Baseline Doom: Currently stubbed at 23%. Future implementation will aggregate AI safety sentiment from research papers, news sentiment analysis, and expert forecasting platforms. Frontier Labs: Automatically counted from organizations mentioned in our AI Safety Resources section, with manual verification for accuracy. Strategic Possibilities: Calculated based on game mechanics, decision trees, and combinatorial analysis of game states. Updated with each major game version.
+[h2] Data Sources
+[li] Game Repository: Version info, issue tracking, community engagement
+[li] AI Safety Resources: Organization tracking and frontier lab identification
+[li] Game Engine: Mechanics analysis for strategic possibility calculations
+[li] Community Feedback: Player reports and gameplay analytics (future)
+[text] Last updated: Loading...

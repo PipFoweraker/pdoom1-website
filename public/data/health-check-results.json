@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-07-22T19:34:54.678076",
-  "duration_seconds": 0.146967,
+  "timestamp": "2026-07-22T22:16:55.398058",
+  "duration_seconds": 0.14011,
   "total_tests": 11,
   "passed_tests": 11,
   "failed_tests": 0,
@@ -11,78 +11,78 @@
     {
       "test": "Main Index File",
       "passed": true,
-      "message": "\u2713 Found: D:\\Local_Code\\pdoom1-website\\scripts\\..\\public\\index.html",
-      "timestamp": "2026-07-22T19:34:54.531109",
+      "message": "\u2713 Found: public/index.html",
+      "timestamp": "2026-07-22T22:16:55.257948",
       "is_warning": false
     },
     {
       "test": "Config File",
       "passed": true,
-      "message": "\u2713 Found: D:\\Local_Code\\pdoom1-website\\scripts\\..\\public\\config.json",
-      "timestamp": "2026-07-22T19:34:54.531109",
+      "message": "\u2713 Found: public/config.json",
+      "timestamp": "2026-07-22T22:16:55.257948",
       "is_warning": false
     },
     {
       "test": "Version Data",
       "passed": true,
-      "message": "\u2713 Found: D:\\Local_Code\\pdoom1-website\\scripts\\..\\public\\data\\version.json",
-      "timestamp": "2026-07-22T19:34:54.531109",
+      "message": "\u2713 Found: public/data/version.json",
+      "timestamp": "2026-07-22T22:16:55.257948",
       "is_warning": false
     },
     {
       "test": "Changelog Data",
       "passed": true,
-      "message": "\u2713 Found: D:\\Local_Code\\pdoom1-website\\scripts\\..\\public\\data\\changes.json",
-      "timestamp": "2026-07-22T19:34:54.531109",
+      "message": "\u2713 Found: public/data/changes.json",
+      "timestamp": "2026-07-22T22:16:55.257948",
       "is_warning": false
     },
     {
       "test": "Config JSON",
       "passed": true,
-      "message": "\u2713 Valid JSON: D:\\Local_Code\\pdoom1-website\\scripts\\..\\public\\config.json",
-      "timestamp": "2026-07-22T19:34:54.531109",
+      "message": "\u2713 Valid JSON: public/config.json",
+      "timestamp": "2026-07-22T22:16:55.257948",
       "is_warning": false
     },
     {
       "test": "Version JSON",
       "passed": true,
-      "message": "\u2713 Valid JSON: D:\\Local_Code\\pdoom1-website\\scripts\\..\\public\\data\\version.json",
-      "timestamp": "2026-07-22T19:34:54.532147",
+      "message": "\u2713 Valid JSON: public/data/version.json",
+      "timestamp": "2026-07-22T22:16:55.258986",
       "is_warning": false
     },
     {
       "test": "Changes JSON",
       "passed": true,
-      "message": "\u2713 Valid JSON: D:\\Local_Code\\pdoom1-website\\scripts\\..\\public\\data\\changes.json",
-      "timestamp": "2026-07-22T19:34:54.532147",
+      "message": "\u2713 Valid JSON: public/data/changes.json",
+      "timestamp": "2026-07-22T22:16:55.258986",
       "is_warning": false
     },
     {
       "test": "Version Update Script",
       "passed": true,
-      "message": "\u2713 Script compiles: D:\\Local_Code\\pdoom1-website\\scripts\\..\\scripts\\update-version-info.py",
-      "timestamp": "2026-07-22T19:34:54.606233",
+      "message": "\u2713 Script compiles: scripts/update-version-info.py",
+      "timestamp": "2026-07-22T22:16:55.325828",
       "is_warning": false
     },
     {
       "test": "Stats Calculation Script",
       "passed": true,
-      "message": "\u2713 Script compiles: D:\\Local_Code\\pdoom1-website\\scripts\\..\\scripts\\calculate-game-stats.py",
-      "timestamp": "2026-07-22T19:34:54.678076",
+      "message": "\u2713 Script compiles: scripts/calculate-game-stats.py",
+      "timestamp": "2026-07-22T22:16:55.398058",
       "is_warning": false
     },
     {
       "test": "Version Data Structure",
       "passed": true,
       "message": "\u2713 All required fields present",
-      "timestamp": "2026-07-22T19:34:54.678076",
+      "timestamp": "2026-07-22T22:16:55.398058",
       "is_warning": false
     },
     {
       "test": "Data Freshness",
       "passed": true,
       "message": "\u2713 Data is 0 days old",
-      "timestamp": "2026-07-22T19:34:54.678076",
+      "timestamp": "2026-07-22T22:16:55.398058",
       "is_warning": false
     }
   ],

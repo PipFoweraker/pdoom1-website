@@ -64,11 +64,23 @@ jobs:
               repo_data = repo_response.json()
 
               # Build version.json
+              # NO literal version fallbacks here. This file is written straight to the
+              # live site, so a hardcoded default would publish a wrong version at exactly
+              # the moment we are least able to notice. If the payload is not a real
+              # release, fail the step and leave the existing cached data in place.
+              tag_name = release_data.get("tag_name")
+              published_at = release_data.get("published_at")
+              if not tag_name or not published_at:
+                  raise RuntimeError(
+                      "GitHub release payload missing tag_name/published_at "
+                      f"(keys: {sorted(release_data)[:10]}) -- refusing to write a guessed version"
+                  )
+
               version_json = {
                   "latest_release": {
-                      "version": release_data.get("tag_name", "v0.10.2"),
-                      "name": release_data.get("name", "P(Doom) v0.10.2"),
-                      "published_at": release_data.get("published_at", datetime.utcnow().isoformat() + "Z"),
+                      "version": tag_name,
+                      "name": release_data.get("name") or f"P(Doom) {tag_name}",
+                      "published_at": published_at,
                       "html_url": release_data.get("html_url", "https://github.com/PipFoweraker/pdoom1/releases/latest"),
                       "body": release_data.get("body", "See CHANGELOG.md for details.")
                   },

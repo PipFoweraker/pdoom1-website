@@ -1,0 +1,33 @@
+[title] p(Doom)1 Leaderboard - Top Players
+[meta@description] View the top players and scores in p(Doom)1, the AI Safety Strategy Game. See rankings, achievements, and player statistics.
+[meta@og:title] p(Doom)1 Leaderboard - Top Players
+[meta@og:description] View the top players and scores in p(Doom)1, the AI Safety Strategy Game. See rankings, achievements, and player statistics.
+[h1] Leaderboard
+[p] Top players in the AI Safety Strategy Game
+[text] Seed: - Economic Model: - Game Version: - - Total Players - Games Played - Average Score - Average p(Doom)
+[input@placeholder] Search players...
+[button] Search
+[option] All Seeds/Weeks
+[option] Current Week
+[option] Sort by Score
+[option] Sort by Name
+[option] Sort by Date
+[option] Sort by Doom Risk
+[option] Sort by Papers
+[option] All Risk Levels
+[option] Safe (≤30%)
+[option] Risky (30-50%)
+[option] Dangerous (>50%)
+[input@placeholder] Min Score
+[button] Table View
+[button] 🃏 Cards
+[h2] Top 10 Players
+[text] Loading... Loading leaderboard
+[th] Rank
+[th] Lab Name
+[th] Turns Survived
+[th] Game Metrics
+[th] Economic Data
+[th] Date
+[h3] Player Profile
+[button] ×

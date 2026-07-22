@@ -41,7 +41,7 @@
       ],
       "summary": "A comprehensive look at our systematic approach to breaking down 4,235+ line monoliths into clean, maintainable modules - featuring real metrics and engineering insights from the trenches",
       "commit": "beae890",
-      "featured": false
+      "featured": true
     },
     {
       "filename": "2025-09-15-ui-monolith-breakdown-complete.md",
@@ -51,22 +51,27 @@
         "milestone",
         "architecture",
         "ui",
-        "refactoring"
+        "refactoring",
+        "v0.7.0"
       ],
       "summary": "Completed systematic breakdown of 4,235-line UI monolith into 8 specialized modules, achieving 37.1% reduction with zero functionality regression",
-      "commit": "4c615f3"
+      "commit": "4c615f3",
+      "featured": false
     },
     {
       "filename": "2025-09-15-multi-repository-integration-complete.md",
       "title": "Multi-Repository Integration System Complete",
       "date": "2025-09-15",
       "tags": [
-        "infrastructure",
         "automation",
-        "versioning"
+        "versioning",
+        "documentation",
+        "architecture",
+        "github-actions"
       ],
-      "summary": "Completed comprehensive multi-repository integration system establishing professional automation and documentation management across pdoom1, pdoom1-website, and pdoom-data repositories",
-      "commit": "139ef35"
+      "summary": "Completed comprehensive multi-repository integration system establishing professional automation and documentation management across pdoom1, pdoom1-website, and pdoom-data repositories with zero-manual-overhead release process.",
+      "commit": "",
+      "featured": false
     },
     {
       "filename": "2025-09-15-monolith-breakdown-tutorial-extraction.md",
@@ -74,10 +79,29 @@
       "date": "2025-09-15",
       "tags": [
         "refactoring",
+        "monolith-breakdown",
         "ui",
-        "cleanup"
+        "cleanup",
+        "modular-architecture"
       ],
-      "summary": "Extracted 486 lines of tutorial functions, removed 151 lines of legacy code, and fixed critical hover tooltips bug"
+      "summary": "Extracted 486 lines of tutorial functions, removed 151 lines of legacy code, and fixed critical hover tooltips bug",
+      "commit": "139ef35",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-14-deterministic-rng-complete.md",
+      "title": "Complete Deterministic RNG System v0.6.0",
+      "date": "2025-09-14",
+      "tags": [
+        "milestone",
+        "deterministic",
+        "competitive",
+        "rng",
+        "v0.6.0"
+      ],
+      "summary": "MAJOR MILESTONE: Transform P(Doom) into fully deterministic competitive gaming platform with perfect reproducibility",
+      "commit": "9956d94",
+      "featured": false
     },
     {
       "filename": "2025-09-14-deployment-infrastructure-complete.md",
@@ -88,84 +112,96 @@
         "infrastructure",
         "deployment"
       ],
-      "summary": "Successfully implemented and documented the complete deployment pipeline for the p(Doom)1 website with GitHub Actions workflow"
-    },
-    {
-      "filename": "2025-09-14-deterministic-rng-complete.md",
-      "title": "Deterministic RNG Foundation Complete",
-      "date": "2025-09-14",
-      "tags": [
-        "architecture",
-        "deterministic",
-        "rng"
-      ],
-      "summary": "268-line comprehensive system for competitive gaming with enhanced deterministic RNG and community challenge features"
+      "summary": "Successfully implemented and documented the complete deployment pipeline for the p(Doom)1 website with GitHub Actions workflow",
+      "commit": "",
+      "featured": false
     },
     {
       "filename": "2025-09-13-enhanced-leaderboard-system-v0-4-1.md",
-      "title": "Enhanced Leaderboard System v0.4.1",
+      "title": "Enhanced Leaderboard System v0.4.1: Seed Competition",
       "date": "2025-09-13",
       "tags": [
-        "release",
+        "milestone",
         "leaderboard",
-        "ui"
+        "bootstrap-economics",
+        "ui",
+        "competition"
       ],
-      "summary": "Enhanced leaderboard system with improved scoring, display features, and competitive gaming infrastructure"
-    },
-    {
-      "filename": "2025-09-11-debug-console-system.md",
-      "title": "Debug Console System Implementation",
-      "date": "2025-09-11",
-      "tags": [
-        "debug",
-        "tools",
-        "development"
-      ],
-      "summary": "Implemented comprehensive debug console system for enhanced development and troubleshooting capabilities"
+      "summary": "Major competitive gaming milestone: seed-specific leaderboards, lab name integration, bootstrap economic model, and comprehensive session tracking",
+      "commit": "2dd48ac",
+      "featured": false
     },
     {
       "filename": "2025-09-11-v0-3-0-consolidated-release.md",
-      "title": "v0.3.0 Consolidated Release - Major Bug Fixes & Infrastructure",
+      "title": "P(Doom) v0.3.0: Consolidated Feature Release",
       "date": "2025-09-11",
       "tags": [
+        "milestone",
         "release",
-        "hotfix",
-        "infrastructure"
+        "longtermist",
+        "accessibility",
+        "alpha",
+        "consolidation"
       ],
-      "summary": "Consolidated release featuring critical bug fixes, infrastructure improvements, and enhanced development tooling"
+      "summary": "Major consolidated release featuring longtermist 5-digit year dates, accessibility framework, comprehensive bug sweep plan, and systematic branch merge for alpha readiness",
+      "commit": "76de59c",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-11-debug-console-system.md",
+      "title": "Debug Console System",
+      "date": "2025-09-11",
+      "tags": [
+        "debug",
+        "ui",
+        "development"
+      ],
+      "summary": "Added real-time debug console with backtick toggle for game state monitoring",
+      "commit": "7aa2673",
+      "featured": false
     },
     {
       "filename": "2025-09-10-version-0-2-12-release.md",
-      "title": "P(Doom) v0.2.12 Release: Development Infrastructure Enhancement",
+      "title": "P(Doom) v0.2.12: Development Infrastructure",
       "date": "2025-09-10",
       "tags": [
         "release",
+        "milestone",
+        "type-annotations",
         "infrastructure",
-        "type-annotation"
+        "quality"
       ],
-      "summary": "Major infrastructure milestone featuring comprehensive type annotations and automated blog system implementation"
+      "summary": "Major version release featuring comprehensive type annotations and development tooling infrastructure",
+      "commit": "fedc543",
+      "featured": false
     },
     {
       "filename": "2025-09-10-type-annotation-sprint.md",
-      "title": "Type Annotation Sprint: Major Codebase Quality Enhancement",
+      "title": "Type Annotation Sprint: game_state.py Near Completion",
       "date": "2025-09-10",
       "tags": [
-        "type-annotation",
-        "sprint",
-        "quality"
+        "type-annotations",
+        "pylance",
+        "code-quality",
+        "monoliths"
       ],
-      "summary": "Intensive type annotation sprint achieving 85-90% coverage across core modules with significant pylance error reduction"
+      "summary": "Completed 85-90% of game_state.py type annotations with 25+ methods annotated across core systems",
+      "commit": "08180d1",
+      "featured": false
     },
     {
       "filename": "2025-09-10-major-type-annotation-milestone.md",
-      "title": "Major Type Annotation Milestone - 4,235 Lines Annotated",
+      "title": "Major Type Annotation Milestone: UI and GameState Complete",
       "date": "2025-09-10",
       "tags": [
         "milestone",
-        "type-annotation",
-        "ui"
+        "type-annotations",
+        "infrastructure",
+        "code-quality"
       ],
-      "summary": "Achieved major milestone with complete type annotation of ui.py (4,235 lines) and significant progress on game_state.py"
+      "summary": "Completed comprehensive type annotations for ui.py and 60% of game_state.py, resolving 1,100-1,600 pylance issues",
+      "commit": "867127d",
+      "featured": false
     }
   ]
 }

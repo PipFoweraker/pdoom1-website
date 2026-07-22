@@ -33,11 +33,22 @@ def fetch_github_data(endpoint: str) -> Optional[Dict[str, Any]]:
         return None
 
 
+def read_existing_version_json() -> Dict[str, Any]:
+    """Whatever version.json currently says. Used to preserve, never to invent."""
+    version_file = os.path.join(DATA_DIR, 'version.json')
+    try:
+        with open(version_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
 def get_latest_release() -> Dict[str, Any]:
     """Get latest release information"""
     data = fetch_github_data(f"/repos/{REPO_OWNER}/{REPO_NAME}/releases/latest")
-    
-    if data:
+
+    if data and (data.get('tag_name') or data.get('name')):
         return {
             'version': data.get('tag_name') or data.get('name'),
             'name': data.get('name'),
@@ -45,21 +56,25 @@ def get_latest_release() -> Dict[str, Any]:
             'html_url': data.get('html_url'),
             'body': data.get('body', '')
         }
-    else:
-        # Fallback if API fails
-        return {
-            'version': 'v0.4.1',
-            'name': 'Latest Release',
-            'published_at': datetime.now().isoformat(),
-            'html_url': f'https://github.com/{REPO_OWNER}/{REPO_NAME}/releases',
-            'body': 'Latest development version'
-        }
+
+    # API failed. This function's output is written straight into version.json, which
+    # every page treats as the source of truth -- a literal fallback here would
+    # overwrite a correct version with an ancient one at exactly the moment nobody is
+    # watching. Keep whatever is already on disk; if there is nothing, stop.
+    existing = read_existing_version_json().get('latest_release')
+    if isinstance(existing, dict) and existing.get('version'):
+        print(f"Warning: release lookup failed; preserving existing version {existing['version']}")
+        return existing
+    raise RuntimeError(
+        'Could not fetch the latest release and no usable latest_release exists in '
+        'version.json. Refusing to write a guessed version.'
+    )
 
 
 def get_repo_stats() -> Dict[str, Any]:
     """Get repository statistics"""
     data = fetch_github_data(f"/repos/{REPO_OWNER}/{REPO_NAME}")
-    
+
     if data:
         return {
             'stars': data.get('stargazers_count', 0),
@@ -67,13 +82,17 @@ def get_repo_stats() -> Dict[str, Any]:
             'open_issues': data.get('open_issues_count', 0),
             'last_updated': data.get('updated_at')
         }
-    else:
-        return {
-            'stars': 0,
-            'forks': 0,
-            'open_issues': 0,
-            'last_updated': datetime.now().isoformat()
-        }
+
+    # Same rule as the release lookup: zeroes are a claim ("this project has no stars"),
+    # not an absence of one. Preserve the last known-good stats instead of asserting.
+    existing = read_existing_version_json().get('repository_stats')
+    if isinstance(existing, dict) and existing:
+        print('Warning: repo stats lookup failed; preserving existing repository_stats')
+        return existing
+    raise RuntimeError(
+        'Could not fetch repository stats and none exist in version.json. '
+        'Refusing to publish zeroes as if they were measured.'
+    )
 
 
 def update_version_data() -> Dict[str, Any]:

@@ -26,6 +26,25 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 
 
+def deployed_game_version(website_dir: Path) -> str:
+    """Read the deployed game version from the site's own source of truth.
+
+    Raises instead of returning a literal. Leaderboard boards are keyed
+    (seed, game_version), so a hardcoded fallback version would file exported
+    scores onto a board that no live client can reach -- players submit and see
+    nothing, with no error anywhere. An exception is the cheaper failure.
+    """
+    version_file = website_dir / "public" / "data" / "version.json"
+    try:
+        data = json.loads(version_file.read_text(encoding="utf-8"))
+    except Exception as e:
+        raise RuntimeError(f"Cannot read {version_file} for the game version: {e}")
+    version = (data.get("latest_release") or {}).get("version")
+    if not version:
+        raise RuntimeError(f"{version_file} has no latest_release.version -- refusing to guess")
+    return version
+
+
 class GameRepositoryIntegration:
     """Integration with the p(Doom)1 game repository for real data export."""
     
@@ -189,9 +208,20 @@ class GameRepositoryIntegration:
     def convert_game_to_website_format(self, game_data: Dict[str, Any], source_file: Path) -> Dict[str, Any]:
         """Convert game leaderboard format to website format."""
         
+        # The exporting client's own version stamp decides which board these entries
+        # land on. If it is missing we do not know it, and inventing one is worse than
+        # stopping: the entries would be filed to an unreachable board.
+        source_version = game_data.get("version")
+        if not source_version:
+            raise ValueError(
+                f"{source_file.name} has no 'version' field; refusing to stamp a literal "
+                "game_version (boards are keyed (seed, game_version), so a guess hides "
+                "these entries from every client)."
+            )
+
         # Handle different possible game data formats
         entries = []
-        
+
         if "entries" in game_data:
             # Already in the expected format
             entries = game_data["entries"]
@@ -216,7 +246,7 @@ class GameRepositoryIntegration:
                     "player_name": entry.get("player_name", entry.get("lab_name", f"Player {i+1}")),
                     "date": entry.get("date", datetime.now().isoformat() + "Z"),
                     "level_reached": entry.get("level_reached", entry.get("score", 0)),
-                    "game_mode": entry.get("game_mode", "Bootstrap_v0.4.1"),
+                    "game_mode": entry.get("game_mode", "unknown"),
                     "duration_seconds": entry.get("duration_seconds", 0.0),
                     "entry_uuid": entry.get("entry_uuid", f"game-{i+1:03d}"),
                     "final_doom": entry.get("final_doom", 25.0),
@@ -237,7 +267,7 @@ class GameRepositoryIntegration:
         return {
             "meta": {
                 "generated": datetime.now().isoformat() + "Z",
-                "game_version": game_data.get("version", "v0.4.1"),
+                "game_version": source_version,
                 "total_seeds": 1,
                 "total_players": len(set(entry["player_name"] for entry in website_entries)),
                 "export_source": "game-repository",
@@ -245,7 +275,7 @@ class GameRepositoryIntegration:
                 "note": "Exported from actual game leaderboard data"
             },
             "seed": game_data.get("seed", source_file.stem.replace("seed_", "")),
-            "economic_model": game_data.get("economic_model", "Bootstrap_v0.4.1"),
+            "economic_model": game_data.get("economic_model", "unknown"),
             "entries": website_entries
         }
     
@@ -253,18 +283,20 @@ class GameRepositoryIntegration:
         """Generate sample data that's aware of the game repository presence."""
         print("FALLBACK: Generating game-aware sample data...")
         
-        # Fallback minimal data
+        # Fallback minimal data. Empty entries, so the version stamp here is a statement
+        # about which board is live, not about who played -- read it from version.json
+        # rather than freezing a literal that goes stale on every release.
         return {
             "meta": {
                 "generated": datetime.now().isoformat() + "Z",
-                "game_version": "v0.4.1",
+                "game_version": deployed_game_version(self.website_dir),
                 "total_seeds": 0,
                 "total_players": 0,
                 "export_source": "fallback",
                 "note": "No game data available - game repository detected but no leaderboard data found"
             },
             "seed": "no-data",
-            "economic_model": "Bootstrap_v0.4.1",
+            "economic_model": "unknown",
             "entries": []
         }
     

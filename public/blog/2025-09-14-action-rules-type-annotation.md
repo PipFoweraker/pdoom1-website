@@ -1,4 +1,5 @@
 ---
+draft: true   # unpublished: never appeared in index.json. Flip to publish.
 title: "Type Annotation: action_rules.py Complete"
 date: "2025-09-14"
 tags: ["type-annotation", "milestone", "core", "action-rules", "game-logic"]

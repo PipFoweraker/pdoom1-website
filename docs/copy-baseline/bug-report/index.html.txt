@@ -1,0 +1,30 @@
+[title] Report a Bug - p(Doom)1
+[meta@description] Report bugs, request features, or submit issues for p(Doom)1 - AI Safety Strategy Game. Upload logs and screenshots to help us improve the game.
+[meta@og:title] Report a Bug - p(Doom)1
+[meta@og:description] Report issues and help improve p(Doom)1 - the AI Safety Strategy Game.
+[text] Skip to main content Pip Foweraker's p(Doom)1
+[li] Game
+[li] Leaderboard
+[li] Stats
+[li] Contact
+[h1] Report a Bug
+[p] Found a bug or need help? Report issues directly through our GitHub integration. You can attach log files, screenshots, or config files to help us debug faster.
+[label] Issue Title *
+[input@placeholder] Brief description of the issue
+[label] Bug Type
+[option] [Bug] Bug Report
+[option] Feature Request
+[option] Documentation Issue
+[option] Performance Issue
+[text] Select the category that best describes your issue
+[label] Description *
+[textarea@placeholder] Detailed description of the issue, including steps to reproduce...
+[text] Include steps to reproduce, expected behavior, and actual behavior
+[label] Email (Optional)
+[input@placeholder] your.email@example.com
+[text] Only used for follow-up questions. Not stored or shared.
+[label] Attach Log/File (Optional)
+[text] Upload logs, screenshots, or config files (max 500 KB). Supported: .txt, .log, .json, .zip, .png, .jpg
+[button] Submit Bug Report
+[p] © 2025 pdoom1. Not affiliated with any AI organization. For fun, education, and satire only.
+[p] Privacy: No personal data collected | Back to Home

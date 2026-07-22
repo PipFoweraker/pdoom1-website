@@ -14,6 +14,7 @@
 # Data contract validation (scripts/validate_data.py, CI)
 # ============================================================================
 jsonschema==4.26.0     # JSON Schema validation of data seams (schemas/*.schema.json)
+PyYAML>=6.0            # Blog post front matter (scripts/build-blog-index.py)
 Pillow>=10.0.0         # Image optimization (optimize-screenshots.py, blog assets)
 
 # ============================================================================

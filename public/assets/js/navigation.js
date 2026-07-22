@@ -10,9 +10,12 @@
 		<nav role="navigation" aria-label="Main navigation">
 			<div class="logo-container">
 				<a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
-				<span class="version-badge" id="versionBadge">
-					<span class="version-number" id="versionNumber">v0.11.0</span>
-					<span id="versionDate">2025-12-07</span>
+				<!-- Deliberately empty: updateNavVersion() fills these from
+				     /data/version.json. A hardcoded version/date here would keep
+				     asserting a stale release whenever that fetch fails. -->
+				<span class="version-badge" id="versionBadge" hidden style="display:none">
+					<span class="version-number" id="versionNumber"></span>
+					<span id="versionDate"></span>
 				</span>
 			</div>
 			<ul class="nav-links" role="menubar">
@@ -124,9 +127,11 @@
 	}
 
 	// Update the nav version badge from the canonical version.json so every page
-	// using this injected nav reflects the current game release (instead of the
-	// hardcoded fallback above). Silently no-ops if the badge or file is absent.
+	// using this injected nav reflects the current game release. The badge markup
+	// ships empty and hidden, so a failed fetch shows nothing rather than a stale
+	// version -- silence beats a confident wrong number.
 	async function updateNavVersion() {
+		const badgeEl = document.getElementById('versionBadge');
 		const numberEl = document.getElementById('versionNumber');
 		const dateEl = document.getElementById('versionDate');
 		if (!numberEl && !dateEl) return;
@@ -141,8 +146,12 @@
 			if (dateEl && release.published_at) {
 				dateEl.textContent = release.published_at.split('T')[0];
 			}
+			if (badgeEl && release.version) {
+				badgeEl.removeAttribute('hidden');
+				badgeEl.style.display = '';
+			}
 		} catch (e) {
-			// Keep the hardcoded fallback on any failure.
+			// Leave the badge hidden and empty on any failure.
 		}
 	}
 

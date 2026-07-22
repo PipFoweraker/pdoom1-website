@@ -559,7 +559,10 @@
 			
 			<div class="stats-grid">
 				<div class="stat-item">
-					<span class="stat-number">v0.11.0</span>
+					<!-- Filled from /data/version.json by the script at the end of this
+					     page. Ships as a dash, not a version literal, so a failed fetch
+					     shows "unknown" instead of quietly asserting an old release. -->
+					<span class="stat-number" id="current-version">&mdash;</span>
 					<span class="stat-label">Current Version</span>
 				</div>
 				<div class="stat-item">
@@ -630,6 +633,24 @@
 				}
 			});
 		});
+	</script>
+
+	<script>
+		// Project Stats "Current Version" comes from the canonical /data/version.json,
+		// never from a literal baked into this page.
+		(async function loadCurrentVersion() {
+			const el = document.getElementById('current-version');
+			if (!el) return;
+			try {
+				const res = await fetch('/data/version.json', { cache: 'no-store' });
+				if (!res.ok) return;
+				const data = await res.json();
+				const version = (data.latest_release || {}).version;
+				if (version) el.textContent = version;
+			} catch (e) {
+				// Leave the dash in place rather than showing a stale version.
+			}
+		})();
 	</script>
 
 	<!-- Standard Navigation -->
