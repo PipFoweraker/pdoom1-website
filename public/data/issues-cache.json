@@ -1,6 +1,80 @@
 {
   "issues": [
     {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/807",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/807/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/807/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/807/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/807",
+      "id": 4958849384,
+      "node_id": "I_kwDOPVWa588AAAABJ5IJaA",
+      "number": 807,
+      "title": "CI: 'Validate Historical Data' fails -- quirks.json mis-validated against researcher schema (pre-existing)",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [],
+      "state": "open",
+      "locked": false,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2026-07-23T12:34:40Z",
+      "updated_at": "2026-07-23T12:34:40Z",
+      "closed_at": null,
+      "assignee": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "body": "The **Validate Historical Data** CI check fails with:\n```\nquirks.json/root: 'researchers' is a required property\n```\n\n## Cause\n`scripts/validate_historical_data.py` validates the researcher-data files against the researcher-PROFILE schema (which requires a `researchers` property). `quirks.json` is a quirk CATALOGUE, not a researcher-profiles file, so it fails that schema.\n\n## Pre-existing -- does NOT block PR #806\nPR #806 (the branch reconcile) did **not** touch `quirks.json` (only `godot/data/balance/defaults.json`). This check fails on `main` independently. So it is inherited debt, not a #806 regression -- #806 is safe to admin-merge (admin override on the inherited red check). Every other check on #806 is green.\n\n## Fix options (~few lines)\n- Exclude `quirks.json` from the researcher-profile validation glob, OR\n- Give quirks its own schema and route it there, OR\n- Move `quirks.json` out of the researcher data dir.\n\nTier: CI / data hygiene, non-forking (patch any time). NOT Friday-blocking.",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/807/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/807/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null,
+      "pinned_comment": null
+    },
+    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/806",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/806/labels{/name}",
@@ -1233,101 +1307,8 @@
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
-    },
-    {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/789",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/789/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/789/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/789/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/789",
-      "id": 4948164053,
-      "node_id": "I_kwDOPVWa588AAAABJu791Q",
-      "number": 789,
-      "title": "Hiring stitch: onboarding sub-actions as AP-sink prompts on offer-accept + interview schedule->happen flow",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 11595108524,
-          "node_id": "LA_kwDOPVWa588AAAACsx9QrA",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/ship:hotpatch-48h",
-          "name": "ship:hotpatch-48h",
-          "color": "E9752E",
-          "default": false,
-          "description": "Fast-follow 48h after friend links; ladder break acceptable"
-        },
-        {
-          "id": 11607041624,
-          "node_id": "LA_kwDOPVWa588AAAACs9VmWA",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/league:v0.13",
-          "name": "league:v0.13",
-          "color": "5319e7",
-          "default": false,
-          "description": "Ships in the Fri v0.13 league/epoch cut (forking-adjacent, defines the epoch)"
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignees": [],
-      "milestone": null,
-      "comments": 5,
-      "created_at": "2026-07-22T10:54:19Z",
-      "updated_at": "2026-07-23T11:01:13Z",
-      "closed_at": null,
-      "assignee": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "body": "Early-game hiring is a priority to get right (Pip 2026-07-22, playing the A/B build). Two linked gaps:\n\n1. **Onboarding sub-actions as prompts + predictable AP sinks.** Laptop-provisioning + mentoring for a new hire should surface as PROMPTS when a candidate ACCEPTS an offer during the turn, and act as predictable AP sinks you can plan for when you make the offer. Data already exists (researcher fields laptop_done/visa_done/mentoring_done/onboarded) -- it needs surfacing as costed actions.\n2. **Interview = schedule -> happen.** Interviewing reads more like SCHEDULING an interview, then it taking place later. When the interview happens, fire a pop-up/notification (pairs with newness-glow, sibling issue).\n\nGameplay change (AP economy + timing) -> forks the ladder, fine at the 48h mark. Pointers: hiring pipeline, researcher.gd onboarding fields, month_plan/turn_manager (AP), NotificationManager.",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/789/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/789/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null,
-      "pinned_comment": null
     }
   ],
   "count": 15,
-  "last_updated": "2026-07-23T12:27:55.327028"
+  "last_updated": "2026-07-23T18:22:56.813093"
 }
