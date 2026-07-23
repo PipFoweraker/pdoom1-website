@@ -1,27 +1,85 @@
-# Security hardening for DreamHost Apache (optional)
-# Place this in your site root if using DreamHost for hosting
+# Apache config for pdoom1.com on DreamHost shared hosting.
+#
+# The load-bearing goal here is SURVIVING A TRAFFIC SPIKE. Shared hosting has a
+# hard bandwidth budget and a modest CPU share; a sudden crowd (a reviewer post,
+# a front-page link) is exactly when this file earns its keep. Compression cuts
+# response size, caching cuts repeat origin hits, and dropping dead weight from
+# the deploy cuts what has to be served at all (see the rsync excludes in
+# .github/workflows/auto-deploy-on-push.yml).
 
-# Canonical domain enforcement: redirect www → root domain
 RewriteEngine On
+
+# Canonical domain: redirect www -> apex.
 RewriteCond %{HTTP_HOST} ^www\.pdoom1\.com$ [NC]
 RewriteRule ^(.*)$ https://pdoom1.com/$1 [R=301,L]
 
-# Deny access to dotfiles
+# ---------------------------------------------------------------------------
+# Compression -- the single biggest spike lever.
+# events.json is ~1.18 MB uncompressed and is fetched on every /events/ visit;
+# gzip takes it to ~200 KB. HTML/CSS/JS/SVG compress 70-80%.
+# ---------------------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript text/javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE application/rss+xml application/atom+xml application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+  # Proxies must not hand a compressed body to a client that can't take it.
+  Header append Vary Accept-Encoding
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Caching. There is NO content hashing in filenames here (site.css stays
+# site.css across deploys), so cache lifetimes trade spike relief against update
+# latency. Images are content-stable and are the bandwidth hogs, so they get
+# long lives; text that a deploy changes gets short ones.
+# ---------------------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Images / fonts: rarely change, biggest bytes. Long cache = the largest
+  # bandwidth saving under load (the 3.8 MB cat, the 2.6 MB logo, hero art).
+  ExpiresByType image/png                 "access plus 30 days"
+  ExpiresByType image/jpeg                "access plus 30 days"
+  ExpiresByType image/webp                "access plus 30 days"
+  ExpiresByType image/gif                 "access plus 30 days"
+  ExpiresByType image/svg+xml             "access plus 7 days"
+  ExpiresByType image/x-icon              "access plus 30 days"
+  ExpiresByType font/woff2                "access plus 30 days"
+
+  # CSS/JS: unfingerprinted, so a deploy's change must propagate. One hour
+  # bounds staleness while still absorbing a spike's repeat loads.
+  ExpiresByType text/css                  "access plus 1 hour"
+  ExpiresByType application/javascript    "access plus 1 hour"
+  ExpiresByType text/javascript           "access plus 1 hour"
+
+  # Data a workflow refreshes (version.json, events.json, leaderboard). Kept
+  # short so the homepage never shows a stale version; compression, not caching,
+  # protects these under load.
+  ExpiresByType application/json          "access plus 5 minutes"
+
+  # Feeds: subscribers should see new posts promptly.
+  ExpiresByType application/rss+xml       "access plus 30 minutes"
+  ExpiresByType application/atom+xml      "access plus 30 minutes"
+
+  # HTML: 10 minutes. Long enough to blunt a spike, short enough that a fix
+  # pushed mid-event reaches people within the event.
+  ExpiresByType text/html                 "access plus 10 minutes"
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Security hardening.
+# ---------------------------------------------------------------------------
+# Deny dotfiles (.htaccess, .git leftovers, etc.)
 <FilesMatch "^\.">
   Require all denied
 </FilesMatch>
 
-# Prevent directory listings
+# No directory listings.
 Options -Indexes
 
-# Block access to design tokens directly if desired (comment to allow)
-#<Files "tokens.json">
-#  Require all denied
-#</Files>
-
-# Basic CORS for API if you proxy elsewhere (adjust as needed)
-#<IfModule mod_headers.c>
-#  Header set Access-Control-Allow-Origin "https://YOUR_DOMAIN"
-#  Header set Access-Control-Allow-Methods "POST, OPTIONS"
-#  Header set Access-Control-Allow-Headers "Content-Type"
-#</IfModule>
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

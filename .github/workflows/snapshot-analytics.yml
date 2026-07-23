@@ -1,0 +1,56 @@
+name: Snapshot analytics to git
+
+# Pulls Plausible stats into a committed daily snapshot, so the traffic history
+# survives losing the analytics VPS. See scripts/snapshot-plausible.py.
+#
+# Does nothing until the PLAUSIBLE_API_KEY secret is set -- an unconfigured run
+# is a harmless no-op. During a spike you can also trigger it manually to catch
+# the shape at finer granularity than the daily schedule.
+
+on:
+  schedule:
+    - cron: '30 1 * * *'   # daily, 01:30 UTC
+  workflow_dispatch:
+    inputs:
+      period:
+        description: 'Plausible period (7d, 30d, 6mo, 12mo)'
+        default: '30d'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: snapshot-analytics
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Snapshot
+        env:
+          PLAUSIBLE_API_KEY: ${{ secrets.PLAUSIBLE_API_KEY }}
+        run: |
+          # A stable UTC date label, so re-runs on the same day overwrite rather
+          # than accrete duplicates.
+          python scripts/snapshot-plausible.py \
+            --period "${{ github.event.inputs.period || '30d' }}" \
+            --date "$(date -u +%F)"
+
+      - name: Commit the snapshot
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A public/data/analytics/history public/data/analytics/latest.json
+          if git diff --cached --quiet; then
+            echo "No snapshot to commit (likely PLAUSIBLE_API_KEY not set)"
+          else
+            git commit -m "chore(analytics): daily snapshot $(date -u +%F)"
+            git push
+          fi
