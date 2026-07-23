@@ -1,0 +1,342 @@
+{
+  "site": "pdoom1.com",
+  "period": "30d",
+  "sections": {
+    "aggregate": {
+      "results": {
+        "pageviews": {
+          "value": 90
+        },
+        "visit_duration": {
+          "value": 11
+        },
+        "visitors": {
+          "value": 79
+        },
+        "visits": {
+          "value": 80
+        },
+        "bounce_rate": {
+          "value": 91
+        }
+      }
+    },
+    "timeseries": {
+      "results": [
+        {
+          "date": "2026-06-23",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "date": "2026-06-24",
+          "pageviews": 5,
+          "visitors": 5
+        },
+        {
+          "date": "2026-06-25",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "date": "2026-06-26",
+          "pageviews": 0,
+          "visitors": 0
+        },
+        {
+          "date": "2026-06-27",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "date": "2026-06-28",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "date": "2026-06-29",
+          "pageviews": 0,
+          "visitors": 0
+        },
+        {
+          "date": "2026-06-30",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "date": "2026-07-01",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "date": "2026-07-02",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "date": "2026-07-03",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "date": "2026-07-04",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "date": "2026-07-05",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "date": "2026-07-06",
+          "pageviews": 0,
+          "visitors": 0
+        },
+        {
+          "date": "2026-07-07",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "date": "2026-07-08",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "date": "2026-07-09",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "date": "2026-07-10",
+          "pageviews": 5,
+          "visitors": 4
+        },
+        {
+          "date": "2026-07-11",
+          "pageviews": 0,
+          "visitors": 0
+        },
+        {
+          "date": "2026-07-12",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "date": "2026-07-13",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "date": "2026-07-14",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "date": "2026-07-15",
+          "pageviews": 12,
+          "visitors": 5
+        },
+        {
+          "date": "2026-07-16",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "date": "2026-07-17",
+          "pageviews": 4,
+          "visitors": 3
+        },
+        {
+          "date": "2026-07-18",
+          "pageviews": 5,
+          "visitors": 4
+        },
+        {
+          "date": "2026-07-19",
+          "pageviews": 4,
+          "visitors": 2
+        },
+        {
+          "date": "2026-07-20",
+          "pageviews": 9,
+          "visitors": 9
+        },
+        {
+          "date": "2026-07-21",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "date": "2026-07-22",
+          "pageviews": 6,
+          "visitors": 7
+        }
+      ]
+    },
+    "sources": {
+      "results": [
+        {
+          "source": "Direct / None",
+          "visitors": 66
+        },
+        {
+          "source": "Google",
+          "visitors": 7
+        },
+        {
+          "source": "DuckDuckGo",
+          "visitors": 3
+        },
+        {
+          "source": "Bing",
+          "visitors": 2
+        },
+        {
+          "source": "Ecosia",
+          "visitors": 1
+        },
+        {
+          "source": "Perplexity",
+          "visitors": 1
+        }
+      ]
+    },
+    "pages": {
+      "results": [
+        {
+          "page": "/",
+          "pageviews": 70,
+          "visitors": 64
+        },
+        {
+          "page": "/dashboard/",
+          "pageviews": 8,
+          "visitors": 7
+        },
+        {
+          "page": "/blog/",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "page": "/leaderboard/",
+          "pageviews": 4,
+          "visitors": 3
+        },
+        {
+          "page": "/__analytics_audit_test",
+          "pageviews": 0,
+          "visitors": 1
+        },
+        {
+          "page": "/docs/",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/game-stats/",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/issues/",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/resources/",
+          "pageviews": 1,
+          "visitors": 1
+        }
+      ]
+    },
+    "countries": {
+      "results": [
+        {
+          "country": "US",
+          "visitors": 28
+        },
+        {
+          "country": "CN",
+          "visitors": 24
+        },
+        {
+          "country": "AU",
+          "visitors": 6
+        },
+        {
+          "country": "DE",
+          "visitors": 4
+        },
+        {
+          "country": "PL",
+          "visitors": 3
+        },
+        {
+          "country": "NL",
+          "visitors": 2
+        },
+        {
+          "country": "SG",
+          "visitors": 2
+        },
+        {
+          "country": "AE",
+          "visitors": 1
+        },
+        {
+          "country": "AT",
+          "visitors": 1
+        },
+        {
+          "country": "DK",
+          "visitors": 1
+        },
+        {
+          "country": "FR",
+          "visitors": 1
+        },
+        {
+          "country": "GB",
+          "visitors": 1
+        },
+        {
+          "country": "JP",
+          "visitors": 1
+        },
+        {
+          "country": "KR",
+          "visitors": 1
+        },
+        {
+          "country": "LU",
+          "visitors": 1
+        },
+        {
+          "country": "MX",
+          "visitors": 1
+        },
+        {
+          "country": "SE",
+          "visitors": 1
+        }
+      ]
+    },
+    "utm_campaign": {
+      "results": []
+    },
+    "goals": {
+      "results": [
+        {
+          "events": 2,
+          "goal": "Outbound Link: Click",
+          "visitors": 2
+        }
+      ]
+    }
+  },
+  "errors": {},
+  "snapshot_date": "2026-07-23"
+}
