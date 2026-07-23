@@ -44,17 +44,17 @@ PLAUSIBLE = (
 # the same cascade as the ~2,200 generated event pages. If you change one, change
 # both -- see CLAUDE.md on public/css/site.css loading LAST and winning.
 PALETTE = """		:root {
-			--bg-primary: #1a1a1a;
-			--bg-secondary: #2d2d2d;
-			--bg-tertiary: #3d3d3d;
+			--bg-primary: #12100f;
+			--bg-secondary: #1c1917;
+			--bg-tertiary: #262220;
 			--text-primary: #ffffff;
-			--text-secondary: #cccccc;
-			--text-muted: #aaaaaa;
-			--accent-primary: #00ff41;
-			--accent-secondary: #ff6b35;
+			--text-secondary: #cfc7bb;
+			--text-muted: #a79e92;
+			--accent-primary: #f6a800;
+			--accent-secondary: #2fd4c2;
 			--accent-danger: #ff4444;
-			--border-color: #444444;
-			--success-color: #4caf50;
+			--border-color: #3a342e;
+			--success-color: #4fb37a;
 			--radius-md: 6px;
 		}"""
 
@@ -294,7 +294,7 @@ PAGE_CSS = """
 		.meta strong { color: var(--text-secondary); }
 		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
 			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
-			background: rgba(255, 107, 53, 0.08); font-size: 0.92rem; }
+			background: rgba(47, 212, 194, 0.08); font-size: 0.92rem; }
 		.card-list { list-style: none; padding: 0; }
 		.card-list li { border: 1px solid var(--border-color);
 			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
