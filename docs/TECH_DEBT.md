@@ -70,6 +70,24 @@ it is to a developer.
 
 ---
 
+## Spike readiness
+
+See `docs/SPIKE_PREMORTEM.md` for the full two-sided premortem (spike breaks us /
+spike succeeds and we fail to capture it). The three items only Pip can do:
+set `PLAUSIBLE_API_KEY`, add an honest homepage "follow along" block (RSS+GitHub,
+not the mailto newsletter), and downscale the 2.6 MB OG logo + 3.8 MB dashboard
+cat. Compression, caching, deploy-trimming and the analytics-to-git hedge are
+done (branch `feat/spike-readiness`).
+
+## Flaky / stateful tests
+
+- **`scripts/test_ingest_scores.py`** is state-dependent: its "live" fixture
+  assertion reads the current `public/leaderboard/data/leaderboard.json`, which
+  is now legitimately `pre-launch` (0 entries) after the version restamp. So the
+  test flips PASS/FAIL depending on repo state rather than code correctness.
+  Reproduces on `main`; not a regression. Fix: make the test build its own
+  fixture in a temp dir instead of reading the live file.
+
 ## E-0. TAGGED FOR PIP / pdoom-data uplift — do NOT delete
 
 ### The 1,000 "orphaned" alignmentforum event pages are not orphans

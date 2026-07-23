@@ -109,10 +109,21 @@ jobs:
           echo "   Source: ./public/"
           echo "   Destination: ${DH_USER}@${DH_HOST}:${DH_PATH}/"
 
+          # assets/dump and assets/image-processing-systems are SOURCE material
+          # (unprocessed cat originals + the processing pipeline), ~23 MB, kept
+          # in git but not meant for the web. Excluding them stops shipping that
+          # weight and stops exposing internal working files at pdoom1.com. The
+          # processed images the /cats/ page actually serves live in
+          # assets/cats-gallery/ and are unaffected.
+          # NOTE: with --delete, an exclude also PROTECTS these from deletion, so
+          # copies already on the server persist. Remove them once by hand if you
+          # want the space back; they are unlinked so they cost nothing served.
           rsync -avz --delete \
             --exclude='.git*' \
             --exclude='node_modules' \
             --exclude='*.log' \
+            --exclude='assets/dump' \
+            --exclude='assets/image-processing-systems' \
             -e "ssh -p $PORT" \
             public/ "${DH_USER}@${DH_HOST}:${DH_PATH}/"
 
