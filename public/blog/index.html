@@ -28,9 +28,9 @@
 	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
     <style>
         :root {
-            --bg-primary: #1a1a1a; --bg-secondary: #2d2d2d; --bg-tertiary: #3d3d3d;
-            --text-primary: #ffffff; --text-secondary: #cccccc; --text-muted: #888888;
-            --accent-primary: #00ff41; --accent-secondary: #ff6b35; --border-color: #444444;
+            --bg-primary: #12100f; --bg-secondary: #1c1917; --bg-tertiary: #262220;
+            --text-primary: #ffffff; --text-secondary: #cfc7bb; --text-muted: #a79e92;
+            --accent-primary: #f6a800; --accent-secondary: #2fd4c2; --border-color: #3a342e;
             --radius-sm: 4px; --radius-md: 6px; --border-width: 1px; 
             --duration-fast: 150ms; --duration-base: 300ms; --easing: cubic-bezier(0.2,0.8,0.2,1);
         }
@@ -72,7 +72,7 @@
         }
 
         .feed-links a {
-            color: var(--accent-primary, #00ff41);
+            color: var(--accent-primary, #f6a800);
             text-decoration: none;
             font-weight: 700;
         }
@@ -162,7 +162,7 @@
         
         .blog-post:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 255, 65, 0.1);
+            box-shadow: 0 10px 20px rgba(246, 168, 0, 0.1);
         }
         
         .post-header {
@@ -209,12 +209,12 @@
         }
         
         .post-tag {
-            background: rgba(0, 255, 65, 0.1);
+            background: rgba(246, 168, 0, 0.1);
             color: var(--accent-primary);
             padding: 0.25rem 0.5rem;
             border-radius: var(--radius-sm);
             font-size: 0.8rem;
-            border: 1px solid rgba(0, 255, 65, 0.3);
+            border: 1px solid rgba(246, 168, 0, 0.3);
         }
         
         .post-summary {
@@ -231,7 +231,7 @@
         }
         
         .read-more {
-            background: linear-gradient(145deg, var(--accent-primary), #00cc35);
+            background: linear-gradient(145deg, var(--accent-primary), #d99400);
             color: var(--bg-primary);
             padding: 0.5rem 1rem;
             border-radius: var(--radius-sm);
@@ -242,7 +242,7 @@
         
         .read-more:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 255, 65, 0.3);
+            box-shadow: 0 4px 8px rgba(246, 168, 0, 0.3);
         }
         
         .post-commit {

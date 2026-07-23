@@ -32,24 +32,24 @@
 	<style>
 		:root {
 			/* Color scheme inspired by terminal aesthetics */
-			--bg-primary: #1a1a1a;
-			--bg-secondary: #2d2d2d;
-			--bg-tertiary: #3d3d3d;
+			--bg-primary: #12100f;
+			--bg-secondary: #1c1917;
+			--bg-tertiary: #262220;
 			--text-primary: #ffffff;
-			--text-secondary: #cccccc;
-			--text-muted: #aaaaaa;
-			--accent-primary: #00ff41;  /* Matrix green */
-			--accent-secondary: #ff6b35; /* Warning orange */
+			--text-secondary: #cfc7bb;
+			--text-muted: #a79e92;
+			--accent-primary: #f6a800;  /* Matrix green */
+			--accent-secondary: #2fd4c2; /* Warning orange */
 			--accent-danger: #ff4444;   /* Error red */
-			--border-color: #444444;
-			--success-color: #4caf50;
+			--border-color: #3a342e;
+			--success-color: #4fb37a;
 
 			/* Tokens that may be injected from /design/tokens.json */
 			--radius-sm: 4px;
 			--radius-md: 6px;
 			--radius-lg: 10px;
 			--border-width: 1px;
-			--shadow-button: 0 10px 20px rgba(0, 255, 65, 0.3);
+			--shadow-button: 0 10px 20px rgba(246, 168, 0, 0.3);
 			--duration-fast: 150ms;
 			--duration-base: 300ms;
 			--easing: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -67,8 +67,8 @@
 			color: var(--text-primary);
 			line-height: 1.6;
 			background-image:
-				radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
-				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+				radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.04) 0%, transparent 50%),
+				radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.04) 0%, transparent 50%),
 				linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
 				url('assets/screenshots/hero-bg-800w.webp');
 			background-size: 100% 100%, 100% 100%, 100% 100%, cover;
@@ -81,8 +81,8 @@
 		@media (min-width: 801px) {
 			body {
 				background-image:
-					radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
-					radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.04) 0%, transparent 50%),
 					linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
 					url('assets/screenshots/hero-bg-1200w.webp');
 			}
@@ -91,8 +91,8 @@
 		@media (min-width: 1201px) {
 			body {
 				background-image:
-					radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
-					radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.04) 0%, transparent 50%),
 					linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
 					url('assets/screenshots/hero-bg-1600w.webp');
 			}
@@ -101,8 +101,8 @@
 		@media (min-width: 1921px) {
 			body {
 				background-image:
-					radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
-					radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.04) 0%, transparent 50%),
 					linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
 					url('assets/screenshots/hero-bg-2400w.webp');
 			}
@@ -112,16 +112,16 @@
 		@supports not (background-image: url('test.webp')) {
 			body {
 				background-image:
-					radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
-					radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.04) 0%, transparent 50%),
+					radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.04) 0%, transparent 50%),
 					linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
 					url('assets/screenshots/hero-bg-800w.jpg');
 			}
 			@media (min-width: 801px) {
 				body {
 					background-image:
-						radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
-						radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+						radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.04) 0%, transparent 50%),
+						radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.04) 0%, transparent 50%),
 						linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
 						url('assets/screenshots/hero-bg-1200w.jpg');
 				}
@@ -129,8 +129,8 @@
 			@media (min-width: 1201px) {
 				body {
 					background-image:
-						radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
-						radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+						radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.04) 0%, transparent 50%),
+						radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.04) 0%, transparent 50%),
 						linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
 						url('assets/screenshots/hero-bg-1600w.jpg');
 				}
@@ -138,8 +138,8 @@
 			@media (min-width: 1921px) {
 				body {
 					background-image:
-						radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
-						radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+						radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.04) 0%, transparent 50%),
+						radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.04) 0%, transparent 50%),
 						linear-gradient(to bottom, rgba(26, 26, 26, 0.30), rgba(26, 26, 26, 0.50) 30%, rgba(26, 26, 26, 0.70) 60%, rgba(26, 26, 26, 0.90) 90%),
 						url('assets/screenshots/hero-bg-2400w.jpg');
 				}
@@ -326,7 +326,7 @@
 
 		.cta-button:hover {
 			transform: translateY(-2px);
-			box-shadow: var(--shadow-button, 0 10px 20px rgba(0, 255, 65, 0.3));
+			box-shadow: var(--shadow-button, 0 10px 20px rgba(246, 168, 0, 0.3));
 		}
 
 		.section { max-width: 700px; margin-left: auto; margin-right: auto; background: rgba(45, 45, 45, 0.80);
@@ -413,7 +413,7 @@
 		.stat-link:hover {
 			background: var(--bg-secondary);
 			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(0, 255, 65, 0.2);
+			box-shadow: 0 4px 12px rgba(246, 168, 0, 0.2);
 		}
 
 		.stat-link:hover .stat-number {
@@ -458,7 +458,7 @@
 		input:focus, textarea:focus, select:focus {
 			outline: none;
 			border-color: var(--accent-primary);
-			box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.2);
+			box-shadow: 0 0 0 2px rgba(246, 168, 0, 0.2);
 		}
 
 		.form-help {
@@ -578,9 +578,9 @@
 		@media (prefers-contrast: high) {
 			:root {
 				--bg-primary: #000000;
-				--bg-secondary: #1a1a1a;
+				--bg-secondary: #12100f;
 				--text-primary: #ffffff;
-				--accent-primary: #00ff00;
+				--accent-primary: #f6a800;
 				--border-color: #666666;
 			}
 		}
@@ -615,7 +615,7 @@
 		.resource-card:hover {
 			transform: translateY(-3px);
 			border-color: var(--accent-primary);
-			box-shadow: 0 4px 8px rgba(0, 255, 65, 0.1);
+			box-shadow: 0 4px 8px rgba(246, 168, 0, 0.1);
 		}
 
 		.resource-card h4 {
@@ -927,7 +927,7 @@ t	.hero {
 		</section>
 
 		<!-- Live Game Stats & Status - Combined Section -->
-		<section class="section" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(0, 255, 65, 0.05) 100%); border-left: 4px solid var(--accent-primary);">
+		<section class="section" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(246, 168, 0, 0.05) 100%); border-left: 4px solid var(--accent-primary);">
 			<h2 style="color: var(--accent-primary); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
 				<span class="status-indicator status-active" style="animation: pulse 2s infinite;"></span>
 				Live Game Stats & Status

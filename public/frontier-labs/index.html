@@ -13,17 +13,17 @@
 	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
 	<style>
 		:root {
-			--bg-primary: #1a1a1a;
-			--bg-secondary: #2d2d2d;
-			--bg-tertiary: #3d3d3d;
+			--bg-primary: #12100f;
+			--bg-secondary: #1c1917;
+			--bg-tertiary: #262220;
 			--text-primary: #ffffff;
-			--text-secondary: #cccccc;
-			--text-muted: #aaaaaa;
-			--accent-primary: #00ff41;
-			--accent-secondary: #ff6b35;
+			--text-secondary: #cfc7bb;
+			--text-muted: #a79e92;
+			--accent-primary: #f6a800;
+			--accent-secondary: #2fd4c2;
 			--accent-danger: #ff4444;
-			--border-color: #444444;
-			--success-color: #4caf50;
+			--border-color: #3a342e;
+			--success-color: #4fb37a;
 			--radius-sm: 4px;
 			--radius-md: 6px;
 			--radius-lg: 10px;
@@ -41,8 +41,8 @@
 			color: var(--text-primary);
 			line-height: 1.6;
 			background-image:
-				radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.02) 0%, transparent 50%),
-				radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
+				radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.02) 0%, transparent 50%),
+				radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.02) 0%, transparent 50%);
 		}
 
 		header {
@@ -131,13 +131,13 @@
 
 		.lab-card:hover {
 			transform: translateY(-5px);
-			box-shadow: 0 8px 24px rgba(0, 255, 65, 0.2);
+			box-shadow: 0 8px 24px rgba(246, 168, 0, 0.2);
 			border-color: var(--accent-primary);
 		}
 
 		.lab-card.hypothetical {
 			border-color: var(--accent-secondary);
-			background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 107, 53, 0.05) 100%);
+			background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(47, 212, 194, 0.05) 100%);
 		}
 
 		.lab-card.hypothetical::before {
@@ -146,7 +146,7 @@
 
 		.lab-card.hypothetical:hover {
 			border-color: var(--accent-secondary);
-			box-shadow: 0 8px 24px rgba(255, 107, 53, 0.2);
+			box-shadow: 0 8px 24px rgba(47, 212, 194, 0.2);
 		}
 
 		.lab-header {
@@ -252,7 +252,7 @@
 			text-align: center;
 			margin: 3rem 0;
 			padding: 2rem;
-			background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(0, 255, 65, 0.05) 100%);
+			background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(246, 168, 0, 0.05) 100%);
 			border: 2px solid var(--accent-primary);
 			border-radius: var(--radius-lg);
 		}

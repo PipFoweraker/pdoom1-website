@@ -12,13 +12,13 @@
   * {margin:0;padding:0;box-sizing:border-box;}
 
   :root {
-    --primary-green: #00ff41;
+    --primary-green: #f6a800;
     --primary-cyan: #0ff;
-    --primary-orange: #ff9966;
+    --primary-orange: #e9752e;
     --primary-red: #ff4444;
     --bg-dark: rgba(0,0,0,0.85);
     --bg-panel: rgba(0,20,10,0.75);
-    --border-glow: rgba(0,255,65,0.3);
+    --border-glow: rgba(246, 168, 0,0.3);
   }
 
   body {
@@ -41,7 +41,7 @@
     height: 100%;
     background: repeating-linear-gradient(
       0deg,
-      rgba(0, 255, 65, 0.03) 0px,
+      rgba(246, 168, 0, 0.03) 0px,
       rgba(0, 0, 0, 0.02) 1px,
       rgba(0, 0, 0, 0.02) 2px
     );
@@ -53,34 +53,34 @@
   /* Header */
   #header {
     background:rgba(0,0,0,0.75);
-    border-bottom:3px solid #00ff41;
+    border-bottom:3px solid #f6a800;
     padding:15px 25px;
     display:flex;
     flex-direction:column;
     align-items:center;
-    box-shadow:0 0 30px rgba(0,255,65,0.6);
+    box-shadow:0 0 30px rgba(246, 168, 0,0.6);
     backdrop-filter:blur(5px);
   }
 
   #header h1 {
     font-size:30px;
     color:#ffffff;
-    text-shadow:0 0 3px #000, 0 0 6px #000, 0 0 10px #00ff41;
+    text-shadow:0 0 3px #000, 0 0 6px #000, 0 0 10px #f6a800;
     letter-spacing:3px;
     font-weight:bold;
   }
 
   #headerSubtitle {
     font-size:12px;
-    color:#cccccc;
+    color:#cfc7bb;
     margin-top:6px;
     text-shadow:0 0 2px #000;
   }
 
   #headerSubtitle a {
-    color:#00ff41;
+    color:#f6a800;
     text-decoration:none;
-    text-shadow:0 0 8px #00ff41;
+    text-shadow:0 0 8px #f6a800;
     margin:0 8px;
     transition:all 0.2s;
   }
@@ -99,14 +99,14 @@
 
   #timestamp {
     font-size:13px;
-    color:#cccccc;
+    color:#cfc7bb;
     text-shadow:0 0 2px #000, 0 0 4px #000;
     font-weight:normal;
   }
 
   #status {
     font-size:13px;
-    color:#ff9966;
+    color:#e9752e;
     text-shadow:0 0 2px #000, 0 0 4px #000;
     font-weight:normal;
   }
@@ -145,8 +145,8 @@
   }
 
   .warning-light.warning {
-    border-color:#ff6b35;
-    box-shadow:0 0 20px rgba(255,107,53,0.5);
+    border-color:#2fd4c2;
+    box-shadow:0 0 20px rgba(47, 212, 194,0.5);
   }
 
   .warning-light.info {
@@ -180,11 +180,11 @@
     top:80px;
     right:20px;
     background:rgba(0,0,0,0.85);
-    border:3px solid #00ff41;
+    border:3px solid #f6a800;
     border-radius:8px;
     padding:15px;
     z-index:200;
-    box-shadow:0 0 30px rgba(0,255,65,0.5);
+    box-shadow:0 0 30px rgba(246, 168, 0,0.5);
     min-width:340px;
     backdrop-filter:blur(10px);
     cursor:move;
@@ -195,9 +195,9 @@
     color:#ffffff;
     text-align:center;
     margin-bottom:12px;
-    text-shadow:0 0 3px #000, 0 0 8px #000, 0 0 12px #00ff41;
+    text-shadow:0 0 3px #000, 0 0 8px #000, 0 0 12px #f6a800;
     font-weight:bold;
-    border-bottom:2px solid #00ff41;
+    border-bottom:2px solid #f6a800;
     padding-bottom:8px;
   }
 
@@ -219,15 +219,15 @@
   }
 
   .slider-value {
-    color:#00ff41;
-    text-shadow:0 0 2px #000, 0 0 5px #000, 0 0 10px #00ff41;
+    color:#f6a800;
+    text-shadow:0 0 2px #000, 0 0 5px #000, 0 0 10px #f6a800;
     font-weight:bold;
   }
 
   input[type="range"] {
     width:100%;
     height:10px;
-    background:linear-gradient(to right, #00ff41 0%, #ff6b35 50%, #f00 100%);
+    background:linear-gradient(to right, #f6a800 0%, #2fd4c2 50%, #f00 100%);
     border-radius:5px;
     outline:none;
   }
@@ -236,10 +236,10 @@
     appearance:none;
     width:22px;
     height:22px;
-    background:#00ff41;
+    background:#f6a800;
     cursor:pointer;
     border-radius:50%;
-    box-shadow:0 0 20px #00ff41;
+    box-shadow:0 0 20px #f6a800;
     border:2px solid #000;
   }
 
@@ -265,10 +265,10 @@
   /* Main graph - top 2/3 */
   #graphContainer {
     background:rgba(0,0,0,0.3);
-    border:3px solid #00ff41;
+    border:3px solid #f6a800;
     border-radius:8px;
     padding:20px;
-    box-shadow:0 0 40px rgba(0,255,65,0.3);
+    box-shadow:0 0 40px rgba(246, 168, 0,0.3);
     backdrop-filter:blur(3px);
   }
 
@@ -282,10 +282,10 @@
   /* World map - bottom left */
   #pieContainer {
     background:rgba(0,0,0,0.5);
-    border:3px solid #00ff41;
+    border:3px solid #f6a800;
     border-radius:8px;
     padding:15px;
-    box-shadow:0 0 30px rgba(0,255,65,0.3);
+    box-shadow:0 0 30px rgba(246, 168, 0,0.3);
     backdrop-filter:blur(5px);
     position:relative;
   }
@@ -296,22 +296,22 @@
   }
 
   .map-region {
-    fill:#00ff4133;
-    stroke:#00ff41;
+    fill:#f6a80033;
+    stroke:#f6a800;
     stroke-width:1;
     cursor:pointer;
     transition:all 0.2s;
   }
 
   .map-region:hover {
-    fill:#00ff4166;
+    fill:#f6a80066;
     stroke:#0ff;
     stroke-width:2;
   }
 
   .map-region.selected {
-    fill:#ff6b3566;
-    stroke:#ff6b35;
+    fill:#2fd4c266;
+    stroke:#2fd4c2;
     stroke-width:2;
   }
 
@@ -322,17 +322,17 @@
     font-size:14px;
     color:#ffffff;
     font-weight:bold;
-    text-shadow:0 0 10px #00ff41;
+    text-shadow:0 0 10px #f6a800;
     pointer-events:none;
   }
 
   /* Text box - bottom right */
   #narrativeBox {
     background:rgba(0,0,0,0.7);
-    border:3px solid #00ff41;
+    border:3px solid #f6a800;
     border-radius:8px;
     padding:20px;
-    box-shadow:0 0 30px rgba(0,255,65,0.3);
+    box-shadow:0 0 30px rgba(246, 168, 0,0.3);
     backdrop-filter:blur(8px);
     overflow-y:auto;
     color:#ffffff;
@@ -341,10 +341,10 @@
 
   .narrative-title {
     font-size:16px;
-    color:#00ff41;
+    color:#f6a800;
     margin-bottom:10px;
     font-weight:bold;
-    text-shadow:0 0 10px #00ff41;
+    text-shadow:0 0 10px #f6a800;
   }
 
   .narrative-text {
@@ -354,9 +354,9 @@
   }
 
   .highlight {
-    color:#ff6b35;
+    color:#2fd4c2;
     font-weight:bold;
-    text-shadow:0 0 10px #ff6b35;
+    text-shadow:0 0 10px #2fd4c2;
   }
 
   .source-link {
@@ -367,18 +367,18 @@
   }
 
   .source-link:hover {
-    color:#00ff41;
-    text-shadow:0 0 12px #00ff41;
+    color:#f6a800;
+    text-shadow:0 0 12px #f6a800;
   }
 
   /* Panels */
   .panel {
     background:rgba(0,0,0,0.7);
-    border:3px solid #00ff41;
+    border:3px solid #f6a800;
     border-radius:8px;
     padding:15px;
     overflow-y:auto;
-    box-shadow:0 0 25px rgba(0,255,65,0.3);
+    box-shadow:0 0 25px rgba(246, 168, 0,0.3);
     backdrop-filter:blur(8px);
     cursor:move;
   }
@@ -391,10 +391,10 @@
     color:#ffffff;
     text-align:center;
     padding:10px;
-    background:rgba(0,255,65,0.15);
-    border:2px solid #00ff41;
+    background:rgba(246, 168, 0,0.15);
+    border:2px solid #f6a800;
     margin:-15px -15px 15px -15px;
-    text-shadow:0 0 3px #000, 0 0 8px #000, 0 0 15px #00ff41;
+    text-shadow:0 0 3px #000, 0 0 8px #000, 0 0 15px #f6a800;
     font-weight:bold;
     letter-spacing:2px;
   }
@@ -404,13 +404,13 @@
     margin-bottom:18px;
     padding:12px;
     background:rgba(0,40,20,0.65);
-    border-left:4px solid #00ff41;
+    border-left:4px solid #f6a800;
     border-radius:4px;
   }
 
   .metric-label {
     font-size:11px;
-    color:#cccccc;
+    color:#cfc7bb;
     opacity:0.95;
     text-transform:uppercase;
     letter-spacing:1px;
@@ -421,7 +421,7 @@
   .metric-value {
     font-size:26px;
     color:#ffffff;
-    text-shadow:0 0 2px #000, 0 0 4px #000, 0 0 8px #00ff41;
+    text-shadow:0 0 2px #000, 0 0 4px #000, 0 0 8px #f6a800;
     margin-top:6px;
     font-weight:bold;
   }
@@ -435,9 +435,9 @@
   }
 
   .warning {
-    color:#ff9966 !important;
-    text-shadow:0 0 2px #000, 0 0 4px #000, 0 0 8px #ff9966 !important;
-    border-left-color:#ff9966 !important;
+    color:#e9752e !important;
+    text-shadow:0 0 2px #000, 0 0 4px #000, 0 0 8px #e9752e !important;
+    border-left-color:#e9752e !important;
   }
 
   .critical {
@@ -457,7 +457,7 @@
     margin:10px 0;
     padding:10px;
     background:rgba(0,30,15,0.7);
-    border-left:3px solid #00ff41;
+    border-left:3px solid #f6a800;
     border-radius:3px;
     cursor:pointer;
     transition:all 0.2s;
@@ -480,12 +480,12 @@
     color:#ffffff;
     float:right;
     font-weight:bold;
-    text-shadow:0 0 2px #000, 0 0 5px #000, 0 0 12px #00ff41;
+    text-shadow:0 0 2px #000, 0 0 5px #000, 0 0 12px #f6a800;
   }
 
   .stock-change {
     font-size:10px;
-    color:#cccccc;
+    color:#cfc7bb;
     opacity:0.85;
     margin-top:2px;
     text-shadow:0 0 2px #000;
@@ -496,15 +496,15 @@
     margin-top:18px;
     padding:12px;
     background:rgba(0,20,10,0.75);
-    border:2px solid #00ff41;
+    border:2px solid #f6a800;
     border-radius:6px;
   }
 
   #catCam img {
     width:100%;
     border-radius:6px;
-    border:2px solid #00ff41;
-    box-shadow:0 0 20px rgba(0,255,65,0.4);
+    border:2px solid #f6a800;
+    box-shadow:0 0 20px rgba(246, 168, 0,0.4);
   }
 
   #catStatus {
@@ -513,7 +513,7 @@
     color:#ffffff;
     margin-top:8px;
     font-weight:bold;
-    text-shadow:0 0 2px #000, 0 0 5px #000, 0 0 10px #00ff41;
+    text-shadow:0 0 2px #000, 0 0 5px #000, 0 0 10px #f6a800;
   }
 
   /* ==========================================================
@@ -522,8 +522,8 @@
      here, in the site's dark terminal palette.
      ========================================================== */
   body > header {
-    background:#2d2d2d;
-    border-bottom:2px solid #00ff41;
+    background:#1c1917;
+    border-bottom:2px solid #f6a800;
     padding:0.6rem 1rem;
     position:relative;
     z-index:300;
@@ -541,9 +541,9 @@
   body > header .logo {
     font-size:1.2rem;
     font-weight:bold;
-    color:#00ff41;
+    color:#f6a800;
     text-decoration:none;
-    text-shadow:0 0 10px #00ff41;
+    text-shadow:0 0 10px #f6a800;
   }
   body > header .version-badge {font-size:10px;color:#999999;display:block;}
   body > header .nav-links {display:flex;gap:0.5rem;list-style:none;flex-wrap:wrap;}
@@ -555,15 +555,15 @@
     border:1px solid transparent;
     border-radius:4px;
   }
-  body > header .nav-links a:hover {color:#00ff41;border-color:#00ff41;}
+  body > header .nav-links a:hover {color:#f6a800;border-color:#f6a800;}
   body > header .dropdown {position:relative;}
   body > header .dropdown-toggle {cursor:pointer;}
   body > header .dropdown-menu {
     position:absolute;
     top:100%;
     right:0;
-    background:#2d2d2d;
-    border:1px solid #444444;
+    background:#1c1917;
+    border:1px solid #3a342e;
     border-radius:4px;
     opacity:0;
     visibility:hidden;
@@ -579,15 +579,15 @@
 
   /* ==========================================================
      Calibration notice + staleness markers.
-     Palette: --bg-secondary #2d2d2d, --accent-secondary #ff6b35,
-     --accent-primary #00ff41, --border-color #444444.
+     Palette: --bg-secondary #1c1917, --accent-secondary #2fd4c2,
+     --accent-primary #f6a800, --border-color #3a342e.
      ========================================================== */
   #calibrationNotice {
     flex:none;
-    background:#2d2d2d;
-    border-top:2px solid #ff6b35;
-    border-bottom:2px solid #ff6b35;
-    box-shadow:0 0 25px rgba(255,107,53,0.35);
+    background:#1c1917;
+    border-top:2px solid #2fd4c2;
+    border-bottom:2px solid #2fd4c2;
+    box-shadow:0 0 25px rgba(47, 212, 194,0.35);
     padding:10px 20px;
     text-align:center;
     position:relative;
@@ -595,14 +595,14 @@
   }
   #calibrationNotice .cal-stamp {
     display:inline-block;
-    border:2px dashed #ff6b35;
+    border:2px dashed #2fd4c2;
     border-radius:4px;
-    color:#ff6b35;
+    color:#2fd4c2;
     font-size:15px;
     font-weight:bold;
     letter-spacing:3px;
     padding:4px 14px;
-    text-shadow:0 0 2px #000, 0 0 10px rgba(255,107,53,0.7);
+    text-shadow:0 0 2px #000, 0 0 10px rgba(47, 212, 194,0.7);
   }
   #calibrationNotice .cal-sub {
     font-size:11px;
@@ -614,8 +614,8 @@
     margin-left:auto;
     margin-right:auto;
   }
-  #calibrationNotice .cal-sub b {color:#ff6b35;}
-  #calibrationNotice .cal-sub .live-word {color:#00ff41;}
+  #calibrationNotice .cal-sub b {color:#2fd4c2;}
+  #calibrationNotice .cal-sub .live-word {color:#f6a800;}
 
   .stale-tag, .live-tag, .toy-tag {
     display:inline-block;
@@ -630,29 +630,29 @@
     text-shadow:none;
     white-space:nowrap;
   }
-  .stale-tag {color:#ff6b35;border:1px solid #ff6b35;}
-  .toy-tag   {color:#ff6b35;border:1px dashed #ff6b35;}
-  .live-tag  {color:#00ff41;border:1px solid #00ff41;}
+  .stale-tag {color:#2fd4c2;border:1px solid #2fd4c2;}
+  .toy-tag   {color:#2fd4c2;border:1px dashed #2fd4c2;}
+  .live-tag  {color:#f6a800;border:1px solid #f6a800;}
 
   .panel-note {
     font-size:10px;
     line-height:1.5;
-    color:#cccccc;
-    background:#2d2d2d;
-    border:1px solid #444444;
-    border-left:4px solid #ff6b35;
+    color:#cfc7bb;
+    background:#1c1917;
+    border:1px solid #3a342e;
+    border-left:4px solid #2fd4c2;
     border-radius:4px;
     padding:7px 9px;
     margin:0 0 14px 0;
     text-transform:none;
     letter-spacing:0;
   }
-  .panel-note b {color:#ff6b35;}
+  .panel-note b {color:#2fd4c2;}
 
   .as-of {
     display:block;
     font-size:10px;
-    color:#ff6b35;
+    color:#2fd4c2;
     margin-top:3px;
     text-shadow:0 0 2px #000;
   }
@@ -689,8 +689,8 @@
   /* Scrollbar */
   ::-webkit-scrollbar {width:10px;}
   ::-webkit-scrollbar-track {background:rgba(0,10,5,0.5);border-radius:5px;}
-  ::-webkit-scrollbar-thumb {background:#00ff41;border-radius:5px;}
-  ::-webkit-scrollbar-thumb:hover {background:#00ff41ee;box-shadow:0 0 10px #00ff41;}
+  ::-webkit-scrollbar-thumb {background:#f6a800;border-radius:5px;}
+  ::-webkit-scrollbar-thumb:hover {background:#f6a800ee;box-shadow:0 0 10px #f6a800;}
 </style>
 </head>
 <body>
@@ -868,7 +868,7 @@
       </div>
 
       <!-- AI Safety Investment Graph -->
-      <div style="margin-top:20px;padding:15px;background:rgba(0,40,20,0.5);border:2px solid #00ff41;border-radius:6px;">
+      <div style="margin-top:20px;padding:15px;background:rgba(0,40,20,0.5);border:2px solid #f6a800;border-radius:6px;">
         <div class="metric-label" style="text-align:center;margin-bottom:10px;"><span class="stale-tag">OLD</span> 💰 AI SAFETY INVESTMENT</div>
         <div id="safetyInvestmentGraph" style="width:100%;height:180px;"></div>
         <div class="panel-note" style="margin:10px 0 0 0;">
@@ -970,7 +970,7 @@
       <!-- Manifold Markets -->
       <div style="margin-top:20px;">
         <div class="metric-label" style="margin-bottom:12px;"><span class="live-tag">LIVE</span> 📊 PREDICTION MARKETS</div>
-        <div class="panel-note" style="border-left-color:#00ff41;">
+        <div class="panel-note" style="border-left-color:#f6a800;">
           Fetched from the <a href="https://manifold.markets" target="_blank" class="source-link">Manifold Markets</a>
           API when you loaded this page. These probabilities are current; almost nothing else here is.
         </div>
@@ -1205,11 +1205,11 @@ function updatePlots(currentYear) {
       ticksuffix: '%'
     },
     yaxis2: {
-      title: {text: 'Training Compute (FLOPS)', font: {size: 12, color: '#cccccc'}},
+      title: {text: 'Training Compute (FLOPS)', font: {size: 12, color: '#cfc7bb'}},
       overlaying: 'y',
       side: 'right',
       type: 'log',
-      tickfont: {size: 10, color: '#cccccc'},
+      tickfont: {size: 10, color: '#cfc7bb'},
       gridcolor: 'transparent'
     },
     plot_bgcolor: 'rgba(0,0,0,0)',
@@ -1243,7 +1243,7 @@ function updatePlots(currentYear) {
         ay: -60,
         font: {size: 9, color: '#ffffff'},
         bgcolor: 'rgba(0,0,0,0.85)',
-        bordercolor: '#00ff41',
+        bordercolor: '#f6a800',
         borderwidth: 1
       }))
     ]
@@ -1255,7 +1255,7 @@ function updatePlots(currentYear) {
       y: pdoomCurve.map(p => p.pdoom * 100),
       mode: 'lines',
       name: 'Base P(doom)',
-      line: {color: '#ff6b35', width: 4},
+      line: {color: '#2fd4c2', width: 4},
       yaxis: 'y'
     },
     {
@@ -1263,7 +1263,7 @@ function updatePlots(currentYear) {
       y: adjustedCurve.map(p => p.pdoom * 100),
       mode: 'lines',
       name: 'Adjusted',
-      line: {color: '#00ff41', width: 3, dash: 'dot'},
+      line: {color: '#f6a800', width: 3, dash: 'dot'},
       yaxis: 'y'
     },
     {
@@ -1279,8 +1279,8 @@ function updatePlots(currentYear) {
 
   // World map interaction
   const regionData = {
-    'USA': { compute: 45, labs: ['OpenAI', 'Anthropic', 'Meta'], color: '#00ff41' },
-    'China': { compute: 30, labs: ['Baidu', 'Alibaba', 'Tencent'], color: '#ff6b35' },
+    'USA': { compute: 45, labs: ['OpenAI', 'Anthropic', 'Meta'], color: '#f6a800' },
+    'China': { compute: 30, labs: ['Baidu', 'Alibaba', 'Tencent'], color: '#2fd4c2' },
     'Europe': { compute: 15, labs: ['DeepMind', 'Mistral'], color: '#0ff' },
     'Others': { compute: 10, labs: ['Various'], color: '#f0f' }
   };
@@ -1296,7 +1296,7 @@ function updatePlots(currentYear) {
 
       // Update map title with region info
       document.getElementById('mapTitle').innerHTML = `
-        <b>${regionName}</b>: ${data.compute}% of AI compute <span style="font-size:10px;color:#ff6b35">[OLD &middot; rough share, Oct 2025]</span><br>
+        <b>${regionName}</b>: ${data.compute}% of AI compute <span style="font-size:10px;color:#2fd4c2">[OLD &middot; rough share, Oct 2025]</span><br>
         <span style="font-size:11px;opacity:0.8">Major labs: ${data.labs.join(', ')}</span>
       `;
     });
@@ -1318,8 +1318,8 @@ function updatePlots(currentYear) {
     x: safetyInvestmentData.map(d => d.year),
     y: safetyInvestmentData.map(d => d.investment),
     mode: 'lines+markers',
-    line: {color: '#00ff41', width: 3},
-    marker: {color: '#00ff41', size: 8},
+    line: {color: '#f6a800', width: 3},
+    marker: {color: '#f6a800', size: 8},
     hovertemplate: '<b>%{x}</b><br>$%{y}M invested<extra></extra>'
   }], {
     paper_bgcolor: 'rgba(0,0,0,0)',

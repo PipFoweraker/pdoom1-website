@@ -3,7 +3,7 @@
 
 :root {
     /* Game-inspired color palette from UI */
-    --game-money-color: #4caf50;      /* Money green */
+    --game-money-color: #4fb37a;      /* Money green */
     --game-doom-color: #ff4444;       /* Doom red */
     --game-ap-color: #ffff00;         /* Action Points yellow */
     --game-staff-color: #87ceeb;      /* Staff blue */
@@ -14,7 +14,7 @@
     
     /* Typography matching game */
     --game-font-family: 'Courier New', 'Consolas', monospace;
-    --game-retro-glow: 0 0 8px rgba(0, 255, 65, 0.4);
+    --game-retro-glow: 0 0 8px rgba(246, 168, 0, 0.4);
     
     /* Game UI dimensions */
     --game-button-height: 42px;
@@ -95,7 +95,7 @@
 .loading-skeleton {
     background: linear-gradient(90deg, 
         transparent 0%, 
-        rgba(0, 255, 65, 0.1) 50%, 
+        rgba(246, 168, 0, 0.1) 50%, 
         transparent 100%
     );
     background-size: 200% 100%;

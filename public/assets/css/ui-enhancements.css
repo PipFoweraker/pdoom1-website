@@ -99,20 +99,20 @@
 .quick-actions-toggle {
     width: 56px;
     height: 56px;
-    background: linear-gradient(145deg, var(--accent-primary), #00cc35);
+    background: linear-gradient(145deg, var(--accent-primary), #d99400);
     border: none;
     border-radius: 50%;
     color: var(--bg-primary);
     font-size: 1.5rem;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 255, 65, 0.3);
+    box-shadow: 0 4px 12px rgba(246, 168, 0, 0.3);
     transition: all var(--duration-base) var(--easing);
 }
 
 .quick-actions-toggle:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 255, 65, 0.4);
+    box-shadow: 0 6px 20px rgba(246, 168, 0, 0.4);
 }
 
 .quick-actions-menu {
@@ -185,7 +185,7 @@
 
 .content-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 255, 65, 0.1);
+    box-shadow: 0 8px 25px rgba(246, 168, 0, 0.1);
 }
 
 .content-card:hover::before {
@@ -202,7 +202,7 @@
 .card-icon {
     width: 40px;
     height: 40px;
-    background: linear-gradient(145deg, var(--accent-primary), #00cc35);
+    background: linear-gradient(145deg, var(--accent-primary), #d99400);
     border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
@@ -237,7 +237,7 @@
 
 .status-live {
     background: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
+    color: #4fb37a;
     border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
@@ -344,7 +344,7 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-primary: #0a0a0a;
-        --bg-secondary: #1a1a1a;
+        --bg-secondary: #12100f;
         --bg-tertiary: #2a2a2a;
     }
 }
