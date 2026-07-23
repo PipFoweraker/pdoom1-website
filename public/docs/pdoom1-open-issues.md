@@ -1,9 +1,11 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-22T18:39:27.952Z UTC
+Generated: 2026-07-23T00:54:12.413Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 804 | Procurement + equipment lead-time: pre-order laptops, start-date scheduling, dead-time as opportunity cost |  |  | 2026-07-22 22:45:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/804) |
+| 803 | Revisit ADR-0014 (conferences): days-granularity + travel-cost fine-tuning + conference data -> pdoom-data |  |  | 2026-07-22 21:43:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/803) |
 | 802 | In-game music controller (mute/skip/next) + more track variety; expose the doom-triggered rotation |  |  | 2026-07-22 13:29:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/802) |
 | 801 | Onboarding: narrative cold-open + first-turn direction (playtest #1: 'lots of info, not a lot of direction') |  |  | 2026-07-22 13:29:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/801) |
 | 800 | In-game bug reporter (F8) does not transmit -- reports die on player's local disk, confirmation text lies |  |  | 2026-07-22 12:44:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/800) |
@@ -15,7 +17,7 @@ Generated: 2026-07-22T18:39:27.952Z UTC
 | 793 | Office floor: all staff render as the same character + sprites oversized vs the room | ship:hotpatch-48h |  | 2026-07-22 11:06:31 | [link](https://github.com/PipFoweraker/pdoom1/issues/793) |
 | 791 | Early economy: force a small early lease spend; bedroom/basement start hard-caps hires; unlocks small-now, bigger-over-time | ship:next-release |  | 2026-07-22 10:54:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/791) |
 | 790 | Newness-glow: draw the eye to new/changed state (glow-until-mouseover) | ship:hotpatch-48h |  | 2026-07-22 10:54:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/790) |
-| 789 | Hiring stitch: onboarding sub-actions as AP-sink prompts on offer-accept + interview schedule->happen flow | ship:hotpatch-48h |  | 2026-07-22 11:06:29 | [link](https://github.com/PipFoweraker/pdoom1/issues/789) |
+| 789 | Hiring stitch: onboarding sub-actions as AP-sink prompts on offer-accept + interview schedule->happen flow | ship:hotpatch-48h |  | 2026-07-22 22:40:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/789) |
 | 788 | Leaderboard: mark runs where dev mode was used (visible badge, NOT exclusion) | ship:hotpatch-48h |  | 2026-07-22 09:48:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/788) |
 | 787 | Repo tidy: purge shippable cruft from godot/ to shrink the .pck (+ front-door README rewrites) | ship:hotpatch-48h |  | 2026-07-22 09:37:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/787) |
 | 786 | Finalize CREDITS.md (fill names) + merge after F&F deploy | ship:next-release |  | 2026-07-22 12:16:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/786) |
