@@ -5,6 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>p(Doom)1 - AI Safety Strategy Game</title>
 	<link rel="canonical" href="https://pdoom1.com/" />
+	<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+	<link rel="icon" href="/favicon.ico" sizes="any">
 	<link rel="alternate" type="application/rss+xml" title="p(Doom)1 dev blog (RSS)" href="/blog/feed.xml" />
 	<link rel="alternate" type="application/atom+xml" title="p(Doom)1 dev blog (Atom)" href="/blog/atom.xml" />
 	<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
@@ -15,7 +17,7 @@
 	<meta property="og:title" content="p(Doom)1 - AI Safety Strategy Game" />
 	<meta property="og:description" content="A satirical meta-strategy game about AI Safety." />
 	<meta property="og:url" content="https://pdoom1.com/" />
-	<meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+	<meta property="og:image" content="https://pdoom1.com/assets/og-card.jpg" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<!-- twitter:site intentionally omitted until handle is finalized (must be ASCII, suggest @pdoom1) -->
 
@@ -1225,12 +1227,14 @@ t	.hero {
 					<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">View Repository --&gt;</a>
 				</div>
 				<div class="card">
-					<h3>[Mail] Newsletter</h3>
-					<p>Get updates on new releases and development progress.</p>
-					<form class="newsletter-form" id="newsletter-form">
-						<input type="email" name="email" placeholder="Enter your email" aria-label="Email address for newsletter subscription" class="newsletter-input" required>
-						<button type="submit" class="cta-button" style="width: 100%; padding: 0.4rem;">Subscribe</button>
-					</form>
+					<h3>[Feed] Follow along</h3>
+					<p>No list, no tracking, no account &mdash; follow however you already do:</p>
+					<p style="margin-top: 0.75rem; line-height: 2;">
+						&#128225; Dev blog &mdash; <a href="/blog/feed.xml" style="color: var(--accent-primary);">RSS</a> / <a href="/blog/atom.xml" style="color: var(--accent-primary);">Atom</a><br>
+						&#11088; GitHub &mdash; <a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">star &amp; Watch &rarr; Releases</a><br>
+						&#129449; Bluesky &mdash; <span style="color: var(--text-muted);">@pdoom1 (soon)</span>
+					</p>
+					<p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">We will never email you unless you email us first.</p>
 				</div>
 				<div class="card">
 					<h3>Email</h3>
@@ -1457,15 +1461,7 @@ t	.hero {
 			statusDiv.style.color = isError ? 'var(--accent-danger)' : 'var(--success-color)';
 		}
 
-		// Newsletter form
-		document.getElementById('newsletter-form').addEventListener('submit', function(e) {
-			e.preventDefault();
-			const input = e.target.querySelector('input[type="email"]');
-			const email = (window.__PDOOM_CONFIG__ && window.__PDOOM_CONFIG__.contactEmail) || 'team@pdoom1.com';
-			const subject = encodeURIComponent('Subscribe: pdoom1 newsletter');
-			const body = encodeURIComponent(`Please subscribe this address: ${input?.value || ''}`);
-			window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-		});
+		// (newsletter mailto form removed -- replaced by the honest RSS/GitHub follow-along block)
         
 		// Smooth scrolling for nav links
 		document.querySelectorAll('a[href^="#"]').forEach(anchor => {
