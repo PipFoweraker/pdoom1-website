@@ -1,7 +1,7 @@
 {
   "apiBase": "https://api.pdoom1.com",
   "scoreApi": "",
-  "bugApi": "",
+  "bugApi": "/bug-submit.php",
   "contactEmail": "team@pdoom1.com",
   "steamStoreUrl": "",
   "githubReleasesUrl": "https://github.com/PipFoweraker/pdoom1/releases",

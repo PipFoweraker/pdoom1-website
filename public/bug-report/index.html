@@ -322,14 +322,25 @@
 					<div id="description-error" class="error-message" role="alert" aria-live="polite"></div>
 				</div>
 
-				<!-- Email field removed 2026-07-22. It was labelled "Not stored or
-				     shared", but the only working submit path pastes the form into a
-				     PUBLIC GitHub issue -- so an address typed here was published on
-				     the issue tracker, contradicting this page's own promise and
-				     /privacy/'s "we never collect personally identifiable
-				     information". Follow-up now happens on the GitHub issue thread,
-				     where the reporter controls what they disclose. Do not
-				     reintroduce a contact field without a private sink to put it in. -->
+				<!-- Optional email reintroduced 2026-07-23. Safe now because there
+				     is a PRIVATE sink: bug-submit.php mails it to the team inbox. It
+				     is never added to the GitHub fallback (that stays public), so it
+				     cannot leak the way it would have before. -->
+				<div class="form-group">
+					<label for="bug-email">Your email <span style="color:var(--text-muted);font-weight:normal">(optional)</span></label>
+					<input type="email" id="bug-email" name="email"
+						   placeholder="you@example.com"
+						   autocomplete="email"
+						   aria-describedby="email-help">
+					<div id="email-help" class="form-help">Only if you'd like a reply. Sent privately to the team &mdash; never published, never added to a public issue.</div>
+				</div>
+
+				<!-- Honeypot: off-screen and hidden from people, tempting to bots.
+				     A real submission leaves it empty; a filled one is dropped. -->
+				<div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
+					<label for="bug-hp">Do not fill this in</label>
+					<input type="text" id="bug-hp" name="hp" tabindex="-1" autocomplete="off">
+				</div>
 
 				<div class="form-group">
 					<label for="bug-attachment">Attach Log/File (Optional)</label>
@@ -374,6 +385,9 @@
 					title: formData.get('title'),
 					type: formData.get('type') || 'bug',
 					description: formData.get('description'),
+					email: (formData.get('email') || '').trim(),
+					hp: formData.get('hp') || '',
+					elapsed_ms: Math.round(performance.now()),
 					source: 'web'
 				};
 				
@@ -427,11 +441,13 @@
 					return;
 				}
 				
-				// Bug reports -> pdoom1 GitHub issues (backend decision). Try a configured
-				// server-side endpoint (config.bugApi) first; else / on failure open a
-				// pre-filled GitHub issue the reporter confirms. Never lose a report.
-				const cfg = window.__PDOOM_CONFIG__ || {};
-				const bugApi = (cfg.bugApi || '').replace(/\/$/, '');
+				// Feedback path: email-primary, GitHub as the never-lose-it fallback.
+				// bug-submit.php (same DreamHost box, PHP + mail()) sends the report
+				// privately to the team -- no GitHub account needed. On any failure we
+				// fall through to a prefilled GitHub issue below, so a report is never
+				// lost. Recipient is hardcoded server-side; a reporter's optional email
+				// goes ONLY to the private inbox, never into the public GitHub fallback.
+				const bugApi = '/bug-submit.php';
 
 				// Target the ISSUE FORM, not a blank issue. The game repo sets
 				// blank_issues_enabled:false, so /issues/new?title=&body= redirects
