@@ -4,9 +4,14 @@ Executable steps for moving the league from the L1 epoch (`(seed, v0.12.0)`
 weekly board) to the L2 epoch, per issue #151. Written on launch day
 (2026-07-24) so the cutover is a checklist, not a scramble at 3pm.
 
-**Blessed seed (from `docs/LEAGUE_SEED_LEDGER.md`):** `league_2026-07_7d6ced29`
-**New L2 board file:** `board_league_2026-07_7d6ced29__L2.json`
+**Board key (from the shipped v0.13 client — pdoom1 #151, gate-green):**
+`(weekly-2026-w30, L2)` → `board_weekly-2026-w30__L2.json`
 **Legacy L1 board file:** `board_weekly-2026-w0__L1.json`
+
+> The seed is `weekly-2026-w30`, NOT the earlier website-side proposal
+> `league_2026-07_7d6ced29` — see the correction note in
+> `docs/LEAGUE_SEED_LEDGER.md`. The client POSTs to `weekly-2026-w30`; the board
+> must match it or scores vanish silently.
 
 ---
 
@@ -15,14 +20,14 @@ weekly board) to the L2 epoch, per issue #151. Written on launch day
 | # | step | side | state |
 |---|---|---|---|
 | 1 | Preserve L1 board as legacy | VPS (Pip) | **ready** — command below |
-| 2 | Confirm score API accepts the new `(seed, L2)` key | VPS/API | **BLOCKED** — needs the exact key string the v0.13 client POSTs |
-| 3 | Point website display at the L2 board | website | **contingent** — depends on step 2 + issue #735 |
+| 2 | Confirm score API accepts `(weekly-2026-w30, L2)` | VPS/API | **ready** — key now known; check below |
+| 3 | Point website display at the L2 board | website | **contingent on #735** — does v0.13 submit remotely |
 | 4 | Verify | website | **ready** — checks below |
 
-The two BLOCKED/contingent items hang on the follow-up you owe issue #151 (the
-exact board-key string once the v0.13 version-split lands) and on the answer to
-issue #735 (does v0.13 actually submit scores remotely). Nothing here fabricates
-those — the steps that can't be pinned down yet say so.
+The values that were blocked are now known (client is built). Step 3 remains
+contingent only on whether v0.13 actually submits scores remotely (issue #735) —
+if it does not, there is nothing to display yet and the honest pre-launch banner
+is correct as-is.
 
 ---
 
@@ -42,18 +47,18 @@ ls -la board_weekly-2026-w0__*.json    # confirm both exist, same size
 `-n` (no-clobber) so re-running never overwrites the legacy copy. The original
 keeps its seed string so the provenance of those scores stays legible.
 
-## Step 2 — confirm the API accepts the L2 key  [BLOCKED]
+## Step 2 — confirm the API accepts `(weekly-2026-w30, L2)`
 
-The board key is client-supplied and the store is flat-file, so a new key should
-auto-create on first POST — but confirm no version allowlist rejects it. **This
-needs the exact key string the v0.13 build POSTs**, which lands with the #151
-follow-up. When known, a read of the (empty) new board is the cheap check:
+The board key is client-supplied and the store is flat-file, so it should
+auto-create on first POST — but confirm no version allowlist rejects the new
+`L2` epoch form (the game flagged this against #149). Read of the (empty) new
+board is the cheap check:
 
 ```bash
-# TEMPLATE — fill <API_BASE> and the exact key once known:
-curl -s "<API_BASE>/board?seed=league_2026-07_7d6ced29&ladder=L2" -o /dev/null -w "%{http_code}\n"
+# fill <API_BASE>:
+curl -s "<API_BASE>/board?seed=weekly-2026-w30&ladder=L2" -o /dev/null -w "%{http_code}\n"
 # 200 (empty board) or a clean 404-that-will-autocreate = OK; a 4xx rejecting
-# the key = an allowlist to fix before the cutover.
+# the key = a version allowlist to widen for L<n> before the cutover.
 ```
 
 ## Step 3 — point the website display at L2  [contingent on #735]
@@ -78,8 +83,8 @@ is a read-only consumer of the one PHP score API).
 ## Step 4 — verify
 
 ```bash
-# blessed seed still derives correctly (guards against an edited ledger):
-python tools/derive_league_seed.py 2026-07     # -> league_2026-07_7d6ced29
+# the shipped seed is referenced in the release notes (sanity anchor):
+grep -o "weekly-2026-w30" public/data/version.json    # 1 hit
 
 # leaderboard page is honest right now (pre-launch banner, empty toolbar hidden):
 curl -s https://pdoom1.com/leaderboard/ | grep -c "No scores recorded yet"   # >=1
