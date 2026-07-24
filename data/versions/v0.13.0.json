@@ -1,0 +1,27 @@
+{
+  "game_version": "0.13.0",
+  "display_version": "v0.13.0",
+  "release_name": "P(Doom) v0.13.0 -- First Contact league (L2)",
+  "release_date": "2026-07-24T11:15:49Z",
+  "release_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.13.0",
+  "is_prerelease": false,
+  "changelog_section": "Release notes for version 0.13.0",
+  "sync_timestamp": "2026-07-24T11:15:49Z",
+  "sync_source": "pdoom1-game-release",
+  "assets": {
+    "download_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.13.0",
+    "source_zip": "https://github.com/PipFoweraker/pdoom1/archive/refs/tags/v0.13.0.zip",
+    "changelog_url": "https://github.com/PipFoweraker/pdoom1/blob/main/CHANGELOG.md"
+  },
+  "requirements": {
+    "python": "3.9+",
+    "os": ["Windows 10+", "Linux", "macOS"],
+    "memory": "512MB",
+    "storage": "100MB"
+  },
+  "compatibility": {
+    "website_features": "full",
+    "data_integration": "ready",
+    "api_version": "1.0.0"
+  }
+}
