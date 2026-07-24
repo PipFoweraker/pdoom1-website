@@ -816,10 +816,23 @@
       const banner = document.getElementById('data-status-banner');
       if (!banner) return;
       const status = (data && data.data_status) || 'live';
-      if (status === 'live') { banner.style.display = 'none'; return; }
-      const ver = (data.meta && data.meta.game_version) || '';
+      const controls = document.querySelector('.controls-section');
+      if (status === 'live') {
+        banner.style.display = 'none';
+        if (controls) controls.style.display = '';
+        return;
+      }
+      // Pre-launch the board is empty, so the search/sort/filter toolbar only offers
+      // a visitor ways to filter nothing. Hide it and let the banner carry the whole
+      // message; it comes back automatically once real scores publish.
+      if (controls) controls.style.display = 'none';
+
+      // Deliberately names no version. The board is stamped with whatever release last
+      // exported, which drifts behind the live game, and a stale number here reads as a
+      // promise about a specific build. Naming the *condition* instead stays true
+      // whichever release turns submission on.
       banner.innerHTML = (status === 'pre-launch')
-        ? `&#9432; <strong>Leaderboards launch with the next release.</strong> No competitive scores are recorded yet &mdash; the live board (${ver}) arrives when in-game score submission ships.`
+        ? `&#9432; <strong>No scores recorded yet.</strong> The board turns on when in-game score submission ships &mdash; until then this page is a placeholder, not an empty ranking.`
         : `&#9432; <strong>Showing sample / pre-release data</strong> &mdash; not live competitive results.`;
       banner.style.display = 'block';
     }
@@ -1214,9 +1227,20 @@
         if (response.ok) {
           const weekData = await response.json();
           const seedsGroup = document.getElementById('recent-seeds-group');
-          
-          // Add current week's seed
-          if (weekData.seed) {
+
+          // Only offer a week that has not already finished. The rollover cron fires
+          // Sunday 14:00 UTC and derives the week from `now`, so it re-publishes the
+          // week that ends hours later (TECH_DEBT A9) -- current.json therefore keeps
+          // claiming `is_current` for days after the week closed. Trusting that flag
+          // would show a fresh visitor a competition that is already over, so the
+          // end timestamp is the authority here, not the flag. Self-heals the moment
+          // the rollover cadence is fixed; no league logic is changed by this.
+          const endsAt = Date.parse(
+            weekData.week_info?.end_timestamp || weekData.meta?.end_date || ''
+          );
+          const weekStillOpen = Number.isFinite(endsAt) && endsAt > Date.now();
+
+          if (weekData.seed && weekStillOpen) {
             const option = document.createElement('option');
             option.value = weekData.seed;
             option.textContent = `Week ${weekData.meta?.week_id || 'Current'} - ${weekData.seed}`;

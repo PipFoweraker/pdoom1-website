@@ -888,16 +888,26 @@ t	.hero {
 			<div class="download-ctas" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.4rem;">
 				<!-- hrefs default to the release PAGE (never 404s on any asset naming);
 				     resolveDownloads() upgrades them to direct per-platform asset URLs. -->
-				<a id="download-windows" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+				<a id="download-windows" data-platform-label="Windows" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for Windows
 				</a>
-				<a id="download-macos" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+				<a id="download-macos" data-platform-label="macOS" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for macOS
 				</a>
-				<a id="download-linux" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+				<a id="download-linux" data-platform-label="Linux" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for Linux
 				</a>
 			</div>
+
+			<!-- Shown by resolveDownloads() only when a macOS build actually resolved.
+			     An unsigned/un-notarised Godot .app is refused by Gatekeeper on first
+			     open with "the developer cannot be verified", which reads as a broken
+			     download; most testers bounce silently rather than report it. -->
+			<p id="macos-gatekeeper-note" style="display: none; text-align: center; margin: 0 auto 0.6rem; max-width: 46rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+				<strong>On macOS:</strong> the first launch is blocked because the build isn't
+				Apple-notarised yet. Right-click (or Control-click) the app and choose
+				<strong>Open</strong>, then confirm — you only need to do this once.
+			</p>
 
 			<div style="text-align: center; margin-bottom: 0.8rem;">
 				<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-secondary); text-decoration: none; font-size: 0.9rem;">
@@ -1570,16 +1580,55 @@ t	.hero {
 				'download-linux': /linux|x86_64|\.appimage/i
 			};
 			const isBuild = /\.(zip|dmg|appimage|x86_64|exe|tar\.gz)$/i;
+
+			// A platform with no build in the latest release must SAY so. Leaving the
+			// release-page baseline in place would send (say) a Linux visitor to a page
+			// carrying only Windows and macOS zips -- a dead end that looks like a
+			// working button. Absence of evidence is not evidence of absence, though:
+			// only degrade when the asset list was actually fetched. On rate-limit or
+			// offline we cannot know what shipped, so every button keeps the baseline.
+			function markUnavailable(el) {
+				if (!el) return;
+				const label = el.dataset.platformLabel || el.textContent.trim();
+				el.removeAttribute('href');
+				el.removeAttribute('target');
+				el.setAttribute('role', 'note');
+				el.setAttribute('aria-disabled', 'true');
+				el.title = label + ' build is not in the current release yet';
+				el.style.opacity = '0.55';
+				el.style.cursor = 'default';
+				el.style.pointerEvents = 'none';
+				el.textContent = label + ' — coming soon';
+			}
+
 			try {
 				const res = await fetch('https://api.github.com/repos/PipFoweraker/pdoom1/releases/latest',
 					{ headers: { 'Accept': 'application/vnd.github+json' } });
 				if (!res.ok) return; // rate-limited/offline -> keep release-page baseline
 				const assets = (await res.json()).assets || [];
-				for (const [id, rx] of Object.entries(platforms)) {
+
+				// Resolve every platform BEFORE mutating anything, so the "we recognised
+				// nothing" case can bail out without having already degraded buttons.
+				const found = Object.entries(platforms).map(([id, rx]) => [
+					id, assets.find(a => rx.test(a.name) && isBuild.test(a.name))
+				]);
+
+				// Zero recognised builds in a release that HAS assets means our filename
+				// guess is wrong, not that nothing shipped. Keep the working baseline
+				// rather than tell every visitor the game is unavailable on every OS.
+				if (!found.some(([, asset]) => asset)) return;
+
+				for (const [id, asset] of found) {
 					const el = document.getElementById(id);
 					if (!el) continue;
-					const asset = assets.find(a => rx.test(a.name) && isBuild.test(a.name));
 					if (asset) el.href = asset.browser_download_url;
+					else markUnavailable(el);
+				}
+				// Show the macOS first-run note only when a macOS build actually resolved.
+				const macNote = document.getElementById('macos-gatekeeper-note');
+				if (macNote) {
+					const macEl = document.getElementById('download-macos');
+					macNote.style.display = (macEl && macEl.hasAttribute('href')) ? 'block' : 'none';
 				}
 			} catch (_) { /* keep baseline */ }
 		}
