@@ -287,10 +287,9 @@
 	<main id="main-content" role="main">
 		<h1>Report a Bug</h1>
 		<p class="intro">
-			Found a bug or need help? Report issues directly through our GitHub integration.
-			Please describe the problem in words &mdash; the email we receive carries your
-			text, but <strong>not</strong> an attached file. If you pick one, we are told its
-			name so we know to ask you for it.
+			Found a bug or need help? Send it straight to the team &mdash; no GitHub account needed.
+			You can <strong>attach a screenshot, log, or config file</strong> (up to 500&nbsp;KB) and it
+			comes through with your report.
 		</p>
 
 		<div class="form-container">
@@ -365,11 +364,11 @@
 				</div>
 
 				<div class="form-group">
-					<label for="bug-attachment">Name a File (Optional)</label>
+					<label for="bug-attachment">Attach a File (Optional)</label>
 					<input type="file" id="bug-attachment" name="attachment"
 						   accept=".txt,.log,.json,.zip,.png,.jpg,.jpeg"
 						   aria-describedby="attachment-help attachment-error">
-					<div id="attachment-help" class="form-help"><strong>The file itself is not sent to us</strong> &mdash; only its name and size, so we know to ask. To get a screenshot or log to us directly, mention it below and we will reply, or file on GitHub where you can attach it. (max 500 KB. Supported: .txt, .log, .json, .zip, .png, .jpg)</div>
+					<div id="attachment-help" class="form-help">A screenshot, log, or config file &mdash; it comes through attached to your report. Max 500&nbsp;KB. Supported: .txt, .log, .json, .zip, .png, .jpg</div>
 					<div id="attachment-error" class="error-message" role="alert" aria-live="polite"></div>
 				</div>
 
@@ -385,7 +384,7 @@
 	<footer role="contentinfo">
 		<div class="footer-content">
 			<p>&copy; 2026 pdoom1. Not affiliated with any AI organization. For fun, education, and satire only.</p>
-			<p>Privacy: No personal data collected | <a href="/" style="color: var(--accent-primary);">Back to Home</a></p>
+			<p>Privacy: we use what you send only to handle your report &mdash; <a href="/privacy/" style="color: var(--accent-primary);">details</a> | <a href="/" style="color: var(--accent-primary);">Back to Home</a></p>
 		</div>
 	</footer>
 
@@ -502,11 +501,9 @@
 				if (submitted) {
 					button.textContent = '[OK] Report Submitted!';
 					button.style.background = 'var(--success-color)';
-					// bug-submit.php forwards the attachment's NAME and SIZE, never its
-					// bytes. A reporter who picked a screenshot has just been shown a
-					// success state, and without this would reasonably believe we now
-					// hold the image. Say plainly that we do not, while the report is
-					// still fresh enough for them to act on it.
+					// Attachments now come through with the report (bug-submit.php
+					// MIME-attaches them). Confirm it, so a reporter who attached a
+					// screenshot knows we have it.
 					if (bugData.attachment && bugData.attachment.filename) {
 						let an = document.getElementById('bug-attach-note');
 						if (!an) {
@@ -515,13 +512,9 @@
 							an.style.cssText = 'margin-top:0.8rem; font-size:0.9rem; color: var(--text-secondary);';
 							button.insertAdjacentElement('afterend', an);
 						}
-						an.innerHTML = 'Your description reached us &mdash; but <strong>"' +
-							bugData.attachment.filename.replace(/[<>&]/g, '') +
-							'" did not.</strong> We only received its name. If the file matters, ' +
-							'reply to us at <a href="mailto:team@pdoom1.com" style="color: var(--accent-primary);">team@pdoom1.com</a> ' +
-							'with it attached, or <a href="' + ghUrl + '" target="_blank" rel="noopener" style="color: var(--accent-primary);">file it on GitHub &rarr;</a> where you can upload it.';
+						an.textContent = '\u{1F4CE} "' + bugData.attachment.filename + '" came through with your report.';
 					}
-					setTimeout(() => { button.textContent = originalText; button.style.background = ''; e.target.reset(); button.disabled = false; }, 3000);
+					setTimeout(() => { button.textContent = originalText; button.style.background = ''; e.target.reset(); button.disabled = false; const n = document.getElementById('bug-attach-note'); if (n) n.remove(); }, 3000);
 				} else {
 					window.open(ghUrl, '_blank', 'noopener');
 					button.textContent = 'Continue on GitHub \u2192';

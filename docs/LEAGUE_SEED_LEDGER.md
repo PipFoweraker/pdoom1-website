@@ -17,7 +17,17 @@ picked here.
 
 | epoch | seed | ladder | board file | blessed (UTC) | by | notes |
 |---|---|---|---|---|---|---|
-| L2 | `weekly-2026-w30` | L2 | `board_weekly-2026-w30__L2.json` | 2026-07-24 (pending re-confirm) | Pip | **First epoch cut.** Client sends `version="L2"`, seed `weekly-2026-w30` (pdoom1 #151, gate-green; echoed in `public/data/version.json` release notes). Legacy L1 board preserved as `board_weekly-2026-w0__L1.json`. |
+| L2 | `weekly-2026-w30` | L2 | `board_weekly-2026-w30__L2.json` | 2026-07-25 | Pip | **First epoch cut.** Client sends `version="L2"`, seed `weekly-2026-w30` (pdoom1 #151, gate-green; echoed in `public/data/version.json` release notes). Legacy L1 board preserved as `board_weekly-2026-w0__L1.json`. |
+
+## Blessings log
+
+The ceremony, for the record — including the one that missed, because the log is
+history, not a tidy final answer.
+
+| # | when (AEST) | seed | rite | outcome |
+|---|---|---|---|---|
+| 1 | 2026-07-24 ~08:00 | `league_2026-07_7d6ced29` | *waves doom staff* | **Superseded.** Blessed in good faith, but conflicted with the already-shipped client key. Corrected same day. |
+| 2 | 2026-07-25 ~09:20 | `weekly-2026-w30` | *waves doom staff* | **Canonical.** Matches the shipped v0.13 client. This is the seed the L2 board uses. |
 
 ## Correction note (2026-07-24)
 
