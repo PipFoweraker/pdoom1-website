@@ -1,9 +1,13 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-23T18:41:15.803Z UTC
+Generated: 2026-07-24T00:51:04.452Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 811 | Workshop 3 (mechanics) -- Wed 2026-07-30: crisp parts, brutal decisions |  |  | 2026-07-23 22:13:42 | [link](https://github.com/PipFoweraker/pdoom1/issues/811) |
+| 810 | Archive migration: move evolutionary/cruft docs off main repo to keep repo-wide search crisp |  |  | 2026-07-23 21:57:28 | [link](https://github.com/PipFoweraker/pdoom1/issues/810) |
+| 809 | Remove vestigial victory plumbing + reconcile runtime ADR-0002 (no-victory is half-implemented) |  |  | 2026-07-23 21:17:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/809) |
+| 808 | Reflective review (on/after 2026-08-24): release/league cycle nomenclature + cadence |  |  | 2026-07-23 21:17:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/808) |
 | 807 | CI: 'Validate Historical Data' fails -- quirks.json mis-validated against researcher schema (pre-existing) |  |  | 2026-07-23 12:34:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/807) |
 | 805 | Stretch: macOS (Ventura 13.5.2) + Debian/Linux builds for testers (late-flyby or weekend fast-follow) | patch:ui |  | 2026-07-23 11:01:33 | [link](https://github.com/PipFoweraker/pdoom1/issues/805) |
 | 804 | Procurement + equipment lead-time: pre-order laptops, start-date scheduling, dead-time as opportunity cost | league:next |  | 2026-07-23 11:01:37 | [link](https://github.com/PipFoweraker/pdoom1/issues/804) |
