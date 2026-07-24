@@ -287,8 +287,10 @@
 	<main id="main-content" role="main">
 		<h1>Report a Bug</h1>
 		<p class="intro">
-			Found a bug or need help? Report issues directly through our GitHub integration. 
-			You can attach log files, screenshots, or config files to help us debug faster.
+			Found a bug or need help? Report issues directly through our GitHub integration.
+			Please describe the problem in words &mdash; the email we receive carries your
+			text, but <strong>not</strong> an attached file. If you pick one, we are told its
+			name so we know to ask you for it.
 		</p>
 
 		<div class="form-container">
@@ -343,11 +345,11 @@
 				</div>
 
 				<div class="form-group">
-					<label for="bug-attachment">Attach Log/File (Optional)</label>
-					<input type="file" id="bug-attachment" name="attachment" 
+					<label for="bug-attachment">Name a File (Optional)</label>
+					<input type="file" id="bug-attachment" name="attachment"
 						   accept=".txt,.log,.json,.zip,.png,.jpg,.jpeg"
 						   aria-describedby="attachment-help attachment-error">
-					<div id="attachment-help" class="form-help">Upload logs, screenshots, or config files (max 500 KB). Supported: .txt, .log, .json, .zip, .png, .jpg</div>
+					<div id="attachment-help" class="form-help"><strong>The file itself is not sent to us</strong> &mdash; only its name and size, so we know to ask. To get a screenshot or log to us directly, mention it below and we will reply, or file on GitHub where you can attach it. (max 500 KB. Supported: .txt, .log, .json, .zip, .png, .jpg)</div>
 					<div id="attachment-error" class="error-message" role="alert" aria-live="polite"></div>
 				</div>
 
@@ -479,6 +481,25 @@
 				if (submitted) {
 					button.textContent = '[OK] Report Submitted!';
 					button.style.background = 'var(--success-color)';
+					// bug-submit.php forwards the attachment's NAME and SIZE, never its
+					// bytes. A reporter who picked a screenshot has just been shown a
+					// success state, and without this would reasonably believe we now
+					// hold the image. Say plainly that we do not, while the report is
+					// still fresh enough for them to act on it.
+					if (bugData.attachment && bugData.attachment.filename) {
+						let an = document.getElementById('bug-attach-note');
+						if (!an) {
+							an = document.createElement('p');
+							an.id = 'bug-attach-note';
+							an.style.cssText = 'margin-top:0.8rem; font-size:0.9rem; color: var(--text-secondary);';
+							button.insertAdjacentElement('afterend', an);
+						}
+						an.innerHTML = 'Your description reached us &mdash; but <strong>"' +
+							bugData.attachment.filename.replace(/[<>&]/g, '') +
+							'" did not.</strong> We only received its name. If the file matters, ' +
+							'reply to us at <a href="mailto:team@pdoom1.com" style="color: var(--accent-primary);">team@pdoom1.com</a> ' +
+							'with it attached, or <a href="' + ghUrl + '" target="_blank" rel="noopener" style="color: var(--accent-primary);">file it on GitHub &rarr;</a> where you can upload it.';
+					}
 					setTimeout(() => { button.textContent = originalText; button.style.background = ''; e.target.reset(); button.disabled = false; }, 3000);
 				} else {
 					window.open(ghUrl, '_blank', 'noopener');

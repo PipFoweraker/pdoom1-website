@@ -21,7 +21,22 @@ Actions: `triaged #<issue>` · `needs-repro` · `wontfix` · `duplicate` · `—
 
 | date | who | channel | what they said | action |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| 2026-07-24 03:03 UTC | Helpful Stranger (pip.f.temp@) | web-form | Smoke test. Confirms the form → team@pdoom1.com path **works**. | — (channel verified) |
+| 2026-07-24 03:03 UTC | Helpful Stranger | web-form | "this event system probably needs some love and at least one human eyeball involved in the system that reviews and promotes it, just like the system that y'all have for doing art assets in game. Pip would love to spend a month manually reviewing AI papers" | needs-issue — see below |
+| 2026-07-24 03:03 UTC | (surfaced by above) | web-form | Reporter attached `Screenshot 2026-07-15 161002.png` (201,249 bytes). The file was **not forwarded** — only its name reached us, and the reporter was shown "Report Submitted!" with no indication. | fixed on `launch/2026-07-24-alpha` |
+
+### On the event-curation point
+
+Read past the joke and it lands on a real gap. The events pipeline
+(pdoom-data → `sync-events.py` → ~2,194 generated pages) has **no human review or
+promotion stage**. The art asset pipeline does. ADR-0016 assumes one — its monthly
+cycle is *"collect real-world events, suggestions on papers etc → author a
+world-update pack"* — and "author" is the step that does not exist as tooling.
+
+The sarcasm carries the actual argument: nobody will hand-review a month of AI
+papers, so an unreviewed firehose is the default outcome unless something makes
+curation cheap. Worth an issue against the monthly world-update cadence, not a
+launch-day fix.
 
 ---
 
