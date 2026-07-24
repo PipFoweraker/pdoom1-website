@@ -10,6 +10,14 @@ Disallow: /assets/private/
 Disallow: /data/
 Disallow: /design/
 Disallow: /monitoring/
+
+# Orphaned pending revision (2026-07-24): no inbound links, stale content.
+# These also carry <meta name="robots" content="noindex">.
+# See docs/ORPHANED_PAGES_TODO.md before re-linking or removing.
+Disallow: /league/
+Disallow: /players/
+Disallow: /changelog/
+Disallow: /dev-notes/
 Disallow: /stats/
 Disallow: /dev-notes/
 

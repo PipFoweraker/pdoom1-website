@@ -26,6 +26,7 @@ const THROTTLE_S  = 30;                      // seconds between reports per IP
 const MAX_TITLE   = 200;
 const MAX_DESC    = 5000;
 const MAX_EMAIL   = 200;
+const MAX_CREDIT  = 80;                      // name the reporter wants crediting as
 const TYPES       = ['bug', 'feature', 'documentation', 'performance'];
 
 header('Content-Type: application/json; charset=utf-8');
@@ -83,6 +84,10 @@ $desc  = $clean($data['description'] ?? '', MAX_DESC);
 $type  = in_array($data['type'] ?? '', TYPES, true) ? $data['type'] : 'bug';
 $email = $clean($data['email'] ?? '', MAX_EMAIL);
 $email = ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) ? $email : '';
+// Opt-in credit name. Unlike $email this MAY be published, so it is labelled
+// explicitly in the mail -- whoever writes the release notes must be able to tell
+// at a glance that consent was given, and never mine the Contact line for a name.
+$credit = $clean($data['credit_name'] ?? '', MAX_CREDIT);
 
 if ($title === '' || $desc === '') {
     done(422, ['ok' => false, 'error' => 'A title and description are required.']);
@@ -104,6 +109,9 @@ $body = "New feedback from the pdoom1.com bug form.\n"
       . "Type:    $type\n"
       . "Title:   $title\n"
       . "Contact: " . ($email !== '' ? $email : '(none given)') . "\n"
+      . "Credit:  " . ($credit !== ''
+            ? $credit . '  <-- OK to credit publicly (reporter opted in)'
+            : '(anonymous -- do NOT name this reporter publicly)') . "\n"
       . "When:    " . gmdate('Y-m-d H:i:s') . " UTC\n"
       . "----------------------------------------\n\n"
       . $desc

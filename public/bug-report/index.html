@@ -337,6 +337,26 @@
 					<div id="email-help" class="form-help">Only if you'd like a reply. Sent privately to the team &mdash; never published, never added to a public issue.</div>
 				</div>
 
+				<!-- Credit name. This is the PRIVACY-INVERSE of the email field above:
+				     email is never published, this may be. The two sit next to each
+				     other, so the copy has to make that difference unmissable or someone
+				     will type their real name expecting the email field's promise. -->
+				<div class="form-group">
+					<label for="bug-credit">Name for credit <span style="color:var(--text-muted);font-weight:normal">(optional)</span></label>
+					<input type="text" id="bug-credit" name="credit_name"
+						   placeholder="However you'd like to be credited"
+						   maxlength="80"
+						   autocomplete="nickname"
+						   aria-describedby="credit-help">
+					<div id="credit-help" class="form-help">
+						If you'd like credit for finding this, tell us what to call you &mdash; a
+						first name, a handle, anything. <strong>Unlike your email, this one may be
+						shown publicly</strong> (release notes, credits, or a linked issue).
+						<strong>Leave it blank and you stay anonymous</strong> &mdash; the report is
+						just as welcome either way.
+					</div>
+				</div>
+
 				<!-- Honeypot: off-screen and hidden from people, tempting to bots.
 				     A real submission leaves it empty; a filled one is dropped. -->
 				<div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
@@ -364,7 +384,7 @@
 
 	<footer role="contentinfo">
 		<div class="footer-content">
-			<p>&copy; 2025 pdoom1. Not affiliated with any AI organization. For fun, education, and satire only.</p>
+			<p>&copy; 2026 pdoom1. Not affiliated with any AI organization. For fun, education, and satire only.</p>
 			<p>Privacy: No personal data collected | <a href="/" style="color: var(--accent-primary);">Back to Home</a></p>
 		</div>
 	</footer>
@@ -388,6 +408,7 @@
 					type: formData.get('type') || 'bug',
 					description: formData.get('description'),
 					email: (formData.get('email') || '').trim(),
+					credit_name: (formData.get('credit_name') || '').trim(),
 					hp: formData.get('hp') || '',
 					elapsed_ms: Math.round(performance.now()),
 					source: 'web'
