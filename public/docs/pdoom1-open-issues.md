@@ -1,9 +1,26 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-24T00:51:04.452Z UTC
+Generated: 2026-07-24T07:08:17.209Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 828 | observe/design(ux): hiring actions don't appear in the action queue (top bar + hiring submenu only) |  |  | 2026-07-24 04:27:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/828) |
+| 827 | fix(ux): show option/action costs ON the button + grey out unaffordable |  |  | 2026-07-24 04:27:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/827) |
+| 826 | docs: rendered HTML architecture + nomenclature map (turn/game systems, with diagrams) |  |  | 2026-07-24 02:24:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/826) |
+| 825 | design(events): OUTS sweep -- every event response offers a resource trade-off (no dead-ends) |  |  | 2026-07-24 01:43:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/825) |
+| 824 | feat(ux): MTG-style pass-priority / F6 -- accept defaults, skip to end-turn summary |  |  | 2026-07-24 01:43:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/824) |
+| 823 | design(liveops): layered / overlapping leagues -- staggered lifespans, default to freshest |  |  | 2026-07-24 01:27:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/823) |
+| 822 | feat(mechanic): overbook TEETH -- forcing-function instead of a flat reject |  |  | 2026-07-24 03:21:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/822) |
+| 821 | fix(ux): overbook phantom queue tiles + red-error spam (honor select_action return) |  |  | 2026-07-24 01:20:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/821) |
+| 820 | feat(display): window mode options (windowed / borderless / fullscreen) |  |  | 2026-07-24 01:14:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/820) |
+| 819 | feat(ux): action-queue visual feedback -- work-card flies to the queue (A/B dev toggle) |  |  | 2026-07-24 01:14:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/819) |
+| 818 | fast-follow(music): drop BPM 10-15%, consider 2 layered tracks |  |  | 2026-07-24 01:13:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/818) |
+| 817 | feat(cold-open): cycle hero backgrounds per text beat |  |  | 2026-07-24 01:13:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/817) |
+| 816 | feat(cat): scene flashover on cat adoption (curled-cat asset) |  |  | 2026-07-24 01:13:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/816) |
+| 815 | feat(cat): photo->pixel cat pipeline, 3 base models |  |  | 2026-07-24 01:13:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/815) |
+| 814 | feat(onboarding): progressive disclosure -- operator monologue, greyed-UI intro, hire waterfall |  |  | 2026-07-24 01:13:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/814) |
+| 813 | feat(hiring): stateful candidate representation -- knowledge-gated portrait to lanyard |  |  | 2026-07-24 01:13:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/813) |
+| 812 | feat(leaderboard): show lab name + operator name by default |  |  | 2026-07-24 01:13:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/812) |
 | 811 | Workshop 3 (mechanics) -- Wed 2026-07-30: crisp parts, brutal decisions |  |  | 2026-07-23 22:13:42 | [link](https://github.com/PipFoweraker/pdoom1/issues/811) |
 | 810 | Archive migration: move evolutionary/cruft docs off main repo to keep repo-wide search crisp |  |  | 2026-07-23 21:57:28 | [link](https://github.com/PipFoweraker/pdoom1/issues/810) |
 | 809 | Remove vestigial victory plumbing + reconcile runtime ADR-0002 (no-victory is half-implemented) |  |  | 2026-07-23 21:17:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/809) |
