@@ -1,22 +1,22 @@
 {
   "latest_release": {
-    "version": "v0.12.0",
-    "name": "P(Doom)1 v0.12.0 -- friends & family alpha",
-    "published_at": "2026-07-22T12:39:27Z",
-    "html_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.12.0",
-    "body": "The friends-and-family alpha of **P(Doom)1** -- a turn-based AI-safety strategy game where you run a frontier AI lab and try to steer the world's p(doom) before it steers you.\n\n## The loop\nPlay a run, lose (you will), and your score posts to a **live global leaderboard** -- your name lands next to everyone else brave enough to try.\n\n## New in this build\n- The game reaches the leaderboard without crashing (that one took a while).\n- A first-launch welcome overlay + a \"Show gameplay hints\" toggle for fresh players.\n- Icons on the PLAN action categories.\n- 7x smaller download than the old build.\n\n## Play it (Windows)\n1. Download `PDoom-v0.12.0-windows.zip` below.\n2. Extract the whole folder (keep the files together).\n3. Run `PDoom.exe`.\n\n## Notes\n- Early alpha -- expect rough edges. That is what you are here for.\n- Windows only for now (Steam + web later).\n- Found a bug or broke something interesting? Tell Pip.\n"
+    "version": "v0.13.0",
+    "name": "P(Doom) v0.13.0 -- First Contact league (L2)",
+    "published_at": "2026-07-24T11:15:26Z",
+    "html_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.13.0",
+    "body": "New league epoch L2 (seed weekly-2026-w30). Story cold-open, hiring pipeline, non-profit/for-profit choice, costs-on-buttons, day-precise ledger, candidate portraits, and a chain of soft-lock fixes. Extract the whole zip first, then run PDoom.exe. Unsigned alpha -- SmartScreen: More info -> Run anyway."
   },
   "repository_stats": {
     "stars": 8,
     "forks": 1,
-    "open_issues": 104,
-    "last_updated": "2026-07-23T22:08:12Z"
+    "open_issues": 111,
+    "last_updated": "2026-07-24T08:54:28Z"
   },
-  "last_updated": "2026-07-24T06:58:53.211638",
+  "last_updated": "2026-07-24T12:25:48.901454",
   "game_stats": {
     "baseline_doom_percent": 23,
     "frontier_labs_count": 5,
     "strategic_possibilities": 10000,
-    "last_calculated": "2026-07-24T06:58:53.211628"
+    "last_calculated": "2026-07-24T12:25:48.901455"
   }
 }
