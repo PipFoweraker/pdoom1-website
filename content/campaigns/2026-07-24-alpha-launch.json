@@ -1,0 +1,38 @@
+{
+  "_README": "DRAFT COPY - rewrite freely, it should sound like you, not like a tool. Nothing is posted by any automation from this file; you post by hand today. Set posted[platform] to an ISO timestamp as each goes out, then commit. Check every link keeps its own platform's utm_source before posting.",
+
+  "campaign": "alpha-launch-2026-07-24",
+  "title": "p(Doom)1 friends-and-family alpha",
+  "url": "https://pdoom1.com/",
+  "approved": false,
+
+  "_facts_this_copy_must_not_break": [
+    "Windows and macOS builds ship today; Linux is coming within a week - say so, do not imply Linux now.",
+    "This is an early alpha. Promise rough edges, not polish.",
+    "Do NOT point anyone at the in-game F8 bug reporter: it does not transmit (pdoom1 #800).",
+    "Do NOT promise leaderboards or scores - remote submission is not live yet (pdoom1 #735).",
+    "The game is free and open source, and non-commercial."
+  ],
+
+  "copy": {
+    "linkedin": "I've been building a game about AI safety, and it's finally in a state where I can hand it to people.\n\np(Doom)1 puts you in charge of an AI safety lab. You hire researchers, chase funding, manage compute, and try to reduce the probability of catastrophe — mostly through meetings, budgets and paperwork. The bureaucracy is the game.\n\nThis is an early alpha, built solo. It is rough in places and that is the point of releasing it now: I want to know where it is confusing, where it drags, and where it is actually fun.\n\nWindows and macOS today. Linux within the week.\n\nFree, open source, non-commercial.\n\nhttps://pdoom1.com/?utm_source=linkedin&utm_medium=social&utm_campaign=alpha-launch-2026-07-24",
+
+    "facebook": "Okay — the thing I've been quietly working on is playable.\n\np(Doom)1 is a strategy game where you run an AI safety lab: hiring, funding, compute, and a lot of bureaucracy standing between you and saving the world.\n\nIt's an early alpha, so expect rough edges. I would genuinely love for you to play it badly and then tell me exactly what confused you — that's more useful to me right now than praise.\n\nWindows and Mac today, Linux next week. Free, no catch.\n\nhttps://pdoom1.com/?utm_source=facebook&utm_medium=social&utm_campaign=alpha-launch-2026-07-24",
+
+    "twitter": "p(Doom)1 is playable.\n\nRun an AI safety lab. Hire researchers, chase funding, fight the bureaucracy, try to lower p(doom).\n\nEarly alpha — rough, solo-built, free. Windows + macOS today, Linux next week.\n\nTell me what confuses you.\n\nhttps://pdoom1.com/?utm_source=twitter&utm_medium=social&utm_campaign=alpha-launch-2026-07-24",
+
+    "bluesky": "p(Doom)1 is playable.\n\nRun an AI safety lab: hiring, funding, compute, and a lot of bureaucracy between you and saving the world.\n\nEarly alpha — rough, free. Windows + macOS today, Linux next week.\n\nTell me what confuses you.\n\nhttps://pdoom1.com/?utm_source=bluesky&utm_medium=social&utm_campaign=alpha-launch-2026-07-24",
+
+    "instagram": "p(Doom)1 — an early alpha, out today.\n\nYou run an AI safety lab. Hiring, funding, compute, and a great deal of bureaucracy between you and saving the world.\n\nSolo-built, free, open source. Windows + macOS now, Linux next week.\n\nIt's rough. That's why I want you to play it and tell me what didn't make sense.\n\nLink in bio.\n\n#gamedev #indiedev #aisafety #strategygame #pixelart",
+
+    "_instagram_bio_link": "https://pdoom1.com/?utm_source=instagram&utm_medium=social&utm_campaign=alpha-launch-2026-07-24"
+  },
+
+  "posted": {
+    "linkedin": null,
+    "facebook": null,
+    "twitter": null,
+    "bluesky": null,
+    "instagram": null
+  }
+}
