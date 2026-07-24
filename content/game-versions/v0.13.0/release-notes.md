@@ -1,7 +1,7 @@
 ---
 title: "P(Doom) v0.13.0 -- First Contact league (L2)"
 version: "0.13.0"
-release_date: "2026-07-24T11:15:49Z"
+release_date: "2026-07-24T11:18:04Z"
 type: "game-release"
 status: "stable"
 download_url: "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.13.0"
@@ -10,7 +10,7 @@ download_url: "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.13.0"
 # P(Doom) v0.13.0 -- First Contact league (L2)
 
 **Version:** v0.13.0
-**Release Date:** 2026-07-24T11:15:49Z
+**Release Date:** 2026-07-24T11:18:04Z
 **Status:** Stable Release
 
 ## Download
