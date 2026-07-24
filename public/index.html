@@ -1642,13 +1642,17 @@ t	.hero {
 
 		// Track download button clicks with Plausible Analytics
 		function setupDownloadTracking() {
-			// Get current version from version.json (loaded by loadVersionInfo)
-			let currentVersion = 'v0.11.0'; // Default fallback
-
-			// Try to extract version from button text or use default
-			const versionMatch = document.querySelector('.version-number')?.textContent;
-			if (versionMatch) {
-				currentVersion = versionMatch.trim();
+			// Resolve the version at CLICK time from loadVersionInfo's authoritative
+			// read of version.json (window.pdoomGameVersion). The old code captured it
+			// once at setup time off the .version-number span -- but that span still
+			// holds its hardcoded default then, because loadVersionInfo's async fetch
+			// has not resolved yet. The result was every Download event stamped with
+			// the stale literal regardless of the real release. Reading at click time
+			// (seconds later, after the fetch) fixes the race; 'unknown' rather than a
+			// version literal is the fallback, so a failed lookup never fabricates a
+			// version in the analytics.
+			function currentVersion() {
+				return window.pdoomGameVersion || 'unknown';
 			}
 
 			// The download buttons point at github.com, so the click leaves our
@@ -1688,7 +1692,7 @@ t	.hero {
 					if (window.plausible) {
 						plausible('Download', {
 							props: Object.assign({
-								version: currentVersion,
+								version: currentVersion(),
 								platform: target.platform,
 								file: target.file
 							}, attributionProps())
@@ -1825,6 +1829,11 @@ t	.hero {
 
 			if (data.latest_release) {
 				const version = data.latest_release.version;
+				// Authoritative deployed version, published for the download tracker to
+				// stamp on its event. version.json is the real source; the tracker must
+				// NOT fall back to a hardcoded literal (a stale stamp is a quiet lie in
+				// the analytics), so it reads this or reports 'unknown'.
+				window.pdoomGameVersion = version;
 				const publishedDate = new Date(data.latest_release.published_at);
 				const formattedDate = publishedDate.toISOString().split('T')[0];
 
