@@ -10,3 +10,5 @@ scripts/game-integration-config.json
 # The .local suffix means per-machine by convention; tracking it makes every
 # permission grant a merge conflict.
 .claude/settings.local.json
+content_audit.json
+page_audit.json
