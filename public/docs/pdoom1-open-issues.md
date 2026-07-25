@@ -1,22 +1,20 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-25T00:53:46.948Z UTC
+Generated: 2026-07-25T07:01:58.902Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 855 | ux(events): show Attention readout in the event-dialog corner | patch:ui |  | 2026-07-25 03:57:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/855) |
+| 850 | art: coherence + dedup pass over approved assets (consistent borders, kill redundant icons) | ship:next-release |  | 2026-07-25 03:01:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/850) |
+| 848 | feat(dev): in-game live A/B icon rotation (dev-mode asset swapper) | ship:next-release |  | 2026-07-25 02:46:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/848) |
 | 833 | design: 'people & money' cohesion spine -- recruitment epic -> roles/salary/manager -> payroll -> finance/roster |  | First Contact | 2026-07-24 23:32:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/833) |
-| 832 | ux/consistency(ledger): express debt due-dates in DAYS/date, not turns (day-precision for sequencing) |  | First Contact | 2026-07-24 23:32:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/832) |
-| 831 | ux: Settings menu needs a scroll bar |  | First Contact | 2026-07-24 23:32:28 | [link](https://github.com/PipFoweraker/pdoom1/issues/831) |
 | 830 | ux(hiring): statefulness -- ask WHO, per-candidate interviews, interview popup w/ card+info fade-in, portraits, embedded employee panel |  | First Contact | 2026-07-24 23:32:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/830) |
-| 829 | design(events): default 4 options, grey-out unaffordable (preserved), free outs, Attention-in-corner |  | First Contact | 2026-07-24 23:32:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/829) |
 | 828 | observe/design(ux): hiring actions don't appear in the action queue (top bar + hiring submenu only) |  | First Contact | 2026-07-24 23:32:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/828) |
-| 827 | fix(ux): show option/action costs ON the button + grey out unaffordable |  | First Contact | 2026-07-24 23:32:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/827) |
 | 826 | docs: rendered HTML architecture + nomenclature map (turn/game systems, with diagrams) |  | Technical Debt Cleanup | 2026-07-24 23:32:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/826) |
 | 825 | design(events): OUTS sweep -- every event response offers a resource trade-off (no dead-ends) |  | First Contact | 2026-07-24 23:32:42 | [link](https://github.com/PipFoweraker/pdoom1/issues/825) |
 | 824 | feat(ux): MTG-style pass-priority / F6 -- accept defaults, skip to end-turn summary |  | First Contact | 2026-07-24 23:32:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/824) |
 | 823 | design(liveops): layered / overlapping leagues -- staggered lifespans, default to freshest |  | Rivals & News | 2026-07-24 23:32:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/823) |
 | 822 | feat(mechanic): overbook TEETH -- forcing-function instead of a flat reject |  | First Contact | 2026-07-24 23:32:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/822) |
-| 821 | fix(ux): overbook phantom queue tiles + red-error spam (honor select_action return) |  | First Contact | 2026-07-24 23:32:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/821) |
 | 820 | feat(display): window mode options (windowed / borderless / fullscreen) |  | First Contact | 2026-07-24 23:32:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/820) |
 | 819 | feat(ux): action-queue visual feedback -- work-card flies to the queue (A/B dev toggle) |  | First Contact | 2026-07-24 23:32:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/819) |
 | 818 | fast-follow(music): drop BPM 10-15%, consider 2 layered tracks |  | First Contact | 2026-07-24 23:33:01 | [link](https://github.com/PipFoweraker/pdoom1/issues/818) |
@@ -26,11 +24,10 @@ Generated: 2026-07-25T00:53:46.948Z UTC
 | 814 | feat(onboarding): progressive disclosure -- operator monologue, greyed-UI intro, hire waterfall |  | First Contact | 2026-07-24 23:33:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/814) |
 | 813 | feat(hiring): stateful candidate representation -- knowledge-gated portrait to lanyard |  | First Contact | 2026-07-24 23:33:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/813) |
 | 812 | feat(leaderboard): show lab name + operator name by default |  | First Contact | 2026-07-24 23:33:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/812) |
-| 811 | Workshop 3 (mechanics) -- Wed 2026-07-30: crisp parts, brutal decisions |  | First Contact | 2026-07-24 23:33:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/811) |
+| 811 | Workshop 3 (mechanics) -- Wed 2026-07-29: crisp parts, brutal decisions |  | First Contact | 2026-07-25 00:54:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/811) |
 | 810 | Archive migration: move evolutionary/cruft docs off main repo to keep repo-wide search crisp |  | Technical Debt Cleanup | 2026-07-24 23:33:29 | [link](https://github.com/PipFoweraker/pdoom1/issues/810) |
 | 809 | Remove vestigial victory plumbing + reconcile runtime ADR-0002 (no-victory is half-implemented) |  | Technical Debt Cleanup | 2026-07-24 23:33:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/809) |
 | 808 | Reflective review (on/after 2026-08-24): release/league cycle nomenclature + cadence |  | First Contact | 2026-07-24 23:33:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/808) |
-| 807 | CI: 'Validate Historical Data' fails -- quirks.json mis-validated against researcher schema (pre-existing) |  | First Contact | 2026-07-24 23:33:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/807) |
 | 805 | Stretch: macOS (Ventura 13.5.2) + Debian/Linux builds for testers (late-flyby or weekend fast-follow) | patch:ui | First Contact | 2026-07-24 23:33:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/805) |
 | 804 | Procurement + equipment lead-time: pre-order laptops, start-date scheduling, dead-time as opportunity cost | league:next | First Contact | 2026-07-24 23:33:42 | [link](https://github.com/PipFoweraker/pdoom1/issues/804) |
 | 803 | Revisit ADR-0014 (conferences): days-granularity + travel-cost fine-tuning + conference data -> pdoom-data | league:next | First Contact | 2026-07-24 23:33:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/803) |
@@ -40,7 +37,6 @@ Generated: 2026-07-25T00:53:46.948Z UTC
 | 799 | Launch call: anonymous install ping + remote update check (one request, two jobs) | priority:high, ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:33:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/799) |
 | 798 | Put 'Buy Compute' under an operations-style submenu (action grouping) | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:33:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/798) |
 | 796 | Office cat 'Missy' (web-missy.jpg) does not render, though present + imported | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:33:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/796) |
-| 795 | Assign category-header icons to the PLAN action groups (hiring/resources/research/management/influence/...) | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:33:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/795) |
 | 794 | PLAN operations gantt: bigger font/area + a 'what's next / ETA to land' indicator | ship:next-release | First Contact | 2026-07-24 23:34:01 | [link](https://github.com/PipFoweraker/pdoom1/issues/794) |
 | 793 | Office floor: all staff render as the same character + sprites oversized vs the room | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:34:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/793) |
 | 791 | Early economy: force a small early lease spend; bedroom/basement start hard-caps hires; unlocks small-now, bigger-over-time | ship:next-release, league:next | First Contact | 2026-07-24 23:34:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/791) |
@@ -49,10 +45,7 @@ Generated: 2026-07-25T00:53:46.948Z UTC
 | 788 | Leaderboard: mark runs where dev mode was used (visible badge, NOT exclusion) | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:34:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/788) |
 | 786 | Finalize CREDITS.md (fill names) + merge after F&F deploy | ship:next-release | First Contact | 2026-07-24 23:34:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/786) |
 | 777 | In-game screenshot flow: make [ capture the dev-blog default | ship:next-release | First Contact | 2026-07-24 23:34:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/777) |
-| 775 | Release branching model for v0.12+: hotpatch discipline, impulse stash, Jira-compatible tracking | ship:tonight | First Contact | 2026-07-22 08:04:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/775) |
-| 773 | enforce_standards: ASCII auto-transliteration sweeps the WHOLE TREE as unstaged churn during pre-commit | ship:next-release | Technical Debt Cleanup | 2026-07-24 23:35:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/773) |
 | 763 | Nomenclature + pacing: strategic-options unlock expressed at month grain; align fanfare hero | ship:next-release | First Contact | 2026-07-24 23:35:46 | [link](https://github.com/PipFoweraker/pdoom1/issues/763) |
-| 758 | Session agenda: Friday 2026-07-24 (decisions + conversations queue) |  |  | 2026-07-21 09:03:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/758) |
 | 755 | UI: theme the event popup / dialog buttons (still default grey after menu theme) | ship:hotpatch-48h | First Contact | 2026-07-22 08:04:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/755) |
 | 753 | chore: docs typographic ASCII cleanup (em-dashes, box-drawing) -- low priority | ship:next-release | Technical Debt Cleanup | 2026-07-24 23:35:42 | [link](https://github.com/PipFoweraker/pdoom1/issues/753) |
 | 745 | Art tooling: compare-and-contrast mode for kept assets (batch style reviews) | ship:next-release | Technical Debt Cleanup | 2026-07-24 23:35:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/745) |
@@ -89,25 +82,18 @@ Generated: 2026-07-25T00:53:46.948Z UTC
 | 529 | Revisit terminal/CRT texture aesthetic (parked art package) | enhancement, ui-ux, worktree:player-experience |  | 2026-06-26 06:14:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/529) |
 | 528 | Lab Ledger: player-facing review page with insight-gated 'redacted' risk zone | enhancement |  | 2026-06-26 05:42:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/528) |
 | 526 | Track down the CSIRO/Data61 retro Win3-style web UI project |  |  | 2026-06-15 10:31:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/526) |
-| 520 | QA: Test Doom System & Victory Conditions | good first issue, qa-testing |  | 2026-02-03 03:52:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/520) |
-| 519 | QA: Test Accessibility Features section | good first issue, qa-testing |  | 2026-02-03 03:52:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/519) |
-| 518 | QA: Test Events System section | good first issue, qa-testing |  | 2026-02-03 03:52:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/518) |
-| 517 | QA: Test Debug & Developer Tools section | good first issue, qa-testing |  | 2026-02-03 03:52:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/517) |
-| 516 | QA: Test Core Gameplay Flow section | good first issue, qa-testing |  | 2026-02-03 03:52:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/516) |
-| 514 | Character Creation System (Point Allocation) | enhancement, game-mechanics, post-launch, worktree:dialogue |  | 2026-07-13 11:30:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/514) |
-| 511 | Add visual highlight effect for newly available actions | worktree:player-experience, ship:next-release |  | 2026-07-22 08:05:29 | [link](https://github.com/PipFoweraker/pdoom1/issues/511) |
-| 508 | Add hero art/images to event popup options | worktree:player-experience, ship:hotpatch-48h |  | 2026-07-22 08:04:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/508) |
-| 506 | chore: Clean up GDScript warnings and style issues | good first issue, worktree:infrastructure, ship:next-release |  | 2026-07-22 08:05:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/506) |
-| 500 | Research Quality System (Rushed/Standard/Thorough) | enhancement, game-mechanics, post-launch, worktree:new-mechanics |  | 2026-07-13 11:30:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/500) |
-| 476 | Progressive finance and software management system | enhancement, worktree:dialogue |  | 2026-07-13 11:30:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/476) |
-| 475 | Comprehensive upgrades system overhaul | worktree:dialogue |  | 2026-07-21 23:09:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/475) |
-| 473 | Character creation and lab setup point allocation system | worktree:dialogue |  | 2026-07-13 11:30:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/473) |
-| 471 | Office cosmetic shopping system | worktree:new-mechanics |  | 2026-07-13 11:29:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/471) |
-| 470 | Visual office representation on screen | worktree:new-mechanics |  | 2026-07-13 11:29:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/470) |
-| 467 | Employee living and office environment outfitting system | worktree:new-mechanics |  | 2026-07-13 11:29:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/467) |
+| 514 | Character Creation System (Point Allocation) | enhancement, game-mechanics, post-launch, worktree:dialogue | First Contact | 2026-07-25 03:34:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/514) |
+| 508 | Add hero art/images to event popup options | worktree:player-experience, ship:hotpatch-48h | First Contact | 2026-07-25 03:34:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/508) |
+| 506 | chore: Clean up GDScript warnings and style issues | good first issue, worktree:infrastructure, ship:next-release | First Contact | 2026-07-25 03:34:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/506) |
+| 500 | Research Quality System (Rushed/Standard/Thorough) | enhancement, game-mechanics, post-launch, worktree:new-mechanics | First Contact | 2026-07-25 03:34:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/500) |
+| 476 | Progressive finance and software management system | enhancement, worktree:dialogue | First Contact | 2026-07-25 03:34:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/476) |
+| 475 | Comprehensive upgrades system overhaul | worktree:dialogue | First Contact | 2026-07-25 03:34:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/475) |
+| 473 | Character creation and lab setup point allocation system | worktree:dialogue | First Contact | 2026-07-25 03:34:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/473) |
+| 471 | Office cosmetic shopping system | worktree:new-mechanics | First Contact | 2026-07-25 03:34:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/471) |
+| 467 | Employee living and office environment outfitting system | worktree:new-mechanics | First Contact | 2026-07-25 03:34:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/467) |
 | 437 | Automated Blog Publishing From Data Lake Events & Commits | documentation, enhancement, pdoom-website, worktree:infrastructure |  | 2026-07-13 11:30:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/437) |
 | 433 | Extract 2018-2019 timeline from Alignment Research Dataset | pdoom-data, worktree:infrastructure |  | 2026-07-13 11:29:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/433) |
-| 236 | (Design) Create a schema to aallow for end game states based off Manifold market outcomes | enhancement, worktree:dialogue | Future Releases | 2026-07-13 11:30:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/236) |
+| 236 | (Design) Create a schema to aallow for end game states based off Manifold market outcomes | enhancement, worktree:dialogue | First Contact | 2026-07-25 03:34:28 | [link](https://github.com/PipFoweraker/pdoom1/issues/236) |
 | 188 | (0.2) Enhancement - geopolitics | enhancement, worktree:new-mechanics | Future Releases | 2026-01-15 11:55:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/188) |
 | 187 | (0.2) Enhancement - regulations | enhancement, worktree:new-mechanics | Future Releases | 2026-01-15 11:55:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/187) |
 | 186 | (0.2) Enhancement - public opinion and media system | enhancement, worktree:new-mechanics | Future Releases | 2026-01-15 11:55:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/186) |
