@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-24T10:15:20.915650+00:00",
+  "generated": "2026-07-25T06:52:27.623000+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -35,17 +35,17 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 4.8 days ago"
+      "detail": "generated 5.7 days ago"
     },
     {
       "name": "league:current_week",
       "status": "WARN",
-      "detail": "week 2026_W29 is marked is_current but ended 4.4 days ago -- rollover cadence off"
+      "detail": "week 2026_W29 is marked is_current but ended 5.3 days ago -- rollover cadence off"
     },
     {
       "name": "league:version_drift",
       "status": "WARN",
-      "detail": "leaderboard game_version=v0.11.0 but deployed game=v0.12.0 -- export stamping stale version"
+      "detail": "leaderboard game_version=v0.11.0 but deployed game=v0.13.0 -- export stamping stale version"
     },
     {
       "name": "league:integrity",
