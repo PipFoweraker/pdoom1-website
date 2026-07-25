@@ -840,9 +840,14 @@ t	.hero {
 				<div class="designer-credit">Pip Foweraker's</div>
 				<a href="#" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
 			</div>
+			<!-- Ships empty: loadVersionInfo() fills these from /data/version.json.
+			     A hardcoded literal here asserts a stale release on every load before
+			     the fetch resolves, and forever if it fails -- silence beats a
+			     confident wrong number. (Previously carried a hardcoded version and
+			     date that had gone two releases stale.) -->
 			<div class="version-info" id="versionInfo">
-				<span class="version-number" id="versionNumber">v0.11.0</span>
-				<span id="versionDate">2025-12-07</span>
+				<span class="version-number" id="versionNumber"></span>
+				<span id="versionDate"></span>
 			</div>
 			<ul class="nav-links" role="menubar">
 				<li role="none"><a href="#home" role="menuitem">Game</a></li>
@@ -886,16 +891,21 @@ t	.hero {
 
 			<!-- Download Options - Platform-Specific CTAs -->
 			<div class="download-ctas" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.4rem;">
-				<!-- hrefs default to the release PAGE (never 404s on any asset naming);
-				     resolveDownloads() upgrades them to direct per-platform asset URLs. -->
+				<!-- Windows has a shipped build, so it defaults live (release PAGE href,
+				     which never 404s on any asset naming); resolveDownloads() upgrades it
+				     to the direct asset URL. macOS and Linux default to a DISABLED
+				     "coming soon" state and are upgraded to live ONLY when a matching
+				     build is confirmed in the latest release. That inverts the old
+				     fail direction: a rate-limited/offline visitor now sees the honest
+				     "coming soon" rather than a live-looking button that leads nowhere. -->
 				<a id="download-windows" data-platform-label="Windows" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for Windows
 				</a>
-				<a id="download-macos" data-platform-label="macOS" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
-					Download for macOS
+				<a id="download-macos" data-platform-label="macOS" role="note" aria-disabled="true" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem; opacity: 0.55; cursor: default; pointer-events: none;">
+					macOS — coming soon
 				</a>
-				<a id="download-linux" data-platform-label="Linux" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
-					Download for Linux
+				<a id="download-linux" data-platform-label="Linux" role="note" aria-disabled="true" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem; opacity: 0.55; cursor: default; pointer-events: none;">
+					Linux — coming soon
 				</a>
 			</div>
 
@@ -934,7 +944,7 @@ t	.hero {
 			-->
 
 			<p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
-				Windows, macOS, Linux | Free & Open Source
+				Windows now · macOS & Linux coming soon | Free & Open Source
 			</p>
 		</section>
 
@@ -1093,7 +1103,7 @@ t	.hero {
 							<h3>System Requirements</h3>
 							<p style="margin-bottom: 0.8rem;"><strong>Minimum:</strong></p>
 							<ul style="color: var(--text-secondary); margin: 0 0 1rem 1.2rem; line-height: 1.8;">
-								<li>64-bit Windows, macOS, or Linux</li>
+								<li>64-bit Windows (macOS &amp; Linux builds coming soon)</li>
 								<li>Native build &mdash; no runtime to install</li>
 								<li>Basic graphics support</li>
 								<li>Built with Godot 4.5.1</li>
@@ -1101,13 +1111,13 @@ t	.hero {
 							<p style="margin-bottom: 0.5rem;"><strong>Platforms:</strong></p>
 							<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
 								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">Windows</span>
-								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">macOS</span>
-								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">Linux</span>
+								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem; opacity: 0.6;">macOS — soon</span>
+								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem; opacity: 0.6;">Linux — soon</span>
 							</div>
 						</div>
 						<div class="card">
 							<h3>Quick Installation</h3>
-							<p style="margin-bottom: 0.8rem;">Download the build for your platform from the buttons above &mdash; no installation, no runtime needed.</p>
+							<p style="margin-bottom: 0.8rem;">Download the Windows build from the buttons above &mdash; no installation, no runtime needed. macOS &amp; Linux builds are coming soon.</p>
 <pre style="background: var(--bg-primary); padding: 0.8rem; border-radius: var(--radius-sm); overflow-x: auto; color: var(--accent-primary); font-size: 0.85rem; line-height: 1.4; margin: 0;">git clone https://github.com/PipFoweraker/pdoom1.git
 # then open the project in Godot 4.5.1 to run from source</pre>
 							<p style="margin-top: 0.8rem; font-size: 0.85rem; color: var(--text-muted);">
@@ -1215,7 +1225,7 @@ t	.hero {
 
 				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
 					<summary style="font-weight: bold; color: var(--accent-primary); cursor: pointer; margin-bottom: 0.8rem;">Is it free and open source?</summary>
-					<p style="color: var(--text-secondary); font-size: 0.95rem;">Yes! Completely free on <a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">GitHub</a>. Windows, macOS, and Linux supported. Steam release coming soon.</p>
+					<p style="color: var(--text-secondary); font-size: 0.95rem;">Yes! Completely free on <a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);">GitHub</a>. Windows is available now; macOS and Linux builds are coming soon. Steam release later.</p>
 				</details>
 
 				<details class="faq-item" style="background: var(--bg-tertiary); padding: 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
@@ -1601,6 +1611,25 @@ t	.hero {
 				el.textContent = label + ' — coming soon';
 			}
 
+			// Inverse of markUnavailable: promote a button to a live download once a
+			// build for it is confirmed. macOS/Linux ship DISABLED in the HTML, so
+			// this is what turns them back on the day their build lands -- reachable
+			// only via a confirmed asset, never by default.
+			function markAvailable(el, url) {
+				if (!el) return;
+				const label = el.dataset.platformLabel || 'this platform';
+				el.href = url;
+				el.setAttribute('target', '_blank');
+				el.setAttribute('rel', 'noopener');
+				el.setAttribute('role', 'button');
+				el.removeAttribute('aria-disabled');
+				el.title = '';
+				el.style.opacity = '';
+				el.style.cursor = '';
+				el.style.pointerEvents = '';
+				el.textContent = 'Download for ' + label;
+			}
+
 			try {
 				const res = await fetch('https://api.github.com/repos/PipFoweraker/pdoom1/releases/latest',
 					{ headers: { 'Accept': 'application/vnd.github+json' } });
@@ -1621,7 +1650,7 @@ t	.hero {
 				for (const [id, asset] of found) {
 					const el = document.getElementById(id);
 					if (!el) continue;
-					if (asset) el.href = asset.browser_download_url;
+					if (asset) markAvailable(el, asset.browser_download_url);
 					else markUnavailable(el);
 				}
 				// Show the macOS first-run note only when a macOS build actually resolved.

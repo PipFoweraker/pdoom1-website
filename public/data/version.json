@@ -4,7 +4,12 @@
     "name": "P(Doom) v0.13.0 -- First Contact league (L2)",
     "published_at": "2026-07-24T11:15:26Z",
     "html_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.13.0",
-    "body": "New league epoch L2 (seed weekly-2026-w30). Story cold-open, hiring pipeline, non-profit/for-profit choice, costs-on-buttons, day-precise ledger, candidate portraits, and a chain of soft-lock fixes. Extract the whole zip first, then run PDoom.exe. Unsigned alpha -- SmartScreen: More info -> Run anyway."
+    "body": "New league epoch L2 (seed weekly-2026-w30). Story cold-open, hiring pipeline, non-profit/for-profit choice, costs-on-buttons, day-precise ledger, candidate portraits, and a chain of soft-lock fixes. Extract the whole zip first, then run PDoom.exe. Unsigned alpha -- SmartScreen: More info -> Run anyway.",
+    "platforms": {
+      "windows": true,
+      "macos": false,
+      "linux": false
+    }
   },
   "repository_stats": {
     "stars": 8,

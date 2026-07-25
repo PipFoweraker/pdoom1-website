@@ -540,7 +540,7 @@
 				</div>
 				<div class="card">
 					<h3>Native Cross-Platform</h3>
-					<p>Exported to Windows, macOS, and Linux from a single Godot codebase, for smooth native gameplay.</p>
+					<p>Built to run natively on Windows, macOS, and Linux from a single Godot codebase. The Windows build is available now; macOS and Linux are coming soon.</p>
 				</div>
 				<div class="card">
 					<h3>Data-Driven Design</h3>
@@ -570,8 +570,12 @@
 					<span class="stat-label">Source License</span>
 				</div>
 				<div class="stat-item">
-					<span class="stat-number">3+</span>
-					<span class="stat-label">Platforms Supported</span>
+					<!-- Count of platforms with a shipped build, from version.json
+					     latest_release.platforms. Ships as a dash so a failed fetch
+					     shows "unknown" rather than a hardcoded "3+" that overclaims
+					     while only Windows is downloadable. -->
+					<span class="stat-number" id="platforms-available">&mdash;</span>
+					<span class="stat-label">Platforms Available</span>
 				</div>
 				<div class="stat-item">
 					<span class="stat-number">Active</span>
@@ -636,19 +640,28 @@
 	</script>
 
 	<script>
-		// Project Stats "Current Version" comes from the canonical /data/version.json,
-		// never from a literal baked into this page.
-		(async function loadCurrentVersion() {
-			const el = document.getElementById('current-version');
-			if (!el) return;
+		// Project Stats "Current Version" and "Platforms Available" both come from the
+		// canonical /data/version.json, never from a literal baked into this page. On
+		// any failure the dashes stay put rather than asserting a stale/overclaimed value.
+		(async function loadProjectStats() {
+			const verEl = document.getElementById('current-version');
+			const platEl = document.getElementById('platforms-available');
+			if (!verEl && !platEl) return;
 			try {
 				const res = await fetch('/data/version.json', { cache: 'no-store' });
 				if (!res.ok) return;
 				const data = await res.json();
-				const version = (data.latest_release || {}).version;
-				if (version) el.textContent = version;
+				const release = data.latest_release || {};
+				if (verEl && release.version) verEl.textContent = release.version;
+				// platforms is { windows: bool, macos: bool, linux: bool }; count the
+				// ones with a shipped build. Only fill when the key is present, so an
+				// older version.json without it leaves the honest dash.
+				if (platEl && release.platforms && typeof release.platforms === 'object') {
+					const n = Object.values(release.platforms).filter(Boolean).length;
+					platEl.textContent = String(n);
+				}
 			} catch (e) {
-				// Leave the dash in place rather than showing a stale version.
+				// Leave the dashes in place rather than showing stale/overclaimed stats.
 			}
 		})();
 	</script>

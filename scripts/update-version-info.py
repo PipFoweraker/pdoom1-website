@@ -7,9 +7,18 @@ Fetches latest release info and updates website data files
 import json
 import os
 import re
+import sys
 import urllib.request
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Any, Dict, List, Optional
+
+# Windows console is cp1252; the check marks below (U+2713) would raise
+# UnicodeEncodeError on the FIRST print, aborting before any work. Force UTF-8.
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
 
 GITHUB_API_BASE = 'https://api.github.com'
 REPO_OWNER = 'PipFoweraker'
@@ -44,6 +53,34 @@ def read_existing_version_json() -> Dict[str, Any]:
         return {}
 
 
+# Same filename heuristics resolveDownloads() uses in index.html. Keep the two in
+# step: if the button can resolve a build for a platform, this must report that
+# platform available, and vice versa.
+_PLATFORM_PATTERNS = {
+    'windows': re.compile(r'win', re.I),
+    'macos':   re.compile(r'mac|osx|darwin|\.app|\.dmg', re.I),
+    'linux':   re.compile(r'linux|x86_64|\.appimage', re.I),
+}
+_BUILD_SUFFIX = re.compile(r'\.(zip|dmg|appimage|x86_64|exe|tar\.gz)$', re.I)
+
+
+def derive_platforms(assets: List[Dict[str, Any]]) -> Dict[str, bool]:
+    """Which OS builds are actually attached to the release.
+
+    A platform is 'available' iff a matching downloadable build exists -- the one
+    un-fakeable source of truth (the file is either in the release or it is not).
+    Pages and the platform-claims guard read this instead of trusting hand-typed
+    prose, which is what silently rots into a lie. NOTE: this is only meaningful on
+    a FRESH asset list; an empty list from a failed fetch would read as 'nothing
+    shipped anywhere', so callers must preserve the prior value on failure rather
+    than write all-False. See get_latest_release()."""
+    names = [a.get('name', '') for a in (assets or [])]
+    return {
+        os_key: any(pat.search(n) and _BUILD_SUFFIX.search(n) for n in names)
+        for os_key, pat in _PLATFORM_PATTERNS.items()
+    }
+
+
 def get_latest_release() -> Dict[str, Any]:
     """Get latest release information"""
     data = fetch_github_data(f"/repos/{REPO_OWNER}/{REPO_NAME}/releases/latest")
@@ -54,7 +91,10 @@ def get_latest_release() -> Dict[str, Any]:
             'name': data.get('name'),
             'published_at': data.get('published_at'),
             'html_url': data.get('html_url'),
-            'body': data.get('body', '')
+            'body': data.get('body', ''),
+            # Derived from THIS release's assets. Fresh fetch, so it is safe to
+            # write; the failure branch below keeps the last known-good instead.
+            'platforms': derive_platforms(data.get('assets', [])),
         }
 
     # API failed. This function's output is written straight into version.json, which
