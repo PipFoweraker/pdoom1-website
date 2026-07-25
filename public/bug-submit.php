@@ -27,6 +27,7 @@ const MAX_TITLE   = 200;
 const MAX_DESC    = 5000;
 const MAX_EMAIL   = 200;
 const MAX_CREDIT  = 80;                      // name the reporter wants crediting as
+const MAX_ATTACH_BYTES = 550 * 1024;         // decoded cap; client caps the file at 500 KB
 const TYPES       = ['bug', 'feature', 'documentation', 'performance'];
 
 header('Content-Type: application/json; charset=utf-8');
@@ -93,18 +94,36 @@ if ($title === '' || $desc === '') {
     done(422, ['ok' => false, 'error' => 'A title and description are required.']);
 }
 
-$hasAttachment = isset($data['attachment']['filename']);
+// ---- attachment (optional) ---------------------------------------------
+// The client base64-encodes the picked file into attachment.content. We decode
+// it, hard-cap the size, and sanitise the filename to inert characters (no CR/LF
+// or quotes -> no header injection, no path traversal), then MIME-attach it. The
+// bytes are inert in an email and Gmail scans attachments on receipt; we never
+// execute, store, or trust the declared type -- everything is octet-stream.
+$att = $data['attachment'] ?? null;
+$attBytes = '';
+$attName = '';
+if (is_array($att) && !empty($att['content']) && is_string($att['content'])) {
+    $attName = preg_replace('/[^\w.\- ]+/u', '_', basename($clean($att['filename'] ?? 'attachment', 120)));
+    if ($attName === '') { $attName = 'attachment'; }
+    $decoded = base64_decode(preg_replace('/\s+/', '', $att['content']), true);
+    if ($decoded !== false && $decoded !== '' && strlen($decoded) <= MAX_ATTACH_BYTES) {
+        $attBytes = $decoded;
+    }
+}
+$hasAttachment = ($attBytes !== '');
 $attNote = $hasAttachment
-    ? "\n\nAttachment: reporter attached \"" . $clean($data['attachment']['filename'], 120)
-      . "\" (" . (int)($data['attachment']['size'] ?? 0) . " bytes) -- not forwarded by email; "
-      . "reply to ask for it, or they can re-file on GitHub with the file attached."
-    : '';
+    ? "\n\nAttachment: \"$attName\" (" . strlen($attBytes) . " bytes) is attached to this email."
+    : (isset($att['filename'])
+        ? "\n\nAttachment: reporter picked \"" . $clean($att['filename'] ?? '', 120)
+          . "\" but it could not be attached (too large or unreadable) -- reply to ask for it."
+        : '');
 
 // ---- compose (all user text in the BODY; headers are constants) ---------
 $subject = 'p(Doom)1 ' . $type . ': ' . mb_substr($title, 0, 80);
 $subject = str_replace(["\r", "\n"], ' ', $subject);   // belt-and-braces
 
-$body = "New feedback from the pdoom1.com bug form.\n"
+$textBody = "New feedback from the pdoom1.com bug form.\n"
       . "----------------------------------------\n"
       . "Type:    $type\n"
       . "Title:   $title\n"
@@ -117,9 +136,29 @@ $body = "New feedback from the pdoom1.com bug form.\n"
       . $desc
       . $attNote . "\n";
 
-$headers = 'From: p(Doom)1 site <' . FROM . ">\r\n"
-         . 'Content-Type: text/plain; charset=utf-8' . "\r\n"
-         . 'X-Mailer: pdoom1-bug-form';
+if ($hasAttachment) {
+    // multipart/mixed: the text report + the file, in one email.
+    $boundary = '=_pdoom_' . bin2hex(random_bytes(12));
+    $headers = 'From: p(Doom)1 site <' . FROM . ">\r\n"
+             . "MIME-Version: 1.0\r\n"
+             . 'Content-Type: multipart/mixed; boundary="' . $boundary . '"' . "\r\n"
+             . 'X-Mailer: pdoom1-bug-form';
+    $body = "--$boundary\r\n"
+          . "Content-Type: text/plain; charset=utf-8\r\n"
+          . "Content-Transfer-Encoding: 8bit\r\n\r\n"
+          . $textBody . "\r\n"
+          . "--$boundary\r\n"
+          . "Content-Type: application/octet-stream; name=\"$attName\"\r\n"
+          . "Content-Transfer-Encoding: base64\r\n"
+          . "Content-Disposition: attachment; filename=\"$attName\"\r\n\r\n"
+          . chunk_split(base64_encode($attBytes)) . "\r\n"
+          . "--$boundary--\r\n";
+} else {
+    $headers = 'From: p(Doom)1 site <' . FROM . ">\r\n"
+             . 'Content-Type: text/plain; charset=utf-8' . "\r\n"
+             . 'X-Mailer: pdoom1-bug-form';
+    $body = $textBody;
+}
 
 $sent = @mail(RECIPIENT, $subject, $body, $headers);
 
