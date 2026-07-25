@@ -53,17 +53,9 @@ if (!is_array($data)) {
     done(400, ['ok' => false, 'error' => 'Malformed request']);
 }
 
-// ---- spam guards --------------------------------------------------------
-// Honeypot: a hidden field real users never fill. If it's set, pretend success
-// so the bot moves on and doesn't probe for the real behaviour.
-if (!empty($data['hp'])) {
-    done(200, ['ok' => true]);
-}
-// Time-trap: a human takes seconds to write a report; a bot posts instantly.
-if (isset($data['elapsed_ms']) && (int)$data['elapsed_ms'] < MIN_FILL_MS) {
-    done(200, ['ok' => true]);
-}
-// Per-IP throttle. Recipient is fixed, so this only limits inbox spam volume.
+// ---- rate limit ---------------------------------------------------------
+// Throttle FIRST, so nothing below (which now emails rather than drops) can be
+// used to flood the inbox: at most one report per IP per THROTTLE_S seconds.
 $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 $throttle = sys_get_temp_dir() . '/pdoom_bug_' . hash('sha256', $ip);
 $now = time();
@@ -71,6 +63,21 @@ if (is_file($throttle) && ($now - (int)@file_get_contents($throttle)) < THROTTLE
     done(429, ['ok' => false, 'error' => 'Please wait a moment before sending another report.']);
 }
 @file_put_contents($throttle, (string)$now);
+
+// ---- spam signals -> FLAG, never silently drop --------------------------
+// A silently-dropped report is indistinguishable from success to the sender, so
+// a legit fast typer, a prefilled paste, or a browser that autofills the honeypot
+// used to vanish with no trace -- and we couldn't even tell which guard fired.
+// Now a tripped signal only TAGS the report; it still reaches the inbox, and the
+// tag names the reason (with the raw elapsed_ms) so the cause is visible next time.
+$flags = [];
+if (!empty($data['hp'])) {
+    $flags[] = 'honeypot hidden field was filled (a bot, or an over-eager autofill)';
+}
+$elapsed = isset($data['elapsed_ms']) ? (int)$data['elapsed_ms'] : -1;
+if ($elapsed >= 0 && $elapsed < MIN_FILL_MS) {
+    $flags[] = "submitted in {$elapsed}ms (under " . MIN_FILL_MS . "ms -- a bot, or a very fast/prefilled human)";
+}
 
 // ---- validate + normalise ----------------------------------------------
 $clean = static function ($v, int $max): string {
@@ -120,7 +127,7 @@ $attNote = $hasAttachment
         : '');
 
 // ---- compose (all user text in the BODY; headers are constants) ---------
-$subject = 'p(Doom)1 ' . $type . ': ' . mb_substr($title, 0, 80);
+$subject = 'p(Doom)1 ' . $type . ($flags ? ' [REVIEW]' : '') . ': ' . mb_substr($title, 0, 80);
 $subject = str_replace(["\r", "\n"], ' ', $subject);   // belt-and-braces
 
 $textBody = "New feedback from the pdoom1.com bug form.\n"
@@ -132,6 +139,8 @@ $textBody = "New feedback from the pdoom1.com bug form.\n"
             ? $credit . '  <-- OK to credit publicly (reporter opted in)'
             : '(anonymous -- do NOT name this reporter publicly)') . "\n"
       . "When:    " . gmdate('Y-m-d H:i:s') . " UTC\n"
+      . ($flags ? "Flags:   " . implode("\n         ", $flags)
+                  . "\n         ^ auto-flagged; likely still a real report -- read it.\n" : "")
       . "----------------------------------------\n\n"
       . $desc
       . $attNote . "\n";
