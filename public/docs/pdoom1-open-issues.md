@@ -1,9 +1,17 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-25T07:01:58.902Z UTC
+Generated: 2026-07-25T18:34:15.810Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 900 | Pre-WS-3 art ramp: scale up pixellab (round-2, gap-fill) + pixel-density review |  |  | 2026-07-25 14:29:02 | [link](https://github.com/PipFoweraker/pdoom1/issues/900) |
+| 899 | Sandbox v3: per-sprite scale [,]/[.] doesn't work | bug |  | 2026-07-25 14:29:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/899) |
+| 894 | Future UI: atmosphere/weather through windows (graphics-quality jump, ~2 epochs out) |  |  | 2026-07-25 13:23:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/894) |
+| 889 | Architecture Week: systematic destructive testing + integrity/security review sweep |  |  | 2026-07-25 12:23:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/889) |
+| 882 | Bug-report auto-close: show a visible countdown before dismissing |  |  | 2026-07-25 11:04:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/882) |
+| 881 | Submit-paper submenu needs interim UI pass (reuse existing icons) |  |  | 2026-07-25 11:03:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/881) |
+| 880 | Financing submenu inconsistent with Fundraising: no icons, costs not shown | bug |  | 2026-07-25 11:03:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/880) |
+| 877 | Modal stacking: no shared LIFO overlay chokepoint (stacked-modal soft-lock) | bug |  | 2026-07-25 12:12:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/877) |
 | 855 | ux(events): show Attention readout in the event-dialog corner | patch:ui |  | 2026-07-25 03:57:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/855) |
 | 850 | art: coherence + dedup pass over approved assets (consistent borders, kill redundant icons) | ship:next-release |  | 2026-07-25 03:01:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/850) |
 | 848 | feat(dev): in-game live A/B icon rotation (dev-mode asset swapper) | ship:next-release |  | 2026-07-25 02:46:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/848) |
@@ -41,7 +49,7 @@ Generated: 2026-07-25T07:01:58.902Z UTC
 | 793 | Office floor: all staff render as the same character + sprites oversized vs the room | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:34:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/793) |
 | 791 | Early economy: force a small early lease spend; bedroom/basement start hard-caps hires; unlocks small-now, bigger-over-time | ship:next-release, league:next | First Contact | 2026-07-24 23:34:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/791) |
 | 790 | Newness-glow: draw the eye to new/changed state (glow-until-mouseover) | ship:hotpatch-48h | First Contact | 2026-07-24 23:34:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/790) |
-| 789 | Hiring stitch: onboarding sub-actions as AP-sink prompts on offer-accept + interview schedule->happen flow | ship:hotpatch-48h, league:v0.13 | First Contact | 2026-07-24 23:34:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/789) |
+| 789 | Hiring stitch: onboarding sub-actions as AP-sink prompts on offer-accept + interview schedule->happen flow | ship:hotpatch-48h, league:v0.13 | First Contact | 2026-07-25 11:04:01 | [link](https://github.com/PipFoweraker/pdoom1/issues/789) |
 | 788 | Leaderboard: mark runs where dev mode was used (visible badge, NOT exclusion) | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:34:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/788) |
 | 786 | Finalize CREDITS.md (fill names) + merge after F&F deploy | ship:next-release | First Contact | 2026-07-24 23:34:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/786) |
 | 777 | In-game screenshot flow: make [ capture the dev-blog default | ship:next-release | First Contact | 2026-07-24 23:34:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/777) |
@@ -69,7 +77,7 @@ Generated: 2026-07-25T07:01:58.902Z UTC
 | 603 | Popups: fanfare needs a dimming backdrop (events leak under it); bug-report 'thanks' Submit still clickable | bug, ui-ux, ship:hotpatch-48h |  | 2026-07-22 08:04:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/603) |
 | 602 | Navigation audit + universal principle (ESC/back consistency, mirrored toggle keys, unreachable Employee screen) | ui-ux, ship:hotpatch-48h |  | 2026-07-22 08:04:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/602) |
 | 601 | Ledger UX: layout wrong/cramped, L-to-close, critical-due popup, distinct warning colour | bug, ui-ux, ship:next-release |  | 2026-07-22 08:05:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/601) |
-| 600 | Dev overlays (DEV MODE + F3) can't read live game state; 29 runtime errors; nudge/advance-turn wiring | bug, ship:next-release |  | 2026-07-22 08:05:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/600) |
+| 600 | Dev overlays (DEV MODE + F3) can't read live game state; 29 runtime errors; nudge/advance-turn wiring | bug, ship:next-release |  | 2026-07-25 11:04:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/600) |
 | 595 | Audit strategic options/events/buttons that cost but have no meaningful game impact | game-mechanics, ship:next-release |  | 2026-07-22 08:05:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/595) |
 | 579 | Balance/design from session 2 (workshop #2): events depth, upgrade rebalance, compute economy, investor-pressure frequency | enhancement, game-mechanics, post-launch, ship:next-release |  | 2026-07-22 08:05:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/579) |
 | 578 | Legibility pass (buildable soon): doom blow-by-blow, ledger/overlay discoverability, researcher info, event fanfare | enhancement, ui-ux, ship:next-release |  | 2026-07-22 08:05:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/578) |
@@ -82,17 +90,15 @@ Generated: 2026-07-25T07:01:58.902Z UTC
 | 529 | Revisit terminal/CRT texture aesthetic (parked art package) | enhancement, ui-ux, worktree:player-experience |  | 2026-06-26 06:14:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/529) |
 | 528 | Lab Ledger: player-facing review page with insight-gated 'redacted' risk zone | enhancement |  | 2026-06-26 05:42:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/528) |
 | 526 | Track down the CSIRO/Data61 retro Win3-style web UI project |  |  | 2026-06-15 10:31:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/526) |
-| 514 | Character Creation System (Point Allocation) | enhancement, game-mechanics, post-launch, worktree:dialogue | First Contact | 2026-07-25 03:34:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/514) |
 | 508 | Add hero art/images to event popup options | worktree:player-experience, ship:hotpatch-48h | First Contact | 2026-07-25 03:34:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/508) |
 | 506 | chore: Clean up GDScript warnings and style issues | good first issue, worktree:infrastructure, ship:next-release | First Contact | 2026-07-25 03:34:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/506) |
 | 500 | Research Quality System (Rushed/Standard/Thorough) | enhancement, game-mechanics, post-launch, worktree:new-mechanics | First Contact | 2026-07-25 03:34:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/500) |
 | 476 | Progressive finance and software management system | enhancement, worktree:dialogue | First Contact | 2026-07-25 03:34:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/476) |
 | 475 | Comprehensive upgrades system overhaul | worktree:dialogue | First Contact | 2026-07-25 03:34:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/475) |
-| 473 | Character creation and lab setup point allocation system | worktree:dialogue | First Contact | 2026-07-25 03:34:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/473) |
+| 473 | Character creation and lab setup point allocation system | worktree:dialogue | First Contact | 2026-07-25 08:34:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/473) |
 | 471 | Office cosmetic shopping system | worktree:new-mechanics | First Contact | 2026-07-25 03:34:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/471) |
 | 467 | Employee living and office environment outfitting system | worktree:new-mechanics | First Contact | 2026-07-25 03:34:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/467) |
 | 437 | Automated Blog Publishing From Data Lake Events & Commits | documentation, enhancement, pdoom-website, worktree:infrastructure |  | 2026-07-13 11:30:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/437) |
-| 433 | Extract 2018-2019 timeline from Alignment Research Dataset | pdoom-data, worktree:infrastructure |  | 2026-07-13 11:29:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/433) |
 | 236 | (Design) Create a schema to aallow for end game states based off Manifold market outcomes | enhancement, worktree:dialogue | First Contact | 2026-07-25 03:34:28 | [link](https://github.com/PipFoweraker/pdoom1/issues/236) |
 | 188 | (0.2) Enhancement - geopolitics | enhancement, worktree:new-mechanics | Future Releases | 2026-01-15 11:55:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/188) |
 | 187 | (0.2) Enhancement - regulations | enhancement, worktree:new-mechanics | Future Releases | 2026-01-15 11:55:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/187) |
