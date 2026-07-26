@@ -1,17 +1,20 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-25T18:34:15.810Z UTC
+Generated: 2026-07-26T00:58:03.162Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
-| 900 | Pre-WS-3 art ramp: scale up pixellab (round-2, gap-fill) + pixel-density review |  |  | 2026-07-25 14:29:02 | [link](https://github.com/PipFoweraker/pdoom1/issues/900) |
-| 899 | Sandbox v3: per-sprite scale [,]/[.] doesn't work | bug |  | 2026-07-25 14:29:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/899) |
+| 913 | office juice: water-cooler bubbles, sneaky 1.1x cat scale, butt-flash alternate north loop |  |  | 2026-07-26 00:25:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/913) |
+| 912 | art: RESERVED ASSETS -- high-doom bipedal horror cats (do not ship... yet) |  |  | 2026-07-26 00:25:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/912) |
+| 903 | art: quirk/perk icon set for the employee surfaces (16 icons, valence colour-coding) | ship:next-release |  | 2026-07-25 22:55:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/903) |
+| 900 | Pre-WS-3 art ramp: scale up pixellab (round-2, gap-fill) + pixel-density review |  |  | 2026-07-26 00:25:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/900) |
+| 899 | Sandbox v3: per-sprite scale [,]/[.] doesn't work | bug |  | 2026-07-26 00:06:31 | [link](https://github.com/PipFoweraker/pdoom1/issues/899) |
 | 894 | Future UI: atmosphere/weather through windows (graphics-quality jump, ~2 epochs out) |  |  | 2026-07-25 13:23:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/894) |
 | 889 | Architecture Week: systematic destructive testing + integrity/security review sweep |  |  | 2026-07-25 12:23:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/889) |
 | 882 | Bug-report auto-close: show a visible countdown before dismissing |  |  | 2026-07-25 11:04:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/882) |
 | 881 | Submit-paper submenu needs interim UI pass (reuse existing icons) |  |  | 2026-07-25 11:03:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/881) |
 | 880 | Financing submenu inconsistent with Fundraising: no icons, costs not shown | bug |  | 2026-07-25 11:03:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/880) |
-| 877 | Modal stacking: no shared LIFO overlay chokepoint (stacked-modal soft-lock) | bug |  | 2026-07-25 12:12:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/877) |
+| 877 | Modal stacking: no shared LIFO overlay chokepoint (stacked-modal soft-lock) | bug |  | 2026-07-25 22:56:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/877) |
 | 855 | ux(events): show Attention readout in the event-dialog corner | patch:ui |  | 2026-07-25 03:57:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/855) |
 | 850 | art: coherence + dedup pass over approved assets (consistent borders, kill redundant icons) | ship:next-release |  | 2026-07-25 03:01:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/850) |
 | 848 | feat(dev): in-game live A/B icon rotation (dev-mode asset swapper) | ship:next-release |  | 2026-07-25 02:46:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/848) |
@@ -32,7 +35,7 @@ Generated: 2026-07-25T18:34:15.810Z UTC
 | 814 | feat(onboarding): progressive disclosure -- operator monologue, greyed-UI intro, hire waterfall |  | First Contact | 2026-07-24 23:33:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/814) |
 | 813 | feat(hiring): stateful candidate representation -- knowledge-gated portrait to lanyard |  | First Contact | 2026-07-24 23:33:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/813) |
 | 812 | feat(leaderboard): show lab name + operator name by default |  | First Contact | 2026-07-24 23:33:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/812) |
-| 811 | Workshop 3 (mechanics) -- Wed 2026-07-29: crisp parts, brutal decisions |  | First Contact | 2026-07-25 00:54:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/811) |
+| 811 | Workshop 3 (mechanics) -- Wed 2026-07-29: crisp parts, brutal decisions |  | First Contact | 2026-07-25 22:45:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/811) |
 | 810 | Archive migration: move evolutionary/cruft docs off main repo to keep repo-wide search crisp |  | Technical Debt Cleanup | 2026-07-24 23:33:29 | [link](https://github.com/PipFoweraker/pdoom1/issues/810) |
 | 809 | Remove vestigial victory plumbing + reconcile runtime ADR-0002 (no-victory is half-implemented) |  | Technical Debt Cleanup | 2026-07-24 23:33:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/809) |
 | 808 | Reflective review (on/after 2026-08-24): release/league cycle nomenclature + cadence |  | First Contact | 2026-07-24 23:33:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/808) |
@@ -50,7 +53,7 @@ Generated: 2026-07-25T18:34:15.810Z UTC
 | 791 | Early economy: force a small early lease spend; bedroom/basement start hard-caps hires; unlocks small-now, bigger-over-time | ship:next-release, league:next | First Contact | 2026-07-24 23:34:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/791) |
 | 790 | Newness-glow: draw the eye to new/changed state (glow-until-mouseover) | ship:hotpatch-48h | First Contact | 2026-07-24 23:34:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/790) |
 | 789 | Hiring stitch: onboarding sub-actions as AP-sink prompts on offer-accept + interview schedule->happen flow | ship:hotpatch-48h, league:v0.13 | First Contact | 2026-07-25 11:04:01 | [link](https://github.com/PipFoweraker/pdoom1/issues/789) |
-| 788 | Leaderboard: mark runs where dev mode was used (visible badge, NOT exclusion) | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:34:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/788) |
+| 788 | Leaderboard: mark runs where dev mode was used (visible badge, NOT exclusion) | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-25 22:48:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/788) |
 | 786 | Finalize CREDITS.md (fill names) + merge after F&F deploy | ship:next-release | First Contact | 2026-07-24 23:34:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/786) |
 | 777 | In-game screenshot flow: make [ capture the dev-blog default | ship:next-release | First Contact | 2026-07-24 23:34:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/777) |
 | 763 | Nomenclature + pacing: strategic-options unlock expressed at month grain; align fanfare hero | ship:next-release | First Contact | 2026-07-24 23:35:46 | [link](https://github.com/PipFoweraker/pdoom1/issues/763) |
