@@ -1,10 +1,20 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-26T07:09:14.803Z UTC
+Generated: 2026-07-26T12:38:30.532Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
-| 950 | creative: 2026-07-26 closing harvest -- easter eggs, pickups, extras (Fable + full-day context) |  |  | 2026-07-26 07:07:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/950) |
+| 961 | design(hiring): W3 -- revisit the candidate pool cap (MAX_CANDIDATES=6); stale once networking changes, and cap-hits are partly silent |  |  | 2026-07-26 11:42:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/961) |
+| 959 | feat(ux): Surrender button on the in-game menu -- end run to leaderboard instead of abandoning |  |  | 2026-07-26 09:00:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/959) |
+| 958 | content(leaderboard): massively more lab-name variety; randomly generate player lab name by default |  |  | 2026-07-26 09:00:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/958) |
+| 957 | feat(leaderboard): optional Operator name + visually highlight own lab row |  |  | 2026-07-26 09:00:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/957) |
+| 956 | design(narrative): mysterious-stranger messages delivered via an in-world basic PC (unlock/boot/password) |  |  | 2026-07-26 09:00:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/956) |
+| 955 | ui(endgame): major refresh of the end-game board before leaderboard transition (old button pattern, wasted space) |  |  | 2026-07-26 09:00:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/955) |
+| 954 | ux(hiring): click small pool card -> full candidate card (full portrait, detailed strengths/weaknesses, reveal-gated) |  |  | 2026-07-26 09:00:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/954) |
+| 953 | ux(advisor): large upper-right advisor text -- context per hovered action (teach what Interview/Offer reveal) |  |  | 2026-07-26 09:00:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/953) |
+| 952 | bug(hiring): queued hire that fails at execution strands the candidate -- vanishes from pool AND queue forever | bug |  | 2026-07-26 09:17:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/952) |
+| 951 | integration & closeout lane (Tuesday queue): wire promoted art into the game + retire superseded assets |  |  | 2026-07-26 07:27:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/951) |
+| 950 | creative: 2026-07-26 closing harvest -- easter eggs, pickups, extras (Fable + full-day context) |  |  | 2026-07-26 07:14:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/950) |
 | 944 | sandbox v5: controls as buttons in top-left negative space -- declutter the legend wall | patch:ui |  | 2026-07-26 06:28:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/944) |
 | 940 | data: morning-briefing metric stubs -- passive, append-only collection architecture |  |  | 2026-07-26 05:55:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/940) |
 | 936 | ui: attention items force left-hand action menu to compact with inconsistent item sizes | bug, patch:ui |  | 2026-07-26 04:48:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/936) |
