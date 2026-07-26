@@ -179,3 +179,34 @@ aisafety.info entry]. We'll link the strongest version we can find, not the scar
 
 *End of capture. The picture version is in the Artifact; the factual-clock MVP is the
 first thing to build once Pip's had his coffee.*
+
+---
+
+## Addendum — data-channel decision (2026-07-27)
+
+Pip's call: **dates are not hardcoded on the website.** Static milestone dates flow
+through **pdoom-data** — cleaned, verified, and human-eyeball sensechecked for the
+important (governance/treaty) ones — then the website reads them. A few may be "live"
+(a `date_source` like a Metaculus median that legitimately drifts); that's honest, not
+a bug. The internal clocks (league / patch / pdoom-data) derive from a **cadence**, not
+a literal.
+
+Contracts + issues now in place:
+- `public/data/clocks.json` — the website-side clock **contract** (this repo). Every
+  milestone entry is `status: pending` against pdoom-data until the data lands; a
+  pending clock renders as "awaiting data", **never** a guessed date.
+- **pdoom-data#38** — the countdown-milestones dataset (dated AI-governance / timeline
+  events, sourced + verified).
+- **pdoom-data#37 → pdoom1#962** — the frontier-labs dataset feeding
+  `calculate-game-stats.py` (see also this repo's stats-uplift audit, **#177**).
+- The **AGI hero number** needs the game's **calibration emit** (game leads
+  calibration); pending pdoom1 ask.
+
+Build order (bottom-up): the **internal cadence clocks** are buildable now (no external
+dates) and are the first renderer increment; milestone clocks slot in as pdoom-data#38
+delivers; the hero AGI graph waits on the calibration emit.
+
+Ethos reaffirmed — **agency in the face of doom.** The act-clocks (PauseAI, program
+deadlines, local meetups) are near-term precisely because people and communities
+metabolise fast — so they're the short, urgent bars, and the page reads as *"here are
+the few things you can do, and they're all ticking."*
