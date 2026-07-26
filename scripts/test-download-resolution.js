@@ -89,6 +89,14 @@ async function run(name, assets, { ok = true } = {}) {
   check(els['download-windows'].href === BASE, 'Windows keeps baseline');
   check(!els['download-macos'].hasAttribute('href'), 'macOS stays disabled');
 
+  // Scenario 5: v0.13.1 naming -- bare PDoom.exe / PDoom.x86_64 / PDoom.app.zip.
+  // The Windows asset lost its "windows" substring, so /win|\.exe$/ must catch it.
+  els = await run('v0.13.1', [A('PDoom.exe'), A('PDoom.x86_64'), A('PDoom.app.zip')]);
+  console.log('Scenario 5: v0.13.1 bare-name assets (PDoom.exe / .x86_64 / .app.zip)');
+  check(els['download-windows'].href === 'https://gh/PDoom.exe', 'Windows -> PDoom.exe resolved (not missed)');
+  check(els['download-macos'].href === 'https://gh/PDoom.app.zip', 'macOS -> PDoom.app.zip resolved');
+  check(els['download-linux'].href === 'https://gh/PDoom.x86_64', 'Linux -> PDoom.x86_64 resolved');
+
   console.log(failures ? `\n${failures} FAILURE(S)` : '\nAll checks passed.');
   process.exit(failures ? 1 : 0);
 })();

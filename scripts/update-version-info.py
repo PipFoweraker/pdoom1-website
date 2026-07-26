@@ -57,7 +57,9 @@ def read_existing_version_json() -> Dict[str, Any]:
 # step: if the button can resolve a build for a platform, this must report that
 # platform available, and vice versa.
 _PLATFORM_PATTERNS = {
-    'windows': re.compile(r'win', re.I),
+    # '\.exe$' catches a bare PDoom.exe (v0.13.1+ dropped "windows" from the name);
+    # 'win' still catches PDoom-...-windows.zip (v0.13.0 style).
+    'windows': re.compile(r'win|\.exe$', re.I),
     'macos':   re.compile(r'mac|osx|darwin|\.app|\.dmg', re.I),
     'linux':   re.compile(r'linux|x86_64|\.appimage', re.I),
 }
