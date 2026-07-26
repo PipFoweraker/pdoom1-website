@@ -101,7 +101,7 @@ Pip's stated top priority. Practically:
   escapes into a heredoc. (This bit again on 2026-07-22 despite being documented.)
 - `gh issue ... --json comments` returns `comments` as a **list**, not a count.
 
-## Workflow authoring traps (both cost months of silent failure here)
+## Workflow authoring traps (each has cost real time here)
 1. **`git diff` cannot see untracked files.** A workflow that writes new files
    then tests `git diff --quiet <path>` will always report "no changes" and
    commit nothing — while reporting SUCCESS. `sync-pdoom1-docs.yml` did this
@@ -116,6 +116,17 @@ Pip's stated top priority. Practically:
 4. Prefer parking a broken workflow to `workflow_dispatch` with a comment
    explaining why, over deleting it. Several here are parked — **read the header
    comment before re-enabling any schedule.**
+5. **Author-controlled context spliced into `run:`/`script:` is executable code,
+   not data.** GitHub substitutes `${{ }}` into the shell/JS text *before* it runs,
+   so a commit message, issue title, branch name, or `client_payload` field
+   templated inline can execute. `auto-deploy-on-push.yml` echoed the raw commit
+   message; a push whose message contained "…macOS & Linux…" ran `macOS` as a
+   command → exit 127 → **that push's production deploy failed** (2026-07-26). The
+   class was swept in PR #170, but that pass missed **push-event** context (commit
+   messages). **Fix:** put untrusted context in an `env:` var and read it as quoted
+   `"$VAR"` (bash) / `process.env` (github-script); build JSON with `jq --arg`;
+   never `eval`. Trusted GitHub contexts (`github.sha`, `github.run_id`) may stay
+   inline. Sweep command: `grep -rnE 'head_commit\.message|github\.event\.(issue|comment|client_payload|pull_request)|github\.head_ref|github\.ref_name' .github/workflows/`.
 
 ## Data flow & generated files (don't hand-edit blindly)
 - `public/data/events.json` + `public/events/*.html` are **generated** by
