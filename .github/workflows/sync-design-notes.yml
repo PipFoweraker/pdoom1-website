@@ -42,12 +42,17 @@ jobs:
 
       - name: Resolve game ref
         id: ref
+        # The ref can arrive from a dispatch payload (untrusted); read it via env so
+        # it is data, not shell. github.event_name is a trusted GitHub enum.
+        env:
+          INPUT_REF: ${{ github.event.inputs.ref }}
+          CP_REF: ${{ github.event.client_payload.ref }}
         run: |
           set -euo pipefail
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            REF="${{ github.event.inputs.ref }}"
+            REF="${INPUT_REF:-}"
           elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            REF="${{ github.event.client_payload.ref }}"
+            REF="${CP_REF:-}"
           else
             REF=""
           fi
