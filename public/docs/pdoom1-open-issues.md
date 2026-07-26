@@ -1,14 +1,23 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-26T00:58:03.162Z UTC
+Generated: 2026-07-26T07:09:14.803Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 950 | creative: 2026-07-26 closing harvest -- easter eggs, pickups, extras (Fable + full-day context) |  |  | 2026-07-26 07:07:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/950) |
+| 944 | sandbox v5: controls as buttons in top-left negative space -- declutter the legend wall | patch:ui |  | 2026-07-26 06:28:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/944) |
+| 940 | data: morning-briefing metric stubs -- passive, append-only collection architecture |  |  | 2026-07-26 05:55:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/940) |
+| 936 | ui: attention items force left-hand action menu to compact with inconsistent item sizes | bug, patch:ui |  | 2026-07-26 04:48:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/936) |
+| 934 | tools(art): cycle-closeout script -- move assets to their right home when a generation cycle finishes |  |  | 2026-07-26 04:26:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/934) |
+| 929 | tools(art-review): verdict provenance -- timestamped, append-only progression capture |  |  | 2026-07-26 02:54:33 | [link](https://github.com/PipFoweraker/pdoom1/issues/929) |
+| 925 | office: W3 pre-build -- decision-agnostic engineering so W3 rulings flow into builds without decision fatigue |  |  | 2026-07-26 02:17:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/925) |
+| 924 | office: cat interaction animations -- bend-and-pat, be-patted, scamper-away (single-entity decomposition) |  |  | 2026-07-26 02:17:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/924) |
+| 923 | community: contributor-cat digitization pipeline (Kambu pilot, the ur-cat) |  |  | 2026-07-26 01:44:49 | [link](https://github.com/PipFoweraker/pdoom1/issues/923) |
+| 917 | deploy: robust cross-OS releases (Windows/Linux/macOS) by next Epoch | priority:high | First Contact | 2026-07-26 01:04:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/917) |
 | 913 | office juice: water-cooler bubbles, sneaky 1.1x cat scale, butt-flash alternate north loop |  |  | 2026-07-26 00:25:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/913) |
 | 912 | art: RESERVED ASSETS -- high-doom bipedal horror cats (do not ship... yet) |  |  | 2026-07-26 00:25:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/912) |
 | 903 | art: quirk/perk icon set for the employee surfaces (16 icons, valence colour-coding) | ship:next-release |  | 2026-07-25 22:55:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/903) |
-| 900 | Pre-WS-3 art ramp: scale up pixellab (round-2, gap-fill) + pixel-density review |  |  | 2026-07-26 00:25:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/900) |
-| 899 | Sandbox v3: per-sprite scale [,]/[.] doesn't work | bug |  | 2026-07-26 00:06:31 | [link](https://github.com/PipFoweraker/pdoom1/issues/899) |
+| 900 | Pre-WS-3 art ramp: scale up pixellab (round-2, gap-fill) + pixel-density review |  |  | 2026-07-26 05:33:37 | [link](https://github.com/PipFoweraker/pdoom1/issues/900) |
 | 894 | Future UI: atmosphere/weather through windows (graphics-quality jump, ~2 epochs out) |  |  | 2026-07-25 13:23:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/894) |
 | 889 | Architecture Week: systematic destructive testing + integrity/security review sweep |  |  | 2026-07-25 12:23:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/889) |
 | 882 | Bug-report auto-close: show a visible countdown before dismissing |  |  | 2026-07-25 11:04:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/882) |
@@ -17,7 +26,7 @@ Generated: 2026-07-26T00:58:03.162Z UTC
 | 877 | Modal stacking: no shared LIFO overlay chokepoint (stacked-modal soft-lock) | bug |  | 2026-07-25 22:56:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/877) |
 | 855 | ux(events): show Attention readout in the event-dialog corner | patch:ui |  | 2026-07-25 03:57:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/855) |
 | 850 | art: coherence + dedup pass over approved assets (consistent borders, kill redundant icons) | ship:next-release |  | 2026-07-25 03:01:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/850) |
-| 848 | feat(dev): in-game live A/B icon rotation (dev-mode asset swapper) | ship:next-release |  | 2026-07-25 02:46:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/848) |
+| 848 | feat(dev): in-game live A/B icon rotation (dev-mode asset swapper) | ship:next-release |  | 2026-07-26 01:38:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/848) |
 | 833 | design: 'people & money' cohesion spine -- recruitment epic -> roles/salary/manager -> payroll -> finance/roster |  | First Contact | 2026-07-24 23:32:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/833) |
 | 830 | ux(hiring): statefulness -- ask WHO, per-candidate interviews, interview popup w/ card+info fade-in, portraits, embedded employee panel |  | First Contact | 2026-07-24 23:32:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/830) |
 | 828 | observe/design(ux): hiring actions don't appear in the action queue (top bar + hiring submenu only) |  | First Contact | 2026-07-24 23:32:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/828) |
@@ -35,7 +44,7 @@ Generated: 2026-07-26T00:58:03.162Z UTC
 | 814 | feat(onboarding): progressive disclosure -- operator monologue, greyed-UI intro, hire waterfall |  | First Contact | 2026-07-24 23:33:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/814) |
 | 813 | feat(hiring): stateful candidate representation -- knowledge-gated portrait to lanyard |  | First Contact | 2026-07-24 23:33:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/813) |
 | 812 | feat(leaderboard): show lab name + operator name by default |  | First Contact | 2026-07-24 23:33:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/812) |
-| 811 | Workshop 3 (mechanics) -- Wed 2026-07-29: crisp parts, brutal decisions |  | First Contact | 2026-07-25 22:45:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/811) |
+| 811 | Workshop 3 (mechanics) -- Mon 07-27 W-3a / Tue 07-28 build / Wed 07-29 W-3b-W-4: crisp parts, brutal decisions |  | First Contact | 2026-07-26 06:25:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/811) |
 | 810 | Archive migration: move evolutionary/cruft docs off main repo to keep repo-wide search crisp |  | Technical Debt Cleanup | 2026-07-24 23:33:29 | [link](https://github.com/PipFoweraker/pdoom1/issues/810) |
 | 809 | Remove vestigial victory plumbing + reconcile runtime ADR-0002 (no-victory is half-implemented) |  | Technical Debt Cleanup | 2026-07-24 23:33:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/809) |
 | 808 | Reflective review (on/after 2026-08-24): release/league cycle nomenclature + cadence |  | First Contact | 2026-07-24 23:33:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/808) |
@@ -45,7 +54,6 @@ Generated: 2026-07-26T00:58:03.162Z UTC
 | 802 | In-game music controller (mute/skip/next) + more track variety; expose the doom-triggered rotation | patch:ui | First Contact | 2026-07-24 23:33:46 | [link](https://github.com/PipFoweraker/pdoom1/issues/802) |
 | 801 | Onboarding: narrative cold-open + first-turn direction (playtest #1: 'lots of info, not a lot of direction') | league:v0.13 | First Contact | 2026-07-24 23:33:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/801) |
 | 800 | In-game bug reporter (F8) does not transmit -- reports die on player's local disk, confirmation text lies | league:v0.13 | First Contact | 2026-07-24 23:33:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/800) |
-| 799 | Launch call: anonymous install ping + remote update check (one request, two jobs) | priority:high, ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:33:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/799) |
 | 798 | Put 'Buy Compute' under an operations-style submenu (action grouping) | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:33:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/798) |
 | 796 | Office cat 'Missy' (web-missy.jpg) does not render, though present + imported | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:33:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/796) |
 | 794 | PLAN operations gantt: bigger font/area + a 'what's next / ETA to land' indicator | ship:next-release | First Contact | 2026-07-24 23:34:01 | [link](https://github.com/PipFoweraker/pdoom1/issues/794) |
