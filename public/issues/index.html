@@ -341,7 +341,11 @@
 		<section class="section" id="submit-issue">
 			<h2>Submit Feedback</h2>
 			<p style="color: var(--text-secondary); margin-bottom: 2rem;">
-				Tell us what's wrong or what could be better. We respect your privacy - only the information you provide will be shared.
+				Tell us what's wrong or what could be better. The quickest path is the
+				<a href="/bug-report/" style="color: var(--accent-primary);">direct bug reporter</a>,
+				which sends straight to the team &mdash; no email client, no GitHub account.
+				The form below is an alternative: it composes an email or a pre-filled GitHub
+				issue that <em>you</em> send. Nothing here is transmitted automatically.
 			</p>
 
 			<form id="issue-form" style="max-width: 700px; margin: 0 auto;">
@@ -384,13 +388,13 @@
 				</div>
 
 				<div style="background: var(--bg-tertiary); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--accent-primary); margin-bottom: 1.5rem;">
-					<h4 style="color: var(--accent-primary); margin-bottom: 0.5rem;">🔒 Privacy Promise</h4>
-					<p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 0.5rem 0;">
-						Your feedback will be shared with GitHub Issues and our community forum. Only the issue details you provide above will be posted publicly.
-						Contact information is stored separately and never shared publicly. You can submit anonymously.
-					</p>
-					<p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
-						<strong>Note:</strong> We're currently setting up our community forum and automated forum posting &mdash; stay tuned!
+					<h4 style="color: var(--accent-primary); margin-bottom: 0.5rem;">🔒 What happens to your feedback</h4>
+					<p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+						This form doesn't transmit anything on its own. When you submit, it prepares
+						an email to the team &mdash; or a pre-filled GitHub issue &mdash; for you to send.
+						If you file it on GitHub, the issue text you wrote becomes public there; if you
+						email it, it stays private with the team. Any contact detail you add is used only
+						to reply, never posted publicly. You can submit anonymously.
 					</p>
 				</div>
 
@@ -660,8 +664,8 @@
 
 			// Disable form
 			submitButton.disabled = true;
-			submitButton.textContent = 'Submitting...';
-			formStatus.textContent = 'Processing your feedback...';
+			submitButton.textContent = 'Preparing...';
+			formStatus.textContent = 'Preparing your report...';
 			formStatus.style.color = 'var(--accent-primary)';
 
 			try {
@@ -686,14 +690,16 @@ ${formData.contact !== 'Anonymous' ? `**Contact:** ${formData.contact}` : ''}
 				await new Promise(resolve => setTimeout(resolve, 1000));
 
 				formStatus.innerHTML = `
-					<div style="color: var(--success-color); margin-bottom: 1rem;">✅ Thank you for your feedback!</div>
+					<div style="color: var(--accent-primary); margin-bottom: 1rem;">📝 Your report is ready &mdash; one step left to send it:</div>
 					<div style="font-size: 0.9rem; color: var(--text-secondary);">
 						<a href="mailto:team@pdoom1.com?subject=${subject}&body=${body}"
 						   style="color: var(--accent-primary); text-decoration: underline;">
-							Click here to complete submission via email
+							Send it via email
 						</a>
-						<p style="margin-top: 0.5rem;">Or manually create an issue on
-						<a href="https://github.com/PipFoweraker/pdoom1/issues/new" target="_blank" style="color: var(--accent-primary);">GitHub</a></p>
+						<p style="margin-top: 0.5rem;">or file it on
+						<a href="https://github.com/PipFoweraker/pdoom1/issues/new/choose" target="_blank" style="color: var(--accent-primary);">GitHub</a>.
+						Prefer it to just go straight through? Use the
+						<a href="/bug-report/" style="color: var(--accent-primary);">direct bug reporter</a>.</p>
 					</div>
 				`;
 
