@@ -1,0 +1,47 @@
+name: Content Honesty
+
+# Guards reader-facing claims that silently rot into lies. Today it enforces one
+# thing: no page a visitor can reach may advertise a platform that has no shipped
+# build. The source of truth is public/data/version.json -> latest_release.platforms
+# (derived from the release's actual assets by update-version-info.py), so this can
+# never drift from what actually shipped.
+#
+# Fails the PR check on violation -- that is the whole signal; it does not open
+# issues (unlike the data-contract workflow, this runs only on human-driven events,
+# so a red check is seen immediately). No secrets, read-only.
+
+on:
+  pull_request:
+    paths:
+      - 'public/**/*.html'
+      - 'public/data/version.json'
+      - 'scripts/check-platform-claims.py'
+      - 'scripts/test-download-resolution.js'
+  push:
+    branches: [main]
+    paths:
+      - 'public/**/*.html'
+      - 'public/data/version.json'
+      - 'scripts/check-platform-claims.py'
+      - 'scripts/test-download-resolution.js'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  honesty:
+    name: Platform-claims + download resolution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: No reachable page claims an unshipped platform
+        run: python scripts/check-platform-claims.py
+      - name: Download buttons resolve/degrade correctly
+        run: node scripts/test-download-resolution.js
