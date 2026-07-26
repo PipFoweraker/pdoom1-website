@@ -18,12 +18,18 @@ jobs:
     environment: production
     steps:
       - name: Deployment Start Notice
+        # The commit message is author-controlled text; splicing it into run: lets a
+        # message like `macOS & Linux` execute as shell (it did -- exit 127 killed a
+        # deploy 2026-07-26). Read it via env and echo as DATA. (github.sha is hex and
+        # github.actor is a constrained username, so those stay inline.)
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           echo "🚀 AUTO-DEPLOYMENT TRIGGERED 🚀"
           echo "Triggered by push to main branch"
           echo "Commit: ${{ github.sha }}"
           echo "Author: ${{ github.actor }}"
-          echo "Message: ${{ github.event.head_commit.message }}"
+          echo "Message: $COMMIT_MSG"
 
       - name: Check required secrets
         run: |
