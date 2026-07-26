@@ -54,70 +54,53 @@ jobs:
 
       - name: Update game status from repository dispatch
         if: github.event_name == 'repository_dispatch'
+        # Every value is cross-repo dispatch payload = UNTRUSTED (a release version
+        # or warning can carry shell metacharacters -- the 2026-07-26 backtick-in-
+        # release-body bug proved this class is live). Read via env, build an argv
+        # ARRAY (never a string), exec node directly. The old code spliced the raw
+        # payload into a string AND `eval`'d it -- arbitrary command execution.
+        env:
+          CP_VERSION: ${{ github.event.client_payload.version }}
+          CP_STATUS: ${{ github.event.client_payload.status }}
+          CP_WARNING: ${{ github.event.client_payload.warning }}
+          CP_PHASE: ${{ github.event.client_payload.phase }}
+          CP_PROGRESS: ${{ github.event.client_payload.progress }}
+          CP_FETCH_RELEASE: ${{ github.event.client_payload.fetch_release }}
         run: |
           cd scripts
-          args=""
-          
-          # Parse payload from repository dispatch
-          if [ -n "${{ github.event.client_payload.version }}" ]; then
-            args="$args --version ${{ github.event.client_payload.version }}"
-          fi
-          
-          if [ -n "${{ github.event.client_payload.status }}" ]; then
-            args="$args --status ${{ github.event.client_payload.status }}"
-          fi
-          
-          if [ -n "${{ github.event.client_payload.warning }}" ]; then
-            args="$args --warning '${{ github.event.client_payload.warning }}'"
-          fi
-          
-          if [ -n "${{ github.event.client_payload.phase }}" ]; then
-            args="$args --phase '${{ github.event.client_payload.phase }}'"
-          fi
-          
-          if [ -n "${{ github.event.client_payload.progress }}" ]; then
-            args="$args --progress '${{ github.event.client_payload.progress }}'"
-          fi
-          
-          if [ "${{ github.event.client_payload.fetch_release }}" = "true" ]; then
-            args="$args --fetch-release"
-          fi
-          
-          echo "Running: node update-game-status.js $args"
-          eval "node update-game-status.js $args"
+          args=()
+          [ -n "$CP_VERSION" ]  && args+=(--version "$CP_VERSION")
+          [ -n "$CP_STATUS" ]   && args+=(--status "$CP_STATUS")
+          [ -n "$CP_WARNING" ]  && args+=(--warning "$CP_WARNING")
+          [ -n "$CP_PHASE" ]    && args+=(--phase "$CP_PHASE")
+          [ -n "$CP_PROGRESS" ] && args+=(--progress "$CP_PROGRESS")
+          [ "$CP_FETCH_RELEASE" = "true" ] && args+=(--fetch-release)
+          echo "Running update-game-status.js with ${#args[@]} args"
+          node update-game-status.js "${args[@]}"
 
       - name: Update game status from manual workflow
         if: github.event_name == 'workflow_dispatch'
+        # workflow_dispatch inputs are maintainer-only, but the same argv-array /
+        # no-eval pattern is used here too -- so there is no `eval` left in the file
+        # to copy from, and a value with a quote/backtick can't break the command.
+        env:
+          IN_VERSION: ${{ github.event.inputs.version }}
+          IN_STATUS: ${{ github.event.inputs.status }}
+          IN_WARNING: ${{ github.event.inputs.warning }}
+          IN_PHASE: ${{ github.event.inputs.phase }}
+          IN_PROGRESS: ${{ github.event.inputs.progress }}
+          IN_FETCH_RELEASE: ${{ github.event.inputs.fetch_release }}
         run: |
           cd scripts
-          args=""
-          
-          if [ -n "${{ github.event.inputs.version }}" ]; then
-            args="$args --version ${{ github.event.inputs.version }}"
-          fi
-          
-          if [ -n "${{ github.event.inputs.status }}" ]; then
-            args="$args --status ${{ github.event.inputs.status }}"
-          fi
-          
-          if [ -n "${{ github.event.inputs.warning }}" ]; then
-            args="$args --warning '${{ github.event.inputs.warning }}'"
-          fi
-          
-          if [ -n "${{ github.event.inputs.phase }}" ]; then
-            args="$args --phase '${{ github.event.inputs.phase }}'"
-          fi
-          
-          if [ -n "${{ github.event.inputs.progress }}" ]; then
-            args="$args --progress '${{ github.event.inputs.progress }}'"
-          fi
-          
-          if [ "${{ github.event.inputs.fetch_release }}" = "true" ]; then
-            args="$args --fetch-release"
-          fi
-          
-          echo "Running: node update-game-status.js $args"
-          eval "node update-game-status.js $args"
+          args=()
+          [ -n "$IN_VERSION" ]  && args+=(--version "$IN_VERSION")
+          [ -n "$IN_STATUS" ]   && args+=(--status "$IN_STATUS")
+          [ -n "$IN_WARNING" ]  && args+=(--warning "$IN_WARNING")
+          [ -n "$IN_PHASE" ]    && args+=(--phase "$IN_PHASE")
+          [ -n "$IN_PROGRESS" ] && args+=(--progress "$IN_PROGRESS")
+          [ "$IN_FETCH_RELEASE" = "true" ] && args+=(--fetch-release)
+          echo "Running update-game-status.js with ${#args[@]} args"
+          node update-game-status.js "${args[@]}"
 
       - name: Commit and push changes
         run: |

@@ -50,15 +50,19 @@ jobs:
           cat public/design/tokens.json
           
       - name: Commit changes
+        # The ref (used only in the commit message) can come from a dispatch
+        # payload; read via env so a crafted ref can't reach the shell as code.
+        env:
+          REF_RAW: ${{ github.event.inputs.ref || github.event.client_payload.ref || 'main' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           if git diff --quiet public/design/tokens.json; then
             echo "No changes to tokens.json"
           else
             git add public/design/tokens.json
-            REF="${{ github.event.inputs.ref || github.event.client_payload.ref || 'main' }}"
+            REF="${REF_RAW:-main}"
             git commit -m "chore(design): sync tokens.json from pdoom1@${REF}"
             git push
             echo "Tokens updated and committed"

@@ -45,15 +45,19 @@ jobs:
 
       - name: Determine ref to sync
         id: get_ref
+        # Refs from a dispatch payload are untrusted; read via env, echo as data.
+        env:
+          INPUT_REF: ${{ github.event.inputs.ref }}
+          CP_REF: ${{ github.event.client_payload.ref }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "ref=${{ github.event.inputs.ref }}" >> $GITHUB_OUTPUT
+            echo "ref=${INPUT_REF:-main}" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            echo "ref=${{ github.event.client_payload.ref || 'main' }}" >> $GITHUB_OUTPUT
+            echo "ref=${CP_REF:-main}" >> "$GITHUB_OUTPUT"
           else
             # Get latest release tag
             LATEST=$(curl -s https://api.github.com/repos/PipFoweraker/pdoom1/releases/latest | jq -r .tag_name)
-            echo "ref=${LATEST:-main}" >> $GITHUB_OUTPUT
+            echo "ref=${LATEST:-main}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout pdoom1 repo
