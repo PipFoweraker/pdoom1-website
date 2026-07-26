@@ -1,22 +1,22 @@
 {
   "latest_release": {
-    "version": "v0.13.0",
-    "name": "P(Doom) v0.13.0 -- First Contact league (L2)",
-    "published_at": "2026-07-24T11:15:26Z",
-    "html_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.13.0",
-    "body": "New league epoch L2 (seed weekly-2026-w30). Story cold-open, hiring pipeline, non-profit/for-profit choice, costs-on-buttons, day-precise ledger, candidate portraits, and a chain of soft-lock fixes. Extract the whole zip first, then run PDoom.exe. Unsigned alpha -- SmartScreen: More info -> Run anyway."
+    "version": "v0.13.1",
+    "name": "P(Doom) v0.13.1",
+    "published_at": "2026-07-26T00:07:25Z",
+    "html_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.13.1",
+    "body": "Release v0.13.1\n\nSee CHANGELOG.md for details.\n\n## Build Information\n\n- **Commit:** `409535dc0215d5e7bf4ff1b83025e8da98d7b4ef`\n- **Data Hash:** `847b187267046f25f6bc860fab828ad7d0485a54ea4f285b291f825c85e97e71`\n- **Manifest Hash:** `518e43cb953d2135ce0c773c2ef89808c5b2bda712ddb91ec613bf2b87408e38`\n- **Engine:** Godot 4.5.1\n"
   },
   "repository_stats": {
     "stars": 8,
     "forks": 1,
-    "open_issues": 100,
-    "last_updated": "2026-07-25T14:13:04Z"
+    "open_issues": 101,
+    "last_updated": "2026-07-25T23:58:10Z"
   },
-  "last_updated": "2026-07-25T18:23:13.320145",
+  "last_updated": "2026-07-26T00:20:22.317204",
   "game_stats": {
     "baseline_doom_percent": 23,
     "frontier_labs_count": 5,
     "strategic_possibilities": 10000,
-    "last_calculated": "2026-07-25T18:23:13.320136"
+    "last_calculated": "2026-07-26T00:20:22.317205"
   }
 }
