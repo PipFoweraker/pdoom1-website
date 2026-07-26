@@ -1582,7 +1582,7 @@ t	.hero {
 		// asset naming; on rate-limit/offline it silently keeps the working release-page href.
 		async function resolveDownloads() {
 			const platforms = {
-				'download-windows': /win/i,
+				'download-windows': /win|\.exe$/i,
 				'download-macos': /mac|osx|darwin|\.app|\.dmg/i,
 				'download-linux': /linux|x86_64|\.appimage/i
 			};

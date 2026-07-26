@@ -177,10 +177,21 @@ node    scripts/test-analytics-optout.js  # opt-out, DNT, no-injection regressio
 python  scripts/test_ingest_scores.py     # leaderboard read path
 python  scripts/validate_data.py          # data contracts
 python  scripts/check-stale-facts.py      # hardcoded facts that rot
+python  scripts/check-platform-claims.py  # no reachable page claims an unshipped OS
+node    scripts/test-download-resolution.js # download buttons resolve/degrade right
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift
 python  scripts/generate-feeds.py --check # feeds in step with the blog
 node    scripts/test-header-consistency.js
 ```
+
+**Platform availability is a *derived* fact, not prose.** The source of truth is
+`public/data/version.json` → `latest_release.platforms` ({windows,macos,linux}
+booleans), which `scripts/update-version-info.py` derives from the GitHub release's
+actual **assets** (a build is either attached or it is not). Pages must not hardcode
+"available on Windows/Mac/Linux"; say "coming soon" for anything unshipped, or read
+the field (see `about/index.html`'s `platforms-available` stat). `check-platform-claims.py`
+(also wired to CI via `content-honesty.yml`) fails if a reachable page advertises a
+platform that has no build.
 
 ## Automation notes
 - Weekly-league rollover only opens a GitHub issue **on failure**
