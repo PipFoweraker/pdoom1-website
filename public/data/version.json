@@ -4,24 +4,19 @@
     "name": "P(Doom) v0.13.1",
     "published_at": "2026-07-26T00:07:25Z",
     "html_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.13.1",
-    "body": "Release v0.13.1 -- two soft-lock fixes over v0.13.0: the ledger event-orphan dialog (#883) and the staff-card ESC dead-mouse (#887). Both could strand a session; no other gameplay changes.\n\n## Platform status (honest, 2026-07-26)\n| Platform | File | Tested? |\n|---|---|---|\n| Windows | PDoom-Windows-v0.13.1.zip | Yes -- this is the supported lineage (v0.13.0 played extensively) |\n| Linux | PDoom-Linux-v0.13.1.zip | NOT extensively tested -- it should boot; early feedback wanted |\n| macOS | PDoom-macOS-v0.13.1.zip | NOT extensively tested -- it should boot; early feedback wanted |\n\nIf a build does not work on your machine, that is exactly the feedback we need: email pip@beacongcr.org with your OS version and what happened. In-game, F8 saves a bug report file and shows you its path.\n\nWindows SmartScreen: More info -> Run anyway. macOS Gatekeeper: right-click -> Open the first time. Linux: chmod +x the binary. Always EXTRACT the zip first -- running from inside the zip viewer breaks the game.\n\n## Build Information\n- **Commit:** `409535dc0215d5e7bf4ff1b83025e8da98d7b4ef`\n- **Data Hash:** `847b187267046f25f6bc860fab828ad7d0485a54ea4f285b291f825c85e97e71`\n- **Manifest Hash:** `518e43cb953d2135ce0c773c2ef89808c5b2bda712ddb91ec613bf2b87408e38`\n- **Engine:** Godot 4.5.1",
-    "platforms": {
-      "windows": true,
-      "macos": true,
-      "linux": true
-    }
+    "body": "Release v0.13.1 -- two soft-lock fixes over v0.13.0: the ledger event-orphan dialog (#883) and the staff-card ESC dead-mouse (#887). Both could strand a session; no other gameplay changes.\n\n## Platform status (honest, 2026-07-26)\n| Platform | File | Tested? |\n|---|---|---|\n| Windows | PDoom-Windows-v0.13.1.zip | Yes -- this is the supported lineage (v0.13.0 played extensively) |\n| Linux | PDoom-Linux-v0.13.1.zip | NOT extensively tested -- it should boot; early feedback wanted |\n| macOS | PDoom-macOS-v0.13.1.zip | NOT extensively tested -- it should boot; early feedback wanted |\n\nIf a build does not work on your machine, that is exactly the feedback we need: email pip@beacongcr.org with your OS version and what happened. In-game, F8 saves a bug report file and shows you its path.\n\nWindows SmartScreen: More info -> Run anyway. macOS Gatekeeper: right-click -> Open the first time. Linux: chmod +x the binary. Always EXTRACT the zip first -- running from inside the zip viewer breaks the game.\n\n## Build Information\n- **Commit:** `409535dc0215d5e7bf4ff1b83025e8da98d7b4ef`\n- **Data Hash:** `847b187267046f25f6bc860fab828ad7d0485a54ea4f285b291f825c85e97e71`\n- **Manifest Hash:** `518e43cb953d2135ce0c773c2ef89808c5b2bda712ddb91ec613bf2b87408e38`\n- **Engine:** Godot 4.5.1"
   },
   "repository_stats": {
     "stars": 8,
     "forks": 1,
-    "open_issues": 121,
+    "open_issues": 126,
     "last_updated": "2026-07-26T07:13:46Z"
   },
-  "last_updated": "2026-07-26T18:26:06.460147",
+  "last_updated": "2026-07-27T00:19:53.017498",
   "game_stats": {
     "baseline_doom_percent": 23,
     "frontier_labs_count": 5,
     "strategic_possibilities": 10000,
-    "last_calculated": "2026-07-26T18:26:06.460133"
+    "last_calculated": "2026-07-27T00:19:53.017499"
   }
 }
