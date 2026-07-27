@@ -1,9 +1,11 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-27T07:24:46.365Z UTC
+Generated: 2026-07-27T13:18:52.120Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 984 | Half-day workshop: audit mechanics deep-dive (next epoch) -- something amazing under the smell |  |  | 2026-07-27 11:44:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/984) |
+| 980 | Conference away-window: planning-forward allowed, operating-present forbidden (attention drain refinement) |  |  | 2026-07-27 07:25:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/980) |
 | 976 | test_perf_log flake: test_written_line_has_timestamp_and_type_fields order-dependent in full fast-gate runs |  |  | 2026-07-27 06:54:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/976) |
 | 971 | doom.streams.action_* Balance keys absent from defaults.json -- publish_paper alarm + safety_research absorption are zero-priced no-ops |  |  | 2026-07-27 01:19:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/971) |
 | 970 | Six upgrades charge money for effects with zero implementing code (+ hire_ethicist unbacked claim) |  |  | 2026-07-27 01:19:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/970) |
