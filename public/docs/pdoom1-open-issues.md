@@ -1,9 +1,12 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-27T00:57:49.423Z UTC
+Generated: 2026-07-27T07:24:46.365Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 976 | test_perf_log flake: test_written_line_has_timestamp_and_type_fields order-dependent in full fast-gate runs |  |  | 2026-07-27 06:54:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/976) |
+| 971 | doom.streams.action_* Balance keys absent from defaults.json -- publish_paper alarm + safety_research absorption are zero-priced no-ops |  |  | 2026-07-27 01:19:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/971) |
+| 970 | Six upgrades charge money for effects with zero implementing code (+ hire_ethicist unbacked claim) |  |  | 2026-07-27 01:19:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/970) |
 | 967 | finance_engine desperation_payroll promises '-N doom now' but writes to the clobbered inert sink (silently never fires) |  |  | 2026-07-27 00:53:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/967) |
 | 964 | CI: sim tier silently red on every main run -- test_adversarial_ui_state 6 deterministic invariant violations |  |  | 2026-07-26 22:00:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/964) |
 | 963 | fix(release): v0.13.1.json advertises 404 download URLs; align contact address |  |  | 2026-07-26 21:26:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/963) |
@@ -16,7 +19,6 @@ Generated: 2026-07-27T00:57:49.423Z UTC
 | 955 | ui(endgame): major refresh of the end-game board before leaderboard transition (old button pattern, wasted space) |  |  | 2026-07-26 09:00:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/955) |
 | 954 | ux(hiring): click small pool card -> full candidate card (full portrait, detailed strengths/weaknesses, reveal-gated) |  |  | 2026-07-26 09:00:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/954) |
 | 953 | ux(advisor): large upper-right advisor text -- context per hovered action (teach what Interview/Offer reveal) |  |  | 2026-07-26 09:00:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/953) |
-| 952 | bug(hiring): queued hire that fails at execution strands the candidate -- vanishes from pool AND queue forever | bug |  | 2026-07-26 09:17:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/952) |
 | 951 | integration & closeout lane (Tuesday queue): wire promoted art into the game + retire superseded assets |  |  | 2026-07-26 07:27:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/951) |
 | 950 | creative: 2026-07-26 closing harvest -- easter eggs, pickups, extras (Fable + full-day context) |  |  | 2026-07-26 07:14:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/950) |
 | 944 | sandbox v5: controls as buttons in top-left negative space -- declutter the legend wall | patch:ui |  | 2026-07-26 06:28:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/944) |
@@ -97,7 +99,7 @@ Generated: 2026-07-27T00:57:49.423Z UTC
 | 619 | Build lane L8 · Achievements skeleton (observer-only) |  |  | 2026-07-12 08:23:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/619) |
 | 615 | Build lane L4 · Event taxonomy + ledger intake (ADR-0012) |  |  | 2026-07-12 08:23:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/615) |
 | 614 | Build lane L3 · Adoption, papers, conferences (ADR-0010, ADR-0014) |  |  | 2026-07-12 08:22:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/614) |
-| 613 | Build lane L2 · Effort economy: founder hours, staff lanes, managers (ADR-0011) |  |  | 2026-07-12 08:22:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/613) |
+| 613 | Build lane L2 · Effort economy: founder hours, staff lanes, managers (ADR-0011) |  |  | 2026-07-27 01:48:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/613) |
 | 608 | Architecture smell: two GameManager instances (scene-local + autoload); 'ready' prints twice | technical-debt |  | 2026-07-12 08:26:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/608) |
 | 603 | Popups: fanfare needs a dimming backdrop (events leak under it); bug-report 'thanks' Submit still clickable | bug, ui-ux, ship:hotpatch-48h |  | 2026-07-22 08:04:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/603) |
 | 602 | Navigation audit + universal principle (ESC/back consistency, mirrored toggle keys, unreachable Employee screen) | ui-ux, ship:hotpatch-48h |  | 2026-07-22 08:04:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/602) |
