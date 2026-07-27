@@ -1,9 +1,13 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-26T18:36:19.194Z UTC
+Generated: 2026-07-27T00:57:49.423Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 967 | finance_engine desperation_payroll promises '-N doom now' but writes to the clobbered inert sink (silently never fires) |  |  | 2026-07-27 00:53:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/967) |
+| 964 | CI: sim tier silently red on every main run -- test_adversarial_ui_state 6 deterministic invariant violations |  |  | 2026-07-26 22:00:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/964) |
+| 963 | fix(release): v0.13.1.json advertises 404 download URLs; align contact address |  |  | 2026-07-26 21:26:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/963) |
+| 962 | feat(engine): integrate frontier-labs dataset (pdoom-data#37); expose a list the website can pull to fix calculate-game-stats |  |  | 2026-07-26 21:00:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/962) |
 | 961 | design(hiring): W3 -- revisit the candidate pool cap (MAX_CANDIDATES=6); stale once networking changes, and cap-hits are partly silent |  |  | 2026-07-26 11:42:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/961) |
 | 959 | feat(ux): Surrender button on the in-game menu -- end run to leaderboard instead of abandoning |  |  | 2026-07-26 09:00:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/959) |
 | 958 | content(leaderboard): massively more lab-name variety; randomly generate player lab name by default |  |  | 2026-07-26 09:00:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/958) |
