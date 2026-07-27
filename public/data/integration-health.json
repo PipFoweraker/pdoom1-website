@@ -1,10 +1,10 @@
 {
-  "generated": "2026-07-26T07:00:11.753751+00:00",
-  "overall_status": "WARN",
+  "generated": "2026-07-27T07:16:23.729362+00:00",
+  "overall_status": "OK",
   "summary": {
     "fail": 0,
-    "warn": 2,
-    "ok": 8
+    "warn": 0,
+    "ok": 10
   },
   "checks": [
     {
@@ -35,17 +35,17 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 6.7 days ago"
+      "detail": "generated 0.7 days ago"
     },
     {
       "name": "league:current_week",
-      "status": "WARN",
-      "detail": "week 2026_W29 is marked is_current but ended 6.3 days ago -- rollover cadence off"
+      "status": "OK",
+      "detail": "week 2026_W30 current"
     },
     {
       "name": "league:version_drift",
-      "status": "WARN",
-      "detail": "leaderboard game_version=v0.11.0 but deployed game=v0.13.1 -- export stamping stale version"
+      "status": "OK",
+      "detail": "game_version v0.13.1 matches deployed"
     },
     {
       "name": "league:integrity",
