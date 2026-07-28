@@ -32,4 +32,4 @@ Use this when the `pdoom1` game ships a new release, to confirm the website refl
 ## Known follow-ups (not blockers)
 - Blog/changelog content is **Airtable-sourced** (`sync_airtable.py`); refresh at source, not by editing `public/data/*.json`.
 - The website's own version scheme is muddled (`status.json` website `0.2.1` vs `CHANGELOG.md` `1.2.0`) — pick a canonical scheme when convenient.
-- `public/includes/navigation.html` is an unused legacy include; the live nav is `public/assets/js/navigation.js`.
+- `public/includes/navigation.html` was an unused legacy include (and had gone stale at `v0.11.0`); deleted 2026-07-28. The live nav is `public/assets/js/navigation.js`.
