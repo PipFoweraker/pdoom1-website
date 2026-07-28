@@ -7,9 +7,18 @@ Disallow: /api/
 Disallow: /assets/private/
 
 # Disallow build artifacts and internal resources
-Disallow: /data/
-Disallow: /design/
 Disallow: /monitoring/
+
+# /data/ and /design/ are DELIBERATELY crawlable (TECH_DEBT A8, 2026-07-28).
+# They are not build artifacts, they are runtime subresources. The homepage
+# fetches /data/version.json and /design/tokens.json; /state-of-doom/ fetches
+# /data/clocks.json and /design/tokens.json; about, game-stats, leaderboard,
+# resources and assets/js/navigation.js fetch from them too. Googlebot obeys
+# robots.txt for subresources as well as for pages, so disallowing these
+# directories made the crawler render our hardcoded fallbacks instead of the
+# real version and token data. Do not re-add Disallow lines for them.
+# Nothing under either path is private: both hold plain public JSON, and
+# robots.txt never provided access control in the first place.
 
 # Orphaned pending revision (2026-07-24): no inbound links, stale content.
 # These also carry <meta name="robots" content="noindex">.
