@@ -22,9 +22,16 @@
  *       (in-page `#home` anchor, an `Events` link the shared nav lacks). Any
  *       page in this regime is drift waiting to happen -- prefer (A).
  *
- * A page that loads navigation.js AND leaves markup inside its `<header>` is an
- * ERROR, not a third regime: navigation.js overwrites that markup at runtime,
- * so it is dead weight that reads as live and drifts silently.
+ * A delegating page MAY keep a small no-JS fallback in its `<header>`, as long
+ * as that fallback's `<nav>` has no `.nav-links` class. That is not a loophole,
+ * it is navigation.js's own contract: the script replaces the header's nav
+ * unless it finds `.nav-links`, on the assumption that a page with `.nav-links`
+ * already has a real nav. `public/design-notes/index.html` uses this on purpose
+ * (with a comment saying so) to render links on first paint and with JS off.
+ *
+ * What IS an error is loading navigation.js while the header's nav DOES carry
+ * `.nav-links`: the script then leaves that markup alone, so the page is a
+ * hand-copy that looks like it inherits the shared nav and silently will not.
  *
  * TWO REAL BUGS WERE FIXED HERE (2026-07-28), both of which made the old
  * numbers meaningless -- read before "fixing" a failure by relaxing a rule:
@@ -159,17 +166,29 @@ function resolvePageNav(content, canonicalNav) {
   const loadsNavScript = content.includes(NAV_SCRIPT_SRC);
 
   if (loadsNavScript) {
-    if (strippedInner.length > 0) {
+    // navigation.js's own contract: it replaces the header's nav UNLESS that
+    // nav contains .nav-links, in which case it assumes the page has a real
+    // nav already and leaves it alone. So markup in the header is only safe
+    // while it has no .nav-links -- design-notes uses exactly that to keep a
+    // small link row rendering on first paint and with JS off.
+    const keptByScript = /class="[^"]*\bnav-links\b/.test(inner);
+    if (keptByScript) {
       return {
         errors: [
-          'Loads navigation.js but <header> still contains markup - navigation.js ' +
-          'overwrites it at runtime, so this is dead markup that drifts silently',
+          'Loads navigation.js but its <header> nav has .nav-links, so ' +
+          'navigation.js leaves that markup in place. The page is really a ' +
+          'hand-copy pretending to inherit the shared nav - drop .nav-links ' +
+          'to make it a no-JS fallback, or empty the header.',
         ],
-        nav: canonicalNav,
-        regime: 'delegate(dirty)',
+        nav: inner,
+        regime: 'static(masquerading)',
       };
     }
-    return { errors: [], nav: canonicalNav, regime: 'delegate' };
+    return {
+      errors: [],
+      nav: canonicalNav,
+      regime: strippedInner.length > 0 ? 'delegate(+fallback)' : 'delegate',
+    };
   }
 
   if (/<nav[\s>]/.test(inner)) {
