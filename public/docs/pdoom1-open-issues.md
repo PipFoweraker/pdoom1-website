@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-28T00:50:29.663Z UTC
+Generated: 2026-07-28T07:09:53.395Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 994 | feat(emit): calibration artifact — baseline p(Doom), sim 100%-topout date, ladder version (unblocks the website's doom clock + pdoom1-website#177) |  |  | 2026-07-28 04:48:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/994) |
 | 987 | Bureaucratic tells: bodies telegraph doom via procedural anomaly (design, Wed W-block) |  |  | 2026-07-27 19:45:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/987) |
 | 986 | ADR-0015 M-ticket: risk_events re-author + rebalance (20 live fields) + #967 finance fix + political_pressure dead-write |  |  | 2026-07-27 19:45:02 | [link](https://github.com/PipFoweraker/pdoom1/issues/986) |
 | 984 | Half-day workshop: audit mechanics deep-dive (next epoch) -- something amazing under the smell |  |  | 2026-07-27 11:44:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/984) |
@@ -12,7 +13,7 @@ Generated: 2026-07-28T00:50:29.663Z UTC
 | 970 | Six upgrades charge money for effects with zero implementing code (+ hire_ethicist unbacked claim) |  |  | 2026-07-27 01:19:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/970) |
 | 967 | finance_engine desperation_payroll promises '-N doom now' but writes to the clobbered inert sink (silently never fires) |  |  | 2026-07-27 00:53:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/967) |
 | 964 | CI: sim tier silently red on every main run -- test_adversarial_ui_state 6 deterministic invariant violations |  |  | 2026-07-26 22:00:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/964) |
-| 963 | fix(release): v0.13.1.json advertises 404 download URLs; align contact address |  |  | 2026-07-26 21:26:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/963) |
+| 963 | fix(release): v0.13.1.json advertises 404 download URLs; align contact address |  |  | 2026-07-28 04:53:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/963) |
 | 962 | feat(engine): integrate frontier-labs dataset (pdoom-data#37); expose a list the website can pull to fix calculate-game-stats |  |  | 2026-07-26 21:00:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/962) |
 | 961 | design(hiring): W3 -- revisit the candidate pool cap (MAX_CANDIDATES=6); stale once networking changes, and cap-hits are partly silent |  |  | 2026-07-26 11:42:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/961) |
 | 959 | feat(ux): Surrender button on the in-game menu -- end run to leaderboard instead of abandoning |  |  | 2026-07-26 09:00:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/959) |
