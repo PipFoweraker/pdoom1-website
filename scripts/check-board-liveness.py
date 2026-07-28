@@ -5,48 +5,69 @@ check-board-liveness.py -- READ-ONLY live probe of the PHP score API.
 
 WHY THIS EXISTS
 ---------------
-A leaderboard board is keyed by (seed, game_version) -- pdoom1 PR #679. When a
-submitting client's key does not match the board anyone reads, the score lands on
-a board nobody looks at and the player is shown no error. From the outside that is
-indistinguishable from "nobody is playing".
+A leaderboard board is keyed by (seed, board_version). When a submitting client's key
+does not match the board anyone reads, the score lands on a board nobody looks at and
+the player is shown no error. From the outside that is indistinguishable from "nobody
+is playing".
 
-Nothing in this repo has ever read the score API. The website publishes
-leaderboard.json by aggregating LOCAL seed files, so "0 entries" on the site has
-never been evidence about the API one way or the other. This script closes that
-gap: it asks the API directly and records what it found, with a timestamp, so
-"the board is empty" becomes a dated observation instead of a mystery.
+Nothing in this repo had ever read the score API, so "0 entries" on the site was never
+evidence about the API one way or the other. This script closes that gap: it asks the
+API directly and records what it found, with a timestamp.
+
+THE BOARD VERSION IS THE LADDER EPOCH, NOT THE BUILD
+----------------------------------------------------
+Authoritative (pdoom1, via pdoom1-website issue #151, comment 2026-07-28T23:13):
+`GameConfig.get_board_version()` returns "L" + LADDER_VERSION. The client sends `L3`,
+not `v0.13.2`. The build version no longer touches the board key at all -- that is the
+build-vs-ladder split, and it means a cosmetic patch bump will never again fork a board.
+
+So comparing a board's version half against `version.json` is WRONG, and worse than
+wrong: after the next ladder bump the two are SUPPOSED to differ, and a check built that
+way would scream "mismatch" forever on correct data. A permanently-firing alarm is how a
+team learns to ignore alarms.
+
+Two key shapes coexist live and NEITHER is an error:
+  * epoch-shaped  `L2`       -- current. What the game sends today.
+  * build-shaped  `v0.11.0`  -- historical, from before the split. Frozen evidence.
+Entries on an epoch board carry their build in `game_mode`, so one board spans builds.
+
+WHAT WE STILL CANNOT DO
+-----------------------
+The website has NO artifact telling it which ladder epoch is current. That is a real gap
+(see the artifact request in PR #190), not something to paper over. While the epoch is
+unknown this script reports `epoch-unknown` and every surface says "cannot confirm".
+It never asserts a mismatch it cannot demonstrate.
+
+NOTHING IS HARDCODED
+--------------------
+Probe targets are DERIVED (Pip's standing rule: "keep using variables and not hardcoding
+things where we can"). Seeds come from the preserved captures, weekly/current.json and
+leaderboard.json. Epochs come from the epoch-shaped keys already seen, plus a forward
+window relative to the highest one -- so a ladder bump is picked up without anyone
+editing a literal. Anything that genuinely must be pinned goes in
+public/leaderboard/data/board-probe-targets.json WITH A SOURCE, never in this file.
 
 CONTRACT (do not break)
 -----------------------
-pdoom1 PR #679 makes this repo a READ-ONLY consumer of ONE score API. This script
-issues GETs only. It never POSTs, never writes to the API, and never re-stamps a
-version -- re-stamping would fabricate history. It writes exactly one local file,
-public/leaderboard/data/board-liveness.json, which is an OBSERVATION record, not a
-score store.
+pdoom1 PR #679 makes this repo a READ-ONLY consumer of ONE score API. GETs only. Never
+POSTs, never writes to the API, never re-stamps a version (that fabricates history). It
+writes one local file, board-liveness.json, which is an OBSERVATION, not a score store.
 
-WHAT IT REPORTS
----------------
-  1. The deployed board -- (current weekly seed, deployed game version) -- and how
-     many entries the API holds for it.
-  2. Every other (seed, version) board it probes that DOES hold entries. Those are
-     orphaned scores: real runs by real players that no visitor to pdoom1.com can
-     see.
-
-EXIT CODES (so CI can go red on the state that matters)
-  0  consistent -- either the deployed board has entries, or nothing anywhere does
-  1  LOUD -- entries exist on some board, but not on the deployed one. Scores are
-     being recorded and are invisible to visitors.
-  2  the API could not be reached / did not answer usefully (unknown, not "empty")
+EXIT CODES
+  0  consistent, OR every orphaned board is already acknowledged in the anomaly archive
+  1  a NEW, unacknowledged orphaned board holds entries -- scores are being lost NOW
+  2  the epoch is unknown, or the API could not be read (unknown, never "empty")
 
 RUN
     python scripts/check-board-liveness.py
-    python scripts/check-board-liveness.py --seed weekly-2026-w0 --seed other-seed
-    python scripts/check-board-liveness.py --check      # no file write, exit code only
+    python scripts/check-board-liveness.py --seed some-seed --version L4
+    python scripts/check-board-liveness.py --check      # no file write
 """
 
 import argparse
 import io
 import json
+import re
 import sys
 import urllib.error
 import urllib.parse
@@ -72,23 +93,23 @@ LB_DIR = PUBLIC / "leaderboard" / "data"
 VERSION_JSON = PUBLIC / "data" / "version.json"
 WEEKLY_JSON = LB_DIR / "weekly" / "current.json"
 SNAPSHOT_JSON = LB_DIR / "leaderboard.json"
+PRESERVED_DIR = LB_DIR / "preserved"
+TARGETS_JSON = LB_DIR / "board-probe-targets.json"
 OUT_JSON = LB_DIR / "board-liveness.json"
 
 SCORE_API = "https://api.pdoom1.com/score_api.php"
-RELEASES_API = "https://api.github.com/repos/PipFoweraker/pdoom1/releases"
 
-# Seeds observed in real client traffic that the website does not derive itself.
-# This is a PROBE LIST, not a source of truth: it exists so the check can still see
-# an orphaned board whose seed the website has no other way to learn. Nothing here
-# is ever published as "the current seed" -- that always comes from weekly/current.json.
-OBSERVED_CLIENT_SEEDS = [
-    "weekly-2026-w0",   # seen live 2026-07-28 holding v0.11.0 and v0.12.0 entries
-]
+# Shape tests, not value lists. These classify a key; they never supply one.
+EPOCH_RE = re.compile(r"^L(\d+)$")
+BUILD_RE = re.compile(r"^v?\d+\.\d+\.\d+$")
 
-# Versions probed in addition to the deployed one. Derived from the pdoom1 releases
-# API at run time so this list cannot rot into a hardcoded literal; the constant below
-# is only the fallback COUNT of recent releases to look back over.
-RECENT_RELEASES_TO_PROBE = 6
+# How far past the highest KNOWN epoch to probe. Relative, so it tracks the ladder
+# instead of naming one. 2 covers a bump landing between two runs of this script.
+EPOCH_LOOKAHEAD = 2
+
+# Preserved captures are named "<seed>__<boardversion>.json" -- the filename IS the
+# board key, which is what makes the archive a derivation source rather than a dump.
+CAPTURE_RE = re.compile(r"^(?P<seed>.+)__(?P<version>[^_]+)\.json$")
 
 
 def now_iso():
@@ -114,105 +135,177 @@ def get_json(url, headers=None, timeout=20):
         return None, "%s: %s" % (type(e).__name__, e)
 
 
-def deployed_version():
-    """The version the site says is current. Absence is 'unknown', never a literal."""
-    v = load_json(VERSION_JSON, {}) or {}
-    lr = v.get("latest_release") if isinstance(v, dict) else None
-    return (lr or {}).get("version")
+def key_shape(version):
+    """'epoch' | 'build' | 'unknown'. The first two are both legitimate."""
+    if not version:
+        return "unknown"
+    if EPOCH_RE.match(str(version)):
+        return "epoch"
+    if BUILD_RE.match(str(version)):
+        return "build"
+    return "unknown"
 
 
-def website_weekly_seed():
-    w = load_json(WEEKLY_JSON, {}) or {}
-    return w.get("seed"), ((w.get("meta") or {}).get("game_version"))
+# ---------------------------------------------------------------- derivation
+def archived_keys():
+    """Every (seed, version) the anomaly archive holds, from the capture FILENAMES.
+
+    Doubles as the acknowledgement register: an orphaned board that appears here is
+    known history (Pip's ruling -- these stay archived permanently), whereas one that
+    does not is a live incident. That distinction is what lets the guard be loud about
+    the archive every run without ever going red for it.
+    """
+    keys = []
+    if not PRESERVED_DIR.is_dir():
+        return keys
+    for f in sorted(PRESERVED_DIR.rglob("*.json")):
+        m = CAPTURE_RE.match(f.name)
+        if m:
+            keys.append((m.group("seed"), m.group("version")))
+    return keys
 
 
+def derive_targets(extra_seeds, extra_versions):
+    """Build the probe set from what the repo already knows.
+
+    Deliberately not a literal list anywhere: every seed and every epoch here comes from
+    a data file, a capture filename, or arithmetic on one of those.
+    """
+    notes = []
+    targets = load_json(TARGETS_JSON, {}) or {}
+    seeds, versions = [], []
+
+    def add(bucket, value):
+        if value and value not in bucket:
+            bucket.append(value)
+
+    # 1. What the site currently publishes -- the board it believes in.
+    add(seeds, (load_json(WEEKLY_JSON, {}) or {}).get("seed"))
+    snap_seed = (load_json(SNAPSHOT_JSON, {}) or {}).get("seed")
+    if snap_seed not in ("-", "—", "aggregate", "no-data"):
+        add(seeds, snap_seed)
+
+    # 2. Every board the archive has seen. This is how the CLIENT's own seed format --
+    #    which the website does not generate and could not otherwise guess -- stays in
+    #    the probe set without being typed into a script.
+    arch = archived_keys()
+    for s, v in arch:
+        add(seeds, s)
+        add(versions, v)
+    if arch:
+        notes.append("%d board key(s) derived from the anomaly archive" % len(arch))
+    else:
+        notes.append("anomaly archive absent -- probe set is narrower than it should be, "
+                     "and orphans cannot be classified as known vs new")
+
+    # 3. Whatever the last run saw, so the set grows as the ladder moves.
+    for b in ((load_json(OUT_JSON, {}) or {}).get("boards") or []):
+        add(seeds, b.get("seed"))
+        add(versions, b.get("version"))
+
+    # 4. Pinned values -- only from the data file, and only with a source. A pinned value
+    #    with no source is a hardcoded literal wearing a costume, so it is refused.
+    for key, bucket in (("extra_seeds", seeds), ("extra_versions", versions)):
+        for item in (targets.get(key) or []):
+            if isinstance(item, dict):
+                if not item.get("source"):
+                    notes.append("ignored pinned %s %r: no source recorded"
+                                 % (key, item.get("value")))
+                    continue
+                add(bucket, item.get("value"))
+            else:
+                notes.append("ignored bare %s %r: pinned values must carry a source"
+                             % (key, item))
+
+    # 5. CLI overrides, for a human who has just been told a new value.
+    for s in extra_seeds:
+        add(seeds, s)
+    for v in extra_versions:
+        add(versions, v)
+
+    # 6. Epoch forward window, derived from the highest epoch actually seen. A ladder
+    #    bump is therefore caught with no edit here. If none has been seen we start at
+    #    L1: the sequence is defined by its own shape, not by a remembered value.
+    epochs = [int(m.group(1)) for m in (EPOCH_RE.match(str(v)) for v in versions) if m]
+    highest = max(epochs) if epochs else 0
+    for n in range(1, highest + EPOCH_LOOKAHEAD + 1):
+        add(versions, "L%d" % n)
+    notes.append("epoch window L1..L%d (highest seen L%d, +%d lookahead)"
+                 % (highest + EPOCH_LOOKAHEAD, highest, EPOCH_LOOKAHEAD))
+
+    return seeds, versions, notes
+
+
+def current_epoch(targets):
+    """The ladder epoch the game is on RIGHT NOW, or (None, None).
+
+    There is no artifact for this yet. None means 'cannot confirm' and must never be
+    quietly replaced by a guess -- answering confidently without knowing is the exact
+    failure mode this script exists to end.
+    """
+    ce = (targets or {}).get("current_ladder_epoch") or {}
+    val, src = ce.get("value"), ce.get("source")
+    if val and key_shape(val) == "epoch" and src:
+        return val, src
+    return None, None
+
+
+# ---------------------------------------------------------------- probing
 def probe_board(seed, version):
-    """Read one board. Returns dict with count, or error."""
     q = urllib.parse.urlencode({"seed": seed, "version": version})
     data, err = get_json("%s?%s" % (SCORE_API, q))
+    base = {"seed": seed, "version": version, "key_shape": key_shape(version)}
     if err:
-        return {"seed": seed, "version": version, "error": err, "entries": None}
+        base.update({"error": err, "entries": None})
+        return base
     if not isinstance(data, dict) or not data.get("ok"):
-        return {"seed": seed, "version": version,
-                "error": "unexpected payload: %s" % json.dumps(data)[:120],
-                "entries": None}
+        base.update({"error": "unexpected payload: %s" % json.dumps(data)[:120],
+                     "entries": None})
+        return base
     entries = data.get("entries") or []
     players = sorted({e.get("player_name") for e in entries if e.get("player_name")})
     dates = sorted(e.get("date") for e in entries if e.get("date"))
-    return {
-        "seed": seed,
-        "version": version,
+    # An epoch board spans builds, so record which builds appear. That is the evidence
+    # the split is working, and it is the only place a build version belongs.
+    base.update({
         "entries": len(entries),
         "players": len(players),
+        "player_names": players,
+        "builds_seen": sorted({e.get("game_mode") for e in entries if e.get("game_mode")}),
         "first_entry": dates[0] if dates else None,
         "last_entry": dates[-1] if dates else None,
-    }
-
-
-def candidate_versions(deployed, extra):
-    """Deployed + recent published releases + anything the caller named.
-
-    Pulled from the releases API rather than hardcoded, so the probe set follows the
-    game instead of rotting. If GitHub is unreachable we probe what we know locally
-    and SAY SO -- we do not silently shrink the search and call it a clean result.
-    """
-    seen, out, note = set(), [], None
-    for v in [deployed] + list(extra):
-        if v and v not in seen:
-            seen.add(v)
-            out.append(v)
-    rel, err = get_json(RELEASES_API, {"Accept": "application/vnd.github+json"})
-    if err:
-        note = "GitHub releases unreachable (%s) -- probed only locally-known versions" % err
-    else:
-        for r in (rel or [])[:RECENT_RELEASES_TO_PROBE]:
-            tag = r.get("tag_name")
-            if tag and tag not in seen:
-                seen.add(tag)
-                out.append(tag)
-    return out, note
+    })
+    return base
 
 
 def main():
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--seed", action="append", default=[],
-                    help="extra seed to probe (repeatable)")
+    ap.add_argument("--seed", action="append", default=[], help="extra seed (repeatable)")
     ap.add_argument("--version", action="append", default=[],
-                    help="extra version to probe (repeatable)")
-    ap.add_argument("--check", action="store_true",
-                    help="exit code only, do not write board-liveness.json")
+                    help="extra board version / ladder epoch (repeatable)")
+    ap.add_argument("--check", action="store_true", help="exit code only, no file write")
     args = ap.parse_args()
 
-    deployed = deployed_version()
-    site_seed, weekly_stamp = website_weekly_seed()
-    snapshot = load_json(SNAPSHOT_JSON, {}) or {}
-    snap_ver = (snapshot.get("meta") or {}).get("game_version")
-    snap_entries = len(snapshot.get("entries") or [])
+    targets = load_json(TARGETS_JSON, {}) or {}
+    epoch, epoch_source = current_epoch(targets)
+    site_seed = (load_json(WEEKLY_JSON, {}) or {}).get("seed")
+    # Read only to REPORT. The build plays no part in any board comparison -- see the
+    # module docstring on the build-vs-ladder split.
+    build = ((load_json(VERSION_JSON, {}) or {}).get("latest_release") or {}).get("version")
+
+    seeds, versions, notes = derive_targets(args.seed, args.version)
+    archive = set(archived_keys())
 
     print("Board liveness probe -- %s" % now_iso())
-    print("=" * 72)
-    print("  deployed game version   %s" % (deployed or "UNKNOWN (version.json has no latest_release.version)"))
-    print("  website weekly seed     %s" % (site_seed or "UNKNOWN"))
-    print("  weekly stamp            %s" % (weekly_stamp or "UNKNOWN"))
-    print("  published snapshot      %s, %d entries" % (snap_ver or "UNKNOWN", snap_entries))
+    print("=" * 74)
+    print("  site seed (published)   %s" % (site_seed or "UNKNOWN"))
+    print("  current ladder epoch    %s" % (epoch or "UNKNOWN -- no artifact publishes it"))
+    print("  deployed build          %s   (NOT part of the board key)" % (build or "unknown"))
+    print("  anomaly archive         %d acknowledged board key(s)" % len(archive))
+    for n in notes:
+        print("  note: %s" % n)
     print()
-
-    if not deployed:
-        # A missing deployed version is itself the loud condition: every comparison
-        # downstream would be vacuously "fine". Never treat absence as agreement.
-        print("  FAIL: cannot determine the deployed version, so no board comparison is")
-        print("        meaningful. version.json has no latest_release.version.")
-        return 2
-
-    seeds, seen = [], set()
-    for s in [site_seed] + OBSERVED_CLIENT_SEEDS + list(args.seed):
-        if s and s not in seen:
-            seen.add(s)
-            seeds.append(s)
-    versions, ver_note = candidate_versions(deployed, [snap_ver] + list(args.version))
-    if ver_note:
-        print("  note: %s" % ver_note)
 
     results, errors = [], 0
     for s in seeds:
@@ -222,85 +315,123 @@ def main():
                 errors += 1
             results.append(r)
 
-    deployed_board = next(
-        (r for r in results if r["seed"] == site_seed and r["version"] == deployed), None)
     populated = [r for r in results if (r.get("entries") or 0) > 0]
-    orphaned = [r for r in populated
-                if not (r["seed"] == site_seed and r["version"] == deployed)]
-    deployed_count = (deployed_board or {}).get("entries")
 
-    print("  probed %d board(s) across %d seed(s) x %d version(s); %d unreachable"
+    def is_deployed(r):
+        return bool(epoch) and r["seed"] == site_seed and r["version"] == epoch
+
+    deployed_board = next((r for r in results if is_deployed(r)), None)
+    orphaned = [r for r in populated if not is_deployed(r)]
+    known = [r for r in orphaned if (r["seed"], r["version"]) in archive]
+    unknown = [r for r in orphaned if (r["seed"], r["version"]) not in archive]
+
+    print("  probed %d board(s): %d seed(s) x %d version(s); %d unreadable"
           % (len(results), len(seeds), len(versions), errors))
-    print("-" * 72)
-    for r in results:
-        if r.get("error"):
-            print("  [ERR ] %-28s %-9s  %s" % (r["seed"][:28], r["version"], r["error"]))
-        elif r["entries"]:
-            print("  [%4d] %-28s %-9s  %d player(s), %s .. %s"
-                  % (r["entries"], r["seed"][:28], r["version"], r["players"],
-                     (r["first_entry"] or "?")[:10], (r["last_entry"] or "?")[:10]))
+    print("-" * 74)
+    for r in sorted(populated, key=lambda x: -(x["entries"] or 0)):
+        tag = "DEPLOYED" if is_deployed(r) else \
+              ("archived" if (r["seed"], r["version"]) in archive else "NEW ORPHAN")
+        print("  [%4d] %-26s %-6s %-6s %-10s %s"
+              % (r["entries"], r["seed"][:26], r["version"], r["key_shape"], tag,
+                 ("builds " + ",".join(r["builds_seen"])) if r.get("builds_seen") else ""))
     if not populated:
         print("  (no probed board holds any entry)")
-    print("-" * 72)
+    print("-" * 74)
 
-    # ---- the verdict, stated in counts, never as a bare "0 entries" ----------
-    if orphaned:
-        total = sum(r["entries"] for r in orphaned)
-        verdict = "orphaned-scores"
-        exit_code = 1
+    total_known = sum(r["entries"] for r in known)
+    total_unknown = sum(r["entries"] for r in unknown)
+    archive_absent = not archive
+
+    # ---- verdict ------------------------------------------------------------
+    if unknown and not archive_absent:
+        verdict, exit_code = "orphaned-scores", 1
         print()
-        print("  !! LOUD: %d score entr%s exist on the live API on %d board(s) that NO"
-              % (total, "y" if total == 1 else "ies", len(orphaned)))
-        print("     visitor to pdoom1.com can see.")
-        print("     Deployed board (%s, %s) holds %s."
-              % (site_seed, deployed,
-                 "%d entries" % deployed_count if deployed_count is not None
-                 else "an unknown number of entries -- it could not be read"))
-        for r in orphaned:
-            print("       - (%s, %s): %d entries, %d player(s), %s .. %s"
-                  % (r["seed"], r["version"], r["entries"], r["players"],
+        print("  !! NEW ORPHANED BOARD(S): %d entr%s on %d board(s) NOT in the anomaly"
+              % (total_unknown, "y" if total_unknown == 1 else "ies", len(unknown)))
+        print("     archive. These are being lost RIGHT NOW.")
+        for r in unknown:
+            print("       - (%s, %s) [%s]: %d entries, %d player(s), %s .. %s"
+                  % (r["seed"], r["version"], r["key_shape"], r["entries"], r["players"],
                      (r["first_entry"] or "?")[:10], (r["last_entry"] or "?")[:10]))
         print()
-        print("     The board key is (seed, game_version). These entries did not fail to")
-        print("     save -- they saved to a key nothing reads. Do NOT 'fix' this by")
-        print("     re-stamping a version: that fabricates history. The game must submit")
-        print("     to the board the site publishes, or the site must publish the board")
-        print("     the game submits to.")
-    elif deployed_count:
-        verdict = "live"
-        exit_code = 0
+        print("     The board key is (seed, ladder_epoch). These entries did not fail to")
+        print("     save -- they saved to a key nothing reads. Do NOT re-stamp anything:")
+        print("     that fabricates history.")
+    elif unknown and archive_absent:
+        # Losing the archive must not manufacture an emergency. Same principle as
+        # everywhere else here: absence is unknown, never a confident claim.
+        verdict, exit_code = "unclassifiable", 2
+        print()
+        print("  CANNOT CLASSIFY. %d populated orphan board(s) found, but the anomaly"
+              % len(unknown))
+        print("  archive is missing, so there is no way to tell known history from a new")
+        print("  incident. Restore public/leaderboard/data/preserved/ and re-run.")
+    elif not epoch:
+        # The honest state today: we can see the boards, we cannot say which is current.
+        verdict, exit_code = "epoch-unknown", 2
+        print()
+        print("  CANNOT CONFIRM. No artifact tells this site which ladder epoch is")
+        print("  current, so it cannot say whether the board it publishes is the board")
+        print("  players submit to. This is NOT a mismatch claim -- it is an admission.")
+        print("  To resolve: pdoom1 publishes the current ladder epoch, and it lands in")
+        print("  board-probe-targets.json -> current_ladder_epoch (with a source).")
+    elif deployed_board and deployed_board.get("entries"):
+        verdict, exit_code = "live", 0
         print()
         print("  OK: deployed board (%s, %s) holds %d entries."
-              % (site_seed, deployed, deployed_count))
+              % (site_seed, epoch, deployed_board["entries"]))
     elif errors == len(results):
-        verdict = "unreachable"
-        exit_code = 2
+        verdict, exit_code = "unreachable", 2
         print()
-        print("  UNKNOWN: every probe failed. This is NOT evidence that the board is")
-        print("  empty -- it is evidence that we cannot tell. Treat as unknown.")
+        print("  UNKNOWN: every probe failed. NOT evidence that the board is empty --")
+        print("  evidence that we cannot tell.")
     else:
-        verdict = "genuinely-empty"
-        exit_code = 0
+        verdict, exit_code = "genuinely-empty", 0
         print()
-        print("  Deployed board (%s, %s) holds 0 entries, and no other probed board"
-              % (site_seed, deployed))
-        print("  holds any either. As of this timestamp, nobody has submitted a score")
-        print("  that this probe can see. That is an observation, not an assumption.")
+        print("  Deployed board (%s, %s) holds 0 entries, and every other populated board"
+              % (site_seed, epoch))
+        print("  is already acknowledged. Nobody has submitted to the current board yet.")
+
+    if known:
+        # Loud every run, green every run. Pip's ruling: these stay archived permanently,
+        # so failing on them would leave the guard red forever and train everyone to
+        # ignore red -- the exact failure mode this repo keeps getting bitten by.
+        names = sorted({n for r in known for n in (r.get("player_names") or [])})
+        print()
+        print("  ARCHIVED ANOMALY (acknowledged history, not a regression):")
+        print("    %d entr%s across %d board(s), %d distinct player name(s)."
+              % (total_known, "y" if total_known == 1 else "ies", len(known), len(names)))
+        print("    players: %s" % ", ".join(names))
+        print("    see %s" % PRESERVED_DIR.relative_to(PUBLIC))
 
     record = {
         "_comment": "Read-only observation of the live score API. Not a score store. "
-                    "Written by scripts/check-board-liveness.py.",
+                    "Written by scripts/check-board-liveness.py. The board key is "
+                    "(seed, ladder_epoch); the build version is NOT part of it.",
         "checked_at": now_iso(),
         "api": SCORE_API,
         "verdict": verdict,
-        "deployed": {"version": deployed, "seed": site_seed,
-                     "entries": deployed_count},
-        "published_snapshot": {"game_version": snap_ver, "entries": snap_entries},
-        "probe": {"seeds": seeds, "versions": versions,
-                  "boards_probed": len(results), "unreachable": errors,
-                  "note": ver_note},
-        "orphaned_boards": orphaned,
-        "orphaned_entries_total": sum(r["entries"] for r in orphaned),
+        "board_key": {
+            "seed": site_seed,
+            "ladder_epoch": epoch,
+            "ladder_epoch_source": epoch_source,
+            "epoch_known": bool(epoch),
+            "note": "epoch_known=false means this site cannot confirm which board is "
+                    "current. It is NOT a mismatch finding.",
+        },
+        "deployed_build": build,
+        "deployed_board": deployed_board,
+        "probe": {"seeds": seeds, "versions": versions, "boards_probed": len(results),
+                  "unreachable": errors, "notes": notes},
+        "archived_orphans": {
+            "acknowledged": True,
+            "boards": known,
+            "entries_total": total_known,
+            "player_names": sorted({n for r in known for n in (r.get("player_names") or [])}),
+            "note": "Pre-epoch anomaly archive. Permanent by Pip's ruling -- reported "
+                    "every run, never a CI failure.",
+        },
+        "new_orphans": {"boards": unknown, "entries_total": total_unknown},
         "boards": results,
     }
 

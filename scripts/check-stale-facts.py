@@ -43,7 +43,11 @@ SCAN_GLOBS = ["public/**/*.html", "public/**/*.json", "public/**/*.js",
               "scripts/**/*.py", "scripts/**/*.js", ".github/workflows/*.yml"]
 
 SKIP_PARTS = {"node_modules", ".git", "copy-baseline", "events", "backups",
-              "archive", "__pycache__"}
+              "archive", "__pycache__",
+              # A dated capture archive. Old version literals in there are the POINT --
+              # they are frozen evidence, never presented as current, and re-stamping
+              # them would fabricate history. Flagging them forever is pure noise.
+              "preserved"}
 
 # Files whose CONTENT is a record of other versions. Flagging these is a guaranteed
 # false positive that recurs on every regeneration, and a permanent block of known-noise

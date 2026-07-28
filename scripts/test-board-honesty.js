@@ -87,133 +87,201 @@ async function run(data, fetchMap, { status } = {}) {
   return { dom, api, text: dom.banner._visible, shown: dom.banner.style.display };
 }
 
-const LIVENESS_ORPHANED = {
-  checked_at: '2026-07-28T20:45:33+00:00',
-  verdict: 'orphaned-scores',
-  orphaned_entries_total: 23,
-  orphaned_boards: [
-    { seed: 'weekly-2026-w0', version: 'v0.11.0', entries: 20, players: 3 },
-    { seed: 'weekly-2026-w0', version: 'v0.12.0', entries: 3, players: 2 },
+// The archive: acknowledged history, permanent by Pip's ruling. Reported, never failed on.
+const ARCHIVE = {
+  acknowledged: true,
+  entries_total: 27,
+  player_names: ['AI Safety Lab', 'CogDerp', 'Cognitive Development',
+    'Division of Intelligent Agents', 'Hamthropic', 'Laboratory of Autonomous Systems'],
+  boards: [
+    { seed: 'weekly-2026-w0', version: 'v0.11.0', entries: 20 },
+    { seed: 'weekly-2026-w0', version: 'v0.12.0', entries: 3 },
+    { seed: 'weekly-2026-w30', version: 'L2', entries: 4 },
   ],
 };
-const V13 = { latest_release: { version: 'v0.13.1' } };
+const NO_NEW = { boards: [], entries_total: 0 };
+const AT = '2026-07-29T09:30:00+00:00';
+
+// Today's real state: boards visible, current epoch unknowable.
+const LIVENESS_EPOCH_UNKNOWN = {
+  checked_at: AT, verdict: 'epoch-unknown',
+  board_key: { seed: 'weekly_2026_W30_18a08709', ladder_epoch: null, epoch_known: false },
+  archived_orphans: ARCHIVE, new_orphans: NO_NEW,
+};
+// After the artifact exists and the board agrees. THE regression case.
+const LIVENESS_LIVE = {
+  checked_at: AT, verdict: 'live',
+  board_key: { seed: 's', ladder_epoch: 'L3', epoch_known: true },
+  deployed_board: { entries: 12 },
+  archived_orphans: ARCHIVE, new_orphans: NO_NEW,
+};
+const BOARD_L3 = { data_status: 'live', entries: [{}], meta: { game_version: 'L3' } };
 const BOARD_V11 = { data_status: 'pre-launch', entries: [], meta: { game_version: 'v0.11.0' } };
 
 (async () => {
-  // 1. The live situation: board stamped v0.11.0, deployed v0.13.1, scores orphaned.
-  console.log('1. Board v0.11.0 vs deployed v0.13.1, 23 orphaned entries');
-  let r = await run(BOARD_V11, {
-    '/data/version.json': V13,
-    'board-liveness.json': LIVENESS_ORPHANED,
+  // 1. THE REGRESSION THAT MATTERS. The board key is the ladder epoch, not the build.
+  //    Board L3, live epoch L3, build v0.13.2 -- correct data. Any "version mismatch"
+  //    here would fire permanently from the next ladder bump onward and burn the alarm.
+  console.log('1. Board L3 + epoch L3 + build v0.13.2 -> NO mismatch claim');
+  const r1 = await run(BOARD_L3, {
+    '/data/version.json': { latest_release: { version: 'v0.13.2' } },
+    'board-liveness.json': LIVENESS_LIVE,
   });
-  check(r.shown === 'block', 'banner is displayed');
-  check(r.text.includes('v0.11.0') && r.text.includes('v0.13.1'), 'names BOTH versions');
-  check(/Version mismatch/i.test(r.text), 'calls it a version mismatch plainly');
-  check(r.text.includes('23'), 'reports the orphaned entry COUNT, not just "empty"');
-  check(/People are playing/i.test(r.text), 'tells the visitor people are playing');
-  // The page may mention "nobody has played" only to REFUSE that inference. What must
-  // never appear is a bare assertion of it.
-  check(/does not by itself mean nobody has played/i.test(r.text),
-    'explicitly refuses the "nobody played" inference');
-  check(!/\b(no one|nobody) (has )?played\b(?!.{0,40}(not|does not))/i.test(
-    r.text.replace(/does not by itself mean nobody has played/gi, '')),
-    'makes no bare claim that nobody played');
+  check(!/mismatch/i.test(r1.text),
+    'does NOT claim a mismatch when board and epoch agree but the build differs');
+  check(!/not the current season/i.test(r1.text), 'does not claim the wrong season');
+  check(!r1.text.includes('v0.13.2'),
+    'does not put the build version into a board-key claim at all');
 
-  // 2. Genuinely empty must read differently from orphaned. If these two produced the
-  //    same page, the whole exercise would be pointless.
-  console.log('2. Genuinely empty board');
+  // 2. Today's honest state: the epoch cannot be derived.
+  console.log('2. Epoch unknown -> "cannot confirm", never "mismatch"');
   const r2 = await run(BOARD_V11, {
-    '/data/version.json': { latest_release: { version: 'v0.11.0' } },
+    '/data/version.json': { latest_release: { version: 'v0.13.1' } },
+    'board-liveness.json': LIVENESS_EPOCH_UNKNOWN,
+  });
+  check(r2.shown === 'block', 'banner is displayed');
+  check(/Cannot confirm this is the current board/i.test(r2.text), 'says it cannot confirm');
+  // The page may use the word "mismatch" ONLY to disclaim one. What must never survive is
+  // a positive claim, so strip the disclaimer and require nothing to be left.
+  check(/not claiming a mismatch/i.test(r2.text), 'explicitly disclaims a mismatch finding');
+  check(!/mismatch/i.test(r2.text.replace(/It is not claiming a mismatch[^.]*\./i, '')),
+    'makes no positive mismatch claim it cannot demonstrate');
+  check(/does not know|genuinely does not know/i.test(r2.text), 'admits not knowing');
+  check(/does not by itself mean nobody has played/i.test(r2.text),
+    'still refuses the "nobody played" inference');
+
+  // 3. Epoch known AND different -> now a mismatch claim IS earned.
+  console.log('3. Board L2 vs live epoch L3 -> names both, plainly');
+  const r3 = await run({ ...BOARD_V11, meta: { game_version: 'L2' } }, {
+    '/data/version.json': { latest_release: { version: 'v0.13.2' } },
     'board-liveness.json': {
-      checked_at: '2026-07-28T20:45:33+00:00', verdict: 'genuinely-empty',
-      orphaned_entries_total: 0, orphaned_boards: [],
+      ...LIVENESS_LIVE, verdict: 'genuinely-empty',
+      board_key: { seed: 's', ladder_epoch: 'L3', epoch_known: true },
     },
   });
-  check(/really is empty|no scores had been submitted/i.test(r2.text),
-    'says the board really is empty, with a timestamp');
-  check(r2.text !== r.text, 'empty and orphaned render DIFFERENTLY');
+  check(/not the current season/i.test(r3.text), 'states the board is not the live season');
+  check(r3.text.includes('L2') && r3.text.includes('L3'), 'names BOTH board keys');
+  check(!r3.text.includes('v0.13.2'), 'still keeps the build out of the board-key claim');
 
-  // 3. API unreachable -> unknown, never zero.
-  console.log('3. Score API unreachable at last check');
-  const r3 = await run(BOARD_V11, {
-    '/data/version.json': V13,
+  // 4. The permanent archive is reported to the visitor, with counts and people.
+  console.log('4. Archived anomaly is surfaced with counts');
+  check(r2.text.includes('27'), 'reports the archived entry count');
+  check(/Laboratory of Autonomous Systems/.test(r2.text), 'names the players');
+  check(/re-stamped/i.test(r2.text), 'rules out re-stamping onto a newer board');
+
+  // 5. A NEW orphan is a different, louder thing than the archive.
+  console.log('5. New unacknowledged orphan -> people are playing RIGHT NOW');
+  const r5 = await run(BOARD_L3, {
+    '/data/version.json': { latest_release: { version: 'v0.13.2' } },
     'board-liveness.json': {
-      checked_at: '2026-07-28T20:45:33+00:00', verdict: 'unreachable',
-      orphaned_entries_total: 0, orphaned_boards: [],
+      checked_at: AT, verdict: 'orphaned-scores',
+      board_key: { seed: 's', ladder_epoch: 'L3', epoch_known: true },
+      archived_orphans: ARCHIVE,
+      new_orphans: { entries_total: 5, boards: [{ seed: 's', version: 'L4', entries: 5 }] },
     },
   });
-  check(/unknown, not zero/i.test(r3.text), 'unreachable reads as UNKNOWN, not zero');
+  check(/playing right now/i.test(r5.text), 'flags a live incident, not history');
+  check(r5.text.includes('5') && r5.text.includes('L4'), 'names the new orphan count and board');
+  check(r5.text.includes('27'), 'still reports the archive alongside it');
 
-  // 4. No live check on record -> must not imply the board is truly empty.
-  console.log('4. board-liveness.json missing');
-  const r4 = await run(BOARD_V11, { '/data/version.json': V13, 'board-liveness.json': null });
-  check(/No live check on record/i.test(r4.text), 'admits nothing has been verified');
-  check(/not evidence/i.test(r4.text), 'says an empty board is not evidence of no scores');
+  // 6. Genuinely empty must read differently from every other state.
+  console.log('6. Genuinely empty board');
+  const r6 = await run(BOARD_V11, {
+    '/data/version.json': { latest_release: { version: 'v0.13.1' } },
+    'board-liveness.json': {
+      checked_at: AT, verdict: 'genuinely-empty',
+      board_key: { seed: 's', ladder_epoch: 'L3', epoch_known: true },
+      archived_orphans: { ...ARCHIVE, entries_total: 0, boards: [], player_names: [] },
+      new_orphans: NO_NEW,
+    },
+  });
+  check(/really is empty/i.test(r6.text), 'says the board really is empty, with a timestamp');
+  check(r6.text !== r2.text && r6.text !== r5.text, 'renders differently from unknown/orphaned');
 
-  // 5. version.json unreadable -> must not silently assume the versions agree.
-  console.log('5. version.json unreadable');
-  const r5 = await run(BOARD_V11, { '/data/version.json': null, 'board-liveness.json': LIVENESS_ORPHANED });
-  check(/Cannot verify the version/i.test(r5.text), 'says it cannot verify the version');
-  // "matches" may appear only inside "cannot confirm ... matches". A positive claim of
-  // agreement, having read nothing, is the failure mode.
-  check(/cannot confirm/i.test(r5.text), 'frames it as unconfirmed, not agreed');
-  check(!/\b(board|version)\s+matches\b(?!.{0,60}$)/i.test(
-    r5.text.replace(/cannot confirm[\s\S]*?playing\./i, '')),
-    'never asserts the versions agree');
+  // 7. API unreachable -> unknown, never zero.
+  console.log('7. Score API unreachable at last check');
+  const r7 = await run(BOARD_V11, {
+    '/data/version.json': { latest_release: { version: 'v0.13.1' } },
+    'board-liveness.json': {
+      checked_at: AT, verdict: 'unreachable',
+      board_key: { seed: 's', ladder_epoch: 'L3', epoch_known: true },
+      archived_orphans: ARCHIVE, new_orphans: NO_NEW,
+    },
+  });
+  check(/unknown, not zero/i.test(r7.text), 'unreachable reads as UNKNOWN, not zero');
 
-  // 6. Withheld local files are named with counts.
-  console.log('6. Version-mismatched local seed files are reported with counts');
-  const r6 = await run({
+  // 8. No live check on record -> must not imply the board is truly empty.
+  console.log('8. board-liveness.json missing');
+  const r8 = await run(BOARD_V11, {
+    '/data/version.json': { latest_release: { version: 'v0.13.1' } },
+    'board-liveness.json': null,
+  });
+  check(/No live check on record/i.test(r8.text), 'admits nothing has been verified');
+  check(/not evidence/i.test(r8.text), 'says an empty board is not evidence of no scores');
+  check(!/mismatch/i.test(r8.text), 'claims no mismatch with nothing to compare against');
+
+  // 9. Withheld local files are named with counts. These are BUILD stamps on stored
+  //    files -- a separate concern from the board key, and labelled as such.
+  console.log('9. Withheld local result files are reported with counts');
+  const r9 = await run({
     ...BOARD_V11,
     exclusions: {
       deployed_version: 'v0.13.1', version_mismatched_files: 5,
       version_mismatched_entries: 21, version_mismatched_versions: ['1.0.0'],
     },
-  }, { '/data/version.json': V13, 'board-liveness.json': LIVENESS_ORPHANED });
-  check(r6.text.includes('5') && r6.text.includes('21') && r6.text.includes('1.0.0'),
-    'names file count, entry count and the excluded version');
-  check(/re-stamping would fabricate history/i.test(r6.text), 'rules out re-stamping');
+  }, { '/data/version.json': null, 'board-liveness.json': LIVENESS_EPOCH_UNKNOWN });
+  check(r9.text.includes('5') && r9.text.includes('21') && r9.text.includes('1.0.0'),
+    'names file count, entry count and the excluded build');
+  check(/re-stamping would fabricate history/i.test(r9.text), 'rules out re-stamping');
 
-  // 7. Data-file strings are escaped, not injected as markup.
-  console.log('7. Version strings from data files are escaped');
-  const r7 = await run(
+  // 10. Data-file strings are escaped, not injected as markup.
+  console.log('10. Strings from data files are escaped');
+  const r10 = await run(
     { data_status: 'pre-launch', entries: [], meta: { game_version: '<img src=x onerror=alert(1)>' } },
-    { '/data/version.json': V13, 'board-liveness.json': LIVENESS_ORPHANED });
-  check(!r7.text.includes('<img src=x'), 'markup from a data file is escaped');
-  check(r7.text.includes('&lt;img'), 'escaped form is present');
+    { '/data/version.json': null, 'board-liveness.json': {
+      ...LIVENESS_LIVE, verdict: 'genuinely-empty',
+      board_key: { seed: 's', ladder_epoch: 'L3', epoch_known: true } } });
+  check(!r10.text.includes('<img src=x'), 'markup from a data file is escaped');
+  check(r10.text.includes('&lt;img'), 'escaped form is present');
 
-  // 8. Idempotence: the seed/week filter re-runs the loader.
-  console.log('8. Re-running does not stack duplicate notices');
+  // 11. Idempotence: the seed/week filter re-runs the loader.
+  console.log('11. Re-running does not stack duplicate notices');
   const dom = makeDOM();
   const api = new Function('document', 'fetch',
     srcEscape + '\n' + srcApply + '\n' + srcHonesty +
     '\nreturn { applyDataStatus, applyBoardHonesty };')(
-    dom.document, makeFetch({ '/data/version.json': V13, 'board-liveness.json': LIVENESS_ORPHANED }));
+    dom.document, makeFetch({ 'board-liveness.json': LIVENESS_EPOCH_UNKNOWN }));
   api.applyDataStatus(BOARD_V11);
   await api.applyBoardHonesty(BOARD_V11);
-  const once = (dom.banner._visible.match(/Version mismatch/g) || []).length;
+  const once = (dom.banner._visible.match(/Cannot confirm/g) || []).length;
   await api.applyBoardHonesty(BOARD_V11);
-  const twice = (dom.banner._visible.match(/Version mismatch/g) || []).length;
+  const twice = (dom.banner._visible.match(/Cannot confirm/g) || []).length;
   check(once === 1 && twice === 1, `notice rendered once, still once after reload (${once}/${twice})`);
 
   // ---- source-level contracts (the dead-code bug) ----------------------------
-  console.log('9. The live loader actually calls the honesty code');
+  console.log('12. The live loader actually calls the honesty code');
   const loader = src.match(/async function loadLeaderboardWithFiltering\(\) \{[\s\S]*?\n    \}/);
   check(!!loader, 'loadLeaderboardWithFiltering() found');
   check(/applyDataStatus\(/.test(loader[0]),
     'live loader calls applyDataStatus (it did NOT before -- banner never rendered)');
   check(/applyBoardHonesty\(/.test(loader[0]), 'live loader calls applyBoardHonesty');
 
-  console.log('10. No second, dead loader reintroduced');
+  console.log('13. No second, dead loader reintroduced');
   const loaders = (src.match(/async function loadLeaderboard\b/g) || []).length;
   check(loaders === 0, 'the dead loadLeaderboard() decoy is gone');
   check(/leaderboard-table'\)\.style\.display =\s*\n?\s*\(filteredData\.entries/.test(loader[0]),
     'empty table is not revealed as if it were a real ranking');
 
-  console.log('11. No version literal is hardcoded in the banner copy');
+  console.log('14. Nothing about the board key is hardcoded');
   const banners = srcApply + srcHonesty;
-  check(!/v0\.\d+\.\d+/.test(banners),
-    'banner text contains no hardcoded version (it must read both at run time)');
+  check(!/v0\.\d+\.\d+/.test(banners), 'no build-version literal in the banner code');
+  check(!/\bL\d+\b/.test(banners.replace(/\/\/[^\n]*/g, '')),
+    'no ladder-epoch literal in the banner code (it must be read at run time)');
+  // The build version must not reach the board-key comparison by ANY route. Reading
+  // version.json here is how the invalidated comparison got written the first time.
+  check(!/version\.json/.test(srcHonesty),
+    'applyBoardHonesty does not read version.json -- the build is not part of the board key');
+  check(!/latest_release/.test(srcHonesty), 'does not reach for latest_release');
 
   console.log('');
   if (failures) { console.log(`FAIL: ${failures} check(s) failed`); process.exit(1); }

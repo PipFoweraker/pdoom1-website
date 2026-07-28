@@ -218,11 +218,35 @@ def check_weekly_league():
 
 
 def deployed_version():
+    """The deployed BUILD. Report-only -- it is not part of the board key."""
     try:
         ver = load_json(PUBLIC / "data" / "version.json")
         return (ver.get("latest_release") or {}).get("version")
     except Exception:
         return None
+
+
+def load_json_or_none(path):
+    try:
+        return load_json(path)
+    except Exception:
+        return None
+
+
+# Shape tests for the version half of a board key. Both shapes are legitimate: epoch is
+# current ("L2"), build is frozen history from before the build-vs-ladder split.
+EPOCH_RE = re.compile(r"^L\d+$")
+BUILD_RE = re.compile(r"^v?\d+\.\d+\.\d+$")
+
+
+def board_key_shape(v):
+    if not v:
+        return "missing"
+    if EPOCH_RE.match(str(v)):
+        return "epoch"
+    if BUILD_RE.match(str(v)):
+        return "build"
+    return "unrecognised"
 
 
 def check_published_board():
@@ -244,25 +268,34 @@ def check_published_board():
         add("board:present", FAIL, f"leaderboard.json is not valid JSON: {e}")
         return
 
-    deployed = deployed_version()
     board_ver = (d.get("meta") or {}).get("game_version")
     n_entries = len(d.get("entries") or [])
     status = d.get("data_status")
 
-    if not deployed:
-        # Absence must never read as agreement. Same trap as version.json's platforms key.
-        add("board:version_drift", WARN,
-            f"version.json has no latest_release.version, so the published board "
-            f"(game_version={board_ver}, {n_entries} entries) cannot be compared to "
-            f"anything -- unrecorded, not verified-matching")
-    elif board_ver and board_ver != deployed:
-        add("board:version_drift", WARN,
-            f"published board is stamped {board_ver} but the deployed game is {deployed}; "
-            f"the board shows {n_entries} entries. A {deployed} client's scores cannot land "
-            f"on a {board_ver} board, so this reads to a visitor exactly like 'nobody is "
-            f"playing'. Do not re-stamp -- that fabricates history.")
-    elif board_ver:
-        add("board:version_drift", OK, f"published board {board_ver} matches deployed")
+    # The board key's version half is the LADDER EPOCH ("L3"), not the build version
+    # (pdoom1 via issue #151, 2026-07-28T23:13). Comparing it to version.json used to
+    # look sensible and is actually wrong: after a ladder bump the two are SUPPOSED to
+    # differ, so that check would have gone WARN forever on correct data. A guard that
+    # always fires is a guard nobody reads.
+    live = load_json_or_none(PUBLIC / "leaderboard" / "data" / "board-liveness.json")
+    epoch = ((live or {}).get("board_key") or {}).get("ladder_epoch")
+    shape = board_key_shape(board_ver)
+
+    if not epoch:
+        add("board:key", WARN,
+            f"published board key version is {board_ver!r} ({shape}-shaped, "
+            f"{n_entries} entries), but no artifact tells this site which ladder epoch is "
+            f"current -- so it CANNOT confirm the board it publishes is the board players "
+            f"submit to. Reported as unconfirmed, deliberately NOT as a mismatch. "
+            f"Needs pdoom1 to publish the current epoch.")
+    elif board_ver == epoch:
+        add("board:key", OK, f"published board key matches the current ladder epoch {epoch}")
+    else:
+        add("board:key", WARN,
+            f"published board is keyed {board_ver!r} ({shape}-shaped) but the current "
+            f"ladder epoch is {epoch}; the board shows {n_entries} entries. Scores "
+            f"submitted under {epoch} cannot appear on a {board_ver} board. Do not "
+            f"re-stamp -- that fabricates history.")
 
     # What ingest_scores refused to publish, named. Older snapshots predate this block;
     # its absence is reported as unknown rather than as "nothing was excluded".
@@ -314,9 +347,11 @@ def check_board_liveness():
 
     checked = parse_dt(d.get("checked_at"))
     verdict = d.get("verdict")
-    orphaned = d.get("orphaned_entries_total") or 0
-    boards = d.get("orphaned_boards") or []
-    dep = (d.get("deployed") or {})
+    key = d.get("board_key") or {}
+    arch = d.get("archived_orphans") or {}
+    new = d.get("new_orphans") or {}
+    n_arch = arch.get("entries_total") or 0
+    n_new = new.get("entries_total") or 0
 
     if checked:
         age_h = (datetime.now(timezone.utc) - checked).total_seconds() / 3600
@@ -329,25 +364,51 @@ def check_board_liveness():
     else:
         add("board:liveness_freshness", WARN, "board-liveness.json has no parseable checked_at")
 
+    # The archived anomaly is reported LOUDLY on every run and is never a FAIL. Pip has
+    # ruled those entries stay in the anomaly archive permanently, so failing on them
+    # would leave this check red forever -- and a guard that is always red teaches
+    # everyone to ignore red, which is the failure mode this repo keeps repeating.
+    # Only a NEW, unacknowledged orphan is an emergency.
+    if n_arch:
+        names = arch.get("player_names") or []
+        add("board:archived_anomaly", WARN,
+            f"{n_arch} score entries across {len(arch.get('boards') or [])} board(s) from "
+            f"{len(names)} player(s) sit in the permanent anomaly archive "
+            f"({', '.join(names)}). Acknowledged history, NOT a regression -- reported "
+            f"every run so it stays visible, never failed on.")
+
     if verdict == "orphaned-scores":
         detail = "; ".join(f"({b.get('seed')}, {b.get('version')}): {b.get('entries')} entries"
-                           for b in boards)
+                           for b in (new.get("boards") or []))
         add("board:liveness", FAIL,
-            f"{orphaned} score entries exist on the live API on {len(boards)} board(s) no "
-            f"visitor can see. Deployed board ({dep.get('seed')}, {dep.get('version')}) holds "
-            f"{dep.get('entries')}. Orphaned: {detail}. Scores are being recorded and lost to "
-            f"the site -- the board key (seed, game_version) does not match what clients submit.")
+            f"NEW orphaned board(s): {n_new} score entries on {len(new.get('boards') or [])} "
+            f"board(s) that are NOT in the anomaly archive. Scores are being lost RIGHT NOW. "
+            f"{detail}. The board key is (seed, ladder_epoch). Do not re-stamp.")
+    elif verdict == "unclassifiable":
+        add("board:liveness", FAIL,
+            f"{n_new} entries on orphan board(s), but the anomaly archive is missing so "
+            f"known history cannot be told from a new incident. Restore "
+            f"public/leaderboard/data/preserved/ and re-run.")
+    elif verdict == "epoch-unknown":
+        add("board:liveness", WARN,
+            "no artifact tells this site which ladder epoch is current, so it cannot "
+            "confirm the board it publishes is the board players submit to. Reported as "
+            "UNCONFIRMED, deliberately not as a mismatch -- asserting one here would fire "
+            "permanently once the ladder and the build legitimately diverge.")
     elif verdict == "unreachable":
         add("board:liveness", WARN,
             "the score API could not be reached at the last check -- board state is UNKNOWN, "
             "not empty")
     elif verdict == "genuinely-empty":
         add("board:liveness", OK,
-            f"live API checked: deployed board ({dep.get('seed')}, {dep.get('version')}) and "
-            f"all probed boards hold 0 entries -- genuinely empty, not misrouted")
+            f"live API checked: deployed board ({key.get('seed')}, {key.get('ladder_epoch')}) "
+            f"holds 0 entries and every other populated board is acknowledged -- genuinely "
+            f"empty, not misrouted")
     elif verdict == "live":
+        dep = d.get("deployed_board") or {}
         add("board:liveness", OK,
-            f"deployed board ({dep.get('seed')}, {dep.get('version')}) holds {dep.get('entries')} entries")
+            f"deployed board ({key.get('seed')}, {key.get('ladder_epoch')}) holds "
+            f"{dep.get('entries')} entries")
     else:
         add("board:liveness", WARN, f"unrecognised verdict {verdict!r} in board-liveness.json")
 

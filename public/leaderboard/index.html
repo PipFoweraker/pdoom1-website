@@ -836,11 +836,21 @@
     // Board honesty: a visitor must never see an empty board that silently means
     // "the scores went somewhere else".
     //
-    // A board is keyed by (seed, game_version) -- pdoom1 PR #679. If the key this page
-    // publishes is not the key a player's client submits to, their run is recorded and
-    // is invisible here, and neither they nor we get an error. "0 entries" therefore has
-    // at least two very different meanings, and this function's whole job is to stop the
-    // page presenting them as if they were one.
+    // A board is keyed by (seed, LADDER EPOCH). If the key this page publishes is not the
+    // key a player's client submits to, their run is recorded and is invisible here, and
+    // neither they nor we get an error. "0 entries" therefore has at least two very
+    // different meanings, and this function's whole job is to stop the page presenting
+    // them as if they were one.
+    //
+    // The epoch is NOT the build version. GameConfig.get_board_version() returns
+    // "L" + LADDER_VERSION, so the client sends "L3", never "v0.13.2" (pdoom1, via
+    // issue #151, 2026-07-28). This page therefore must NOT compare the board key against
+    // version.json: after a ladder bump the two are SUPPOSED to differ, and a page built
+    // that way would shout "version mismatch" permanently at correct data. Being loudly
+    // wrong is worse than being quietly wrong, because it spends the alarm.
+    //
+    // The website has no artifact naming the current epoch yet. Where it cannot be
+    // derived, this says "cannot confirm" -- an admission, never an accusation.
     //
     // Both inputs are same-origin static files. The page does NOT call the score API at
     // run time: scripts/check-board-liveness.py does that read-only probe and records the
@@ -859,65 +869,85 @@
         } catch (e) { return null; }
       };
 
-      const [versionDoc, liveness] = await Promise.all([
-        readJSON('/data/version.json'),
-        readJSON('data/board-liveness.json'),
-      ]);
+      const liveness = await readJSON('data/board-liveness.json');
 
-      const deployed = versionDoc && versionDoc.latest_release && versionDoc.latest_release.version;
       const boardVersion = data && data.meta && data.meta.game_version;
+      const key = (liveness && liveness.board_key) || {};
+      const epoch = key.ladder_epoch;
       const notes = [];
 
-      // 1. Key mismatch between what this page publishes and what the site says is current.
-      if (deployed && boardVersion && deployed !== boardVersion) {
+      // 1. Is the board this page publishes the board players submit to?
+      //    Three answers, and "cannot confirm" is a real one -- not a soft version of "no".
+      if (!liveness) {
         notes.push(
-          `<strong>Version mismatch.</strong> This board was last published for ` +
-          `<code>${escapeHTML(boardVersion)}</code>, but the current release is ` +
-          `<code>${escapeHTML(deployed)}</code>. Scores are stored per ` +
-          `(seed, version), so runs on <code>${escapeHTML(deployed)}</code> do not appear ` +
-          `on a <code>${escapeHTML(boardVersion)}</code> board.`
+          `<strong>No live check on record.</strong> Nothing has verified this board ` +
+          `against the score API, so an empty board here is not evidence that no scores exist.`
         );
-      } else if (!deployed) {
+      } else if (!key.epoch_known) {
         notes.push(
-          `<strong>Cannot verify the version.</strong> The site could not read the current ` +
-          `release number, so this page cannot confirm the board matches the game you are playing.`
+          `<strong>Cannot confirm this is the current board.</strong> Scores are grouped by ` +
+          `season (a "ladder epoch"), and nothing yet tells this site which season is live. ` +
+          `So this page cannot promise that a run you finish today would show up here. ` +
+          `It is not claiming a mismatch either &mdash; it genuinely does not know.`
+        );
+      } else if (boardVersion && epoch && boardVersion !== epoch) {
+        notes.push(
+          `<strong>This board is not the current season.</strong> It is keyed ` +
+          `<code>${escapeHTML(boardVersion)}</code>, and the live season is ` +
+          `<code>${escapeHTML(epoch)}</code>. Runs submitted now go to ` +
+          `<code>${escapeHTML(epoch)}</code> and will not appear on this board.`
         );
       }
 
       // 2. What the local files refused to publish, and why -- named, with counts.
+      //    These are BUILD stamps on stored result files, a separate thing from the board
+      //    key; they gate what may be republished, not which board a score lands on.
       const ex = data && data.exclusions;
       if (ex && ex.version_mismatched_files > 0) {
         const vers = (ex.version_mismatched_versions || []).map(escapeHTML).join(', ');
         notes.push(
           `${ex.version_mismatched_files} stored result file(s) holding ` +
           `${ex.version_mismatched_entries} entr${ex.version_mismatched_entries === 1 ? 'y' : 'ies'} ` +
-          `were withheld: they are stamped ${vers || 'an unrecorded version'} and the ` +
-          `deployed version is <code>${escapeHTML(ex.deployed_version || deployed || '?')}</code>. ` +
+          `were withheld: they are stamped ${vers || 'an unrecorded build'} and the ` +
+          `deployed build is <code>${escapeHTML(ex.deployed_version || '?')}</code>. ` +
           `They are not deleted and not re-stamped &mdash; re-stamping would fabricate history.`
         );
       }
 
-      // 3. The live check. This is the part that separates "nobody played" from
-      //    "scores landed on a board nobody reads".
-      if (!liveness || !liveness.checked_at) {
+      // 3. The permanent anomaly archive. These players really did finish these runs, and
+      //    saying so is the difference between an honest gap and a silent one.
+      const arch = (liveness && liveness.archived_orphans) || {};
+      if (arch.entries_total > 0) {
+        const names = (arch.player_names || []).map(escapeHTML).join(', ');
         notes.push(
-          `<strong>No live check on record.</strong> Nothing has verified against the score ` +
-          `API, so an empty board here is not evidence that no scores exist.`
+          `<strong>${arch.entries_total} earlier runs are preserved but not shown here.</strong> ` +
+          `They were submitted by ${(arch.player_names || []).length} player(s) ` +
+          `(${names}) before the current season scheme existed, so they sit on boards this ` +
+          `page does not publish. They are kept exactly as recorded, and deliberately not ` +
+          `re-stamped onto a newer board &mdash; that would fabricate history.`
         );
-      } else {
+      }
+
+      // 4. The live check. This is the part that separates "nobody played" from
+      //    "scores landed on a board nobody reads".
+      if (liveness && liveness.checked_at) {
         const when = new Date(liveness.checked_at);
         const stamp = isNaN(when) ? escapeHTML(liveness.checked_at) : when.toLocaleString();
-        const orphaned = liveness.orphaned_entries_total || 0;
-        if (liveness.verdict === 'orphaned-scores' && orphaned > 0) {
-          const boards = (liveness.orphaned_boards || [])
+        const newOrphans = (liveness.new_orphans && liveness.new_orphans.entries_total) || 0;
+        if (liveness.verdict === 'orphaned-scores' && newOrphans > 0) {
+          const boards = ((liveness.new_orphans || {}).boards || [])
             .map(b => `<code>${escapeHTML(String(b.version))}</code> (${b.entries})`)
             .join(', ');
           notes.push(
-            `<strong>People are playing, and their scores are not shown here.</strong> ` +
-            `As of ${stamp}, the score API held ${orphaned} recorded ` +
-            `entr${orphaned === 1 ? 'y' : 'ies'} on ${liveness.orphaned_boards.length} board(s) ` +
-            `this page does not publish &mdash; ${boards}. Those runs were saved. This page ` +
-            `cannot currently show them.`
+            `<strong>People are playing right now, and their scores are not shown here.</strong> ` +
+            `As of ${stamp}, the score API held ${newOrphans} recorded ` +
+            `entr${newOrphans === 1 ? 'y' : 'ies'} on board(s) this page does not publish ` +
+            `&mdash; ${boards}. Those runs were saved. This page cannot currently show them.`
+          );
+        } else if (liveness.verdict === 'unclassifiable') {
+          notes.push(
+            `<strong>Board state could not be classified</strong> at the last check (${stamp}). ` +
+            `Treat anything on this page as unverified.`
           );
         } else if (liveness.verdict === 'unreachable') {
           notes.push(
@@ -926,9 +956,13 @@
           );
         } else if (liveness.verdict === 'genuinely-empty') {
           notes.push(
-            `Checked against the live score API at ${stamp}: no scores had been submitted ` +
-            `to any known board. This one really is empty rather than misrouted.`
+            `Checked against the live score API at ${stamp}: nobody has submitted a score ` +
+            `to the current board yet. This one really is empty rather than misrouted.`
           );
+        } else if (liveness.verdict === 'epoch-unknown') {
+          // The "cannot confirm" case already spoke above; here we only date it, so the
+          // visitor knows the admission is current rather than stale.
+          notes.push(`Last checked against the live score API at ${stamp}.`);
         }
       }
 
