@@ -1,6 +1,33 @@
 {
   "posts": [
     {
+      "filename": "2026-07-30-issue-1-turns-one.md",
+      "title": "Issue #1 turns one",
+      "date": "2026-07-30",
+      "tags": [
+        "anniversary",
+        "milestone",
+        "process",
+        "dev-notes"
+      ],
+      "summary": "The first issue ever filed on p(Doom)1 - 'Text overflows UI elements on several screens', 2025-07-30 - turns one. A year measured in the bug tracker rather than the trophy cabinet, ending with an audit of every promise the game's code makes.",
+      "commit": "",
+      "featured": false
+    },
+    {
+      "filename": "2026-07-28-this-post-has-a-shelf-life.md",
+      "title": "This post has a shelf life",
+      "date": "2026-07-28",
+      "tags": [
+        "process",
+        "honesty",
+        "dev-notes"
+      ],
+      "summary": "This week's development cadence, reported as a dated decision (2026-07-27) rather than a forward promise - and where to check for yourself whether it held.",
+      "commit": "",
+      "featured": false
+    },
+    {
       "filename": "2026-07-15-ui-before-snapshot.md",
       "title": "Where the site stands, before the refresh",
       "date": "2026-07-15",

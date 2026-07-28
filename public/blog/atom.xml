@@ -4,8 +4,29 @@
   <link href="https://pdoom1.com/blog/" />
   <link href="https://pdoom1.com/blog/atom.xml" rel="self" />
   <id>urn:pdoom1:blog</id>
-  <updated>2026-07-15T12:00:00Z</updated>
+  <updated>2026-07-30T12:00:00Z</updated>
   <subtitle>Development notes from p(Doom)1 - a satirical strategy game about managing an AI safety lab.</subtitle>
+  <entry>
+    <title>Issue #1 turns one</title>
+    <link href="https://pdoom1.com/blog/post.html?p=2026-07-30-issue-1-turns-one.md" />
+    <id>urn:pdoom1:blog:2026-07-30-issue-1-turns-one.md</id>
+    <updated>2026-07-30T12:00:00Z</updated>
+    <summary>The first issue ever filed on p(Doom)1 - 'Text overflows UI elements on several screens', 2025-07-30 - turns one. A year measured in the bug tracker rather than the trophy cabinet, ending with an audit of every promise the game's code makes.</summary>
+    <category term="anniversary" />
+    <category term="milestone" />
+    <category term="process" />
+    <category term="dev-notes" />
+  </entry>
+  <entry>
+    <title>This post has a shelf life</title>
+    <link href="https://pdoom1.com/blog/post.html?p=2026-07-28-this-post-has-a-shelf-life.md" />
+    <id>urn:pdoom1:blog:2026-07-28-this-post-has-a-shelf-life.md</id>
+    <updated>2026-07-28T12:00:00Z</updated>
+    <summary>This week's development cadence, reported as a dated decision (2026-07-27) rather than a forward promise - and where to check for yourself whether it held.</summary>
+    <category term="process" />
+    <category term="honesty" />
+    <category term="dev-notes" />
+  </entry>
   <entry>
     <title>Where the site stands, before the refresh</title>
     <link href="https://pdoom1.com/blog/post.html?p=2026-07-15-ui-before-snapshot.md" />

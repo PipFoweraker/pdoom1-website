@@ -5,8 +5,29 @@
     <link>https://pdoom1.com/blog/</link>
     <description>Development notes from p(Doom)1 - a satirical strategy game about managing an AI safety lab.</description>
     <language>en-AU</language>
-    <lastBuildDate>Wed, 15 Jul 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 30 Jul 2026 12:00:00 +0000</lastBuildDate>
     <atom:link href="https://pdoom1.com/blog/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Issue #1 turns one</title>
+      <link>https://pdoom1.com/blog/post.html?p=2026-07-30-issue-1-turns-one.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2026-07-30-issue-1-turns-one.md</guid>
+      <pubDate>Thu, 30 Jul 2026 12:00:00 +0000</pubDate>
+      <description>The first issue ever filed on p(Doom)1 - 'Text overflows UI elements on several screens', 2025-07-30 - turns one. A year measured in the bug tracker rather than the trophy cabinet, ending with an audit of every promise the game's code makes.</description>
+      <category>anniversary</category>
+      <category>milestone</category>
+      <category>process</category>
+      <category>dev-notes</category>
+    </item>
+    <item>
+      <title>This post has a shelf life</title>
+      <link>https://pdoom1.com/blog/post.html?p=2026-07-28-this-post-has-a-shelf-life.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2026-07-28-this-post-has-a-shelf-life.md</guid>
+      <pubDate>Tue, 28 Jul 2026 12:00:00 +0000</pubDate>
+      <description>This week's development cadence, reported as a dated decision (2026-07-27) rather than a forward promise - and where to check for yourself whether it held.</description>
+      <category>process</category>
+      <category>honesty</category>
+      <category>dev-notes</category>
+    </item>
     <item>
       <title>Where the site stands, before the refresh</title>
       <link>https://pdoom1.com/blog/post.html?p=2026-07-15-ui-before-snapshot.md</link>
