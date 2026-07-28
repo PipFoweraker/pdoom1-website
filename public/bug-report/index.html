@@ -66,52 +66,8 @@
 			z-index: 100;
 		}
 
-		nav {
-			max-width: 1200px;
-			margin: 0 auto;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 0 2rem;
-		}
-
-		.logo-container {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-		}
-
-		.designer-credit {
-			font-size: 0.75rem;
-			color: var(--text-muted);
-			font-weight: normal;
-			margin-bottom: -0.2rem;
-			letter-spacing: 0.5px;
-		}
-
-		.logo {
-			font-size: 1.5rem;
-			font-weight: bold;
-			color: var(--accent-primary);
-			text-decoration: none;
-			text-shadow: 0 0 10px var(--accent-primary);
-		}
-
-		.nav-links {
-			display: flex;
-			gap: 2rem;
-			list-style: none;
-		}
-
-		.nav-links a {
-			color: var(--text-secondary);
-			text-decoration: none;
-			transition: color var(--duration-base) var(--easing);
-		}
-
-		.nav-links a:hover {
-			color: var(--accent-primary);
-		}
+		/* Nav styling lives in navigation.js, scoped to
+		   header[data-nav-injected]. Do not re-add nav rules here. */
 
 		main {
 			max-width: 800px;
@@ -241,17 +197,6 @@
 		}
 
 		@media (max-width: 768px) {
-			nav {
-				flex-direction: column;
-				gap: 1rem;
-			}
-
-			.nav-links {
-				flex-direction: column;
-				gap: 0.5rem;
-				text-align: center;
-			}
-
 			main {
 				padding: 2rem 1rem;
 			}
@@ -270,18 +215,7 @@
 	<a href="#main-content" class="skip-link">Skip to main content</a>
 
 	<header role="banner">
-		<nav role="navigation" aria-label="Main navigation">
-			<div class="logo-container">
-				<div class="designer-credit">Pip Foweraker's</div>
-				<a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
-			</div>
-			<ul class="nav-links" role="menubar">
-				<li role="none"><a href="/#game" role="menuitem">Game</a></li>
-				<li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
-				<li role="none"><a href="/stats/" role="menuitem">Stats</a></li>
-				<li role="none"><a href="/#contact" role="menuitem">Contact</a></li>
-			</ul>
-		</nav>
+		<!-- Navigation loaded by navigation.js -->
 	</header>
 
 	<main id="main-content" role="main">
@@ -535,5 +469,6 @@
 			}
 		});
 	</script>
+	<script src="/assets/js/navigation.js"></script>
 </body>
 </html>

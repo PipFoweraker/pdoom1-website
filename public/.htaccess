@@ -89,6 +89,42 @@ RewriteRule ^changelog(/|/index\.html)?$ /game-changelog/ [R=301,L]
   # HTML: 10 minutes. Long enough to blunt a spike, short enough that a fix
   # pushed mid-event reaches people within the event.
   ExpiresByType text/html                 "access plus 10 minutes"
+
+  # Markdown routes are re-typed to text/plain just below, and the roadmap is
+  # edited often. Without this they inherited DreamHost's default (measured
+  # 2026-07-28: `Cache-Control: max-age=172800`, i.e. two days).
+  ExpiresByType text/plain                "access plus 10 minutes"
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Markdown routes -- TECH_DEBT B8.
+#
+# DreamHost's server-wide mime map types `.md` as `text/markdown`. Measured
+# 2026-07-28: `curl -I https://pdoom1.com/docs/roadmap.md` returns
+# `Content-Type: text/markdown`. No browser RENDERS that type, so it becomes a
+# download: clicking "Roadmap" in the site nav saved a file instead of showing
+# a page. Five routes are reachable this way and all are in the sitemap:
+#   /docs/DEV_NOTES.md  /docs/how-leaderboards-work.md
+#   /docs/pdoom1-open-issues.md  /docs/roadmap.md  /docs/steam-readiness.md
+#
+# Re-typing to text/plain makes every one of them render in the browser. This
+# is a floor, not the destination -- a reader gets raw markdown source, with
+# `##` and pipe tables visible. The proper fix is an HTML surface that renders
+# the markdown, which does NOT exist yet: /blog/post.html's client-side parser
+# handles only links, images, inline code, bold and italic -- no headings, no
+# tables, no fenced code -- and roadmap.md is mostly headings and a table, so
+# reusing it would render worse than plain text. Building that surface is a
+# separate piece of work; it is deliberately not invented here.
+#
+# Content-type is chosen at the SERVER, so this fixes the routes without
+# touching a single .md file (public/docs/roadmap.md's content is owned
+# elsewhere right now) and without forking the content into an HTML copy.
+#
+# text/plain is already in the DEFLATE list above, so these still compress.
+# ---------------------------------------------------------------------------
+<IfModule mod_mime.c>
+  AddType text/plain .md
+  AddCharset UTF-8 .md
 </IfModule>
 
 # ---------------------------------------------------------------------------
