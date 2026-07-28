@@ -1,12 +1,13 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-27T18:46:38.489Z UTC
+Generated: 2026-07-28T00:50:29.663Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 987 | Bureaucratic tells: bodies telegraph doom via procedural anomaly (design, Wed W-block) |  |  | 2026-07-27 19:45:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/987) |
+| 986 | ADR-0015 M-ticket: risk_events re-author + rebalance (20 live fields) + #967 finance fix + political_pressure dead-write |  |  | 2026-07-27 19:45:02 | [link](https://github.com/PipFoweraker/pdoom1/issues/986) |
 | 984 | Half-day workshop: audit mechanics deep-dive (next epoch) -- something amazing under the smell |  |  | 2026-07-27 11:44:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/984) |
 | 980 | Conference away-window: planning-forward allowed, operating-present forbidden (attention drain refinement) |  |  | 2026-07-27 07:25:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/980) |
-| 976 | test_perf_log flake: test_written_line_has_timestamp_and_type_fields order-dependent in full fast-gate runs |  |  | 2026-07-27 06:54:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/976) |
 | 971 | doom.streams.action_* Balance keys absent from defaults.json -- publish_paper alarm + safety_research absorption are zero-priced no-ops |  |  | 2026-07-27 01:19:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/971) |
 | 970 | Six upgrades charge money for effects with zero implementing code (+ hire_ethicist unbacked claim) |  |  | 2026-07-27 01:19:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/970) |
 | 967 | finance_engine desperation_payroll promises '-N doom now' but writes to the clobbered inert sink (silently never fires) |  |  | 2026-07-27 00:53:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/967) |
