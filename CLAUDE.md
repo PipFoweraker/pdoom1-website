@@ -190,6 +190,7 @@ python  scripts/validate_data.py          # data contracts
 python  scripts/check-stale-facts.py      # hardcoded facts that rot
 python  scripts/check-platform-claims.py  # no reachable page claims an unshipped OS
 node    scripts/test-download-resolution.js # download buttons resolve/degrade right
+node    scripts/test-changelog-render.js  # /game-changelog/ derives, never hardcodes
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift
 python  scripts/generate-feeds.py --check # feeds in step with the blog
 node    scripts/test-header-consistency.js
@@ -203,6 +204,32 @@ actual **assets** (a build is either attached or it is not). Pages must not hard
 the field (see `about/index.html`'s `platforms-available` stat). `check-platform-claims.py`
 (also wired to CI via `content-honesty.yml`) fails if a reachable page advertises a
 platform that has no build.
+
+- **`version.json` has TWO writers, and one of them disarms the guard.**
+  `update-version-info.py` (via `auto-update-data.yml`) writes `latest_release.platforms`.
+  `update-game-data.yml` has its own inline Python that rebuilds `version.json` **from
+  scratch without that key**. Both run on ~6h crons, so the field blinks in and out —
+  `git log -S'"platforms"' -- public/data/version.json` shows the two alternating. While
+  it is absent, `check-platform-claims.py` prints `SKIP: version.json has no
+  latest_release.platforms` and **exits 0**, so the honesty guard is silently inert about
+  half the time. A page reading `latest_release.platforms` must therefore treat absence as
+  "unrecorded", never as "nothing shipped". (Found 2026-07-28; not yet fixed.)
+
+## Changelog surfaces — there are three, and only one is live
+- **`/game-changelog/` is the player-facing one.** It is in `navigation.js` ("Updates"),
+  the homepage footer ("Releases"), `/press/` and `/dashboard/`, and in
+  `check-platform-claims.py`'s REACHABLE list. It renders release notes **derived at
+  runtime** from `public/data/version.json` (current release) plus the pdoom1 releases API
+  (history) — no version literal exists in the page. `scripts/test-changelog-render.js`
+  locks that contract down, including the degradation paths.
+- `/website-changelog/` is a *different audience* (site infrastructure), fed by
+  hand-typed `data/website-changes.json`. Not a duplicate; also not maintained.
+- `/changelog/` is orphaned (`noindex` + `Disallow` + 0 inbound links) and its data
+  pipeline is dead — `sync_airtable.py`'s workflow was parked after 1,264 consecutive
+  failures against an Airtable base that does not exist. Disposition is an open owner
+  decision; see `docs/ORPHANED_PAGES_TODO.md`.
+- `public/data/game-changes.json` is now read by nothing (it carries a `_deprecated`
+  note saying so). Kept, not deleted: `rsync --delete`.
 
 ## Automation notes
 - Weekly-league rollover only opens a GitHub issue **on failure**

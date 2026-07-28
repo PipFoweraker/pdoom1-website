@@ -1,4 +1,5 @@
 {
+  "_deprecated": "NOT RENDERED ANYWHERE, AND NOT MAINTAINED. /game-changelog/ used to read this file; as of the change that made that page derive its notes from public/data/version.json and the pdoom1 releases API, nothing reads it. No script or workflow has ever written it -- it was hand-typed, and it froze at the newest entry below while the game went on releasing. Kept (not deleted) because deleting from public/ removes it from production on the next rsync --delete and because it is a correct record of its own era. Do not revive it as a data source: hand-maintained release facts are exactly the rot the derived page exists to prevent.",
   "entries": [
     {
       "version": "0.4.1",
