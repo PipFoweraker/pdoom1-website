@@ -14,10 +14,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -41,10 +44,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -68,10 +74,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -95,10 +104,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -122,10 +134,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -149,10 +164,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -176,10 +194,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -203,10 +224,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -230,10 +254,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -257,10 +284,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -284,10 +314,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -311,10 +344,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -338,10 +374,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -365,10 +404,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -392,10 +434,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -419,10 +464,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -446,10 +494,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -473,10 +524,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -500,10 +554,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -527,10 +584,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -554,10 +614,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -581,10 +644,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -608,10 +674,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -635,10 +704,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -662,10 +734,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -689,10 +764,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -716,10 +794,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -743,10 +824,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -770,10 +854,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -797,10 +884,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -824,10 +914,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -851,10 +944,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -878,10 +974,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -905,10 +1004,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -932,10 +1034,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -959,10 +1064,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -986,10 +1094,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -1013,10 +1124,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -1040,10 +1154,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -1067,10 +1184,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
@@ -1094,10 +1214,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it.",
@@ -1120,10 +1243,13 @@
       "epoch": {
         "id": "pre-regularisation",
         "anomalous": true,
-        "boundary_utc": "2026-07-31T00:00:00Z",
-        "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "boundary_local": "2026-08-07T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-08-06T14:00:00Z",
+        "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
           "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
           "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it.",
           "rollover-off-by-one": "week_id/date range describe the week that was ENDING when the rollover ran, not the week that was starting -- the record is one week behind the competition it claims to represent (docs/TECH_DEBT.md A9, fixed 2026-07-28)."
@@ -1136,18 +1262,20 @@
     "2025_Q4"
   ],
   "epochs": {
-    "boundary_utc": "2026-07-31T00:00:00Z",
+    "boundary_local": "2026-08-07T00:00:00+10:00",
+    "boundary_tz": "Australia/Hobart",
+    "boundary_utc": "2026-08-06T14:00:00Z",
     "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
     "pre-regularisation": {
       "count": 42,
       "anomalous": true,
-      "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result."
+      "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result."
     },
     "regularised": {
       "count": 0,
       "anomalous": false,
-      "reason": "Opened on or after the 2026-07-31 patch-cycle regularisation, by a rollover whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py."
+      "reason": "Opened on or after the 2026-08-07 epoch fork (0.13 -> 0.14, L2 -> L3), by a rollover anchored to Friday 00:00 Australia/Hobart, whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py."
     }
   },
-  "last_updated": "2026-07-28T04:42:52.015045Z"
+  "last_updated": "2026-07-28T19:33:09.193902Z"
 }

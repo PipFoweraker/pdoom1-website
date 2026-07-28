@@ -210,21 +210,40 @@ platform that has no build.
 - Weekly-league rollover only opens a GitHub issue **on failure**
   (`weekly-league-reset.yml`). The old workflow that spammed 35 "success" issues
   was removed 2026-07-14 — don't reintroduce success-issue creation.
-- **The rollover off-by-one is FIXED (2026-07-28, TECH_DEBT A9).** The cron fires
-  Sunday 14:00 UTC — ~10h *before* the week it opens begins — so the run-time →
-  week mapping is now explicit (`league_week_start()`), not derived from `now`.
-  `scripts/test-weekly-league-boundary.py` pins it at exactly Sun 14:00:00 UTC and
-  one minute either side, and runs as the **first** step of the rollover workflow.
-  **Do not "simplify" that back to `datetime.now()`** — and note `datetime.now()`
-  without a tz is *local* time, which on Pip's box is AEST (+10), exactly the size
-  of skew that crosses this boundary.
+- **The league week is anchored to Friday 00:00 `Australia/Hobart`** (Pip,
+  2026-07-28: "Everything is going to be based off Hobart time, AEST"), matching
+  the game's own "Seed — every Fri" cadence in
+  `pdoom1/docs/RELEASE_NOMENCLATURE.md`. The cron is `0 14 * * 4` — **Thursday**
+  14:00 UTC — which is Fri 00:00 Hobart in winter and Fri 01:00 in summer, i.e.
+  always a Friday there and never *before* the week it opens.
+  **`Australia/Hobart` is not a fixed offset:** +10 (AEST) in winter, +11 (AEDT)
+  from October to April. The week is derived with `ZoneInfo`, never an offset, so
+  DST cannot move the answer — only how far into the week the run lands. A
+  hardcoded `+10` is the tempting wrong fix; `league_tz()` raises rather than
+  falling back to one.
+  **`zoneinfo` has no bundled tz database on Windows** — `ZoneInfo("Australia/Hobart")`
+  raises until `pip install tzdata`. It is pinned in `requirements.txt`; without
+  it the league scripts die locally while CI stays green.
+- **The rollover off-by-one is FIXED (2026-07-28, TECH_DEBT A9).** The run-time →
+  week mapping is explicit (`league_week_start()`), never derived from `now`, and
+  the Friday anchor let the old look-ahead go away entirely: the cron fires inside
+  the week it opens, so the week is simply the one containing the run.
+  `scripts/test-weekly-league-boundary.py` (74 assertions) pins the boundary in
+  **both DST states** plus the two DST-spanning weeks, and runs as the **first**
+  step of the rollover workflow. **Do not "simplify" that back to
+  `datetime.now()`** — `datetime.now()` without a tz is *local* time, which on
+  Pip's box is AEST (+10), exactly the size of skew that crosses this boundary.
 - **The league and player pages are retired-and-hidden, not deleted** (Pip,
-  2026-07-28), and everything before the 2026-07-31 patch-cycle cut is labelled
-  **anomalous pre-history** via a machine-readable `epoch` block in the data.
-  First regularised week is **2026_W32**. Before touching any weekly archive,
-  seed leaderboard, or `/league/` + `/players/` page, read
-  `docs/LEAGUE_EPOCH_ANOMALY.md` — it records what each file is, why the `v0.4.1`
-  stamps must NOT be restamped, and where every piece lives.
+  2026-07-28), and everything opened before the **2026-08-07 epoch fork** is
+  labelled **anomalous pre-history** via a machine-readable `epoch` block in the
+  data. The boundary is the fork (first Friday of August: `0.13→0.14`, `L2→L3`),
+  not 31 July — that is the *last* Friday of July, a Seed roll on unchanged rules.
+  First regularised week is **2026_W33** (Fri 2026-08-07). Week ids changed
+  meaning at the 2026-07-30 rollover, so **compare `start_timestamp`, not ids**,
+  across that switch. Before touching any weekly archive, seed leaderboard, or
+  `/league/` + `/players/` page, read `docs/LEAGUE_EPOCH_ANOMALY.md` — it records
+  what each file is, why the `v0.4.1` stamps must NOT be restamped, and where
+  every piece lives.
 - The leaderboard board key is **`(seed, game_version)`** (pdoom1 PR #679). A
   version-stamp mismatch means submitted scores land nowhere, with **no error
   shown to the player** — it looks exactly like "nobody is playing". Suspect this

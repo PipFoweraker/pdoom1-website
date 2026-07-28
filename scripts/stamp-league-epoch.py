@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 """Stamp the ladder-epoch flag onto weekly league records. Idempotent.
 
-Pip's ruling (2026-07-28): the league is retired-and-hidden, not deleted, and
-everything generated before the 2026-07-31 patch-cycle regularisation becomes
-deliberately-labelled **anomalous pre-history** -- visible in the archive as an
-explicit anomaly section, not silently buried. "so the ultra archivists can
-track it down".
+Pip's ruling (2026-07-28, boundary revised 2026-07-29): the league is
+retired-and-hidden, not deleted, and everything opened before the **2026-08-07
+epoch fork** -- the first Friday of August, where the game's minor and ladder
+versions both bump (0.13 -> 0.14, L2 -> L3) -- becomes deliberately-labelled
+**anomalous pre-history**, visible in the archive as an explicit anomaly section
+rather than silently buried. "so the ultra archivists can track it down".
+
+The boundary is the fork, not a tidy date: 2026-07-31 (this file's first
+boundary) is the *last* Friday of July, which by
+pdoom1/docs/RELEASE_NOMENCLATURE.md is a Seed roll on unchanged rules. Anchoring
+there would have started the regularised era one week before a fork.
 
 What this writes: an `epoch` object into every weekly archive file and into
 current.json. What it does NOT touch: entries, scores, seeds, version stamps,
@@ -52,6 +58,13 @@ DEFECT_TEXT = {
         "not the week that was starting -- the record is one week behind the "
         "competition it claims to represent (docs/TECH_DEBT.md A9, fixed 2026-07-28)."
     ),
+    "monday-anchored-utc-week": (
+        "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is "
+        "a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to "
+        "Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two "
+        "days out of phase with the competition it claims to describe, independently of "
+        "the off-by-one below."
+    ),
     "is_current-stuck-true": (
         "week_info.is_current is true on an archived week. Nothing ever cleared the "
         "flag on archival, so every pre-cut archive claims to be the live week."
@@ -86,6 +99,18 @@ def observed_defects(d, path):
     meta = d.get("meta") or {}
     raw = path.read_text(encoding="utf-8")
 
+    # Wrong anchor: say so only where the file itself demonstrates it -- a start
+    # instant that is a Monday at 00:00 with a zero UTC offset.
+    start_raw = wi.get("start_timestamp")
+    if start_raw:
+        try:
+            s = datetime.fromisoformat(str(start_raw).replace("Z", "+00:00"))
+            off = s.utcoffset()
+            if s.weekday() == 0 and (s.hour, s.minute, s.second) == (0, 0, 0) \
+                    and (off is None or off == timezone.utc.utcoffset(None)):
+                found.append("monday-anchored-utc-week")
+        except ValueError:
+            pass
     if wi.get("is_current") and d.get("archive_status") == "completed":
         found.append("is_current-stuck-true")
     if not (d.get("entries") or []):
@@ -139,13 +164,25 @@ def stamp(path, check_only):
     if ws is None:
         print(f"[SKIP] {path.name}: no parseable week start -- cannot place it in an epoch")
         return None
-    epoch = wlm.epoch_for(ws)
+    bare = wlm.epoch_for(ws)          # what the manager writes into week_info
+    epoch = dict(bare)
     epoch["observed_defects"] = {k: DEFECT_TEXT[k] for k in observed_defects(d, path)}
-    if d.get("epoch") == epoch:
+
+    # current.json also carries week_info.epoch (the manager writes both). If the
+    # two ever disagree, a consumer reading the fallback path -- archive.html's
+    # isAnomalous() reads week_info.epoch when the top level is absent -- would
+    # get a different answer from the same file. Keep them in step here rather
+    # than hoping.
+    wi = d.get("week_info")
+    wi_stale = isinstance(wi, dict) and "epoch" in wi and wi["epoch"] != bare
+
+    if d.get("epoch") == epoch and not wi_stale:
         return False  # already correct
     if check_only:
         print(f"[STALE] {path.name}: epoch stamp missing or out of date")
         return True
+    if wi_stale:
+        wi["epoch"] = bare
     # Insert `epoch` after `meta` so it reads first, before any score data.
     out = {}
     for k, v in d.items():

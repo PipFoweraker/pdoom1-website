@@ -7,10 +7,21 @@ name: Weekly League Reset
 # that the old rollover workflow provided.
 
 on:
-  # Monday at 14:00 UTC = Monday 00:00 AEST (standard time)
-  # Note: During daylight saving (Oct-Apr), Monday 00:00 AEDT = Sunday 13:00 UTC
+  # THURSDAY 14:00 UTC. The league week is anchored to Friday 00:00 in
+  # Australia/Hobart (Pip's ruling, 2026-07-28; pdoom1/docs/RELEASE_NOMENCLATURE.md
+  # says a Seed roll is "every Fri"). Hobart is UTC+10 in winter and UTC+11 under
+  # daylight saving, and GitHub cron is UTC-only with no DST awareness, so this
+  # single UTC time lands:
+  #     winter  Thu 2026-07-30 14:00Z -> Fri 2026-07-31 00:00 +10:00  (exactly the boundary)
+  #     summer  Thu 2026-11-26 14:00Z -> Fri 2026-11-27 01:00 +11:00  (one hour in)
+  # i.e. always a Friday in Hobart, and never before the week it opens. The cron
+  # is only the trigger; the week is derived from the zone in
+  # scripts/weekly-league-manager.py (league_week_start), so a DST change cannot
+  # move which week is opened -- only how far into it the run happens.
+  # scripts/test-weekly-league-boundary.py parses this cron and fails if it stops
+  # agreeing with ROLLOVER_HOUR_UTC / ROLLOVER_CRON_DOW.
   schedule:
-    - cron: '0 14 * * 0'  # Sunday 14:00 UTC = Monday 00:00 AEST
+    - cron: '0 14 * * 4'  # Thursday 14:00 UTC = Friday 00:00 (winter) / 01:00 (summer) Hobart
   
   # Manual trigger for testing or manual league resets
   workflow_dispatch:
@@ -39,11 +50,11 @@ jobs:
           echo ""
           echo "⏰ Time: $(date -u +'%Y-%m-%d %H:%M UTC')"
           # This line used to read "New week beginning: Monday $(date -u)" on a
-          # run that fires on SUNDAY -- it printed Sunday's date under the word
+          # run that fired on SUNDAY -- it printed Sunday's date under the word
           # Monday, echoing the same off-by-one the code had (TECH_DEBT A9).
-          # The week actually being opened is printed by the status step below,
-          # straight out of weekly-league-manager.py, so the banner cannot
-          # disagree with the code.
+          # No day name is hardcoded here any more: the week actually being
+          # opened is printed by the status step below, straight out of
+          # weekly-league-manager.py, so the banner cannot disagree with the code.
           echo "👤 Triggered by: ${{ github.event_name }}"
 
       - name: Checkout repository
@@ -56,10 +67,17 @@ jobs:
         with:
           python-version: '3.11'
 
+      # The league week is anchored to a real IANA zone (Australia/Hobart), not
+      # an offset. ubuntu-latest ships a system tz database so zoneinfo already
+      # works here, but installing tzdata makes the dependency explicit and keeps
+      # the runner behaving like a Windows box (where it is mandatory).
+      - name: Install the IANA timezone database
+        run: pip install --quiet tzdata
+
       # Runs BEFORE anything mutates data. If the run-time -> week mapping has
       # regressed, the correct outcome is a failed rollover (which opens the
       # single failure issue below), not a wrong week published quietly.
-      - name: Pin the rollover boundary (TECH_DEBT A9)
+      - name: Pin the rollover boundary (TECH_DEBT A9 + the Friday/Hobart anchor)
         run: python scripts/test-weekly-league-boundary.py
 
       - name: Check current league status
@@ -172,7 +190,9 @@ jobs:
           echo "🏆 New Week: $WEEK_ID"
           echo "🎲 Seed: $SEED"
           echo "⏰ Started: $(date -u +'%Y-%m-%d %H:%M UTC')"
-          echo "📅 Ends: Sunday 23:59 AEST"
+          # No hardcoded end day: the week runs Friday 00:00 -> Thursday 23:59:59
+          # Australia/Hobart, and the actual dates are printed by the status step
+          # above, out of the code that derives them.
           echo ""
           echo "🔗 Live at: https://pdoom1.com/leaderboard/"
           echo ""
@@ -180,7 +200,6 @@ jobs:
           echo "  - Announce new week in Discord"
           echo "  - Share competitive seed with players"
           echo "  - Monitor first scores coming in"
-          echo "  - Prepare for Tuesday balance review"
 
   post_reset_verification:
     name: Post-Reset Verification

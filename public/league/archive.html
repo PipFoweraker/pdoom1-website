@@ -184,9 +184,9 @@
     }
 
     /* --- Anomalous pre-history (see docs/LEAGUE_EPOCH_ANOMALY.md) ---------
-       Weeks generated before the 2026-07-31 patch-cycle regularisation are
-       kept and shown, but fenced off so nobody reads them as competition
-       results. Muted, not hidden. */
+       Weeks opened before the 2026-08-07 epoch fork are kept and shown, but
+       fenced off so nobody reads them as competition results. Muted, not
+       hidden. */
     .anomaly-section {
       margin: 3rem 0 2rem;
       border-top: 1px dashed var(--border-color);
@@ -591,9 +591,9 @@
 
     <!-- No Results -->
     <div class="no-results" id="no-results" style="display: none;">
-      No regularised league weeks have been archived yet. The first one closes on
-      Sunday 9 August 2026. Everything before 31 July 2026 is anomalous pre-history
-      and is listed separately below.
+      No regularised league weeks have been archived yet. The first one runs from
+      Friday 7 August 2026 and closes on Thursday 13 August 2026. Everything before
+      7 August 2026 is anomalous pre-history and is listed separately below.
     </div>
 
     <!-- Archive Grid -->
@@ -613,23 +613,35 @@
          anomaly that isn't in the data. See docs/LEAGUE_EPOCH_ANOMALY.md. -->
     <section class="anomaly-section" id="anomaly-section" style="display: none;">
       <div class="anomaly-notice">
-        <h2>[ANOMALY] Pre-history: weeks before 31 July 2026</h2>
+        <h2>[ANOMALY] Pre-history: weeks before 7 August 2026</h2>
         <p>
           The <strong id="anomaly-count">&mdash;</strong> weeks below were produced before the
-          patch cycle was regularised on <strong>31 July 2026</strong>. They are kept and
-          shown deliberately, but they are <strong>not results</strong> and are
+          epoch fork on <strong>Friday 7 August 2026</strong>. They are kept and shown
+          deliberately, but they are <strong>not results</strong> and are
           <strong>not comparable</strong> to anything after that date.
         </p>
         <p>
-          What actually happened: the weekly rollover ran every Sunday at 14:00 UTC and
-          created the week that was <em>ending</em> ten hours later instead of the week
-          that was starting, so each record is labelled one week behind the period it
-          describes. Every one of these weeks also contains zero entries — no shipped
-          game client ever submitted a score to these board keys — and the seeds shown
-          were derived by the website rather than sent by the game. Some records still
-          carry <code>v0.4.1</code> version stamps from the old pygame client; those are
-          left exactly as found, because restamping them would invent a history that did
-          not happen.
+          The cut is a fork, not a tidy date. 7 August is the first Friday of the month,
+          which is when the game's rules version and its ladder version both change — so
+          scores either side of it were set under different rules and cannot be ranked
+          against each other. (31 July, the previous Friday, only refreshed the board on
+          unchanged rules, which is why the cut is not there.)
+        </p>
+        <p>
+          What actually happened before it: the weekly rollover ran every Sunday at
+          14:00 UTC on a Monday-to-Sunday week, two days out of phase with the game's own
+          Friday cadence, and it created the week that was <em>ending</em> ten hours later
+          instead of the week that was starting — so each record is labelled one week
+          behind the period it describes. Every one of these weeks also contains zero
+          entries — no shipped game client ever submitted a score to these board keys —
+          and the seeds shown were derived by the website rather than sent by the game.
+          Some records still carry <code>v0.4.1</code> version stamps from the old pygame
+          client; those are left exactly as found, because restamping them would invent a
+          history that did not happen.
+        </p>
+        <p>
+          From 30 July 2026 the league week runs Friday 00:00 to Thursday 23:59 in
+          Hobart, which is the clock everything on this site is now anchored to.
         </p>
         <p>
           They are retained for the record, not for competition. Each card lists the
@@ -661,7 +673,7 @@
     let currentPage = 1;
     const itemsPerPage = 9;
     let allArchives = [];        // regularised weeks only -- the main grid
-    let anomalousArchives = [];  // pre-2026-07-31 pre-history -- fenced off below
+    let anomalousArchives = [];  // pre-2026-08-07 pre-history -- fenced off below
     let filteredArchives = [];
 
     // A week is anomalous iff its own record says so. Never inferred from the
