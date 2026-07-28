@@ -742,8 +742,12 @@
         </div>
         
         <div class="view-controls">
-          <button class="view-toggle active" onclick="setViewMode('table')" id="table-view">Table View</button>
-          <button class="view-toggle" onclick="setViewMode('cards')" id="cards-view">🃏 Cards</button>
+          <!-- These ids must NOT collide with the view containers below
+               (#leaderboard-table, #cards-view). The Cards button once carried the
+               cards-view id itself, so getElementById returned the BUTTON and the
+               cards were rendered inside it. See TECH_DEBT B9. -->
+          <button class="view-toggle active" onclick="setViewMode('table')" id="view-btn-table">Table View</button>
+          <button class="view-toggle" onclick="setViewMode('cards')" id="view-btn-cards">🃏 Cards</button>
         </div>
       </div>
     </div>
@@ -1034,9 +1038,9 @@
     function setViewMode(mode) {
       const tableView = document.getElementById('leaderboard-table');
       const cardsView = document.getElementById('cards-view') || createCardsView();
-      const tableButton = document.getElementById('table-view');
-      const cardsButton = document.getElementById('cards-view');
-      
+      const tableButton = document.getElementById('view-btn-table');
+      const cardsButton = document.getElementById('view-btn-cards');
+
       if (mode === 'table') {
         tableView.style.display = 'table';
         cardsView.style.display = 'none';
@@ -1065,11 +1069,13 @@
     function displayCardsView(data) {
       const cardsContainer = document.getElementById('cards-view') || createCardsView();
       cardsContainer.innerHTML = '';
-      
+
+      const entries = (data && data.entries) || [];
+
       // Store current data for player profile access
-      currentDisplayData = data.entries;
-      
-      data.entries.forEach((entry, index) => {
+      currentDisplayData = entries;
+
+      entries.forEach((entry, index) => {
         const rank = index + 1;
         const doomPercent = entry.final_doom;
         let riskClass = 'safe';
