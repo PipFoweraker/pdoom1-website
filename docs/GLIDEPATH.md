@@ -177,10 +177,24 @@ Corrected 2026-07-28 after an inventory of all 2,247 images in the game repo:
 
 **The genuinely new finding:** the homepage hero the site serves today
 (`assets/screenshots/hero-bg-*`) **has no source anywhere in the game repo** — all
-2,247 images were scanned and nothing matches it. It is unattributable marketing
-art depicting a build we no longer ship. `hero-main-office.png` and both
-`gameplay-office-*.png` are byte-identical to files in
-`godot/assets/dump_october_31_2025/`, superseded by the 2026-07-22 wave.
+2,247 images were scanned and nothing matches it.
+
+**Provenance, per Pip 2026-07-28 (correcting an earlier draft of this section which
+called it "unattributable"):** he generated it himself with ChatGPT's paid tier
+around November 2025, on or near the day it was committed, using prompts traceable
+to the commits from that session. So it is *attributable* — just not *reproducible
+from the game repo*, and not derived from any asset the game ships. Ownership is
+Pip's under OpenAI's output-assignment terms (worth re-verifying at source before
+any commercial use).
+
+What Pip likes about it, recorded as art-direction input rather than as a defect:
+**purple** (his favourite colour), a **"cozy-Tarkov"** read — grimy utilitarian
+interior, warm pools of light, danger implied off-screen — and the fact that it
+**hints at a purple/blue/red set for doom flavours**, which the game's doom-flavour
+system could make mechanical rather than decorative.
+
+`hero-main-office.png` and both `gameplay-office-*.png` are byte-identical to files
+in `godot/assets/dump_october_31_2025/`, superseded by the 2026-07-22 wave.
 
 The real hero candidates are the **2026-07-22 wave** in
 `godot/assets/images/backgrounds/`, `.../records/` and `.../events/` — all 1536×1024,
