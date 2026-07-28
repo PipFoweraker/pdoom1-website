@@ -235,15 +235,23 @@ function walkHtml(dir, out) {
 }
 
 const NOINDEX_RE = /<meta[^>]+name=["']robots["'][^>]*content=["'][^"']*noindex/i;
+// A meta-refresh stub is a redirect, not a page. Listing a redirecting URL in a
+// sitemap is a soft error Search Console reports. /changelog/ becomes one of
+// these when PR #183 lands, so detect the shape rather than name the path.
+const REFRESH_RE = /<meta[^>]+http-equiv=["']refresh["']/i;
 
-function hasNoindex(absPath) {
-  // The meta tag lives in <head>; reading the first 16 KB is enough and keeps
-  // this cheap across ~2,200 files.
+/**
+ * Read the head of an HTML file once and report both exclusion signals.
+ * The tags live in <head>; 16 KB is plenty and keeps this cheap across ~2,200
+ * files.
+ */
+function headSignals(absPath) {
   const fd = fs.openSync(absPath, 'r');
   try {
     const buf = Buffer.alloc(16384);
     const read = fs.readSync(fd, buf, 0, buf.length, 0);
-    return NOINDEX_RE.test(buf.slice(0, read).toString('utf8'));
+    const head = buf.slice(0, read).toString('utf8');
+    return { noindex: NOINDEX_RE.test(head), redirect: REFRESH_RE.test(head) };
   } finally {
     fs.closeSync(fd);
   }
@@ -276,7 +284,7 @@ function collectUrls() {
     console.warn('Preserving ' + previous.size + ' <lastmod> values from the committed sitemap.xml.');
   }
 
-  const stats = { total: 0, fragments: 0, disallowed: 0, noindex: 0 };
+  const stats = { total: 0, fragments: 0, disallowed: 0, noindex: 0, redirects: 0 };
   const urls = [];
   const seen = new Set();
 
@@ -305,8 +313,13 @@ function collectUrls() {
       stats.disallowed += 1;
       continue;
     }
-    if (hasNoindex(abs)) {
+    const signals = headSignals(abs);
+    if (signals.noindex) {
       stats.noindex += 1;
+      continue;
+    }
+    if (signals.redirect) {
+      stats.redirects += 1;
       continue;
     }
     add(urlPath, lastmods ? lastmods.get('public/' + rel) : null);
@@ -382,6 +395,7 @@ function main() {
   console.log('  skipped, not a page:           ' + stats.fragments);
   console.log('  skipped, robots.txt disallows: ' + stats.disallowed);
   console.log('  skipped, meta noindex:         ' + stats.noindex);
+  console.log('  skipped, meta refresh redirect:' + stats.redirects);
 }
 
 if (require.main === module) {
