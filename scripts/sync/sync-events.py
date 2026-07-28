@@ -14,6 +14,7 @@ Usage:
     python scripts/sync/sync-events.py [--pdoom-data-path PATH] [--sync-icons]
 """
 
+import html
 import json
 import os
 import sys
@@ -21,7 +22,7 @@ import argparse
 import shutil
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 # Force UTF-8 for Windows console
 if sys.platform == 'win32':
@@ -40,6 +41,41 @@ ICONS_DIR = PUBLIC_DIR / "assets" / "icons" / "events"
 # Default pdoom-data location (sibling directory)
 DEFAULT_PDOOM_DATA = WEBSITE_ROOT.parent / "pdoom-data"
 DEFAULT_PDOOM1 = WEBSITE_ROOT.parent / "pdoom1"
+
+# Canonical origin, used to build absolute og:url / og:image values (the
+# OpenGraph spec requires absolute URLs -- a relative path is silently ignored
+# by every scraper).
+SITE_ORIGIN = "https://pdoom1.com"
+
+# The site-wide share card already referenced by index/about/press. Deliberately
+# NOT a per-event image: no per-event art exists, and pointing at one that does
+# not exist is worse than pointing at the generic card.
+OG_IMAGE_URL = f"{SITE_ORIGIN}/assets/og-card.jpg"
+
+# Length budget for the description reused by <meta name="description">,
+# og:description and twitter:description.
+META_DESCRIPTION_CHARS = 155
+
+
+def meta_text(value: Any, limit: Optional[int] = None) -> str:
+    """Make an arbitrary event string safe to sit inside a double-quoted
+    HTML attribute.
+
+    Three separate problems, all of which are present in the real data:
+      * quotes -- e.g. the event titled '"Why Should I Trust You?": ...' would
+        otherwise terminate the content attribute early and inject markup;
+      * ampersands and angle brackets -- 8 titles and 12 descriptions contain
+        them (measured against all_events.json, 1,194 events);
+      * newlines/runs of whitespace -- many arXiv-derived descriptions are
+        multi-line, which renders as a mangled preview snippet.
+
+    Truncation happens BEFORE escaping so the limit counts characters a reader
+    sees, not entity length.
+    """
+    collapsed = " ".join(str(value).split())
+    if limit is not None and len(collapsed) > limit:
+        collapsed = collapsed[:limit].rstrip() + "…"
+    return html.escape(collapsed, quote=True)
 
 
 def log(message: str, level: str = "INFO"):
@@ -248,14 +284,41 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
     safety_badge, safety_source = build_reaction_html(event['safety_researcher_reaction'], 'safety_researcher_reaction')
     media_badge, media_source = build_reaction_html(event['media_reaction'], 'media_reaction')
 
+    # Values shared by <title>, <meta name="description"> and the OpenGraph /
+    # Twitter card block. All attribute-escaped; see meta_text().
+    page_url = f"{SITE_ORIGIN}/events/{event_id}.html"
+    og_title = meta_text(event['title'])
+    og_description = meta_text(event['description'], META_DESCRIPTION_CHARS)
+
     html_content = f"""<!DOCTYPE html>
 <html lang="en-AU">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{event['title']} | p(Doom)1 Events</title>
-	<link rel="canonical" href="https://pdoom1.com/events/{event_id}.html" />
-	<meta name="description" content="{event['description'][:155]}" />
+	<link rel="canonical" href="{page_url}" />
+	<meta name="description" content="{og_description}" />
+
+	<!-- Share cards. Without these an event link pastes as a bare URL. -->
+	<meta property="og:type" content="article" />
+	<meta property="og:site_name" content="p(Doom)1" />
+	<meta property="og:title" content="{og_title}" />
+	<meta property="og:description" content="{og_description}" />
+	<meta property="og:url" content="{page_url}" />
+	<meta property="og:image" content="{OG_IMAGE_URL}" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="{og_title}" />
+	<meta name="twitter:description" content="{og_description}" />
+	<!-- twitter:site intentionally omitted until the handle is finalized,
+	     matching public/index.html. -->
+
+	<!-- Analytics consent shim. MUST stay above the deferred tracker below:
+	     this tag is parser-blocking, so it sets localStorage.plausible_ignore
+	     (from Do-Not-Track or an explicit opt-out) before the deferred script
+	     runs and fires its pageview. Without it on this page, a deep-linked
+	     visitor is counted before the privacy page's promise can be honoured.
+	     It never injects a tracker -- see public/assets/js/analytics.js. -->
+	<script src="/assets/js/analytics.js"></script>
 
 	<!-- Plausible Analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
@@ -780,7 +843,7 @@ def write_events_json(events: Dict[str, Any]):
     """Write events.json for the events index page"""
     output_file = DATA_DIR / "events.json"
 
-    with open(output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, 'w', encoding='utf-8', newline='\n') as f:
         json.dump(events, f, indent=2)
 
     log(f"Wrote events index to {output_file}")
@@ -866,7 +929,12 @@ def main():
         html_content = generate_event_detail_page(event_id, event)
         output_file = EVENTS_DIR / f"{event_id}.html"
 
-        with open(output_file, 'w', encoding='utf-8') as f:
+        # newline='\n' pins LF output. Without it, a Windows run writes CRLF;
+        # git's autocrlf clean filter silently REFUSES to normalise any file
+        # that already contains a lone CR (one arXiv description does), so that
+        # page alone would be committed with CRLF and show up as a whole-file
+        # rewrite in every future diff.
+        with open(output_file, 'w', encoding='utf-8', newline='\n') as f:
             f.write(html_content)
 
     log(f"Generated {len(events)} event detail pages")
@@ -949,7 +1017,7 @@ def main():
     }
 
     summary_file = DATA_DIR / "events-sync-summary.json"
-    with open(summary_file, 'w') as f:
+    with open(summary_file, 'w', encoding='utf-8', newline='\n') as f:
         json.dump(summary, f, indent=2)
 
     log(f"Summary report: {summary_file}")
