@@ -158,6 +158,24 @@ Pip's stated top priority. Practically:
   `localStorage.plausible_ignore === "true"`. Nothing else works.
 - `analytics-config.json` is unused documentation.
 - `scripts/alpha-watch.py` reports the two launch signals (site + leaderboard).
+- **The Plausible VPS has no backups of any kind** (TECH_DEBT A1). The interim
+  hedge is `snapshot-analytics.yml` → `scripts/snapshot-plausible.py`, which
+  commits a daily `public/data/analytics/history/<date>.json`. There is exactly
+  ONE such workflow; extend it rather than adding a second (see what two writers
+  did to `version.json`).
+  - The API answers `--period 30d` with the 30 days **ending yesterday**, so
+    every day is captured by ~30 consecutive snapshots and one lost run costs
+    nothing. The flip side: the hedge only reaches back 30 days from the first
+    snapshot ever taken (2026-07-23 → 2026-06-23). **Older history exists only
+    on the VPS** until someone runs `--range START:END`.
+  - The script **writes nothing** on a missing key (exit 2), a failed/malformed
+    fetch (3) or an all-zero response (4), so a bad run can never clobber the
+    last good `latest.json`. CI passes `--require-key`: a revoked secret is a
+    red run, not a green no-op. `scripts/test-snapshot-plausible.py` asserts all
+    of that against a stubbed API — no key needed — plus the workflow contract.
+  - Snapshots live under `public/`, so they are publicly fetchable once a human
+    push deploys. Aggregate counts only; `public/data/analytics/README.md`
+    already declares the retention public.
 
 ## Blog & feeds
 - Posts are `.md` in `public/blog/`, listed in `public/blog/index.json` (keys:
@@ -192,6 +210,7 @@ python  scripts/check-platform-claims.py  # no reachable page claims an unshippe
 node    scripts/test-download-resolution.js # download buttons resolve/degrade right
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift
 python  scripts/generate-feeds.py --check # feeds in step with the blog
+python  scripts/test-snapshot-plausible.py # analytics backup still fails loudly
 node    scripts/test-header-consistency.js
 ```
 

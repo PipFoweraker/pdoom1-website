@@ -1,11 +1,39 @@
 name: Snapshot analytics to git
 
-# Pulls Plausible stats into a committed daily snapshot, so the traffic history
-# survives losing the analytics VPS. See scripts/snapshot-plausible.py.
+# THE analytics backup. There is exactly one of these -- if you are about to add
+# a second workflow that pulls Plausible into the repo, extend this instead.
+# (public/data/version.json already has two writers that overwrite each other's
+# fields on alternating crons; do not reproduce that here.)
 #
-# Does nothing until the PLAUSIBLE_API_KEY secret is set -- an unconfigured run
-# is a harmless no-op. During a spike you can also trigger it manually to catch
-# the shape at finer granularity than the daily schedule.
+# WHAT IT IS
+# Plausible is self-hosted on a single DreamCompute VPS with no snapshots, no
+# pg_dump and no ClickHouse BACKUP -- docs/TECH_DEBT.md A1. This pulls daily
+# aggregates from the read-only Stats API and commits them, so the traffic
+# history survives losing that box. It is the cheap interim hedge, NOT the real
+# backup solution.
+#
+# WHY IT DOES NOT DEPLOY, AND WHY THAT IS CORRECT
+# Commits made with the default GITHUB_TOKEN do not trigger other workflows, so
+# a snapshot reaches the repo but not pdoom1.com until the next human push. For
+# a BACKUP that is entirely fine: git is the durable second copy, and serving
+# the file is not the point. Please do not "fix" this into a deploy trigger --
+# it would mean every unattended cron run rsyncs to production.
+#
+# NOTE ON EXPOSURE: snapshots land under public/, so they do ship to pdoom1.com
+# on the next human push and are publicly fetchable. That was already true
+# before this workflow was hardened, and public/data/analytics/README.md states
+# the retention is public. Aggregate counts only -- no PII. If that should ever
+# change, the lever is deploy-excludes.txt, and note that an exclude does not
+# remove what is already on the server.
+#
+# FAILURE IS LOUD ON PURPOSE
+# A backup that silently stops is worse than none: it manufactures confidence.
+# scripts/snapshot-plausible.py exits non-zero on a missing key (2), a failed
+# or malformed fetch (3), or an all-zero response (4), and writes nothing in
+# those cases so the last good latest.json survives. Any non-zero exit fails
+# this workflow and opens/updates one rolling issue.
+#
+# Contract tests: scripts/test-snapshot-plausible.py (needs no API key).
 
 on:
   schedule:
@@ -15,9 +43,13 @@ on:
       period:
         description: 'Plausible period (7d, 30d, 6mo, 12mo)'
         default: '30d'
+      allow_zero:
+        description: 'Record an all-zero result as real data (only if you have verified the zero)'
+        default: 'false'
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: snapshot-analytics
@@ -26,31 +58,160 @@ concurrency:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
+
+    # TRAP 2: `github.event.inputs` is EMPTY on a schedule trigger, and the
+    # `inputs` context only exists for dispatch, so neither supplies the
+    # declared default on cron. The `|| '30d'` covers the cron case explicitly.
+    # TRAP 5: these are author-controlled strings. They are bound to env here
+    # and read as quoted "$VAR" below -- never templated into a run: block,
+    # where GitHub would substitute them before bash ever sees them.
+    env:
+      PERIOD: ${{ inputs.period || '30d' }}
+      ALLOW_ZERO: ${{ inputs.allow_zero || 'false' }}
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      - name: Validate the requested period
+        run: |
+          set -euo pipefail
+          case "$PERIOD" in
+            7d|30d|6mo|12mo|day|month|year) ;;
+            *) echo "Refusing an unrecognised period: $PERIOD" >&2; exit 1 ;;
+          esac
+          echo "period=$PERIOD allow_zero=$ALLOW_ZERO"
+
       - name: Snapshot
+        id: snap
         env:
           PLAUSIBLE_API_KEY: ${{ secrets.PLAUSIBLE_API_KEY }}
         run: |
+          set -euo pipefail
           # A stable UTC date label, so re-runs on the same day overwrite rather
           # than accrete duplicates.
+          LABEL="$(date -u +%F)"
+          echo "label=$LABEL" >> "$GITHUB_OUTPUT"
+
+          FLAGS=""
+          if [ "$ALLOW_ZERO" = "true" ]; then
+            FLAGS="--allow-zero"
+            echo "::warning::allow_zero was requested -- an empty result will be recorded as real data"
+          fi
+
+          # --require-key turns "the secret is missing" from a green no-op into
+          # a failure. A revoked or rotated key is precisely the case where a
+          # silent success would leave the backup dead for months.
           python scripts/snapshot-plausible.py \
-            --period "${{ github.event.inputs.period || '30d' }}" \
-            --date "$(date -u +%F)"
+            --require-key \
+            --period "$PERIOD" \
+            --date "$LABEL" \
+            $FLAGS
+
+      - name: Assert the snapshot is on disk
+        run: |
+          set -euo pipefail
+          LABEL='${{ steps.snap.outputs.label }}'
+          FILE="public/data/analytics/history/${LABEL}.json"
+          # Belt and braces: the script exits non-zero when it declines to
+          # write, but a backup should never take "it probably wrote something"
+          # on trust.
+          test -s "$FILE" || { echo "Expected $FILE and it is missing or empty" >&2; exit 1; }
+          python -m json.tool "$FILE" > /dev/null
+          echo "OK: $FILE ($(wc -c < "$FILE") bytes)"
 
       - name: Commit the snapshot
         run: |
           set -euo pipefail
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # TRAP 1: `git diff` cannot see untracked files, and a daily snapshot
+          # creates a NEW dated file every run -- so testing for changes BEFORE
+          # staging would report "nothing to commit" and succeed, every day,
+          # forever. Stage first, then ask the index.
           git add -A public/data/analytics/history public/data/analytics/latest.json
           if git diff --cached --quiet; then
-            echo "No snapshot to commit (likely PLAUSIBLE_API_KEY not set)"
-          else
-            git commit -m "chore(analytics): daily snapshot $(date -u +%F)"
-            git push
+            # Only reachable on a same-day re-run that produced byte-identical
+            # content. A missing key or a failed fetch can no longer land here:
+            # the script exits non-zero and the assert step already failed.
+            echo "Snapshot identical to the committed one -- nothing to commit."
+            exit 0
           fi
+
+          git commit -m "chore(analytics): daily snapshot ${{ steps.snap.outputs.label }}"
+
+          # Other crons commit to main too, so a push race is routine rather
+          # than exceptional. Rebase and retry; a genuinely stuck push still
+          # fails the run rather than dropping the day's backup quietly.
+          for attempt in 1 2 3; do
+            if git push; then
+              echo "Pushed on attempt ${attempt}."
+              exit 0
+            fi
+            echo "Push rejected (attempt ${attempt}); rebasing onto origin."
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+            sleep 5
+          done
+          echo "Could not push the snapshot after 3 attempts." >&2
+          exit 1
+
+  alert:
+    name: Alert on failure (de-duplicated)
+    needs: snapshot
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      # TRAP 3: this job is useless without `permissions: issues: write` -- it
+      # 403s and the failure becomes invisible, which is worse than having no
+      # handler because someone believes it is watching. The permission is
+      # declared at workflow level above.
+      - name: Open or update the single analytics-backup issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🔴 Analytics snapshot to git is failing';
+            const label = 'analytics-backup';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              'The daily Plausible-to-git snapshot failed. **The analytics VPS has no other backup**',
+              '(docs/TECH_DEBT.md A1), so every day this stays broken is a day of traffic history',
+              'that exists in exactly one place.',
+              '',
+              `Run: ${runUrl}`,
+              '',
+              'What the exit code means (`scripts/snapshot-plausible.py`):',
+              '',
+              '| code | meaning | first thing to check |',
+              '| --- | --- | --- |',
+              '| 2 | `PLAUSIBLE_API_KEY` unset or empty | the repository secret -- revoked, rotated, or dropped |',
+              '| 3 | a required section failed or came back malformed | is analytics.pdoom1.com up? is the key still valid (401) and the site id still present (404)? |',
+              '| 4 | the response was fine but every metric was zero | is the tracker still in the page `<head>`? is ingestion landing? re-run with `allow_zero` only if the zero is real |',
+              '| 1 | the commit or push step failed | a push race, or a branch protection change |',
+              '',
+              'Nothing is written on codes 2, 3 or 4, so `latest.json` still holds the last good copy.',
+              'Reproduce the non-network half locally: `python scripts/test-snapshot-plausible.py`.',
+              '',
+              '_Single rolling issue -- reused, not duplicated, per run._'
+            ].join('\n');
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const found = existing.data.find(i => i.title === title);
+            if (found) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: found.number,
+                body: `Still failing as of ${new Date().toUTCString()}.\n\nRun: ${runUrl}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label, 'automation', 'priority:high'],
+              });
+            }
