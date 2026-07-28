@@ -20,6 +20,10 @@ on:
 
 permissions:
   contents: write
+  # Without this the "Create issue on failure" step below 403s and the failure is
+  # invisible -- CLAUDE.md workflow trap #3. The handler was written correctly and had
+  # never been able to run.
+  issues: write
 
 jobs:
   sync-leaderboards:
@@ -81,7 +85,37 @@ jobs:
           echo "status=success" >> $GITHUB_OUTPUT
         continue-on-error: true
 
+      # Every step above is continue-on-error, so the job could never reach a failed
+      # state and the `if: failure()` alert at the end was unreachable by construction.
+      # continue-on-error is right here -- we want later steps to run and the outcomes
+      # logged -- but the outcomes have to be adjudicated somewhere. This is that place.
+      - name: Fail the job if a sync step failed
+        if: always()
+        env:
+          SYNC_ALL: ${{ steps.sync-all.outcome }}
+          SYNC_WEEKLY: ${{ steps.sync-weekly.outcome }}
+          EXPORT: ${{ steps.export.outcome }}
+          VERIFY: ${{ steps.verify.outcome }}
+        run: |
+          bad=0
+          for name in SYNC_ALL SYNC_WEEKLY EXPORT VERIFY; do
+            outcome="${!name}"
+            # "skipped" is normal -- these steps are gated on sync_type.
+            if [ "$outcome" = "failure" ]; then
+              echo "::error::step $name failed"
+              bad=1
+            else
+              echo "step $name: ${outcome:-not-run}"
+            fi
+          done
+          if [ "$bad" = "1" ]; then
+            echo "At least one leaderboard sync step failed. Failing the job so the"
+            echo "alert below actually fires instead of reporting a green sync."
+            exit 1
+          fi
+
       - name: Log automation run
+        if: always()
         run: |
           echo "Logging leaderboard sync to monitoring..."
           python scripts/log-automation-run.py \
@@ -98,13 +132,17 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action [Leaderboard Sync]"
 
-          if git diff --quiet; then
+          # CLAUDE.md workflow trap #1: `git diff` cannot see UNTRACKED files, so testing
+          # it before `git add` reports "no changes" whenever the sync created a new file
+          # -- and reports SUCCESS while committing nothing. Stage first, then test the
+          # index. board-liveness.json in particular starts life untracked.
+          git add public/leaderboard/data/
+          git add public/monitoring/data/ || true
+
+          if git diff --cached --quiet; then
             echo "No changes to commit (data already up to date)"
             exit 0
           fi
-
-          git add public/leaderboard/data/
-          git add public/monitoring/data/ || true
 
           # Count changed files
           CHANGED=$(git diff --cached --numstat | wc -l)

@@ -789,33 +789,21 @@
   </main>
 
   <script>
-    // Load and display leaderboard data
-    async function loadLeaderboard() {
-      try {
-        const response = await fetch('data/leaderboard.json', { cache: 'no-store' });
-        const data = await response.json();
-        
-        applyDataStatus(data);
-        displayStats(data);
-        displayLeaderboard(data);
-
-        // Hide loading, show table (hide the empty table pre-launch)
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('leaderboard-table').style.display =
-          (data.entries && data.entries.length) ? 'table' : 'none';
-
-      } catch (error) {
-        console.error('Failed to load leaderboard:', error);
-        document.getElementById('loading').innerHTML = 'Failed to load leaderboard data';
-      }
-    }
+    // NOTE: a second loader, loadLeaderboard(), used to live here. It was never invoked
+    // -- the page bootstraps loadLeaderboardWithFiltering() -- but it was the ONLY caller
+    // of applyDataStatus(), so a reader grepping for the honesty banner found a call site
+    // and wrongly concluded the banner worked. It has been deleted rather than left as a
+    // decoy. There is now exactly one loader.
 
     // Honesty banner: never present pre-launch/legacy data as live. Self-heals when
     // ingest_scores.py publishes real deployed-version scores (data_status: "live").
     function applyDataStatus(data) {
       const banner = document.getElementById('data-status-banner');
       if (!banner) return;
-      const status = (data && data.data_status) || 'live';
+      // A board with NO data_status used to fall back to 'live' -- absence resolving to
+      // the most confident claim available. That is the fallback-literal trap: the default
+      // ships exactly when the real value was missing. Unknown is now its own state.
+      const status = (data && data.data_status) || 'unknown';
       const controls = document.querySelector('.controls-section');
       if (status === 'live') {
         banner.style.display = 'none';
@@ -827,14 +815,142 @@
       // message; it comes back automatically once real scores publish.
       if (controls) controls.style.display = 'none';
 
-      // Deliberately names no version. The board is stamped with whatever release last
-      // exported, which drifts behind the live game, and a stale number here reads as a
-      // promise about a specific build. Naming the *condition* instead stays true
-      // whichever release turns submission on.
-      banner.innerHTML = (status === 'pre-launch')
-        ? `&#9432; <strong>No scores recorded yet.</strong> The board turns on when in-game score submission ships &mdash; until then this page is a placeholder, not an empty ranking.`
-        : `&#9432; <strong>Showing sample / pre-release data</strong> &mdash; not live competitive results.`;
+      // This base message still names no version -- applyBoardHonesty() below appends the
+      // version detail, and only when it has verified both numbers at run time from
+      // /data/version.json. A version literal typed into this string would be a promise
+      // about a specific build that rots the next time the game ships.
+      //
+      // The old pre-launch wording said the board "turns on when in-game score submission
+      // ships". That became false: submission HAS shipped and scores are being recorded.
+      // What is missing is this page's ability to publish them, which is a different claim.
+      banner.innerHTML =
+        (status === 'pre-launch')
+          ? `&#9432; <strong>This page is not showing any scores.</strong> That does not by itself mean nobody has played &mdash; see the check below.`
+        : (status === 'unknown')
+          ? `&#9432; <strong>This board does not say whether it is live.</strong> It carries no status, so nothing on this page should be read as confirmed competitive results.`
+          : `&#9432; <strong>Showing sample / pre-release data</strong> &mdash; not live competitive results.`;
       banner.style.display = 'block';
+    }
+
+    // ------------------------------------------------------------------------
+    // Board honesty: a visitor must never see an empty board that silently means
+    // "the scores went somewhere else".
+    //
+    // A board is keyed by (seed, game_version) -- pdoom1 PR #679. If the key this page
+    // publishes is not the key a player's client submits to, their run is recorded and
+    // is invisible here, and neither they nor we get an error. "0 entries" therefore has
+    // at least two very different meanings, and this function's whole job is to stop the
+    // page presenting them as if they were one.
+    //
+    // Both inputs are same-origin static files. The page does NOT call the score API at
+    // run time: scripts/check-board-liveness.py does that read-only probe and records the
+    // dated result, so the page reports an observation rather than depending on a third
+    // party being up. Every branch degrades to "we cannot tell", never to "there is nothing".
+    // ------------------------------------------------------------------------
+    async function applyBoardHonesty(data) {
+      const banner = document.getElementById('data-status-banner');
+      if (!banner) return;
+
+      const readJSON = async (url) => {
+        try {
+          const r = await fetch(url, { cache: 'no-store' });
+          if (!r.ok) return null;
+          return await r.json();
+        } catch (e) { return null; }
+      };
+
+      const [versionDoc, liveness] = await Promise.all([
+        readJSON('/data/version.json'),
+        readJSON('data/board-liveness.json'),
+      ]);
+
+      const deployed = versionDoc && versionDoc.latest_release && versionDoc.latest_release.version;
+      const boardVersion = data && data.meta && data.meta.game_version;
+      const notes = [];
+
+      // 1. Key mismatch between what this page publishes and what the site says is current.
+      if (deployed && boardVersion && deployed !== boardVersion) {
+        notes.push(
+          `<strong>Version mismatch.</strong> This board was last published for ` +
+          `<code>${escapeHTML(boardVersion)}</code>, but the current release is ` +
+          `<code>${escapeHTML(deployed)}</code>. Scores are stored per ` +
+          `(seed, version), so runs on <code>${escapeHTML(deployed)}</code> do not appear ` +
+          `on a <code>${escapeHTML(boardVersion)}</code> board.`
+        );
+      } else if (!deployed) {
+        notes.push(
+          `<strong>Cannot verify the version.</strong> The site could not read the current ` +
+          `release number, so this page cannot confirm the board matches the game you are playing.`
+        );
+      }
+
+      // 2. What the local files refused to publish, and why -- named, with counts.
+      const ex = data && data.exclusions;
+      if (ex && ex.version_mismatched_files > 0) {
+        const vers = (ex.version_mismatched_versions || []).map(escapeHTML).join(', ');
+        notes.push(
+          `${ex.version_mismatched_files} stored result file(s) holding ` +
+          `${ex.version_mismatched_entries} entr${ex.version_mismatched_entries === 1 ? 'y' : 'ies'} ` +
+          `were withheld: they are stamped ${vers || 'an unrecorded version'} and the ` +
+          `deployed version is <code>${escapeHTML(ex.deployed_version || deployed || '?')}</code>. ` +
+          `They are not deleted and not re-stamped &mdash; re-stamping would fabricate history.`
+        );
+      }
+
+      // 3. The live check. This is the part that separates "nobody played" from
+      //    "scores landed on a board nobody reads".
+      if (!liveness || !liveness.checked_at) {
+        notes.push(
+          `<strong>No live check on record.</strong> Nothing has verified against the score ` +
+          `API, so an empty board here is not evidence that no scores exist.`
+        );
+      } else {
+        const when = new Date(liveness.checked_at);
+        const stamp = isNaN(when) ? escapeHTML(liveness.checked_at) : when.toLocaleString();
+        const orphaned = liveness.orphaned_entries_total || 0;
+        if (liveness.verdict === 'orphaned-scores' && orphaned > 0) {
+          const boards = (liveness.orphaned_boards || [])
+            .map(b => `<code>${escapeHTML(String(b.version))}</code> (${b.entries})`)
+            .join(', ');
+          notes.push(
+            `<strong>People are playing, and their scores are not shown here.</strong> ` +
+            `As of ${stamp}, the score API held ${orphaned} recorded ` +
+            `entr${orphaned === 1 ? 'y' : 'ies'} on ${liveness.orphaned_boards.length} board(s) ` +
+            `this page does not publish &mdash; ${boards}. Those runs were saved. This page ` +
+            `cannot currently show them.`
+          );
+        } else if (liveness.verdict === 'unreachable') {
+          notes.push(
+            `<strong>The score API could not be reached</strong> at the last check (${stamp}), ` +
+            `so whether any scores exist is unknown, not zero.`
+          );
+        } else if (liveness.verdict === 'genuinely-empty') {
+          notes.push(
+            `Checked against the live score API at ${stamp}: no scores had been submitted ` +
+            `to any known board. This one really is empty rather than misrouted.`
+          );
+        }
+      }
+
+      // Render into a dedicated child and REPLACE it. The seed/week filter re-runs the
+      // loader, so appending here would stack a fresh copy of every notice on each change.
+      let host = document.getElementById('board-honesty-notes');
+      if (!host) {
+        host = document.createElement('div');
+        host.id = 'board-honesty-notes';
+        banner.appendChild(host);
+      }
+      if (!notes.length) { host.innerHTML = ''; return; }
+      host.style.cssText = 'margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--border-color);';
+      host.innerHTML = notes.map(n => `<p style="margin:0 0 0.5rem 0;">${n}</p>`).join('');
+      banner.style.display = 'block';
+    }
+
+    // Board/version strings come from data files; render them as text, never as markup.
+    function escapeHTML(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+      ));
     }
 
     function displayStats(data) {
@@ -937,22 +1053,42 @@
     async function loadLeaderboardWithFiltering() {
       try {
         const response = await fetch('data/leaderboard.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         originalData = await response.json();
         filteredData = originalData;
-        
+
+        // This call was MISSING, and loadLeaderboard() -- the only other caller of
+        // applyDataStatus -- is dead code that nothing invokes. Net effect until now:
+        // the honesty banner never rendered on the live page, while leaderboard.json
+        // carried data_status "pre-launch". A visitor saw an empty ranking table and a
+        // fully live-looking toolbar, with nothing telling them the board was not real.
+        applyDataStatus(filteredData);
         displayStats(filteredData);
         displayLeaderboard(filteredData);
-        
-        // Hide loading, show table
+
         document.getElementById('loading').style.display = 'none';
-        document.getElementById('leaderboard-table').style.display = 'table';
-        
+        // Only reveal the table if there is something in it. A bare header row reads as
+        // "these are the rankings and nobody is on them", which is a claim we cannot make.
+        document.getElementById('leaderboard-table').style.display =
+          (filteredData.entries && filteredData.entries.length) ? 'table' : 'none';
+
         // Set up search input listener
         document.getElementById('search-input').addEventListener('input', filterLeaderboard);
-        
+
+        // Independent of the snapshot: say plainly whether the board key matches the
+        // deployed build, and what the last live check of the score API actually saw.
+        applyBoardHonesty(filteredData);
+
       } catch (error) {
         console.error('Failed to load leaderboard:', error);
-        document.getElementById('loading').innerHTML = 'Failed to load leaderboard data';
+        // Say which failure this was. "Failed to load" alone leaves a visitor unable to
+        // tell a broken page from an empty board.
+        document.getElementById('loading').classList.remove('loading');
+        document.getElementById('loading').innerHTML =
+          'Could not load the leaderboard data file, so this page cannot say whether any ' +
+          'scores exist. This is a site fault, not an empty board.';
+        const controls = document.querySelector('.controls-section');
+        if (controls) controls.style.display = 'none';
       }
     }
     

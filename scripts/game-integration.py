@@ -295,6 +295,11 @@ class GameRepositoryIntegration:
                 "export_source": "fallback",
                 "note": "No game data available - game repository detected but no leaderboard data found"
             },
+            # Without this the leaderboard page had no status to read. It defaulted the
+            # absent field to "live", so a FAILED EXPORT published itself as a real, empty
+            # competitive board. The failure has to travel with the data it produced.
+            "data_status": "pre-launch",
+            "legacy": True,
             "seed": "no-data",
             "economic_model": "unknown",
             "entries": []

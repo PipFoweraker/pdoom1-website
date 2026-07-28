@@ -36,6 +36,7 @@ PLAUSIBLE API KEY (optional but recommended)
 import argparse
 import json
 import os
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
@@ -43,8 +44,16 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+# CLAUDE.md: cp1252 console kills the FIRST non-ASCII print before any work happens.
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 LEADERBOARD = REPO_ROOT / "public" / "leaderboard" / "data" / "leaderboard.json"
+BOARD_LIVENESS = REPO_ROOT / "public" / "leaderboard" / "data" / "board-liveness.json"
 WEEKLY = REPO_ROOT / "public" / "leaderboard" / "data" / "weekly" / "current.json"
 ANNOTATIONS = REPO_ROOT / "public" / "data" / "analytics" / "annotations.json"
 VERSION_JSON = REPO_ROOT / "public" / "data" / "version.json"
@@ -159,6 +168,39 @@ def stream_a(days):
     print()
 
 
+def _board_liveness(max_age_hours=12):
+    """The last dated observation of the live score API, refreshed if stale.
+
+    check-board-liveness.py owns talking to the API; this just consumes its record. But
+    a stale record read as current would recreate the very ambiguity this is here to
+    remove, so anything older than max_age_hours triggers a re-run. Returns None if we
+    genuinely do not know -- never a fabricated 'empty'.
+    """
+    rec = load_json(BOARD_LIVENESS)
+    fresh = False
+    if isinstance(rec, dict) and rec.get("checked_at"):
+        try:
+            ts = datetime.fromisoformat(rec["checked_at"].replace("Z", "+00:00"))
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+            fresh = (datetime.now(timezone.utc) - ts).total_seconds() < max_age_hours * 3600
+        except Exception:
+            fresh = False
+    if fresh:
+        return rec
+
+    script = REPO_ROOT / "scripts" / "check-board-liveness.py"
+    if not script.exists():
+        return rec if isinstance(rec, dict) else None
+    try:
+        # Exit code 1 means "orphaned scores found" -- a successful, informative run.
+        subprocess.run([sys.executable, str(script)], cwd=str(REPO_ROOT),
+                       capture_output=True, text=True, timeout=180)
+    except Exception as e:
+        print("  (could not refresh board liveness: %s)" % e)
+    return load_json(BOARD_LIVENESS) or (rec if isinstance(rec, dict) else None)
+
+
 # ---------------------------------------------------------------- stream B
 def stream_b():
     """Game side: are scores actually landing?"""
@@ -202,17 +244,69 @@ def stream_b():
         print("  Board version matches the current release (%s)." % board_version)
 
     wk = load_json(WEEKLY)
+    site_seed = None
     if isinstance(wk, dict):
-        wv = wk.get("game_version")
+        wv = (wk.get("meta") or {}).get("game_version") or wk.get("game_version")
+        site_seed = wk.get("seed")
         print("  weekly league version: %s%s"
               % (wv, "   <-- STALE" if (wv and site_version and wv != site_version)
                  else ""))
+        print("  weekly league seed:    %s" % site_seed)
+
+    # The board KEY is (seed, game_version). Everything above compares only the version
+    # half. A seed mismatch loses scores just as completely and had never been printed.
+    live = _board_liveness()
+    print()
+    if live is None:
+        print("  !! The live score API has NOT been checked, so nothing here is evidence")
+        print("     about whether scores exist. Everything above reads only LOCAL files,")
+        print("     and no local file has ever been fed by the API.")
+        print("     Run: python scripts/check-board-liveness.py")
+    else:
+        dep = live.get("deployed") or {}
+        print("  LIVE SCORE API (checked %s)" % live.get("checked_at"))
+        print("    deployed board (%s, %s): %s entries"
+              % (dep.get("seed"), dep.get("version"), dep.get("entries")))
+        verdict = live.get("verdict")
+        if verdict == "orphaned-scores":
+            n = live.get("orphaned_entries_total") or 0
+            print()
+            print("  !!!! SCORES ARE BEING LOST TO THE SITE ****")
+            print("     %d entries are recorded on the live API on boards nothing here" % n)
+            print("     publishes. Real people finished real runs and no visitor can see it.")
+            for b in live.get("orphaned_boards") or []:
+                print("       (%s, %s): %d entries, %d player(s), %s .. %s"
+                      % (b.get("seed"), b.get("version"), b.get("entries"),
+                         b.get("players", 0), (b.get("first_entry") or "?")[:10],
+                         (b.get("last_entry") or "?")[:10]))
+            print()
+            print("     This is NOT 'nobody is playing'. Do not go looking at analytics.")
+            print("     The submitting client's (seed, version) does not match the board")
+            print("     this site publishes. Never fix it by re-stamping a version.")
+        elif verdict == "unreachable":
+            print("    verdict: API UNREACHABLE -- board state is unknown, not empty.")
+        elif verdict == "genuinely-empty":
+            print("    verdict: genuinely empty. Every probed board holds 0 entries, so")
+            print("             nobody has submitted a score this probe can see. That is")
+            print("             an observation with a timestamp, not an assumption.")
+        elif verdict == "live":
+            print("    verdict: live -- the deployed board is the one receiving scores.")
 
     if not entries:
         print()
-        print("  No entries yet. Expected before launch. After you send links,")
-        print("  scores should start appearing hours later -- that lag between")
-        print("  Stream A and Stream B is the signal you are looking for.")
+        if live and (live.get("orphaned_entries_total") or 0) > 0:
+            # The old text here said "No entries yet. Expected before launch." That is a
+            # lie whenever the API holds entries, and it is exactly the sentence that
+            # would send an operator off to debug analytics instead of the board key.
+            print("  The published board shows 0 entries, but that is a PUBLISHING failure,")
+            print("  not an absence of players -- see the orphaned boards above.")
+        elif live is None:
+            print("  The published board shows 0 entries. Whether that means anything is")
+            print("  currently unknowable from this repo -- run the liveness check first.")
+        else:
+            print("  No entries yet, and the live API agrees. After you send links, scores")
+            print("  should start appearing hours later -- that lag between Stream A and")
+            print("  Stream B is the signal you are looking for.")
     print()
 
 

@@ -45,6 +45,15 @@ SCAN_GLOBS = ["public/**/*.html", "public/**/*.json", "public/**/*.js",
 SKIP_PARTS = {"node_modules", ".git", "copy-baseline", "events", "backups",
               "archive", "__pycache__"}
 
+# Files whose CONTENT is a record of other versions. Flagging these is a guaranteed
+# false positive that recurs on every regeneration, and a permanent block of known-noise
+# findings is how a report teaches people to stop reading it.
+SKIP_FILES = {
+    # A dated observation of which score-API boards exist, per game version. Listing
+    # non-current versions is its entire purpose -- none is presented as current.
+    "board-liveness.json",
+}
+
 SCRIPT_OR_STYLE = re.compile(r"<(script|style)\b.*?</\1>", re.S | re.I)
 
 VERSION_RE = re.compile(r"\bv?(\d+)\.(\d+)\.(\d+)\b")
@@ -113,6 +122,8 @@ def iter_files():
                 continue
             if p.name == self_name:
                 continue          # this file documents the patterns it hunts
+            if p.name in SKIP_FILES:
+                continue
             seen.add(p)
             yield p
 

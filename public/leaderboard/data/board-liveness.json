@@ -1,0 +1,149 @@
+{
+  "_comment": "Read-only observation of the live score API. Not a score store. Written by scripts/check-board-liveness.py.",
+  "checked_at": "2026-07-28T20:45:43+00:00",
+  "api": "https://api.pdoom1.com/score_api.php",
+  "verdict": "orphaned-scores",
+  "deployed": {
+    "version": "v0.13.1",
+    "seed": "weekly_2026_W30_18a08709",
+    "entries": 0
+  },
+  "published_snapshot": {
+    "game_version": "v0.11.0",
+    "entries": 0
+  },
+  "probe": {
+    "seeds": [
+      "weekly_2026_W30_18a08709",
+      "weekly-2026-w0"
+    ],
+    "versions": [
+      "v0.13.1",
+      "v0.11.0",
+      "v0.13.0",
+      "v0.12.0",
+      "v0.10.6",
+      "v0.10.5"
+    ],
+    "boards_probed": 12,
+    "unreachable": 0,
+    "note": null
+  },
+  "orphaned_boards": [
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.11.0",
+      "entries": 20,
+      "players": 3,
+      "first_entry": "2026-07-19T19:40:08",
+      "last_entry": "2026-07-22T15:56:46"
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.12.0",
+      "entries": 3,
+      "players": 2,
+      "first_entry": "2026-07-22T21:03:57",
+      "last_entry": "2026-07-22T23:36:37"
+    }
+  ],
+  "orphaned_entries_total": 23,
+  "boards": [
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.13.1",
+      "entries": 0,
+      "players": 0,
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.11.0",
+      "entries": 0,
+      "players": 0,
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.13.0",
+      "entries": 0,
+      "players": 0,
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.12.0",
+      "entries": 0,
+      "players": 0,
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.10.6",
+      "entries": 0,
+      "players": 0,
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.10.5",
+      "entries": 0,
+      "players": 0,
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.13.1",
+      "entries": 0,
+      "players": 0,
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.11.0",
+      "entries": 20,
+      "players": 3,
+      "first_entry": "2026-07-19T19:40:08",
+      "last_entry": "2026-07-22T15:56:46"
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.13.0",
+      "entries": 0,
+      "players": 0,
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.12.0",
+      "entries": 3,
+      "players": 2,
+      "first_entry": "2026-07-22T21:03:57",
+      "last_entry": "2026-07-22T23:36:37"
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.10.6",
+      "entries": 0,
+      "players": 0,
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.10.5",
+      "entries": 0,
+      "players": 0,
+      "first_entry": null,
+      "last_entry": null
+    }
+  ]
+}
