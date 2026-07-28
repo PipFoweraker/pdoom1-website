@@ -123,6 +123,20 @@ Deleting them *without* making that choice would silently drop 1,000 pages of
 curated content whose source is alive and well. Pip is uplifting pdoom-data next
 week; this belongs to that work.
 
+**New in 2026-07-29 — the unmanaged pages now carry a privacy cost, not just a
+staleness cost.** `sync-events.py` gained a redaction pass that strips
+third-party email addresses out of PDF-scraped descriptions (75 addresses were
+being published across 44 pages). That pass protects everything generated from
+`all_events.json` — and by construction cannot protect these 1,000, because
+nothing regenerates them. Two of them were carrying addresses
+(`alignmentforum_5cf6dbe41151b29e.html`, `alignmentforum_7154aca101dbeb10.html`)
+and were scrubbed in place with `scripts/check-published-emails.py --fix`. That
+is a **stopgap**: an in-place edit to a generated file, which is exactly the
+thing this repo warns against, tolerable only because no generator will clobber
+it. Option (a) above is the real fix — it puts these pages under the redaction
+pass with everything else. Until then, `check-published-emails.py` is the only
+thing standing between them and the next scraped address.
+
 **Also flagged upstream:** `pdoom-data/.../timeline_events/manifest.json` claims
 `"total_events": 28`, which matches neither the 1,194 in `all_events.json` nor
 the 1,000 in `alignment_research`. That manifest is stale and should not be
