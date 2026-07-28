@@ -234,19 +234,39 @@ platform that has no build.
   `datetime.now()`** — `datetime.now()` without a tz is *local* time, which on
   Pip's box is AEST (+10), exactly the size of skew that crosses this boundary.
 - **The league and player pages are retired-and-hidden, not deleted** (Pip,
-  2026-07-28), and everything opened before the **2026-08-07 epoch fork** is
+  2026-07-28), and everything opened before the **L2 → L3 ladder fork** is
   labelled **anomalous pre-history** via a machine-readable `epoch` block in the
-  data. The boundary is the fork (first Friday of August: `0.13→0.14`, `L2→L3`),
-  not 31 July — that is the *last* Friday of July, a Seed roll on unchanged rules.
-  First regularised week is **2026_W33** (Fri 2026-08-07). Week ids changed
-  meaning at the 2026-07-30 rollover, so **compare `start_timestamp`, not ids**,
-  across that switch. Before touching any weekly archive, seed leaderboard, or
-  `/league/` + `/players/` page, read `docs/LEAGUE_EPOCH_ANOMALY.md` — it records
-  what each file is, why the `v0.4.1` stamps must NOT be restamped, and where
-  every piece lives.
-- The leaderboard board key is **`(seed, game_version)`** (pdoom1 PR #679). A
-  version-stamp mismatch means submitted scores land nowhere, with **no error
-  shown to the player** — it looks exactly like "nobody is playing". Suspect this
+  data. The boundary is `2026-07-31 00:00 Australia/Hobart`
+  (`2026-07-30T14:00:00Z`) and **it is not a script literal** — it lives in
+  `public/data/ladder-epochs.json`, which `weekly-league-manager.py` reads. First
+  regularised week is **2026_W32** (Fri 2026-07-31).
+  **Do not re-derive this from `RELEASE_NOMENCLATURE.md`'s "Epoch = first Friday"
+  rule** — that is how an earlier pass got 2026-08-07. The ladder forked
+  *mid-month* on gameplay changes (the AP pool was removed for an attention
+  economy); the shipping build is v0.13.2 on L3. **pdoom1-website#151, comment
+  2026-07-28T23:13Z, is authoritative and supersedes that calendar row.**
+  Week ids changed meaning at the 2026-07-30 rollover, so **compare
+  `start_timestamp`, not ids**, across that switch. Before touching any weekly
+  archive, seed leaderboard, or `/league/` + `/players/` page, read
+  `docs/LEAGUE_EPOCH_ANOMALY.md`.
+- **The board key is `(seed, ladder_version)` — literally `L3`.** NOT
+  `v0.13.2`, NOT `L3.0`, and **no longer `(seed, game_version)`** (an earlier note
+  here said that; pdoom1 #151 supersedes it). `GameConfig.get_board_version()`
+  returns `"L" + LADDER_VERSION`. The build version never touches the board key
+  again — that is the point of the build-vs-ladder split. `meta.game_version` in
+  a weekly record is a **record stamp only**; keying off it is what stranded 23
+  real submissions.
+  **The score API has NO key validation.** A wrong seed or version returns
+  `ok:true` with an empty board (verified 2026-07-29, read path) — indistinguishable
+  from "nobody is playing", and **no error is shown to the player**. Proving a key
+  needs a *positive* check (post a score, read it back). Suspect a key mismatch
   before suspecting analytics.
+- **Never present an unblessed seed to a player.** The blessed value is
+  `docs/LEAGUE_SEED_LEDGER.md` → mirrored into `public/data/ladder-epochs.json`;
+  anything the website derives is a placeholder marked
+  `seed_provenance.blessed: false`, and `public/leaderboard/index.html` will not
+  offer it. Pip, 2026-07-29: *"Let's keep using variables and not hardcoding
+  things where we can!"* — pinned values go in a data file with a `source` note,
+  never a script literal.
 - pdoom1 PR #679 also rules that this repo is a **read-only consumer** of one PHP
   score API and must not stand up a second score store.

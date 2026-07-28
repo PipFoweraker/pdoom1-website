@@ -1,13 +1,12 @@
-# The league epoch anomaly — pre-history before 2026-08-07
+# The league epoch anomaly — pre-history before ladder epoch L3
 
 **Status:** deliberate. Nothing described here is a bug awaiting a fix.
-**Written:** 2026-07-28. **Revised 2026-07-29** for two later rulings (the
-Friday/Hobart anchor and the 2026-08-07 boundary) — see
-[What changed on 2026-07-29](#what-changed-on-2026-07-29). Every count and path
-below was measured, not recalled.
+**Written:** 2026-07-28. **Revised twice on 2026-07-29** — see
+[Revision history](#revision-history). Every count and path below was measured,
+not recalled.
 
 Pip's ruling (2026-07-28): the weekly league and player pages are **retired and
-kept hidden, not deleted**, and everything opened before the epoch fork becomes
+kept hidden, not deleted**, and everything opened before the ladder fork becomes
 deliberately-labelled **anomalous pre-history** — visible in the archive as an
 explicit anomaly section, not silently buried. In his words, kept so "the ultra
 archivists can track it down".
@@ -20,43 +19,91 @@ This file is that record. If you are the archivist: start at
 ## The epoch boundary
 
 ```
-EPOCH_BOUNDARY = 2026-08-07 00:00:00 Australia/Hobart
-               = 2026-08-06T14:00:00Z
+EPOCH_BOUNDARY = 2026-07-31 00:00:00 Australia/Hobart
+               = 2026-07-30T14:00:00Z
 ```
 
-**The boundary is a fork, not a date someone liked.** Per
-`pdoom1/docs/RELEASE_NOMENCLATURE.md` the cadence is:
+**It is not a literal in any script.** It lives in
+`public/data/ladder-epochs.json` with its source cited, and
+`scripts/weekly-league-manager.py` reads it (`ladder_contract()`,
+`epoch_boundary()`). It has moved twice in two days, and Pip's standing rule
+(2026-07-29) is *"Let's keep using variables and not hardcoding things where we
+can!"*.
 
-- **Seed** — weekly, every **Fri** — a fresh board on **unchanged** rules (new
-  `seed`, same `ladder_version`).
-- **Epoch** — monthly, the **first Friday** — minor and ladder both bump.
+### Why here: the ladder forked, mid-month
 
-2026-08-07 is the first Friday of August: the Epoch roll where `0.13 → 0.14` and
-`L2 → L3`. 2026-07-31, which this file originally named, is the *last* Friday of
-July — by the spec a Seed roll on unchanged rules. Anchoring the boundary there
-would have started the "regularised" era one week **before** a fork, so the good
-era would have forked seven days into its life. Scores either side of an Epoch
-were set under different rules and are not rankable against each other; scores
-either side of a Seed roll are.
+The boundary is the **L2 → L3 ladder fork**, not a calendar rule.
+`ladder_version.txt` moved 2 → 3 **mid-month**, on gameplay changes:
+
+- the **action-point pool was removed entirely**, in favour of an attention
+  economy;
+- office lease and lock-in;
+- four-way founder hours;
+- six previously-inert upgrades wired up;
+- quirk rebalance.
+
+The build shipping Friday 2026-07-31 is **v0.13.2 on L3**. Nothing has ever been
+published on L3 — the current public build, v0.13.1, is L2.
+
+A score set under the old rules and a score set under the new ones are not
+measuring the same game. That non-comparability *is* the reason `ladder_version`
+is half the board key. It is a far stronger justification than "before this
+date", and it is sourced.
+
+> **Source precedence.** `pdoom1/docs/RELEASE_NOMENCLATURE.md` describes the
+> cadence *pattern* (Seed weekly on Fridays; Epoch monthly on the first Friday)
+> and that pattern still holds — but its calendar row
+> `Jul 31 | Fri | Weekly Seed | Seed | -- / L2` is **stale**, because the ladder
+> forked off-cadence. **pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z
+> is authoritative for this cut.** Anywhere this repo cites either, it says which.
+
+### Midnight, not 1700 — and why the difference is recorded rather than hidden
+
+The board itself opens **~1700 AEST on Friday 2026-07-31** (the seed is drawn and
+spoken at a ceremony ~1645), which is ~17 hours *into* the first L3 week. The
+boundary is nevertheless the **Hobart-midnight anchor of that week**, for one
+reason:
+
+- The unit being flagged is a **whole league week**. Cutting at 1700 would put
+  the boundary inside the first L3 week, so that week would start before its own
+  boundary and be labelled pre-L3 — the first good week flagged as bad.
+- Worse, a week that is half under L2 rules and half under L3 is exactly the
+  cross-epoch blend the ladder split exists to prevent. Weeks do not get to be
+  half-comparable.
+
+So the open time is carried **separately** — `epoch.board_opens_local` in every
+regularised record, `epochs.board_opens_local` in the archive index, and a
+sentence on the archive page — flagged `board_opens_confirmed: false` because
+"~1700" is approximate until the game side confirms it. Nothing anywhere claims
+the board was accepting scores from midnight. A player who played Friday morning
+was on v0.13.1/L2 and submitted to the **L2** board, which is preserved and
+labelled; a player who played Friday evening was on v0.13.2/L3. Both are
+described correctly.
+
+### The rule
 
 A week is **anomalous** iff its own start instant is **before** the boundary.
 The rule is one line, in one place, and every consumer reads the flag rather
 than re-deriving the date:
 
-- `scripts/weekly-league-manager.py` → `EPOCH_BOUNDARY_LOCAL_DATE`,
-  `epoch_boundary()`, `epoch_for()`
+- `public/data/ladder-epochs.json` → the boundary, ladder version, board-key
+  shape, seed blessing state and both reason strings
+- `scripts/weekly-league-manager.py` → `ladder_contract()`, `epoch_boundary()`,
+  `board_opens()`, `epoch_for()`
 - stamped into the data as an `epoch` object (below)
 - read by `public/league/archive.html` → `isAnomalous()`
 
 | week | starts | ends | epoch |
 |---|---|---|---|
 | … 2025_W41 … 2026_W30 | 2025-10-06 … 2026-07-20 | … 2026-07-26 | `pre-regularisation` (anomalous) — Monday-anchored UTC weeks |
-| **2026_W31** | 2026-07-27 | 2026-08-02 | `pre-regularisation` (anomalous) — the last Monday-anchored week; archived by the 2026-07-30 rollover |
-| **2026_W32** | Fri 2026-07-31 | Thu 2026-08-06 | `pre-regularisation` (anomalous) — **first Friday/Hobart week**, but it opens on a *Seed* roll, one week before the fork |
-| **2026_W33** | Fri 2026-08-07 | Thu 2026-08-13 | `regularised` — **the first good week**, opened by the Thu 2026-08-06 14:00 UTC rollover, at the fork |
+| **2026_W31** | 2026-07-27 | 2026-08-02 | `pre-regularisation` (anomalous) — the last Monday-anchored week; archived by the Thu 2026-07-30 rollover |
+| **2026_W32** | Fri 2026-07-31 | Thu 2026-08-06 | `regularised`, `ladder_version: L3` — **the first good week**, and the first Friday/Hobart week. Opened by the Thu 2026-07-30 14:00 UTC rollover; board opens ~1700 that day. |
 
-The straddle is deliberate. A week that began before the fork cannot be a clean
-week just because it happened to end after it.
+There is no straddle any more: the anchor change and the fork land on the same
+instant, `2026-07-30T14:00:00Z`. That is a coincidence worth stating rather than
+relying on — the test asserts the two agree
+(`the boundary IS the rollover instant`), so if either moves independently the
+rollover fails instead of publishing a week under the wrong epoch.
 
 ### The week itself moved: Friday 00:00 Australia/Hobart
 
@@ -126,11 +173,14 @@ Every weekly record carries a top-level `epoch` object, written directly after
 "epoch": {
   "id": "pre-regularisation",
   "anomalous": true,
-  "boundary_local": "2026-08-07T00:00:00+10:00",
+  "ladder_version": null,
+  "boundary_ladder_version": "L3",
+  "boundary_local": "2026-07-31T00:00:00+10:00",
   "boundary_tz": "Australia/Hobart",
-  "boundary_utc": "2026-08-06T14:00:00Z",
-  "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day ... Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+  "boundary_utc": "2026-07-30T14:00:00Z",
+  "reason": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable ...",
   "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+  "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
   "observed_defects": {
     "monday-anchored-utc-week": "...",
     "rollover-off-by-one": "...",
@@ -140,7 +190,43 @@ Every weekly record carries a top-level `epoch` object, written directly after
 ```
 
 The boundary is carried in **both clocks plus the zone name**, so a reader never
-has to know which one a bare timestamp meant.
+has to know which one a bare timestamp meant. A **regularised** record adds
+`ladder_version: "L3"` and `board_opens_local` / `board_opens_confirmed`; a
+pre-fork record carries `ladder_version: null` (it belongs to no current epoch)
+and no board-open time, because none applies to it.
+
+### The board key is `(seed, L<n>)` — literally `L3`
+
+Not `v0.13.2`. Not `L3.0`. **The build version never touches the board key
+again**; that is the entire point of the build-vs-ladder split, and it means a
+cosmetic patch bump can no longer fork a board. From the game side:
+`GameConfig.get_board_version()` returns `"L" + LADDER_VERSION`; the local board
+file is `leaderboard_<seed>__L3.json`; the remote POST body field and the remote
+GET query parameter are both `version=L3`.
+
+Every new weekly record therefore carries an explicit `board_key` object
+(`seed`, `ladder_version`, `shape`, `blessed`) so no consumer has to reassemble
+the key and get its shape wrong. `meta.game_version` is still written, but it is
+a **record stamp** — which build produced the file — and is commented as such in
+`weekly-league-manager.py`. Under the old `(seed, game_version)` keying a patch
+bump *did* fork the board; that is how 23 of the 27 preserved submissions below
+were stranded.
+
+### The seed is deliberately absent
+
+`public/data/ladder-epochs.json` → `regularised_from.seed` is **`null`**, with
+`seed_status: "unblessed"`. The L3 seed is drawn at the ceremony ~1645 AEST on
+2026-07-31 and posted by the game side; pdoom1 asked explicitly that nothing
+hardcode it beforehand, and this repo has been wrong about a seed before
+(`league_2026-07_7d6ced29`). Until a human blesses it:
+
+- `seed_for_week()` falls back to the website's derived placeholder and marks it
+  `blessed: false`;
+- `public/leaderboard/index.html` **refuses to offer an unblessed seed to a
+  player** — previously it would have advertised the placeholder, sending people
+  to a board that can only ever be empty;
+- `scripts/test-weekly-league-boundary.py` greps `scripts/*.py` and
+  `public/data/*.json` and fails if the probable value appears anywhere.
 
 `observed_defects` is derived **per file**, never asserted blanket-wise: each
 key is present only if that specific file demonstrates it. Frequencies across
@@ -284,7 +370,7 @@ All paths relative to the repo root. Counts verified 2026-07-28.
 |---|---:|---|
 | `public/leaderboard/data/weekly/archive/*_league.json` | **42** | `2025_W41` … `2026_W30`, contiguous, no gaps. All `epoch.anomalous: true`. Total 121,508 bytes. |
 | `public/leaderboard/data/weekly/archive/index.json` | 1 | **Derived**, rebuilt from the directory by `weekly-league-manager.py --rebuild-archive-index`. Carries a per-week `epoch` plus an `epochs` summary block. |
-| `public/leaderboard/data/weekly/current.json` | 1 | Currently `2026_W31` (the last Monday-anchored week), `epoch.anomalous: true`. Archived and replaced by `2026_W32` at the **Thu 2026-07-30 14:00 UTC** rollover; `2026_W33` — the first regularised week — opens at the **Thu 2026-08-06 14:00 UTC** rollover. |
+| `public/leaderboard/data/weekly/current.json` | 1 | Currently `2026_W31` (the last Monday-anchored week), `epoch.anomalous: true`. Archived and replaced by `2026_W32` — the first L3 week — at the **Thu 2026-07-30 14:00 UTC** rollover. |
 
 **Deliberately not pre-rolled.** `current.json` was left holding the
 Monday-anchored `2026_W31` rather than being regenerated under the new geometry.
@@ -293,13 +379,13 @@ the Friday week of 2026-07-24 would also be labelled `2026_W31` — it would hav
 overwritten the archive of the week it was archiving. The geometry change takes
 effect at the next real rollover, which is the honest place for it.
 
-**Merge timing matters, and only in one direction.** Every week before
-2026-08-07 is anomalous by definition, so a rollover that runs under the old code
-in the meantime is harmless. What must not slip is **Thu 2026-08-06 14:00 UTC**:
-that is the run that opens the first regularised week. If this lands after
-2026-07-30 but before 2026-08-06, `2026_W32` simply never gets a file (the era
-starts one file later) and `validate_data.py` will WARN about a stale current
-week from 2026-08-04 — noisy, not wrong.
+**Merge timing is now tight.** The boundary and the anchor land on the same
+instant, **Thu 2026-07-30 14:00 UTC**, and that single run both switches the
+geometry and opens the first L3 week. If this merges after it, the first L3 week
+gets no record until the following Thursday while the board is live —
+`validate_data.py` would WARN about a stale current week from 2026-08-04, and the
+archive page would show no L3 week at all. The #191 scope line also closes on
+2026-07-30: no board-key handling changes after that without a heads-up.
 
 `2026_W30_league.json` is **new in this change**: it is the stale `current.json`
 (week 2026_W30, generated 2026-07-26) archived where it belongs, so the live
@@ -311,6 +397,60 @@ file could hold the truthful running week.
 > it. Since `public/league/archive.html` reads *only* the index, **38 weeks of
 > pre-history were invisible on the page**. It is now derived on every archive and
 > every new week.
+
+### Preserved orphaned boards — 27 real submissions the site never showed
+
+`public/leaderboard/data/preserved/2026-07-29-orphaned-boards/` (arrives with
+branch `data/preserve-orphaned-boards`). Captured live from
+`https://api.pdoom1.com/score_api.php` **before** any remediation, so repairing
+the fault could not destroy the evidence of it.
+
+Measured from the capture on 2026-07-29 — **27 entries, 6 distinct
+`player_name` values, 2026-07-19T19:40:08 → 2026-07-26T18:30:47**:
+
+| board key | key kind | entries |
+|---|---|---:|
+| `(weekly-2026-w0, v0.11.0)` | build-version — pre-split keying | **20** |
+| `(weekly-2026-w0, v0.12.0)` | build-version — pre-split keying | **3** |
+| `(weekly-2026-w30, L2)` | ladder | **4** |
+| four other captured boards | mixed | 0 |
+
+Players: `AI Safety Lab`, `CogDerp`, `Cognitive Development`,
+`Division of Intelligent Agents`, `Hamthropic`,
+`Laboratory of Autonomous Systems`.
+
+**Why they were invisible — two independent mismatches**, either of which alone
+lost every score: the client submitted seed `weekly-2026-w0` while the site
+derived `weekly_2026_W30_18a08709`, **and** the versions differed. Compounding
+it, the score API has **no key validation at all** — a wrong seed or version
+returns `ok:true` with an empty board (verified 2026-07-29 on the read path), so
+nothing on either side could tell "the key is wrong" from "nobody has played".
+23 of the 27 sat on `(seed, game_version)` boards forked by patch bumps, which is
+precisely what the build-vs-ladder split now prevents.
+
+**How they surface.** `rebuild_archive_index()` scans the preserved directory and
+writes a `preserved_boards` summary into `archive/index.json`; the archive page
+renders a **[PRESERVED] Real scores the site never showed** block from it, listing
+each board key and its actual entries. It is derived from the directory, so:
+
+- while the capture is on its own branch, the array is `[]` and the block does
+  not render — the page claims nothing;
+- **the moment `data/preserve-orphaned-boards` merges, someone must run
+  `python scripts/weekly-league-manager.py --rebuild-archive-index`** (or wait
+  for the next rollover, which does it) for the block to appear.
+
+**They are never merged forward.** Pip's ruling 2026-07-29, echoing pdoom1:
+merging scores earned under different rules is the exact lie the ladder split
+exists to prevent. `scan_preserved_boards()` only ever *summarises* — it has no
+path that copies an entry into a league record. Pip is contacting the six players
+directly.
+
+> **The capture's own README is one revision behind this file.** It says "23 real
+> player submissions", "4 distinct `player_name` values" and a range ending
+> 2026-07-22 — true of the five files it tabulates, but the directory also holds
+> `weekly-2026-w30__L2.json` (4 entries, to 2026-07-26). It also cites the
+> superseded `2026-08-07` boundary. Both are that branch's to correct; the counts
+> above were measured against the files, not copied from the README.
 
 ### Seed leaderboards — 15 files, ~39 KB, the only real entries anywhere
 
@@ -351,8 +491,9 @@ from that fact.
 
 | path | role |
 |---|---|
-| `scripts/weekly-league-manager.py` | The producer. `league_tz()`, `league_week_start()`, `league_week_end()`, `week_id_for()`, `epoch_boundary()`, `epoch_for()`, `rebuild_archive_index()`, `SEED_PROVENANCE`. |
-| `scripts/test-weekly-league-boundary.py` | 74 assertions: the zone resolves at all (the tzdata trap), the boundary in **winter and summer**, the two DST-spanning weeks, the A9 regression instant, the ISO-year straddle, input timezone handling, 60 rollovers of invariants, the epoch rule, and that the workflow's cron still matches `ROLLOVER_HOUR_UTC` / `ROLLOVER_CRON_DOW` **and still lands on a Friday in Hobart in both DST states**. |
+| `public/data/ladder-epochs.json` | **The contract.** Boundary, ladder version, board-key shape, board-open time, seed blessing state, both reason strings, and the source citation for each. Edit the boundary here, nowhere else. |
+| `scripts/weekly-league-manager.py` | The producer. `league_tz()`, `league_week_start()`, `league_week_end()`, `week_id_for()`, `ladder_contract()`, `epoch_boundary()`, `board_opens()`, `epoch_for()`, `seed_for_week()`, `scan_preserved_boards()`, `rebuild_archive_index()`. |
+| `scripts/test-weekly-league-boundary.py` | 93 assertions: the zone resolves at all (the tzdata trap), the boundary in **winter and summer**, the two DST-spanning weeks, the A9 regression instant, the ISO-year straddle, input timezone handling, 60 rollovers of invariants, the epoch rule, board-open vs boundary, the contract's board-key shape, that the unblessed seed is hardcoded nowhere, that a wrong offset in the contract is rejected, and that the workflow's cron still matches `ROLLOVER_HOUR_UTC` / `ROLLOVER_CRON_DOW` **and still lands on a Friday in Hobart in both DST states**. |
 | `requirements.txt` | Pins `tzdata`. Without it the anchor cannot be resolved on Windows and every league script fails loudly. |
 | `scripts/stamp-league-epoch.py` | Idempotent backfill. `--check` exits 1 if any weekly record is unstamped. |
 | `.github/workflows/weekly-league-reset.yml` | Runs the boundary test **before** mutating anything, then stamps epochs after opening the week. |
@@ -369,11 +510,15 @@ from that fact.
    the seed that was actually competitive in any period.
 4. **A `v0.4.1` or `1.0.0` stamp is evidence, not an error.** It dates the
    producing tool. Restamping destroys the only provenance these files have.
-5. **Nothing before 2026_W33 is comparable to anything after it.** Not the week
-   numbering, not the seeds, not the version stamps, not the participant counts.
+5. **Nothing before 2026_W32 is comparable to anything after it.** Not the week
+   numbering, not the seeds, not the version stamps, not the participant counts —
+   and above all not the scores, because L3 changed the rules that produced them.
    The week numbering in particular changed meaning at the 2026-07-30 rollover
    (Monday-anchored UTC → Friday-anchored Hobart), so two records can share an
    id and describe different spans. Compare `start_timestamp`, never ids.
+7. **A board is `(seed, L<n>)`.** If you find yourself keying anything off
+   `meta.game_version`, stop: that is a record stamp, and treating it as a key is
+   what stranded 23 real submissions.
 6. **To reproduce any claim here**, run:
    ```
    python scripts/stamp-league-epoch.py --check      # every record stamped?
@@ -411,30 +556,41 @@ patched, because each is someone else's page to change.
 
 ---
 
-## What changed on 2026-07-29
+## Revision history
 
-Two rulings landed after the first version of this file was written. Recorded
-rather than quietly overwritten, because "the boundary moved" is itself part of
-the provenance.
+Three rulings landed after the first version of this file was written. Recorded
+rather than quietly overwritten, because "the boundary moved twice" is itself
+part of the provenance — and it is the reason the boundary now lives in a data
+file instead of a script.
 
-| | before (2026-07-28) | after (2026-07-29) | why |
+| | v1 (2026-07-28) | v2 (2026-07-29 AM) | v3 (2026-07-29 PM, current) |
 |---|---|---|---|
-| week anchor | Monday 00:00 **UTC** | Friday 00:00 **Australia/Hobart** | the game's spec says a Seed roll is "every Fri"; Pip: everything runs on Hobart time |
-| rollover cron | `0 14 * * 0` (Sunday 14:00 UTC) | `0 14 * * 4` (Thursday 14:00 UTC) | lands on a Hobart Friday in both DST states |
-| epoch boundary | `2026-07-31T00:00:00Z` | `2026-08-07 00:00 Hobart` (`2026-08-06T14:00:00Z`) | 31 July is a Seed roll; 7 August is the Epoch fork (`0.13→0.14`, `L2→L3`) |
-| first regularised week | `2026_W32` (2026-08-03) | `2026_W33` (Fri 2026-08-07) | follows from both of the above |
-| anomalous window | 43 records, through the week starting 2026-07-27 | **44** records — one week more: the Friday week starting 2026-07-31 is also pre-history | the fork is a week later than the old boundary |
-| new dependency | — | `tzdata` in `requirements.txt` | `zoneinfo` has no bundled tz database on Windows |
+| week anchor | Monday 00:00 **UTC** | Friday 00:00 **Australia/Hobart** | unchanged |
+| rollover cron | `0 14 * * 0` (Sun 14:00 UTC) | `0 14 * * 4` (Thu 14:00 UTC) | unchanged |
+| epoch boundary | `2026-07-31T00:00:00Z` | `2026-08-07 00:00 Hobart` | **`2026-07-31 00:00 Hobart`** (`2026-07-30T14:00:00Z`) |
+| justification | "patch-cycle regularisation" (a date) | "first Friday Epoch, `0.13→0.14` / `L2→L3`" (a calendar rule) | **the L2 → L3 ladder fork itself** (a rules change), sourced to #151 |
+| first regularised week | `2026_W32` (Mon 2026-08-03) | `2026_W33` (Fri 2026-08-07) | **`2026_W32`** (Fri 2026-07-31) |
+| where the boundary lives | script literal | script literal | **`public/data/ladder-epochs.json`** |
+| board key | `(seed, game_version)` | not addressed | **`(seed, L<n>)`**, literally `L3` |
+| new dependency | — | `tzdata` in `requirements.txt` | unchanged |
 
-The 43 records on disk today were all anomalous under the old boundary and are
-all still anomalous under the new one; the growth is the one *future* week
-(`2026_W32`, Fri 2026-07-31 → Thu 2026-08-06) that the old boundary would have
-called clean and the fork correctly calls pre-history.
+**Why v2 was wrong.** It derived 7 August from `RELEASE_NOMENCLATURE.md`'s
+"Epoch = first Friday" rule. The rule still describes the pattern, but the ladder
+**forked early** — `ladder_version.txt` moved 2 → 3 mid-month on gameplay
+changes, and the build shipping 2026-07-31 is v0.13.2 on L3. So that document's
+row `Jul 31 | Fri | Weekly Seed | Seed | -- / L2` is stale, and
+pdoom1-website#151 (2026-07-28T23:13Z) wins. Deriving a boundary from a cadence
+rule instead of from the thing the boundary is *about* is the mistake worth
+remembering.
 
-The A9 diagnosis and fix were **not** revisited: the off-by-one, and the
-`datetime.now()`-is-local half of it, are independent of which day the anchor
-sits on. Only the day constant, the timezone, the boundary date, and the
-assertions that pin them moved.
+**The anomalous window therefore shrank by one week between v2 and v3.** The 43
+records on disk were anomalous under all three boundaries and remain so. The week
+that moved is `2026_W32` (Fri 2026-07-31 → Thu 2026-08-06): v2 called it
+pre-history, v3 correctly calls it the **first L3 week**.
+
+The A9 diagnosis and fix have **not** been revisited across any of this: the
+off-by-one, and the `datetime.now()`-is-local half of it, are independent of
+which day the anchor sits on and of which epoch the boundary marks.
 
 ---
 

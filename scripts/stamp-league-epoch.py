@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 """Stamp the ladder-epoch flag onto weekly league records. Idempotent.
 
-Pip's ruling (2026-07-28, boundary revised 2026-07-29): the league is
-retired-and-hidden, not deleted, and everything opened before the **2026-08-07
-epoch fork** -- the first Friday of August, where the game's minor and ladder
-versions both bump (0.13 -> 0.14, L2 -> L3) -- becomes deliberately-labelled
-**anomalous pre-history**, visible in the archive as an explicit anomaly section
-rather than silently buried. "so the ultra archivists can track it down".
+Pip's ruling (2026-07-28, boundary corrected 2026-07-29): the league is
+retired-and-hidden, not deleted, and everything opened before the **L2 -> L3
+ladder fork** becomes deliberately-labelled **anomalous pre-history**, visible in
+the archive as an explicit anomaly section rather than silently buried. "so the
+ultra archivists can track it down".
 
-The boundary is the fork, not a tidy date: 2026-07-31 (this file's first
-boundary) is the *last* Friday of July, which by
-pdoom1/docs/RELEASE_NOMENCLATURE.md is a Seed roll on unchanged rules. Anchoring
-there would have started the regularised era one week before a fork.
+The boundary is the FORK -- a rules change, not a date. L3 removed the
+action-point pool entirely in favour of an attention economy, plus office
+lease/lock-in, four-way founder hours, six previously-inert upgrades and a quirk
+rebalance, so scores either side of it are not measuring the same game. It lands
+with the week beginning Fri 2026-07-31 in Hobart. (An intermediate revision of
+this file said 2026-08-07, derived from RELEASE_NOMENCLATURE.md's "Epoch = first
+Friday" cadence rule; the ladder actually forked mid-month, so pdoom1-website#151
+2026-07-28T23:13Z supersedes that row.)
+
+The boundary itself is NOT a literal here -- it is read from
+public/data/ladder-epochs.json via weekly-league-manager.ladder_contract().
 
 What this writes: an `epoch` object into every weekly archive file and into
 current.json. What it does NOT touch: entries, scores, seeds, version stamps,

@@ -184,7 +184,7 @@
     }
 
     /* --- Anomalous pre-history (see docs/LEAGUE_EPOCH_ANOMALY.md) ---------
-       Weeks opened before the 2026-08-07 epoch fork are kept and shown, but
+       Weeks opened before the L2 -> L3 ladder fork are kept and shown, but
        fenced off so nobody reads them as competition results. Muted, not
        hidden. */
     .anomaly-section {
@@ -192,6 +192,35 @@
       border-top: 1px dashed var(--border-color);
       padding-top: 2rem;
     }
+
+    .preserved-board {
+      margin-top: 1.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .preserved-board h3 { margin: 0 0 .35rem; font-size: 1rem; }
+
+    .preserved-meta {
+      font-size: .85rem;
+      opacity: .8;
+      margin: 0 0 .75rem;
+    }
+
+    .preserved-table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: .9rem;
+    }
+
+    .preserved-table th,
+    .preserved-table td {
+      padding: .3rem .6rem;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+    }
+
+    .preserved-table th { font-weight: 600; opacity: .85; }
 
     .anomaly-notice {
       background: var(--bg-secondary);
@@ -591,9 +620,9 @@
 
     <!-- No Results -->
     <div class="no-results" id="no-results" style="display: none;">
-      No regularised league weeks have been archived yet. The first one runs from
-      Friday 7 August 2026 and closes on Thursday 13 August 2026. Everything before
-      7 August 2026 is anomalous pre-history and is listed separately below.
+      No league weeks on ladder epoch L3 have been archived yet. The first one runs from
+      Friday 31 July 2026 and closes on Thursday 6 August 2026. Everything set under the
+      earlier rules is anomalous pre-history and is listed separately below.
     </div>
 
     <!-- Archive Grid -->
@@ -613,28 +642,36 @@
          anomaly that isn't in the data. See docs/LEAGUE_EPOCH_ANOMALY.md. -->
     <section class="anomaly-section" id="anomaly-section" style="display: none;">
       <div class="anomaly-notice">
-        <h2>[ANOMALY] Pre-history: weeks before 7 August 2026</h2>
+        <h2>[ANOMALY] Pre-history: everything before ladder epoch L3</h2>
         <p>
           The <strong id="anomaly-count">&mdash;</strong> weeks below were produced before the
-          epoch fork on <strong>Friday 7 August 2026</strong>. They are kept and shown
+          <strong>L2&nbsp;&rarr;&nbsp;L3 ladder fork</strong>, which lands with the week
+          beginning <strong>Friday 31 July 2026</strong> in Hobart. They are kept and shown
           deliberately, but they are <strong>not results</strong> and are
-          <strong>not comparable</strong> to anything after that date.
+          <strong>not comparable</strong> to anything after it.
         </p>
         <p>
-          The cut is a fork, not a tidy date. 7 August is the first Friday of the month,
-          which is when the game's rules version and its ladder version both change — so
-          scores either side of it were set under different rules and cannot be ranked
-          against each other. (31 July, the previous Friday, only refreshed the board on
-          unchanged rules, which is why the cut is not there.)
+          The cut is a rules change, not a date. L3 removed the action-point pool entirely
+          in favour of an attention economy, and added office lease and lock-in, four-way
+          founder hours, six previously-inert upgrades and a quirk rebalance. A score set
+          under the old rules and a score set under the new ones are not measuring the same
+          game, so ranking them against each other would be meaningless. That is exactly
+          why the ladder version is part of a board's identity: a board is keyed
+          <code>(seed,&nbsp;L3)</code> — the ladder epoch, never the build number.
+        </p>
+        <p id="board-opens-note" style="display: none;">
+          The first L3 board opens later on that Friday, not at midnight: <strong
+          id="board-opens-when">&mdash;</strong>. The week is labelled from its own start
+          because a week cannot be half under one set of rules and half under another —
+          but nothing was submittable until the board opened.
         </p>
         <p>
-          What actually happened before it: the weekly rollover ran every Sunday at
-          14:00 UTC on a Monday-to-Sunday week, two days out of phase with the game's own
-          Friday cadence, and it created the week that was <em>ending</em> ten hours later
-          instead of the week that was starting — so each record is labelled one week
-          behind the period it describes. Every one of these weeks also contains zero
-          entries — no shipped game client ever submitted a score to these board keys —
-          and the seeds shown were derived by the website rather than sent by the game.
+          What went wrong before it, separately from the rules change: the weekly rollover
+          ran every Sunday at 14:00 UTC on a Monday-to-Sunday week, two days out of phase
+          with the game's own Friday cadence, and it created the week that was
+          <em>ending</em> ten hours later instead of the week that was starting — so each
+          record is labelled one week behind the period it describes. Every one of these
+          weekly files also contains zero entries, because scores never lived in them.
           Some records still carry <code>v0.4.1</code> version stamps from the old pygame
           client; those are left exactly as found, because restamping them would invent a
           history that did not happen.
@@ -651,6 +688,34 @@
         </p>
       </div>
       <div class="archive-grid anomaly-grid" id="anomaly-grid"></div>
+
+      <!-- Stranded submissions. Rendered ONLY from index.preserved_boards, so
+           when the capture is not present this whole block stays hidden and the
+           page claims nothing. These are real scores; they are shown, never
+           merged forward. See docs/LEAGUE_EPOCH_ANOMALY.md. -->
+      <div class="anomaly-notice" id="preserved-section" style="display: none; margin-top: 2.5rem;">
+        <h2>[PRESERVED] Real scores the site never showed</h2>
+        <p>
+          <strong id="preserved-entry-count">&mdash;</strong> submissions from
+          <strong id="preserved-player-count">&mdash;</strong> players reached the score
+          API and were never published here. They are not lost — they were captured
+          straight off the live API before anything was repaired, so fixing the fault
+          could not destroy the evidence of it.
+        </p>
+        <p>
+          Why they were invisible: a board is identified by a key, and the key the game
+          sent did not match the key this site looked under. There were two independent
+          mismatches, and either one alone was enough to lose every score. The score API
+          has no validation, so a wrong key does not return an error — it returns a
+          perfectly valid empty board, which looks exactly like nobody having played.
+        </p>
+        <p>
+          They are shown here and <strong>not merged forward</strong>. They were set under
+          earlier rules, and carrying them across an epoch would be precisely the lie the
+          ladder split exists to prevent. Pip is contacting the players directly.
+        </p>
+        <div id="preserved-boards"></div>
+      </div>
     </section>
   </main>
 
@@ -673,7 +738,7 @@
     let currentPage = 1;
     const itemsPerPage = 9;
     let allArchives = [];        // regularised weeks only -- the main grid
-    let anomalousArchives = [];  // pre-2026-08-07 pre-history -- fenced off below
+    let anomalousArchives = [];  // pre-L3 pre-history -- fenced off below
     let filteredArchives = [];
 
     // A week is anomalous iff its own record says so. Never inferred from the
@@ -691,12 +756,18 @@
         const indexResponse = await fetch('/leaderboard/data/weekly/archive/index.json', { cache: 'no-store' });
 
         let archiveFiles = [];
+        let index = null;
         if (indexResponse.ok) {
           // Use index file if available
-          const index = await indexResponse.json();
+          index = await indexResponse.json();
           archiveFiles = (index.archives || []).map(a => a.file);
         }
         // No fallback needed - empty array is fine
+
+        // Both of these render from the index or not at all: if the data does
+        // not carry the fact, the page stays silent rather than asserting it.
+        showBoardOpens(index);
+        await displayPreservedBoards(index);
 
         // Load all archive files
         const archiveData = await Promise.all(
@@ -748,6 +819,78 @@
       grid.innerHTML = '';
       sorted.forEach(a => grid.appendChild(createArchiveCard(a, true)));
       section.style.display = 'block';
+    }
+
+    // The board-open time is a separate fact from the epoch boundary: the week
+    // is labelled from its Friday anchor, but the board did not accept scores
+    // until later that day. Shown only if the data says when.
+    function showBoardOpens(index) {
+      const opens = index && index.epochs && index.epochs.board_opens_local;
+      if (!opens) return;
+      const when = new Date(opens);
+      if (isNaN(when)) return;
+      const confirmed = index.epochs.board_opens_confirmed === true;
+      document.getElementById('board-opens-when').textContent =
+        when.toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' }) +
+        (confirmed ? '' : ' (approximate, not yet confirmed)');
+      document.getElementById('board-opens-note').style.display = '';
+    }
+
+    // Real submissions the site never published, captured off the live API.
+    // Rendered from index.preserved_boards; absent data renders nothing.
+    async function displayPreservedBoards(index) {
+      const boards = (index && index.preserved_boards) || [];
+      const withEntries = boards.filter(b => (b.entry_count || 0) > 0);
+      if (withEntries.length === 0) return;
+
+      const players = new Set();
+      let total = 0;
+      withEntries.forEach(b => {
+        total += b.entry_count || 0;
+        (b.players || []).forEach(p => players.add(p));
+      });
+      document.getElementById('preserved-entry-count').textContent = total;
+      document.getElementById('preserved-player-count').textContent = players.size;
+
+      // Fetch each board so the actual entries can be shown, not just counted.
+      const host = document.getElementById('preserved-boards');
+      host.innerHTML = '';
+      for (const b of withEntries) {
+        let data = null;
+        try {
+          const r = await fetch(`/leaderboard/data/preserved/${b.file}`, { cache: 'no-store' });
+          if (r.ok) data = await r.json();
+        } catch (e) { /* leave data null; the summary below still renders */ }
+
+        const entries = (data && data.entries) || [];
+        const rows = entries
+          .slice()
+          .sort((x, y) => (y.score || 0) - (x.score || 0))
+          .map(e => `<tr>
+              <td>${escapeHtml(e.player_name || 'Unknown')}</td>
+              <td style="text-align:right">${escapeHtml(String(e.score ?? ''))}</td>
+              <td>${escapeHtml(String(e.date || '').slice(0, 10))}</td>
+              <td><code>${escapeHtml(String(e.game_mode || ''))}</code></td>
+            </tr>`).join('');
+
+        const block = document.createElement('div');
+        block.className = 'preserved-board';
+        block.innerHTML = `
+          <h3><code>${escapeHtml(b.board_key || '')}</code></h3>
+          <p class="preserved-meta">
+            ${b.entry_count} submission${b.entry_count === 1 ? '' : 's'}
+            &middot; ${escapeHtml(String(b.first_entry || '').slice(0, 10))}
+            &ndash; ${escapeHtml(String(b.last_entry || '').slice(0, 10))}
+            &middot; key type: ${escapeHtml(b.key_kind || '')}
+          </p>
+          ${rows ? `<div style="overflow-x:auto"><table class="preserved-table">
+            <thead><tr><th>Player</th><th style="text-align:right">Score</th><th>Date</th><th>Build</th></tr></thead>
+            <tbody>${rows}</tbody></table></div>`
+            : '<p class="preserved-meta">Entries could not be loaded; the counts above come from the archive index.</p>'}
+        `;
+        host.appendChild(block);
+      }
+      document.getElementById('preserved-section').style.display = 'block';
     }
 
     // Populate season filter dropdown

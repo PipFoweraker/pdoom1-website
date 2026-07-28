@@ -13,11 +13,14 @@
   "epoch": {
     "id": "pre-regularisation",
     "anomalous": true,
-    "boundary_local": "2026-08-07T00:00:00+10:00",
+    "ladder_version": null,
+    "boundary_ladder_version": "L3",
+    "boundary_local": "2026-07-31T00:00:00+10:00",
     "boundary_tz": "Australia/Hobart",
-    "boundary_utc": "2026-08-06T14:00:00Z",
-    "reason": "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday UTC instead of Friday-to-Thursday Hobart, two days out of phase with pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+    "boundary_utc": "2026-07-30T14:00:00Z",
+    "reason": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
     "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+    "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
     "observed_defects": {
       "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
       "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",

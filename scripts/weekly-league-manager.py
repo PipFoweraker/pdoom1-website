@@ -107,55 +107,122 @@ def league_tz():
 
 # --- Ladder epoch ---------------------------------------------------------
 #
-# Everything opened before the first Friday of August 2026 is deliberately-
-# labelled anomalous pre-history, not silently buried. See
-# docs/LEAGUE_EPOCH_ANOMALY.md.
+# Everything opened before the L2 -> L3 ladder fork is deliberately-labelled
+# anomalous pre-history, not silently buried. See docs/LEAGUE_EPOCH_ANOMALY.md.
 #
-# The boundary is a FORK, not a date someone liked. Per
-# pdoom1/docs/RELEASE_NOMENCLATURE.md the monthly Epoch roll -- where the game's
-# minor version and the ladder version both bump (0.13 -> 0.14, L2 -> L3) --
-# lands on the first Friday of the month. 2026-08-07 is that Friday.
-# 2026-07-31, the boundary this file originally carried, is the *last* Friday of
-# July: by the spec that is a Seed roll on unchanged rules, so anchoring there
-# would have started the "regularised" era one week before a fork, and the good
-# era would have forked seven days into its life.
+# The boundary is NOT a literal in this file. It lives in
+# public/data/ladder-epochs.json with its source cited, because it has already
+# moved twice in two days and because Pip's standing rule (2026-07-29) is
+# "Let's keep using variables and not hardcoding things where we can!".
 #
-# A week is pre-epoch iff it STARTS before the boundary. The week beginning
-# Fri 2026-07-31 therefore remains anomalous; the first regularised week is the
-# one beginning Fri 2026-08-07 (id 2026_W33).
-EPOCH_BOUNDARY_LOCAL_DATE = date(2026, 8, 7)
+# The reason it is a fork and not a date: L3 removed the action-point pool
+# entirely in favour of an attention economy, plus office lease/lock-in, four-way
+# founder hours, six previously-inert upgrades and a quirk rebalance. Scores set
+# under the old rules cannot be ranked against scores set under the new ones --
+# which is exactly why `ladder_version` is part of the board key. The board key
+# is `(seed, L<n>)`, literally "L3"; the build version never touches it.
+# (Authoritative: pdoom1 on pdoom1-website#151, 2026-07-28T23:13Z. That comment
+# supersedes RELEASE_NOMENCLATURE.md's calendar row for this cut -- the ladder
+# forked mid-month rather than on the first Friday.)
+#
+# A week is pre-epoch iff it STARTS before the boundary.
 EPOCH_PRE_ID = "pre-regularisation"
 EPOCH_POST_ID = "regularised"
 EPOCH_DOC = "docs/LEAGUE_EPOCH_ANOMALY.md"
-EPOCH_PRE_REASON = (
-    "Opened before the 2026-08-07 epoch fork (the first Friday of August 2026, where "
-    "the game's minor and ladder versions both bump: 0.13 -> 0.14, L2 -> L3), while the "
-    "weekly rollover was off by one week and anchored to the wrong day (Monday-to-Sunday "
-    "UTC instead of Friday-to-Thursday Hobart, two days out of phase with "
-    "pdoom1/docs/RELEASE_NOMENCLATURE.md), and while no shipped client could submit to "
-    "these boards. Retained as a record of what the pipeline produced, NOT as a "
-    "comparable competition result."
-)
-EPOCH_POST_REASON = (
-    "Opened on or after the 2026-08-07 epoch fork (0.13 -> 0.14, L2 -> L3), by a "
-    "rollover anchored to Friday 00:00 Australia/Hobart, whose run-time -> week mapping "
-    "is pinned by scripts/test-weekly-league-boundary.py."
-)
+LADDER_CONTRACT_REL = "public/data/ladder-epochs.json"
+
+_CONTRACT_CACHE = []
+
+
+def ladder_contract() -> Dict[str, Any]:
+    """The ladder/epoch contract from public/data/ladder-epochs.json.
+
+    Raises rather than falling back to a literal. CLAUDE.md: "Fallback literals
+    are the dangerous ones. A default value ships precisely when the real lookup
+    failed." A wrong epoch boundary mislabels which scores are comparable, which
+    is the one thing the ladder split exists to prevent.
+    """
+    if _CONTRACT_CACHE:
+        return _CONTRACT_CACHE[0]
+    path = Path(__file__).parent.parent / LADDER_CONTRACT_REL
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        raise RuntimeError(
+            f"Cannot read the ladder/epoch contract {path}: {e}. Refusing to guess a "
+            "boundary -- see docs/LEAGUE_EPOCH_ANOMALY.md."
+        )
+    cut = data.get("regularised_from")
+    if not isinstance(cut, dict):
+        raise RuntimeError(f"{path} has no `regularised_from` object")
+    for key in ("ladder_version", "boundary_local", "boundary_tz",
+                "reason_pre", "reason_post"):
+        if not cut.get(key):
+            raise RuntimeError(f"{path} -> regularised_from.{key} is missing or empty")
+    if cut["boundary_tz"] != LEAGUE_TZ_NAME:
+        raise RuntimeError(
+            f"{path} anchors the boundary to {cut['boundary_tz']!r} but the league week "
+            f"is anchored to {LEAGUE_TZ_NAME!r}. Two clocks, one boundary -- refusing."
+        )
+    _CONTRACT_CACHE.append(data)
+    return data
 
 
 def epoch_boundary() -> datetime:
-    """The epoch fork instant, in Hobart terms (2026-08-07 00:00 +10:00)."""
-    return datetime.combine(EPOCH_BOUNDARY_LOCAL_DATE, time(0, 0, 0),
-                            tzinfo=league_tz())
+    """The ladder-fork instant, resolved in the league zone.
+
+    The offset written in the contract file is CHECKED against the real tz
+    database rather than trusted: a hand-edited "+11:00" on a July date would
+    otherwise move the boundary an hour without anyone noticing.
+    """
+    cut = ladder_contract()["regularised_from"]
+    raw = cut["boundary_local"]
+    try:
+        stated = datetime.fromisoformat(raw)
+    except ValueError as e:
+        raise RuntimeError(f"regularised_from.boundary_local is not ISO-8601: {raw!r} ({e})")
+    if stated.tzinfo is None:
+        raise RuntimeError(
+            f"regularised_from.boundary_local must carry its offset, got {raw!r}"
+        )
+    resolved = stated.replace(tzinfo=None).replace(tzinfo=league_tz())
+    if resolved.utcoffset() != stated.utcoffset():
+        raise RuntimeError(
+            f"regularised_from.boundary_local says {raw!r}, but {LEAGUE_TZ_NAME} is at "
+            f"{resolved.utcoffset()} at that local time. Fix the file, not the zone."
+        )
+    return resolved
+
+
+def board_opens() -> Optional[datetime]:
+    """When the board for the current epoch actually starts accepting scores.
+
+    Deliberately separate from epoch_boundary(): the week is labelled from its
+    own anchor, but a player could not submit until the board opened ~17 hours
+    later. Returning it lets pages say so instead of implying midnight.
+    """
+    cut = ladder_contract()["regularised_from"]
+    raw = cut.get("board_opens_local")
+    if not raw:
+        return None
+    try:
+        return datetime.fromisoformat(raw)
+    except ValueError:
+        return None
 
 # The seed this script derives is NOT the competitive seed. docs/LEAGUE_SEED_LEDGER.md
 # is explicit: "The seed is not a free website-side choice" -- the canonical key is
-# whatever the shipped client POSTs (currently seed `weekly-2026-w30`, ladder L2),
-# blessed by Pip in the ledger. This script's `weekly_<week_id>_<hash>` values have
-# never matched that and no client has ever used one. Every record therefore carries
-# its own disclaimer, so nothing downstream can mistake a derived value for a blessed
-# one the way `league_2026-07_7d6ced29` was mistaken on 2026-07-24.
-SEED_PROVENANCE = {
+# whatever the shipped client POSTs, blessed by Pip in the ledger. This script's
+# `weekly_<week_id>_<hash>` values have never matched that and no client has ever used
+# one. Every record therefore carries its own disclaimer, so nothing downstream can
+# mistake a derived value for a blessed one the way `league_2026-07_7d6ced29` was
+# mistaken on 2026-07-24.
+#
+# When a blessed seed EXISTS it goes in public/data/ladder-epochs.json ->
+# regularised_from.seed and seed_for_week() uses it instead of deriving. It is null
+# there on purpose right now: the L3 seed is drawn at a ceremony ~1645 AEST Fri
+# 2026-07-31 and pdoom1 asked explicitly that nothing hardcode it beforehand.
+SEED_PROVENANCE_UNBLESSED = {
     "blessed": False,
     "derivation": "sha256('pdoom1_weekly_<week_id>_<season>')[:8], website-side",
     "canonical_source": "the shipped game client, recorded in docs/LEAGUE_SEED_LEDGER.md",
@@ -163,9 +230,43 @@ SEED_PROVENANCE = {
         "Placeholder. Do NOT present this to players as the competitive seed. The board "
         "key scores are actually submitted under is blessed in docs/LEAGUE_SEED_LEDGER.md; "
         "a seed that is not in that ledger routes submissions to a board nobody displays, "
-        "with no error shown to the player."
+        "with no error shown to the player. The live score API has NO key validation -- a "
+        "wrong seed or version returns ok:true with an empty board (verified 2026-07-29), "
+        "so a bad key is indistinguishable from nobody having played."
     ),
 }
+
+
+def seed_for_week(derived: str) -> Dict[str, Any]:
+    """`{seed, seed_provenance}` -- the blessed value if one exists, else the
+    derived placeholder, always labelled with which it is."""
+    contract = ladder_contract()
+    cut = contract["regularised_from"]
+    source = (contract.get("sources") or [{}])[0].get("where")
+    blessed = cut.get("seed")
+    if blessed:
+        return {
+            "seed": blessed,
+            "seed_provenance": {
+                "blessed": True,
+                "ladder_version": cut["ladder_version"],
+                "board_key": f"({blessed}, {cut['ladder_version']})",
+                "canonical_source": (
+                    "the shipped game client; blessed in docs/LEAGUE_SEED_LEDGER.md and "
+                    f"copied into {LADDER_CONTRACT_REL}"
+                ),
+                "source": source,
+            },
+        }
+    return {
+        "seed": derived,
+        "seed_provenance": dict(
+            SEED_PROVENANCE_UNBLESSED,
+            seed_status=cut.get("seed_status", "unblessed"),
+            ladder_version=cut["ladder_version"],
+            board_key_shape=(contract.get("board_key") or {}).get("shape"),
+        ),
+    }
 
 
 def as_utc(dt: datetime) -> datetime:
@@ -246,17 +347,34 @@ def week_id_for(week_start: datetime) -> str:
 
 def epoch_for(week_start: datetime) -> Dict[str, Any]:
     """Machine-readable ladder-epoch stamp for a week beginning at `week_start`."""
+    contract = ladder_contract()
+    cut = contract["regularised_from"]
     boundary = epoch_boundary()
     anomalous = as_utc(week_start) < as_utc(boundary)
-    return {
+    stamp = {
         "id": EPOCH_PRE_ID if anomalous else EPOCH_POST_ID,
         "anomalous": anomalous,
+        # The ladder version IS the board key's second element. Recorded on both
+        # sides of the fork so a reader never has to infer it from a date.
+        "ladder_version": None if anomalous else cut["ladder_version"],
+        "boundary_ladder_version": cut["ladder_version"],
         "boundary_local": boundary.isoformat(),
         "boundary_tz": LEAGUE_TZ_NAME,
         "boundary_utc": as_utc(boundary).isoformat().replace("+00:00", "Z"),
-        "reason": EPOCH_PRE_REASON if anomalous else EPOCH_POST_REASON,
+        "reason": cut["reason_pre"] if anomalous else cut["reason_post"],
         "see": EPOCH_DOC,
+        "source": (contract.get("sources") or [{}])[0].get("where"),
     }
+    if not anomalous:
+        # A regularised week is labelled from its own Friday anchor, but the
+        # board did not open until later that day. Say so in the record rather
+        # than letting the week's start imply the board was live.
+        opens = board_opens()
+        if opens is not None:
+            stamp["board_opens_local"] = opens.isoformat()
+            stamp["board_opens_utc"] = as_utc(opens).isoformat().replace("+00:00", "Z")
+            stamp["board_opens_confirmed"] = bool(cut.get("board_opens_confirmed"))
+    return stamp
 
 
 class WeeklyLeagueManager:
@@ -302,11 +420,17 @@ class WeeklyLeagueManager:
     def get_game_version(self) -> str:
         """Read the deployed game version from public/data/version.json.
 
-        Raises rather than falling back to a literal. A weekly board is keyed
-        (seed, game_version), so stamping a stale version here creates a board that
-        the shipped client cannot submit to: players would submit scores and see
-        nothing appear, with no error raised anywhere. Failing here is far cheaper
-        than publishing a league nobody can enter.
+        This is a RECORD STAMP -- which build produced the file -- and is NOT part
+        of the board key. Boards are keyed `(seed, ladder_version)`, literally
+        `L3`; pdoom1 on #151 (2026-07-28): "the build version no longer touches
+        the board key at all -- that was the whole point of the build-vs-ladder
+        split. A cosmetic patch bump will never again fork a board." Under the old
+        `(seed, game_version)` keying a patch bump DID fork the board, which is how
+        23 of the 27 preserved submissions were stranded.
+
+        Still raises rather than falling back to a literal: a stale stamp here
+        misdescribes which build produced a record, and CLAUDE.md is explicit that
+        a fallback literal ships precisely when the real lookup failed.
         """
         try:
             with open(self.version_file, 'r', encoding='utf-8') as f:
@@ -447,9 +571,14 @@ class WeeklyLeagueManager:
         new_seed = self.generate_weekly_seed(week_info)
         game_version = self.get_game_version()
 
+        seed_block = seed_for_week(new_seed)
+        ladder = ladder_contract()["regularised_from"]["ladder_version"]
+
         print(f"NEW WEEK: Starting new weekly league for {week_info['week_id']}")
-        print(f"SEED: Generated seed: {new_seed}")
-        print(f"GAME_VERSION: {game_version}")
+        print(f"SEED: {seed_block['seed']} "
+              f"(blessed={seed_block['seed_provenance']['blessed']})")
+        print(f"BOARD_KEY: ({seed_block['seed']}, {ladder})")
+        print(f"GAME_VERSION: {game_version}  [record stamp only -- NOT part of the board key]")
         print(f"PERIOD: {week_info['start_date']} to {week_info['end_date']} "
               f"({week_info['timezone']})")
         print(f"EPOCH: {week_info['epoch']['id']} "
@@ -466,15 +595,31 @@ class WeeklyLeagueManager:
                 "week_id": week_info['week_id'],
                 "season": self.config["current_season"],
                 "generated": iso_z(now),
+                # A RECORD STAMP, not part of the board key. The board is keyed
+                # (seed, ladder_version) -- an `L<n>` string, never a build
+                # version and never `L<n>.<m>`; see the `board_key.is_not` list in
+                # public/data/ladder-epochs.json. pdoom1 on #151, 2026-07-28: "the
+                # build version no longer touches the board key at all". Keeping
+                # game_version here says which build produced the record;
+                # nothing may key off it.
                 "game_version": game_version,
+                "ladder_version": ladder,
                 "competition_type": "weekly_league",
                 "start_date": week_info['start_timestamp'],
                 "end_date": week_info['end_timestamp'],
                 "total_participants": 0,
                 "total_submissions": 0
             },
-            "seed": new_seed,
-            "seed_provenance": dict(SEED_PROVENANCE),
+            "seed": seed_block["seed"],
+            "seed_provenance": seed_block["seed_provenance"],
+            # The board key, spelled out, so no consumer has to reassemble it and
+            # get the shape wrong. See public/data/ladder-epochs.json.
+            "board_key": {
+                "seed": seed_block["seed"],
+                "ladder_version": ladder,
+                "shape": "(seed, L<n>)",
+                "blessed": seed_block["seed_provenance"]["blessed"],
+            },
             # "Bootstrap_v0.4.1" was a legacy-pygame concept; the current Godot client
             # exports no economic model, so claiming one would be inventing a fact.
             "economic_model": "unknown",
@@ -558,6 +703,59 @@ class WeeklyLeagueManager:
             print(f"ERROR: Failed to archive current week: {e}")
             return False
 
+    def scan_preserved_boards(self) -> list:
+        """Summarise `public/leaderboard/data/preserved/**/*.json` for the archive page.
+
+        These are boards captured live from the score API that the website never
+        published -- 27 real submissions from 6 players, stranded by a board-key
+        mismatch (two independent ones: the client submitted seed `weekly-2026-w0`
+        while the site derived `weekly_2026_W30_...`, AND the versions differed).
+        Pip's ruling 2026-07-29: they belong in the anomaly archive, and they must
+        NEVER be merged forward across epochs -- merging scores earned under
+        different rules is the exact lie the ladder split exists to prevent. So
+        this only ever SUMMARISES; it never copies an entry into a league record.
+
+        Derived from the directory: returns [] when the preserved data is not
+        present, so the page shows nothing rather than claiming something. (The
+        capture lives on branch `data/preserve-orphaned-boards`; the moment it
+        merges, any rollover or `--rebuild-archive-index` lights this up.)
+        """
+        root = self.league_data_dir.parent / "preserved"
+        out = []
+        if not root.exists():
+            return out
+        for path in sorted(root.glob("*/*.json")):
+            if path.name.lower() in ("index.json", "readme.json"):
+                continue
+            try:
+                d = json.loads(path.read_text(encoding="utf-8"))
+            except Exception as e:
+                print(f"WARNING: skipping unreadable preserved board {path.name}: {e}")
+                continue
+            entries = d.get("entries") or []
+            if not isinstance(entries, list):
+                continue
+            dates = sorted(str(e.get("date")) for e in entries if e.get("date"))
+            players = sorted({str(e.get("player_name")) for e in entries
+                              if e.get("player_name")})
+            version = d.get("version")
+            out.append({
+                "file": f"{path.parent.name}/{path.name}",
+                "captured": path.parent.name,
+                "seed": d.get("seed"),
+                "version": version,
+                # `L<n>` is a ladder epoch; anything else is a build version, i.e.
+                # a board forked by the OLD (seed, game_version) keying.
+                "key_kind": "ladder" if isinstance(version, str) and version.startswith("L")
+                            else "build-version (pre-split keying)",
+                "board_key": f"({d.get('seed')}, {version})",
+                "entry_count": len(entries),
+                "players": players,
+                "first_entry": dates[0] if dates else None,
+                "last_entry": dates[-1] if dates else None,
+            })
+        return out
+
     def rebuild_archive_index(self, now: Optional[datetime] = None) -> bool:
         """Regenerate archive/index.json from the archive files that exist.
 
@@ -602,24 +800,35 @@ class WeeklyLeagueManager:
                 })
 
             anomalous = [a for a in archives if (a.get("epoch") or {}).get("anomalous")]
+            contract = ladder_contract()
+            cut = contract["regularised_from"]
             payload = {
                 "archives": archives,
                 "total_archives": len(archives),
                 "seasons": sorted({a["season"] for a in archives if a.get("season")}),
+                # Boards captured from the live API that the website never
+                # published. Derived from the directory, so this key is absent
+                # when there is nothing to show and the page claims nothing.
+                "preserved_boards": self.scan_preserved_boards(),
                 "epochs": {
+                    "ladder_version": cut["ladder_version"],
+                    "board_key": contract.get("board_key"),
+                    "board_opens_local": cut.get("board_opens_local"),
+                    "board_opens_confirmed": bool(cut.get("board_opens_confirmed")),
                     "boundary_local": epoch_boundary().isoformat(),
                     "boundary_tz": LEAGUE_TZ_NAME,
                     "boundary_utc": as_utc(epoch_boundary()).isoformat().replace("+00:00", "Z"),
+                    "boundary_why": cut.get("boundary_why"),
                     "see": EPOCH_DOC,
                     EPOCH_PRE_ID: {
                         "count": len(anomalous),
                         "anomalous": True,
-                        "reason": EPOCH_PRE_REASON,
+                        "reason": cut["reason_pre"],
                     },
                     EPOCH_POST_ID: {
                         "count": len(archives) - len(anomalous),
                         "anomalous": False,
-                        "reason": EPOCH_POST_REASON,
+                        "reason": cut["reason_post"],
                     },
                 },
                 "last_updated": iso_z(now),

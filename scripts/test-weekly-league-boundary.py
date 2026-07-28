@@ -96,36 +96,36 @@ check("Hobart offset on 2026-11-27 (AEDT)", _summer.utcoffset(), timedelta(hours
 
 
 # --------------------------------------------------------------------------
-# 1. THE BOUNDARY IN WINTER. Thu 2026-08-06 14:00 UTC == Fri 2026-08-07
-#    00:00:00 +10:00 exactly -- and that Friday is the epoch fork, so this is
-#    the single most load-bearing instant in the whole system.
+# 1. THE BOUNDARY IN WINTER. Thu 2026-07-30 14:00 UTC == Fri 2026-07-31
+#    00:00:00 +10:00 exactly -- and that Friday is the L2 -> L3 ladder fork, so
+#    this is the single most load-bearing instant in the whole system.
 # --------------------------------------------------------------------------
-print("\n-- boundary, winter: Thu 2026-08-06 14:00 UTC == Fri 2026-08-07 00:00 Hobart --")
+print("\n-- boundary, winter: Thu 2026-07-30 14:00 UTC == Fri 2026-07-31 00:00 Hobart --")
 
-before = week_of("2026-08-06T13:59:00Z")
-check("13:59 UTC (one minute BEFORE) -> previous week", before["week_id"], "2026_W32")
-check("13:59 UTC -> week started Fri 2026-07-31", before["start_date"], "2026-07-31")
-check("13:59 UTC -> week ends Thu 2026-08-06", before["end_date"], "2026-08-06")
+before = week_of("2026-07-30T13:59:00Z")
+check("13:59 UTC (one minute BEFORE) -> previous week", before["week_id"], "2026_W31")
+check("13:59 UTC -> week started Fri 2026-07-24", before["start_date"], "2026-07-24")
+check("13:59 UTC -> week ends Thu 2026-07-30", before["end_date"], "2026-07-30")
 check("13:59 UTC -> status", before["status"], "running")
 
 check("13:59:59 UTC is still the outgoing week",
-      week_of("2026-08-06T13:59:59Z")["week_id"], "2026_W32")
+      week_of("2026-07-30T13:59:59Z")["week_id"], "2026_W31")
 
-at = week_of("2026-08-06T14:00:00Z")
+at = week_of("2026-07-30T14:00:00Z")
 check("14:00:00 UTC (exactly the rollover) -> the week that STARTS",
-      at["week_id"], "2026_W33")
-check("14:00 UTC -> week starts Fri 2026-08-07", at["start_date"], "2026-08-07")
-check("14:00 UTC -> week ends Thu 2026-08-13", at["end_date"], "2026-08-13")
+      at["week_id"], "2026_W32")
+check("14:00 UTC -> week starts Fri 2026-07-31", at["start_date"], "2026-07-31")
+check("14:00 UTC -> week ends Thu 2026-08-06", at["end_date"], "2026-08-06")
 check("14:00 UTC -> start_timestamp is Hobart-local with its offset",
-      at["start_timestamp"], "2026-08-07T00:00:00+10:00")
-check("14:00 UTC -> end_timestamp", at["end_timestamp"], "2026-08-13T23:59:59+10:00")
-check("14:00 UTC -> start_timestamp_utc", at["start_timestamp_utc"], "2026-08-06T14:00:00Z")
+      at["start_timestamp"], "2026-07-31T00:00:00+10:00")
+check("14:00 UTC -> end_timestamp", at["end_timestamp"], "2026-08-06T23:59:59+10:00")
+check("14:00 UTC -> start_timestamp_utc", at["start_timestamp_utc"], "2026-07-30T14:00:00Z")
 check("14:00 UTC -> the week is already running, not upcoming", at["status"], "running")
 check("14:00 UTC -> week_info names the zone", at["timezone"], "Australia/Hobart")
 
-after = week_of("2026-08-06T14:01:00Z")
+after = week_of("2026-07-30T14:01:00Z")
 check("14:01 UTC (one minute AFTER) -> same week as 14:00",
-      after["week_id"], "2026_W33")
+      after["week_id"], "2026_W32")
 check("14:01 UTC -> start_date matches 14:00", after["start_date"], at["start_date"])
 
 # --------------------------------------------------------------------------
@@ -216,14 +216,14 @@ check("...and the same start date",
 # 5. Ordinary instants map to the week that contains them.
 # --------------------------------------------------------------------------
 print("\n-- ordinary instants --")
-check("Sat 2026-08-08 (Hobart) is in the week that opened Fri 2026-08-07",
-      week_of("2026-08-08T02:00:00Z")["week_id"], "2026_W33")
+check("Sat 2026-08-01 (Hobart) is in the week that opened Fri 2026-07-31",
+      week_of("2026-08-01T02:00:00Z")["week_id"], "2026_W32")
 check("Wed 2026-07-29 09:00Z -> the week that opened Fri 2026-07-24",
       week_of("2026-07-29T09:00:00Z")["week_id"], "2026_W31")
-check("Thu 2026-08-06 03:00Z (Thursday, pre-rollover) -> outgoing week",
-      week_of("2026-08-06T03:00:00Z")["week_id"], "2026_W32")
-check("Fri 2026-08-07 14:00Z (14:00 but NOT Thursday -> no shift)",
-      week_of("2026-08-07T14:00:00Z")["week_id"], "2026_W33")
+check("Thu 2026-07-30 03:00Z (Thursday, pre-rollover) -> outgoing week",
+      week_of("2026-07-30T03:00:00Z")["week_id"], "2026_W31")
+check("Fri 2026-07-31 14:00Z (14:00 but NOT Thursday -> no shift)",
+      week_of("2026-07-31T14:00:00Z")["week_id"], "2026_W32")
 
 # --------------------------------------------------------------------------
 # 6. ISO-year straddle. 2026 has 53 ISO weeks. The label comes from the league
@@ -245,13 +245,13 @@ check("Thu 2026-12-31 12:59Z -> still 2026_W53 (week not over yet)",
 #    UTC suffix onto it.
 # --------------------------------------------------------------------------
 print("\n-- timezone handling of the input instant --")
-naive = _MANAGER.get_current_week_info(datetime(2026, 8, 6, 14, 0, 0))
-check("naive 2026-08-06 14:00 treated as UTC", naive["week_id"], "2026_W33")
-tagged = _MANAGER.get_current_week_info(datetime(2026, 8, 7, 0, 0, 0, tzinfo=AEST))
-check("2026-08-07 00:00 +10:00 == 2026-08-06 14:00 UTC", tagged["week_id"], "2026_W33")
+naive = _MANAGER.get_current_week_info(datetime(2026, 7, 30, 14, 0, 0))
+check("naive 2026-07-30 14:00 treated as UTC", naive["week_id"], "2026_W32")
+tagged = _MANAGER.get_current_week_info(datetime(2026, 7, 31, 0, 0, 0, tzinfo=AEST))
+check("2026-07-31 00:00 +10:00 == 2026-07-30 14:00 UTC", tagged["week_id"], "2026_W32")
 check("a naive local-looking instant does NOT silently become the next week",
-      _MANAGER.get_current_week_info(datetime(2026, 8, 6, 13, 0, 0))["week_id"],
-      "2026_W32")
+      _MANAGER.get_current_week_info(datetime(2026, 7, 30, 13, 0, 0))["week_id"],
+      "2026_W31")
 
 # --------------------------------------------------------------------------
 # 8. Invariants across a year of rollovers, ACROSS both DST transitions.
@@ -286,32 +286,124 @@ check("week_id always agrees with its own start", bad_id, 0)
 check("week_id increases week over week", non_monotonic, 0)
 
 # --------------------------------------------------------------------------
-# 9. The epoch fork. Boundary = Fri 2026-08-07 00:00 Hobart (2026-08-06T14:00Z):
-#    the first Friday of August, where 0.13 -> 0.14 and L2 -> L3. A week is
-#    anomalous iff it STARTS before the fork, so the week beginning Fri
-#    2026-07-31 -- a Seed roll on unchanged rules -- is still pre-history.
+# 9. The epoch fork. Boundary = Fri 2026-07-31 00:00 Hobart (2026-07-30T14:00Z),
+#    the L2 -> L3 ladder fork. NOT a calendar rule: the ladder moved 2 -> 3
+#    MID-MONTH on gameplay changes (the action-point pool was removed entirely
+#    in favour of an attention economy), so RELEASE_NOMENCLATURE.md's
+#    "Epoch = first Friday" calendar row is stale for this cut. Authoritative:
+#    pdoom1 on pdoom1-website#151, 2026-07-28T23:13Z.
 # --------------------------------------------------------------------------
 print("\n-- ladder epoch stamp --")
 check("epoch boundary in UTC", wlm.as_utc(wlm.epoch_boundary()).isoformat(),
-      "2026-08-06T14:00:00+00:00")
+      "2026-07-30T14:00:00+00:00")
 check("epoch boundary in Hobart terms", wlm.epoch_boundary().isoformat(),
-      "2026-08-07T00:00:00+10:00")
-pre = week_of("2026-08-06T13:59:00Z")
-post = week_of("2026-08-06T14:00:00Z")
-check("2026_W32 (starts Fri 2026-07-31, a Seed roll) is anomalous",
+      "2026-07-31T00:00:00+10:00")
+check("the boundary IS the rollover instant -- the first L3 week opens at it",
+      wlm.as_utc(wlm.epoch_boundary()),
+      wlm.as_utc(wlm.league_week_start(
+          datetime.fromisoformat("2026-07-30T14:00:00+00:00"))))
+pre = week_of("2026-07-30T13:59:00Z")
+post = week_of("2026-07-30T14:00:00Z")
+check("2026_W31 (starts Fri 2026-07-24, pre-fork) is anomalous",
       pre["epoch"]["anomalous"], True)
-check("2026_W32 epoch id", pre["epoch"]["id"], "pre-regularisation")
-check("2026_W33 (starts Fri 2026-08-07, the fork) is NOT anomalous",
+check("2026_W31 epoch id", pre["epoch"]["id"], "pre-regularisation")
+check("a pre-fork week claims NO ladder version", pre["epoch"]["ladder_version"], None)
+check("2026_W32 (starts Fri 2026-07-31, the fork) is NOT anomalous",
       post["epoch"]["anomalous"], False)
-check("2026_W33 epoch id", post["epoch"]["id"], "regularised")
+check("2026_W32 epoch id", post["epoch"]["id"], "regularised")
+check("the first regularised week names its ladder version",
+      post["epoch"]["ladder_version"], "L3")
 check("the stamp carries the boundary in both clocks",
       (post["epoch"]["boundary_utc"], post["epoch"]["boundary_local"],
        post["epoch"]["boundary_tz"]),
-      ("2026-08-06T14:00:00Z", "2026-08-07T00:00:00+10:00", "Australia/Hobart"))
+      ("2026-07-30T14:00:00Z", "2026-07-31T00:00:00+10:00", "Australia/Hobart"))
 check("epoch stamp points at the archivist doc",
       post["epoch"]["see"], "docs/LEAGUE_EPOCH_ANOMALY.md")
-check("the stated reason names the fork, not just a date",
-      all(s in post["epoch"]["reason"] for s in ("2026-08-07", "L2 -> L3")), True)
+check("the stamp cites where the boundary came from",
+      "#151" in (post["epoch"]["source"] or ""), True)
+check("the stated reason is the RULES change, not a date",
+      all(s in pre["epoch"]["reason"]
+          for s in ("L2 -> L3", "action-point pool", "not comparable")), True)
+
+# --------------------------------------------------------------------------
+# 9b. Boundary vs board-open. The board opens ~1700 AEST, 17 hours INTO the
+#     first L3 week. The week is labelled from its anchor, not from the open,
+#     because a week half under L2 rules and half under L3 is exactly the
+#     cross-epoch blend the ladder split exists to prevent -- but the open time
+#     is recorded so nothing implies the board was live from midnight.
+# --------------------------------------------------------------------------
+print("\n-- board-open is recorded separately from the boundary --")
+_opens = wlm.board_opens()
+check("board_opens() resolves", _opens is not None, True)
+if _opens is not None:
+    check("board opens AFTER the epoch boundary",
+          wlm.as_utc(_opens) > wlm.as_utc(wlm.epoch_boundary()), True)
+    _w32_start = datetime.fromisoformat(post["start_timestamp"])
+    _w32_end = datetime.fromisoformat(post["end_timestamp"])
+    check("board opens INSIDE the first regularised week, not before it",
+          _w32_start <= _opens <= _w32_end, True)
+    check("the regularised stamp carries the open time",
+          post["epoch"]["board_opens_local"], _opens.isoformat())
+    check("...and flags that the open time is not yet confirmed",
+          post["epoch"]["board_opens_confirmed"], False)
+check("a PRE-fork week does not claim a board-open time",
+      "board_opens_local" in pre["epoch"], False)
+
+# --------------------------------------------------------------------------
+# 9c. The contract lives in data, not in a script literal (Pip, 2026-07-29:
+#     "Let's keep using variables and not hardcoding things where we can!").
+#     The boundary has moved twice in two days; these assertions are what makes
+#     the next move a one-file edit instead of an archaeology exercise.
+# --------------------------------------------------------------------------
+print("\n-- the ladder contract is data, and the seed is not hardcoded --")
+_contract = wlm.ladder_contract()
+_cut = _contract["regularised_from"]
+check("board key shape is (seed, L<n>)", _contract["board_key"]["shape"], "(seed, L<n>)")
+check("the shape explicitly excludes a build-version key",
+      "v0.13.2" in _contract["board_key"]["is_not"], True)
+check("current ladder version", _cut["ladder_version"], "L3")
+check("the L3 seed is NOT set -- it is blessed at a ceremony on the day",
+      _cut["seed"], None)
+check("...and is labelled unblessed", _cut["seed_status"], "unblessed")
+
+# A derived seed must never be presented as the competitive one.
+_seed_block = wlm.seed_for_week("weekly_2026_W32_deadbeef")
+check("with no blessed seed, the manager falls back to its placeholder",
+      _seed_block["seed"], "weekly_2026_W32_deadbeef")
+check("...and marks it blessed: false", _seed_block["seed_provenance"]["blessed"], False)
+
+# Ruling: nothing may hardcode Friday's probable seed before the game side posts
+# it. Grep the scripts and the published data for it -- a test is the only thing
+# that will still be enforcing this next week.
+_probable = "weekly-" + "2026-w31"      # assembled so this file does not contain it
+_leaks = []
+for _p in list((Path(__file__).parent).glob("*.py")) + \
+        list((Path(__file__).parent.parent / "public" / "data").glob("*.json")):
+    if _p.name == Path(__file__).name:
+        continue
+    try:
+        if _probable in _p.read_text(encoding="utf-8"):
+            _leaks.append(_p.name)
+    except (UnicodeDecodeError, OSError):
+        pass
+check("the unblessed L3 seed is hardcoded nowhere in scripts/ or public/data/",
+      _leaks, [])
+
+# The offset written in the contract is checked against the real tz database,
+# not trusted. Prove the guard bites.
+_saved = list(wlm._CONTRACT_CACHE)
+try:
+    import copy as _copy
+    _bad = _copy.deepcopy(_contract)
+    _bad["regularised_from"]["boundary_local"] = "2026-07-31T00:00:00+11:00"
+    wlm._CONTRACT_CACHE[:] = [_bad]
+    try:
+        wlm.epoch_boundary()
+        check("a wrong offset in the contract is rejected", "no error", "RuntimeError")
+    except RuntimeError:
+        check("a wrong offset in the contract is rejected", "RuntimeError", "RuntimeError")
+finally:
+    wlm._CONTRACT_CACHE[:] = _saved
 
 # --------------------------------------------------------------------------
 # 10. The cron in the workflow must still match the constants -- AND still land

@@ -41,9 +41,9 @@ For each, pick one:
 
 Pip's call: `league/index.html`, `league/archive.html` and `players/index.html`
 are **retired and kept hidden — not deleted, not revived**. Everything they show
-that predates the **2026-08-07 epoch fork** (first Friday of August; boundary
-revised from 2026-07-31 on 2026-07-29, because 31 July is a Seed roll on
-unchanged rules and 7 August is where `0.13→0.14` / `L2→L3` actually fork) is now labelled
+that predates the **L2 → L3 ladder fork** (the week beginning Fri 2026-07-31 in
+Hobart — the ladder forked mid-month on gameplay changes; see
+pdoom1-website#151, 2026-07-28T23:13Z) is now labelled
 **anomalous pre-history** by a machine-readable `epoch` block in the data, and
 the archive page renders it in a separate, explicitly-labelled anomaly section.
 
