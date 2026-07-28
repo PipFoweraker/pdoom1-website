@@ -229,7 +229,9 @@ jobs:
           PORT=${DH_PORT:-22}
           
           echo "🔄 Deploying to DreamHost..."
-          rsync -avz --delete -e "ssh -p $PORT" public/ "${DH_USER}@${DH_HOST}:${DH_PATH}/"
+          # Source material that must not be served: see deploy-excludes.txt.
+          rsync -avz --delete --exclude-from=deploy-excludes.txt \
+            -e "ssh -p $PORT" public/ "${DH_USER}@${DH_HOST}:${DH_PATH}/"
           
           echo "✅ Deployment completed successfully!"
 

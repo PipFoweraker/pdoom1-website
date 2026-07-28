@@ -1,0 +1,45 @@
+# rsync filter list for every deploy of public/ to DreamHost shared hosting.
+# Consumed via `rsync --exclude-from=deploy-excludes.txt`.
+#
+# WHY A SHARED FILE
+# Four workflows rsync public/ to production (auto-deploy-on-push,
+# deploy-dreamhost, version-aware-deploy, weekly-deployment). Only one of them
+# carried excludes, so any of the other three would have silently re-uploaded
+# every byte the first one had just stopped shipping. One list, one place.
+#
+# WHAT BELONGS HERE
+# Source material that lives in git for good reasons but that no browser should
+# ever fetch. NOT a general "files I think are unused" list -- see
+# docs/TECH_DEBT.md E-0 for the case where 1,000 apparently-orphaned pages were
+# the only published surface for a live dataset.
+#
+# BEFORE ADDING A LINE, run:  python scripts/check-deploy-excludes.py
+# It expands these patterns against the tree and fails if any deployed
+# html/css/js still points at a file the list would drop. Netlify PR previews
+# serve public/ whole and will NOT catch a bad exclude.
+#
+# NOTE ON --delete: an exclude also PROTECTS a path from deletion, so copies
+# already on the server persist and stay publicly fetchable. This list stops
+# NEW leakage only; reclaiming what is already there is a deliberate one-off
+# (see the comment in .github/workflows/auto-deploy-on-push.yml).
+
+# Repo/tooling leftovers.
+.git*
+node_modules
+*.log
+
+# Unprocessed cat originals (11.2 MB). The images /cats/ serves are the
+# processed ones in assets/cats-gallery/.
+assets/dump
+
+# The photo -> pixel-art processing pipeline and its intermediate outputs
+# (11.6 MB): three implementations, their READMEs and their scratch renders.
+assets/image-processing-systems
+
+# Full-resolution screenshot masters (9.2 MB). Every screenshot the site shows
+# is a derived variant -- *-web.jpg, *-web.webp, hero-bg-<w>.jpg|webp -- built
+# from these by optimize-screenshots.py / optimize-hero-responsive.py.
+assets/screenshots/*.png
+
+# 1.7 MB animation referenced by nothing on the site.
+assets/8-bit-effect.gif
