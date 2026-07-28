@@ -1,0 +1,9 @@
+# deploy-excludes.txt is read by `rsync --exclude-from` on an ubuntu-latest
+# runner. rsync does not strip a trailing CR, so a CRLF checkout turns every
+# pattern into "assets/dump\r", which matches nothing -- the deploy would then
+# silently ship all the source material again while reporting success. Pin LF.
+#
+# Deliberately scoped to this one file. The workflows and shell scripts here
+# already run fine as they are; renormalising them is a separate change with a
+# much larger diff, and this file is the one where the failure is silent.
+deploy-excludes.txt text eol=lf

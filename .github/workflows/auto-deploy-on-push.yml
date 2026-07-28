@@ -115,21 +115,20 @@ jobs:
           echo "   Source: ./public/"
           echo "   Destination: ${DH_USER}@${DH_HOST}:${DH_PATH}/"
 
-          # assets/dump and assets/image-processing-systems are SOURCE material
-          # (unprocessed cat originals + the processing pipeline), ~23 MB, kept
-          # in git but not meant for the web. Excluding them stops shipping that
-          # weight and stops exposing internal working files at pdoom1.com. The
-          # processed images the /cats/ page actually serves live in
-          # assets/cats-gallery/ and are unaffected.
-          # NOTE: with --delete, an exclude also PROTECTS these from deletion, so
-          # copies already on the server persist. Remove them once by hand if you
-          # want the space back; they are unlinked so they cost nothing served.
+          # What is NOT shipped, and why, lives in deploy-excludes.txt at the
+          # repo root -- one list shared by all four workflows that rsync
+          # public/ to production. Read it before changing what deploys, and
+          # run scripts/check-deploy-excludes.py after.
+          #
+          # NOTE: with --delete, an exclude also PROTECTS a path from deletion,
+          # so copies already on the server persist and stay publicly fetchable.
+          # The list only stops NEW leakage. To reclaim the ~34 MB already
+          # there, remove it once by hand (deliberate, not automated):
+          #   ssh $DH_USER@$DH_HOST "cd $DH_PATH && rm -rf assets/dump \
+          #     assets/image-processing-systems assets/8-bit-effect.gif \
+          #     assets/screenshots/*.png"
           rsync -avz --delete \
-            --exclude='.git*' \
-            --exclude='node_modules' \
-            --exclude='*.log' \
-            --exclude='assets/dump' \
-            --exclude='assets/image-processing-systems' \
+            --exclude-from=deploy-excludes.txt \
             -e "ssh -p $PORT" \
             public/ "${DH_USER}@${DH_HOST}:${DH_PATH}/"
 
