@@ -192,8 +192,20 @@ python  scripts/check-platform-claims.py  # no reachable page claims an unshippe
 node    scripts/test-download-resolution.js # download buttons resolve/degrade right
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift
 python  scripts/generate-feeds.py --check # feeds in step with the blog
+python  scripts/generate-metabolism.py --check # /metabolism/ in step with crons+configs
 node    scripts/test-header-consistency.js
 ```
+
+**`/metabolism/` is generated, never hand-edited.** `scripts/generate-metabolism.py`
+derives every cadence on that page at build time from the thing that actually runs —
+the `cron:` lines in `.github/workflows/`, `scripts/weekly-league-config.json`, the
+manager's own week arithmetic, `docs/LEAGUE_SEED_LEDGER.md`, `public/data/clocks.json`
+— and renders each with a clickable `file:line`. The two classes of fact it cannot
+derive (pdoom1's release nomenclature, and observations with no in-repo measurement)
+live in `public/data/metabolism.json` with an explicit `source` + `derived_from`, and
+render as *declared*, not measured. Change a cron and `--check` fails the PR
+(`metabolism-map.yml`); the fix is to re-run the generator. It refuses to build if a
+workflow carries a park marker *and* a schedule, or if a citation needle has vanished.
 
 **Platform availability is a *derived* fact, not prose.** The source of truth is
 `public/data/version.json` → `latest_release.platforms` ({windows,macos,linux}
