@@ -224,10 +224,14 @@ platform that has no build.
   locks that contract down, including the degradation paths.
 - `/website-changelog/` is a *different audience* (site infrastructure), fed by
   hand-typed `data/website-changes.json`. Not a duplicate; also not maintained.
-- `/changelog/` is orphaned (`noindex` + `Disallow` + 0 inbound links) and its data
-  pipeline is dead — `sync_airtable.py`'s workflow was parked after 1,264 consecutive
-  failures against an Airtable base that does not exist. Disposition is an open owner
-  decision; see `docs/ORPHANED_PAGES_TODO.md`.
+- `/changelog/` **301s to `/game-changelog/`** (Pip's call, 2026-07-28). It was orphaned
+  and its data pipeline is dead — `sync_airtable.py`'s workflow was parked after 1,264
+  consecutive failures against an Airtable base that does not exist. The redirect lives in
+  `public/.htaccess`; the page itself keeps a meta-refresh + `location.replace()` fallback
+  and an honest "this page has moved" message. Redirected, not deleted, because
+  `rsync --delete` makes deletion a production removal. **`.htaccess` cannot be tested on
+  a Netlify preview — Netlify ignores it.** Any change to it needs
+  `curl -I https://pdoom1.com/<path>` against production after merge.
 - `public/data/game-changes.json` is now read by nothing (it carries a `_deprecated`
   note saying so). Kept, not deleted: `rsync --delete`.
 
