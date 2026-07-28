@@ -134,10 +134,13 @@ jobs:
           # forever. Stage first, then ask the index.
           git add -A public/data/analytics/history public/data/analytics/latest.json
           if git diff --cached --quiet; then
-            # Only reachable on a same-day re-run that produced byte-identical
-            # content. A missing key or a failed fetch can no longer land here:
-            # the script exits non-zero and the assert step already failed.
-            echo "Snapshot identical to the committed one -- nothing to commit."
+            # Near-unreachable in practice: every snapshot carries a
+            # captured_at_utc, so even identical numbers produce a different
+            # file. Kept as a floor, not as a path anything relies on. What
+            # matters is that a missing key or a failed fetch can NO LONGER
+            # land here -- the script exits non-zero and the assert step has
+            # already failed the run.
+            echo "Snapshot byte-identical to the committed one -- nothing to commit."
             exit 0
           fi
 
