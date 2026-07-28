@@ -1,0 +1,31 @@
+{
+  "_README": "Config contract for the 'state of doom' clocks. DATES ARE NOT HARDCODED HERE. Static milestone dates come from pdoom-data (issue #38), cleaned and human-eyeball-verified; some are 'live' (a date_source whose value legitimately drifts, e.g. a Metaculus median). Internal clocks derive from a cadence, not a literal. Any clock with status 'pending' renders as 'awaiting data', never as a guessed date. Renderer is a later increment. See docs/DOOM_CLOCK_AND_STATS_DESIGN.md.",
+  "version": 1,
+  "source_of_truth": {
+    "milestone_dates": "pdoom-data#38",
+    "agi_calibration": "game calibration emit (pending pdoom1 ask)",
+    "note": "Pip is leery of hardcoded dates. Interim: the renderer MAY fetch one or two live sources directly, but the destination for every static date is pdoom-data, cleaned + verified."
+  },
+  "clocks": [
+    {
+      "id": "agi",
+      "title": "Estimated time to AGI",
+      "kind": "watch",
+      "metabolism": "company",
+      "hero": true,
+      "date_source": { "provider": "pdoom-data", "ref": "milestones/agi_median", "status": "pending", "issue": "pdoom-data#38" },
+      "calibration": { "provider": "game", "status": "pending", "note": "game leads calibration; weighting = Foo (TBD)" }
+    },
+    { "id": "eu-ai-act",   "title": "EU AI Act — next phased obligation", "kind": "watch", "metabolism": "gov",     "date_source": { "provider": "pdoom-data", "ref": "milestones/eu_ai_act_next", "status": "pending", "issue": "pdoom-data#38" }, "link": "https://artificialintelligenceact.eu/" },
+    { "id": "ai-summit",   "title": "Next international AI Summit",        "kind": "watch", "metabolism": "gov",     "date_source": { "provider": "pdoom-data", "ref": "milestones/ai_summit_next", "status": "pending", "issue": "pdoom-data#38" } },
+    { "id": "unga",        "title": "Next UN General Assembly",           "kind": "watch", "metabolism": "gov",     "date_source": { "provider": "pdoom-data", "ref": "milestones/unga_next", "status": "pending", "issue": "pdoom-data#38" } },
+    { "id": "metaculus-agi","title": "Metaculus AGI community median",    "kind": "watch", "metabolism": "company", "date_source": { "provider": "pdoom-data", "ref": "milestones/metaculus_agi", "status": "pending", "issue": "pdoom-data#38", "live": true } },
+
+    { "id": "league",      "title": "Next league",             "kind": "watch", "metabolism": "internal", "cadence": { "type": "weekly",  "anchor_utc": "Sun 14:00" }, "note": "New seed, same engine." },
+    { "id": "patch",       "title": "Next patch",              "kind": "watch", "metabolism": "internal", "cadence": { "type": "monthly", "note": "monthly metabolism; messy this week, then settles" } },
+    { "id": "pdoom-data",  "title": "Next pdoom-data update",  "kind": "watch", "metabolism": "internal", "cadence": { "type": "from_source", "provider": "pdoom-data" }, "note": "the dataset behind the events" },
+
+    { "id": "pauseai",     "title": "Next PauseAI action",     "kind": "act",   "metabolism": "people", "date_source": { "provider": "pdoom-data", "ref": "milestones/pauseai_next", "status": "pending", "issue": "pdoom-data#38", "recurs": true }, "link": "https://pauseai.info/", "cta": "join, near you" },
+    { "id": "aisafety-program", "title": "Next AI-safety program deadline", "kind": "act", "metabolism": "people", "date_source": { "provider": "pdoom-data", "ref": "milestones/program_deadline_next", "status": "pending", "issue": "pdoom-data#38", "recurs": true }, "cta": "apply" }
+  ]
+}

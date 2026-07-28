@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>State of Doom — p(Doom)1</title>
+	<meta name="description" content="Everything p(Doom)1 is counting down to, on one honest timeline — the things you can watch, and the few you can do.">
+	<link rel="canonical" href="https://pdoom1.com/state-of-doom/" />
+	<!-- Plausible Analytics - Privacy-first, self-hosted -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+	<style>
+		/* Fallbacks are the current shipped palette; the loader below overrides each
+		   from /design/tokens.json (the upstream token channel synced from the game),
+		   so the page's colours follow the game's art without being hardcoded here. */
+		:root{
+			--bg:#12100F; --panel:#1C1917; --panel-2:#262220; --hair:#3A342E; --hair-2:#2a2622;
+			--ink:#E9F2F2; --ink-2:#CFC7BB; --ink-3:#A79E92;
+			--amber:#F6A800; --teal:#2FD4C2; --doom:#E2524A; --phosphor:#5BE87A;
+			--radius:10px;
+			--mono:ui-monospace,"SFMono-Regular",Menlo,"Courier New",monospace;
+		}
+		*{margin:0;padding:0;box-sizing:border-box}
+		html{color-scheme:dark}
+		body{
+			background:var(--bg); color:var(--ink); font-family:var(--mono); line-height:1.6;
+			-webkit-font-smoothing:antialiased;
+			background-image:radial-gradient(60rem 40rem at 50% -10%, rgba(226,82,74,.06), transparent 60%);
+			background-attachment:fixed;
+		}
+		main{max-width:min(820px,92vw); margin:0 auto; padding:2rem 0 4rem}
+		.intro{margin-bottom:1.8rem}
+		.intro h1{font-size:clamp(1.8rem,5vw,2.6rem); color:var(--ink); letter-spacing:.01em; text-wrap:balance}
+		.intro h1 b{color:var(--doom)}
+		.intro p{color:var(--ink-2); max-width:46rem; margin-top:.6rem; text-wrap:pretty}
+		.early{display:inline-block; margin-top:.9rem; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+			color:var(--ink-3); border:1px solid var(--hair); padding:.3rem .6rem; border-radius:999px}
+
+		.rack{background:var(--panel); border:1px solid var(--hair); border-radius:14px; padding:1.4rem 1.5rem; margin-top:1.4rem}
+		.rack h2{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); margin-bottom:1.1rem; font-weight:700}
+		.row{display:grid; gap:.45rem; padding:.9rem 0; border-top:1px solid var(--hair-2)}
+		.row:first-of-type{border-top:0; padding-top:.2rem}
+		.row-top{display:flex; align-items:baseline; justify-content:space-between; gap:1rem}
+		.row .label{color:var(--ink-2)} .row .label b{color:var(--ink)}
+		.row .kindtag{font-size:.64rem; letter-spacing:.12em; text-transform:uppercase; padding:.1rem .4rem; border-radius:4px; margin-left:.5rem; vertical-align:.1em}
+		.kind-watch{color:var(--teal); border:1px solid color-mix(in srgb,var(--teal) 40%,transparent)}
+		.kind-act{color:var(--amber); border:1px solid color-mix(in srgb,var(--amber) 45%,transparent)}
+		.row .val{font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--ink); text-align:right}
+		.row .val .n{font-weight:800; font-size:1.2rem} .row .val .u{color:var(--ink-3); font-size:.78rem; margin-left:.25em}
+		.row.live .val .n{color:var(--teal)}
+		.row.act .val .n{color:var(--amber)}
+		.track{position:relative; height:10px; border-radius:999px; background:rgba(255,255,255,.04); box-shadow:inset 0 0 0 1px var(--hair-2)}
+		.fill{position:absolute; left:0; top:0; height:100%; border-radius:999px; min-width:4px; transition:width .6s cubic-bezier(.2,.8,.2,1)}
+		.row.live .fill{background:linear-gradient(90deg,color-mix(in srgb,var(--teal) 18%,transparent),var(--teal))}
+		.row.act .fill{background:linear-gradient(90deg,color-mix(in srgb,var(--amber) 18%,transparent),var(--amber))}
+
+		.pending{opacity:.72}
+		.pending .val{color:var(--ink-3); font-size:.82rem; font-weight:400}
+		.pending .val .n{font-weight:400; font-size:.9rem; color:var(--ink-3)}
+		.src{font-size:.76rem; color:var(--ink-3)} .src a{color:var(--amber); text-decoration:none} .src a:hover{text-decoration:underline}
+
+		.note{margin-top:1.4rem; font-size:.82rem; color:var(--ink-3); text-wrap:pretty}
+		.note b{color:var(--ink-2)}
+		a:focus-visible{outline:2px solid var(--amber); outline-offset:3px}
+		@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+	</style>
+</head>
+<body>
+	<header></header>
+	<main>
+		<div class="intro">
+			<h1>The <b>state of doom</b>, on one clock face</h1>
+			<p>Everything we're counting down to, on one honest timeline — the things worth watching, and the few you can actually do. Early: the league clock is live; the rest wire up as their data channels land. No date on this page is guessed.</p>
+			<span class="early" id="early">Early — clocks coming online</span>
+		</div>
+
+		<section class="rack">
+			<h2>Counting down</h2>
+			<div id="rows"><div class="row"><div class="label" style="color:var(--ink-3)">Loading clocks…</div></div></div>
+		</section>
+
+		<p class="note"><b>How this stays honest:</b> the internal clocks derive from a real cadence (the league resets Sundays 14:00 UTC); the milestone clocks are wired to <b>pdoom-data</b>, cleaned and human-verified, and show <em>“awaiting data”</em> rather than a made-up date until that lands. The AGI clock waits on the game's own calibration. Colours are pulled from the game's shipped palette.</p>
+	</main>
+
+	<script src="/assets/js/navigation.js"></script>
+	<script>
+	(function(){
+		var DAY=864e5;
+		// 1) Infer the colour schema from upstream: override the CSS fallbacks with the
+		//    game's shipped tokens. Fail-safe — on any error the fallback palette stays.
+		fetch('/design/tokens.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(t){
+			if(!t||!t.colors) return; var c=t.colors, s=document.documentElement.style;
+			var map={'--bg':'bgPrimary','--panel':'bgSecondary','--panel-2':'bgTertiary','--ink':'textPrimary','--ink-2':'textSecondary','--ink-3':'textMuted','--amber':'accentPrimary','--teal':'accentSecondary','--doom':'accentDanger','--hair':'border','--phosphor':'phosphor'};
+			Object.keys(map).forEach(function(k){ if(c[map[k]]) s.setProperty(k,c[map[k]]); });
+		}).catch(function(){});
+
+		function pad(n){return String(n).padStart(2,'0')}
+		function nextWeekly(dow,hour){ var d=new Date(),day=d.getUTCDay(),add=((dow-day)%7+7)%7;
+			if(add===0 && (d.getUTCHours()>hour || (d.getUTCHours()===hour&&d.getUTCMinutes()>0))) add=7;
+			var t=new Date(d); t.setUTCDate(d.getUTCDate()+add); t.setUTCHours(hour,0,0,0); return t; }
+
+		// Resolve a clock's target date from its config. Only cadences we can honestly
+		// compute return a date; everything else returns null -> renders "awaiting data".
+		function resolveTarget(c){
+			if(c.cadence && c.cadence.type==='weekly' && c.cadence.anchor_utc){
+				var m=/([A-Za-z]{3})\s+(\d{1,2}):(\d{2})/.exec(c.cadence.anchor_utc);
+				var dows={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+				if(m && m[1] in dows) return nextWeekly(dows[m[1]], parseInt(m[2],10));
+			}
+			return null; // monthly-without-anchor, from_source, and all pending milestones
+		}
+
+		function render(clocks){
+			var live=[], pend=[];
+			clocks.forEach(function(c){ var t=resolveTarget(c); (t?live:pend).push({c:c,t:t}); });
+			live.sort(function(a,b){return a.t-b.t});
+			var maxMs=live.reduce(function(m,o){return Math.max(m,o.t-new Date())},1);
+			var out='';
+			live.forEach(function(o){
+				var id=o.c.id, act=o.c.kind==='act';
+				out+='<div class="row '+(act?'act':'live')+'" data-id="'+id+'" data-t="'+o.t.getTime()+'">'
+					+'<div class="row-top"><div class="label"><b>'+o.c.title+'</b>'
+					+'<span class="kindtag '+(act?'kind-act':'kind-watch')+'">'+(act?'act':'watch')+'</span></div>'
+					+'<div class="val"><span class="n" id="n-'+id+'">—</span><span class="u">days</span></div></div>'
+					+'<div class="track"><div class="fill" id="f-'+id+'" style="width:0"></div></div>'
+					+(o.c.note?'<div class="src">'+o.c.note+'</div>':'')+'</div>';
+			});
+			pend.forEach(function(o){
+				var src=o.c.date_source||{}, ref=src.issue?('awaiting '+src.issue):(o.c.calibration?'awaiting game calibration':'awaiting data');
+				var link=o.c.link?' · <a href="'+o.c.link+'" target="_blank" rel="noopener">source</a>':'';
+				out+='<div class="row pending" data-id="'+o.c.id+'">'
+					+'<div class="row-top"><div class="label">'+o.c.title
+					+'<span class="kindtag '+(o.c.kind==='act'?'kind-act':'kind-watch')+'">'+(o.c.kind||'watch')+'</span></div>'
+					+'<div class="val"><span class="n">'+ref+'</span></div></div>'
+					+'<div class="src">'+(o.c.metabolism||'')+link+'</div></div>';
+			});
+			document.getElementById('rows').innerHTML=out;
+			document.getElementById('early').textContent = live.length+' live · '+pend.length+' coming online';
+			tick(); if(window._ct) clearInterval(window._ct); window._ct=setInterval(tick,1000);
+			window._live=live; window._max=maxMs;
+		}
+		function tick(){
+			(window._live||[]).forEach(function(o){
+				var ms=Math.max(0,o.t-new Date()), d=Math.floor(ms/DAY);
+				var n=document.getElementById('n-'+o.c.id), f=document.getElementById('f-'+o.c.id);
+				if(n) n.textContent=d.toLocaleString();
+				if(f) f.style.width=Math.max(4, ms/window._max*100)+'%';
+			});
+		}
+		fetch('/data/clocks.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(cfg){
+			render(cfg.clocks||[]);
+		}).catch(function(){
+			document.getElementById('rows').innerHTML='<div class="row"><div class="label" style="color:var(--ink-3)">Clocks unavailable right now.</div></div>';
+		});
+	})();
+	</script>
+</body>
+</html>
