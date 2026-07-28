@@ -2,7 +2,7 @@
 
 This roadmap is a living document. It summarizes major goals for the **website** and feeds the GitHub Issues backlog for execution. It is organized by status rather than version number to avoid confusion.
 
-> **Versioning note:** The *game* (`PipFoweraker/pdoom1`) is the source of truth for gameplay and releases — its current release is **v0.11.0**. This site tracks that release automatically via `public/data/version.json`. The milestones below describe *website* work and are independent of the game's version.
+> **Versioning note:** The *game* (`PipFoweraker/pdoom1`) is the source of truth for gameplay and releases. This site tracks its current release automatically via `public/data/version.json`, so no version number is written down here to go stale — see the [game roadmap](/docs/roadmap/) for where the game is headed. The milestones below describe *website* work and are independent of the game's version.
 
 ## Shipped
 - **Weekly League system** — deterministic seeding, standings UI, archives, and automated weekly rollover.
@@ -28,4 +28,4 @@ This roadmap is a living document. It summarizes major goals for the **website**
 ## Notes
 - The source of truth for game code and the design system is the `PipFoweraker/pdoom1` repo. This site links there for downloads until the Steam launch.
 
-- Forward cadence note (2026-07-21): league/content operations move to a MONTHLY cycle; weekly output is limited to generated challenge seeds. See the game roadmap.
+- Forward cadence note (2026-07-21, re-cast 2026-07-25): the game ships one named Theme a month, and league/content operations run on that same monthly cycle; weekly output is limited to generated challenge seeds. See the [game roadmap](/docs/roadmap/).
