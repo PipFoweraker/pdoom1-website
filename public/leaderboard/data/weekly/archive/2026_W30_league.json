@@ -1,12 +1,12 @@
 {
   "meta": {
-    "week_id": "2026_W29",
+    "week_id": "2026_W30",
     "season": "2025_Q4",
-    "generated": "2026-07-19T14:25:24.331899Z",
-    "game_version": "v0.11.0",
+    "generated": "2026-07-26T14:28:04.392677Z",
+    "game_version": "v0.13.1",
     "competition_type": "weekly_league",
-    "start_date": "2026-07-13T00:00:00",
-    "end_date": "2026-07-19T23:59:59",
+    "start_date": "2026-07-20T00:00:00",
+    "end_date": "2026-07-26T23:59:59",
     "total_participants": 0,
     "total_submissions": 0
   },
@@ -17,27 +17,26 @@
     "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
     "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
     "observed_defects": {
-      "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
       "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
       "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it.",
-      "rollover-off-by-one": "week_id/date range describe the week that was ENDING when the rollover ran, not the week that was starting -- the record is one week behind the competition it claims to represent (docs/TECH_DEBT.md A9, fixed 2026-07-28).",
-      "naive-local-timestamp-labelled-utc": "archived_at was written as local wall-clock time with a 'Z' suffix bolted on (datetime.now().isoformat() + 'Z'), so its UTC claim is off by the writing machine's offset. Fixed 2026-07-28; historical values left as found."
+      "rollover-off-by-one": "week_id/date range describe the week that was ENDING when the rollover ran, not the week that was starting -- the record is one week behind the competition it claims to represent (docs/TECH_DEBT.md A9, fixed 2026-07-28)."
     }
   },
-  "seed": "weekly_2026_W29_eb0ee12a",
+  "seed": "weekly_2026_W30_18a08709",
   "economic_model": "unknown",
   "week_info": {
-    "week_id": "2026_W29",
+    "week_id": "2026_W30",
     "year": 2026,
-    "week_number": 29,
-    "start_date": "2026-07-13",
-    "end_date": "2026-07-19",
-    "start_timestamp": "2026-07-13T00:00:00",
-    "end_timestamp": "2026-07-19T23:59:59",
+    "week_number": 30,
+    "start_date": "2026-07-20",
+    "end_date": "2026-07-26",
+    "start_timestamp": "2026-07-20T00:00:00",
+    "end_timestamp": "2026-07-26T23:59:59",
     "days_remaining": 0,
     "hours_remaining": 9,
-    "is_current": true,
-    "season": "2025_Q4"
+    "is_current": false,
+    "season": "2025_Q4",
+    "status": "ended"
   },
   "entries": [],
   "statistics": {
@@ -46,6 +45,6 @@
     "total_games": 0,
     "unique_players": 0
   },
-  "archived_at": "2026-07-26T14:28:04.280319Z",
+  "archived_at": "2026-07-28T04:42:47.484642Z",
   "archive_status": "completed"
 }

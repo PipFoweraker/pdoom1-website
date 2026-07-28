@@ -10,6 +10,21 @@
     "total_participants": 0,
     "total_submissions": 0
   },
+  "epoch": {
+    "id": "pre-regularisation",
+    "anomalous": true,
+    "boundary_utc": "2026-07-31T00:00:00Z",
+    "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+    "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+    "observed_defects": {
+      "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
+      "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
+      "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
+      "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it.",
+      "rollover-off-by-one": "week_id/date range describe the week that was ENDING when the rollover ran, not the week that was starting -- the record is one week behind the competition it claims to represent (docs/TECH_DEBT.md A9, fixed 2026-07-28).",
+      "naive-local-timestamp-labelled-utc": "archived_at was written as local wall-clock time with a 'Z' suffix bolted on (datetime.now().isoformat() + 'Z'), so its UTC claim is off by the writing machine's offset. Fixed 2026-07-28; historical values left as found."
+    }
+  },
   "seed": "weekly_2026_W22_7a099351",
   "economic_model": "Bootstrap_v0.4.1",
   "week_info": {

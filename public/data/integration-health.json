@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-27T07:16:23.729362+00:00",
+  "generated": "2026-07-28T06:02:11.667046+00:00",
   "overall_status": "OK",
   "summary": {
     "fail": 0,
@@ -35,12 +35,12 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 0.7 days ago"
+      "detail": "generated 0.1 days ago"
     },
     {
       "name": "league:current_week",
       "status": "OK",
-      "detail": "week 2026_W30 current"
+      "detail": "week 2026_W31 current"
     },
     {
       "name": "league:version_drift",

@@ -141,6 +141,38 @@
       transform: translateX(-4px);
     }
 
+    /* Retirement / anomalous-pre-history notice.
+       See docs/LEAGUE_EPOCH_ANOMALY.md. */
+    .epoch-notice {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-secondary);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .epoch-notice h2 {
+      font-size: 1.15rem;
+      color: var(--accent-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .epoch-notice p {
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      max-width: 74ch;
+      font-size: 0.92rem;
+    }
+
+    .epoch-notice p:last-child {
+      margin-bottom: 0;
+    }
+
+    .epoch-notice a {
+      color: var(--accent-primary);
+    }
+
     .player-header {
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
@@ -465,6 +497,30 @@
     <a href="/league/" class="back-link">
       ← Back to League
     </a>
+
+    <!-- Retirement / epoch notice. Static: true regardless of what loads below.
+         This page has no data store of its own -- every figure it shows is
+         derived from the weekly league files, all of which are flagged
+         epoch.anomalous. See docs/LEAGUE_EPOCH_ANOMALY.md. -->
+    <div class="epoch-notice">
+      <h2>This page is retired, and its data predates 31 July 2026</h2>
+      <p>
+        Player profiles are not maintained. This page is kept reachable but is not linked
+        from anywhere on the site and is excluded from search engines — hidden, not
+        deleted, so the record survives.
+      </p>
+      <p>
+        There is no player database behind this page. Every figure below is computed in
+        your browser from the weekly league files, and every one of those files is
+        flagged as anomalous pre-history: they contain zero entries, because no shipped
+        game client ever submitted a score to those board keys. A profile rendered from
+        them is a profile of nothing, and the zeroes you see are the honest result.
+      </p>
+      <p>
+        The full account, with file paths and counts, is in
+        <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/LEAGUE_EPOCH_ANOMALY.md">docs/LEAGUE_EPOCH_ANOMALY.md</a>.
+      </p>
+    </div>
 
     <div class="loading" id="loading">Loading player profile</div>
 

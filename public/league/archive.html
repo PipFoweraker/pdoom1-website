@@ -183,6 +183,86 @@
       margin-bottom: 2rem;
     }
 
+    /* --- Anomalous pre-history (see docs/LEAGUE_EPOCH_ANOMALY.md) ---------
+       Weeks generated before the 2026-07-31 patch-cycle regularisation are
+       kept and shown, but fenced off so nobody reads them as competition
+       results. Muted, not hidden. */
+    .anomaly-section {
+      margin: 3rem 0 2rem;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 2rem;
+    }
+
+    .anomaly-notice {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-secondary);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .anomaly-notice h2 {
+      font-size: 1.2rem;
+      color: var(--accent-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .anomaly-notice p {
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      max-width: 70ch;
+    }
+
+    .anomaly-notice p:last-child {
+      margin-bottom: 0;
+    }
+
+    .anomaly-notice code {
+      color: var(--accent-primary);
+      background: var(--bg-tertiary);
+      padding: 0.1rem 0.35rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .anomaly-notice a {
+      color: var(--accent-primary);
+    }
+
+    .anomaly-grid .archive-card {
+      opacity: 0.72;
+      border-style: dashed;
+    }
+
+    .anomaly-grid .archive-card:hover {
+      opacity: 1;
+    }
+
+    .anomaly-badge {
+      display: inline-block;
+      background: var(--bg-tertiary);
+      color: var(--accent-secondary);
+      border: 1px solid var(--accent-secondary);
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .defect-list {
+      margin: 0.75rem 0 0;
+      padding-left: 1.1rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .defect-list li {
+      margin-bottom: 0.35rem;
+    }
+
     .archive-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
@@ -511,7 +591,9 @@
 
     <!-- No Results -->
     <div class="no-results" id="no-results" style="display: none;">
-      No archived weeks found. Check back later!
+      No regularised league weeks have been archived yet. The first one closes on
+      Sunday 9 August 2026. Everything before 31 July 2026 is anomalous pre-history
+      and is listed separately below.
     </div>
 
     <!-- Archive Grid -->
@@ -525,6 +607,39 @@
       <span class="pagination-info" id="page-info">Page 1</span>
       <button id="next-page">Next →</button>
     </div>
+
+    <!-- Anomalous pre-history. Populated only when the archive data actually
+         carries epoch.anomalous records, so this section can never claim an
+         anomaly that isn't in the data. See docs/LEAGUE_EPOCH_ANOMALY.md. -->
+    <section class="anomaly-section" id="anomaly-section" style="display: none;">
+      <div class="anomaly-notice">
+        <h2>[ANOMALY] Pre-history: weeks before 31 July 2026</h2>
+        <p>
+          The <strong id="anomaly-count">&mdash;</strong> weeks below were produced before the
+          patch cycle was regularised on <strong>31 July 2026</strong>. They are kept and
+          shown deliberately, but they are <strong>not results</strong> and are
+          <strong>not comparable</strong> to anything after that date.
+        </p>
+        <p>
+          What actually happened: the weekly rollover ran every Sunday at 14:00 UTC and
+          created the week that was <em>ending</em> ten hours later instead of the week
+          that was starting, so each record is labelled one week behind the period it
+          describes. Every one of these weeks also contains zero entries — no shipped
+          game client ever submitted a score to these board keys — and the seeds shown
+          were derived by the website rather than sent by the game. Some records still
+          carry <code>v0.4.1</code> version stamps from the old pygame client; those are
+          left exactly as found, because restamping them would invent a history that did
+          not happen.
+        </p>
+        <p>
+          They are retained for the record, not for competition. Each card lists the
+          specific problems recorded against that week; the full account, with file
+          paths and counts, is in
+          <a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/LEAGUE_EPOCH_ANOMALY.md">docs/LEAGUE_EPOCH_ANOMALY.md</a>.
+        </p>
+      </div>
+      <div class="archive-grid anomaly-grid" id="anomaly-grid"></div>
+    </section>
   </main>
 
   <!-- Toast notification -->
@@ -534,46 +649,68 @@
   </div>
 
   <script>
+    // Archive JSON is repo-controlled, but it is still data being spliced into
+    // innerHTML -- escape it rather than trust the pipeline that produced it.
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
     // Pagination state
     let currentPage = 1;
     const itemsPerPage = 9;
-    let allArchives = [];
+    let allArchives = [];        // regularised weeks only -- the main grid
+    let anomalousArchives = [];  // pre-2026-07-31 pre-history -- fenced off below
     let filteredArchives = [];
+
+    // A week is anomalous iff its own record says so. Never inferred from the
+    // date here: the data carries the flag (epoch.anomalous), so the page and
+    // the archive can never disagree. See docs/LEAGUE_EPOCH_ANOMALY.md.
+    function isAnomalous(archive) {
+      return (archive?.epoch?.anomalous === true) ||
+             (archive?.week_info?.epoch?.anomalous === true);
+    }
 
     // Load archive data
     async function loadArchives() {
       try {
         // First, try to load the archive index
         const indexResponse = await fetch('/leaderboard/data/weekly/archive/index.json', { cache: 'no-store' });
-        
-        let archiveFiles;
+
+        let archiveFiles = [];
         if (indexResponse.ok) {
           // Use index file if available
           const index = await indexResponse.json();
-          archiveFiles = index.archives.map(a => a.file);
+          archiveFiles = (index.archives || []).map(a => a.file);
         }
         // No fallback needed - empty array is fine
 
         // Load all archive files
         const archiveData = await Promise.all(
-          archiveFiles.map(file => 
+          archiveFiles.map(file =>
             fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })
               .then(r => r.ok ? r.json() : null)
               .catch(() => null)
           )
         );
 
-        // Filter out failed loads
-        allArchives = archiveData.filter(d => d !== null);
-        
+        // Filter out failed loads, then split the epochs apart
+        const loaded = archiveData.filter(d => d !== null);
+        anomalousArchives = loaded.filter(isAnomalous);
+        allArchives = loaded.filter(d => !isAnomalous(d));
+
+        displayAnomalies();
+
+        // Extract unique seasons for filter (regularised weeks only -- the
+        // filter must not offer a season that only exists in the pre-history)
+        const seasons = [...new Set(allArchives.map(a => a.meta?.season).filter(Boolean))];
+        populateSeasonFilter(seasons);
+
         if (allArchives.length === 0) {
           showNoResults();
           return;
         }
-
-        // Extract unique seasons for filter
-        const seasons = [...new Set(allArchives.map(a => a.meta?.season).filter(Boolean))];
-        populateSeasonFilter(seasons);
 
         // Initial display
         filteredArchives = [...allArchives];
@@ -583,6 +720,22 @@
         console.error('Failed to load archives:', error);
         showError();
       }
+    }
+
+    // Render the anomalous pre-history, oldest-last, with its per-week defects.
+    function displayAnomalies() {
+      const section = document.getElementById('anomaly-section');
+      const grid = document.getElementById('anomaly-grid');
+      if (anomalousArchives.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+      document.getElementById('anomaly-count').textContent = anomalousArchives.length;
+      const sorted = [...anomalousArchives].sort(
+        (a, b) => (b.meta?.week_id || '').localeCompare(a.meta?.week_id || ''));
+      grid.innerHTML = '';
+      sorted.forEach(a => grid.appendChild(createArchiveCard(a, true)));
+      section.style.display = 'block';
     }
 
     // Populate season filter dropdown
@@ -678,10 +831,10 @@
     }
 
     // Create archive card element
-    function createArchiveCard(archive) {
+    function createArchiveCard(archive, anomalous) {
       const card = document.createElement('div');
       card.className = 'archive-card';
-      
+
       const meta = archive.meta || {};
       const stats = archive.statistics || {};
       const weekInfo = archive.week_info || {};
@@ -692,12 +845,22 @@
         ? entries.reduce((max, entry) => entry.score > max.score ? entry : max, entries[0])
         : null;
 
+      const defects = (archive.epoch && archive.epoch.observed_defects) || {};
+      const defectItems = Object.values(defects)
+        .map(text => `<li>${escapeHtml(text)}</li>`).join('');
+
       card.innerHTML = `
+        ${anomalous ? '<div class="anomaly-badge">Anomalous pre-history — not a result</div>' : ''}
         <div class="archive-card-header">
           <div class="week-id">${meta.week_id || 'Unknown Week'}</div>
           <div class="season-badge">${meta.season || 'Unknown'}</div>
         </div>
         <div class="archive-stats">
+          ${anomalous ? `
+          <div class="stat-item">
+            <span class="stat-label">Version stamp</span>
+            <span class="stat-value">${escapeHtml(meta.game_version || 'unknown')}</span>
+          </div>` : ''}
           <div class="stat-item">
             <span class="stat-label">Date Range</span>
             <span class="stat-value">${weekInfo.start_date || '-'} to ${weekInfo.end_date || '-'}</span>
@@ -722,9 +885,10 @@
         ${winner ? `
           <div class="winner-highlight">
             <div class="winner-label">[WIN] Winner</div>
-            <div class="winner-name">${winner.player_name || 'Unknown'}</div>
+            <div class="winner-name">${escapeHtml(winner.player_name || 'Unknown')}</div>
           </div>
         ` : ''}
+        ${defectItems ? `<ul class="defect-list">${defectItems}</ul>` : ''}
       `;
 
       // Add click handler to view details (using toast instead of alert)

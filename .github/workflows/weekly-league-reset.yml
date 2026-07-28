@@ -38,7 +38,12 @@ jobs:
           echo "🏆 WEEKLY LEAGUE RESET STARTING 🏆"
           echo ""
           echo "⏰ Time: $(date -u +'%Y-%m-%d %H:%M UTC')"
-          echo "📅 New week beginning: Monday $(date -u +'%Y-%m-%d')"
+          # This line used to read "New week beginning: Monday $(date -u)" on a
+          # run that fires on SUNDAY -- it printed Sunday's date under the word
+          # Monday, echoing the same off-by-one the code had (TECH_DEBT A9).
+          # The week actually being opened is printed by the status step below,
+          # straight out of weekly-league-manager.py, so the banner cannot
+          # disagree with the code.
           echo "👤 Triggered by: ${{ github.event_name }}"
 
       - name: Checkout repository
@@ -50,6 +55,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+
+      # Runs BEFORE anything mutates data. If the run-time -> week mapping has
+      # regressed, the correct outcome is a failed rollover (which opens the
+      # single failure issue below), not a wrong week published quietly.
+      - name: Pin the rollover boundary (TECH_DEBT A9)
+        run: python scripts/test-weekly-league-boundary.py
 
       - name: Check current league status
         run: |
@@ -85,6 +96,12 @@ jobs:
           echo "new_week=$NEW_WEEK" >> $GITHUB_OUTPUT
           echo "✅ New weekly league started successfully"
 
+      # Stamps epoch{} onto every weekly record (idempotent) and rebuilds the
+      # derived archive index, so the archive page's anomaly section can never
+      # drift from the files on disk. See docs/LEAGUE_EPOCH_ANOMALY.md.
+      - name: Stamp ladder epoch on weekly records
+        run: python scripts/stamp-league-epoch.py
+
       - name: Verify new league status
         id: verify
         run: |
@@ -119,13 +136,16 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action (Weekly League)"
-          
-          if git diff --quiet; then
+
+          # `git diff` cannot see untracked files, and archiving a week CREATES
+          # one (archive/<week>_league.json). Stage first, then test the index --
+          # see CLAUDE.md "Workflow authoring traps" #1.
+          git add -A
+          if git diff --cached --quiet; then
             echo "ℹ️  No changes to commit"
           else
             WEEK_ID=$(python scripts/weekly-league-manager.py --status | grep "CURRENT_WEEK:" | awk '{print $2}')
-            
-            git add -A
+
             git commit -m "Weekly league reset - $WEEK_ID
 
             - Archived previous week's results

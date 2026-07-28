@@ -37,6 +37,32 @@ For each, pick one:
 3. **Keep hidden** — fine as a holding state, but revisit; a permanently hidden
    page is dead weight that still ships in the deploy.
 
+## DECIDED 2026-07-28 — the league trio: option 3, formalised
+
+Pip's call: `league/index.html`, `league/archive.html` and `players/index.html`
+are **retired and kept hidden — not deleted, not revived**. Everything they show
+that predates the 2026-07-31 patch-cycle regularisation is now labelled
+**anomalous pre-history** by a machine-readable `epoch` block in the data, and
+the archive page renders it in a separate, explicitly-labelled anomaly section.
+
+This closes the "permanently hidden page is dead weight" objection above: the
+pages now state what they are, so a visitor who reaches one is not misled, and
+the record survives for anyone tracing the history.
+
+Two corrections to this file, found while doing that work:
+
+- `league/archive.html` did **not** show "Failed to load archive data". Its index
+  was present and parseable — but listed **3** of the **41** archive files, with
+  `last_updated` frozen at 2025-10-31, because nothing ever rewrote it. So it
+  rendered 3 weeks and looked fine. The index is now derived from the directory.
+- The precondition named below (TECH_DEBT A9, rollover cadence) is **fixed** as
+  of 2026-07-28.
+
+Full account: `docs/LEAGUE_EPOCH_ANOMALY.md`.
+
+`changelog/index.html` and `dev-notes/index.html` are untouched by that decision
+and still need one.
+
 ## Related
 
 - The league trio's staleness is **downstream of the weekly rollover off-by-one**

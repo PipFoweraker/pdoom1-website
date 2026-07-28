@@ -193,6 +193,8 @@ node    scripts/test-download-resolution.js # download buttons resolve/degrade r
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift
 python  scripts/generate-feeds.py --check # feeds in step with the blog
 node    scripts/test-header-consistency.js
+python  scripts/test-weekly-league-boundary.py  # rollover run-time -> week mapping (A9)
+python  scripts/stamp-league-epoch.py --check   # every weekly record carries its epoch
 ```
 
 **Platform availability is a *derived* fact, not prose.** The source of truth is
@@ -208,9 +210,21 @@ platform that has no build.
 - Weekly-league rollover only opens a GitHub issue **on failure**
   (`weekly-league-reset.yml`). The old workflow that spammed 35 "success" issues
   was removed 2026-07-14 — don't reintroduce success-issue creation.
-- **The rollover is off by one week**: cron fires Sunday 14:00 UTC and
-  `get_current_week_info()` derives the week from `now`, so it creates the week
-  that *ends* hours later. `validate_data.py` reports it. See TECH_DEBT A9.
+- **The rollover off-by-one is FIXED (2026-07-28, TECH_DEBT A9).** The cron fires
+  Sunday 14:00 UTC — ~10h *before* the week it opens begins — so the run-time →
+  week mapping is now explicit (`league_week_start()`), not derived from `now`.
+  `scripts/test-weekly-league-boundary.py` pins it at exactly Sun 14:00:00 UTC and
+  one minute either side, and runs as the **first** step of the rollover workflow.
+  **Do not "simplify" that back to `datetime.now()`** — and note `datetime.now()`
+  without a tz is *local* time, which on Pip's box is AEST (+10), exactly the size
+  of skew that crosses this boundary.
+- **The league and player pages are retired-and-hidden, not deleted** (Pip,
+  2026-07-28), and everything before the 2026-07-31 patch-cycle cut is labelled
+  **anomalous pre-history** via a machine-readable `epoch` block in the data.
+  First regularised week is **2026_W32**. Before touching any weekly archive,
+  seed leaderboard, or `/league/` + `/players/` page, read
+  `docs/LEAGUE_EPOCH_ANOMALY.md` — it records what each file is, why the `v0.4.1`
+  stamps must NOT be restamped, and where every piece lives.
 - The leaderboard board key is **`(seed, game_version)`** (pdoom1 PR #679). A
   version-stamp mismatch means submitted scores land nowhere, with **no error
   shown to the player** — it looks exactly like "nobody is playing". Suspect this

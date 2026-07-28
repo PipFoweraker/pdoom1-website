@@ -1,29 +1,54 @@
 {
   "meta": {
-    "week_id": "2026_W30",
+    "week_id": "2026_W31",
     "season": "2025_Q4",
-    "generated": "2026-07-26T14:28:04.392677Z",
+    "generated": "2026-07-28T04:42:47.484642Z",
     "game_version": "v0.13.1",
     "competition_type": "weekly_league",
-    "start_date": "2026-07-20T00:00:00",
-    "end_date": "2026-07-26T23:59:59",
+    "start_date": "2026-07-27T00:00:00+00:00",
+    "end_date": "2026-08-02T23:59:59+00:00",
     "total_participants": 0,
     "total_submissions": 0
   },
-  "seed": "weekly_2026_W30_18a08709",
+  "epoch": {
+    "id": "pre-regularisation",
+    "anomalous": true,
+    "boundary_utc": "2026-07-31T00:00:00Z",
+    "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+    "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+    "observed_defects": {
+      "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
+      "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it."
+    }
+  },
+  "seed": "weekly_2026_W31_f148a5b6",
+  "seed_provenance": {
+    "blessed": false,
+    "derivation": "sha256('pdoom1_weekly_<week_id>_<season>')[:8], website-side",
+    "canonical_source": "the shipped game client, recorded in docs/LEAGUE_SEED_LEDGER.md",
+    "note": "Placeholder. Do NOT present this to players as the competitive seed. The board key scores are actually submitted under is blessed in docs/LEAGUE_SEED_LEDGER.md; a seed that is not in that ledger routes submissions to a board nobody displays, with no error shown to the player."
+  },
   "economic_model": "unknown",
   "week_info": {
-    "week_id": "2026_W30",
+    "week_id": "2026_W31",
     "year": 2026,
-    "week_number": 30,
-    "start_date": "2026-07-20",
-    "end_date": "2026-07-26",
-    "start_timestamp": "2026-07-20T00:00:00",
-    "end_timestamp": "2026-07-26T23:59:59",
-    "days_remaining": 0,
-    "hours_remaining": 9,
+    "week_number": 31,
+    "start_date": "2026-07-27",
+    "end_date": "2026-08-02",
+    "start_timestamp": "2026-07-27T00:00:00+00:00",
+    "end_timestamp": "2026-08-02T23:59:59+00:00",
+    "days_remaining": 5,
+    "hours_remaining": 19,
     "is_current": true,
-    "season": "2025_Q4"
+    "status": "running",
+    "season": "2025_Q4",
+    "epoch": {
+      "id": "pre-regularisation",
+      "anomalous": true,
+      "boundary_utc": "2026-07-31T00:00:00Z",
+      "reason": "Generated before the 2026-07-31 patch-cycle regularisation, while the weekly rollover was off by one week (it re-opened the week that was ending instead of the week that was starting) and while no shipped client could submit to these boards. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+      "see": "docs/LEAGUE_EPOCH_ANOMALY.md"
+    }
   },
   "entries": [],
   "statistics": {
