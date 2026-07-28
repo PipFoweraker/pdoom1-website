@@ -2,66 +2,82 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-	<!-- Orphaned pending revision: stale content, no inbound links.
-	     See docs/ORPHANED_PAGES_TODO.md before re-linking or deleting. -->
-	<meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>pdoom1 Changelog</title>
-  <link rel="canonical" href="https://pdoom1.com/changelog/" />
-  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-  <meta name="description" content="Changelog and update history for p(Doom)1 - AI Safety Strategy Game. Track all the latest features, fixes, and improvements." />
+  <!--
+    RETIRED URL -- /changelog/ now redirects to /game-changelog/ (issue #141,
+    Pip's call 2026-07-28).
+
+    The PRIMARY mechanism is a 301 in public/.htaccess. This page is the FALLBACK,
+    for the case where that directive does not take effect on DreamHost shared
+    hosting. It is deliberately not deleted: deploy is `rsync --delete`, so
+    removing it from public/ would remove it from production, and this ruling was
+    chosen precisely because it is reversible.
+
+    Two things this page must not do, and does not:
+      - It must not render the old changelog. It used to fetch /data/changes.json,
+        whose single entry froze in September 2025 and whose writer (sync_airtable.py)
+        has never once run successfully. Flashing that up for a moment before
+        redirecting would show a visitor a stale version as if it were current.
+      - It must not pretend to be the changelog while it leaves. The visible copy
+        below says plainly that the page moved and where it went, and the link works
+        with JavaScript disabled and with meta-refresh ignored.
+
+    The previous `noindex, nofollow` was removed on purpose: `nofollow` would tell a
+    crawler not to follow the very redirect this page exists to perform. The 301 and
+    the canonical below are what should now describe this URL to a search engine.
+    (`robots.txt` still carries `Disallow: /changelog/`, which would forbid crawling
+    this redirect -- that line is being removed separately in PR #181.)
+  -->
+  <meta http-equiv="refresh" content="0; url=/game-changelog/">
+  <title>Moved to the game changelog - p(Doom)1</title>
+  <link rel="canonical" href="https://pdoom1.com/game-changelog/" />
+  <meta name="description" content="This page has moved. The p(Doom)1 release notes now live at /game-changelog/." />
   <meta name="author" content="p(Doom)1" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="p(Doom)1" />
-  <meta property="og:title" content="pdoom1 Changelog" />
-  <meta property="og:description" content="Changelog and update history for p(Doom)1 - AI Safety Strategy Game. Track all the latest features, fixes, and improvements." />
-  <meta property="og:url" content="https://pdoom1.com/changelog/" />
+  <meta property="og:title" content="Moved to the game changelog - p(Doom)1" />
+  <meta property="og:description" content="This page has moved. The p(Doom)1 release notes now live at /game-changelog/." />
+  <meta property="og:url" content="https://pdoom1.com/game-changelog/" />
   <meta property="og:image" content="https://pdoom1.com/assets/og-card.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
 	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
 	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
   <style>
-    :root { --bg-primary:#12100f; --bg-secondary:#1c1917; --text-primary:#fff; --text-muted:#888; --accent-primary:#f6a800; --border-color:#444; --radius-md:6px; }
-    body { font-family: 'Courier New', monospace; background: var(--bg-primary); color: var(--text-primary); }
-    a { color: var(--accent-primary); text-decoration: none; }
-    header { background: var(--bg-secondary); border-bottom: 2px solid var(--accent-primary); padding: 1rem; }
-    main { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
-    .entry { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem; }
-    .entry h2 { margin: 0 0 .25rem 0; color: var(--accent-primary); }
-    .meta { color: var(--text-muted); font-size: .9rem; margin-bottom: .5rem; }
-    ul { margin: 0 0 0 1.25rem; }
+    :root{
+      --bg:#12100F; --panel:#1C1917; --hair:#3A342E;
+      --ink:#E9F2F2; --ink-2:#CFC7BB; --ink-3:#A79E92; --amber:#F6A800;
+      --mono:ui-monospace,"SFMono-Regular",Menlo,"Courier New",monospace;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{color-scheme:dark}
+    body{background:var(--bg); color:var(--ink); font-family:var(--mono); line-height:1.6;
+         min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem}
+    main{max-width:min(560px,92vw); background:var(--panel); border:1px solid var(--hair);
+         border-radius:14px; padding:1.8rem}
+    h1{font-size:1.3rem; letter-spacing:.01em; text-wrap:balance}
+    p{color:var(--ink-2); margin-top:.8rem; text-wrap:pretty}
+    .go{display:inline-block; margin-top:1.2rem; color:var(--amber); text-decoration:none;
+        border:1px solid color-mix(in srgb,var(--amber) 45%,transparent);
+        border-radius:8px; padding:.5rem .9rem}
+    .go:hover{text-decoration:underline}
+    .go:focus-visible{outline:2px solid var(--amber); outline-offset:3px}
+    .small{font-size:.8rem; color:var(--ink-3); margin-top:1.1rem}
   </style>
 </head>
 <body>
-  <header>
-    <a href="/" style="font-weight:bold;">← Back to Home</a>
-  </header>
   <main>
-    <h1>Changelog</h1>
-    <div id="changes"></div>
+    <h1>This page has moved</h1>
+    <p>The p(Doom)1 release notes now live at <b>/game-changelog/</b>, where they are read
+       straight from each build rather than typed by hand. Taking you there now.</p>
+    <a class="go" href="/game-changelog/">Go to the game changelog &rarr;</a>
+    <p class="small">If you are not moved automatically, follow the link above.</p>
   </main>
   <script>
-    async function load(){
-      try{
-        const res = await fetch('/data/changes.json', { cache:'no-store' });
-        const data = await res.json();
-        const entries = data.entries || [];
-        const el = document.getElementById('changes');
-        if(entries.length===0){ el.innerHTML='<p style="color:#ccc">No changes yet.</p>'; return; }
-        el.innerHTML = entries.map(x=>{
-          const date = x.date ? new Date(x.date).toLocaleDateString() : '';
-          const items = (x.items||[]).map(i=>`<li>${String(i).replace(/</g,'&lt;')}</li>`).join('');
-          return `<section class="entry">
-            <h2>${x.version || 'Unversioned'}</h2>
-            <div class="meta">${date} ${x.channel? ' · '+x.channel : ''}</div>
-            ${x.summary? `<p>${String(x.summary).replace(/</g,'&lt;')}</p>`:''}
-            ${items? `<ul>${items}</ul>`:''}
-          </section>`;
-        }).join('');
-      }catch(e){ document.getElementById('changes').innerHTML='<p style="color:#ff4444">Failed to load changelog.</p>'; }
-    }
-    load();
+    // Third mechanism, after the .htaccess 301 and the meta-refresh above. Uses
+    // replace() so the dead URL does not land in the back-button history and trap
+    // someone in a redirect loop when they try to go back.
+    location.replace('/game-changelog/');
   </script>
 </body>
 </html>

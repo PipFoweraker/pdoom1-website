@@ -3,6 +3,17 @@
 
 import os
 import json
+import sys
+
+# Windows console is cp1252; the check/cross marks below (U+2713 / U+2717) raise
+# UnicodeEncodeError on the FIRST print, aborting this script before it checks
+# anything -- it exited 1 for reasons that had nothing to do with the changelog.
+# Force UTF-8 so a failure here means a real failure. See CLAUDE.md, "Environment".
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
 
 def test_changelog_files():
     """Test that both changelog files exist and have correct data structure"""
