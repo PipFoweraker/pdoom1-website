@@ -50,6 +50,17 @@ on:
       - 'scripts/test-download-resolution.js'
       - 'scripts/test-header-consistency.js'
       - 'scripts/sync/sync-keybinds.py'
+      # What does and does not ship. A bad exclude 404s an asset in production
+      # while every Netlify preview renders it fine -- previews serve public/
+      # whole, so only this script can catch it.
+      - 'deploy-excludes.txt'
+      - 'scripts/check-deploy-excludes.py'
+      - 'scripts/make-og-card.py'
+      - 'public/assets/og-card.jpg'
+      - '.github/workflows/auto-deploy-on-push.yml'
+      - '.github/workflows/deploy-dreamhost.yml'
+      - '.github/workflows/version-aware-deploy.yml'
+      - '.github/workflows/weekly-deployment.yml'
       - '.github/workflows/content-honesty.yml'
       - '.github/workflows/snapshot-analytics.yml'
   push:
@@ -73,6 +84,14 @@ on:
       - 'scripts/test-download-resolution.js'
       - 'scripts/test-header-consistency.js'
       - 'scripts/sync/sync-keybinds.py'
+      - 'deploy-excludes.txt'
+      - 'scripts/check-deploy-excludes.py'
+      - 'scripts/make-og-card.py'
+      - 'public/assets/og-card.jpg'
+      - '.github/workflows/auto-deploy-on-push.yml'
+      - '.github/workflows/deploy-dreamhost.yml'
+      - '.github/workflows/version-aware-deploy.yml'
+      - '.github/workflows/weekly-deployment.yml'
       - '.github/workflows/content-honesty.yml'
       - '.github/workflows/snapshot-analytics.yml'
   workflow_dispatch:
@@ -140,6 +159,23 @@ jobs:
       # contract (stage-before-diff, issues:write, no dispatch input spliced into run:).
       - name: The analytics-to-git backup still fails loudly
         run: python scripts/test-snapshot-plausible.py
+
+      # A deploy exclude is decided at deploy time; an <img src> is written at
+      # authoring time, and nothing else connects the two. Netlify previews serve
+      # public/ WHOLE, without the excludes, so a preview structurally cannot
+      # catch a bad one -- the asset renders in review and 404s in production.
+      # Also asserts all four rsync workflows read the one shared list.
+      - name: Nothing deployed points at an excluded file
+        run: python scripts/check-deploy-excludes.py
+
+      - name: Pillow (for the share-card check)
+        run: pip install --quiet Pillow
+
+      # Every page declares twitter:card=summary_large_image (~1.91:1). A card
+      # that is not 1200x630 gets centre-cropped by the scraper, which is how the
+      # laser eyes -- the whole point of the image -- ended up out of frame once.
+      - name: The share card is 1200x630 and under budget
+        run: python scripts/make-og-card.py --check
 
   advisory:
     name: ADVISORY -- reported, never blocks

@@ -88,6 +88,22 @@ Pip's stated top priority. Practically:
 - Push to `main` → **"Auto-Deploy to DreamHost on Push"** (~20s), `rsync --delete`
   from `public/`. Deleting a file from `public/` therefore removes it from
   production on the next deploy.
+- **What does NOT ship is `deploy-excludes.txt`** (repo root, `--exclude-from`).
+  Source material — the cat originals, the image pipeline, the full-res
+  screenshot masters — lives in git but must never be served. **Four** workflows
+  rsync `public/` to DreamHost; all four now read that one file, because for a
+  while only `auto-deploy-on-push.yml` had excludes and dispatching any of the
+  other three re-uploaded everything it had just stopped shipping.
+  `scripts/check-deploy-excludes.py` enforces both halves: every deploy uses the
+  shared list, and no deployed html/css/js references a file the list drops.
+  **Netlify PR previews serve `public/` whole**, so a preview can never catch a
+  bad exclude — run the script.
+- **An exclude is not a delete.** With `--delete`, rsync *protects* excluded
+  paths on the remote, so anything a previous deploy uploaded stays live and
+  publicly fetchable. Unpublishing it needs a manual `rm` over SSH.
+- `public/.htaccess` carries compression, cache lifetimes and security headers
+  (verified live: `events.json` 1.18 MB → 165 KB gzipped). It is a dotfile, and
+  the `--exclude='.git*'` pattern does **not** match it — it does deploy.
 - Use branch + PR (Pip's default). Every PR gets a Netlify **deploy-preview** —
   verify there before merge. Can't render a browser in-session, so verify by
   `curl`-ing the preview/prod asset and node-testing any JS.
@@ -301,6 +317,9 @@ python  scripts/test-publish-live-board.py # publisher refuses, never guesses [b
 node    scripts/test-escaping.js          # the SAME rule on the other 14 pages [escaping]
 node    scripts/test-roadmap-render.js    # roadmap markdown subset + escaping  [escaping]
 node    scripts/test-blog-render.js       # blog markdown subset               [generate-feeds]
+
+python  scripts/check-deploy-excludes.py  # nothing deployed points at an excluded file [content-honesty]
+python  scripts/make-og-card.py --check   # share card is 1200x630 and under budget [content-honesty]
 ```
 
 **Severity model — the rule that decides where a check goes.** A check is
