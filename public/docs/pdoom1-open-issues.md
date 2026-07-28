@@ -1,19 +1,17 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-28T07:09:53.395Z UTC
+Generated: 2026-07-28T12:53:51.581Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1008 | Release feed index is hand-maintained in practice: generated feed is uploaded as an artifact, never committed back | bug |  | 2026-07-28 10:29:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1008) |
+| 1004 | design(upgrades): next-epoch review -- three parked upgrade-backed mechanics (chairs attrition, board oversight/payroll UI, ethicist headcount) |  |  | 2026-07-28 09:45:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/1004) |
 | 994 | feat(emit): calibration artifact — baseline p(Doom), sim 100%-topout date, ladder version (unblocks the website's doom clock + pdoom1-website#177) |  |  | 2026-07-28 04:48:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/994) |
 | 987 | Bureaucratic tells: bodies telegraph doom via procedural anomaly (design, Wed W-block) |  |  | 2026-07-27 19:45:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/987) |
 | 986 | ADR-0015 M-ticket: risk_events re-author + rebalance (20 live fields) + #967 finance fix + political_pressure dead-write |  |  | 2026-07-27 19:45:02 | [link](https://github.com/PipFoweraker/pdoom1/issues/986) |
 | 984 | Half-day workshop: audit mechanics deep-dive (next epoch) -- something amazing under the smell |  |  | 2026-07-27 11:44:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/984) |
-| 980 | Conference away-window: planning-forward allowed, operating-present forbidden (attention drain refinement) |  |  | 2026-07-27 07:25:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/980) |
-| 971 | doom.streams.action_* Balance keys absent from defaults.json -- publish_paper alarm + safety_research absorption are zero-priced no-ops |  |  | 2026-07-27 01:19:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/971) |
-| 970 | Six upgrades charge money for effects with zero implementing code (+ hire_ethicist unbacked claim) |  |  | 2026-07-27 01:19:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/970) |
-| 967 | finance_engine desperation_payroll promises '-N doom now' but writes to the clobbered inert sink (silently never fires) |  |  | 2026-07-27 00:53:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/967) |
-| 964 | CI: sim tier silently red on every main run -- test_adversarial_ui_state 6 deterministic invariant violations |  |  | 2026-07-26 22:00:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/964) |
-| 963 | fix(release): v0.13.1.json advertises 404 download URLs; align contact address |  |  | 2026-07-28 04:53:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/963) |
+| 967 | finance_engine desperation_payroll promises '-N doom now' but writes to the clobbered inert sink (silently never fires) | bug |  | 2026-07-28 10:11:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/967) |
+| 964 | CI: sim tier silently red on every main run -- test_adversarial_ui_state 6 deterministic invariant violations | bug |  | 2026-07-28 10:11:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/964) |
 | 962 | feat(engine): integrate frontier-labs dataset (pdoom-data#37); expose a list the website can pull to fix calculate-game-stats |  |  | 2026-07-26 21:00:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/962) |
 | 961 | design(hiring): W3 -- revisit the candidate pool cap (MAX_CANDIDATES=6); stale once networking changes, and cap-hits are partly silent |  |  | 2026-07-26 11:42:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/961) |
 | 959 | feat(ux): Surrender button on the in-game menu -- end run to leaderboard instead of abandoning |  |  | 2026-07-26 09:00:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/959) |
@@ -43,7 +41,6 @@ Generated: 2026-07-28T07:09:53.395Z UTC
 | 882 | Bug-report auto-close: show a visible countdown before dismissing |  |  | 2026-07-25 11:04:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/882) |
 | 881 | Submit-paper submenu needs interim UI pass (reuse existing icons) |  |  | 2026-07-25 11:03:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/881) |
 | 880 | Financing submenu inconsistent with Fundraising: no icons, costs not shown | bug |  | 2026-07-25 11:03:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/880) |
-| 877 | Modal stacking: no shared LIFO overlay chokepoint (stacked-modal soft-lock) | bug |  | 2026-07-25 22:56:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/877) |
 | 855 | ux(events): show Attention readout in the event-dialog corner | patch:ui |  | 2026-07-25 03:57:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/855) |
 | 850 | art: coherence + dedup pass over approved assets (consistent borders, kill redundant icons) | ship:next-release |  | 2026-07-25 03:01:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/850) |
 | 848 | feat(dev): in-game live A/B icon rotation (dev-mode asset swapper) | ship:next-release |  | 2026-07-26 01:38:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/848) |
