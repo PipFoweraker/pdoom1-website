@@ -13,11 +13,27 @@ Deeper material lives in `docs/`:
 ## What this repo is
 - **Statically pre-rendered** site: ~2,225 HTML files. Most styling is **inline
   `<style>`** per page; shared `css/site.css` is tiny.
-- **No shared layout spine.** `public/includes/navigation.html` is wired into
-  ZERO pages. `public/assets/js/navigation.js` is the de-facto single source
-  (used by ~8 pages) and is what new pages should adopt — put an empty
-  `<header></header>` in the body and load the script at the end.
-  `scripts/test-header-consistency.js` reports the drift (currently 0/23 pass).
+- **The layout spine is `public/assets/js/navigation.js`** and nothing else
+  (as of 2026-07-28). 21 of the 25 hand-written pages delegate to it: an empty
+  `<header></header>` in the body, `<script src="/assets/js/navigation.js">` at
+  the end. It ships its own styles, scoped to `header[data-nav-injected]`, so a
+  page needs no `.nav-links`/`.dropdown` rules of its own — if you see any,
+  they are dead. Recipe and rationale: `public/includes/README.md`.
+  - `public/includes/navigation.html` was **deleted**. It was wired into zero
+    pages and hardcoded a stale `v0.11.0`. Do not recreate a second copy.
+  - `docs/HTML_PAGE_TEMPLATE.md` used to tell authors to **hand-copy** the nav
+    into each page. That instruction is what generated the ten variants; it now
+    documents the two-line recipe. Do not re-add "copy the nav" guidance.
+  - Four static navs survive on purpose, all owned elsewhere: `index.html`
+    (diverges deliberately — links Events, hides Press Kit; needs a product
+    call), `events/index.html` (generated), `league/`, `players/`.
+  - `scripts/test-header-consistency.js` enforces it (currently 15/25 overall,
+    22/25 on the nav contract; the 9 remaining failures are content emoji in
+    frozen prose, not nav). It validates `navigationHTML` itself, so breaking
+    the single source fails every delegating page at once.
+  - **Nav does not render with JS off.** `design-notes/index.html` shows the
+    intended fallback: a `<nav>` in the header *without* `.nav-links`, which
+    navigation.js overwrites when it runs. TECH_DEBT B1b.
 
 ## The prime directive: never lie to a visitor
 Pip's stated top priority. Practically:
