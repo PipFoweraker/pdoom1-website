@@ -1,6 +1,90 @@
 {
   "issues": [
     {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1024",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1024/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1024/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1024/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/1024",
+      "id": 5009369296,
+      "node_id": "I_kwDOPVWa588AAAABKpTo0A",
+      "number": 1024,
+      "title": "art: regen the endgame poster batch under the provisional rules, THEN decide which rules survive",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [
+        {
+          "id": 9880871838,
+          "node_id": "LA_kwDOPVWa588AAAACTPIjng",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/post-launch",
+          "name": "post-launch",
+          "color": "7B68EE",
+          "default": false,
+          "description": "Deferred to post-launch release (v1.1+)"
+        }
+      ],
+      "state": "open",
+      "locked": false,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2026-07-29T12:44:14Z",
+      "updated_at": "2026-07-29T12:44:14Z",
+      "closed_at": null,
+      "assignee": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "body": "From the 2026-07-29 spoken review of the endgame concept batch (Pip + Wanasai, 34 min). Full extraction with per-concept verdicts and the ten rules: `docs/art/ENDGAME_CONCEPT_REVIEW_2026-07-29.md`.\n\nTicketed deliberately, because the lesson of the same day was that a commitment recorded only in prose does not get scheduled (see #1018).\n\n## The order matters\n\n1. Fold rules **A1-A10 into the manifest's shared style block as PROVISIONAL**, so they apply by construction rather than by anyone remembering them.\n2. Regenerate the keepers under those rules -- **no people** is the default.\n3. **Then review the rules against the output** and decide which are real.\n\nStep 3 is the point of this issue. Pip's ruling:\n\n> \"some of the rules here might be more like guidelines and I don't want to over-commit future me without a generation of regens at least\"\n\nSo: **do not promote any of A1-A10 into `UI_STYLE_GUIDE.md`, an ADR, or the glossary before one full regen cycle has run.** After it, promote what demonstrably improved the output, demote what merely narrowed it, and kill anything that made the art worse.\n\n**A2 (no people in poster art) is the one to watch.** It is the most sweeping rule and the most likely to be over-broad -- it may turn out to mean \"no *incidental* people\" rather than \"no people\". It is also a genuine insight about the game's thesis (people in frame imply a protagonist, and this is a game about everyone else), so it should not be dismissed cheaply either. That tension is exactly what a regen cycle resolves and argument does not.\n\nThe one exception safe to land early: **A9**, that the correct term is *poster art* rather than hero art. That is a naming correction, not a taste judgement.\n\n## Batch outcome for reference\n\n- **Keep / rework (9):** orbital_datacenter_ring (V1, extended further through the composition), cheerful_propaganda_atrium (generate with and without a face -- Pip and Wanasai disagreed), chokehold_water_and_gigawatts (hybrid: V1 composition + pipe, V2 colour, less electricity), chokehold_permit_counter, crux_drone_arms_race, defeated_drone_coolant (V2, no cockpit), economics_rung_shuttered_street (V2), attention_loud_vs_slow (V2), intro_bus_strangers_help (V2, hero must stay unidentifiable)\n- **Hard pass (4):** same_desire_two_field_strengths, attention_stack_buried_desk, field_leaks_at_every_angle, pacification_delivery_suburb\n- **Still open (2):** field_ladder_three_rungs variant; remote_operators_room, which is blocked on how A2 resolves\n\n## Two things worth carrying forward\n\n**The best idea in the session was a salvage, not an image.** Robots all facing one way implies a camera and therefore a protagonist. The replacement concept -- you order one TV and twenty robots arrive with twenty TVs, then twenty fridges the next day, explicitly the horror of an unbounded `for` loop -- is stronger than the image it replaces and wants its own concept id.\n\n**The generating agent's self-nominated best image was hard-passed as cliche** (`attention_stack_buried_desk`). Useful calibration for any future batch where an agent reports which of its outputs is strongest.",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1024/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1024/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null,
+      "pinned_comment": null
+    },
+    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1023",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1023/labels{/name}",
@@ -1211,92 +1295,8 @@
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
-    },
-    {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/967",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/967/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/967/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/967/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/967",
-      "id": 4983343687,
-      "node_id": "I_kwDOPVWa588AAAABKQfKRw",
-      "number": 967,
-      "title": "finance_engine desperation_payroll promises '-N doom now' but writes to the clobbered inert sink (silently never fires)",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 9028221041,
-          "node_id": "LA_kwDOPVWa588AAAACGh-4cQ",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/bug",
-          "name": "bug",
-          "color": "d73a4a",
-          "default": true,
-          "description": "Something isn't working"
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2026-07-27T00:53:15Z",
-      "updated_at": "2026-07-28T10:11:10Z",
-      "closed_at": null,
-      "assignee": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "body": "## Summary\nFound during the ADR-0015 strip inventory (2026-07-27). The desperation_payroll financing offer (finance_engine.gd:254-264, accept_offer -> factory == 'desperation_payroll') calls state.add_resources({\"doom\": -suppress}) at line 258 and tells the player 'Pulled the desperation lever: -N doom now; a SECRET liability is planted' (line 264).\n\nThat doom write goes through the INERT sink: Resources.add() -> state.doom += value, which is clobbered every resolve by state.doom = doom_system.current_doom (turn_manager.gd:657). The promised immediate doom suppression never survives a resolve -- a live, player-reachable promise that silently does nothing.\n\n## The fix pattern already exists\nactions.gd:392-399 ('desperation_lever' quick action) is the already-fixed sibling: it routes the suppression through safety_absorption and deliberately omits any doom number from its message. finance_engine.gd is the stale duplicate that ADR-0015's original sweep missed (it only covered godot/data/).\n\n## Scope\n- Route the offer's suppression through the systemic channel (mirror actions.gd:392-399).\n- Reword the offer message honestly.\n- Before/after check: accepting the offer must produce a measurable doom-trajectory difference across a resolve, not just a transient print.\n\n## Provenance\nADR-0015 inventory scout; recommended to ride the M half of the split strip errand (46 inert fields = S ticket; 20 live risk_events re-authors + this = M ticket). Related: ADR-0015, #613 prep docs, WS3_FINISH_OR_DROP.md section 5.",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/967/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/967/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null,
-      "pinned_comment": null
     }
   ],
   "count": 15,
-  "last_updated": "2026-07-29T12:34:59.581927"
+  "last_updated": "2026-07-29T18:17:16.608001"
 }
