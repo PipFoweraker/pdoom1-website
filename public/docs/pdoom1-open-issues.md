@@ -1,9 +1,11 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-29T07:11:20.553Z UTC
+Generated: 2026-07-29T12:55:47.460Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1024 | art: regen the endgame poster batch under the provisional rules, THEN decide which rules survive | post-launch |  | 2026-07-29 12:44:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1024) |
+| 1023 | LEAGUE-CRITICAL: game does not initialise on launch -- full UI, Phase: Not Started, no action buttons | bug, priority:critical |  | 2026-07-29 12:30:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/1023) |
 | 1020 | ADR-0005 seed schedules are INERT in real play: nothing passes a schedule to GameState, so event_schedule is always empty | bug, technical-debt |  | 2026-07-29 06:04:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1020) |
 | 1018 | Philosophy Quest: progressive supersession scan over the ADR set + stricter admission rules | documentation, technical-debt, post-launch |  | 2026-07-29 05:52:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1018) |
 | 1017 | release: ship a FIRST-RUN.txt in the zip — macOS instructions currently reach nobody who has downloaded |  |  | 2026-07-29 02:34:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1017) |
