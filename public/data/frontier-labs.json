@@ -1,0 +1,166 @@
+{
+  "_README": "Single source of truth for the frontier-labs roster on /frontier-labs/ and for game_stats.frontier_labs_count. NOTHING downstream may hardcode a lab list or a lab count: scripts/calculate-game-stats.py derives the count from this file and fails loudly if the file is missing, rather than substituting a literal. The roster itself is INTERIM and hand-entered; its destination is pdoom-data (issue #37), consumed via pdoom1#962. The inclusion boundary is prose, pinned at https://pdoom1.com/frontier-labs/#definition, and is versioned by definition_version so a later boundary change is visible as a change rather than a silent recount.",
+  "version": 1,
+  "definition_version": 1,
+  "definition_ref": "https://pdoom1.com/frontier-labs/#definition",
+  "definition_status": "under_review",
+  "as_of": "2026-07-29",
+
+  "stat_contract": {
+    "frontier_labs_count": "COUNT of roster.labs where kind == 'real' AND status == 'active'. It is the size of a published, interrogable roster -- NOT a claim about how many frontier labs exist in the world. The roster is known-incomplete; see known_omissions.",
+    "excluded_from_count": "hypothetical entries. A modelling parameter is not an organisation, and adding one to a list of real ones is a category error. The page's previous headline figure of 7 was 6 real labs + 1 hypothetical entrant summed together.",
+    "no_floor": "There is no minimum. An earlier implementation returned max(count, 5), so the published number was the floor and not a count."
+  },
+
+  "roster": {
+    "status": "provisional",
+    "completeness": "known_incomplete",
+    "source": {
+      "provider": "hand-entered",
+      "upstream": "pdoom-data#37",
+      "status": "interim",
+      "note": "Carried forward from the prose that was already on /frontier-labs/. Founding years are recorded at year precision because that is the precision we can stand behind; per-row primary citations are part of pdoom-data#37's deliverable."
+    },
+    "source_quality": "tertiary",
+    "labs": [
+      {
+        "id": "openai",
+        "name": "OpenAI",
+        "kind": "real",
+        "status": "active",
+        "founded": "2015",
+        "founded_precision": "year",
+        "admitted_under": 1,
+        "url": "https://openai.com",
+        "reference": "https://en.wikipedia.org/wiki/OpenAI",
+        "note": "Trains its own foundation models at the largest publicly known scale."
+      },
+      {
+        "id": "anthropic",
+        "name": "Anthropic",
+        "kind": "real",
+        "status": "active",
+        "founded": "2021",
+        "founded_precision": "year",
+        "admitted_under": 1,
+        "url": "https://anthropic.com",
+        "reference": "https://en.wikipedia.org/wiki/Anthropic",
+        "note": "Founded by former OpenAI researchers; trains the Claude models."
+      },
+      {
+        "id": "google-deepmind",
+        "name": "Google DeepMind",
+        "kind": "real",
+        "status": "active",
+        "founded": "2010",
+        "founded_precision": "year",
+        "admitted_under": 1,
+        "url": "https://deepmind.google",
+        "reference": "https://en.wikipedia.org/wiki/Google_DeepMind",
+        "note": "Founded 2010 as DeepMind; acquired by Google 2014; merged with Google Brain in 2023 to form Google DeepMind. Counted as one entity under criterion 3 -- it sets its own research agenda. Reasonable people count the lineage differently."
+      },
+      {
+        "id": "meta-ai",
+        "name": "Meta AI",
+        "kind": "real",
+        "status": "active",
+        "founded": "2013",
+        "founded_precision": "year",
+        "admitted_under": 1,
+        "url": "https://ai.meta.com",
+        "reference": "https://en.wikipedia.org/wiki/Meta_AI",
+        "note": "Founded 2013 as Facebook AI Research (FAIR). Meta now runs more than one AI organisation; this row treats them as one entity, which is a judgement call."
+      },
+      {
+        "id": "xai",
+        "name": "xAI",
+        "kind": "real",
+        "status": "active",
+        "founded": "2023",
+        "founded_precision": "year",
+        "admitted_under": 1,
+        "url": "https://x.ai",
+        "reference": "https://en.wikipedia.org/wiki/XAI_(company)",
+        "note": "Trains the Grok models."
+      },
+      {
+        "id": "mistral",
+        "name": "Mistral AI",
+        "kind": "real",
+        "status": "active",
+        "founded": "2023",
+        "founded_precision": "year",
+        "admitted_under": 1,
+        "url": "https://mistral.ai",
+        "reference": "https://en.wikipedia.org/wiki/Mistral_AI",
+        "note": "European; trains its own models and releases several open-weights. Sits closest to criterion 2's threshold of any row here."
+      }
+    ]
+  },
+
+  "known_omissions": [
+    {
+      "name": "DeepSeek",
+      "reason": "Trains its own foundation models at frontier scale. Absent from this roster only because the roster inherited an Anglophone list, which is a defect in the roster, not a judgement about the lab.",
+      "blocking": "founding date + primary citation, pdoom-data#37"
+    },
+    {
+      "name": "Alibaba (Qwen)",
+      "reason": "Frontier-scale in-house training programme inside a large parent. Also raises the subsidiary-vs-parent question in criterion 3.",
+      "blocking": "entity boundary decision + citation, pdoom-data#37"
+    },
+    {
+      "name": "Moonshot AI",
+      "reason": "Trains its own frontier-scale models.",
+      "blocking": "founding date + primary citation, pdoom-data#37"
+    },
+    {
+      "name": "Zhipu AI",
+      "reason": "Trains its own frontier-scale models.",
+      "blocking": "founding date + primary citation, pdoom-data#37"
+    },
+    {
+      "name": "Safe Superintelligence Inc.",
+      "reason": "Explicitly formed to train frontier systems, but has not publicly shipped one -- so criterion 4 (shipped or announced at frontier scale) is genuinely unsettled for it.",
+      "blocking": "criterion 4 ruling, then citation"
+    },
+    {
+      "name": "Microsoft AI, Amazon",
+      "reason": "Both now train in-house foundation models rather than only serving partners'. Whether they clear criterion 2 at the top tier is exactly the contested part.",
+      "blocking": "compute-threshold ruling (see contested/threshold)"
+    }
+  ],
+
+  "hypothetical": [
+    {
+      "id": "ai-2027-entrant",
+      "name": "AI-2027 Entrant",
+      "kind": "hypothetical",
+      "status": "modelling_parameter",
+      "scenario_year": "2027",
+      "excluded_from_count": true,
+      "note": "A slot in the game's model for a well-resourced late entrant. Not an organisation, not an observation, and not counted as a lab."
+    }
+  ],
+
+  "tracking": {
+    "status": "pending",
+    "what": "A time series, not a snapshot: founding, status changes, acquisitions, mergers and exits from roughly 2000 to today, so the roster can be replayed at any date rather than only read as of now.",
+    "why_pending": "No such series exists in any repo yet. This site will not draw an axis it cannot fill.",
+    "date_source": {
+      "provider": "pdoom-data",
+      "ref": "frontier_labs/timeline",
+      "status": "pending",
+      "issue": "pdoom-data#37"
+    },
+    "engine_issue": "pdoom1#962",
+    "consumer_issue": "pdoom1-website#177",
+    "artifact_contract": {
+      "expected_url": "https://raw.githubusercontent.com/PipFoweraker/pdoom-data/main/data/serveable/api/frontier_labs/all_labs.json",
+      "expected_shape": "{ schema_version, generated_at, definition: {version, ref, criteria[]}, labs: [{id, name, founded, founded_precision, status, status_date, parent_org, country, source}], events: [{lab_id, date, date_precision, type, source}] }",
+      "note": "`events` is the part that makes tracking-over-time possible; `labs` alone only supports a snapshot."
+    }
+  },
+
+  "_contested_note": "The inclusion boundary and what is contested about it are PROSE, and they live in the page source at /frontier-labs/#definition and #contested so they are pinned and readable without JavaScript. They are deliberately not duplicated here -- two copies of an argument drift apart, and the one a reader sees would be the one nobody edited."
+}

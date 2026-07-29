@@ -183,7 +183,7 @@ def update_version_data() -> Dict[str, Any]:
     
     release = get_latest_release()
     stats = get_repo_stats()
-    
+
     version_data: Dict[str, Any] = {
         'latest_release': release,
         'repository_stats': stats,

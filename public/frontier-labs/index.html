@@ -5,264 +5,145 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Frontier AI Labs - p(Doom)1</title>
 	<link rel="canonical" href="https://pdoom1.com/frontier-labs/" />
-	<meta name="description" content="Real-world frontier AI laboratories and hypothetical future entities used in p(Doom)1 modeling" />
+	<meta name="description" content="What counts as a frontier AI lab in p(Doom)1's model, why the boundary sits where it does, and the roster the count is derived from." />
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 	<link rel="stylesheet" href="/css/site.css">
+	<link rel="stylesheet" href="/css/stamp.css">
 	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
 	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+	<!-- THE escaper. Plain blocking <script src> on purpose -- not defer, not async:
+	     the inline renderer at the end of this file calls escapeHTML/safeUrl directly,
+	     so it must already exist. If this fails to load the renderer throws and the
+	     page shows nothing rather than showing unescaped roster data. Fail closed. -->
+	<script src="/assets/js/escape.js"></script>
 	<style>
+		/* Fallbacks are the current shipped palette; the loader at the end of the
+		   page overrides each from /design/tokens.json (the upstream token channel
+		   synced from the game), so colours follow the game's art without being
+		   pinned here. Same pattern as /state-of-doom/. */
 		:root {
-			--bg-primary: #12100f;
-			--bg-secondary: #1c1917;
-			--bg-tertiary: #262220;
-			--text-primary: #ffffff;
-			--text-secondary: #cfc7bb;
-			--text-muted: #a79e92;
-			--accent-primary: #f6a800;
-			--accent-secondary: #2fd4c2;
-			--accent-danger: #ff4444;
-			--border-color: #3a342e;
-			--success-color: #4fb37a;
-			--radius-sm: 4px;
-			--radius-md: 6px;
-			--radius-lg: 10px;
+			--bg: #12100f;
+			--panel: #1c1917;
+			--panel-2: #262220;
+			--hair: #3a342e;
+			--hair-2: #2a2622;
+			--ink: #ffffff;
+			--ink-2: #cfc7bb;
+			--ink-3: #a79e92;
+			--amber: #f6a800;
+			--teal: #2fd4c2;
+			--doom: #e2524a;
+			--radius: 10px;
+			--mono: ui-monospace, "SFMono-Regular", Menlo, "Courier New", monospace;
 		}
 
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
-		}
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		html { color-scheme: dark; }
 
 		body {
-			font-family: 'Courier New', monospace;
-			background: var(--bg-primary);
-			color: var(--text-primary);
+			font-family: var(--mono);
+			background: var(--bg);
+			color: var(--ink);
 			line-height: 1.6;
-			background-image:
-				radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.02) 0%, transparent 50%),
-				radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.02) 0%, transparent 50%);
+			-webkit-font-smoothing: antialiased;
+			background-image: radial-gradient(60rem 40rem at 50% -10%, rgba(246, 168, 0, .05), transparent 60%);
+			background-attachment: fixed;
 		}
 
-		header {
-			background: var(--bg-secondary);
-			border-bottom: 2px solid var(--accent-primary);
-			padding: 1rem 0;
-			margin-bottom: 2rem;
+		main { max-width: min(880px, 92vw); margin: 0 auto; padding: 2rem 0 4rem; }
+
+		h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); color: var(--ink); letter-spacing: .01em; text-wrap: balance; }
+		h1 b { color: var(--amber); }
+		.intro p { color: var(--ink-2); max-width: 48rem; margin-top: .7rem; text-wrap: pretty; }
+
+		h2 {
+			font-size: .82rem; letter-spacing: .16em; text-transform: uppercase;
+			color: var(--ink-3); font-weight: 700; margin-bottom: 1rem;
 		}
+		h3 { font-size: 1rem; color: var(--ink); margin-bottom: .35rem; }
 
-		main {
-			max-width: 1200px;
-			margin: 0 auto;
-			padding: 0 2rem 4rem;
+		section { margin-top: 2.2rem; }
+
+		.rack {
+			background: var(--panel); border: 1px solid var(--hair);
+			border-radius: 14px; padding: 1.4rem 1.5rem;
 		}
+		.rack > p, .rack > ul, .rack > ol { color: var(--ink-2); }
+		.rack > * + * { margin-top: .9rem; }
 
-		h1 {
-			color: var(--accent-primary);
-			text-align: center;
-			margin: 2rem 0;
-			font-size: 2.5rem;
-			text-shadow: 0 0 20px var(--accent-primary);
+		/* --- the derived counts --- */
+		.tally { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; }
+		.tally .cell {
+			border: 1px solid var(--hair); border-radius: var(--radius);
+			background: var(--panel-2); padding: 1rem 1.1rem;
 		}
+		.tally .n { font-size: 2.4rem; font-weight: 800; color: var(--amber); font-variant-numeric: tabular-nums; line-height: 1.1; }
+		.tally .cell.muted .n { color: var(--ink-3); font-size: 1.6rem; }
+		.tally .k { display: block; color: var(--ink-2); font-size: .82rem; margin-top: .3rem; text-wrap: pretty; }
+		.tally .k em { color: var(--ink-3); font-style: normal; display: block; font-size: .75rem; margin-top: .25rem; }
 
-		.intro {
-			text-align: center;
-			color: var(--text-secondary);
-			margin-bottom: 3rem;
-			font-size: 1.1rem;
-			max-width: 800px;
-			margin-left: auto;
-			margin-right: auto;
+		/* --- criteria --- */
+		.criteria { list-style: none; counter-reset: crit; }
+		.criteria li {
+			counter-increment: crit; position: relative;
+			padding: .8rem 0 .8rem 2.6rem; border-top: 1px solid var(--hair-2); color: var(--ink-2);
 		}
-
-		.lab-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-			gap: 2rem;
-			margin-bottom: 3rem;
+		.criteria li:first-child { border-top: 0; }
+		.criteria li::before {
+			content: counter(crit); position: absolute; left: 0; top: .8rem;
+			width: 1.7rem; height: 1.7rem; border: 1px solid var(--amber); border-radius: 4px;
+			color: var(--amber); font-size: .78rem; font-weight: 800;
+			display: flex; align-items: center; justify-content: center;
 		}
+		.criteria li b { color: var(--ink); }
 
-		.lab-card {
-			background: var(--bg-secondary);
-			border: 1px solid var(--border-color);
-			border-radius: var(--radius-lg);
-			padding: 2rem;
-			transition: all 0.3s ease;
-			position: relative;
-			overflow: hidden;
+		/* --- roster --- */
+		.roster { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+		.lab {
+			background: var(--panel-2); border: 1px solid var(--hair);
+			border-radius: var(--radius); padding: 1.1rem 1.2rem;
 		}
+		.lab .name { font-size: 1.15rem; color: var(--amber); font-weight: 700; }
+		.lab .fields { display: flex; gap: 1.4rem; flex-wrap: wrap; margin-top: .6rem; }
+		.lab .field .lbl { display: block; color: var(--ink-3); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
+		.lab .field .val { color: var(--ink); font-weight: 700; }
+		.lab .note { color: var(--ink-2); font-size: .84rem; margin-top: .7rem; text-wrap: pretty; }
+		.lab .links { margin-top: .7rem; font-size: .8rem; }
+		.lab .links a { color: var(--amber); text-decoration: none; }
+		.lab .links a:hover { text-decoration: underline; }
+		.lab .links span { color: var(--hair); margin: 0 .5rem; }
 
-		.lab-card::before {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			height: 4px;
-			background: var(--accent-primary);
-			transform: scaleX(0);
-			transition: transform 0.3s ease;
+		.lab--hypothetical { border-color: color-mix(in srgb, var(--teal) 40%, var(--hair)); }
+		.lab--hypothetical .name { color: var(--teal); }
+
+		/* --- omissions --- */
+		.omissions { list-style: none; }
+		.omissions li { border-top: 1px solid var(--hair-2); padding: .7rem 0; color: var(--ink-2); font-size: .88rem; }
+		.omissions li:first-child { border-top: 0; }
+		.omissions li b { color: var(--ink); }
+		.omissions li em { display: block; color: var(--ink-3); font-style: normal; font-size: .78rem; margin-top: .2rem; }
+
+		/* --- contested --- */
+		.contested { list-style: none; }
+		.contested li { border-top: 1px solid var(--hair-2); padding: 1rem 0; }
+		.contested li:first-child { border-top: 0; padding-top: .2rem; }
+		.contested p { color: var(--ink-2); font-size: .9rem; text-wrap: pretty; }
+
+		.fail { color: var(--doom); font-size: .9rem; }
+		.note { margin-top: 1.6rem; font-size: .84rem; color: var(--ink-3); text-wrap: pretty; }
+		.note b { color: var(--ink-2); }
+
+		a { color: var(--amber); }
+		a:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+		footer {
+			border-top: 1px solid var(--hair); text-align: center;
+			padding: 2rem; margin-top: 3rem; color: var(--ink-3); font-size: .88rem;
 		}
+		footer a { text-decoration: none; }
 
-		.lab-card:hover::before {
-			transform: scaleX(1);
-		}
-
-		.lab-card:hover {
-			transform: translateY(-5px);
-			box-shadow: 0 8px 24px rgba(246, 168, 0, 0.2);
-			border-color: var(--accent-primary);
-		}
-
-		.lab-card.hypothetical {
-			border-color: var(--accent-secondary);
-			background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(47, 212, 194, 0.05) 100%);
-		}
-
-		.lab-card.hypothetical::before {
-			background: var(--accent-secondary);
-		}
-
-		.lab-card.hypothetical:hover {
-			border-color: var(--accent-secondary);
-			box-shadow: 0 8px 24px rgba(47, 212, 194, 0.2);
-		}
-
-		.lab-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: start;
-			margin-bottom: 1rem;
-		}
-
-		.lab-name {
-			font-size: 1.5rem;
-			color: var(--accent-primary);
-			margin-bottom: 0.5rem;
-		}
-
-		.lab-card.hypothetical .lab-name {
-			color: var(--accent-secondary);
-		}
-
-		.lab-tag {
-			background: var(--accent-primary);
-			color: var(--bg-primary);
-			padding: 0.25rem 0.75rem;
-			border-radius: var(--radius-sm);
-			font-size: 0.75rem;
-			font-weight: bold;
-			text-transform: uppercase;
-		}
-
-		.lab-card.hypothetical .lab-tag {
-			background: var(--accent-secondary);
-		}
-
-		.lab-description {
-			color: var(--text-secondary);
-			margin-bottom: 1.5rem;
-			line-height: 1.7;
-		}
-
-		.lab-stats {
-			display: grid;
-			grid-template-columns: repeat(2, 1fr);
-			gap: 1rem;
-			margin-top: 1.5rem;
-			padding-top: 1.5rem;
-			border-top: 1px solid var(--border-color);
-		}
-
-		.stat-item {
-			display: flex;
-			flex-direction: column;
-		}
-
-		.stat-label {
-			color: var(--text-muted);
-			font-size: 0.85rem;
-			margin-bottom: 0.25rem;
-		}
-
-		.stat-value {
-			color: var(--accent-primary);
-			font-weight: bold;
-			font-size: 1.1rem;
-		}
-
-		.lab-card.hypothetical .stat-value {
-			color: var(--accent-secondary);
-		}
-
-		.lab-link {
-			display: inline-block;
-			margin-top: 1rem;
-			color: var(--accent-primary);
-			text-decoration: none;
-			font-weight: bold;
-			transition: opacity 0.2s;
-		}
-
-		.lab-link:hover {
-			opacity: 0.8;
-		}
-
-		.section-header {
-			text-align: center;
-			margin: 4rem 0 2rem;
-			padding: 1.5rem;
-			background: var(--bg-secondary);
-			border-radius: var(--radius-lg);
-			border: 1px solid var(--border-color);
-		}
-
-		.section-header h2 {
-			color: var(--accent-secondary);
-			font-size: 2rem;
-			margin-bottom: 1rem;
-		}
-
-		.section-header p {
-			color: var(--text-secondary);
-		}
-
-		.total-count {
-			text-align: center;
-			margin: 3rem 0;
-			padding: 2rem;
-			background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(246, 168, 0, 0.05) 100%);
-			border: 2px solid var(--accent-primary);
-			border-radius: var(--radius-lg);
-		}
-
-		.total-count .number {
-			font-size: 4rem;
-			color: var(--accent-primary);
-			font-weight: bold;
-			text-shadow: 0 0 30px var(--accent-primary);
-		}
-
-		.total-count .label {
-			color: var(--text-secondary);
-			font-size: 1.2rem;
-			margin-top: 0.5rem;
-		}
-
-		@media (max-width: 768px) {
-			.lab-grid {
-				grid-template-columns: 1fr;
-			}
-
-			h1 {
-				font-size: 2rem;
-			}
-
-			.lab-stats {
-				grid-template-columns: 1fr;
-			}
-		}
+		@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 	</style>
 </head>
 <body>
@@ -271,282 +152,406 @@
 	</header>
 
 	<main>
-		<h1>Frontier AI Labs</h1>
-		<p class="intro">
-			Real-world frontier AI laboratories and hypothetical future entities used in p(Doom)1 modeling.
-			These organizations represent the cutting edge of AI development and are central to AI Safety considerations.
-		</p>
-
-		<div class="total-count">
-			<div class="number" id="total-labs">7</div>
-			<div class="label">Total Frontier Labs in Model</div>
-		</div>
-
-		<!-- Real Labs -->
-		<h2 style="color: var(--accent-primary); font-size: 1.8rem; margin: 3rem 0 1.5rem; text-align: center;">Real-World Labs</h2>
-
-		<div class="lab-grid">
-			<div class="lab-card">
-				<div class="lab-header">
-					<div>
-						<h3 class="lab-name">OpenAI</h3>
-						<span class="lab-tag">Active</span>
-					</div>
-				</div>
-				<p class="lab-description">
-					Creator of GPT-4, ChatGPT, and DALL-E. Leading research in large language models and multimodal AI with a stated mission to ensure AGI benefits all of humanity.
-				</p>
-				<div class="lab-stats">
-					<div class="stat-item">
-						<span class="stat-label">Founded</span>
-						<span class="stat-value">2015</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Notable Models</span>
-						<span class="stat-value">GPT-4, o1</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Compute</span>
-						<span class="stat-value">Very High</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Safety Focus</span>
-						<span class="stat-value">High</span>
-					</div>
-				</div>
-				<a href="https://openai.com" target="_blank" rel="noopener" class="lab-link">Visit OpenAI →</a>
-			</div>
-
-			<div class="lab-card">
-				<div class="lab-header">
-					<div>
-						<h3 class="lab-name">Anthropic</h3>
-						<span class="lab-tag">Active</span>
-					</div>
-				</div>
-				<p class="lab-description">
-					Developers of Claude AI with strong focus on Constitutional AI and AI safety research. Founded by former OpenAI researchers with emphasis on alignment.
-				</p>
-				<div class="lab-stats">
-					<div class="stat-item">
-						<span class="stat-label">Founded</span>
-						<span class="stat-value">2021</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Notable Models</span>
-						<span class="stat-value">Claude 3.5</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Compute</span>
-						<span class="stat-value">High</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Safety Focus</span>
-						<span class="stat-value">Very High</span>
-					</div>
-				</div>
-				<a href="https://anthropic.com" target="_blank" rel="noopener" class="lab-link">Visit Anthropic →</a>
-			</div>
-
-			<div class="lab-card">
-				<div class="lab-header">
-					<div>
-						<h3 class="lab-name">DeepMind (Google)</h3>
-						<span class="lab-tag">Active</span>
-					</div>
-				</div>
-				<p class="lab-description">
-					Pioneers in reinforcement learning and game-playing AI (AlphaGo, AlphaFold). Now merged with Google Brain, working on Gemini and foundational AI research.
-				</p>
-				<div class="lab-stats">
-					<div class="stat-item">
-						<span class="stat-label">Founded</span>
-						<span class="stat-value">2010</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Notable Models</span>
-						<span class="stat-value">Gemini, AlphaFold</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Compute</span>
-						<span class="stat-value">Very High</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Safety Focus</span>
-						<span class="stat-value">High</span>
-					</div>
-				</div>
-				<a href="https://deepmind.google" target="_blank" rel="noopener" class="lab-link">Visit DeepMind →</a>
-			</div>
-
-			<div class="lab-card">
-				<div class="lab-header">
-					<div>
-						<h3 class="lab-name">Meta AI (FAIR)</h3>
-						<span class="lab-tag">Active</span>
-					</div>
-				</div>
-				<p class="lab-description">
-					Facebook AI Research developing Llama models with open-source approach. Focus on computer vision, NLP, and multimodal research.
-				</p>
-				<div class="lab-stats">
-					<div class="stat-item">
-						<span class="stat-label">Founded</span>
-						<span class="stat-value">2013</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Notable Models</span>
-						<span class="stat-value">Llama 3</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Compute</span>
-						<span class="stat-value">Very High</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Safety Focus</span>
-						<span class="stat-value">Medium</span>
-					</div>
-				</div>
-				<a href="https://ai.facebook.com" target="_blank" rel="noopener" class="lab-link">Visit Meta AI →</a>
-			</div>
-
-			<div class="lab-card">
-				<div class="lab-header">
-					<div>
-						<h3 class="lab-name">xAI</h3>
-						<span class="lab-tag">Active</span>
-					</div>
-				</div>
-				<p class="lab-description">
-					Founded by Elon Musk to develop AI that is "maximally truth-seeking". Creator of Grok AI assistant with emphasis on reducing political correctness.
-				</p>
-				<div class="lab-stats">
-					<div class="stat-item">
-						<span class="stat-label">Founded</span>
-						<span class="stat-value">2023</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Notable Models</span>
-						<span class="stat-value">Grok</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Compute</span>
-						<span class="stat-value">High</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Safety Focus</span>
-						<span class="stat-value">Medium</span>
-					</div>
-				</div>
-				<a href="https://x.ai" target="_blank" rel="noopener" class="lab-link">Visit xAI →</a>
-			</div>
-
-			<div class="lab-card">
-				<div class="lab-header">
-					<div>
-						<h3 class="lab-name">Mistral AI</h3>
-						<span class="lab-tag">Active</span>
-					</div>
-				</div>
-				<p class="lab-description">
-					European AI startup focused on open-source models and efficient architectures. Rapidly growing with strong technical team and investor backing.
-				</p>
-				<div class="lab-stats">
-					<div class="stat-item">
-						<span class="stat-label">Founded</span>
-						<span class="stat-value">2023</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Notable Models</span>
-						<span class="stat-value">Mistral Large</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Compute</span>
-						<span class="stat-value">Medium-High</span>
-					</div>
-					<div class="stat-item">
-						<span class="stat-label">Safety Focus</span>
-						<span class="stat-value">Medium</span>
-					</div>
-				</div>
-				<a href="https://mistral.ai" target="_blank" rel="noopener" class="lab-link">Visit Mistral →</a>
-			</div>
-		</div>
-
-		<!-- Hypothetical Labs -->
-		<div class="section-header">
-			<h2>Hypothetical Future Lab</h2>
+		<div class="intro">
+			<h1>What counts as a <b>frontier lab</b></h1>
 			<p>
-				Used in p(Doom)1 modeling to represent potential future entrants to frontier AI development.
-				Based on AI-2027 scenario planning and extrapolation of current trends.
+				p(Doom)1 publishes a number for how many frontier AI labs are in its model. A count is
+				meaningless without its boundary, so the boundary is pinned here, above the count, along
+				with the parts of it that are genuinely arguable. Everything below is derived from one
+				roster file you can read yourself.
 			</p>
 		</div>
 
-		<div class="lab-grid">
-			<div class="lab-card hypothetical">
-				<div class="lab-header">
-					<div>
-						<h3 class="lab-name">AI-2027 Entrant</h3>
-						<span class="lab-tag">Hypothetical</span>
-					</div>
-				</div>
-				<p class="lab-description">
-					Represents a hypothetical well-resourced lab entering the frontier AI space by 2027. Could be state-backed (China, EU), a tech giant entering late (Apple, Amazon), or a well-funded startup. Used in game modeling to test scenarios where the competitive landscape shifts.
+		<!-- ================= THE DEFINITION (pinned, static) ================= -->
+		<section id="definition">
+			<h2>The definition</h2>
+			<div class="rack">
+				<p>
+					A <b>frontier lab</b>, for p(Doom)1's purposes, is an organisation that meets
+					<b>all four</b> of the following. This is version 1 of the boundary; changing it
+					changes the count, so it is versioned rather than quietly edited.
 				</p>
-				<div class="lab-stats">
-					<div class="stat-item">
-						<span class="stat-label">Scenario Year</span>
-						<span class="stat-value">2027</span>
+				<ol class="criteria">
+					<li><b>Trains its own foundation models from scratch.</b> Not fine-tuning someone else's
+						base model, not serving someone else's weights. The organisation runs the pre-training.</li>
+					<li><b>Trains at or near the largest publicly known scale.</b> It has the compute, and it
+						spends it on frontier runs rather than only on inference.</li>
+					<li><b>Sets its own research agenda.</b> A subsidiary counts if it decides what to train
+						and whether to release it. A team that executes a parent's roadmap does not.</li>
+					<li><b>Is currently active.</b> It has shipped or announced a frontier-scale model recently
+						enough that treating it as a live actor is not a fiction.</li>
+				</ol>
+				<p>
+					Note what is <b>not</b> in the definition: safety posture, openness, jurisdiction, or
+					headcount. Those are attributes of a lab, and the game models several of them — but
+					putting any of them in the membership test would turn a count into an editorial.
+				</p>
+
+				<div class="stamp-block" role="note">
+					<p><span class="stamp stamp--review"><span class="stamp-sr">Status stamp: </span><span class="stamp-text">Definition under review</span></span></p>
+					<div class="stamp-body">
+						<p>
+							Criterion 2 has no number attached to it yet, and that is the honest state of
+							affairs rather than an oversight — see <a href="#contested">what is contested</a>.
+							Until a threshold is pinned, this boundary is applied by judgement, and two
+							careful people applying it would not produce identical rosters.
+						</p>
 					</div>
-					<div class="stat-item">
-						<span class="stat-label">Model Type</span>
-						<span class="stat-value">Hypothetical</span>
+					<p class="stamp-docket">
+						Form PD-1/FL &middot; Boundary v1 &middot; Ref
+						<a href="https://github.com/PipFoweraker/pdoom-data/issues/37" target="_blank" rel="noopener">pdoom-data#37</a>
+						&middot; Clerk: unassigned
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- ================= THE COUNT (derived) ================= -->
+		<section id="count">
+			<h2>What the count actually counts</h2>
+			<div class="rack">
+				<div class="tally">
+					<div class="cell">
+						<div class="n" id="n-roster">&mdash;</div>
+						<span class="k">Real labs on the roster
+							<em>This is the published <code>frontier_labs_count</code>.</em></span>
 					</div>
-					<div class="stat-item">
-						<span class="stat-label">Compute</span>
-						<span class="stat-value">High (Projected)</span>
+					<div class="cell muted">
+						<div class="n" id="n-omissions">&mdash;</div>
+						<span class="k">Known omissions
+							<em>Labs that meet the definition but have no sourced row yet.</em></span>
 					</div>
-					<div class="stat-item">
-						<span class="stat-label">Safety Focus</span>
-						<span class="stat-value">Unknown</span>
+					<div class="cell muted">
+						<div class="n" id="n-hypothetical">&mdash;</div>
+						<span class="k">Hypothetical model slots
+							<em>Not organisations. Excluded from every count above.</em></span>
 					</div>
 				</div>
-				<p style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.9rem;">
-					<strong style="color: var(--accent-secondary);">Modeling Note:</strong> This entity is used to test game scenarios where new entrants with significant resources enter the frontier AI race, potentially disrupting existing safety norms or accelerating capability advances.
+				<p id="tally-fail" class="fail" hidden>Roster unavailable right now — no count is being shown rather than a remembered one.</p>
+				<p>
+					The roster count is the size of a list you can read, not a claim about how many frontier
+					labs exist in the world. Those are different statements and only the first one is ours to
+					make.
+				</p>
+				<p class="note" style="margin-top:.9rem">
+					<b>What this replaced.</b> The headline figure here used to be <b>7</b>, which was six real
+					labs plus one hypothetical entrant added together. Meanwhile the site's data file said
+					<b>5</b>, because the script that produced it counted how many of a hardcoded list of names
+					appeared anywhere in the homepage's HTML and then applied a floor of five — so the
+					published number was the floor, not a count. Both numbers are gone. The figure above is
+					the length of <a href="/data/frontier-labs.json">the roster file</a>, and nothing else.
 				</p>
 			</div>
-		</div>
+		</section>
 
-		<!-- Info Box -->
-		<div style="margin-top: 4rem; padding: 2rem; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
-			<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">Why These Labs Matter</h3>
-			<p style="color: var(--text-secondary); margin-bottom: 1rem;">
-				These organizations are developing the most advanced AI systems on Earth. Their decisions about safety, openness, and deployment directly impact global AI risk levels - the core mechanic of p(Doom)1.
+		<!-- ================= THE ROSTER ================= -->
+		<section id="roster">
+			<h2>The roster</h2>
+			<div class="stamp-block" role="note">
+				<p><span class="stamp stamp--provisional"><span class="stamp-sr">Status stamp: </span><span class="stamp-text">Provisional &mdash; hand-entered</span></span></p>
+				<div class="stamp-body">
+					<p>
+						Every row below was typed in by hand and carries a tertiary reference, not a primary
+						citation. Founding years are recorded at year precision because that is the precision
+						we can stand behind. The destination for this data is <b>pdoom-data</b>, where it will
+						arrive cleaned and cited; this file is the interim.
+					</p>
+				</div>
+				<p class="stamp-docket">
+					Form PD-1/FL &middot; Source: hand-entered, interim &middot; Destination
+					<a href="https://github.com/PipFoweraker/pdoom-data/issues/37" target="_blank" rel="noopener">pdoom-data#37</a>
+					&middot; Consumer
+					<a href="https://github.com/PipFoweraker/pdoom1-website/issues/177" target="_blank" rel="noopener">pdoom1-website#177</a>
+				</p>
+			</div>
+			<div class="roster" id="roster-grid">
+				<p class="note" id="roster-loading">Loading the roster&hellip;</p>
+			</div>
+			<noscript>
+				<p class="note">This roster renders from <a href="/data/frontier-labs.json">/data/frontier-labs.json</a>,
+					which is plain JSON and readable directly. The definition and the discussion above and below
+					do not need scripting.</p>
+			</noscript>
+		</section>
+
+		<!-- ================= KNOWN OMISSIONS ================= -->
+		<section id="omissions">
+			<h2>Known omissions</h2>
+			<div class="stamp-block" role="note">
+				<p><span class="stamp stamp--incomplete"><span class="stamp-sr">Status stamp: </span><span class="stamp-text">File incomplete</span></span></p>
+				<div class="stamp-body">
+					<p>
+						The roster is knowingly missing labs that meet the definition. Listing them is cheaper
+						and more honest than either pretending the list is complete or filling it with founding
+						dates nobody sourced. The incompleteness is itself data, and it lives in the same file.
+					</p>
+				</div>
+				<p class="stamp-docket">Form PD-1/FL &middot; Completeness: known incomplete &middot; Blocking: primary citations</p>
+			</div>
+			<div class="rack">
+				<ul class="omissions" id="omissions-list">
+					<li class="note">Loading&hellip;</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- ================= TRACKING OVER TIME ================= -->
+		<section id="tracking">
+			<h2>Tracking over time</h2>
+			<div class="stamp-block" role="note">
+				<p><span class="stamp stamp--awaiting stamp--lg"><span class="stamp-sr">Status stamp: </span><span class="stamp-text">Awaiting data</span></span></p>
+				<div class="stamp-body">
+					<p>
+						<b>This section will show the roster as a time series</b> — labs appearing, merging,
+						being acquired and exiting, from roughly 2000 to today — so you can replay the frontier
+						at any date rather than only read it as of now.
+					</p>
+					<p>
+						<b>No such series exists yet, in this repo or any other.</b> A snapshot list of founding
+						years is not a time series: it cannot tell you when a lab stopped being one, and it has
+						no events in it. So there is no chart here. An axis with nothing on it is a claim that
+						we measured something, and we have not.
+					</p>
+					<p>
+						What has to land first: <b>pdoom-data</b> publishes a fetchable artifact with a
+						<code>labs</code> array <em>and</em> an <code>events</code> array; <b>pdoom1</b> integrates
+						it into the engine timeline and confirms the shape; this page then renders it. The exact
+						artifact URL and schema this page will consume are written down in
+						<a href="/data/frontier-labs.json">the roster file</a> under <code>tracking</code>, so
+						the implementing repo does not have to re-derive them.
+					</p>
+				</div>
+				<p class="stamp-docket">
+					Form PD-1/FL &middot; Ref
+					<a href="https://github.com/PipFoweraker/pdoom-data/issues/37" target="_blank" rel="noopener">pdoom-data#37</a>
+					&middot;
+					<a href="https://github.com/PipFoweraker/pdoom1/issues/962" target="_blank" rel="noopener">pdoom1#962</a>
+					&middot;
+					<a href="https://github.com/PipFoweraker/pdoom1-website/issues/177" target="_blank" rel="noopener">pdoom1-website#177</a>
+					&middot; Status: awaiting upstream
+				</p>
+			</div>
+		</section>
+
+		<!-- ================= WHAT IS CONTESTED (pinned, static) ================= -->
+		<section id="contested">
+			<h2>What is genuinely contested</h2>
+			<div class="rack">
+				<p>
+					These are not caveats added for politeness. Each one would change the number on this page
+					if it were settled differently, and none of them is settled.
+				</p>
+				<ul class="contested">
+					<li>
+						<h3>The compute threshold is arbitrary, and it moves</h3>
+						<p>
+							Regulators have drawn different lines — the EU AI Act uses 10<sup>25</sup> FLOP for
+							systemic-risk obligations, the 2023 US executive order used 10<sup>26</sup> for
+							reporting. Any fixed number is wrong within about a year, and whichever one you pick
+							largely determines the count. This is the single biggest lever on the figure above,
+							and criterion 2 deliberately does not pin it rather than pretending to a precision
+							we do not have.
+						</p>
+					</li>
+					<li>
+						<h3>Where one lab ends and its parent begins</h3>
+						<p>
+							Google DeepMind is one row on this page, but DeepMind and Google Brain were separate
+							labs until 2023. Meta runs more than one AI organisation under one roof. Counting
+							corporate entities and counting research programmes give different answers, and it is
+							not obvious which unit a game about labs making decisions should use.
+						</p>
+					</li>
+					<li>
+						<h3>The roster is Anglophone-biased, and that is a defect</h3>
+						<p>
+							Several Chinese labs train at frontier scale and are missing from the roster. That is
+							not a ruling that they fall outside the definition — they do not. It is an artefact
+							of where the original list came from. They are named in the omissions above rather
+							than quietly added with dates nobody sourced.
+						</p>
+					</li>
+					<li>
+						<h3>Serving a frontier model is not training one</h3>
+						<p>
+							Anyone can host open-weights models. Criterion 1 counts organisations that train from
+							scratch, which excludes a large and commercially important set of companies a casual
+							reader might expect to find here.
+						</p>
+					</li>
+					<li>
+						<h3>Safety posture is an attribute, not a membership test</h3>
+						<p>
+							An earlier version of this page rated each lab's "Compute" and "Safety Focus" on an
+							invented ordinal scale — Very High, High, Medium — with no source behind any of them.
+							Those ratings have been removed. Putting an unsourced ordinal beside a sourced
+							founding year makes the two look equally solid, and they are not.
+						</p>
+					</li>
+					<li>
+						<h3>A modelling parameter is not a lab</h3>
+						<p>
+							The AI-2027 entrant below is a slot in the game's model. It is shown because it
+							affects the simulation, and excluded from every count because including it is exactly
+							how the old headline figure of 7 was produced from six real labs.
+						</p>
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- ================= HYPOTHETICAL ================= -->
+		<section id="hypothetical">
+			<h2>Hypothetical entrant (not counted)</h2>
+			<div class="roster" id="hypothetical-grid"></div>
+		</section>
+
+		<!-- ================= WHY ================= -->
+		<section id="why">
+			<h2>Why these labs matter</h2>
+			<div class="rack">
+				<p>
+					These organizations are developing the most advanced AI systems on Earth. Their decisions
+					about safety, openness, and deployment directly impact global AI risk levels - the core
+					mechanic of p(Doom)1.
+				</p>
+				<p>In the game, you manage a lab competing in this ecosystem, making strategic choices about:</p>
+				<ul style="margin-left:1.6rem">
+					<li>Research priorities (capabilities vs. safety)</li>
+					<li>Publication strategy (open vs. closed)</li>
+					<li>Compute allocation and scaling</li>
+					<li>Collaboration vs. competition</li>
+					<li>Policy advocacy and governance</li>
+				</ul>
+				<p>
+					Learn more about real AI Safety considerations at
+					<a href="https://stampy.ai" target="_blank" rel="noopener">Stampy.ai</a> or explore our
+					<a href="/resources/">AI Safety Resources</a>.
+				</p>
+			</div>
+			<p class="note">
+				<b>How this page stays honest:</b> the definition and the contested points are written into
+				this page's source, so they survive without scripting and change only in a reviewable diff.
+				Every number is derived from <a href="/data/frontier-labs.json">/data/frontier-labs.json</a> at
+				page load — nothing is typed into the markup — and if that file fails to load the page shows
+				nothing rather than a remembered value. Colours are pulled from the game's shipped palette.
 			</p>
-			<p style="color: var(--text-secondary); margin-bottom: 1rem;">
-				In the game, you manage a lab competing in this ecosystem, making strategic choices about:
-			</p>
-			<ul style="color: var(--text-secondary); margin-left: 2rem; margin-bottom: 1rem;">
-				<li>Research priorities (capabilities vs. safety)</li>
-				<li>Publication strategy (open vs. closed)</li>
-				<li>Compute allocation and scaling</li>
-				<li>Collaboration vs. competition</li>
-				<li>Policy advocacy and governance</li>
-			</ul>
-			<p style="color: var(--text-secondary);">
-				Learn more about real AI Safety considerations at <a href="https://stampy.ai" target="_blank" rel="noopener" style="color: var(--accent-primary);">Stampy.ai</a> or explore our <a href="/resources/" style="color: var(--accent-primary);">AI Safety Resources</a>.
-			</p>
-		</div>
+		</section>
 	</main>
 
-	<footer style="background: var(--bg-secondary); border-top: 2px solid var(--accent-primary); text-align: center; padding: 2rem; margin-top: 4rem;">
-		<p>&copy; 2026 p(Doom)1 by <a href="https://github.com/PipFoweraker" target="_blank" rel="noopener" style="color: var(--accent-primary); text-decoration: none; font-weight: bold;">Pip Foweraker</a></p>
-		<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
-			<a href="/" style="color: var(--accent-primary);">Home</a> |
-			<a href="/resources/" style="color: var(--accent-primary);">AI Safety Resources</a> |
-			<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);" target="_blank" rel="noopener">GitHub</a>
+	<footer>
+		<p>&copy; 2026 p(Doom)1 by <a href="https://github.com/PipFoweraker" target="_blank" rel="noopener">Pip Foweraker</a></p>
+		<p style="margin-top:.5rem">
+			<a href="/">Home</a> &middot;
+			<a href="/state-of-doom/">State of Doom</a> &middot;
+			<a href="/resources/">AI Safety Resources</a> &middot;
+			<a href="https://github.com/PipFoweraker/pdoom1" target="_blank" rel="noopener">GitHub</a>
 		</p>
 	</footer>
+
 	<script src="/assets/js/navigation.js"></script>
+	<script>
+	(function () {
+		// 1) Inherit the upstream colour schema: override the CSS fallbacks with the
+		//    game's shipped tokens. Fail-safe -- on any error the fallback palette stays.
+		fetch('/design/tokens.json', { cache: 'no-store' })
+			.then(function (r) { return r.ok ? r.json() : null; })
+			.then(function (t) {
+				if (!t || !t.colors) return;
+				var c = t.colors, s = document.documentElement.style;
+				var map = {
+					'--bg': 'bgPrimary', '--panel': 'bgSecondary', '--panel-2': 'bgTertiary',
+					'--ink': 'textPrimary', '--ink-2': 'textSecondary', '--ink-3': 'textMuted',
+					'--amber': 'accentPrimary', '--teal': 'accentSecondary', '--doom': 'accentDanger',
+					'--hair': 'border'
+				};
+				Object.keys(map).forEach(function (k) { if (c[map[k]]) s.setProperty(k, c[map[k]]); });
+			}).catch(function () {});
+
+		// Escaping is /assets/js/escape.js's job, not this page's. This file used to
+		// define its own escapeHTML(); that is the exact pattern the 2026-08-01 sweep removed
+		// from five pages, and CLAUDE.md forbids writing a second one. escapeHTML for
+		// text and quoted attributes; safeUrl for an href, because escaping alone cannot
+		// make a URL safe -- javascript:alert(1) contains no HTML metacharacter.
+		function labCard(lab, hypothetical) {
+			var fields = '';
+			if (hypothetical) {
+				fields += '<div class="field"><span class="lbl">Scenario year</span>'
+					+ '<span class="val">' + escapeHTML(lab.scenario_year || 'unset') + '</span></div>'
+					+ '<div class="field"><span class="lbl">Kind</span><span class="val">Model parameter</span></div>';
+			} else {
+				fields += '<div class="field"><span class="lbl">Founded</span>'
+					+ '<span class="val">' + escapeHTML(lab.founded) + '</span></div>'
+					+ '<div class="field"><span class="lbl">Precision</span>'
+					+ '<span class="val">' + escapeHTML(lab.founded_precision || 'unrecorded') + '</span></div>'
+					+ '<div class="field"><span class="lbl">Status</span>'
+					+ '<span class="val">' + escapeHTML(lab.status) + '</span></div>';
+			}
+
+			var links = '';
+			if (lab.url) links += '<a href="' + safeUrl(lab.url) + '" target="_blank" rel="noopener">site</a>';
+			if (lab.reference) {
+				if (links) links += '<span>&middot;</span>';
+				links += '<a href="' + safeUrl(lab.reference) + '" target="_blank" rel="noopener">reference</a>';
+			}
+
+			return '<article class="lab' + (hypothetical ? ' lab--hypothetical' : '') + '">'
+				+ '<div class="name">' + escapeHTML(lab.name) + '</div>'
+				+ '<div class="fields">' + fields + '</div>'
+				+ (lab.note ? '<p class="note">' + escapeHTML(lab.note) + '</p>' : '')
+				+ (links ? '<p class="links">' + links + '</p>' : '')
+				+ '</article>';
+		}
+
+		function render(d) {
+			var labs = (d.roster && d.roster.labs) || [];
+			// The count is DERIVED here, exactly as scripts/calculate-game-stats.py
+			// derives it, so page and published stat cannot disagree.
+			var real = labs.filter(function (l) { return l.kind === 'real' && l.status === 'active'; });
+			var omissions = d.known_omissions || [];
+			var hypos = d.hypothetical || [];
+
+			document.getElementById('n-roster').textContent = real.length;
+			document.getElementById('n-omissions').textContent = '≥' + omissions.length;
+			document.getElementById('n-hypothetical').textContent = hypos.length;
+
+			document.getElementById('roster-grid').innerHTML =
+				labs.length
+					? labs.map(function (l) { return labCard(l, false); }).join('')
+					: '<p class="fail">The roster file loaded but contains no labs.</p>';
+
+			document.getElementById('omissions-list').innerHTML =
+				omissions.length
+					? omissions.map(function (o) {
+						return '<li><b>' + escapeHTML(o.name) + '</b> &mdash; ' + escapeHTML(o.reason)
+							+ '<em>Blocking: ' + escapeHTML(o.blocking) + '</em></li>';
+					}).join('')
+					: '<li class="note">No omissions recorded.</li>';
+
+			document.getElementById('hypothetical-grid').innerHTML =
+				hypos.map(function (h) { return labCard(h, true); }).join('');
+		}
+
+		function fail(msg) {
+			['n-roster', 'n-omissions', 'n-hypothetical'].forEach(function (id) {
+				document.getElementById(id).textContent = '—';
+			});
+			var f = document.getElementById('tally-fail');
+			f.hidden = false;
+			f.textContent = msg;
+			document.getElementById('roster-grid').innerHTML = '<p class="fail">' + escapeHTML(msg) + '</p>';
+			document.getElementById('omissions-list').innerHTML = '<li class="fail">' + escapeHTML(msg) + '</li>';
+		}
+
+		fetch('/data/frontier-labs.json', { cache: 'no-store' })
+			.then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+			.then(render)
+			.catch(function (e) {
+				// Fail visibly and empty. A remembered roster would be indistinguishable
+				// from a current one at exactly the moment it was wrong.
+				fail('Roster unavailable (' + e.message + ') — showing nothing rather than a remembered list.');
+			});
+	})();
+	</script>
 </body>
 </html>
