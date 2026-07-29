@@ -19,6 +19,15 @@ it NEVER writes data. Delete once no workflow/test references it.
 import argparse
 import sys
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 
 def main():
     ap = argparse.ArgumentParser(description="DEPRECATED -- superseded by ingest_scores.py")

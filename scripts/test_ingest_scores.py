@@ -18,6 +18,15 @@ import sys
 import tempfile
 from pathlib import Path
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "scripts" / "fixtures" / "leaderboard"
 PY = sys.executable
@@ -28,6 +37,7 @@ def run(*args):
     r = subprocess.run(
         [PY, str(ROOT / "scripts" / "ingest_scores.py"), "--output", str(out), *args],
         capture_output=True, text=True, cwd=str(ROOT),
+        encoding="utf-8", errors="replace",
     )
     assert r.returncode == 0, f"ingest_scores exited {r.returncode}\n{r.stderr}"
     return json.loads(out.read_text(encoding="utf-8"))

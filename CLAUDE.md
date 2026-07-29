@@ -95,6 +95,25 @@ Pip's stated top priority. Practically:
       try: _s.reconfigure(encoding="utf-8", errors="replace")
       except (AttributeError, ValueError): pass
   ```
+  **Swept repo-wide 2026-07-29** and now enforced by
+  `python scripts/check-encoding-safety.py` (CI: `encoding-safety.yml`). The
+  preamble is duplicated per-module on purpose, not imported from a helper —
+  scripts run directly from many working directories, so an import that must
+  resolve is a new way for the thing-that-runs-first to fail. Three files were
+  held by concurrent branches and are listed in that script's `KNOWN_UNFIXED`.
+- **The quiet half of the same bug: `open(path)` with no `encoding=`.** It
+  decodes as cp1252 on Windows and utf-8 on Linux, so a UTF-8 file mojibakes
+  *without raising*. On 2026-07-28 a diagnostic read a file this way, mistook a
+  mangled em dash for data corruption, and produced a false bug report. This is
+  worse than the print crash: it yields wrong answers rather than no answer.
+  Always pass `encoding="utf-8"` to `open`, `read_text`/`write_text`, and to any
+  `subprocess` call using `text=True`.
+- **Your agent shell may be lying to you.** Claude Code sets
+  `PYTHONIOENCODING=utf-8` and code page 65001, so the print crash does NOT
+  reproduce in-session even though Pip hits it in his own terminal. Reproduce it
+  with `$env:PYTHONIOENCODING="cp1252"` before concluding a script is fine.
+  (`locale.getpreferredencoding()` is still cp1252 there, so the *read* side
+  misbehaves in-session regardless.)
 - **Encoding gremlin:** shell heredocs mangle backslashes. A `python - <<'PY'`
   block containing regex like `[^\n]` or `\d` will silently corrupt. Use the
   Write tool to create a script file and run it, or use Edit — do NOT hand-type
@@ -193,6 +212,8 @@ node    scripts/test-download-resolution.js # download buttons resolve/degrade r
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift
 python  scripts/generate-feeds.py --check # feeds in step with the blog
 node    scripts/test-header-consistency.js
+python  scripts/test-changelog-structure.py   # changelog files + data shape
+python  scripts/check-encoding-safety.py      # cp1252 preamble + explicit encodings
 ```
 
 **Platform availability is a *derived* fact, not prose.** The source of truth is

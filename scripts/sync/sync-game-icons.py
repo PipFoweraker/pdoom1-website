@@ -15,6 +15,17 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 
+import sys
+
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 SCRIPT_DIR = Path(__file__).parent
 WEBSITE_ROOT = SCRIPT_DIR.parent.parent
 ICONS_DIR = WEBSITE_ROOT / "public" / "assets" / "icons" / "game"

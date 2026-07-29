@@ -7,6 +7,17 @@ Mobile: 800px, Tablet: 1200px, Desktop: 1600px, Full: 2400px
 from PIL import Image
 import os
 
+import sys
+
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 def create_responsive_variant(input_path, output_base, width, quality=85):
     """Create a single responsive variant"""
     img = Image.open(input_path)

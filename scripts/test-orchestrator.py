@@ -11,6 +11,15 @@ import json
 import time
 from datetime import datetime
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 class TestOrchestrator:
     def __init__(self, verbose=False):
         self.verbose = verbose
@@ -44,6 +53,7 @@ class TestOrchestrator:
                 capture_output=True, 
                 text=True, 
                 timeout=timeout,
+                encoding="utf-8", errors="replace",
                 cwd=os.path.dirname(os.path.dirname(__file__))  # Project root
             )
             end_time = time.time()
@@ -216,7 +226,7 @@ class TestOrchestrator:
         report_file = os.path.join('public', 'data', 'test-report.json')
         os.makedirs(os.path.dirname(report_file), exist_ok=True)
         
-        with open(report_file, 'w') as f:
+        with open(report_file, 'w', encoding="utf-8") as f:
             json.dump(report, f, indent=2)
             
         self.log(f"📄 Detailed report saved: {report_file}")

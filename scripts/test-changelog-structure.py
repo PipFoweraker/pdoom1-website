@@ -4,6 +4,17 @@
 import os
 import json
 
+import sys
+
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 def test_changelog_files():
     """Test that both changelog files exist and have correct data structure"""
     base_path = "public"
@@ -34,7 +45,7 @@ def test_changelog_files():
     # Test data structure
     for data_file, name in [(website_data, "Website"), (game_data, "Game")]:
         try:
-            with open(data_file, 'r') as f:
+            with open(data_file, 'r', encoding="utf-8") as f:
                 data = json.load(f)
             
             if 'entries' in data and isinstance(data['entries'], list):
