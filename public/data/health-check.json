@@ -1,5 +1,5 @@
 {
-  "last_check": "2026-07-29T07:01:07.806860",
+  "last_check": "2026-07-29T12:46:51.778069",
   "generated_by": "scripts/health-check.py via .github/workflows/health-checks.yml",
   "overall_status": "PASS",
   "total_tests": 11,
@@ -11,77 +11,77 @@
       "test": "Main Index File",
       "passed": true,
       "message": "✓ Found: public/index.html",
-      "timestamp": "2026-07-29T07:01:07.745111",
+      "timestamp": "2026-07-29T12:46:51.711579",
       "is_warning": false
     },
     {
       "test": "Config File",
       "passed": true,
       "message": "✓ Found: public/config.json",
-      "timestamp": "2026-07-29T07:01:07.745132",
+      "timestamp": "2026-07-29T12:46:51.711600",
       "is_warning": false
     },
     {
       "test": "Version Data",
       "passed": true,
       "message": "✓ Found: public/data/version.json",
-      "timestamp": "2026-07-29T07:01:07.745150",
+      "timestamp": "2026-07-29T12:46:51.711619",
       "is_warning": false
     },
     {
       "test": "Changelog Data",
       "passed": true,
       "message": "✓ Found: public/data/changes.json",
-      "timestamp": "2026-07-29T07:01:07.745165",
+      "timestamp": "2026-07-29T12:46:51.711633",
       "is_warning": false
     },
     {
       "test": "Config JSON",
       "passed": true,
       "message": "✓ Valid JSON: public/config.json",
-      "timestamp": "2026-07-29T07:01:07.745236",
+      "timestamp": "2026-07-29T12:46:51.711710",
       "is_warning": false
     },
     {
       "test": "Version JSON",
       "passed": true,
       "message": "✓ Valid JSON: public/data/version.json",
-      "timestamp": "2026-07-29T07:01:07.745308",
+      "timestamp": "2026-07-29T12:46:51.711773",
       "is_warning": false
     },
     {
       "test": "Changes JSON",
       "passed": true,
       "message": "✓ Valid JSON: public/data/changes.json",
-      "timestamp": "2026-07-29T07:01:07.745365",
+      "timestamp": "2026-07-29T12:46:51.711820",
       "is_warning": false
     },
     {
       "test": "Version Update Script",
       "passed": true,
       "message": "✓ Script compiles: scripts/update-version-info.py",
-      "timestamp": "2026-07-29T07:01:07.776793",
+      "timestamp": "2026-07-29T12:46:51.745449",
       "is_warning": false
     },
     {
       "test": "Stats Calculation Script",
       "passed": true,
       "message": "✓ Script compiles: scripts/calculate-game-stats.py",
-      "timestamp": "2026-07-29T07:01:07.806739",
+      "timestamp": "2026-07-29T12:46:51.777900",
       "is_warning": false
     },
     {
       "test": "Version Data Structure",
       "passed": true,
       "message": "✓ All required fields present",
-      "timestamp": "2026-07-29T07:01:07.806833",
+      "timestamp": "2026-07-29T12:46:51.778038",
       "is_warning": false
     },
     {
       "test": "Data Freshness",
       "passed": true,
       "message": "✓ Data is 0 days old",
-      "timestamp": "2026-07-29T07:01:07.806848",
+      "timestamp": "2026-07-29T12:46:51.778057",
       "is_warning": false
     }
   ],
