@@ -1228,19 +1228,29 @@
           const weekData = await response.json();
           const seedsGroup = document.getElementById('recent-seeds-group');
 
-          // Only offer a week that has not already finished. The rollover cron fires
-          // Sunday 14:00 UTC and derives the week from `now`, so it re-publishes the
-          // week that ends hours later (TECH_DEBT A9) -- current.json therefore keeps
-          // claiming `is_current` for days after the week closed. Trusting that flag
-          // would show a fresh visitor a competition that is already over, so the
-          // end timestamp is the authority here, not the flag. Self-heals the moment
-          // the rollover cadence is fixed; no league logic is changed by this.
+          // Only offer a week that has not already finished. Historically the rollover
+          // cron fired Sunday 14:00 UTC and derived the week from `now`, so it
+          // re-published the week that ended hours later (TECH_DEBT A9) -- those
+          // records keep claiming `is_current` for days after the week closed. Trusting
+          // that flag would show a fresh visitor a competition that is already over, so
+          // the end timestamp is the authority here, not the flag. The rollover is now
+          // anchored to Friday 00:00 Australia/Hobart and no longer produces that skew,
+          // but the guard stays: it is cheap, and it is what makes a stalled rollover
+          // fail closed instead of advertising a dead week.
           const endsAt = Date.parse(
             weekData.week_info?.end_timestamp || weekData.meta?.end_date || ''
           );
           const weekStillOpen = Number.isFinite(endsAt) && endsAt > Date.now();
 
-          if (weekData.seed && weekStillOpen) {
+          // NEVER offer a seed the game side has not blessed. The website mints
+          // a placeholder seed for every week, and no client has ever submitted
+          // under one; offering it sends a player to a board that will always be
+          // empty, and the score API returns ok:true for any key, so nothing
+          // downstream can tell them apart. The blessed value is recorded in
+          // docs/LEAGUE_SEED_LEDGER.md and public/data/ladder-epochs.json.
+          const seedBlessed = weekData.seed_provenance?.blessed === true;
+
+          if (weekData.seed && weekStillOpen && seedBlessed) {
             const option = document.createElement('option');
             option.value = weekData.seed;
             option.textContent = `Week ${weekData.meta?.week_id || 'Current'} - ${weekData.seed}`;

@@ -193,6 +193,8 @@ node    scripts/test-download-resolution.js # download buttons resolve/degrade r
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift
 python  scripts/generate-feeds.py --check # feeds in step with the blog
 node    scripts/test-header-consistency.js
+python  scripts/test-weekly-league-boundary.py  # rollover run-time -> week mapping (A9)
+python  scripts/stamp-league-epoch.py --check   # every weekly record carries its epoch
 ```
 
 **Platform availability is a *derived* fact, not prose.** The source of truth is
@@ -208,12 +210,63 @@ platform that has no build.
 - Weekly-league rollover only opens a GitHub issue **on failure**
   (`weekly-league-reset.yml`). The old workflow that spammed 35 "success" issues
   was removed 2026-07-14 — don't reintroduce success-issue creation.
-- **The rollover is off by one week**: cron fires Sunday 14:00 UTC and
-  `get_current_week_info()` derives the week from `now`, so it creates the week
-  that *ends* hours later. `validate_data.py` reports it. See TECH_DEBT A9.
-- The leaderboard board key is **`(seed, game_version)`** (pdoom1 PR #679). A
-  version-stamp mismatch means submitted scores land nowhere, with **no error
-  shown to the player** — it looks exactly like "nobody is playing". Suspect this
+- **The league week is anchored to Friday 00:00 `Australia/Hobart`** (Pip,
+  2026-07-28: "Everything is going to be based off Hobart time, AEST"), matching
+  the game's own "Seed — every Fri" cadence in
+  `pdoom1/docs/RELEASE_NOMENCLATURE.md`. The cron is `0 14 * * 4` — **Thursday**
+  14:00 UTC — which is Fri 00:00 Hobart in winter and Fri 01:00 in summer, i.e.
+  always a Friday there and never *before* the week it opens.
+  **`Australia/Hobart` is not a fixed offset:** +10 (AEST) in winter, +11 (AEDT)
+  from October to April. The week is derived with `ZoneInfo`, never an offset, so
+  DST cannot move the answer — only how far into the week the run lands. A
+  hardcoded `+10` is the tempting wrong fix; `league_tz()` raises rather than
+  falling back to one.
+  **`zoneinfo` has no bundled tz database on Windows** — `ZoneInfo("Australia/Hobart")`
+  raises until `pip install tzdata`. It is pinned in `requirements.txt`; without
+  it the league scripts die locally while CI stays green.
+- **The rollover off-by-one is FIXED (2026-07-28, TECH_DEBT A9).** The run-time →
+  week mapping is explicit (`league_week_start()`), never derived from `now`, and
+  the Friday anchor let the old look-ahead go away entirely: the cron fires inside
+  the week it opens, so the week is simply the one containing the run.
+  `scripts/test-weekly-league-boundary.py` (74 assertions) pins the boundary in
+  **both DST states** plus the two DST-spanning weeks, and runs as the **first**
+  step of the rollover workflow. **Do not "simplify" that back to
+  `datetime.now()`** — `datetime.now()` without a tz is *local* time, which on
+  Pip's box is AEST (+10), exactly the size of skew that crosses this boundary.
+- **The league and player pages are retired-and-hidden, not deleted** (Pip,
+  2026-07-28), and everything opened before the **L2 → L3 ladder fork** is
+  labelled **anomalous pre-history** via a machine-readable `epoch` block in the
+  data. The boundary is `2026-07-31 00:00 Australia/Hobart`
+  (`2026-07-30T14:00:00Z`) and **it is not a script literal** — it lives in
+  `public/data/ladder-epochs.json`, which `weekly-league-manager.py` reads. First
+  regularised week is **2026_W32** (Fri 2026-07-31).
+  **Do not re-derive this from `RELEASE_NOMENCLATURE.md`'s "Epoch = first Friday"
+  rule** — that is how an earlier pass got 2026-08-07. The ladder forked
+  *mid-month* on gameplay changes (the AP pool was removed for an attention
+  economy); the shipping build is v0.13.2 on L3. **pdoom1-website#151, comment
+  2026-07-28T23:13Z, is authoritative and supersedes that calendar row.**
+  Week ids changed meaning at the 2026-07-30 rollover, so **compare
+  `start_timestamp`, not ids**, across that switch. Before touching any weekly
+  archive, seed leaderboard, or `/league/` + `/players/` page, read
+  `docs/LEAGUE_EPOCH_ANOMALY.md`.
+- **The board key is `(seed, ladder_version)` — literally `L3`.** NOT
+  `v0.13.2`, NOT `L3.0`, and **no longer `(seed, game_version)`** (an earlier note
+  here said that; pdoom1 #151 supersedes it). `GameConfig.get_board_version()`
+  returns `"L" + LADDER_VERSION`. The build version never touches the board key
+  again — that is the point of the build-vs-ladder split. `meta.game_version` in
+  a weekly record is a **record stamp only**; keying off it is what stranded 23
+  real submissions.
+  **The score API has NO key validation.** A wrong seed or version returns
+  `ok:true` with an empty board (verified 2026-07-29, read path) — indistinguishable
+  from "nobody is playing", and **no error is shown to the player**. Proving a key
+  needs a *positive* check (post a score, read it back). Suspect a key mismatch
   before suspecting analytics.
+- **Never present an unblessed seed to a player.** The blessed value is
+  `docs/LEAGUE_SEED_LEDGER.md` → mirrored into `public/data/ladder-epochs.json`;
+  anything the website derives is a placeholder marked
+  `seed_provenance.blessed: false`, and `public/leaderboard/index.html` will not
+  offer it. Pip, 2026-07-29: *"Let's keep using variables and not hardcoding
+  things where we can!"* — pinned values go in a data file with a `source` note,
+  never a script literal.
 - pdoom1 PR #679 also rules that this repo is a **read-only consumer** of one PHP
   score API and must not stand up a second score store.
