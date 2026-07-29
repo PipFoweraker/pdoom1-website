@@ -193,7 +193,25 @@ node    scripts/test-download-resolution.js # download buttons resolve/degrade r
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift
 python  scripts/generate-feeds.py --check # feeds in step with the blog
 node    scripts/test-header-consistency.js
+python  scripts/sync/sync-keybinds.py --check # keybind mirror fresh + no typed keys
 ```
+
+**Keybinds are MIRRORED from the game, not derived — and a mirror rots.**
+`public/data/keybinds.json` is written by `scripts/sync/sync-keybinds.py`, which
+parses `godot/autoload/keybind_manager.gd` out of a **local pdoom1 checkout**
+(`--game-repo`, `$PDOOM1_REPO`, or `../pdoom1`). pdoom1 publishes no keybind
+artifact yet — the ask is **pdoom1#1011**. Until that lands the file is stamped
+`"mirror": true` with source path, source commit and `verified_on`.
+`--check` fails on three things: drift vs the game source (skipped when no
+checkout is present), a mirror older than 90 days, and — the one that runs
+everywhere, including CI — **any key typed as a literal into a page**. Pages must
+use `<kbd data-keybind="<action>">…</kbd>` and let the JS fill it; typing `N` into
+HTML is exactly how pdoom1's own `CONTRIBUTING.md` came to say "backslash" long
+after the bind moved. If the fetch fails the placeholder deliberately **stands**
+rather than falling back to a remembered key — a stale key sends a player to a key
+that does nothing, which reads as "the game is broken".
+`BuildInfo.DEV_BUILD` is a hand-flipped `const` (nothing in the export tooling
+sets it), so dev-gated keys must be described as "may or may not be in your build".
 
 **Platform availability is a *derived* fact, not prose.** The source of truth is
 `public/data/version.json` → `latest_release.platforms` ({windows,macos,linux}

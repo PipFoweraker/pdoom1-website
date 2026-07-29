@@ -1,0 +1,380 @@
+{
+  "_README": "DEFAULT keybinds for p(Doom)1, MIRRORED from the game's godot/autoload/keybind_manager.gd. Not authoritative and not live: the game publishes no keybind artifact yet, so this file is a point-in-time copy taken by scripts/sync/sync-keybinds.py from a local checkout. These are DEFAULTS -- every bind is rebindable by the player, so the in-game Keybindings screen is the only thing that can state a given player's actual key. Pages must render from this file rather than typing a key into HTML; `python scripts/sync/sync-keybinds.py --check` enforces both that rule and this file's freshness. Upstream ask to make this a real derivation: PipFoweraker/pdoom1#1011",
+  "version": 1,
+  "mirror": true,
+  "source": {
+    "repo": "PipFoweraker/pdoom1",
+    "path": "godot/autoload/keybind_manager.gd",
+    "commit": "4293eee8",
+    "verified_on": "2026-07-29",
+    "generator": "scripts/sync/sync-keybinds.py",
+    "ask_issue": "PipFoweraker/pdoom1#1011"
+  },
+  "rebindable": {
+    "value": true,
+    "where": "Keybindings, on the game's main (welcome) screen",
+    "note": "Rebinding lives on the main menu's Keybindings screen, NOT in the in-game Settings menu -- settings_menu.tscn has no keybind row. Saved binds live in user://keybinds.cfg and are reset to defaults when the game's KEYBINDS_CONFIG_VERSION is bumped."
+  },
+  "dev_build_gate": {
+    "constant": "BuildInfo.DEV_BUILD",
+    "value_at_verification": true,
+    "note": "A plain GDScript constant, not OS.is_debug_build(). Nothing in the export tooling flips it, so its shipped value is whatever was committed at the release cut. Treat dev-gated keys as 'may or may not be present'."
+  },
+  "keybinds": [
+    {
+      "action": "screenshot",
+      "godot_keycode": "KEY_BRACKETLEFT",
+      "key": "[",
+      "modifiers": [],
+      "category": "screenshot",
+      "description": "Take Screenshot",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "export_log",
+      "godot_keycode": "KEY_F12",
+      "key": "F12",
+      "modifiers": [],
+      "category": "admin",
+      "description": "Export Game Log",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "debug_overlay",
+      "godot_keycode": "KEY_F3",
+      "key": "F3",
+      "modifiers": [],
+      "category": "debug",
+      "description": "Toggle Debug Overlay (User)",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "dev_mode",
+      "godot_keycode": "KEY_BACKSLASH",
+      "key": "\\",
+      "modifiers": [],
+      "category": "debug",
+      "description": "Toggle Dev Mode Overlay",
+      "availability": {
+        "kind": "dev_build_only",
+        "gate": "BuildInfo.DEV_BUILD",
+        "gate_source": "godot/scripts/core/build_info.gd",
+        "handler": "godot/scripts/debug/dev_mode_overlay.gd",
+        "note": "The handler returns early unless BuildInfo.is_dev_build(). DEV_BUILD is a plain constant that a release cut is meant to flip off, so this key may do nothing in the build a player downloaded."
+      }
+    },
+    {
+      "action": "flight_recorder",
+      "godot_keycode": "KEY_F6",
+      "key": "F6",
+      "modifiers": [],
+      "category": "debug",
+      "description": "Flight Recorder Capture (screenshot + state + note)",
+      "availability": {
+        "kind": "dev_build_only",
+        "gate": "BuildInfo.DEV_BUILD",
+        "gate_source": "godot/scripts/core/build_info.gd",
+        "handler": "godot/scripts/debug/flight_recorder.gd",
+        "note": "The handler returns early unless BuildInfo.is_dev_build(). DEV_BUILD is a plain constant that a release cut is meant to flip off, so this key may do nothing in the build a player downloaded."
+      }
+    },
+    {
+      "action": "ui_evolution_shot",
+      "godot_keycode": "KEY_F7",
+      "key": "F7",
+      "modifiers": [],
+      "category": "debug",
+      "description": "UI Evolution Capture (screenshot + context line)",
+      "availability": {
+        "kind": "dev_build_only",
+        "gate": "BuildInfo.DEV_BUILD",
+        "gate_source": "godot/scripts/core/build_info.gd",
+        "handler": "godot/scripts/debug/ui_evolution_recorder.gd",
+        "note": "The handler returns early unless BuildInfo.is_dev_build(). DEV_BUILD is a plain constant that a release cut is meant to flip off, so this key may do nothing in the build a player downloaded."
+      }
+    },
+    {
+      "action": "admin_mode",
+      "godot_keycode": "KEY_BRACKETRIGHT",
+      "key": "]",
+      "modifiers": [],
+      "category": "admin",
+      "description": "Toggle Admin Mode",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "end_turn",
+      "godot_keycode": "KEY_SPACE",
+      "key": "Space",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "End Turn",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "undo_action",
+      "godot_keycode": "KEY_Z",
+      "key": "Z",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Undo Last Action",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "clear_queue",
+      "godot_keycode": "KEY_C",
+      "key": "C",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Clear Action Queue",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "cancel",
+      "godot_keycode": "KEY_ESCAPE",
+      "key": "Escape",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Cancel/Back",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "next_tab",
+      "godot_keycode": "KEY_TAB",
+      "key": "Tab",
+      "modifiers": [],
+      "category": "ui",
+      "description": "Next Tab",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "prev_tab",
+      "godot_keycode": "KEY_TAB",
+      "key": "Tab",
+      "modifiers": [
+        "shift"
+      ],
+      "category": "ui",
+      "description": "Previous Tab",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "bug_reporter",
+      "godot_keycode": "KEY_N",
+      "key": "N",
+      "modifiers": [],
+      "category": "ui",
+      "description": "Open Bug Reporter",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "settings",
+      "godot_keycode": "KEY_F10",
+      "key": "F10",
+      "modifiers": [],
+      "category": "ui",
+      "description": "Settings Menu",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "open_ledger",
+      "godot_keycode": "KEY_L",
+      "key": "L",
+      "modifiers": [],
+      "category": "ui",
+      "description": "Open Liability Ledger",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "menu_hire",
+      "godot_keycode": "KEY_H",
+      "key": "H",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Open Hiring Menu",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "menu_fundraise",
+      "godot_keycode": "KEY_F",
+      "key": "F",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Open Fundraising Menu",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "menu_research",
+      "godot_keycode": "KEY_R",
+      "key": "R",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Open Research Actions",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "menu_publicity",
+      "godot_keycode": "KEY_P",
+      "key": "P",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Open Publicity Menu",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "menu_travel",
+      "godot_keycode": "KEY_T",
+      "key": "T",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Open Travel Menu",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "action_1",
+      "godot_keycode": "KEY_1",
+      "key": "1",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Trigger Action 1",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "action_2",
+      "godot_keycode": "KEY_2",
+      "key": "2",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Trigger Action 2",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "action_3",
+      "godot_keycode": "KEY_3",
+      "key": "3",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Trigger Action 3",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "action_4",
+      "godot_keycode": "KEY_4",
+      "key": "4",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Trigger Action 4",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "action_5",
+      "godot_keycode": "KEY_5",
+      "key": "5",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Trigger Action 5",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "action_6",
+      "godot_keycode": "KEY_6",
+      "key": "6",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Trigger Action 6",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "action_7",
+      "godot_keycode": "KEY_7",
+      "key": "7",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Trigger Action 7",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "action_8",
+      "godot_keycode": "KEY_8",
+      "key": "8",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Trigger Action 8",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "action_9",
+      "godot_keycode": "KEY_9",
+      "key": "9",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Trigger Action 9",
+      "availability": {
+        "kind": "all_builds"
+      }
+    },
+    {
+      "action": "commit_plan",
+      "godot_keycode": "KEY_ENTER",
+      "key": "Enter",
+      "modifiers": [],
+      "category": "gameplay",
+      "description": "Commit Plan & Reserve AP",
+      "availability": {
+        "kind": "all_builds"
+      }
+    }
+  ]
+}
