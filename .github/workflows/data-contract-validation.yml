@@ -50,13 +50,26 @@ jobs:
           exit $code
 
       # Keep the dashboard's health snapshot fresh (schedule/main only).
+      #
+      # `git add` FIRST, then test the INDEX. `git diff --quiet <path>` cannot see an
+      # untracked file, so the add-after-test ordering silently commits nothing while
+      # reporting success (see CLAUDE.md workflow trap #1 -- it cost sync-pdoom1-docs
+      # months). This path happens to be tracked today, so the old ordering worked;
+      # it would have failed silently the first time the artefact was regenerated
+      # from scratch or moved.
+      #
+      # Do NOT "optimise" this to skip commits when only `generated` changed. That
+      # timestamp IS the freshness signal /monitoring/ uses to decide whether the
+      # snapshot is stale; freezing it would make a dead workflow look healthy.
       - name: Commit integration-health.json
         if: always() && (github.event_name == 'schedule' || github.event_name == 'push')
         run: |
-          if ! git diff --quiet public/data/integration-health.json; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add public/data/integration-health.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/integration-health.json
+          if git diff --cached --quiet -- public/data/integration-health.json; then
+            echo "integration-health.json unchanged -- nothing to commit"
+          else
             git commit -m "chore: refresh integration-health.json [skip ci]"
             git push
           fi

@@ -353,6 +353,14 @@
     text-shadow:0 0 2px #000;
   }
 
+  /* Development log appends BELOW the calibrated situation analysis; it never
+     replaces it. Empty (and so invisible) until loadEventLog() populates it. */
+  #devLog:not(:empty) {
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid rgba(246, 168, 0,0.35);
+  }
+
   .highlight {
     color:#2fd4c2;
     font-weight:bold;
@@ -922,6 +930,10 @@
           <div class="narrative-text">
             Three major factors could reduce risk: increased AI safety research funding, international coordination on development pace, and stronger regulatory frameworks. At that October 2025 snapshot, levels remained <span class="highlight">insufficient</span> relative to the scale of the challenge (<a href="https://www.anthropic.com" target="_blank" class="source-link">Anthropic safety research</a>).
           </div>
+          <!-- loadEventLog() fills this. It must NOT write to #narrativeBox itself:
+               doing so destroyed the calibrated Situation Analysis above on every
+               page load (TECH_DEBT A6). Empty until the fetch succeeds. -->
+          <div id="devLog"></div>
         </div>
       </div>
     </div>
@@ -1422,10 +1434,12 @@ async function loadEventLog() {
     const data = await response.json();
 
     // Get the 3 most recent entries
-    const recentEvents = data.entries.slice(0, 3);
+    const recentEvents = (data.entries || []).slice(0, 3);
+    if (!recentEvents.length) return;   // nothing to say -> say nothing, leave the box alone
 
-    // Update narrative box with event log
-    const narrativeBox = document.getElementById('narrativeBox');
+    // Append BELOW the situation analysis. Writing to #narrativeBox would wipe the
+    // calibrated, deliberately re-dated copy above it (TECH_DEBT A6).
+    const devLog = document.getElementById('devLog');
     let eventHTML = '<div class="narrative-title">Recent Development Log</div>';
 
     recentEvents.forEach(event => {
@@ -1443,7 +1457,7 @@ async function loadEventLog() {
       </div>
     `;
 
-    narrativeBox.innerHTML = eventHTML;
+    devLog.innerHTML = eventHTML;
   } catch (error) {
     console.error('Failed to load event log:', error);
   }

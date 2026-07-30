@@ -22,7 +22,7 @@ it is to a developer.
 | A3 | **DNT is honoured on 4 pages out of 2,226.** `analytics.js` is only included by `index`, `about`, `press`, `privacy`. A visitor arriving on a deep-linked event page is counted before the ignore flag is ever set. | `grep -rl "assets/js/analytics.js" public --include=*.html` → 4 files. | 1h — add to the event generator template and re-emit | OPEN |
 | A4 | **`generate_game_aware_sample_data()` drops `data_status`.** If that fallback fires it overwrites `leaderboard.json`; `applyDataStatus` defaults absent → `'live'`, so the "pre-launch" honesty banner silently disappears and an empty board reads as a real one. | `scripts/game-integration.py`, `public/leaderboard/index.html`. | 0.5h | OPEN |
 | A5 | **3.78 MB cat PNG** on `/dashboard/`, in the initial desktop viewport. `loading="lazy"` added but barely helps there. No downscaled variant exists (`small-doom-cat.png` is a different cat). | `public/assets/pdoom1-office-cat-default.png` | 0.5h | OPEN |
-| A6 | **Corrected dashboard prose is invisible.** `loadEventLog()` replaces all of `#narrativeBox` with the last 3 changelog entries on load, so the re-dated "Situation Analysis" shows for a moment and is gone. | `public/dashboard/index.html` | 0.5h | OPEN |
+| A6 | **Corrected dashboard prose is invisible.** `loadEventLog()` replaced all of `#narrativeBox` with the last 3 changelog entries on load, so the re-dated "Situation Analysis" showed for a moment and was gone. | `public/dashboard/index.html` | 0.5h | **FIXED** — the dev log now renders into its own `#devLog` child appended below the analysis; a failed/empty fetch leaves both the analysis and `#devLog` untouched. No prose changed. |
 | A7 | ~~**No favicon anywhere.**~~ **RESOLVED — this row was stale.** Both `public/favicon.ico` and `public/favicon.svg` now exist. Re-verified 2026-07-28. Only **6 of 2,245** pages *declare* a `rel="…icon"` link — but that no longer matters to a visitor, because browsers fall back to `/favicon.ico` at the root and that file now exists, so every page resolves an icon. The declaration gap is now cosmetic (2,239 pages get the 192-byte `.ico` rather than the `.svg`). Not worth 0.5h; fold into the event-template work if ever. | `ls public/favicon*` → `.ico` (192 B) + `.svg` (350 B); `grep -rl 'rel="[^"]*icon' public --include=*.html` → 6 | — | **CLOSED 2026-07-28** |
 | A8 | **`robots.txt` blocks `/data/`, `/design/`, `/stats/`** — but the homepage fetches `/data/version.json` and `design/tokens.json` at runtime. Googlebot obeys robots.txt for subresources, so it renders the hardcoded fallbacks and `/stats/` is de-indexed entirely. | `public/robots.txt` vs `public/index.html:1504,1531,1776,787` | 0.25h | OPEN |
 | A9 | **Weekly-league rollover is off by one week** — and anchored to the wrong day. The cron fired Sunday 14:00 UTC and `get_current_week_info()` derived the week from `now`, so it created the week that *ends* 10 hours later. `validate_data.py` confirms: "week 2026_W29 is marked is_current but ended 2.4 days ago". 10 weeks of green checkmarks, all wrong; this is the #126 false positive, proven. Separately, the Monday→Sunday **UTC** week was two days out of phase with `pdoom1/docs/RELEASE_NOMENCLATURE.md` ("Seed — every Fri"). | `scripts/weekly-league-manager.py`, `weekly-league-reset.yml` | 0.5h | **FIXED 2026-07-28; anchor corrected 2026-07-29.** The week now runs **Friday 00:00 → Thursday 23:59:59 `Australia/Hobart`** (cron `0 14 * * 4`, resolved via `ZoneInfo` — never a fixed offset, because Hobart is +10/+11 across DST; `tzdata` pinned in `requirements.txt` since Windows ships no tz database). The run-time → week mapping is explicit (`league_week_start()`) and the old look-ahead is gone: the cron fires inside the week it opens. Pinned by `scripts/test-weekly-league-boundary.py` (93 assertions, both DST states), which runs as the **first** step of the rollover workflow so a regression fails the rollover instead of publishing a wrong week. The ten wrong weeks are kept and labelled — see `docs/LEAGUE_EPOCH_ANOMALY.md`. The epoch boundary is `public/data/ladder-epochs.json`, not a script literal. |
@@ -44,9 +44,31 @@ it is to a developer.
 | B7 | **`data/events.json` is 1.18 MB, uncompressed**, fetched on every visit to `/events/`. DreamHost won't gzip JSON without an `.htaccess` directive. | `public/events/index.html` | 0.5h | OPEN |
 | B8 | **Nav links to a raw `.md` file** (`/docs/roadmap.md`). Confirmed by measurement, not inference: `curl -I` returned `Content-Type: text/markdown`, which no browser renders, so "Roadmap" downloaded a file. All 5 `.md` routes fixed at the server on 2026-07-28 — `AddType text/plain .md` in `public/.htaccess` re-types them so they render, without touching any `.md` file or forking content into an HTML copy. **Verify after deploy:** `curl -I https://pdoom1.com/docs/roadmap.md` should say `text/plain` (Netlify previews ignore `.htaccess`, so the PR preview cannot show this). | `public/.htaccess`, `public/assets/js/navigation.js:39` | done | **DONE (floor)** |
 | B8a | **`.md` routes render as raw markdown source.** The B8 fix stops the download but a reader sees `##` and pipe tables. The proper fix is an HTML surface that renders markdown — which does **not** exist: `/blog/post.html`'s client-side parser handles links, images, inline code, bold and italic only (no headings, no tables, no fenced code), and `roadmap.md` is mostly headings and a table, so routing through it would render *worse* than plain text. Deliberately not invented; needs a real renderer or a build-time converter. Affects `/docs/DEV_NOTES.md`, `how-leaderboards-work.md`, `pdoom1-open-issues.md`, `roadmap.md`, `steam-readiness.md`. | `public/blog/post.html`, `public/docs/index.html` | 2-4h | OPEN |
-| B9 | **Duplicate DOM id on the leaderboard.** `id="cards-view"` on both a button (`:746`) and a div (`:774`); `getElementById` returns the button, so card rendering targets the wrong node. | `public/leaderboard/index.html` | 0.25h | OPEN |
+| B9 | **Duplicate DOM id on the leaderboard.** `cards-view` was on both a button (`:746`) and a div (`:774`); `getElementById` returned the button, so card rendering targeted the wrong node — and `setViewMode('table')` set `display:none` on the Cards button itself, hiding the toggle. | `public/leaderboard/index.html` | 0.25h | **FIXED** — toggles renamed `view-btn-table` / `view-btn-cards`; the containers keep their ids. Page now has zero duplicate ids. |
 | B10 | **123 markdown files in `docs/`** — five on syndication, five on analytics, five session summaries from one day. They describe the *intended* system, so every new agent rediscovers the same gaps. This is the mechanism that generates ambition debt. | `docs/` | 2-4h prune | OPEN |
-| B11 | **`deploy.yml` and `update-stats.yml` are self-declared no-ops** created by the (now deleted) `bootstrap.sh`. Both fail on every run. | their own `run:` lines | 0.1h | OPEN |
+| B11 | **`deploy.yml` and `update-stats.yml` were self-declared no-ops** created by the (now deleted) `bootstrap.sh` (`f602822f`). The "fail on every run" note was itself stale: `bootstrap.sh` emitted them with literal `\n` instead of newlines (`deploy.yml` was one unparseable line; `update-stats.yml` was empty), so both failed in 0s on every push until `7026e814` rewrote them as valid `workflow_dispatch`-only no-ops. Neither has run since **2025-09-09**. | their own `run:` lines | 0.1h | **FIXED (deleted)** — see note below |
+
+### B11 note — why these two were deleted rather than parked
+
+CLAUDE.md's workflow trap #4 says *prefer parking a broken workflow to
+`workflow_dispatch` over deleting it*. That rule protects **real work that is
+temporarily broken**. These two held none, and were already parked:
+
+- `deploy.yml`'s entire body was `echo 'Add your deploy steps here'`. It is **not**
+  the deploy. The real one is `auto-deploy-on-push.yml` ("Auto-Deploy to DreamHost
+  on Push"), with `version-aware-deploy.yml` and `deploy-dreamhost.yml` as the two
+  manual variants — the three documented in `.github/workflows/README.md`, which
+  never mentioned `deploy.yml`. A workflow literally named `deploy` sitting beside
+  them is a decoy: it is the first thing anyone hunting "the deploy" clicks, and it
+  says deploys are a no-op. (`docs/archive/IMPLEMENTATION_SUMMARY.md:281` already
+  mis-cites it as the deployment trigger, for a GitHub Pages setup this repo has
+  never used — the site is on DreamHost shared hosting.)
+- `update-stats.yml`'s body was `echo "Stats updater disabled."`. The real stats
+  updater, `scripts/calculate-game-stats.py`, is already run by
+  `auto-update-data.yml` (6-hourly) and `health-checks.yml`.
+
+Parking preserves knowledge; there was none to preserve, and `git show f602822f`
+still has both bodies. Nothing else in the repo references either file.
 
 ---
 
@@ -85,12 +107,54 @@ done (branch `feat/spike-readiness`).
 
 ## Flaky / stateful tests
 
-- **`scripts/test_ingest_scores.py`** is state-dependent: its "live" fixture
-  assertion reads the current `public/leaderboard/data/leaderboard.json`, which
-  is now legitimately `pre-launch` (0 entries) after the version restamp. So the
-  test flips PASS/FAIL depending on repo state rather than code correctness.
-  Reproduces on `main`; not a regression. Fix: make the test build its own
-  fixture in a temp dir instead of reading the live file.
+- **`scripts/test_ingest_scores.py`** — **FIXED.** It was state-dependent, but the
+  diagnosis recorded here was only half right, so both halves are worth keeping:
+
+  1. *What was actually failing.* Case 1 ran against the checked-in fixture
+     `scripts/fixtures/leaderboard/seed_leaderboard_fixture_live.json`, whose
+     `meta.game_version` was the hardcoded literal `"v0.11.0"`. `ingest_scores.py`
+     only publishes a seed as `live` when its stamp equals the **deployed** version
+     from `public/data/version.json`. The moment that advanced to `v0.13.1` the
+     fixture stopped matching, so the test reported `pre-launch`/0 entries and went
+     red — caused by a routine release, not by any code change. That is the same
+     "fallback literal" class CLAUDE.md warns about, wearing a test's clothes.
+  2. *The state dependency that had not bitten yet.* Case 2 called `ingest_scores`
+     with **no** `--input`, defaulting to the live `public/leaderboard/data/`, and
+     asserted the result was `pre-launch` with 0 entries. Verified by planting one
+     correctly-version-stamped seed there: `ingest_scores` immediately reported
+     `status=live`, 1 entry. So the first real score to land would have failed the
+     test — the leaderboard going live would have looked like a broken build.
+
+  Fix: every fixture is now built in a temp dir by the test itself. The only repo
+  read left is `version.json`, and the deployed version is *read from it and stamped
+  into the fixture*, so the test tracks releases instead of rotting against them.
+  Coverage was widened while the file was open: ADR-0002 sort **and** tiebreak,
+  test-seed-filename exclusion (plus `--include-tests`), `--include-legacy`
+  publishing as `legacy` with the producer's stamp overridden by the deployed one,
+  and the empty-input case. The now-unreferenced fixture file was deleted.
+
+## Fail-silent monitoring surfaces
+
+- **`/monitoring/` showed `integration-health.json` with no staleness rule.**
+  `updateIntegrationHealth()` printed `overall_status` in the same green treatment
+  regardless of the snapshot's age; the only clue was a raw absolute timestamp the
+  reader had to diff by eye. If `data-contract-validation.yml` ever stopped
+  running, the page would have gone on announcing "Overall: OK · 0 fail · 0 warn"
+  indefinitely. The page already had the right idiom — `HEALTH_STALE_AFTER_HOURS`
+  + a `STALE`/`CURRENT` badge, used by `updateRecentChecks()` — it just was not
+  applied here. **FIXED:** added `INTEGRATION_STALE_AFTER_HOURS = 48` (two missed
+  daily runs), a STALE banner, a spelled-out age, and dimming of the check rows.
+
+  The reason this needs a *wider* threshold than the cron interval: the workflow
+  commits the artefact as `github-actions[bot]`, and **bot commits do not trigger
+  the deploy**. So the copy the page fetches is refreshed not when the workflow
+  runs but on the next *human* push. Repo-fresh and site-fresh are different
+  things here, and only the second is what a visitor sees.
+
+  Not fixed, and worth a decision: the general form of this is that every
+  bot-committed artefact under `public/` is served at human-push cadence. A deploy
+  key / PAT or a `workflow_run` trigger (CLAUDE.md "Deploy") would close it for all
+  of them at once.
 
 ## E-0. TAGGED FOR PIP / pdoom-data uplift — do NOT delete
 
