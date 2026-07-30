@@ -1310,7 +1310,18 @@ def build():
                           "about to end, not the one about to begin."
                           if off_by_one else
                           "The week it opens is the one about to run.")),
-            "cites": [cite(LEAGUE_MANAGER, "days_since_monday = now.weekday()"),
+            # The needle was "days_since_monday = now.weekday()" until 2026-07-31. PR #187
+            # replaced Monday-anchored UTC arithmetic with a Friday/Hobart anchor and
+            # renamed the line; PR #188 added this citation pointing at a line that #187
+            # had ALREADY deleted. So --check has failed since the day it shipped, which
+            # (a) blocked every PR touching the watched paths and (b) froze
+            # public/metabolism/index.html at its pre-#187 state, leaving the page telling
+            # readers the reset day is Monday while the config says Friday.
+            #
+            # The guard behaved correctly -- it refused to build rather than publish an
+            # uncheckable claim. It was the citation that was wrong, not the mechanism.
+            "cites": [cite(LEAGUE_MANAGER,
+                           "days_since_anchor = (local.weekday() - ANCHOR_WEEKDAY) % 7"),
                       reset_cron["cite"]],
         })
 
