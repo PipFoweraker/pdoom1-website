@@ -26,7 +26,7 @@ The p(Doom)1 leaderboard system tracks player performance across different game 
 ```
 
 ### Viewing Leaderboards
-- **Website**: Visit [pdoom1-website/leaderboard/](https://yoursite.com/leaderboard/)
+- **Website**: Visit [pdoom1-website/leaderboard/](https://pdoom1.com/leaderboard/)
 - **Filtering**: Sort by score, risk level, date, research output
 - **Search**: Find specific players or game modes
 - **Real-Time**: Data updates when game exports new scores
@@ -54,7 +54,7 @@ The main competitive metric - how many turns you lasted before the game ended.
 ## Planned Features (Coming Soon)
 
 ### Weekly Leagues (Q4 2025)
-- **Reset Schedule**: New competitive seeds every Monday
+- **Reset schedule**: a new seed every **Friday**, anchored to 00:00 Australia/Hobart
 - **League Tables**: Weekly, monthly, and seasonal rankings
 - **Prize Categories**: Best newcomer, most improved, risk management expert
 
@@ -70,13 +70,11 @@ The main competitive metric - how many turns you lasted before the game ended.
 
 ## For Developers
 
-### API Endpoints
-```bash
-GET /api/leaderboards/current?limit=10    # Current top players
-GET /api/leaderboards/seed/{seed}         # Seed-specific board
-GET /api/stats                            # Overall statistics
-GET /api/health                           # System status
-```
+### API endpoints
+
+The website does not expose leaderboard API routes. An earlier version of this
+page listed `/api/leaderboards/...` endpoints; `public/api/` does not exist. See
+the note below on where scores actually live.
 
 ### Data Format
 All leaderboard data follows a standardized JSON schema with game metadata, player information, and performance metrics.
@@ -100,15 +98,23 @@ python scripts/test-integration.py --quick
 
 ## Privacy & Fair Play
 
-### Data Privacy
-- Only performance metrics are shared, not personal data
-- Players control what information appears publicly
-- Local game data remains on your machine unless explicitly shared
+### Data privacy
 
-### Anti-Cheat Measures
-- Score validation against game physics
-- Seed verification for competitive play
-- Anomaly detection for suspicious patterns
+A submitted score carries the lab name the game generated, the score, the turn
+reached, run duration and the build version. It does not carry your account,
+your email or your machine.
+
+**There is no per-player control over what appears publicly yet** -- an earlier
+version of this page said there was, which was not true. An optional operator
+name is proposed but not built (pdoom1#957). Local game data stays on your
+machine unless you submit a score.
+
+### Anti-cheat -- not built yet
+
+There is currently **no anti-cheat**. Scores are accepted unverified: the score
+API performs no validation, and a submission carries no signature or dev-mode
+flag the website could filter on. Treat the boards as a friendly scoreboard, not
+a contest with integrity guarantees. Tracked at pdoom1#1012.
 
 ### Community Guidelines
 - Respectful competition encouraged
