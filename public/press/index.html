@@ -66,42 +66,8 @@
 			z-index: 100;
 		}
 
-		nav {
-			max-width: 1200px;
-			margin: 0 auto;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 0 2rem;
-		}
-
-		.logo {
-			font-size: 1.5rem;
-			font-weight: bold;
-			color: var(--accent-primary);
-			text-decoration: none;
-			text-shadow: 0 0 10px var(--accent-primary);
-		}
-
-		.nav-links {
-			display: flex;
-			gap: 2rem;
-			list-style: none;
-		}
-
-		.nav-links a {
-			color: var(--text-secondary);
-			text-decoration: none;
-			transition: color var(--duration-base) var(--easing);
-			padding: 0.5rem 1rem;
-			border: 1px solid transparent;
-		}
-
-		.nav-links a:hover {
-			color: var(--accent-primary);
-			border-color: var(--accent-primary);
-			border-radius: var(--radius-sm);
-		}
+		/* Nav styling lives in navigation.js, scoped to
+		   header[data-nav-injected]. Do not re-add nav rules here. */
 
 		main {
 			max-width: 1200px;
@@ -298,15 +264,6 @@
 				font-size: 2rem;
 			}
 			
-			nav {
-				flex-direction: column;
-				gap: 1rem;
-			}
-			
-			.nav-links {
-				gap: 1rem;
-			}
-			
 			.factsheet {
 				grid-template-columns: 1fr;
 			}
@@ -319,17 +276,7 @@
 </head>
 <body>
 	<header>
-		<nav>
-			<a href="/" class="logo">p(Doom)1</a>
-			<ul class="nav-links">
-				<li><a href="/">Home</a></li>
-				<li><a href="/leaderboard/">Leaderboard</a></li>
-				<li><a href="/blog/">Blog</a></li>
-				<li><a href="/game-changelog/">Game Changelog</a></li>
-				<li><a href="/docs/">Docs</a></li>
-				<li><a href="/press/" aria-current="page">Press</a></li>
-			</ul>
-		</nav>
+		<!-- Navigation loaded by navigation.js -->
 	</header>
 
 	<main>
@@ -509,5 +456,6 @@
 			});
 		});
 	</script>
+	<script src="/assets/js/navigation.js"></script>
 </body>
 </html>

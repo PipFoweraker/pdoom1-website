@@ -9,6 +9,13 @@
 	const navigationHTML = `
 		<nav role="navigation" aria-label="Main navigation">
 			<div class="logo-container">
+				<!-- The site byline, same wording as the homepage's own nav
+				     (public/index.html) and the other hand-written navs that
+				     still carry it. This markup was missing while the CSS rule
+				     for it below was already here -- an accidental drop, not a
+				     decision, so the injected nav rendered without the credit
+				     that every static nav shows. -->
+				<div class="designer-credit">Pip Foweraker's</div>
 				<a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
 				<!-- Deliberately empty: updateNavVersion() fills these from
 				     /data/version.json. A hardcoded version/date here would keep

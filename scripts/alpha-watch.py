@@ -36,6 +36,7 @@ PLAUSIBLE API KEY (optional but recommended)
 import argparse
 import json
 import os
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
@@ -43,8 +44,16 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+# CLAUDE.md: cp1252 console kills the FIRST non-ASCII print before any work happens.
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 LEADERBOARD = REPO_ROOT / "public" / "leaderboard" / "data" / "leaderboard.json"
+BOARD_LIVENESS = REPO_ROOT / "public" / "leaderboard" / "data" / "board-liveness.json"
 WEEKLY = REPO_ROOT / "public" / "leaderboard" / "data" / "weekly" / "current.json"
 ANNOTATIONS = REPO_ROOT / "public" / "data" / "analytics" / "annotations.json"
 VERSION_JSON = REPO_ROOT / "public" / "data" / "version.json"
@@ -159,6 +168,39 @@ def stream_a(days):
     print()
 
 
+def _board_liveness(max_age_hours=12):
+    """The last dated observation of the live score API, refreshed if stale.
+
+    check-board-liveness.py owns talking to the API; this just consumes its record. But
+    a stale record read as current would recreate the very ambiguity this is here to
+    remove, so anything older than max_age_hours triggers a re-run. Returns None if we
+    genuinely do not know -- never a fabricated 'empty'.
+    """
+    rec = load_json(BOARD_LIVENESS)
+    fresh = False
+    if isinstance(rec, dict) and rec.get("checked_at"):
+        try:
+            ts = datetime.fromisoformat(rec["checked_at"].replace("Z", "+00:00"))
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+            fresh = (datetime.now(timezone.utc) - ts).total_seconds() < max_age_hours * 3600
+        except Exception:
+            fresh = False
+    if fresh:
+        return rec
+
+    script = REPO_ROOT / "scripts" / "check-board-liveness.py"
+    if not script.exists():
+        return rec if isinstance(rec, dict) else None
+    try:
+        # Exit code 1 means "orphaned scores found" -- a successful, informative run.
+        subprocess.run([sys.executable, str(script)], cwd=str(REPO_ROOT),
+                       capture_output=True, text=True, timeout=180)
+    except Exception as e:
+        print("  (could not refresh board liveness: %s)" % e)
+    return load_json(BOARD_LIVENESS) or (rec if isinstance(rec, dict) else None)
+
+
 # ---------------------------------------------------------------- stream B
 def stream_b():
     """Game side: are scores actually landing?"""
@@ -180,39 +222,99 @@ def stream_b():
     print("  entries       %d  (players: %s)"
           % (len(entries), meta.get("total_players")))
 
-    # The failure mode that looks exactly like "nobody is playing".
-    site_version = None
+    # The deployed BUILD, printed for context only. It is NOT part of the board key:
+    # GameConfig.get_board_version() returns "L" + LADDER_VERSION, so the client sends
+    # "L3" (pdoom1 via issue #151, 2026-07-28). This function used to compare the board's
+    # version half against version.json and shout MISMATCH -- which would have fired
+    # permanently from the next ladder bump onward, on entirely correct data.
     vj = load_json(VERSION_JSON, {})
     lr = vj.get("latest_release") if isinstance(vj, dict) else None
-    if isinstance(lr, dict):
-        site_version = lr.get("version")
-
-    board_version = meta.get("game_version")
+    site_build = lr.get("version") if isinstance(lr, dict) else None
     print()
-    if board_version and site_version and board_version != site_version:
-        print("  !! MISMATCH: board is %s but the current release is %s."
-              % (board_version, site_version))
-        print("     The board key is (seed, game_version) per pdoom1 PR #679, so a")
-        print("     %s client's scores CANNOT land on a %s board. Players would"
-              % (site_version, board_version))
-        print("     submit and see nothing, with no error. If Stream A shows")
-        print("     downloads and Stream B stays empty, suspect THIS before you")
-        print("     suspect analytics.")
-    elif board_version:
-        print("  Board version matches the current release (%s)." % board_version)
+    print("  deployed build: %s   (context only -- NOT part of the board key)"
+          % (site_build or "unknown"))
 
     wk = load_json(WEEKLY)
+    site_seed = None
     if isinstance(wk, dict):
-        wv = wk.get("game_version")
-        print("  weekly league version: %s%s"
-              % (wv, "   <-- STALE" if (wv and site_version and wv != site_version)
-                 else ""))
+        site_seed = wk.get("seed")
+        print("  weekly league seed: %s" % site_seed)
+
+    # The board KEY is (seed, ladder_epoch). Both halves matter: a seed mismatch loses
+    # scores just as completely as an epoch mismatch, and neither was ever printed here.
+    live = _board_liveness()
+    print()
+    if live is None:
+        print("  !! The live score API has NOT been checked, so nothing here is evidence")
+        print("     about whether scores exist. Everything above reads only LOCAL files,")
+        print("     and no local file has ever been fed by the API.")
+        print("     Run: python scripts/check-board-liveness.py")
+    else:
+        key = live.get("board_key") or {}
+        dep = live.get("deployed_board") or {}
+        arch = live.get("archived_orphans") or {}
+        new = live.get("new_orphans") or {}
+        verdict = live.get("verdict")
+        print("  LIVE SCORE API (checked %s)" % live.get("checked_at"))
+        print("    board key: seed=%s  ladder epoch=%s"
+              % (key.get("seed"), key.get("ladder_epoch") or "UNKNOWN"))
+        if dep:
+            print("    deployed board holds %s entries" % dep.get("entries"))
+
+        if verdict in ("orphaned-scores", "unclassifiable"):
+            n = new.get("entries_total") or 0
+            print()
+            print("  **** NEW SCORES ARE BEING LOST TO THE SITE ****")
+            print("     %d entries are on live boards that nothing here publishes, and are" % n)
+            print("     NOT in the anomaly archive. Real people finished real runs today.")
+            for b in new.get("boards") or []:
+                print("       (%s, %s): %d entries, %d player(s), %s .. %s"
+                      % (b.get("seed"), b.get("version"), b.get("entries"),
+                         b.get("players", 0), (b.get("first_entry") or "?")[:10],
+                         (b.get("last_entry") or "?")[:10]))
+            print()
+            print("     This is NOT 'nobody is playing'. Do not go looking at analytics.")
+            print("     The client's (seed, ladder_epoch) does not match the board this")
+            print("     site publishes. Never fix it by re-stamping a version.")
+        elif verdict == "epoch-unknown":
+            print()
+            print("  CANNOT CONFIRM: nothing tells this site which ladder epoch is current,")
+            print("  so it cannot say the board it publishes is the board players submit")
+            print("  to. That is an admission, not a mismatch finding.")
+        elif verdict == "unreachable":
+            print("    verdict: API UNREACHABLE -- board state is unknown, not empty.")
+        elif verdict == "genuinely-empty":
+            print("    verdict: genuinely empty. Nobody has submitted to the current board,")
+            print("             and every other populated board is already acknowledged.")
+        elif verdict == "live":
+            print("    verdict: live -- the deployed board is the one receiving scores.")
+
+        # Loud every run, but explicitly framed as settled history so it is never mistaken
+        # for a fresh incident. Pip's ruling: these stay archived permanently.
+        if (arch.get("entries_total") or 0) > 0:
+            names = arch.get("player_names") or []
+            print()
+            print("  ARCHIVED ANOMALY (acknowledged, not a regression):")
+            print("     %d entries from %d player(s): %s"
+                  % (arch["entries_total"], len(names), ", ".join(names)))
+            print("     Preserved at public/leaderboard/data/preserved/. Not a CI failure.")
 
     if not entries:
         print()
-        print("  No entries yet. Expected before launch. After you send links,")
-        print("  scores should start appearing hours later -- that lag between")
-        print("  Stream A and Stream B is the signal you are looking for.")
+        if live and ((live.get("new_orphans") or {}).get("entries_total") or 0) > 0:
+            # The old text here said "No entries yet. Expected before launch." That is a
+            # lie whenever the API holds entries, and it is exactly the sentence that
+            # would send an operator off to debug analytics instead of the board key.
+            print("  The published board shows 0 entries, but that is a PUBLISHING failure,")
+            print("  not an absence of players -- see the new orphaned boards above.")
+        elif live is None or (live.get("board_key") or {}).get("epoch_known") is False:
+            print("  The published board shows 0 entries. Whether that means anything is")
+            print("  currently unknowable -- the current ladder epoch is not published")
+            print("  anywhere this site can read.")
+        else:
+            print("  No entries yet, and the live API agrees. After you send links, scores")
+            print("  should start appearing hours later -- that lag between Stream A and")
+            print("  Stream B is the signal you are looking for.")
     print()
 
 

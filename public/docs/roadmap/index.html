@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Roadmap — p(Doom)1</title>
+	<meta name="description" content="Where p(Doom)1 is headed and how firm each part of it is — the monthly Theme rhythm, the two big milestones, and what is still only a direction.">
+	<link rel="canonical" href="https://pdoom1.com/docs/roadmap/" />
+	<!-- Plausible Analytics - Privacy-first, self-hosted -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+	<style>
+		:root{
+			--bg-primary:#12100f; --bg-secondary:#1c1917; --bg-tertiary:#262220;
+			--text-primary:#ffffff; --text-secondary:#cfc7bb; --text-muted:#a79e92;
+			--accent-primary:#f6a800; --accent-secondary:#2fd4c2;
+			--border-color:#3a342e; --radius-lg:10px;
+			--mono:ui-monospace,"SFMono-Regular",Menlo,"Courier New",monospace;
+		}
+		*{margin:0;padding:0;box-sizing:border-box}
+		html{color-scheme:dark}
+		body{
+			background:var(--bg-primary); color:var(--text-primary);
+			font-family:var(--mono); line-height:1.65;
+			-webkit-font-smoothing:antialiased;
+		}
+		main{max-width:min(860px,92vw); margin:0 auto; padding:2rem 0 4rem}
+		.crumb{font-size:.8rem; color:var(--text-muted); margin-bottom:1.2rem}
+		.crumb a{color:var(--accent-primary); text-decoration:none}
+		.crumb a:hover{text-decoration:underline}
+
+		/* Derived, never typed: filled from /data/version.json at runtime. */
+		.shipped{
+			background:var(--bg-secondary); border:1px solid var(--border-color);
+			border-radius:var(--radius-lg); padding:.9rem 1.1rem; margin-bottom:1.8rem;
+			font-size:.86rem; color:var(--text-secondary);
+		}
+		.shipped .k{font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:.25rem}
+		.shipped a{color:var(--accent-primary); text-decoration:none}
+		.shipped a:hover{text-decoration:underline}
+
+		#doc h1{font-size:clamp(1.7rem,5vw,2.4rem); margin:0 0 .9rem; letter-spacing:.01em; text-wrap:balance}
+		#doc h2{font-size:1.15rem; margin:2.2rem 0 .7rem; color:var(--accent-primary); letter-spacing:.02em}
+		#doc h3{font-size:1rem; margin:1.4rem 0 .5rem; color:var(--accent-secondary)}
+		#doc p{margin:.75rem 0; color:var(--text-secondary); text-wrap:pretty}
+		#doc ul,#doc ol{margin:.75rem 0 .75rem 1.4rem; color:var(--text-secondary)}
+		#doc li{margin:.4rem 0}
+		#doc strong{color:var(--text-primary)}
+		#doc em{color:var(--text-muted); font-style:italic}
+		#doc code{background:var(--bg-tertiary); padding:.1rem .35rem; border-radius:4px; font-size:.9em}
+		#doc a{color:var(--accent-primary); text-decoration:none}
+		#doc a:hover{text-decoration:underline}
+
+		/* Wide tables must scroll inside their own box, never the page body. */
+		.tablewrap{overflow-x:auto; margin:1.1rem 0; border:1px solid var(--border-color); border-radius:var(--radius-lg)}
+		#doc table{border-collapse:collapse; width:100%; min-width:640px; font-size:.83rem}
+		#doc th,#doc td{padding:.6rem .8rem; text-align:left; vertical-align:top; border-bottom:1px solid var(--border-color)}
+		#doc th{background:var(--bg-tertiary); color:var(--text-primary); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap}
+		#doc td{color:var(--text-secondary)}
+		#doc tr:last-child td{border-bottom:0}
+
+		.fallback{background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-lg); padding:1.2rem}
+		.fallback a{color:var(--accent-primary)}
+		.src{margin-top:2.5rem; padding-top:1.2rem; border-top:1px solid var(--border-color); font-size:.78rem; color:var(--text-muted)}
+		.src a{color:var(--accent-primary); text-decoration:none}
+	</style>
+</head>
+<body>
+	<!-- navigation.js injects the shared header here (see CLAUDE.md). -->
+	<header></header>
+
+	<main role="main" id="main-content">
+		<p class="crumb"><a href="/">Home</a> / <a href="/docs/">Docs</a> / Roadmap</p>
+
+		<div class="shipped" id="shipped" hidden>
+			<span class="k">Currently shipped</span>
+			<span id="shipped-body"></span>
+		</div>
+
+		<div id="doc">
+			<div class="fallback" id="loading">Loading the roadmap&hellip;</div>
+		</div>
+
+		<p class="src">
+			This page renders <a href="/docs/roadmap.md">/docs/roadmap.md</a> directly &mdash; it holds no
+			copy of its own, so the two cannot drift apart. That file is itself a projection of the game
+			repo's <a href="https://github.com/PipFoweraker/pdoom1/blob/main/docs/ROADMAP.md">ROADMAP.md</a>,
+			which is the source of truth.
+		</p>
+	</main>
+
+	<script>
+	(function () {
+		'use strict';
+
+		function esc(s) {
+			return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		}
+
+		// Inline spans, applied AFTER escaping so the source can never inject markup.
+		function inline(s) {
+			return esc(s)
+				.replace(/`([^`]+)`/g, '<code>$1</code>')
+				.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, text, href) {
+					// Same-origin or http(s) only; anything else renders as plain text.
+					if (!/^(https?:\/\/|\/|#)/.test(href)) { return m; }
+					var ext = /^https?:\/\//.test(href) ? ' target="_blank" rel="noopener"' : '';
+					return '<a href="' + href + '"' + ext + '>' + text + '</a>';
+				})
+				.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+				.replace(/\*([^*]+)\*/g, '<em>$1</em>')
+				// The markdown keeps ASCII "--" (repo convention); a reader should see
+				// a dash, not a typo. Presentation only -- the wording is untouched.
+				.replace(/(^|\s)--(\s|$)/g, '$1&mdash;$2');
+		}
+
+		function cells(row) {
+			return row.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(function (c) {
+				return c.trim();
+			});
+		}
+
+		// Deliberately a SUBSET: headings, paragraphs, lists, tables, and the inline
+		// spans above. That is everything roadmap.md uses. Anything else would render
+		// as literal text, which is visible and therefore fixable -- unlike silence.
+		function render(md) {
+			var lines = md.replace(/\r\n/g, '\n').split('\n');
+			var out = [];
+			var i = 0;
+
+			while (i < lines.length) {
+				var line = lines[i];
+
+				if (!line.trim()) { i++; continue; }
+
+				var h = /^(#{1,3})\s+(.*)$/.exec(line);
+				if (h) {
+					var lvl = h[1].length;
+					out.push('<h' + lvl + '>' + inline(h[2]) + '</h' + lvl + '>');
+					i++;
+					continue;
+				}
+
+				// Table: a header row followed by a |---|---| separator.
+				if (/^\s*\|/.test(line) && i + 1 < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
+					var head = cells(line);
+					i += 2;
+					var body = [];
+					while (i < lines.length && /^\s*\|/.test(lines[i])) {
+						body.push(cells(lines[i]));
+						i++;
+					}
+					var t = '<div class="tablewrap"><table><thead><tr>';
+					head.forEach(function (c) { t += '<th>' + inline(c) + '</th>'; });
+					t += '</tr></thead><tbody>';
+					body.forEach(function (r) {
+						t += '<tr>';
+						r.forEach(function (c) { t += '<td>' + inline(c) + '</td>'; });
+						t += '</tr>';
+					});
+					out.push(t + '</tbody></table></div>');
+					continue;
+				}
+
+				// Lists. A continuation line is any indented, non-blank, non-marker line.
+				var ulm = /^[-*]\s+/, olm = /^\d+\.\s+/;
+				if (ulm.test(line) || olm.test(line)) {
+					var ordered = olm.test(line);
+					var marker = ordered ? olm : ulm;
+					var items = [];
+					while (i < lines.length && lines[i].trim() && (marker.test(lines[i]) || /^\s+\S/.test(lines[i]))) {
+						if (marker.test(lines[i])) {
+							items.push(lines[i].replace(marker, ''));
+						} else if (items.length) {
+							items[items.length - 1] += ' ' + lines[i].trim();
+						}
+						i++;
+					}
+					var tag = ordered ? 'ol' : 'ul';
+					out.push('<' + tag + '>' + items.map(function (it) {
+						return '<li>' + inline(it) + '</li>';
+					}).join('') + '</' + tag + '>');
+					continue;
+				}
+
+				// Paragraph: run to the next blank line or block marker.
+				var para = [];
+				while (i < lines.length && lines[i].trim() &&
+				       !/^(#{1,3})\s/.test(lines[i]) && !/^\s*\|/.test(lines[i]) &&
+				       !ulm.test(lines[i]) && !olm.test(lines[i])) {
+					para.push(lines[i].trim());
+					i++;
+				}
+				if (para.length) { out.push('<p>' + inline(para.join(' ')) + '</p>'); }
+			}
+
+			return out.join('\n');
+		}
+
+		// Expose for the node test; harmless in the browser.
+		if (typeof module !== 'undefined' && module.exports) { module.exports = { render: render }; }
+
+		if (typeof document === 'undefined') { return; }
+
+		fetch('/docs/roadmap.md', { cache: 'no-cache' })
+			.then(function (r) {
+				if (!r.ok) { throw new Error('HTTP ' + r.status); }
+				return r.text();
+			})
+			.then(function (md) {
+				document.getElementById('doc').innerHTML = render(md);
+			})
+			.catch(function () {
+				// Fail loudly and usefully rather than showing a stale or invented roadmap.
+				document.getElementById('doc').innerHTML =
+					'<div class="fallback"><p>The roadmap could not be loaded just now. ' +
+					'It is readable at <a href="/docs/roadmap.md">/docs/roadmap.md</a>, and the ' +
+					'source of truth is the game repo\'s ' +
+					'<a href="https://github.com/PipFoweraker/pdoom1/blob/main/docs/ROADMAP.md" target="_blank" rel="noopener">ROADMAP.md</a>.</p></div>';
+			});
+
+		// The shipped version is DERIVED, never typed into this page. If the lookup
+		// fails the strip stays hidden -- no fallback literal to go stale.
+		fetch('/data/version.json', { cache: 'no-cache' })
+			.then(function (r) { return r.ok ? r.json() : null; })
+			.then(function (data) {
+				var rel = data && data.latest_release;
+				if (!rel || !rel.version) { return; }
+				var url = rel.html_url || 'https://github.com/PipFoweraker/pdoom1/releases/latest';
+				var body = document.getElementById('shipped-body');
+				var a = document.createElement('a');
+				a.href = url;
+				a.target = '_blank';
+				a.rel = 'noopener';
+				a.textContent = rel.version;
+				body.appendChild(a);
+				body.appendChild(document.createTextNode(' — free, and downloadable from the '));
+				var home = document.createElement('a');
+				home.href = '/';
+				home.textContent = 'home page';
+				body.appendChild(home);
+				body.appendChild(document.createTextNode('.'));
+				document.getElementById('shipped').hidden = false;
+			})
+			.catch(function () { /* strip stays hidden */ });
+	})();
+	</script>
+
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

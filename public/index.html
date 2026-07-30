@@ -910,11 +910,25 @@ t	.hero {
 			<!-- Shown by resolveDownloads() only when a macOS build actually resolved.
 			     An unsigned/un-notarised Godot .app is refused by Gatekeeper on first
 			     open with "the developer cannot be verified", which reads as a broken
-			     download; most testers bounce silently rather than report it. -->
+			     download; most testers bounce silently rather than report it.
+
+			     CORRECTED 2026-07-29. This note used to say "right-click and choose
+			     Open". Apple REMOVED that bypass in macOS Sequoia (15.x): on current
+			     macOS the context menu offers only Cancel / Move to Trash, so the old
+			     instruction failed in exactly the way it was written to prevent. It
+			     cost us a real playtest -- the first backer of the Manifund round
+			     followed it on 15.5, hit the dead end, and gave up. Verify against
+			     Apple's developer note before editing again; do not restore the
+			     Control-click wording as the primary path.
+			     The real fix is notarisation (Apple Developer Program), which is a
+			     budget line, not a copy change. -->
 			<p id="macos-gatekeeper-note" style="display: none; text-align: center; margin: 0 auto 0.6rem; max-width: 46rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
 				<strong>On macOS:</strong> the first launch is blocked because the build isn't
-				Apple-notarised yet. Right-click (or Control-click) the app and choose
-				<strong>Open</strong>, then confirm — you only need to do this once.
+				Apple-notarised yet. On macOS&nbsp;15 (Sequoia) and later, open
+				<strong>System&nbsp;Settings → Privacy&nbsp;&amp;&nbsp;Security</strong>, scroll to
+				<strong>Security</strong>, and choose <strong>Open&nbsp;Anyway</strong> — you may need your
+				admin password. On macOS&nbsp;14 and earlier, right-click (or Control-click) the app
+				and choose <strong>Open</strong>. Either way you only need to do it once.
 			</p>
 
 			<div style="text-align: center; margin-bottom: 0.8rem;">
@@ -1168,16 +1182,16 @@ t	.hero {
 
 		<section class="section" id="roadmap">
 			<h2>Roadmap</h2>
-			<p style="margin-bottom: 0.6rem;">High-level milestones for the website and game. <a href="/docs/roadmap.md" style="color: var(--accent-primary);">View full roadmap →</a></p>
+			<p style="margin-bottom: 0.6rem;">High-level milestones for the website and game. <a href="/docs/roadmap/" style="color: var(--accent-primary);">View full roadmap →</a></p>
 			<div class="grid">
-				<a href="/docs/roadmap.md" class="card roadmap-card" style="text-decoration: none; color: inherit;">
+				<a href="/docs/roadmap/" class="card roadmap-card" style="text-decoration: none; color: inherit;">
 					<h3>Short term (weeks) 📅</h3>
 					<ul style="margin: 0.8rem 0; padding-left: 1.2rem;">
 						<li>Regular feature updates</li>
 						<li>Social media automation</li>
 					</ul>
 				</a>
-				<a href="/docs/roadmap.md" class="card roadmap-card" style="text-decoration: none; color: inherit;">
+				<a href="/docs/roadmap/" class="card roadmap-card" style="text-decoration: none; color: inherit;">
 					<h3>Mid term (months) 🚀</h3>
 					<ul style="margin: 0.8rem 0; padding-left: 1.2rem;">
 						<li>Steam &mdash; eventually, no date</li>
