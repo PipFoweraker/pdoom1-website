@@ -21,9 +21,7 @@ const path = require('path');
 const PAGE = path.join(__dirname, '..', 'public', 'leaderboard', 'index.html');
 // CRLF -> LF first: core.autocrlf=true on Windows, and the extractors below anchor on
 // newlines. test-board-escaping.js died at extraction for exactly this reason.
-const src = fs.readFileSync(PAGE, 'utf8').replace(/
-/g, '
-');
+const src = fs.readFileSync(PAGE, 'utf8').split('\r\n').join('\n');
 
 let failures = 0;
 const check = (cond, msg) => {
