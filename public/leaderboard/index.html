@@ -535,6 +535,38 @@
       font-size: 0.8rem;
     }
 
+    /* The lab name, shown beside the human name once the game emits both.
+       Deliberately quieter than the name: the person is the subject, the lab is
+       the run's flavour. Renders nothing at all when there is only one field. */
+    .identity-lab {
+      color: var(--text-muted);
+      font-weight: normal;
+      font-size: 0.85em;
+    }
+
+    .identity-lab::before {
+      content: "\2014\00a0";
+    }
+
+    /* Dev-build marker. Amber-on-dark like the rest of the palette, but bordered
+       rather than filled so it reads as a caveat on the row, not a decoration.
+       Never rendered unless the entry says so -- see isDevBuild(). */
+    .dev-badge {
+      display: inline-block;
+      margin-left: 0.4rem;
+      padding: 0 0.35rem;
+      border: 1px solid var(--accent-primary);
+      border-radius: var(--radius-sm);
+      color: var(--accent-primary);
+      background: transparent;
+      font-size: 0.7rem;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+      white-space: nowrap;
+      cursor: help;
+    }
+
     .score {
       font-weight: bold;
       color: var(--success-color);
@@ -857,6 +889,71 @@
     // dated result, so the page reports an observation rather than depending on a third
     // party being up. Every branch degrades to "we cannot tell", never to "there is nothing".
     // ------------------------------------------------------------------------
+    // ESCAPING -- MANDATORY for every board field reaching innerHTML.
+    //
+    // Every field below arrives from https://api.pdoom1.com/score_api.php, which is an
+    // UNAUTHENTICATED flat-file API: anyone can POST an entry with any string in it. Until
+    // 2026-07-30 `player_name` and `game_mode` were interpolated raw into three separate
+    // innerHTML templates (row, card, profile modal), so a single crafted POST executed
+    // script for every visitor to /leaderboard/. It had not fired only because the shipped
+    // client generates lab names from a fixed table -- which stops the client, not an
+    // attacker with curl.
+    //
+    // Numbers are escaped too. `entry.score` and `entry.level_reached` were interpolated
+    // without the `|| 0` coercion the money/staff fields happen to get, so a POST supplying
+    // a string for either landed in innerHTML unaltered. Escaping every value closes the
+    // class instead of the two instances -- do not "optimise" a field back out of escapeHTML().
+    //
+    // Escaping is done by escapeHTML() (declared below, hoisted). There is deliberately
+    // ONE escaper on this page -- a second one would drift from the first, and the two of
+    // them disagreeing about a single character is how this class of bug comes back.
+    //
+    // scripts/test-board-escaping.js asserts a payload of known sinks renders inert.
+
+    // IDENTITY -- the v1 payload has exactly ONE identity slot, `player_name`, and the
+    // shipped client puts the LAB name in it ("Applied AI Safety"). Pip wants the human
+    // name shown alongside the lab, because his own scores get beaten quickly and an
+    // anonymous lab name does not tell a visitor whose run it was.
+    //
+    // The website cannot split one string into two truths, so this reads an OPTIONAL
+    // second field and renders the pair only when the game actually emits it. Nothing is
+    // invented and nothing is claimed: with no `lab_name`, the display is exactly what it
+    // was. When pdoom1 starts sending one (pdoom1 issue lodged 2026-07-30), the board
+    // lights up with no website change and no deploy race against a release.
+    //
+    // Accepts either shape so whichever the game picks works: {player_name, lab_name}
+    // (preferred -- name in the existing slot, lab in the new one) or {player_handle}
+    // added alongside a `player_name` that keeps holding the lab.
+    const identityHTML = (entry) => {
+      const primary = entry.player_handle || entry.player_name;
+      const secondary = entry.player_handle ? entry.player_name : entry.lab_name;
+      if (!secondary || secondary === primary) return escapeHTML(primary);
+      return `${escapeHTML(primary)} <span class="identity-lab">${escapeHTML(secondary)}</span>`;
+    };
+
+    // DEV-BUILD MARKER -- a score set with dev mode on is not comparable to one set
+    // without it, and only the game knows which happened. The website therefore cannot
+    // derive this; it can only render what it is told.
+    //
+    // Two carriers are honoured, so the game can pick the cheap one or the clean one:
+    //   - a boolean/truthy `dev_mode` field (clean), or
+    //   - a dev marker inside the existing `game_mode` string, e.g. "v0.13.2-dev"
+    //     (ships without a schema change -- `game_mode` is already free-form and already
+    //     carries the build version despite its name).
+    // Absent both, NOTHING renders. An unmarked entry is never labelled clean, because
+    // absence of a marker is not evidence of absence -- every entry predating the marker
+    // is unmarked too. See docs/LEAGUE_EPOCH_ANOMALY.md.
+    // No \b after the word: "v0.13.2-development" is as much a dev build as "-dev", and a
+    // word boundary silently excluded it. Anchored to a separator so a release version can
+    // never trip it -- the false positive to avoid is labelling a real player's run as dev.
+    const DEV_MARKER = /(^|[-+_.\s])(dev|debug|cheat)/i;
+    const isDevBuild = (entry) =>
+      entry.dev_mode === true || entry.dev_mode === 'true' || entry.dev_mode === 1 ||
+      DEV_MARKER.test(String(entry.game_mode || ''));
+    const devBadgeHTML = (entry) => isDevBuild(entry)
+      ? ` <span class="dev-badge" title="Set on a development build. Dev builds can enable debug tooling, so this score is not comparable to a release-build score.">DEV BUILD</span>`
+      : '';
+
     async function applyBoardHonesty(data) {
       const banner = document.getElementById('data-status-banner');
       if (!banner) return;
@@ -1047,15 +1144,15 @@
           <td>
             <div class="player-info">
               <div>
-                <div class="player-name" style="cursor: pointer; color: var(--accent-primary); text-decoration: underline;" onclick="showPlayerProfile(currentDisplayData[${index}])">${entry.player_name}</div>
-                <div class="player-id" style="color: var(--text-secondary); font-size: 0.8rem;">${entry.game_mode}</div>
+                <div class="player-name" style="cursor: pointer; color: var(--accent-primary); text-decoration: underline;" onclick="showPlayerProfile(currentDisplayData[${index}])">${identityHTML(entry)}</div>
+                <div class="player-id" style="color: var(--text-secondary); font-size: 0.8rem;">${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)}</div>
               </div>
             </div>
           </td>
-          <td class="score">${entry.score}</td>
+          <td class="score">${escapeHTML(entry.score)}</td>
           <td>
             <div style="font-size: 0.9rem;">
-              <div><strong>Turn ${entry.level_reached}</strong> in ${durationText}</div>
+              <div><strong>Turn ${escapeHTML(entry.level_reached)}</strong> in ${durationText}</div>
               <div class="outcome ${riskClass}" style="margin-top: 0.25rem;">
                 Doom: ${doomPercent.toFixed(1)}% | Rep: ${(entry.final_reputation || 0).toFixed(1)}
               </div>
@@ -1067,7 +1164,7 @@
               <div><strong>Bootstrap Economics</strong></div>
               <div>Compute: ${(entry.final_compute || 0).toLocaleString()}</div>
               <div style="margin-top: 0.25rem; color: var(--text-secondary);">
-                Economic Model: ${entry.game_mode}
+                Economic Model: ${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)}
               </div>
             </div>
           </td>
@@ -1140,10 +1237,11 @@
       
       // Apply search filter
       if (searchTerm) {
-        filtered = filtered.filter(entry => 
-          entry.player_name.toLowerCase().includes(searchTerm) ||
-          entry.game_mode.toLowerCase().includes(searchTerm)
-        );
+        // Every field is coerced: an entry that omits one (the API is unauthenticated and
+        // validates nothing) used to throw here and take the entire filter down with it.
+        const hay = (e) => [e.player_name, e.player_handle, e.lab_name, e.game_mode]
+          .filter(Boolean).join(' ').toLowerCase();
+        filtered = filtered.filter(entry => hay(entry).includes(searchTerm));
       }
       
       // Apply risk level filter
@@ -1257,18 +1355,18 @@
           </div>
           
           <div class="player-name" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; cursor: pointer; color: var(--accent-primary);" onclick="showPlayerProfile(currentDisplayData[${index}])">
-            ${entry.player_name}
+            ${identityHTML(entry)}
           </div>
-          
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
-            <div><strong>Score:</strong> ${entry.score}</div>
+            <div><strong>Score:</strong> ${escapeHTML(entry.score)}</div>
             <div><strong>Money:</strong> $${(entry.final_money || 0).toLocaleString()}</div>
             <div><strong>Staff:</strong> ${entry.final_staff || 0}</div>
             <div><strong>Papers:</strong> ${entry.research_papers_published || 0}</div>
           </div>
           
           <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
-            ${entry.game_mode} • ${new Date(entry.date).toLocaleDateString()}
+            ${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)} • ${escapeHTML(new Date(entry.date).toLocaleDateString())}
           </div>
         `;
         
@@ -1282,7 +1380,10 @@
       const modalName = document.getElementById('modal-player-name');
       const modalBody = document.getElementById('modal-body');
       
-      modalName.textContent = entry.player_name;
+      // textContent, so escaping is not needed here -- but the lab still has to show.
+      modalName.textContent = entry.player_handle
+        ? `${entry.player_handle} — ${entry.player_name}`
+        : (entry.lab_name ? `${entry.player_name} — ${entry.lab_name}` : entry.player_name);
       
       const durationMinutes = Math.floor(entry.duration_seconds / 60);
       const durationHours = Math.floor(durationMinutes / 60);
@@ -1295,8 +1396,8 @@
         <div class="profile-section">
           <h4>Game Performance</h4>
           <div class="profile-grid">
-            <div class="profile-item"><span>Score:</span> <strong>${entry.score}</strong></div>
-            <div class="profile-item"><span>Level Reached:</span> <strong>Turn ${entry.level_reached}</strong></div>
+            <div class="profile-item"><span>Score:</span> <strong>${escapeHTML(entry.score)}</strong></div>
+            <div class="profile-item"><span>Level Reached:</span> <strong>Turn ${escapeHTML(entry.level_reached)}</strong></div>
             <div class="profile-item"><span>Game Duration:</span> <strong>${durationText}</strong></div>
             <div class="profile-item"><span>Final Doom:</span> <strong>${entry.final_doom.toFixed(1)}%</strong></div>
           </div>
@@ -1323,7 +1424,7 @@
         <div class="profile-section">
           <h4>Game Details</h4>
           <div class="profile-grid">
-            <div class="profile-item"><span>Economic Model:</span> <strong>${entry.game_mode}</strong></div>
+            <div class="profile-item"><span>Economic Model:</span> <strong>${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)}</strong></div>
             <div class="profile-item"><span>Date Played:</span> <strong>${new Date(entry.date).toLocaleDateString()}</strong></div>
             <div class="profile-item"><span>Entry UUID:</span> <strong style="font-family: monospace; font-size: 0.8rem;">${entry.entry_uuid}</strong></div>
           </div>

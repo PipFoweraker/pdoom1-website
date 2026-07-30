@@ -268,7 +268,14 @@ def check_published_board():
         add("board:present", FAIL, f"leaderboard.json is not valid JSON: {e}")
         return
 
-    board_ver = (d.get("meta") or {}).get("game_version")
+    # The board key's version half, however the writer recorded it. publish-live-board.py
+    # records it as meta.board_key.ladder_epoch, which says what the value IS; older
+    # snapshots from ingest_scores.py put it in meta.game_version, a field name that
+    # predates the build-vs-ladder split and now misdescribes its own contents. Prefer the
+    # explicit one and fall back, rather than teaching the new writer to use the wrong name.
+    _meta = d.get("meta") or {}
+    board_ver = ((_meta.get("board_key") or {}).get("ladder_epoch")
+                 or _meta.get("game_version"))
     n_entries = len(d.get("entries") or [])
     status = d.get("data_status")
 

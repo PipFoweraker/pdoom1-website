@@ -87,18 +87,54 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Commit the observation
+      # Publishing is deliberately part of THIS workflow rather than a second one. The
+      # probe already fetched and classified every board; a separate publisher would
+      # re-derive the same board key from the same API minutes later and could reach a
+      # different answer, which is precisely the split-brain the board key cannot afford.
+      #
+      # It runs even when the probe found new orphans -- publishing is how an orphan STOPS
+      # being one. The failure gate below still fires on the probe's verdict, so a genuine
+      # loss is still red; it just gets fixed in the same run that reports it.
+      - name: Publish the live board
+        id: publish
+        run: |
+          set +e
+          python scripts/publish-live-board.py | tee publish.log
+          code=$?
+          set -e
+          echo "publish exit code: $code"
+          # 0 published / 1 nothing publishable / 2 epoch unknown / 3 fetch failed.
+          # None of these are failures HERE: 2 and 3 mean the script correctly refused to
+          # write rather than guessing, and it leaves the last known-good file untouched.
+          # A refusal to publish is the safe outcome, so it must not go red and train
+          # anyone to ignore this job.
+          {
+            echo "## Board publish"
+            echo ""
+            echo '```'
+            cat publish.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::No artifact says which ladder epoch is current, so the board was NOT published. Populate current_ladder_epoch in public/leaderboard/data/board-probe-targets.json."
+          elif [ "$code" -eq 3 ]; then
+            echo "::warning::The score API could not be read. The previously published board is untouched -- not overwritten with an empty one."
+          fi
+
+      - name: Commit the observation and the published board
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action [Board Liveness]"
-          # Stage BEFORE testing: board-liveness.json is untracked on its first run and
-          # `git diff` cannot see untracked files (CLAUDE.md workflow trap #1).
-          git add public/leaderboard/data/board-liveness.json
+          # Stage BEFORE testing: these are untracked on their first run and `git diff`
+          # cannot see untracked files (CLAUDE.md workflow trap #1).
+          git add public/leaderboard/data/board-liveness.json \
+                  public/leaderboard/data/leaderboard.json \
+                  public/leaderboard/data/published-board.json
           if git diff --cached --quiet; then
-            echo "No change in board liveness since the last run."
+            echo "No change in board state since the last run."
             exit 0
           fi
-          git commit -m "chore(board): record live score-API observation"
+          git commit -m "chore(board): record live score-API observation and publish the live board"
           git push
 
       # Only NEW loss is red. `epoch-unknown` and `unreachable` are genuine unknowns and

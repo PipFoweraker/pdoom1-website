@@ -9,6 +9,17 @@ on:
       - 'scripts/generate-sitemap.js'
       - '.github/workflows/auto-deploy-on-push.yml'
 
+  # A push made by a workflow using the default GITHUB_TOKEN does NOT trigger another
+  # workflow (CLAUDE.md, "Bot commits do not trigger deploys"). Board Liveness commits the
+  # live leaderboard under public/, so without this trigger the board would reach the repo
+  # and never reach pdoom1.com -- during a league, that means a board frozen at whatever a
+  # human last pushed while players watch it not update. This closes that gap for the one
+  # workflow that publishes reader-facing DATA on a schedule.
+  workflow_run:
+    workflows: ["Board liveness (score API)"]
+    types: [completed]
+    branches: [main]
+
 permissions:
   contents: read
 
@@ -23,7 +34,7 @@ jobs:
         # deploy 2026-07-26). Read it via env and echo as DATA. (github.sha is hex and
         # github.actor is a constrained username, so those stay inline.)
         env:
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          COMMIT_MSG: ${{ github.event.head_commit.message || format('scheduled board publish (via {0})', github.event_name) }}
         run: |
           echo "🚀 AUTO-DEPLOYMENT TRIGGERED 🚀"
           echo "Triggered by push to main branch"
