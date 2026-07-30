@@ -1,9 +1,11 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-30T07:09:28.563Z UTC
+Generated: 2026-07-30T12:50:25.583Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1046 | Main-screen warnings: tell players the ladder can fork BEFORE they play (draft copy inside) |  |  | 2026-07-30 12:11:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1046) |
+| 1044 | design(tempo): actions resolve instantly, so the early game has no rhythm -- time, sequencing, and the queue's promise | game-mechanics |  | 2026-07-30 08:49:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1044) |
 | 1043 | ui(layout): the Plan screen wastes its middle and scatters its text -- legibility-first layout brief | ui-ux |  | 2026-07-30 06:59:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1043) |
 | 1042 | Score payload: emit player name AND lab name, plus a dev-mode-used flag (website side is built) |  |  | 2026-07-30 02:55:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1042) |
 | 1041 | playtest 2026-07-30 (v0.13.2 artifact): UI/UX findings from the Gate 4 run | ui-ux |  | 2026-07-30 02:43:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/1041) |
