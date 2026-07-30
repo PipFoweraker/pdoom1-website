@@ -949,7 +949,7 @@ t	.hero {
 
 			<!-- Top Row: Key Game Stats -->
 			<div class="stats" role="complementary" aria-label="Game statistics" style="padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1rem;">
-				<a href="/game-stats/" class="stat-link" role="img" aria-label="This week's baseline doom percentage" style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 0.4rem; text-align: center;">
+				<a href="/game-stats/" class="stat-link" role="img" aria-label="Baseline doom percentage — not yet measured" style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 0.4rem; text-align: center;">
 					<div class="stat">
 						<span class="stat-number loading-number" aria-hidden="true" style="font-size: 2rem; color: var(--accent-primary);">--</span>
 						<span class="stat-label" style="font-size: 0.9rem; color: var(--text-muted);">Baseline Doom</span>
@@ -1543,16 +1543,25 @@ t	.hero {
 				// Update stats with real data
 				const stats = document.querySelectorAll('.stat');
 				if (stats.length >= 3) {
-					// Update baseline doom with stubbed value
-					stats[0].querySelector('.stat-number').textContent = `${versionData.game_stats.baseline_doom_percent}%`;
-					
-					// Update frontier labs count  
-					stats[1].querySelector('.stat-number').textContent = versionData.game_stats.frontier_labs_count;
-					
-					// Update strategic possibilities
-					const possibilities = versionData.game_stats.strategic_possibilities;
-					const formattedPossibilities = possibilities >= 1000 ? `${(possibilities/1000).toFixed(0)}k+` : possibilities;
-					stats[2].querySelector('.stat-number').textContent = formattedPossibilities;
+					// null means NOBODY HAS MEASURED THIS. Render an em dash, never a
+					// number and never 0 -- "0%" under "Baseline Doom" would be a
+					// measurement, and a false one. Two of these three shipped as the
+					// literals 23 and 10000 for months, labelled as if measured.
+					const gs = versionData.game_stats || {};
+					const setStat = (i, value, format) => {
+						const el = stats[i] && stats[i].querySelector('.stat-number');
+						if (!el) return;
+						if (value === null || value === undefined) {
+							el.textContent = '—';
+							el.title = 'Not yet measured';
+							return;
+						}
+						el.textContent = format ? format(value) : value;
+					};
+					setStat(0, gs.baseline_doom_percent, v => `${v}%`);
+					setStat(1, gs.frontier_labs_count);
+					setStat(2, gs.strategic_possibilities,
+					        v => v >= 1000 ? `${(v/1000).toFixed(0)}k+` : String(v));
 				}
 				
 				// Update version info in download buttons if needed

@@ -144,7 +144,21 @@
                 font-size: 2.5rem;
             }
         }
-    </style>
+    
+    /* A stat nobody has measured. Muted and non-numeric on purpose: it must not read
+       as a value, and it must not read as zero. See scripts/calculate-game-stats.py. */
+    .stat-unmeasured {
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+
+    .stat-pending-note {
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+</style>
 </head>
 <body>
     <header>
@@ -157,9 +171,9 @@
         <div class="stats-grid" id="stats-grid">
             <!-- Stats will be loaded dynamically -->
             <div class="stat-card">
-                <span class="stat-number" id="baseline-doom">23%</span>
+                <span class="stat-number stat-unmeasured" id="baseline-doom" data-stat="baseline_doom_percent">—</span>
                 <div class="stat-label">Baseline Doom</div>
-                <div class="stat-description">Placeholder, honestly &mdash; pinned at 23% until the real calculation exists (methodology below).</div>
+                <div class="stat-description">Not yet measured. Baseline doom is a property of the simulation, so only the game can measure it &mdash; until it emits that number, this stays blank rather than showing a made-up one. It read &ldquo;23%&rdquo; for months; nobody had measured it.</div>
             </div>
             
             <div class="stat-card">
@@ -169,9 +183,9 @@
             </div>
             
             <div class="stat-card">
-                <span class="stat-number" id="strategic-possibilities">10k+</span>
+                <span class="stat-number stat-unmeasured" id="strategic-possibilities" data-stat="strategic_possibilities">—</span>
                 <div class="stat-label">Strategic Possibilities</div>
-                <div class="stat-description">Calculated potential strategic combinations and decision paths available in the game</div>
+                <div class="stat-description">Not yet measured. This would be a real count derived from the shipped action and upgrade content, which lives in the game repo. It read &ldquo;10k+&rdquo; for months; that number was invented.</div>
             </div>
             
             <div class="stat-card">
@@ -233,12 +247,34 @@
                 
                 // Update stats with live data
                 if (data.game_stats) {
-                    document.getElementById('baseline-doom').textContent = `${data.game_stats.baseline_doom_percent}%`;
-                    document.getElementById('frontier-labs').textContent = data.game_stats.frontier_labs_count;
-                    
-                    const possibilities = data.game_stats.strategic_possibilities;
-                    const formattedPossibilities = possibilities >= 1000 ? `${(possibilities/1000).toFixed(0)}k+` : possibilities;
-                    document.getElementById('strategic-possibilities').textContent = formattedPossibilities;
+                    // A null value means NOBODY HAS MEASURED THIS. It renders as an em
+                    // dash with an explanation, never as a number and never as 0 --
+                    // "0%" would be a measurement, and a wrong one. A stat with no measurement behind it renders as an em dash, never as a number. See scripts/calculate-game-stats.py and issue #177.
+                    const pending = (data.game_stats.pending) || {};
+                    const showStat = (id, value, format) => {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        if (value === null || value === undefined) {
+                            el.textContent = '—';
+                            el.classList.add('stat-unmeasured');
+                            const why = pending[el.dataset.stat || id];
+                            if (why && why.status) el.title = why.status + ' — ' + (why.needs || '');
+                            const card = el.closest('.stat-card');
+                            const desc = card && card.querySelector('.stat-description');
+                            if (desc && !card.querySelector('.stat-pending-note')) {
+                                const n = document.createElement('div');
+                                n.className = 'stat-pending-note';
+                                n.textContent = 'Not yet measured.';
+                                desc.appendChild(n);
+                            }
+                            return;
+                        }
+                        el.textContent = format ? format(value) : value;
+                    };
+                    showStat('baseline-doom', data.game_stats.baseline_doom_percent, v => `${v}%`);
+                    showStat('frontier-labs', data.game_stats.frontier_labs_count);
+                    showStat('strategic-possibilities', data.game_stats.strategic_possibilities,
+                             v => v >= 1000 ? `${(v/1000).toFixed(0)}k+` : String(v));
                 }
                 
                 // Update repository stats

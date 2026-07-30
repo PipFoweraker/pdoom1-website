@@ -27,7 +27,19 @@ const fs = require('fs');
 const path = require('path');
 
 const PAGE = path.join(__dirname, '..', 'public', 'leaderboard', 'index.html');
-const src = fs.readFileSync(PAGE, 'utf8');
+
+// Normalise CRLF -> LF before anything looks at this.
+//
+// `core.autocrlf=true` on Windows, so a fresh checkout writes CRLF into the working tree.
+// Several extractors below anchor on `;\n` or `\n    }`; under CRLF the byte after `;` is
+// `\r`, so those patterns can never match and the test dies at extraction with
+// "could not extract isDevBuild()" -- exit 1, before a single assertion runs.
+//
+// That is worse than a failing test: it fails on the ONLY platform CLAUDE.md tells you to
+// run it on, while passing in a Linux CI that does not run it either. The guard on the
+// one escaper protecting an unauthenticated API would have been permanently inert while
+// looking like it existed. Found 2026-07-31 by an audit, not by the test.
+const src = fs.readFileSync(PAGE, 'utf8').replace(/\r\n/g, '\n');
 
 let failures = 0;
 const check = (cond, msg) => {
@@ -91,10 +103,24 @@ const htmlOnly = src
   .split('\n')
   .filter((l) => !/textContent/.test(l))
   .join('\n');
-for (const field of ['player_name', 'game_mode', 'score', 'level_reached', 'lab_name', 'player_handle']) {
-  const raw = new RegExp('\\$\\{entry\\.' + field + '\\}');
-  check(!raw.test(htmlOnly), 'no bare ${entry.' + field + '} in any innerHTML template');
-}
+// ENFORCE THE CLASS, NOT A LIST. The first version of this test named six fields --
+// player_name, game_mode, score, level_reached, lab_name, player_handle -- and passed
+// while THIRTEEN other entry fields were still interpolated raw, including entry_uuid and
+// every `${(entry.final_money || 0).toLocaleString()}`. Those looked safe because they
+// are numeric BY NAME, but `|| 0` does not coerce a string and String.toLocaleString() is
+// the identity function, so a POST setting final_money to markup reached innerHTML intact.
+// The score API is unauthenticated, so field names promise nothing about field types.
+//
+// So: scan for EVERY `${...entry.X...}` in an innerHTML template and require each one to
+// go through escapeHTML. A new field added later is covered on the day it is added,
+// without anyone remembering to extend a list.
+const interpolations = htmlOnly.match(/\$\{[^}]*entry\.[^}]*\}/g) || [];
+const unescaped = interpolations.filter((x) => !x.includes('escapeHTML'));
+check(interpolations.length > 0, `found ${interpolations.length} entry interpolations to check`);
+check(unescaped.length === 0,
+  unescaped.length === 0
+    ? 'every entry.* interpolation in an innerHTML template goes through escapeHTML'
+    : `${unescaped.length} UNESCAPED: ${unescaped.slice(0, 4).join('  ')}`);
 check(/modalName\.textContent =/.test(src),
   'the modal name still goes through textContent, not innerHTML');
 check(!/const esc =/.test(src),
