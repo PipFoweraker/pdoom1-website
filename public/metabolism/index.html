@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Metabolism &mdash; p(Doom)1</title>
+	<meta name="description" content="Every recurring cycle this project runs, derived at build time from the files that actually run them.">
+	<meta name="robots" content="noindex, follow">
+	<link rel="canonical" href="https://pdoom1.com/metabolism/" />
+	<!-- Plausible Analytics - Privacy-first, self-hosted -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+	<!-- GENERATED FILE. Do not hand-edit: scripts/generate-metabolism.py rewrites it and CI fails if this file and its sources disagree. -->
+	<style>
+	/* Scoped to this page. Nothing here touches css/site.css -- a light-theme
+	   literal in that file once whited out cards across the whole site. */
+	:root{
+		--bg:#12100F; --panel:#1C1917; --panel-2:#262220; --hair:#3A342E; --hair-2:#2a2622;
+		--ink:#E9F2F2; --ink-2:#CFC7BB; --ink-3:#A79E92;
+		--amber:#F6A800; --teal:#2FD4C2; --doom:#E2524A; --phosphor:#5BE87A;
+		--mono:ui-monospace,"SFMono-Regular",Menlo,"Courier New",monospace;
+	}
+	*{margin:0;padding:0;box-sizing:border-box}
+	html{color-scheme:dark}
+	body{background:var(--bg); color:var(--ink); font-family:var(--mono); line-height:1.6;
+		-webkit-font-smoothing:antialiased;
+		background-image:radial-gradient(60rem 40rem at 50% -10%, rgba(47,212,194,.05), transparent 60%);
+		background-attachment:fixed;}
+	main{max-width:min(980px,92vw); margin:0 auto; padding:2rem 0 4rem}
+	.intro h1{font-size:clamp(1.7rem,5vw,2.5rem); letter-spacing:.01em; text-wrap:balance}
+	.intro h1 b{color:var(--teal)}
+	.intro p{color:var(--ink-2); max-width:52rem; margin-top:.7rem; text-wrap:pretty}
+	.tag{display:inline-block; margin-top:.9rem; font-size:.7rem; letter-spacing:.14em;
+		text-transform:uppercase; color:var(--ink-3); border:1px solid var(--hair);
+		padding:.3rem .6rem; border-radius:999px}
+	.rack{background:var(--panel); border:1px solid var(--hair); border-radius:14px;
+		padding:1.3rem 1.4rem; margin-top:1.4rem}
+	.rack > h2{font-size:.76rem; letter-spacing:.16em; text-transform:uppercase;
+		color:var(--ink-3); margin-bottom:1rem; font-weight:700}
+	.rack > p{color:var(--ink-2); font-size:.86rem; margin-bottom:.9rem; text-wrap:pretty}
+	.scroll{overflow-x:auto}
+	table{border-collapse:collapse; width:100%; font-size:.8rem; min-width:640px}
+	th{text-align:left; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase;
+		color:var(--ink-3); padding:.4rem .6rem .5rem; border-bottom:1px solid var(--hair)}
+	td{padding:.55rem .6rem; border-bottom:1px solid var(--hair-2); vertical-align:top;
+		color:var(--ink-2)}
+	td b{color:var(--ink)}
+	tr:target td{background:rgba(47,212,194,.09)}
+	tr:target td:first-child{box-shadow:inset 3px 0 0 var(--teal)}
+	.prov a{color:var(--amber); text-decoration:none; font-size:.74rem;
+		white-space:nowrap; border-bottom:1px dotted rgba(246,168,0,.5)}
+	.prov a:hover{border-bottom-style:solid}
+	.pill{display:inline-block; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase;
+		padding:.1rem .4rem; border-radius:4px; white-space:nowrap}
+	.p-auto{color:var(--teal); border:1px solid rgba(47,212,194,.4)}
+	.p-up{color:var(--amber); border:1px solid rgba(246,168,0,.45)}
+	.p-cross{color:var(--phosphor); border:1px solid rgba(91,232,122,.4)}
+	.p-clock{color:var(--ink-3); border:1px solid var(--hair)}
+	.p-warn{color:var(--doom); border:1px solid rgba(226,82,74,.45)}
+	.p-ok{color:var(--phosphor); border:1px solid rgba(91,232,122,.4)}
+	.unknown{color:var(--ink-3); font-style:italic}
+	.figwrap{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,15rem); gap:1.2rem;
+		align-items:start}
+	@media (max-width:760px){.figwrap{grid-template-columns:minmax(0,1fr)}}
+	.epi{width:100%; height:auto; display:block}
+	.epi .ring{fill:none; stroke:var(--hair); stroke-width:1}
+	.epi .unknownring{stroke:var(--hair-2); stroke-dasharray:6 7}
+	.epi .core{fill:rgba(246,168,0,.10); stroke:var(--amber); stroke-width:1.2}
+	.epi .corelabel{fill:var(--amber); font:600 10px var(--mono); text-anchor:middle;
+		letter-spacing:.12em; text-transform:uppercase}
+	.epi .coreval{fill:var(--ink-2); font:400 11px var(--mono); text-anchor:middle}
+	.epi .dot{stroke:var(--bg); stroke-width:2}
+	.epi .dot.hollow{fill:var(--bg); stroke-width:2}
+	.epi .arc{fill:none; stroke-width:7; stroke-linecap:round; opacity:.85}
+	.epi a:hover .dot{r:7.5}
+	.epi a:focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+	.epi .ringlabel{fill:var(--ink-3); font:400 10px var(--mono);
+		paint-order:stroke; stroke:var(--bg); stroke-width:4px; stroke-linejoin:round}
+	.epi .unknownlabel{fill:var(--hair)}
+	.epi .spoke{stroke:var(--hair-2); stroke-width:1; stroke-dasharray:3 5}
+	.epi .spokelabel{fill:var(--hair); font:400 9px var(--mono);
+		letter-spacing:.1em; text-transform:uppercase}
+	.legend{font-size:.76rem; color:var(--ink-3)}
+	.legend h3{font-size:.66rem; letter-spacing:.12em; text-transform:uppercase;
+		color:var(--ink-3); margin:.2rem 0 .5rem}
+	.legend ul{list-style:none; display:grid; gap:.4rem}
+	.legend li{display:flex; gap:.5rem; align-items:baseline; text-wrap:pretty}
+	.swatch{width:.62rem; height:.62rem; border-radius:50%; flex:0 0 auto;
+		transform:translateY(.05rem)}
+	.legend p{margin-top:.7rem; text-wrap:pretty}
+	.note{margin-top:1.3rem; font-size:.8rem; color:var(--ink-3); text-wrap:pretty}
+	.note b{color:var(--ink-2)}
+	a{color:var(--amber)}
+	a:focus-visible{outline:2px solid var(--amber); outline-offset:3px}
+	</style>
+</head>
+<body>
+	<header></header>
+	<main>
+		<div class="intro">
+			<h1>The <b>metabolism</b> of this project</h1>
+			<p>Every recurring beat we run, on one page: how fast it turns, when it fires, and &mdash; for every single number &mdash; which file it was read out of. Nothing here is typed in. This page is generated by <code>scripts/generate-metabolism.py</code> from the cron expressions, config files and ledgers that actually run, and a CI check fails the build if the page and its sources ever disagree.</p>
+			<p>Where a cadence is genuinely unknown, it says unknown. A gap in the picture is information; a plausible-looking guess would not be.</p>
+			<span class="tag">16 live cycles &middot; 2 unquantified &middot; 7 parked &middot; 35 sources read</span>
+		</div>
+		<section class="rack">
+			<h2>The epicycles</h2>
+			<p>One ring per distinct period, log-spaced: fastest innermost, slowest outermost. Every ring&rsquo;s radius is computed from its period, so the picture cannot drift from the table below it. Twelve o&rsquo;clock is the start of each ring&rsquo;s period; a marker sits at the point in the cycle when that job fires, which is why markers stacked along one radius are jobs that fire at the same instant. Click any marker to jump to its row.</p>
+			<div class="figwrap">
+				<div><svg viewBox="-330 -330 660 660" role="img" aria-labelledby="mapTitle mapDesc" class="epi">
+<title id="mapTitle">Nested cycle map</title>
+<desc id="mapDesc">Concentric rings, one per distinct period. The innermost ring is the fastest cycle and the outermost the slowest. Each marker is one recurring job, placed at the point in its period when it fires. Markers stacked along one radius are jobs that fire at the same moment.</desc>
+<circle class="core" cx="0" cy="0" r="34.0"/>
+<text class="corelabel" x="0" y="-4">deploy</text>
+<text class="coreval" x="0" y="12">~20 s</text>
+<circle class="ring" cx="0" cy="0" r="76.0"/>
+<a href="#wf-auto-update-data-0_x-6_x_x_x"><title>Auto-Update Data -- :00 past each 6-hour block, UTC</title><circle class="dot" cx="0.0" cy="-76.0" r="5.5" fill="var(--teal)"/></a>
+<a href="#wf-health-checks-0_x-6_x_x_x"><title>Health Checks and Deployment Tests -- :00 past each 6-hour block, UTC (fires at the same moment as 1 other job(s))</title><circle class="dot" cx="0.0" cy="-67.0" r="5.5" fill="var(--teal)"/></a>
+<a href="#wf-pull-pdoom1-issues-17_x-6_x_x_x"><title>Pull pdoom1 open issues to MD -- :17 past each 6-hour block, UTC</title><circle class="dot" cx="22.2" cy="-72.7" r="5.5" fill="var(--teal)"/></a>
+<a href="#wf-update-game-data-0_x-6_x_x_x"><title>Update Game Data Cache -- :00 past each 6-hour block, UTC (fires at the same moment as 2 other job(s))</title><circle class="dot" cx="0.0" cy="-58.0" r="5.5" fill="var(--teal)"/></a>
+<text class="ringlabel" x="-9.9" y="66.3" text-anchor="middle">every 6 hours</text>
+<circle class="ring" cx="0" cy="0" r="101.1"/>
+<a href="#wf-sync-design-notes-0_7,19_x_x_x"><title>Sync design notes from pdoom1 -- 07:00, 19:00 UTC</title><circle class="dot" cx="-50.6" cy="87.6" r="5.5" fill="var(--teal)"/></a>
+<text class="ringlabel" x="46.1" y="-79.8" text-anchor="start">every 12 hours</text>
+<circle class="ring" cx="0" cy="0" r="126.2"/>
+<a href="#wf-data-contract-validation-0_6_x_x_x"><title>Data Contract Validation -- 06:00 UTC daily</title><circle class="dot" cx="126.2" cy="0.0" r="5.5" fill="var(--teal)"/></a>
+<a href="#wf-snapshot-analytics-30_1_x_x_x"><title>Snapshot analytics to git -- 01:30 UTC daily</title><circle class="dot" cx="48.3" cy="-116.6" r="5.5" fill="var(--teal)"/></a>
+<a href="#wf-sync-events-0_3_x_x_x"><title>Sync Events from pdoom-data -- 03:00 UTC daily</title><circle class="dot" cx="89.3" cy="-89.3" r="5.5" fill="var(--teal)"/></a>
+<a href="#wf-sync-leaderboards-0_2_x_x_x"><title>Sync Leaderboards -- 02:00 UTC daily</title><circle class="dot" cx="63.1" cy="-109.3" r="5.5" fill="var(--teal)"/></a>
+<text class="ringlabel" x="-97.5" y="65.1" text-anchor="end">daily</text>
+<circle class="ring" cx="0" cy="0" r="196.7"/>
+<a href="#wf-weekly-league-reset-0_14_x_x_0"><title>Weekly League Reset -- Sun 14:00 UTC weekly</title><circle class="dot" cx="-71.9" cy="-183.1" r="5.5" fill="var(--teal)"/></a>
+<a href="#mirror-seed-weekly"><title>Seed -- weekly, every Friday (Monday 00:00 UTC, days 4-5). The day is published; the time of day is not. The map covers the whole of Friday rather than asserting an hour nobody stated.</title><path class="arc" stroke="var(--amber)" d="M -85.4 177.3 A 196.7 196.7 0 0 1 -191.8 43.8"/></a>
+<text class="ringlabel" x="187.6" y="7.0" text-anchor="start">weekly</text>
+<circle class="ring" cx="0" cy="0" r="250.0"/>
+<a href="#mirror-epoch-monthly"><title>Epoch (monthly Theme) -- 1st Friday of the month (the start of the month, days 0-7). The 1st Friday of a month lands on day 1 through 7 depending on the month, so there is no single phase to draw. The map covers the whole window it can land in. Placing it on one day would be a guess dressed as a schedule.</title><path class="arc" stroke="var(--amber)" d="M 0.0 -250.0 A 250.0 250.0 0 0 1 248.0 -31.4"/></a>
+<a href="#cross-hop-a"><title>Hop A -- World-Update Pack (Triumvirate metabolic cycle) -- each real month: collect events -&gt; author a world-update pack -&gt; the game&#x27;s frontier advances one month (period known, phase not published)</title><circle class="dot hollow" cx="-165.3" cy="187.5" r="5.5" stroke="var(--phosphor)"/></a>
+<a href="#cross-hop-b"><title>Hop B -- monthly publication (Triumvirate metabolic cycle) -- after each Epoch Friday (E+1..E+4) (period known, phase not published)</title><circle class="dot hollow" cx="117.0" cy="220.9" r="5.5" stroke="var(--phosphor)"/></a>
+<text class="ringlabel" x="-225.4" y="-85.2" text-anchor="end">monthly</text>
+<circle class="ring unknownring" cx="0" cy="0" r="292.0"/>
+<a href="#mirror-big-milestone"><title>Big Milestone -- multi-month (no published length)</title><circle class="dot hollow" cx="286.8" cy="54.7" r="5.5" stroke="var(--amber)"/></a>
+<a href="#clock-pdoom-data"><title>Next pdoom-data update (clocks.json) -- declared cadence: from_source (no published length)</title><circle class="dot hollow" cx="36.6" cy="289.7" r="5.5" stroke="var(--ink-3)"/></a>
+<text class="ringlabel unknownlabel" x="0" y="283.0" text-anchor="middle">unquantified &mdash; not to scale</text>
+<line class="spoke" x1="0" y1="-34.0" x2="0" y2="-262.0"/>
+<text class="spokelabel" x="6" y="-266.0">start of period</text>
+</svg></div>
+				<div class="legend">
+					<h3>Reading the map</h3>
+					<ul>
+						<li><span class="swatch" style="background:var(--phosphor)"></span><span>cross-repo</span></li>
+						<li><span class="swatch" style="background:var(--ink-3)"></span><span>declared clock</span></li>
+						<li><span class="swatch" style="background:var(--teal)"></span><span>repo automation</span></li>
+						<li><span class="swatch" style="background:var(--amber)"></span><span>upstream (mirrored)</span></li>
+						<li><span class="swatch" style="background:transparent;border:2px solid var(--ink-3)"></span><span>hollow: period known, firing time not published</span></li>
+					</ul>
+					<p>An arc instead of a dot is a <b>window</b>: the event lands somewhere inside it, and nobody has published where. The arc covers the whole window rather than asserting a moment.</p>
+					<p>Dots stacked outward along one radius fire at the <b>same instant</b>. That is a real collision, not a drawing artefact.</p>
+					<p>The amber disc at the centre is the deploy path. It is a <b>latency, not a period</b>, so it is drawn as a disc rather than a ring: pushing to <code>main</code> is what triggers it, not a clock.</p>
+					<p>The dashed outer ring holds cycles whose length nobody has published. It is drawn outside everything known and is deliberately not to scale.</p>
+					<p>Named periods, in seconds, used ONLY to place rings on the diagram. `monthly` is the mean Gregorian month (365.2425/12 days); no calendar claim is made by it.</p>
+				</div>
+			</div>
+		</section>
+		<section class="rack">
+			<h2>Live cadences</h2>
+			<p>Sorted fastest to slowest. The provenance column is the point of this table: every cadence links to the exact line it was read from.</p>
+			<div class="scroll"><table>
+				<thead><tr><th>Cycle</th><th>Period</th><th>Fires</th><th>Read from</th><th>Notes</th></tr></thead>
+				<tbody>
+					<tr id="wf-auto-update-data-0_x-6_x_x_x"><td><b>Auto-Update Data</b><br><span class="pill p-auto">repo automation</span></td><td>every 6 hours</td><td>:00 past each 6-hour block, UTC</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/auto-update-data.yml#L9" rel="noopener">.github/workflows/auto-update-data.yml:9</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr id="wf-health-checks-0_x-6_x_x_x"><td><b>Health Checks and Deployment Tests</b><br><span class="pill p-auto">repo automation</span></td><td>every 6 hours</td><td>:00 past each 6-hour block, UTC</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/health-checks.yml#L10" rel="noopener">.github/workflows/health-checks.yml:10</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr id="wf-pull-pdoom1-issues-17_x-6_x_x_x"><td><b>Pull pdoom1 open issues to MD</b><br><span class="pill p-auto">repo automation</span></td><td>every 6 hours</td><td>:17 past each 6-hour block, UTC</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/pull-pdoom1-issues.yml#L6" rel="noopener">.github/workflows/pull-pdoom1-issues.yml:6</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr id="wf-update-game-data-0_x-6_x_x_x"><td><b>Update Game Data Cache</b><br><span class="pill p-auto">repo automation</span></td><td>every 6 hours</td><td>:00 past each 6-hour block, UTC</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/update-game-data.yml#L6" rel="noopener">.github/workflows/update-game-data.yml:6</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr id="wf-sync-design-notes-0_7,19_x_x_x"><td><b>Sync design notes from pdoom1</b><br><span class="pill p-auto">repo automation</span></td><td>every 12 hours</td><td>07:00, 19:00 UTC</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/sync-design-notes.yml#L18" rel="noopener">.github/workflows/sync-design-notes.yml:18</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr id="wf-data-contract-validation-0_6_x_x_x"><td><b>Data Contract Validation</b><br><span class="pill p-auto">repo automation</span></td><td>daily</td><td>06:00 UTC daily</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/data-contract-validation.yml#L23" rel="noopener">.github/workflows/data-contract-validation.yml:23</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr id="wf-snapshot-analytics-30_1_x_x_x"><td><b>Snapshot analytics to git</b><br><span class="pill p-auto">repo automation</span></td><td>daily</td><td>01:30 UTC daily</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/snapshot-analytics.yml#L12" rel="noopener">.github/workflows/snapshot-analytics.yml:12</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr id="wf-sync-events-0_3_x_x_x"><td><b>Sync Events from pdoom-data</b><br><span class="pill p-auto">repo automation</span></td><td>daily</td><td>03:00 UTC daily</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/sync-events.yml#L6" rel="noopener">.github/workflows/sync-events.yml:6</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr id="wf-sync-leaderboards-0_2_x_x_x"><td><b>Sync Leaderboards</b><br><span class="pill p-auto">repo automation</span></td><td>daily</td><td>02:00 UTC daily</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/sync-leaderboards.yml#L9" rel="noopener">.github/workflows/sync-leaderboards.yml:9</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr id="clock-league"><td><b>Next league (clocks.json)</b><br><span class="pill p-clock">declared clock</span></td><td>weekly</td><td>Sun 14:00 UTC (declared anchor)</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/clocks.json#L24" rel="noopener">public/data/clocks.json:24</a></span></td><td>New seed, same engine.</td></tr>
+					<tr id="mirror-seed-weekly"><td><b>Seed</b><br><span class="pill p-up">upstream (mirrored)</span></td><td>weekly</td><td>weekly, every Friday (Monday 00:00 UTC, days 4-5)</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/metabolism.json#L22" rel="noopener">public/data/metabolism.json:22</a></span></td><td>new seed, same ladder_version; does not fork the board</td></tr>
+					<tr id="wf-weekly-league-reset-0_14_x_x_0"><td><b>Weekly League Reset</b><br><span class="pill p-auto">repo automation</span></td><td>weekly</td><td>Sun 14:00 UTC weekly</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/weekly-league-reset.yml#L13" rel="noopener">.github/workflows/weekly-league-reset.yml:13</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr id="mirror-epoch-monthly"><td><b>Epoch (monthly Theme)</b><br><span class="pill p-up">upstream (mirrored)</span></td><td>monthly</td><td>1st Friday of the month (the start of the month, days 0-7)</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/metabolism.json#L40" rel="noopener">public/data/metabolism.json:40</a></span></td><td>minor +1 AND ladder_version +1; forks the board</td></tr>
+					<tr id="cross-hop-a"><td><b>Hop A -- World-Update Pack (Triumvirate metabolic cycle)</b><br><span class="pill p-cross">cross-repo</span></td><td>monthly</td><td>each real month: collect events -&gt; author a world-update pack -&gt; the game&#x27;s frontier advances one month</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/design-notes/adr-0016-league-metabolism.html#L111" rel="noopener">public/design-notes/adr-0016-league-metabolism.html:111</a></span></td><td>state: not our leg -- owned by pdoom1 and pdoom-data</td></tr>
+					<tr id="cross-hop-b"><td><b>Hop B -- monthly publication (Triumvirate metabolic cycle)</b><br><span class="pill p-cross">cross-repo</span></td><td>monthly</td><td>after each Epoch Friday (E+1..E+4)</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/metabolism.json#L95" rel="noopener">public/data/metabolism.json:95</a></span></td><td>fires by human memory</td></tr>
+					<tr id="clock-patch"><td><b>Next patch (clocks.json)</b><br><span class="pill p-clock">declared clock</span></td><td>monthly</td><td>monthly, no anchor declared</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/clocks.json#L25" rel="noopener">public/data/clocks.json:25</a></span></td><td>clocks.json declares the period but no anchor, so the next date cannot be computed. The clock renders as a cadence, not a date.</td></tr>
+				</tbody>
+			</table></div>
+		</section>
+		<section class="rack">
+			<h2>The event-driven beat</h2>
+			<p>These have no period at all. They fire when something happens, which is a different kind of rhythm and is shown separately so it cannot be misread as a schedule.</p>
+			<div class="scroll"><table>
+				<thead><tr><th>What</th><th>Triggered by</th><th>Read from</th><th>Notes</th></tr></thead>
+				<tbody>
+					<tr id="fact-deploy-latency"><td><b>A push to main reaches production in roughly 20 seconds.</b><br><span class="pill p-warn">documented, not measured</span></td><td>~20 s</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/CLAUDE.md" rel="noopener">CLAUDE.md</a></span></td><td>No measurement of this exists in the repository. It is a maintainer observation recorded in CLAUDE.md. Deriving it live would mean querying the Actions API at build time, which would make the generated page non-deterministic and defeat the --check guard, so it stays a labelled observation rather than a fabricated precision.</td></tr>
+					<tr id="fact-bot-commits-dont-deploy"><td><b>A commit made by a workflow using the default GITHUB_TOKEN does not trigger another workflow, so bot-committed artifacts reach the repository but not pdoom1.com until the next human push.</b><br><span class="pill p-warn">platform behaviour, documented</span></td><td>asymmetry</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/CLAUDE.md" rel="noopener">CLAUDE.md</a></span></td><td>This is GitHub Actions&#x27; documented recursion guard, not something this repo can measure. It affects every committing workflow listed on this page.</td></tr>
+					<tr><td><b>Auto-Deploy to DreamHost on Push</b><br><span class="pill p-auto">workflow</span></td><td>push</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/auto-deploy-on-push.yml#L1" rel="noopener">.github/workflows/auto-deploy-on-push.yml:1</a></span></td><td>rsyncs public/ to production</td></tr>
+					<tr><td><b>Blog index and feeds</b><br><span class="pill p-auto">workflow</span></td><td>pull_request, push, workflow_dispatch</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/generate-feeds.yml#L1" rel="noopener">.github/workflows/generate-feeds.yml:1</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr><td><b>Bug Report Intake</b><br><span class="pill p-auto">workflow</span></td><td>repository_dispatch, workflow_dispatch</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/bug-report.yml#L1" rel="noopener">.github/workflows/bug-report.yml:1</a></span></td><td>opens or comments on GitHub issues; touches no site content</td></tr>
+					<tr><td><b>Content Honesty</b><br><span class="pill p-auto">workflow</span></td><td>pull_request, push, workflow_dispatch</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/content-honesty.yml#L1" rel="noopener">.github/workflows/content-honesty.yml:1</a></span></td><td>checks only; writes nothing</td></tr>
+					<tr><td><b>Content Syndication</b><br><span class="pill p-auto">workflow</span></td><td>push, workflow_dispatch</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/syndicate-content.yml#L1" rel="noopener">.github/workflows/syndicate-content.yml:1</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr><td><b>Deploy to DreamHost (manual)</b><br><span class="pill p-auto">workflow</span></td><td>workflow_dispatch</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/deploy-dreamhost.yml#L1" rel="noopener">.github/workflows/deploy-dreamhost.yml:1</a></span></td><td>rsyncs public/ to production</td></tr>
+					<tr><td><b>Metabolism map is in step</b><br><span class="pill p-auto">workflow</span></td><td>pull_request, push, workflow_dispatch</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/metabolism-map.yml#L1" rel="noopener">.github/workflows/metabolism-map.yml:1</a></span></td><td>checks only; writes nothing</td></tr>
+					<tr><td><b>Sync Design Tokens from pdoom1</b><br><span class="pill p-auto">workflow</span></td><td>repository_dispatch, workflow_dispatch</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/sync-design-tokens.yml#L1" rel="noopener">.github/workflows/sync-design-tokens.yml:1</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr><td><b>Update Game Status</b><br><span class="pill p-auto">workflow</span></td><td>repository_dispatch, workflow_dispatch</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/update-game-status.yml#L1" rel="noopener">.github/workflows/update-game-status.yml:1</a></span></td><td>commits to the repo; the commit does not itself trigger a deploy</td></tr>
+					<tr><td><b>Version &amp; Changelog Check</b><br><span class="pill p-auto">workflow</span></td><td>pull_request, push</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/version-check.yml#L1" rel="noopener">.github/workflows/version-check.yml:1</a></span></td><td>checks only; writes nothing</td></tr>
+					<tr><td><b>Version-Aware Deployment to DreamHost</b><br><span class="pill p-auto">workflow</span></td><td>workflow_dispatch</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/version-aware-deploy.yml#L1" rel="noopener">.github/workflows/version-aware-deploy.yml:1</a></span></td><td>rsyncs public/ to production</td></tr>
+				</tbody>
+			</table></div>
+		</section>
+		<section class="rack">
+			<h2>Parked &mdash; not a cadence</h2>
+			<p>These workflows look like automation and are not. Each was deliberately reduced to manual dispatch, and each carries a comment saying why; that comment is quoted here rather than summarised. Showing them as live beats would be the exact lie this page exists to avoid. The generator refuses to build if any of them still carries a schedule.</p>
+			<div class="scroll"><table>
+				<thead><tr><th>Workflow</th><th>Marker</th><th>Stated reason</th><th>Read from</th></tr></thead>
+				<tbody>
+					<tr><td><b>Extract DreamHost Analytics</b></td><td><span class="pill p-warn">PARKED</span></td><td>PARKED 2026-07-22 -- do not re-enable the schedule without fixing the target.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/extract-analytics.yml#L1" rel="noopener">.github/workflows/extract-analytics.yml:1</a></span></td></tr>
+					<tr><td><b>Post GitHub Issue to Forum</b></td><td><span class="pill p-warn">TRIGGER REMOVED</span></td><td>ISSUES TRIGGER REMOVED 2026-07-22. This fired on EVERY issue opened, hung for ~132s trying to reach 208.113.200.215:4567 (firewalled), failed, then tried to post a &quot;forum post failed&quot; warning comment onto your issue and got 403 because the job has no `permissions: issues: write`. 0 successes across all runs.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/post-issue-to-forum.yml#L1" rel="noopener">.github/workflows/post-issue-to-forum.yml:1</a></span></td></tr>
+					<tr><td><b>Sync Airtable to JSON</b></td><td><span class="pill p-warn">SCHEDULE REMOVED</span></td><td>SCHEDULE REMOVED 2026-07-22. This ran every 6 hours and failed 1,264 times consecutively -- it has never once succeeded. The run log prints the env block with `AIRTABLE_API_KEY:` blank: the four AIRTABLE_* secrets were never set, and there is no Airtable base behind this.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/sync-airtable.yml#L1" rel="noopener">.github/workflows/sync-airtable.yml:1</a></span></td></tr>
+					<tr><td><b>Sync docs from pdoom1</b></td><td><span class="pill p-warn">PARKED</span></td><td>PARKED 2026-07-22. Superseded by sync-design-notes.yml -- do NOT re-enable the schedule as written.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/sync-pdoom1-docs.yml#L1" rel="noopener">.github/workflows/sync-pdoom1-docs.yml:1</a></span></td></tr>
+					<tr><td><b>Weekly Scheduled Deployment</b></td><td><span class="pill p-warn">SCHEDULE REMOVED</span></td><td>SCHEDULE REMOVED 2026-07-22 -- manual dispatch only. Two reasons:</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/weekly-deployment.yml#L1" rel="noopener">.github/workflows/weekly-deployment.yml:1</a></span></td></tr>
+					<tr><td><b>deploy</b></td><td><span class="pill p-warn">manual only</span></td><td>Placeholder deploy (manual only)</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/deploy.yml#L2" rel="noopener">.github/workflows/deploy.yml:2</a></span></td></tr>
+					<tr><td><b>update-stats (disabled)</b></td><td><span class="pill p-warn">(disabled)</span></td><td>The workflow&#x27;s name says so. No reason is recorded in the file -- read it before re-enabling anything.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/update-stats.yml#L1" rel="noopener">.github/workflows/update-stats.yml:1</a></span></td></tr>
+				</tbody>
+			</table></div>
+		</section>
+		<section class="rack">
+			<h2>Unquantified &mdash; the holes in the picture</h2>
+			<p>Cycles we know exist but whose length or timing nobody has published. They are listed rather than estimated.</p>
+			<div class="scroll"><table>
+				<thead><tr><th>Cycle</th><th>What we know</th><th>Why there is no number</th><th>Read from</th></tr></thead>
+				<tbody>
+					<tr id="mirror-big-milestone"><td><b>Big Milestone</b><br><span class="pill p-up">upstream (mirrored)</span></td><td>multi-month</td><td class="unknown">pdoom1 defines a Big Milestone as a multi-month container spanning several minors. No fixed length is published, so no number exists to derive or to mirror. Rendered as unquantified rather than rounded to a guess.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/metabolism.json#L58" rel="noopener">public/data/metabolism.json:58</a></span></td></tr>
+					<tr id="clock-pdoom-data"><td><b>Next pdoom-data update (clocks.json)</b><br><span class="pill p-clock">declared clock</span></td><td>declared cadence: from_source</td><td class="unknown">cadence type &#x27;from_source&#x27; defers to an upstream provider that publishes no schedule this repo can read.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/clocks.json#L26" rel="noopener">public/data/clocks.json:26</a></span></td></tr>
+				</tbody>
+			</table></div>
+		</section>
+		<section class="rack">
+			<h2>The cross-repo rhythm</h2>
+			<p><b>Triumvirate metabolic cycle</b> &mdash; pdoom1 -&gt; pdoom-data -&gt; website. This repository is the <b>publisher</b>, never the source: it reads pdoom1, never the reverse. Our leg is at <span class="pill p-ok">AGREED-PER-LEG</span> on the ladder PROPOSED &rarr; AGREED-PER-LEG &rarr; ACTIVE. The rule itself lives upstream at <code>pdoom1/docs/TRIUMVIRATE_METABOLIC_CYCLE.md</code>; this repo holds a declared mirror with a pointer, because pdoom1 publishes no artifact for it.</p>
+			<div class="scroll"><table>
+				<thead><tr><th>Unit</th><th>When</th><th>Forks the board?</th><th>Version effect</th><th>Read from</th></tr></thead>
+				<tbody>
+					<tr><td><b>Seed</b><br><span class="pill p-up">mirrored from pdoom1/docs/RELEASE_NOMENCLATURE.md</span></td><td>weekly, every Friday</td><td>no</td><td>new seed, same ladder_version</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/metabolism.json#L22" rel="noopener">public/data/metabolism.json:22</a></span></td></tr>
+					<tr><td><b>Epoch (monthly Theme)</b><br><span class="pill p-up">mirrored from pdoom1/docs/RELEASE_NOMENCLATURE.md</span></td><td>1st Friday of the month</td><td>yes, by definition</td><td>minor +1 AND ladder_version +1</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/metabolism.json#L40" rel="noopener">public/data/metabolism.json:40</a></span></td></tr>
+					<tr><td><b>Big Milestone</b><br><span class="pill p-up">mirrored from pdoom1/docs/RELEASE_NOMENCLATURE.md</span></td><td>multi-month</td><td>n/a &mdash; a container</td><td>spans several minors</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/metabolism.json#L58" rel="noopener">public/data/metabolism.json:58</a></span></td></tr>
+				</tbody>
+			</table></div>
+			<p class="note"><b>Our leg (Hop B -- monthly publication):</b> after each Epoch Friday (E+1..E+4). It fires by <b>human memory</b> &mdash; There is no machine signal on Epoch Friday. Zero pdoom1 workflows reference this repo and zero emit a repository_dispatch to it; sync-pdoom1-docs.yml on this side is PARKED. The proposal sanctions manual-first for Aug-Oct, so this is the acknowledged exception, not a violation -- but the leg&#x27;s reliability is a person remembering, and the page says so.</p>
+			<p class="note">&mdash; League notes do not exist as an artifact in pdoom1 -- half the monthly pull has nothing to pull. This repo will not invent them.</p>
+			<p class="note">&mdash; public/blog/post.html cannot render tables, and release bodies contain them; reshaping is the publisher&#x27;s job, not a renderer bug.</p>
+			<p class="note"><b>pdoom-data -&gt; website (countdown milestones)</b> (pending upstream data): The fourth edge the proposal reserved, now open: public/data/clocks.json reads milestone dates direct from pdoom-data#38. Outside Hop B.</p>
+			<p class="note"><b>pdoom1 -&gt; website (calibration artifact)</b> (requested, not shipping): A fifth edge: pdoom1#994 asks the game to attach calibration.json to each release. The game leads calibration; the website only derives it. One arrow, not a new hop.</p>
+		</section>
+		<section class="rack">
+			<h2>League epochs, as blessed</h2>
+			<p>An epoch becomes real when Pip blesses a seed into the ledger. This table is read straight out of it, so a row that has not been blessed cannot appear here.</p>
+			<div class="scroll"><table>
+				<thead><tr><th>Epoch</th><th>Seed</th><th>Ladder</th><th>Blessed (UTC)</th><th>By</th><th>Read from</th></tr></thead>
+				<tbody>
+					<tr><td><b>L2</b></td><td><code>weekly-2026-w30</code></td><td>L2</td><td>2026-07-25</td><td>Pip</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/LEAGUE_SEED_LEDGER.md#L20" rel="noopener">docs/LEAGUE_SEED_LEDGER.md:20</a></span></td></tr>
+					<tr><td><b>L3</b></td><td colspan="4" class="unknown">not blessed yet &mdash; there is no L3 row in the ledger, so this page has nothing to show. It appears here the moment one is added.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/LEAGUE_SEED_LEDGER.md" rel="noopener">docs/LEAGUE_SEED_LEDGER.md</a></span></td></tr>
+				</tbody>
+			</table></div>
+		</section>
+		<section class="rack">
+			<h2>Cross-checks the generator ran</h2>
+			<p>Several sources describe overlapping beats &mdash; three of them describe the weekly league alone. Rather than pick one and hope, the generator compares them and prints what it found, including when they disagree. A disagreement here is a real finding, not a rendering bug, and it recomputes on every build rather than being written down once.</p>
+			<div class="scroll"><table>
+				<thead><tr><th>Check</th><th>Result</th><th>Read from</th></tr></thead>
+				<tbody>
+					<tr><td><b>Declared league anchor matches the cron that runs</b></td><td><span class="pill p-ok">agree</span> clocks.json declares Sun 14:00 UTC weekly; weekly-league-reset.yml fires Sun 14:00 UTC weekly.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/clocks.json#L24" rel="noopener">public/data/clocks.json:24</a></span> <span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/weekly-league-reset.yml#L13" rel="noopener">.github/workflows/weekly-league-reset.yml:13</a></span></td></tr>
+					<tr><td><b>Cron lands on the league&#x27;s declared local reset time</b></td><td><span class="pill p-warn">half</span> config wants Monday 00:00 in Australia/Hobart; the cron lands at Mon 01:00 AEDT (UTC+11) and Mon 00:00 AEST (UTC+10). Daylight saving moves it, so the declared time holds in only 1 of the 2 offsets this timezone takes.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/scripts/weekly-league-config.json#L11" rel="noopener">scripts/weekly-league-config.json:11</a></span> <span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/weekly-league-reset.yml#L13" rel="noopener">.github/workflows/weekly-league-reset.yml:13</a></span></td></tr>
+					<tr><td><b>The week the rollover opens is the week that is starting</b></td><td><span class="pill p-warn">OFF BY ONE</span> Replaying get_current_week_info()&#x27;s arithmetic at the cron&#x27;s firing moment (Sun 14:00 UTC weekly): the week it derives began 158.0 h earlier and ends 10.0 h later. The rollover therefore creates the week that is about to end, not the one about to begin.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/scripts/weekly-league-manager.py#L103" rel="noopener">scripts/weekly-league-manager.py:103</a></span> <span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows/weekly-league-reset.yml#L13" rel="noopener">.github/workflows/weekly-league-reset.yml:13</a></span></td></tr>
+					<tr><td><b>A machine signal exists for the monthly cross-repo beat</b></td><td><span class="pill p-warn">NO</span> This repo can RECEIVE repository_dispatch on 5 live workflow(s) (Bug Report Intake, Sync Design Tokens from pdoom1, Sync Events from pdoom-data, Sync design notes from pdoom1, Update Game Status), but nothing upstream sends one on Epoch Friday, so the leg fires by human memory.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/metabolism.json#L101" rel="noopener">public/data/metabolism.json:101</a></span></td></tr>
+					<tr><td><b>Automated commits reach production on their own</b></td><td><span class="pill p-warn">NO</span> 14 live workflow(s) commit to the repository. A commit made with the default GITHUB_TOKEN does not trigger another workflow, so none of them reaches pdoom1.com until the next human push: Auto-Update Data, Blog index and feeds, Content Syndication, Data Contract Validation, Health Checks and Deployment Tests, Pull pdoom1 open issues to MD, Snapshot analytics to git, Sync Design Tokens from pdoom1, Sync Events from pdoom-data, Sync Leaderboards, Sync design notes from pdoom1, Update Game Data Cache, Update Game Status, Weekly League Reset.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/CLAUDE.md" rel="noopener">CLAUDE.md</a></span></td></tr>
+					<tr><td><b>Every live workflow with a commit step can actually commit</b></td><td><span class="pill p-ok">yes</span> Checked each file for contents: write at any level, workflow or job. All commit steps are backed by write permission.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows" rel="noopener">.github/workflows</a></span></td></tr>
+					<tr><td><b>Scheduled jobs are spread out rather than piled on one instant</b></td><td><span class="pill p-warn">no</span> Comparing every parsed cron as (period, phase). 3 jobs share every 6 hours: Auto-Update Data, Health Checks and Deployment Tests, Update Game Data Cache. They contend for the same runner minute and, because several of them commit, for the same branch tip.</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows" rel="noopener">.github/workflows</a></span></td></tr>
+					<tr><td><b>The monthly cycle&#x27;s decision record is fully settled</b></td><td><span class="pill p-warn">not yet</span> ADR-0016 defines the monthly world-update cycle and is published here unedited from pdoom1. Its own status line reads: ACCEPTED (shape; pipeline build + league-notes format owed)</td><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/design-notes/adr-0016-league-metabolism.html#L100" rel="noopener">public/design-notes/adr-0016-league-metabolism.html:100</a></span></td></tr>
+				</tbody>
+			</table></div>
+		</section>
+		<section class="rack">
+			<h2>Everything this page was built from</h2>
+			<p>If a file is not on this list, nothing on this page came from it. Editing any of them and not re-running the generator fails CI.</p>
+			<div class="scroll"><table>
+				<thead><tr><th>Source</th><th>What was taken from it</th></tr></thead>
+				<tbody>
+					<tr><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/.github/workflows" rel="noopener">.github/workflows</a></span></td><td>28 workflow files: name, triggers, cron expressions, park notices, whether they deploy or commit</td></tr>
+					<tr><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/CLAUDE.md" rel="noopener">CLAUDE.md</a></span></td><td>two facts with no in-repo measurement, each cited to the line that states them</td></tr>
+					<tr><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/docs/LEAGUE_SEED_LEDGER.md" rel="noopener">docs/LEAGUE_SEED_LEDGER.md</a></span></td><td>blessed epochs, seeds and ladder versions</td></tr>
+					<tr><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/clocks.json" rel="noopener">public/data/clocks.json</a></span></td><td>declared internal cadences and their anchors</td></tr>
+					<tr><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/data/metabolism.json" rel="noopener">public/data/metabolism.json</a></span></td><td>the cadences that cannot be derived here: pdoom1&#x27;s release nomenclature, the cross-repo cycle, and two documented-not-measured facts</td></tr>
+					<tr><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/public/design-notes/adr-0016-league-metabolism.html" rel="noopener">public/design-notes/adr-0016-league-metabolism.html</a></span></td><td>the monthly world-update cycle and its live status line, published unedited from pdoom1&#x27;s decision records</td></tr>
+					<tr><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/scripts/weekly-league-config.json" rel="noopener">scripts/weekly-league-config.json</a></span></td><td>competition timezone, declared league reset day and time</td></tr>
+					<tr><td><span class="prov"><a href="https://github.com/PipFoweraker/pdoom1-website/blob/main/scripts/weekly-league-manager.py" rel="noopener">scripts/weekly-league-manager.py</a></span></td><td>the week arithmetic the rollover actually performs</td></tr>
+				</tbody>
+			</table></div>
+		</section>
+		<p class="note"><b>Why there is no &ldquo;last updated&rdquo; stamp on this page:</b> a timestamp would tell you when the file was written, not whether it is still true, and it would make the CI staleness check impossible &mdash; every run would produce a different file. The check is the freshness guarantee instead: this page cannot be more than one merged pull request away from its sources.</p>
+		<p class="note">Soft preview: this page is <code>noindex</code> and not linked from the navigation yet.</p>
+	</main>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

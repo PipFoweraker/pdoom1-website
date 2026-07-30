@@ -10,6 +10,27 @@
     "total_participants": 0,
     "total_submissions": 0
   },
+  "epoch": {
+    "id": "pre-regularisation",
+    "anomalous": true,
+    "ladder_version": null,
+    "boundary_ladder_version": "L3",
+    "boundary_local": "2026-07-31T00:00:00+10:00",
+    "boundary_tz": "Australia/Hobart",
+    "boundary_utc": "2026-07-30T14:00:00Z",
+    "reason": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+    "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+    "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
+    "observed_defects": {
+      "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
+      "is_current-stuck-true": "week_info.is_current is true on an archived week. Nothing ever cleared the flag on archival, so every pre-cut archive claims to be the live week.",
+      "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
+      "legacy-v0.4.1-stamps": "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the legacy pygame client. LEFT AS FOUND ON PURPOSE: restamping would fabricate history, and scripts/ingest_scores.py already refuses to publish anything whose version != the deployed version.",
+      "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it.",
+      "rollover-off-by-one": "week_id/date range describe the week that was ENDING when the rollover ran, not the week that was starting -- the record is one week behind the competition it claims to represent (docs/TECH_DEBT.md A9, fixed 2026-07-28).",
+      "naive-local-timestamp-labelled-utc": "archived_at was written as local wall-clock time with a 'Z' suffix bolted on (datetime.now().isoformat() + 'Z'), so its UTC claim is off by the writing machine's offset. Fixed 2026-07-28; historical values left as found."
+    }
+  },
   "seed": "weekly_2026_W07_0a1cbac8",
   "economic_model": "Bootstrap_v0.4.1",
   "week_info": {

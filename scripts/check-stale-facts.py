@@ -43,7 +43,32 @@ SCAN_GLOBS = ["public/**/*.html", "public/**/*.json", "public/**/*.js",
               "scripts/**/*.py", "scripts/**/*.js", ".github/workflows/*.yml"]
 
 SKIP_PARTS = {"node_modules", ".git", "copy-baseline", "events", "backups",
-              "archive", "__pycache__"}
+              "archive", "__pycache__",
+              # A dated capture archive. Old version literals in there are the POINT --
+              # they are frozen evidence, never presented as current, and re-stamping
+              # them would fabricate history. Flagging them forever is pure noise.
+              "preserved"}
+
+# Files whose CONTENT is a record of other versions. Flagging these is a guaranteed
+# false positive that recurs on every regeneration, and a permanent block of known-noise
+# findings is how a report teaches people to stop reading it.
+SKIP_FILES = {
+    # A dated observation of which score-API boards exist, per game version. Listing
+    # non-current versions is its entire purpose -- none is presented as current.
+    "board-liveness.json",
+    # The published live board. Every entry carries the build the player ran, in
+    # `game_mode`, and a board is keyed by (seed, LADDER EPOCH) precisely so that ONE
+    # board legitimately spans several builds. So a correct board routinely holds build
+    # strings that are not the current release -- including, right before a cut, the
+    # NEXT one, because whoever proved the build scored on it. Those are observations of
+    # what a player ran, not claims about what is current, and re-stamping them would
+    # fabricate a score's provenance. Written by scripts/publish-live-board.py.
+    "leaderboard.json",
+    "published-board.json",
+    # Board keys and epoch provenance, every value carrying a `source`. It cites the
+    # versions that bracket a ladder fork by design.
+    "board-probe-targets.json",
+}
 
 SCRIPT_OR_STYLE = re.compile(r"<(script|style)\b.*?</\1>", re.S | re.I)
 
@@ -113,6 +138,8 @@ def iter_files():
                 continue
             if p.name == self_name:
                 continue          # this file documents the patterns it hunts
+            if p.name in SKIP_FILES:
+                continue
             seen.add(p)
             yield p
 

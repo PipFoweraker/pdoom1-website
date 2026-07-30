@@ -1,0 +1,33 @@
+{
+  "_comment": "Extra board keys for scripts/check-board-liveness.py to probe, BEYOND what it derives on its own. Normally empty: the probe derives seeds from the preserved captures, weekly/current.json and leaderboard.json, and derives ladder epochs from the epoch-shaped keys it has already seen plus a forward window. Add something here only when a value genuinely cannot be derived, and always with a source.",
+  "_rules": [
+    "Every entry MUST carry a `source` saying who published the value and when. A value with no source is a hardcoded literal wearing a costume.",
+    "Do NOT pre-populate a seed before the ceremony that draws it has happened. An unconfirmed guess published here is a claim the site cannot support.",
+    "Remove entries once the probe can derive them (i.e. once a capture or a data file carries them). This file is a patch, not a registry."
+  ],
+  "board_key_shapes": {
+    "_comment": "How to read the `version` half of a board key. The client sends the LADDER EPOCH, not the build. GameConfig.get_board_version() returns 'L' + LADDER_VERSION. Both shapes exist live: historical boards are build-shaped, current boards are epoch-shaped. Neither is an error.",
+    "ladder_epoch": {
+      "pattern": "^L\\d+$",
+      "example": "L2",
+      "meaning": "current shape. The board key half the game actually sends. A build bump does NOT fork the board -- that was the point of the build-vs-ladder split.",
+      "source": "pdoom1 via pdoom1-website issue #151, comment 2026-07-28T23:13"
+    },
+    "build_version": {
+      "pattern": "^v?\\d+\\.\\d+\\.\\d+$",
+      "example": "v0.11.0",
+      "meaning": "historical shape, from before the build-vs-ladder split. Boards keyed this way are frozen history and must never be re-stamped.",
+      "source": "observed live 2026-07-28/29; captures in preserved/2026-07-29-orphaned-boards/"
+    }
+  },
+  "current_ladder_epoch": {
+    "value": "L3",
+    "_comment": "DECLARED, not derived -- pdoom1 still publishes no machine-readable epoch artifact, so this is the human channel standing in for one. It is populated because the game side has now stated the value twice, unambiguously and in writing, and because leaving it null made the site refuse to publish a board that real players were already scoring on. While it is set, every surface may name L3; if pdoom1 forks again and this is not updated, the site will confidently publish the WRONG board -- which is why the artifact ask below stays open until a workflow can read the epoch instead of a human typing it.",
+    "source": "pdoom1 via pdoom1-website issue #151 comment 2026-07-28T23:13 ('the live epoch on Friday is L3'), restated on issue #201 comment 2026-07-30T02:44 ('Board key: L3. Not v0.13.2, not L3.0, not a build version'). Game-side authority: GameConfig.get_board_version() returns 'L' + LADDER_VERSION, ladder_version.txt = 3.",
+    "declared_on": "2026-07-30",
+    "supersede_when": "pdoom1 publishes the ladder epoch as a fetchable artifact (release asset or synced data file). Standing ask: PR #190's artifact request. Until then this value must be re-verified at every epoch fork, and a fork with no update here is a silent wrong-board bug.",
+    "verify_with": "python scripts/check-board-liveness.py -- if the epoch here is wrong, populated boards on the real epoch show up as NEW ORPHAN rather than DEPLOYED."
+  },
+  "extra_seeds": [],
+  "extra_versions": []
+}

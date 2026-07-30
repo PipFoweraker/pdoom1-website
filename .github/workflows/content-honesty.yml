@@ -1,10 +1,16 @@
 name: Content Honesty
 
-# Guards reader-facing claims that silently rot into lies. Today it enforces one
-# thing: no page a visitor can reach may advertise a platform that has no shipped
-# build. The source of truth is public/data/version.json -> latest_release.platforms
-# (derived from the release's actual assets by update-version-info.py), so this can
-# never drift from what actually shipped.
+# Guards claims that silently rot into lies.
+#
+# 1. No page a visitor can reach may advertise a platform that has no shipped
+#    build. The source of truth is public/data/version.json ->
+#    latest_release.platforms (derived from the release's actual assets by
+#    update-version-info.py), so this can never drift from what actually shipped.
+# 2. The analytics-to-git backup must keep failing LOUDLY. Its script only ever
+#    runs for real in CI, where the API key lives, so the failure paths are
+#    unreachable by hand -- test-snapshot-plausible.py stubs the API to assert
+#    every exit code, and asserts the workflow contract (stage-before-diff,
+#    issues:write, no dispatch input spliced into a run: block). Needs no secret.
 #
 # Fails the PR check on violation -- that is the whole signal; it does not open
 # issues (unlike the data-contract workflow, this runs only on human-driven events,
@@ -17,6 +23,9 @@ on:
       - 'public/data/version.json'
       - 'scripts/check-platform-claims.py'
       - 'scripts/test-download-resolution.js'
+      - 'scripts/snapshot-plausible.py'
+      - 'scripts/test-snapshot-plausible.py'
+      - '.github/workflows/snapshot-analytics.yml'
   push:
     branches: [main]
     paths:
@@ -24,6 +33,9 @@ on:
       - 'public/data/version.json'
       - 'scripts/check-platform-claims.py'
       - 'scripts/test-download-resolution.js'
+      - 'scripts/snapshot-plausible.py'
+      - 'scripts/test-snapshot-plausible.py'
+      - '.github/workflows/snapshot-analytics.yml'
   workflow_dispatch:
 
 permissions:
@@ -31,7 +43,7 @@ permissions:
 
 jobs:
   honesty:
-    name: Platform-claims + download resolution
+    name: Platform-claims, downloads, analytics-backup contract
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,3 +57,5 @@ jobs:
         run: python scripts/check-platform-claims.py
       - name: Download buttons resolve/degrade correctly
         run: node scripts/test-download-resolution.js
+      - name: The analytics-to-git backup still fails loudly
+        run: python scripts/test-snapshot-plausible.py

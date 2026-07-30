@@ -52,26 +52,6 @@
 			margin-bottom: 2rem;
 		}
 
-		.header-content {
-			max-width: 1200px;
-			margin: 0 auto;
-			padding: 0 2rem;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-		}
-
-		.back-link {
-			color: var(--accent-primary);
-			text-decoration: none;
-			font-weight: bold;
-			transition: opacity 0.2s;
-		}
-
-		.back-link:hover {
-			opacity: 0.8;
-		}
-
 		main {
 			max-width: 1200px;
 			margin: 0 auto;
@@ -287,10 +267,7 @@
 </head>
 <body>
 	<header>
-		<div class="header-content">
-			<a href="/" class="back-link">← Back to Home</a>
-			<div style="color: var(--accent-primary); font-weight: bold;">p(Doom)1</div>
-		</div>
+		<!-- Navigation loaded by navigation.js -->
 	</header>
 
 	<main>
@@ -570,5 +547,6 @@
 			<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-primary);" target="_blank" rel="noopener">GitHub</a>
 		</p>
 	</footer>
+	<script src="/assets/js/navigation.js"></script>
 </body>
 </html>

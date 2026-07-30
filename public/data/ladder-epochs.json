@@ -1,0 +1,61 @@
+{
+  "note": "Source of truth for the ladder epoch boundary the website labels weeks against. Read by scripts/weekly-league-manager.py (ladder_contract(), epoch_boundary()) and fetchable by pages. It lives in data, not in a script literal, because it has already moved twice in two days -- Pip, 2026-07-29: 'Let's keep using variables and not hardcoding things where we can!'. Nothing here may be edited to a value the game side has not published; see sources[].",
+  "timezone": "Australia/Hobart",
+  "board_key": {
+    "shape": "(seed, L<n>)",
+    "example": "(weekly-2026-w30, L2)",
+    "is_not": ["v0.13.2", "L3.0", "(seed, game_version)"],
+    "note": "The client sends the LADDER epoch, not the build version: GameConfig.get_board_version() returns \"L\" + LADDER_VERSION. Local board file leaderboard_<seed>__L3.json; remote POST body field version=L3; remote GET query version=L3. The build version never touches the board key again -- that is the whole point of the build-vs-ladder split, so a cosmetic patch bump can never again fork a board.",
+    "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z"
+  },
+  "regularised_from": {
+    "ladder_version": "L3",
+    "boundary_local": "2026-07-31T00:00:00+10:00",
+    "boundary_tz": "Australia/Hobart",
+    "boundary_rule": "A league week is anomalous iff it STARTS before boundary_local. The boundary is the Hobart-midnight anchor of the first L3 week, NOT board_opens_local -- see boundary_why.",
+    "boundary_why": "The unit being flagged is a whole league week (Fri 00:00 -> Thu 23:59:59 Australia/Hobart). Cutting at board_opens_local instead would put the boundary 17 hours inside the first L3 week, so that week would start before its own boundary and be flagged pre-L3 -- and a week half under L2 rules and half under L3 would be exactly the cross-epoch blend the ladder split exists to prevent. The board-open time is therefore recorded separately and stated on the page, so nothing claims the board was accepting scores from midnight.",
+    "board_opens_local": "2026-07-31T17:00:00+10:00",
+    "board_opens_confirmed": false,
+    "board_opens_note": "Approximate, from pdoom1: 'Fri ~1700: board opens', with the seed blessed at a ceremony ~1645 AEST the same day. Treat as approximate until the game side confirms.",
+    "seed": null,
+    "seed_status": "unblessed",
+    "seed_note": "The L3 seed is drawn and spoken at the ceremony ~1645 AEST Fri 2026-07-31 and posted by the game side. pdoom1: 'Please do not hardcode it anywhere before then.' This field stays null until a human blesses it into docs/LEAGUE_SEED_LEDGER.md and copies it here. Anything the website derives in the meantime is a placeholder and is marked unblessed in seed_provenance.",
+    "reason_pre": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+    "reason_post": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L3), by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py."
+  },
+  "epochs": [
+    {
+      "ladder_version": "L1",
+      "status": "legacy",
+      "board_key_note": "Pre-split. Boards were keyed (seed, game_version) -- e.g. (weekly-2026-w0, v0.11.0) -- which is why a patch bump forked the board and stranded scores.",
+      "ran_through_build": "v0.12.0"
+    },
+    {
+      "ladder_version": "L2",
+      "status": "legacy",
+      "seed": "weekly-2026-w30",
+      "blessed_utc": "2026-07-25",
+      "first_build": "v0.13.0",
+      "note": "First epoch cut. Preserved read-only; scores do not migrate forward. See docs/LEAGUE_SEED_LEDGER.md."
+    },
+    {
+      "ladder_version": "L3",
+      "status": "opening",
+      "seed": null,
+      "first_build": "v0.13.2",
+      "note": "Nothing has ever been published on L3. The current public build (v0.13.1) is L2."
+    }
+  ],
+  "sources": [
+    {
+      "what": "The ladder forked 2 -> 3 mid-month on gameplay changes; the build shipping Friday is v0.13.2 on L3; board opens ~1700 AEST Fri 2026-07-31; exact board-key strings; the seed is unblessed until the ceremony.",
+      "where": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
+      "authority": "AUTHORITATIVE"
+    },
+    {
+      "what": "The monthly 'Epoch = first Friday' cadence rule, and a calendar row reading 'Jul 31 | Fri | Weekly Seed | Seed | -- / L2'.",
+      "where": "pdoom1/docs/RELEASE_NOMENCLATURE.md",
+      "authority": "STALE FOR THIS CUT -- the cadence rule still describes the pattern, but the ladder forked mid-month, so that calendar row's '-- / L2' is wrong for 2026-07-31. Issue #151 wins."
+    }
+  ]
+}
