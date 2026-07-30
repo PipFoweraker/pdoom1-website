@@ -241,6 +241,7 @@ python  scripts/sync/sync-keybinds.py --check # keybind mirror fresh + no typed 
 python  scripts/test-weekly-league-boundary.py  # rollover run-time -> week mapping (A9)
 python  scripts/stamp-league-epoch.py --check   # every weekly record carries its epoch
 node    scripts/test-board-escaping.js    # no API field reaches innerHTML unescaped
+python  scripts/test-publish-live-board.py # publisher refuses rather than guesses
 ```
 
 ## Testing discipline
