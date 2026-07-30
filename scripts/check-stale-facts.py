@@ -56,6 +56,18 @@ SKIP_FILES = {
     # A dated observation of which score-API boards exist, per game version. Listing
     # non-current versions is its entire purpose -- none is presented as current.
     "board-liveness.json",
+    # The published live board. Every entry carries the build the player ran, in
+    # `game_mode`, and a board is keyed by (seed, LADDER EPOCH) precisely so that ONE
+    # board legitimately spans several builds. So a correct board routinely holds build
+    # strings that are not the current release -- including, right before a cut, the
+    # NEXT one, because whoever proved the build scored on it. Those are observations of
+    # what a player ran, not claims about what is current, and re-stamping them would
+    # fabricate a score's provenance. Written by scripts/publish-live-board.py.
+    "leaderboard.json",
+    "published-board.json",
+    # Board keys and epoch provenance, every value carrying a `source`. It cites the
+    # versions that bracket a ladder fork by design.
+    "board-probe-targets.json",
 }
 
 SCRIPT_OR_STYLE = re.compile(r"<(script|style)\b.*?</\1>", re.S | re.I)
