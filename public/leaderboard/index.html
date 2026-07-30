@@ -1136,10 +1136,10 @@
         // Generate economic metrics display
         const economicMetrics = `
           <div class="economic-metrics" style="font-size: 0.85rem; margin-top: 0.5rem;">
-            <div><strong>Money:</strong> $${(entry.final_money || 0).toLocaleString()}</div>
-            <div><strong>Staff:</strong> ${entry.final_staff || 0}</div>
-            <div><strong>Papers:</strong> ${entry.research_papers_published || 0}</div>
-            <div><strong>Tech Debt:</strong> ${entry.technical_debt_accumulated || 0}</div>
+            <div><strong>Money:</strong> $${escapeHTML((entry.final_money || 0).toLocaleString())}</div>
+            <div><strong>Staff:</strong> ${escapeHTML(entry.final_staff || 0)}</div>
+            <div><strong>Papers:</strong> ${escapeHTML(entry.research_papers_published || 0)}</div>
+            <div><strong>Tech Debt:</strong> ${escapeHTML(entry.technical_debt_accumulated || 0)}</div>
           </div>
         `;
         
@@ -1158,7 +1158,7 @@
             <div style="font-size: 0.9rem;">
               <div><strong>Turn ${escapeHTML(entry.level_reached)}</strong> in ${durationText}</div>
               <div class="outcome ${riskClass}" style="margin-top: 0.25rem;">
-                Doom: ${doomPercent.toFixed(1)}% | Rep: ${(entry.final_reputation || 0).toFixed(1)}
+                Doom: ${doomPercent.toFixed(1)}% | Rep: ${escapeHTML((entry.final_reputation || 0).toFixed(1))}
               </div>
               ${economicMetrics}
             </div>
@@ -1166,13 +1166,13 @@
           <td>
             <div class="bootstrap-metrics" style="font-size: 0.85rem;">
               <div><strong>Bootstrap Economics</strong></div>
-              <div>Compute: ${(entry.final_compute || 0).toLocaleString()}</div>
+              <div>Compute: ${escapeHTML((entry.final_compute || 0).toLocaleString())}</div>
               <div style="margin-top: 0.25rem; color: var(--text-secondary);">
                 Economic Model: ${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)}
               </div>
             </div>
           </td>
-          <td class="last-played">${new Date(entry.date).toLocaleDateString()}</td>
+          <td class="last-played">${escapeHTML(new Date(entry.date).toLocaleDateString())}</td>
         `;
         
         tbody.appendChild(row);
@@ -1366,9 +1366,9 @@
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
             <div><strong>Score:</strong> ${escapeHTML(entry.score)}</div>
-            <div><strong>Money:</strong> $${(entry.final_money || 0).toLocaleString()}</div>
-            <div><strong>Staff:</strong> ${entry.final_staff || 0}</div>
-            <div><strong>Papers:</strong> ${entry.research_papers_published || 0}</div>
+            <div><strong>Money:</strong> $${escapeHTML((entry.final_money || 0).toLocaleString())}</div>
+            <div><strong>Staff:</strong> ${escapeHTML(entry.final_staff || 0)}</div>
+            <div><strong>Papers:</strong> ${escapeHTML(entry.research_papers_published || 0)}</div>
           </div>
           
           <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
@@ -1388,8 +1388,8 @@
       
       // textContent, so escaping is not needed here -- but the lab still has to show.
       modalName.textContent = entry.player_handle
-        ? `${entry.player_handle} — ${entry.player_name}`
-        : (entry.lab_name ? `${entry.player_name} — ${entry.lab_name}` : entry.player_name);
+        ? `${escapeHTML(entry.player_handle)} — ${escapeHTML(entry.player_name)}`
+        : (entry.lab_name ? `${escapeHTML(entry.player_name)} — ${escapeHTML(entry.lab_name)}` : entry.player_name);
       
       const durationMinutes = Math.floor(entry.duration_seconds / 60);
       const durationHours = Math.floor(durationMinutes / 60);
@@ -1405,25 +1405,25 @@
             <div class="profile-item"><span>Score:</span> <strong>${escapeHTML(entry.score)}</strong></div>
             <div class="profile-item"><span>Level Reached:</span> <strong>Turn ${escapeHTML(entry.level_reached)}</strong></div>
             <div class="profile-item"><span>Game Duration:</span> <strong>${durationText}</strong></div>
-            <div class="profile-item"><span>Final Doom:</span> <strong>${entry.final_doom.toFixed(1)}%</strong></div>
+            <div class="profile-item"><span>Final Doom:</span> <strong>${escapeHTML(Number(entry.final_doom || 0).toFixed(1))}%</strong></div>
           </div>
         </div>
         
         <div class="profile-section">
           <h4>Economic Metrics</h4>
           <div class="profile-grid">
-            <div class="profile-item"><span>Final Money:</span> <strong>$${(entry.final_money || 0).toLocaleString()}</strong></div>
-            <div class="profile-item"><span>Final Staff:</span> <strong>${entry.final_staff || 0}</strong></div>
-            <div class="profile-item"><span>Final Reputation:</span> <strong>${(entry.final_reputation || 0).toFixed(1)}</strong></div>
-            <div class="profile-item"><span>Final Compute:</span> <strong>${(entry.final_compute || 0).toLocaleString()}</strong></div>
+            <div class="profile-item"><span>Final Money:</span> <strong>$${escapeHTML((entry.final_money || 0).toLocaleString())}</strong></div>
+            <div class="profile-item"><span>Final Staff:</span> <strong>${escapeHTML(entry.final_staff || 0)}</strong></div>
+            <div class="profile-item"><span>Final Reputation:</span> <strong>${escapeHTML((entry.final_reputation || 0).toFixed(1))}</strong></div>
+            <div class="profile-item"><span>Final Compute:</span> <strong>${escapeHTML((entry.final_compute || 0).toLocaleString())}</strong></div>
           </div>
         </div>
         
         <div class="profile-section">
           <h4>Research & Development</h4>
           <div class="profile-grid">
-            <div class="profile-item"><span>Papers Published:</span> <strong>${entry.research_papers_published || 0}</strong></div>
-            <div class="profile-item"><span>Technical Debt:</span> <strong>${entry.technical_debt_accumulated || 0}</strong></div>
+            <div class="profile-item"><span>Papers Published:</span> <strong>${escapeHTML(entry.research_papers_published || 0)}</strong></div>
+            <div class="profile-item"><span>Technical Debt:</span> <strong>${escapeHTML(entry.technical_debt_accumulated || 0)}</strong></div>
           </div>
         </div>
         
@@ -1431,8 +1431,8 @@
           <h4>Game Details</h4>
           <div class="profile-grid">
             <div class="profile-item"><span>Economic Model:</span> <strong>${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)}</strong></div>
-            <div class="profile-item"><span>Date Played:</span> <strong>${new Date(entry.date).toLocaleDateString()}</strong></div>
-            <div class="profile-item"><span>Entry UUID:</span> <strong style="font-family: monospace; font-size: 0.8rem;">${entry.entry_uuid}</strong></div>
+            <div class="profile-item"><span>Date Played:</span> <strong>${escapeHTML(new Date(entry.date).toLocaleDateString())}</strong></div>
+            <div class="profile-item"><span>Entry UUID:</span> <strong style="font-family: monospace; font-size: 0.8rem;">${escapeHTML(entry.entry_uuid)}</strong></div>
           </div>
         </div>
       `;
