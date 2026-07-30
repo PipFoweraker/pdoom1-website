@@ -92,6 +92,7 @@ PUBLIC = ROOT / "public"
 LB_DIR = PUBLIC / "leaderboard" / "data"
 VERSION_JSON = PUBLIC / "data" / "version.json"
 WEEKLY_JSON = LB_DIR / "weekly" / "current.json"
+PUBLISHED_JSON = LB_DIR / "published-board.json"
 SNAPSHOT_JSON = LB_DIR / "leaderboard.json"
 PRESERVED_DIR = LB_DIR / "preserved"
 TARGETS_JSON = LB_DIR / "board-probe-targets.json"
@@ -181,6 +182,7 @@ def derive_targets(extra_seeds, extra_versions):
 
     # 1. What the site currently publishes -- the board it believes in.
     add(seeds, (load_json(WEEKLY_JSON, {}) or {}).get("seed"))
+    add(seeds, (load_json(PUBLISHED_JSON, {}) or {}).get("seed"))
     snap_seed = (load_json(SNAPSHOT_JSON, {}) or {}).get("seed")
     if snap_seed not in ("-", "—", "aggregate", "no-data"):
         add(seeds, snap_seed)
@@ -289,7 +291,14 @@ def main():
 
     targets = load_json(TARGETS_JSON, {}) or {}
     epoch, epoch_source = current_epoch(targets)
-    site_seed = (load_json(WEEKLY_JSON, {}) or {}).get("seed")
+    # What the SITE publishes. Prefer published-board.json, the artifact
+    # publish-live-board.py writes to record the board key it actually served. Fall back
+    # to weekly/current.json, which weekly-league-manager.py owns and which historically
+    # carried a website-DERIVED placeholder seed no client ever posted to -- comparing
+    # against that is what made every real board look like an orphan.
+    published = load_json(PUBLISHED_JSON, {}) or {}
+    site_seed = published.get("seed") or (load_json(WEEKLY_JSON, {}) or {}).get("seed")
+    site_seed_source = "published-board.json" if published.get("seed") else "weekly/current.json"
     # Read only to REPORT. The build plays no part in any board comparison -- see the
     # module docstring on the build-vs-ladder split.
     build = ((load_json(VERSION_JSON, {}) or {}).get("latest_release") or {}).get("version")
@@ -299,7 +308,7 @@ def main():
 
     print("Board liveness probe -- %s" % now_iso())
     print("=" * 74)
-    print("  site seed (published)   %s" % (site_seed or "UNKNOWN"))
+    print("  site seed (published)   %s   [from %s]" % (site_seed or "UNKNOWN", site_seed_source))
     print("  current ladder epoch    %s" % (epoch or "UNKNOWN -- no artifact publishes it"))
     print("  deployed build          %s   (NOT part of the board key)" % (build or "unknown"))
     print("  anomaly archive         %d acknowledged board key(s)" % len(archive))

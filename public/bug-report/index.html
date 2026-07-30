@@ -196,6 +196,81 @@
 			color: var(--text-muted);
 		}
 
+		/* --- In-game guidance ------------------------------------------------ */
+		h2 {
+			color: var(--accent-primary);
+			font-size: 1.4rem;
+			margin-bottom: 0.75rem;
+		}
+
+		h3 {
+			color: var(--accent-secondary);
+			font-size: 1.05rem;
+			margin: 1.25rem 0 0.4rem;
+		}
+
+		.route {
+			background: var(--bg-secondary);
+			border: var(--border-width) solid var(--border-color);
+			border-left: 3px solid var(--accent-primary);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.route p,
+		.route li {
+			color: var(--text-secondary);
+		}
+
+		.route p + p {
+			margin-top: 0.75rem;
+		}
+
+		.route ul,
+		.route ol {
+			margin: 0.5rem 0 0 1.25rem;
+		}
+
+		.route li {
+			margin-bottom: 0.35rem;
+		}
+
+		/* Keys are NEVER typed into this page -- each <kbd> is filled at runtime
+		   from /data/keybinds.json. See scripts/sync/sync-keybinds.py. */
+		kbd {
+			display: inline-block;
+			min-width: 1.6em;
+			padding: 0.1em 0.45em;
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-bottom-width: 3px;
+			border-radius: var(--radius-sm);
+			color: var(--accent-primary);
+			font-family: inherit;
+			font-weight: bold;
+			text-align: center;
+			white-space: nowrap;
+		}
+
+		.caveat {
+			border-left-color: var(--accent-secondary);
+		}
+
+		.caveat strong {
+			color: var(--accent-secondary);
+		}
+
+		.route a {
+			color: var(--accent-primary);
+		}
+
+		.note {
+			font-size: 0.9rem;
+			color: var(--text-muted);
+			margin-top: 0.75rem;
+		}
+
 		@media (max-width: 768px) {
 			main {
 				padding: 2rem 1rem;
@@ -221,9 +296,109 @@
 	<main id="main-content" role="main">
 		<h1>Report a Bug</h1>
 		<p class="intro">
-			Found a bug or need help? Send it straight to the team &mdash; no GitHub account needed.
-			You can <strong>attach a screenshot, log, or config file</strong> (up to 500&nbsp;KB) and it
-			comes through with your report.
+			There are two ways to report: from inside the game, or from the form on this page.
+			No GitHub account is needed for either. The in-game reporter is worth the extra step
+			when you can use it &mdash; it records your build and platform for you, and those are
+			the first two things we would otherwise have to ask you for.
+		</p>
+
+		<div class="route">
+			<h2>Reporting from inside the game</h2>
+			<p>
+				Press <kbd data-keybind="bug_reporter">…</kbd> during play to open the bug reporter.
+				That is the <strong>default</strong> bind; every key in the game can be reassigned, so
+				if it does not respond, check <strong>Keybindings</strong> on the game's main menu.
+				That screen lists what your copy is actually bound to, and it is the only thing that
+				can answer the question for a copy that has been rebound. (Rebinding lives on the main
+				menu, not in the in-game Settings menu.)
+			</p>
+
+			<h3>What it fills in for you</h3>
+			<p>You write a title and a description. Attached to that, without you doing anything:</p>
+			<ul>
+				<li>your operating system</li>
+				<li>the game version, and the Godot engine version it was built with</li>
+				<li>a UTC timestamp</li>
+			</ul>
+			<p>
+				There are tick boxes to also include <strong>a screenshot</strong> and <strong>a copy of
+				your most recent save</strong>, and to put your name to the report if you would like the
+				credit. Leave the name blank and the report is filed as anonymous. Nothing is sent
+				anywhere until you send it yourself &mdash; see below.
+			</p>
+
+			<h3 id="in-game-delivery">What happens to the report</h3>
+			<p>
+				<strong>The game does not transmit it.</strong> The reporter writes a
+				<code>.json</code> file to your own machine, plus the screenshot and save file if you
+				ticked them, and then shows you the full path to it. Getting that file to us is a manual
+				step, and if you skip it we never see the report. Automatic submission is intended for a
+				later release; this build does not have it.
+			</p>
+			<p>Once you have the path, either:</p>
+			<ol>
+				<li>
+					email the file to the address the game's confirmation message shows you &mdash; it
+					currently names <strong>pip@beacongcr.org</strong>; or
+				</li>
+				<li>
+					attach it to the form further down this page. It accepts <code>.json</code>, so the
+					saved report goes through as-is, along with anything you want to add.
+				</li>
+			</ol>
+			<p class="note">
+				Those are two different addresses for the same thing &mdash; the game names one, this
+				site uses another. That inconsistency is ours and we are consolidating it. Until then,
+				use whichever address the route you chose puts in front of you, rather than picking
+				between them.
+			</p>
+
+			<h3>Two keys worth knowing before you report</h3>
+			<p>
+				These are also defaults, and also listed on the Keybindings screen. Both work in a normal
+				release build.
+			</p>
+			<ul>
+				<li>
+					<kbd data-keybind="screenshot">…</kbd> takes a screenshot. A picture of the wrong
+					thing on screen is usually faster than describing it.
+				</li>
+				<li>
+					<kbd data-keybind="export_log">…</kbd> exports the game log to a file you can attach.
+					Worth including for a crash or anything that only happens sometimes.
+				</li>
+			</ul>
+		</div>
+
+		<div class="route caveat">
+			<h2>Dev mode</h2>
+			<p>
+				<strong>Dev mode is a developer tool, and you probably do not have it.</strong> It is an
+				overlay showing live internal game state plus controls for forcing situations while
+				testing. It sits behind a build flag that is compiled into the game, and a clean release
+				build is meant to ship with that flag off. Nothing in the export tooling sets it
+				automatically, so whether it is present in any given download depends on how that build
+				was cut.
+			</p>
+			<p>
+				If you want to try: the default bind is <kbd data-keybind="dev_mode">…</kbd>. If nothing
+				happens, your build has the flag off, and there is no setting that turns it on &mdash; it
+				would need a different build. That is expected, not a fault, and nothing about it is
+				needed to file a good bug report.
+			</p>
+			<p>
+				What you <em>can</em> reach in any build is the debug overlay on
+				<kbd data-keybind="debug_overlay">…</kbd>, which shows game state, recent errors and
+				performance figures. If a report is about slowness or a wrong-looking number, a
+				screenshot of that overlay is useful evidence.
+			</p>
+		</div>
+
+		<h2>Reporting from this page</h2>
+		<p class="intro">
+			Use this if the game will not start, if it is already closed, or if you would simply
+			rather type it here. You can <strong>attach a screenshot, log, or config file</strong>
+			(up to 500&nbsp;KB) and it comes through with your report.
 		</p>
 
 		<div class="form-container">
@@ -313,6 +488,28 @@
 				<div id="submit-status" role="status" aria-live="polite"></div>
 			</form>
 		</div>
+
+		<div class="route caveat">
+			<h2>Where these reports go</h2>
+			<p>
+				The form emails your report to <strong>team@pdoom1.com</strong>, a private inbox. If you
+				filled in the optional email field, it goes there too and nowhere else. A name entered
+				for credit may be published; an email address never is.
+			</p>
+			<p>
+				<strong>One caveat we would rather state than hide:</strong> the mail step can fail on
+				our side without telling us, and without telling you &mdash; the page would still show a
+				success message. We cannot confirm delivery from here. So if a report matters to you and
+				you hear nothing back, it is reasonable to assume it went missing and send it again, or
+				use the GitHub route.
+			</p>
+			<p>
+				If the submission fails outright, the page opens a pre-filled
+				<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener">GitHub
+				issue</a> instead, so the report is not lost. That path is public and needs a free GitHub
+				account, but it is the one where you can see for yourself that it arrived.
+			</p>
+		</div>
 	</main>
 
 	<footer role="contentinfo">
@@ -323,6 +520,39 @@
 	</footer>
 
 	<script>
+		// Keybind rendering. No key is typed into this page: each <kbd> carries
+		// data-keybind="<action>" and is filled from /data/keybinds.json, which
+		// scripts/sync/sync-keybinds.py derives by parsing the game's
+		// godot/autoload/keybind_manager.gd. Typing 'N' into the HTML here is
+		// precisely how pdoom1's own docs came to say 'backslash' long after the
+		// bind moved. `sync-keybinds.py --check` fails if a literal appears here.
+		//
+		// On failure we deliberately leave the placeholder rather than substitute a
+		// remembered default: a stale key sends a player to a key that does nothing,
+		// which reads as "the game is broken". The prose always points at the
+		// in-game Keybindings screen, which is correct even when this fetch is not.
+		(function () {
+			var nodes = document.querySelectorAll('kbd[data-keybind]');
+			if (!nodes.length) return;
+			fetch('/data/keybinds.json', { cache: 'no-store' })
+				.then(function (r) { return r.ok ? r.json() : null; })
+				.then(function (data) {
+					if (!data || !Array.isArray(data.keybinds)) return;
+					var byAction = {};
+					data.keybinds.forEach(function (b) { byAction[b.action] = b; });
+					nodes.forEach(function (el) {
+						var bind = byAction[el.getAttribute('data-keybind')];
+						if (!bind || !bind.key) return;
+						var mods = (bind.modifiers || []).map(function (m) {
+							return m.charAt(0).toUpperCase() + m.slice(1);
+						});
+						el.textContent = mods.concat([bind.key]).join(' + ');
+						if (bind.description) el.title = bind.description + ' (default bind)';
+					});
+				})
+				.catch(function () { /* placeholder stands; Keybindings screen is authoritative */ });
+		})();
+
 		// Bug report form submission -> shared backend
 		document.getElementById('bug-report-form').addEventListener('submit', async function(e) {
 			e.preventDefault();
