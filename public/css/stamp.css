@@ -1,0 +1,240 @@
+/* ===========================================================================
+   p(Doom)1 — bureaucratic stamp motif
+   ---------------------------------------------------------------------------
+   A diagonal rubber-stamp impression, of the kind a clerk slams on a form.
+   Register: mid-2000s office paperwork, not a Web 1.0 "under construction" GIF.
+
+   WHY THIS FILE IS NOT IN site.css
+   --------------------------------
+   site.css loads on ~2,225 pages and has whited-out the site once already by
+   carrying a light-palette literal (see CLAUDE.md, "Cascade gotcha"). This
+   stylesheet is OPT-IN: a page adopts it with one <link>, and pages that do not
+   link it are untouched. Every class here is namespaced `.stamp*`, so it cannot
+   collide with a page's inline <style>.
+
+   PALETTE
+   -------
+   Colours come from `--stamp-ink`, which defaults to the amber-terminal accent
+   but reads a page token first, so a page that defines --accent-primary /
+   --amber gets its own ink for free:
+       --stamp-ink: var(--amber, var(--accent-primary, #f6a800));
+
+   HONESTY CONTRACT
+   ----------------
+   A stamp is a LABEL, not a censor bar. It must never sit on top of content a
+   reader needs. The default `.stamp` is in normal flow. `.stamp--overlay` is
+   available for panels that are *themselves* empty/pending, is
+   pointer-events:none, and requires the panel to reserve padding for it.
+
+   Stamp text is REAL TEXT, not a pseudo-element `content:`, because it carries
+   meaning about how far to trust the data underneath. Write the words in
+   sentence case in the HTML and let `text-transform:uppercase` do the shouting —
+   several screen readers spell out ALL-CAPS source text letter by letter.
+
+   MOTION
+   ------
+   Nothing here moves. A stamp is a static impression. The reduced-motion block
+   at the bottom exists only to neutralise transitions a host page might inherit
+   onto the element.
+
+   HOW IT IS BUILT (the recipe, in four cheap layers)
+   --------------------------------------------------
+   1. rotate()          — the slam angle. ~-7deg reads deliberate, not broken.
+   2. ::before          — a 1px-offset duplicate of the border box at low alpha:
+                          the second, misregistered impression of a tired stamp.
+   3. text-shadow       — the same trick on the letterforms.
+   4. ::after           — angled repeating-linear-gradient in the PAGE background
+                          colour, ~18% alpha, with uneven stop widths. Reads as
+                          streaky voids where the ink did not take.
+                          Deliberately an OVERLAY, not a mask: worst case it
+                          renders as nothing. A mask that fails renders the whole
+                          stamp invisible, which is the one failure mode we
+                          cannot accept for a trust label.
+
+   Full recipe + adoption snippet: docs/UNDER_CONSTRUCTION_STAMP.md
+   =========================================================================== */
+
+.stamp,
+.stamp-block,
+.stamp-docket {
+	--stamp-ink: var(--amber, var(--accent-primary, #f6a800));
+	--stamp-void: var(--bg, var(--bg-primary, #12100f));
+	--stamp-rotate: -7deg;
+}
+
+/* --- the impression ------------------------------------------------------ */
+
+.stamp {
+	position: relative;
+	display: inline-block;
+	max-width: 100%;
+	padding: 0.42em 0.85em;
+	border: 2px solid var(--stamp-ink);
+	border-radius: 3px;
+	box-shadow: inset 0 0 0 1px var(--stamp-ink);
+
+	color: var(--stamp-ink);
+	font-family: ui-monospace, "SFMono-Regular", Menlo, "Courier New", monospace;
+	font-size: 0.78rem;
+	font-weight: 800;
+	font-stretch: condensed; /* progressive enhancement; ignored if unavailable */
+	letter-spacing: 0.18em;
+	line-height: 1.15;
+	text-transform: uppercase;
+	text-align: center;
+	white-space: nowrap;
+
+	opacity: 0.9;
+	transform: rotate(var(--stamp-rotate));
+	transform-origin: 50% 50%;
+	/* rotation makes the box sweep past its layout footprint; buy it room so it
+	   never clips against a neighbouring element */
+	margin: 0.55em 0.75em;
+	vertical-align: middle;
+}
+
+/* the misregistered second impression */
+.stamp::before {
+	content: "";
+	position: absolute;
+	inset: -3px -2px 1px -4px;
+	border: 2px solid var(--stamp-ink);
+	border-radius: 3px;
+	opacity: 0.28;
+	pointer-events: none;
+}
+
+/* streaky voids where the ink did not take */
+.stamp::after {
+	content: "";
+	position: absolute;
+	inset: -2px;
+	pointer-events: none;
+	background: repeating-linear-gradient(
+		112deg,
+		var(--stamp-void) 0 1px,
+		transparent 1px 6px,
+		var(--stamp-void) 6px 7px,
+		transparent 7px 19px,
+		var(--stamp-void) 19px 21px,
+		transparent 21px 34px
+	);
+	opacity: 0.18;
+}
+
+.stamp > .stamp-text {
+	/* keeps the letters above the void overlay */
+	position: relative;
+	z-index: 1;
+	text-shadow: 0.5px 0.5px 0 currentColor;
+	opacity: 0.94;
+}
+
+/* --- ink variants: pick the one that is TRUE of the block ---------------- */
+
+.stamp--awaiting    { --stamp-ink: var(--amber, var(--accent-primary, #f6a800)); --stamp-rotate: -6deg; }
+.stamp--provisional { --stamp-ink: var(--amber, var(--accent-primary, #f6a800)); --stamp-rotate: -9deg; }
+.stamp--review      { --stamp-ink: var(--teal, var(--accent-secondary, #2fd4c2)); --stamp-rotate: -5deg; }
+.stamp--restricted  { --stamp-ink: var(--doom, var(--accent-danger, #e2524a)); --stamp-rotate: -11deg; }
+.stamp--incomplete  { --stamp-ink: var(--ink-3, var(--text-muted, #a79e92)); --stamp-rotate: -8deg; }
+
+/* --- sizes --------------------------------------------------------------- */
+
+.stamp--sm { font-size: 0.62rem; letter-spacing: 0.14em; padding: 0.3em 0.6em; border-width: 1px; }
+.stamp--lg { font-size: 1.02rem; letter-spacing: 0.2em; padding: 0.5em 1em; }
+
+/* --- placement ----------------------------------------------------------- */
+
+/* Corner impression. ONLY for panels whose content is itself pending — it must
+   never land on prose a reader needs. The panel must be position:relative and
+   must reserve padding-top for the stamp. */
+.stamp--overlay {
+	position: absolute;
+	top: 0.6rem;
+	right: 0.9rem;
+	margin: 0;
+	pointer-events: none;
+	z-index: 2;
+}
+
+/* --- the panel a stamp labels -------------------------------------------- */
+
+.stamp-block {
+	position: relative;
+	border: 1px dashed var(--stamp-ink);
+	border-radius: 10px;
+	background: var(--panel, var(--bg-secondary, #1c1917));
+	padding: 1.2rem 1.3rem 1.1rem;
+	margin: 1.4rem 0;
+}
+
+.stamp-block > .stamp-body {
+	color: var(--ink-2, var(--text-secondary, #cfc7bb));
+	font-size: 0.92rem;
+	text-wrap: pretty;
+}
+
+.stamp-block > .stamp-body > * + * { margin-top: 0.7rem; }
+
+/* The docket line. Mid-2000s paperwork does not just stamp a form, it gives the
+   form a number. Every reference printed here must be a real one — a made-up
+   docket is exactly the sort of authoritative-sounding lie this page exists to
+   avoid. */
+.stamp-docket {
+	margin-top: 0.9rem;
+	padding-top: 0.7rem;
+	border-top: 1px solid var(--hair, var(--border-color, #3a342e));
+	color: var(--ink-3, var(--text-muted, #a79e92));
+	font-family: ui-monospace, "SFMono-Regular", Menlo, "Courier New", monospace;
+	font-size: 0.68rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	word-break: break-word;
+}
+
+.stamp-docket a { color: var(--stamp-ink); text-decoration: none; }
+.stamp-docket a:hover { text-decoration: underline; }
+
+/* --- screen-reader-only prefix ------------------------------------------- */
+
+/* The stamp's meaning depends on knowing it IS a stamp. Sighted readers get
+   that from the border and the angle; everyone else gets this. */
+.stamp-sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* --- small screens ------------------------------------------------------- */
+
+@media (max-width: 480px) {
+	.stamp { font-size: 0.66rem; letter-spacing: 0.13em; white-space: normal; }
+	.stamp--lg { font-size: 0.82rem; }
+	.stamp--overlay { position: static; display: inline-block; margin: 0 0 0.6rem; }
+}
+
+/* --- a stamp is a static impression -------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.stamp,
+	.stamp::before,
+	.stamp::after,
+	.stamp-block {
+		transition: none !important;
+		animation: none !important;
+	}
+}
+
+/* --- high contrast / forced colours -------------------------------------- */
+
+@media (forced-colors: active) {
+	.stamp { border-color: CanvasText; color: CanvasText; opacity: 1; }
+	.stamp::after { display: none; }
+}
