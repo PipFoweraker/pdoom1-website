@@ -256,6 +256,66 @@ It is kept here because it is the most important methodological point in this do
 line numbers, and was wrong. Anything marked **[reported]** above deserves the same
 treatment before anyone acts on it.
 
+### 4.10 The guards are thinner than the docs claim **[verified]**
+
+Of the 17 checks CLAUDE.md lists as the pre-PR suite, **12 are not wired to CI at all**.
+They run only if a human remembers. That includes `check-published-emails.py` — the guard
+added after 75 academics' addresses were served from 44 pages — and, until today,
+`test-board-escaping.js`.
+
+CLAUDE.md is also **wrong** about one: it says `sync-keybinds.py --check` "runs
+everywhere, including CI". `grep -rn keybind .github/workflows/` returns nothing.
+
+Three checks **crash before asserting anything**, all on the documented cp1252 trap:
+`test-changelog-structure.py`, `test-integration.py`, `test-orchestrator.py`. Those three
+are the *only* references to five reader-facing writers, so a naive cross-reference
+counts those writers as "covered" when nothing covers them. *(PR #198 fixes the class.)*
+
+One test **cannot fail**: `test-syndication.js` has no failure counter and no non-zero
+exit path. It prints success unconditionally.
+
+And the one that stings: **`test-board-escaping.js` — the guard I wrote today — could
+never run on Windows.** `core.autocrlf=true`, so a checkout writes CRLF, and the
+extractors anchor on `;
+`. Under CRLF the byte after `;` is ``, so extraction died
+before a single assertion. It passed for me only because I had written the file from
+Python with LF preserved. It failed on the only platform CLAUDE.md tells you to run it on,
+while passing in a CI that does not run it either. *(Fixed in PR #208.)*
+
+### 4.11 Guards that pass vacuously **[verified]**
+
+`check-platform-claims.py` currently prints `No unavailable platforms to guard against.
+OK.` and returns **before scanning a single page** — because all three platforms are
+currently `true`. It has never been observed rejecting anything, and there is no test that
+forces a platform to `false`. Green here carries no information at all.
+
+Combined with §4.1 — where the field is deleted every six hours and the guard then prints
+`SKIP` — this check has two independent ways of passing without checking, and no way
+anyone would notice.
+
+Eight guards in total have only ever been observed passing, with nothing proving they can
+fail. Only five meet the "forced failure" bar: `test-snapshot-plausible.py` (the strongest
+in the repo, ~20 forced-failure constructs), `test-design-notes.py`, `test_ingest_scores.py`,
+`test-analytics-optout.js`, and `test-publish-live-board.py`.
+
+### 4.12 `validate_data.py` is green while reporting the board cannot work **[verified]**
+
+Exit logic is `sys.exit(1 if n_fail else 0)` — a WARN can never turn the daily cron red.
+The current WARN reads: *"NO stored seed file is stamped with the deployed version, so
+ingest_scores.py has nothing publishable and the board will be empty whatever happens
+upstream."* That is a description of the exact silent failure this repo exists to prevent,
+delivered at a severity nothing acts on.
+
+### 4.13 A guard that greps its own siblings, gating an unattended job **[reported]**
+
+`test-weekly-league-boundary.py` asserts that the unblessed seed is hardcoded nowhere, by
+globbing **every** `scripts/*.py` for the literal. During this audit it went red because a
+*sibling agent's test fixture* legitimately contained that string. That test is the first
+step of `weekly-league-reset.yml` and explicitly gates the unattended Friday rollover — so
+a test file containing a seed string could abort a live league rollover. It needs a
+test-file exclusion.
+
+
 ---
 
 ## 5. The burn-down board
@@ -267,14 +327,16 @@ driven to zero, and the number moving is the signal — not the redness.
 |---|---|---|---|
 | 1 | Data files with more than one writer | 5 | 0 |
 | 2 | Reader-facing generators with no test | 22 | 0 |
-| 3 | Guards not wired to CI | 12 | 0 |
+| 3 | Documented-suite checks not wired to CI | 12 of 17 | 0 |
 | 4 | Orphaned scripts | ~22 | 0 (delete or stub) |
 | 5 | Pages rendering external data unescaped | 6 | 0 |
 | 6 | Escapers on the site | 3 | 1 |
 | 7 | Fallback literals that ship on failure | 15+ | 0 |
 | 8 | Mirrors with no freshness stamp | 7 | 0 |
-| 9 | `check-stale-facts` findings | 214 | triage, then hold |
+| 9 | `check-stale-facts` findings | 213 (1 HIGH, 212 LOW) | triage, then hold |
 | 10 | Committing workflows that cannot deploy | 13 | 0 or documented |
+| 11 | Guards with no forced-failure test | 8 | 0 |
+| 12 | Checks that crash before asserting | 3 | 0 |
 
 **Rule for this board, from your own data-quality practice:** a big number is fine. A
 number with no owner and no trajectory is not. Record the count each month; new entries
