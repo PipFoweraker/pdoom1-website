@@ -1,0 +1,13 @@
+{
+  "_comment": "The board key this site publishes, written by publish-live-board.py. This is an OBSERVATION of what the shipped client posts to, not a choice made here. check-board-liveness.py reads it to decide whether a populated board is 'deployed' or an orphan. Kept separate from weekly/current.json because weekly-league-manager.py owns that file and rewrites it on rollover.",
+  "seed": "weekly-2026-w30",
+  "ladder_epoch": "L3",
+  "epoch_source": "pdoom1 via pdoom1-website issue #151 comment 2026-07-28T23:13 ('the live epoch on Friday is L3'), restated on issue #201 comment 2026-07-30T02:44 ('Board key: L3. Not v0.13.2, not L3.0, not a build version'). Game-side authority: GameConfig.get_board_version() returns 'L' + LADDER_VERSION, ladder_version.txt = 3.",
+  "seed_provenance": {
+    "blessed": false,
+    "derivation": "observed live on the score API; the board the client is posting to",
+    "note": "Not a blessing. Friday's competitive seed is drawn at the ceremony and recorded in docs/LEAGUE_SEED_LEDGER.md. This file records what IS, so that the site publishes the board players actually reach."
+  },
+  "entries_at_publish": 3,
+  "published_at": "2026-07-30T12:53:14+00:00"
+}

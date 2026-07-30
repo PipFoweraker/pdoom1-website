@@ -1,77 +1,89 @@
 # Navigation System
 
-This directory contains the standardized navigation component for the p(Doom)1 website.
+The site has exactly ONE navigation. It lives in
+[`/public/assets/js/navigation.js`](../assets/js/navigation.js), in the
+`navigationHTML` template, and it is injected at runtime.
 
-## How It Works
+## Why there is no HTML include here any more
 
-The navigation is implemented using JavaScript to ensure consistency across all pages while remaining static-site friendly.
+This directory used to hold `navigation.html`, described in its own docs as a
+"static HTML template (reference only)". It was wired into **zero** pages, and
+it had gone stale in the way an unused copy always does: it hardcoded
+`v0.11.0` / `2025-12-07` in the version badge, so any page that had adopted it
+would have asserted a two-releases-old version forever.
 
-### For New Pages
+Two sources of truth for one component is how this site ended up with ten
+divergent navs. It was deleted on 2026-07-28. `navigation.js` is the only
+source; if you want to change the nav, change it there.
 
-To add standard navigation to a new page:
+`docs/HTML_PAGE_TEMPLATE.md` used to instruct authors to *copy* the nav markup
+into each new page. That instruction was the drift generator and has been
+replaced with the recipe below.
 
-1. **Add a header element** in your HTML:
+## Adding the nav to a page
+
+1. Put an **empty** header in the body:
+
    ```html
    <header>
        <!-- Navigation loaded by navigation.js -->
    </header>
    ```
 
-2. **Include the navigation script** before closing `</body>`:
+   It must stay empty. `navigation.js` overwrites the header's contents at
+   runtime, so anything you leave in there is dead markup that reads as live —
+   `scripts/test-header-consistency.js` fails a page for exactly this.
+
+2. Load the script at the **end of the body**:
+
    ```html
    <script src="/assets/js/navigation.js"></script>
    ```
 
-3. **Ensure site.css is loaded** for proper styling:
-   ```html
-   <link rel="stylesheet" href="/css/site.css">
-   ```
+3. That is it. The script ships its own styles (scoped to
+   `header[data-nav-injected]`, every colour a `var()` with a fallback), so the
+   nav is self-contained and does not need the host page to define
+   `.nav-links` / `.dropdown` / `.logo-container` rules. If your page already
+   has such rules only for its own nav, delete them.
 
-That's it! The navigation will automatically populate with the full menu structure.
+`/css/site.css` is optional for the nav — helpful for the rest of the page, not
+required by the component.
 
-## Navigation Structure
+## What the nav contains
 
-The standard navigation includes:
+Read `navigationHTML` in `navigation.js` for the authoritative list. As of
+2026-07-28:
 
-**Main Links:**
-- Game (homepage)
-- Leaderboard
-- Stats
-- Risk Dashboard
-- Forum (external link)
+- **Main links:** Game, Leaderboard, Stats, Risk Dashboard
+- **Community ▾:** Issues & Feedback, Dev Blog, Updates, Cat Custodians, GitHub
+- **Info ▾:** About, AI Safety Resources, Roadmap, Documentation, Press Kit
 
-**Community Dropdown:**
-- Issues & Feedback
-- Dev Blog
-- Updates
-- Cat Custodians
-- GitHub
+The Forum link is deliberately absent until `forum.pdoom1.com` has DNS and
+HTTPS. The version badge ships **empty and hidden**; `updateNavVersion()` fills
+it from `/data/version.json` and leaves it hidden if that fetch fails, so a
+failure shows nothing rather than a stale version.
 
-**Info Dropdown:**
-- About
-- AI Safety Resources
-- Roadmap
-- Documentation
-- Press Kit
+## Known divergence
 
-## Updating Navigation
+`public/index.html` still carries its own static nav. It differs on purpose in
+two ways that need a product call before it can be converted:
 
-To update the navigation across all pages:
+- it links **Events** (`/events/`, ~2,197 pages) — the shared nav does not;
+- it has **Press Kit commented out** — the shared nav includes it.
 
-1. Edit `/assets/js/navigation.js`
-2. Update the `navigationHTML` constant
-3. All pages using the script will automatically get the updated navigation
+Converting the homepage without resolving those would silently drop the Events
+link and silently add Press Kit. See `docs/TECH_DEBT.md` B1.
 
 ## Features
 
-- **Automatic Current Page Highlighting** - Active page is highlighted in nav
-- **Dropdown Menus** - Click to expand Community and Info menus
-- **Responsive Design** - Works on mobile and desktop
-- **Accessibility** - Full ARIA labels and keyboard navigation
-- **Version Badge** - Shows current game version
+- Current page highlighting (`aria-current="page"`)
+- Click-to-open dropdowns, closed on outside click
+- Responsive: stacks under 760px, dropdowns become static
+- ARIA roles throughout (`menubar` / `menuitem` / `aria-haspopup`)
+- Version badge fed from `/data/version.json`, silent on failure
 
 ## Files
 
-- `navigation.html` - Static HTML template (reference only)
-- `/assets/js/navigation.js` - Dynamic navigation loader (active)
-- `/css/site.css` - Navigation styles (shared across site)
+- `/assets/js/navigation.js` — the nav: markup, styles, behaviour (active)
+- `/css/site.css` — shared site styles (does not style the nav)
+- `scripts/test-header-consistency.js` — enforces the contract above

@@ -13,11 +13,27 @@ Deeper material lives in `docs/`:
 ## What this repo is
 - **Statically pre-rendered** site: ~2,225 HTML files. Most styling is **inline
   `<style>`** per page; shared `css/site.css` is tiny.
-- **No shared layout spine.** `public/includes/navigation.html` is wired into
-  ZERO pages. `public/assets/js/navigation.js` is the de-facto single source
-  (used by ~8 pages) and is what new pages should adopt — put an empty
-  `<header></header>` in the body and load the script at the end.
-  `scripts/test-header-consistency.js` reports the drift (currently 0/23 pass).
+- **The layout spine is `public/assets/js/navigation.js`** and nothing else
+  (as of 2026-07-28). 21 of the 25 hand-written pages delegate to it: an empty
+  `<header></header>` in the body, `<script src="/assets/js/navigation.js">` at
+  the end. It ships its own styles, scoped to `header[data-nav-injected]`, so a
+  page needs no `.nav-links`/`.dropdown` rules of its own — if you see any,
+  they are dead. Recipe and rationale: `public/includes/README.md`.
+  - `public/includes/navigation.html` was **deleted**. It was wired into zero
+    pages and hardcoded a stale `v0.11.0`. Do not recreate a second copy.
+  - `docs/HTML_PAGE_TEMPLATE.md` used to tell authors to **hand-copy** the nav
+    into each page. That instruction is what generated the ten variants; it now
+    documents the two-line recipe. Do not re-add "copy the nav" guidance.
+  - Four static navs survive on purpose, all owned elsewhere: `index.html`
+    (diverges deliberately — links Events, hides Press Kit; needs a product
+    call), `events/index.html` (generated), `league/`, `players/`.
+  - `scripts/test-header-consistency.js` enforces it (currently 15/25 overall,
+    22/25 on the nav contract; the 9 remaining failures are content emoji in
+    frozen prose, not nav). It validates `navigationHTML` itself, so breaking
+    the single source fails every delegating page at once.
+  - **Nav does not render with JS off.** `design-notes/index.html` shows the
+    intended fallback: a `<nav>` in the header *without* `.nav-links`, which
+    navigation.js overwrites when it runs. TECH_DEBT B1b.
 
 ## The prime directive: never lie to a visitor
 Pip's stated top priority. Practically:
@@ -160,6 +176,13 @@ Pip's stated top priority. Practically:
   (`timeline_events/alignment_research/`), which the sync has never read. See
   `docs/TECH_DEBT.md` §E-0. **Trace generated content back to its source before
   deleting it.**
+- **Event descriptions are raw PDF text, so they carry other people's PII.**
+  arXiv/ACM author blocks include institutional email addresses; 75 distinct
+  academics' addresses were live on 44 pages until 2026-07-29. `sync-events.py`
+  now redacts them (`redact_pii()` walks the WHOLE event dict, not a field list,
+  so a new upstream field cannot leak). `scripts/check-published-emails.py`
+  re-verifies and imports the generator's one regex rather than copying it.
+  The addresses are still in pdoom-data — scrubbing here does not fix the source.
 - `public/design/tokens.json` is fetched at runtime by ~8 pages; the other ~2,190
   hardcode their colours in an inline `:root`. It is not a design system yet.
 
@@ -177,6 +200,24 @@ Pip's stated top priority. Practically:
   `localStorage.plausible_ignore === "true"`. Nothing else works.
 - `analytics-config.json` is unused documentation.
 - `scripts/alpha-watch.py` reports the two launch signals (site + leaderboard).
+- **The Plausible VPS has no backups of any kind** (TECH_DEBT A1). The interim
+  hedge is `snapshot-analytics.yml` → `scripts/snapshot-plausible.py`, which
+  commits a daily `public/data/analytics/history/<date>.json`. There is exactly
+  ONE such workflow; extend it rather than adding a second (see what two writers
+  did to `version.json`).
+  - The API answers `--period 30d` with the 30 days **ending yesterday**, so
+    every day is captured by ~30 consecutive snapshots and one lost run costs
+    nothing. The flip side: the hedge only reaches back 30 days from the first
+    snapshot ever taken (2026-07-23 → 2026-06-23). **Older history exists only
+    on the VPS** until someone runs `--range START:END`.
+  - The script **writes nothing** on a missing key (exit 2), a failed/malformed
+    fetch (3) or an all-zero response (4), so a bad run can never clobber the
+    last good `latest.json`. CI passes `--require-key`: a revoked secret is a
+    red run, not a green no-op. `scripts/test-snapshot-plausible.py` asserts all
+    of that against a stubbed API — no key needed — plus the workflow contract.
+  - Snapshots live under `public/`, so they are publicly fetchable once a human
+    push deploys. Aggregate counts only; `public/data/analytics/README.md`
+    already declares the retention public.
 
 ## Blog & feeds
 - Posts are `.md` in `public/blog/`, listed in `public/blog/index.json` (keys:
@@ -209,12 +250,79 @@ python  scripts/validate_data.py          # data contracts
 python  scripts/check-stale-facts.py      # hardcoded facts that rot
 python  scripts/check-platform-claims.py  # no reachable page claims an unshipped OS
 node    scripts/test-download-resolution.js # download buttons resolve/degrade right
+python  scripts/check-published-emails.py # no third party's address is served
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift
 python  scripts/generate-feeds.py --check # feeds in step with the blog
+python  scripts/generate-metabolism.py --check # /metabolism/ in step with crons+configs
+python  scripts/test-snapshot-plausible.py # analytics backup still fails loudly
 node    scripts/test-header-consistency.js
 python  scripts/test-changelog-structure.py   # changelog files + data shape
 python  scripts/check-encoding-safety.py      # cp1252 preamble + explicit encodings
+
+python  scripts/sync/sync-keybinds.py --check # keybind mirror fresh + no typed keys
+python  scripts/test-weekly-league-boundary.py  # rollover run-time -> week mapping (A9)
+python  scripts/stamp-league-epoch.py --check   # every weekly record carries its epoch
+node    scripts/test-board-escaping.js    # no API field reaches innerHTML unescaped
 ```
+
+## Testing discipline
+Every line below was earned by something that actually went wrong here, mostly on
+2026-07-30. They are cheap to follow and expensive to relearn.
+
+- **A claimed safety property needs a forced failure.** If a script says it "fails
+  loudly", "refuses rather than guesses" or "never overwrites good data", there must be a
+  test that FORCES that path and observes it. A docstring is documentation, not evidence.
+  Copy `scripts/test-board-escaping.js` or `scripts/test_ingest_scores.py`: build inputs
+  in a temp dir, assert the refusal, never mutate a committed fixture.
+- **A guard seen only in its passing state has not been shown to work.** Green is equally
+  consistent with "the condition is safe" and "the check never fires". Make it fail on
+  purpose once and keep that as the test.
+- **Never assert a literal against a value that moves.** `test_ingest_scores.py` pinned a
+  fixture to `v0.11.0` while the rule under test was "matches the DEPLOYED version"; it
+  went red at v0.12.0 and stayed red through two more releases. Read the moving value and
+  assert the *rule*.
+- **A red test in the suite above is worse than no test** — it teaches everyone to skip
+  the suite, so the one failure that matters is skipped with it. Fix it or delete it.
+- **Refusing to act is itself a silent-failure mode.** A script that correctly declines
+  every run is externally identical to one that is broken. Anything that can refuse needs
+  a staleness escalation, not just a warning in a job summary.
+- **Absence of a marker is never a clean bill of health.** Everything predating a marker
+  is unmarked too, so a missing flag must render as *unknown*, never as *fine*.
+- **Check sibling branches before writing a fix.** Two agents independently rewrote the
+  same test on 2026-07-30, one better than the other. With parallel work here, duplicated
+  effort is a more common waste than merge conflicts are.
+- **Anything rendering data from the score API must escape it.** That API is
+  unauthenticated and validates nothing — `GET ?seed=x&version=L9` returns `ok:true` for
+  a board that never existed — so every field is attacker-controlled. There is exactly
+  ONE escaper on the leaderboard page; do not add a second.
+
+**`/metabolism/` is generated, never hand-edited.** `scripts/generate-metabolism.py`
+derives every cadence on that page at build time from the thing that actually runs —
+the `cron:` lines in `.github/workflows/`, `scripts/weekly-league-config.json`, the
+manager's own week arithmetic, `docs/LEAGUE_SEED_LEDGER.md`, `public/data/clocks.json`
+— and renders each with a clickable `file:line`. The two classes of fact it cannot
+derive (pdoom1's release nomenclature, and observations with no in-repo measurement)
+live in `public/data/metabolism.json` with an explicit `source` + `derived_from`, and
+render as *declared*, not measured. Change a cron and `--check` fails the PR
+(`metabolism-map.yml`); the fix is to re-run the generator. It refuses to build if a
+workflow carries a park marker *and* a schedule, or if a citation needle has vanished.
+
+**Keybinds are MIRRORED from the game, not derived — and a mirror rots.**
+`public/data/keybinds.json` is written by `scripts/sync/sync-keybinds.py`, which
+parses `godot/autoload/keybind_manager.gd` out of a **local pdoom1 checkout**
+(`--game-repo`, `$PDOOM1_REPO`, or `../pdoom1`). pdoom1 publishes no keybind
+artifact yet — the ask is **pdoom1#1011**. Until that lands the file is stamped
+`"mirror": true` with source path, source commit and `verified_on`.
+`--check` fails on three things: drift vs the game source (skipped when no
+checkout is present), a mirror older than 90 days, and — the one that runs
+everywhere, including CI — **any key typed as a literal into a page**. Pages must
+use `<kbd data-keybind="<action>">…</kbd>` and let the JS fill it; typing `N` into
+HTML is exactly how pdoom1's own `CONTRIBUTING.md` came to say "backslash" long
+after the bind moved. If the fetch fails the placeholder deliberately **stands**
+rather than falling back to a remembered key — a stale key sends a player to a key
+that does nothing, which reads as "the game is broken".
+`BuildInfo.DEV_BUILD` is a hand-flipped `const` (nothing in the export tooling
+sets it), so dev-gated keys must be described as "may or may not be in your build".
 
 **Platform availability is a *derived* fact, not prose.** The source of truth is
 `public/data/version.json` → `latest_release.platforms` ({windows,macos,linux}
@@ -229,12 +337,63 @@ platform that has no build.
 - Weekly-league rollover only opens a GitHub issue **on failure**
   (`weekly-league-reset.yml`). The old workflow that spammed 35 "success" issues
   was removed 2026-07-14 — don't reintroduce success-issue creation.
-- **The rollover is off by one week**: cron fires Sunday 14:00 UTC and
-  `get_current_week_info()` derives the week from `now`, so it creates the week
-  that *ends* hours later. `validate_data.py` reports it. See TECH_DEBT A9.
-- The leaderboard board key is **`(seed, game_version)`** (pdoom1 PR #679). A
-  version-stamp mismatch means submitted scores land nowhere, with **no error
-  shown to the player** — it looks exactly like "nobody is playing". Suspect this
+- **The league week is anchored to Friday 00:00 `Australia/Hobart`** (Pip,
+  2026-07-28: "Everything is going to be based off Hobart time, AEST"), matching
+  the game's own "Seed — every Fri" cadence in
+  `pdoom1/docs/RELEASE_NOMENCLATURE.md`. The cron is `0 14 * * 4` — **Thursday**
+  14:00 UTC — which is Fri 00:00 Hobart in winter and Fri 01:00 in summer, i.e.
+  always a Friday there and never *before* the week it opens.
+  **`Australia/Hobart` is not a fixed offset:** +10 (AEST) in winter, +11 (AEDT)
+  from October to April. The week is derived with `ZoneInfo`, never an offset, so
+  DST cannot move the answer — only how far into the week the run lands. A
+  hardcoded `+10` is the tempting wrong fix; `league_tz()` raises rather than
+  falling back to one.
+  **`zoneinfo` has no bundled tz database on Windows** — `ZoneInfo("Australia/Hobart")`
+  raises until `pip install tzdata`. It is pinned in `requirements.txt`; without
+  it the league scripts die locally while CI stays green.
+- **The rollover off-by-one is FIXED (2026-07-28, TECH_DEBT A9).** The run-time →
+  week mapping is explicit (`league_week_start()`), never derived from `now`, and
+  the Friday anchor let the old look-ahead go away entirely: the cron fires inside
+  the week it opens, so the week is simply the one containing the run.
+  `scripts/test-weekly-league-boundary.py` (74 assertions) pins the boundary in
+  **both DST states** plus the two DST-spanning weeks, and runs as the **first**
+  step of the rollover workflow. **Do not "simplify" that back to
+  `datetime.now()`** — `datetime.now()` without a tz is *local* time, which on
+  Pip's box is AEST (+10), exactly the size of skew that crosses this boundary.
+- **The league and player pages are retired-and-hidden, not deleted** (Pip,
+  2026-07-28), and everything opened before the **L2 → L3 ladder fork** is
+  labelled **anomalous pre-history** via a machine-readable `epoch` block in the
+  data. The boundary is `2026-07-31 00:00 Australia/Hobart`
+  (`2026-07-30T14:00:00Z`) and **it is not a script literal** — it lives in
+  `public/data/ladder-epochs.json`, which `weekly-league-manager.py` reads. First
+  regularised week is **2026_W32** (Fri 2026-07-31).
+  **Do not re-derive this from `RELEASE_NOMENCLATURE.md`'s "Epoch = first Friday"
+  rule** — that is how an earlier pass got 2026-08-07. The ladder forked
+  *mid-month* on gameplay changes (the AP pool was removed for an attention
+  economy); the shipping build is v0.13.2 on L3. **pdoom1-website#151, comment
+  2026-07-28T23:13Z, is authoritative and supersedes that calendar row.**
+  Week ids changed meaning at the 2026-07-30 rollover, so **compare
+  `start_timestamp`, not ids**, across that switch. Before touching any weekly
+  archive, seed leaderboard, or `/league/` + `/players/` page, read
+  `docs/LEAGUE_EPOCH_ANOMALY.md`.
+- **The board key is `(seed, ladder_version)` — literally `L3`.** NOT
+  `v0.13.2`, NOT `L3.0`, and **no longer `(seed, game_version)`** (an earlier note
+  here said that; pdoom1 #151 supersedes it). `GameConfig.get_board_version()`
+  returns `"L" + LADDER_VERSION`. The build version never touches the board key
+  again — that is the point of the build-vs-ladder split. `meta.game_version` in
+  a weekly record is a **record stamp only**; keying off it is what stranded 23
+  real submissions.
+  **The score API has NO key validation.** A wrong seed or version returns
+  `ok:true` with an empty board (verified 2026-07-29, read path) — indistinguishable
+  from "nobody is playing", and **no error is shown to the player**. Proving a key
+  needs a *positive* check (post a score, read it back). Suspect a key mismatch
   before suspecting analytics.
+- **Never present an unblessed seed to a player.** The blessed value is
+  `docs/LEAGUE_SEED_LEDGER.md` → mirrored into `public/data/ladder-epochs.json`;
+  anything the website derives is a placeholder marked
+  `seed_provenance.blessed: false`, and `public/leaderboard/index.html` will not
+  offer it. Pip, 2026-07-29: *"Let's keep using variables and not hardcoding
+  things where we can!"* — pinned values go in a data file with a `source` note,
+  never a script literal.
 - pdoom1 PR #679 also rules that this repo is a **read-only consumer** of one PHP
   score API and must not stand up a second score store.

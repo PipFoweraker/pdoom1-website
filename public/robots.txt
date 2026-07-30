@@ -7,19 +7,46 @@ Disallow: /api/
 Disallow: /assets/private/
 
 # Disallow build artifacts and internal resources
-Disallow: /data/
-Disallow: /design/
 Disallow: /monitoring/
 
+# /data/ and /design/ are DELIBERATELY crawlable (TECH_DEBT A8, 2026-07-28).
+# They are not build artifacts, they are runtime subresources. The homepage
+# fetches /data/version.json and /design/tokens.json; /state-of-doom/ fetches
+# /data/clocks.json and /design/tokens.json; about, game-stats, leaderboard,
+# resources and assets/js/navigation.js fetch from them too. Googlebot obeys
+# robots.txt for subresources as well as for pages, so disallowing these
+# directories made the crawler render our hardcoded fallbacks instead of the
+# real version and token data. Do not re-add Disallow lines for them.
+# Nothing under either path is private: both hold plain public JSON, and
+# robots.txt never provided access control in the first place.
+
+# /changelog/ is DELIBERATELY crawlable (Pip's ruling, 2026-07-28): it redirects
+# to /game-changelog/. A redirect a crawler is forbidden to fetch is a dead end
+# -- the crawler never learns the new location, and every inbound link pointing
+# at /changelog/ is stranded. The redirect itself is built on branch
+# feat/changelog-surface, PR #183. Do not re-add a Disallow for it.
+
 # Orphaned pending revision (2026-07-24): no inbound links, stale content.
-# These also carry <meta name="robots" content="noindex">.
 # See docs/ORPHANED_PAGES_TODO.md before re-linking or removing.
+#
+# Disallow stops the CRAWL, not the INDEX. A URL discovered from anywhere else
+# can still be listed in results, just without a snippet. Only
+# <meta name="robots" content="noindex"> keeps a page out of the index -- and a
+# crawler has to be ALLOWED to fetch the page before it can ever see that tag.
+# So the two mechanisms are not interchangeable, and per-file status matters.
+#
+# Verified per file, 2026-07-28:
+#   league/index.html, league/archive.html, players/index.html and
+#     dev-notes/index.html DO carry <meta name="robots" content="noindex">.
+#   stats/index.html and stats/competition.html carry NO noindex tag. They are
+#     disallowed here and nothing more, so either could still be indexed
+#     snippet-less. Adding a noindex would quietly pre-empt an open product
+#     decision -- whether /stats/ is retired, kept, or pointed at
+#     /state-of-doom/ -- so do not add one without Pip's call.
 Disallow: /league/
 Disallow: /players/
-Disallow: /changelog/
 Disallow: /dev-notes/
 Disallow: /stats/
-Disallow: /dev-notes/
 
 # Sitemap (update if domain differs)
 Sitemap: https://pdoom1.com/sitemap.xml

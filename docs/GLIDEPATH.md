@@ -165,19 +165,52 @@ belt-and-braces later would be a copy-to-a-log or a Discord ping on receipt.
 
 ## 6. Fresher assets — the honest answer to "do we have the right banners?"
 
-**No — the site is a version behind on art.** The game now has newer banner/hero
-art the website doesn't use:
-- `godot/assets/icons/decorative_headers/ui_header_banner_1024.png`
-- `art_source/pixellab_2026-07-16/09-V9-heroic-fullcolor_*.png` (heroic hero art)
-- `art_generated/scene_art_wave2/v1/*` (28 event scenes) — these feed the *event
-  pages*, but the **homepage hero** still uses older gameplay **screenshots**
-  (`assets/screenshots/hero-bg-*`, `gameplay-office-*`).
+**No — the site is a version behind on art.** But **two of the three assets named in
+the original version of this section were not what their filenames suggested.**
+Corrected 2026-07-28 after an inventory of all 2,247 images in the game repo:
 
-So: the amber palette now matches the game; the **hero imagery does not**. Uplifting
-it needs your art-direction call (which banner, how it's framed) + processing the
-source art to web sizes. **~1–2 hrs once you point at the assets.** Not
-Friday-blocking, but it's the biggest "looks current" lever after the palette, and
-it pairs with #80 (curated screenshots). Hand me the chosen art and I'll wire it.
+| claimed here | what it actually is |
+|---|---|
+| ~~`decorative_headers/ui_header_banner_1024.png`~~ | **Square (1024×1024), and it is a teal up-arrow button in a stone frame.** A UI icon, not a banner. |
+| ~~`art_source/pixellab_2026-07-16/09-V9-heroic-fullcolor_*.png` ("heroic hero art")~~ | **68×68 px directional character sprites.** "Heroic" is a style/class name, not a banner. |
+| `art_generated/scene_art_wave2/v1/*` (28 event scenes) | **Correct.** These feed the event pages. |
+
+**The genuinely new finding:** the homepage hero the site serves today
+(`assets/screenshots/hero-bg-*`) **has no source anywhere in the game repo** — all
+2,247 images were scanned and nothing matches it.
+
+**Provenance, per Pip 2026-07-28 (correcting an earlier draft of this section which
+called it "unattributable"):** he generated it himself with ChatGPT's paid tier
+around November 2025, on or near the day it was committed, using prompts traceable
+to the commits from that session. So it is *attributable* — just not *reproducible
+from the game repo*, and not derived from any asset the game ships. Ownership is
+Pip's under OpenAI's output-assignment terms (worth re-verifying at source before
+any commercial use).
+
+What Pip likes about it, recorded as art-direction input rather than as a defect:
+**purple** (his favourite colour), a **"cozy-Tarkov"** read — grimy utilitarian
+interior, warm pools of light, danger implied off-screen — and the fact that it
+**hints at a purple/blue/red set for doom flavours**, which the game's doom-flavour
+system could make mechanical rather than decorative.
+
+`hero-main-office.png` and both `gameplay-office-*.png` are byte-identical to files
+in `godot/assets/dump_october_31_2025/`, superseded by the 2026-07-22 wave.
+
+The real hero candidates are the **2026-07-22 wave** in
+`godot/assets/images/backgrounds/`, `.../records/` and `.../events/` — all 1536×1024,
+amber-on-teal, and closed out into the shipping game.
+
+**The honest catch:** every candidate is natively **1536 px** wide; `hero-bg-2400w`
+is **2400 px**. Switching is a resolution downgrade at the widest breakpoint, needing
+an upscaler pass or that breakpoint dropped. Trade that against art that is
+game-canonical and palette-exact instead of untraceable and off-palette.
+
+Only **52 of 2,247** images in the game repo are wide enough and large enough to be
+a hero at all. The whole `art_source/pixellab_*` corpus (786 files) is 48–128 px
+sprites, cat walk-cycles, prop sheets and directional rotations — zero candidates.
+
+A 15-candidate judging bench was built for Pip's call (each shown at homepage scale
+under the site's real headline and CTAs). Pairs with #80 (curated screenshots).
 
 ---
 

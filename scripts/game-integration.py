@@ -304,6 +304,11 @@ class GameRepositoryIntegration:
                 "export_source": "fallback",
                 "note": "No game data available - game repository detected but no leaderboard data found"
             },
+            # Without this the leaderboard page had no status to read. It defaulted the
+            # absent field to "live", so a FAILED EXPORT published itself as a real, empty
+            # competitive board. The failure has to travel with the data it produced.
+            "data_status": "pre-launch",
+            "legacy": True,
             "seed": "no-data",
             "economic_model": "unknown",
             "entries": []
@@ -547,33 +552,42 @@ class GameRepositoryIntegration:
         return True
     
     def get_current_week_info(self) -> Dict[str, Any]:
-        """Get current week information for weekly league system."""
-        from datetime import datetime, timedelta
-        
-        now = datetime.now()
-        
-        # Find the start of the current week (Monday)
-        days_since_monday = now.weekday()
-        week_start = now - timedelta(days=days_since_monday)
-        week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
-        
-        # Week end is Sunday
-        week_end = week_start + timedelta(days=6, hours=23, minutes=59, seconds=59)
-        
-        # ISO week number
-        year, week, _ = now.isocalendar()
-        
-        return {
-            "week_id": f"{year}_W{week:02d}",
-            "year": year,
-            "week": week,
-            "start_date": week_start.strftime("%Y-%m-%d"),
-            "end_date": week_end.strftime("%Y-%m-%d"),
-            "start_timestamp": week_start.isoformat(),
-            "end_timestamp": week_end.isoformat(),
-            "is_current": True
-        }
-    
+        """Current league week -- delegated to the ONE implementation of it.
+
+        This method used to re-derive the week itself: naive `datetime.now()`
+        (local, not UTC), a Monday anchor, and the ISO week taken from `now`
+        rather than from the week start. That is character-for-character the A9
+        bug (docs/TECH_DEBT.md), living in a second file, and it runs inside the
+        rollover workflow (`--weekly-sync`). Two derivations of the same fact are
+        two chances to be wrong and one guarantee of disagreement: after the
+        anchor moved to Friday 00:00 Australia/Hobart, this copy would have gone
+        on globbing the game repo for the Monday-ISO week and quietly matched
+        nothing.
+
+        So it now calls scripts/weekly-league-manager.py, which is pinned by
+        scripts/test-weekly-league-boundary.py. If that import fails it raises:
+        syncing against a week nobody else agrees on is worse than not syncing.
+        """
+        import importlib.util
+
+        manager_path = Path(__file__).parent / "weekly-league-manager.py"
+        try:
+            spec = importlib.util.spec_from_file_location(
+                "weekly_league_manager", manager_path)
+            wlm = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(wlm)
+            week = wlm.WeeklyLeagueManager().get_current_week_info()
+        except Exception as e:
+            raise RuntimeError(
+                f"Cannot derive the current league week from {manager_path}: {e}. "
+                "Refusing to fall back to a local re-derivation -- that is how the "
+                "rollover ended up a week out (docs/TECH_DEBT.md A9)."
+            )
+
+        # `week` is the legacy key this file's callers use; `week_number` is the
+        # manager's name for the same value.
+        return dict(week, week=week["week_number"])
+
     def get_weekly_seed(self, week_info: Optional[Dict[str, Any]] = None) -> str:
         """Generate or get weekly competitive seed."""
         if not week_info:

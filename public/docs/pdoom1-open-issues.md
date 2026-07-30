@@ -1,9 +1,40 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-28T18:45:55.660Z UTC
+Generated: 2026-07-30T12:50:25.583Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1046 | Main-screen warnings: tell players the ladder can fork BEFORE they play (draft copy inside) |  |  | 2026-07-30 12:11:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1046) |
+| 1044 | design(tempo): actions resolve instantly, so the early game has no rhythm -- time, sequencing, and the queue's promise | game-mechanics |  | 2026-07-30 08:49:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1044) |
+| 1043 | ui(layout): the Plan screen wastes its middle and scatters its text -- legibility-first layout brief | ui-ux |  | 2026-07-30 06:59:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1043) |
+| 1042 | Score payload: emit player name AND lab name, plus a dev-mode-used flag (website side is built) |  |  | 2026-07-30 02:55:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1042) |
+| 1041 | playtest 2026-07-30 (v0.13.2 artifact): UI/UX findings from the Gate 4 run | ui-ux |  | 2026-07-30 02:43:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/1041) |
+| 1040 | macOS HOW-TO-RUN still tells testers to right-click -> Open, which Sequoia 15.x removed |  |  | 2026-07-30 02:12:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1040) |
+| 1038 | trust: make provable declarations about what the game touches -- exit surfaces, provenance, signing | documentation, post-launch |  | 2026-07-30 01:17:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1038) |
+| 1037 | nomenclature: stale 'AP' vocabulary in player-facing text after the attention-economy migration (#996) -- scoped sweep + GLOSSARY.md is missing | documentation, ui-ux |  | 2026-07-29 23:55:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1037) |
+| 1036 | testing: which tests pass only by alphabetical ordering accident? GameManager autoload leaks between files | testing, technical-debt |  | 2026-07-29 23:55:33 | [link](https://github.com/PipFoweraker/pdoom1/issues/1036) |
+| 1035 | ascii(#744): player-facing non-ASCII survives in .tscn text -- check_no_emoji.py only blocks emoji there | ui-ux, technical-debt |  | 2026-07-29 23:55:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/1035) |
+| 1034 | scene_transition (latent): fade transition awaits a pausable tween -- would deadlock ALL navigation if called while paused | technical-debt |  | 2026-07-29 23:55:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1034) |
+| 1033 | scene_transition: is_transitioning released before the engine swaps; scene_load perf section excludes _ready | bug, technical-debt |  | 2026-07-29 23:55:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1033) |
+| 1032 | bug(config_confirmation): ENTER double-fires launch -- increment_games_played() runs twice per keyboard launch | bug |  | 2026-07-29 23:55:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/1032) |
+| 1031 | ui(tech-debt): 30 scene-authored placeholders read as real state -- sentinel convention, then a narrow gate | ui-ux, technical-debt |  | 2026-07-29 23:55:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1031) |
+| 1030 | ui(bug): 'Game not started...' is the permanent first line of every player's feed; 'Turn 1' label is dead | bug, ui-ux |  | 2026-07-29 23:55:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/1030) |
+| 1029 | dev+ux: no way to replay the cold-open intro -- add a reset for last_seen_intro_version | enhancement, ui-ux |  | 2026-07-29 23:55:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1029) |
+| 1028 | input(dev): ESC/pause disables ALL diagnostic surfaces -- root cause is process_mode, not input priority | bug, ui-ux |  | 2026-07-29 23:21:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1028) |
+| 1027 | architecture: the project has left explosive-growth phase -- design the guarded, review-heavy cycle before contributors arrive | documentation, technical-debt, post-launch |  | 2026-07-29 22:28:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/1027) |
+| 1026 | post-league mortem: #1023 boot failure -- five whys, captured | documentation, post-launch |  | 2026-07-29 22:31:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1026) |
+| 1025 | ritual: [Gate 2: THE FREEZE] can precede [Gate 4: PROVEN BUILD] -- Council of Elders vote before next league | documentation |  | 2026-07-29 22:25:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1025) |
+| 1024 | art: regen the endgame poster batch under the provisional rules, THEN decide which rules survive | post-launch |  | 2026-07-29 12:44:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1024) |
+| 1023 | LEAGUE-CRITICAL: game does not initialise on launch -- full UI, Phase: Not Started, no action buttons | bug, priority:critical |  | 2026-07-29 12:30:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/1023) |
+| 1020 | ADR-0005 seed schedules are INERT in real play: nothing passes a schedule to GameState, so event_schedule is always empty | bug, technical-debt |  | 2026-07-29 06:04:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1020) |
+| 1018 | Philosophy Quest: progressive supersession scan over the ADR set + stricter admission rules | documentation, technical-debt, post-launch |  | 2026-07-29 05:52:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1018) |
+| 1017 | release: ship a FIRST-RUN.txt in the zip — macOS instructions currently reach nobody who has downloaded |  |  | 2026-07-29 02:34:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1017) |
+| 1016 | design(content): provenance real infrastructure failure modes into the event history as flavour text / metadata |  |  | 2026-07-29 01:40:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/1016) |
+| 1015 | positioning: the AI-generated-art immune reaction is a reputational risk, not just an art-quality one | post-launch |  | 2026-07-29 01:39:31 | [link](https://github.com/PipFoweraker/pdoom1/issues/1015) |
+| 1014 | deploy(web): playable browser demo via Godot HTML5 export -- lower the try-it barrier to zero | distribution, post-launch |  | 2026-07-29 01:39:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/1014) |
+| 1012 | leaderboard integrity: no dev-mode/verification field reaches a submitted score, so the website cannot filter on it |  |  | 2026-07-29 01:25:01 | [link](https://github.com/PipFoweraker/pdoom1/issues/1012) |
+| 1011 | docs+emit(keybinds): three docs disagree with keybind_manager.gd; emit a keybind artifact so the website derives instead of mirroring |  |  | 2026-07-29 00:55:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1011) |
+| 1009 | devblog automation: repair as a draft-generator (never auto-publish) -- post-league | documentation, technical-debt, post-launch |  | 2026-07-28 19:51:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/1009) |
 | 1008 | Release feed index is hand-maintained in practice: generated feed is uploaded as an artifact, never committed back | bug |  | 2026-07-28 10:29:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1008) |
 | 1004 | design(upgrades): next-epoch review -- three parked upgrade-backed mechanics (chairs attrition, board oversight/payroll UI, ethicist headcount) |  |  | 2026-07-28 09:45:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/1004) |
 | 994 | feat(emit): calibration artifact — baseline p(Doom), sim 100%-topout date, ladder version (unblocks the website's doom clock + pdoom1-website#177) |  |  | 2026-07-28 04:48:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/994) |
@@ -11,8 +42,7 @@ Generated: 2026-07-28T18:45:55.660Z UTC
 | 986 | ADR-0015 M-ticket: risk_events re-author + rebalance (20 live fields) + #967 finance fix + political_pressure dead-write |  |  | 2026-07-27 19:45:02 | [link](https://github.com/PipFoweraker/pdoom1/issues/986) |
 | 984 | Half-day workshop: audit mechanics deep-dive (next epoch) -- something amazing under the smell |  |  | 2026-07-27 11:44:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/984) |
 | 967 | finance_engine desperation_payroll promises '-N doom now' but writes to the clobbered inert sink (silently never fires) | bug |  | 2026-07-28 10:11:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/967) |
-| 964 | CI: sim tier silently red on every main run -- test_adversarial_ui_state 6 deterministic invariant violations | bug |  | 2026-07-28 10:11:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/964) |
-| 962 | feat(engine): integrate frontier-labs dataset (pdoom-data#37); expose a list the website can pull to fix calculate-game-stats |  |  | 2026-07-26 21:00:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/962) |
+| 962 | feat(engine): integrate frontier-labs dataset (pdoom-data#37); expose a list the website can pull to fix calculate-game-stats |  |  | 2026-07-29 01:07:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/962) |
 | 961 | design(hiring): W3 -- revisit the candidate pool cap (MAX_CANDIDATES=6); stale once networking changes, and cap-hits are partly silent |  |  | 2026-07-26 11:42:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/961) |
 | 959 | feat(ux): Surrender button on the in-game menu -- end run to leaderboard instead of abandoning |  |  | 2026-07-26 09:00:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/959) |
 | 958 | content(leaderboard): massively more lab-name variety; randomly generate player lab name by default |  |  | 2026-07-26 09:00:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/958) |
@@ -31,7 +61,7 @@ Generated: 2026-07-28T18:45:55.660Z UTC
 | 925 | office: W3 pre-build -- decision-agnostic engineering so W3 rulings flow into builds without decision fatigue |  |  | 2026-07-26 02:17:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/925) |
 | 924 | office: cat interaction animations -- bend-and-pat, be-patted, scamper-away (single-entity decomposition) |  |  | 2026-07-26 02:17:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/924) |
 | 923 | community: contributor-cat digitization pipeline (Kambu pilot, the ur-cat) |  |  | 2026-07-26 01:44:49 | [link](https://github.com/PipFoweraker/pdoom1/issues/923) |
-| 917 | deploy: robust cross-OS releases (Windows/Linux/macOS) by next Epoch | priority:high | First Contact | 2026-07-26 01:04:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/917) |
+| 917 | deploy: robust cross-OS releases (Windows/Linux/macOS) by next Epoch | priority:high | First Contact | 2026-07-29 01:36:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/917) |
 | 913 | office juice: water-cooler bubbles, sneaky 1.1x cat scale, butt-flash alternate north loop |  |  | 2026-07-26 00:25:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/913) |
 | 912 | art: RESERVED ASSETS -- high-doom bipedal horror cats (do not ship... yet) |  |  | 2026-07-26 00:25:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/912) |
 | 903 | art: quirk/perk icon set for the employee surfaces (16 icons, valence colour-coding) | ship:next-release |  | 2026-07-25 22:55:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/903) |

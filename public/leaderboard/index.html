@@ -535,6 +535,38 @@
       font-size: 0.8rem;
     }
 
+    /* The lab name, shown beside the human name once the game emits both.
+       Deliberately quieter than the name: the person is the subject, the lab is
+       the run's flavour. Renders nothing at all when there is only one field. */
+    .identity-lab {
+      color: var(--text-muted);
+      font-weight: normal;
+      font-size: 0.85em;
+    }
+
+    .identity-lab::before {
+      content: "\2014\00a0";
+    }
+
+    /* Dev-build marker. Amber-on-dark like the rest of the palette, but bordered
+       rather than filled so it reads as a caveat on the row, not a decoration.
+       Never rendered unless the entry says so -- see isDevBuild(). */
+    .dev-badge {
+      display: inline-block;
+      margin-left: 0.4rem;
+      padding: 0 0.35rem;
+      border: 1px solid var(--accent-primary);
+      border-radius: var(--radius-sm);
+      color: var(--accent-primary);
+      background: transparent;
+      font-size: 0.7rem;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+      white-space: nowrap;
+      cursor: help;
+    }
+
     .score {
       font-weight: bold;
       color: var(--success-color);
@@ -742,8 +774,12 @@
         </div>
         
         <div class="view-controls">
-          <button class="view-toggle active" onclick="setViewMode('table')" id="table-view">Table View</button>
-          <button class="view-toggle" onclick="setViewMode('cards')" id="cards-view">🃏 Cards</button>
+          <!-- These ids must NOT collide with the view containers below
+               (#leaderboard-table, #cards-view). The Cards button once carried the
+               cards-view id itself, so getElementById returned the BUTTON and the
+               cards were rendered inside it. See TECH_DEBT B9. -->
+          <button class="view-toggle active" onclick="setViewMode('table')" id="view-btn-table">Table View</button>
+          <button class="view-toggle" onclick="setViewMode('cards')" id="view-btn-cards">🃏 Cards</button>
         </div>
       </div>
     </div>
@@ -789,33 +825,21 @@
   </main>
 
   <script>
-    // Load and display leaderboard data
-    async function loadLeaderboard() {
-      try {
-        const response = await fetch('data/leaderboard.json', { cache: 'no-store' });
-        const data = await response.json();
-        
-        applyDataStatus(data);
-        displayStats(data);
-        displayLeaderboard(data);
-
-        // Hide loading, show table (hide the empty table pre-launch)
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('leaderboard-table').style.display =
-          (data.entries && data.entries.length) ? 'table' : 'none';
-
-      } catch (error) {
-        console.error('Failed to load leaderboard:', error);
-        document.getElementById('loading').innerHTML = 'Failed to load leaderboard data';
-      }
-    }
+    // NOTE: a second loader, loadLeaderboard(), used to live here. It was never invoked
+    // -- the page bootstraps loadLeaderboardWithFiltering() -- but it was the ONLY caller
+    // of applyDataStatus(), so a reader grepping for the honesty banner found a call site
+    // and wrongly concluded the banner worked. It has been deleted rather than left as a
+    // decoy. There is now exactly one loader.
 
     // Honesty banner: never present pre-launch/legacy data as live. Self-heals when
     // ingest_scores.py publishes real deployed-version scores (data_status: "live").
     function applyDataStatus(data) {
       const banner = document.getElementById('data-status-banner');
       if (!banner) return;
-      const status = (data && data.data_status) || 'live';
+      // A board with NO data_status used to fall back to 'live' -- absence resolving to
+      // the most confident claim available. That is the fallback-literal trap: the default
+      // ships exactly when the real value was missing. Unknown is now its own state.
+      const status = (data && data.data_status) || 'unknown';
       const controls = document.querySelector('.controls-section');
       if (status === 'live') {
         banner.style.display = 'none';
@@ -827,14 +851,241 @@
       // message; it comes back automatically once real scores publish.
       if (controls) controls.style.display = 'none';
 
-      // Deliberately names no version. The board is stamped with whatever release last
-      // exported, which drifts behind the live game, and a stale number here reads as a
-      // promise about a specific build. Naming the *condition* instead stays true
-      // whichever release turns submission on.
-      banner.innerHTML = (status === 'pre-launch')
-        ? `&#9432; <strong>No scores recorded yet.</strong> The board turns on when in-game score submission ships &mdash; until then this page is a placeholder, not an empty ranking.`
-        : `&#9432; <strong>Showing sample / pre-release data</strong> &mdash; not live competitive results.`;
+      // This base message still names no version -- applyBoardHonesty() below appends the
+      // version detail, and only when it has verified both numbers at run time from
+      // /data/version.json. A version literal typed into this string would be a promise
+      // about a specific build that rots the next time the game ships.
+      //
+      // The old pre-launch wording said the board "turns on when in-game score submission
+      // ships". That became false: submission HAS shipped and scores are being recorded.
+      // What is missing is this page's ability to publish them, which is a different claim.
+      banner.innerHTML =
+        (status === 'pre-launch')
+          ? `&#9432; <strong>This page is not showing any scores.</strong> That does not by itself mean nobody has played &mdash; see the check below.`
+        : (status === 'unknown')
+          ? `&#9432; <strong>This board does not say whether it is live.</strong> It carries no status, so nothing on this page should be read as confirmed competitive results.`
+          : `&#9432; <strong>Showing sample / pre-release data</strong> &mdash; not live competitive results.`;
       banner.style.display = 'block';
+    }
+
+    // ------------------------------------------------------------------------
+    // Board honesty: a visitor must never see an empty board that silently means
+    // "the scores went somewhere else".
+    //
+    // A board is keyed by (seed, LADDER EPOCH). If the key this page publishes is not the
+    // key a player's client submits to, their run is recorded and is invisible here, and
+    // neither they nor we get an error. "0 entries" therefore has at least two very
+    // different meanings, and this function's whole job is to stop the page presenting
+    // them as if they were one.
+    //
+    // The epoch is NOT the build version. GameConfig.get_board_version() returns
+    // "L" + LADDER_VERSION, so the client sends "L3", never "v0.13.2" (pdoom1, via
+    // issue #151, 2026-07-28). This page therefore must NOT compare the board key against
+    // version.json: after a ladder bump the two are SUPPOSED to differ, and a page built
+    // that way would shout "version mismatch" permanently at correct data. Being loudly
+    // wrong is worse than being quietly wrong, because it spends the alarm.
+    //
+    // The website has no artifact naming the current epoch yet. Where it cannot be
+    // derived, this says "cannot confirm" -- an admission, never an accusation.
+    //
+    // Both inputs are same-origin static files. The page does NOT call the score API at
+    // run time: scripts/check-board-liveness.py does that read-only probe and records the
+    // dated result, so the page reports an observation rather than depending on a third
+    // party being up. Every branch degrades to "we cannot tell", never to "there is nothing".
+    // ------------------------------------------------------------------------
+    // ESCAPING -- MANDATORY for every board field reaching innerHTML.
+    //
+    // Every field below arrives from https://api.pdoom1.com/score_api.php, which is an
+    // UNAUTHENTICATED flat-file API: anyone can POST an entry with any string in it. Until
+    // 2026-07-30 `player_name` and `game_mode` were interpolated raw into three separate
+    // innerHTML templates (row, card, profile modal), so a single crafted POST executed
+    // script for every visitor to /leaderboard/. It had not fired only because the shipped
+    // client generates lab names from a fixed table -- which stops the client, not an
+    // attacker with curl.
+    //
+    // Numbers are escaped too. `entry.score` and `entry.level_reached` were interpolated
+    // without the `|| 0` coercion the money/staff fields happen to get, so a POST supplying
+    // a string for either landed in innerHTML unaltered. Escaping every value closes the
+    // class instead of the two instances -- do not "optimise" a field back out of escapeHTML().
+    //
+    // Escaping is done by escapeHTML() (declared below, hoisted). There is deliberately
+    // ONE escaper on this page -- a second one would drift from the first, and the two of
+    // them disagreeing about a single character is how this class of bug comes back.
+    //
+    // scripts/test-board-escaping.js asserts a payload of known sinks renders inert.
+
+    // IDENTITY -- the v1 payload has exactly ONE identity slot, `player_name`, and the
+    // shipped client puts the LAB name in it ("Applied AI Safety"). Pip wants the human
+    // name shown alongside the lab, because his own scores get beaten quickly and an
+    // anonymous lab name does not tell a visitor whose run it was.
+    //
+    // The website cannot split one string into two truths, so this reads an OPTIONAL
+    // second field and renders the pair only when the game actually emits it. Nothing is
+    // invented and nothing is claimed: with no `lab_name`, the display is exactly what it
+    // was. When pdoom1 starts sending one (pdoom1 issue lodged 2026-07-30), the board
+    // lights up with no website change and no deploy race against a release.
+    //
+    // Accepts either shape so whichever the game picks works: {player_name, lab_name}
+    // (preferred -- name in the existing slot, lab in the new one) or {player_handle}
+    // added alongside a `player_name` that keeps holding the lab.
+    const identityHTML = (entry) => {
+      const primary = entry.player_handle || entry.player_name;
+      const secondary = entry.player_handle ? entry.player_name : entry.lab_name;
+      if (!secondary || secondary === primary) return escapeHTML(primary);
+      return `${escapeHTML(primary)} <span class="identity-lab">${escapeHTML(secondary)}</span>`;
+    };
+
+    // DEV-BUILD MARKER -- a score set with dev mode on is not comparable to one set
+    // without it, and only the game knows which happened. The website therefore cannot
+    // derive this; it can only render what it is told.
+    //
+    // Two carriers are honoured, so the game can pick the cheap one or the clean one:
+    //   - a boolean/truthy `dev_mode` field (clean), or
+    //   - a dev marker inside the existing `game_mode` string, e.g. "v0.13.2-dev"
+    //     (ships without a schema change -- `game_mode` is already free-form and already
+    //     carries the build version despite its name).
+    // Absent both, NOTHING renders. An unmarked entry is never labelled clean, because
+    // absence of a marker is not evidence of absence -- every entry predating the marker
+    // is unmarked too. See docs/LEAGUE_EPOCH_ANOMALY.md.
+    // No \b after the word: "v0.13.2-development" is as much a dev build as "-dev", and a
+    // word boundary silently excluded it. Anchored to a separator so a release version can
+    // never trip it -- the false positive to avoid is labelling a real player's run as dev.
+    const DEV_MARKER = /(^|[-+_.\s])(dev|debug|cheat)/i;
+    const isDevBuild = (entry) =>
+      entry.dev_mode === true || entry.dev_mode === 'true' || entry.dev_mode === 1 ||
+      DEV_MARKER.test(String(entry.game_mode || ''));
+    const devBadgeHTML = (entry) => isDevBuild(entry)
+      ? ` <span class="dev-badge" title="Set on a development build. Dev builds can enable debug tooling, so this score is not comparable to a release-build score.">DEV BUILD</span>`
+      : '';
+
+    async function applyBoardHonesty(data) {
+      const banner = document.getElementById('data-status-banner');
+      if (!banner) return;
+
+      const readJSON = async (url) => {
+        try {
+          const r = await fetch(url, { cache: 'no-store' });
+          if (!r.ok) return null;
+          return await r.json();
+        } catch (e) { return null; }
+      };
+
+      const liveness = await readJSON('data/board-liveness.json');
+
+      const boardVersion = data && data.meta && data.meta.game_version;
+      const key = (liveness && liveness.board_key) || {};
+      const epoch = key.ladder_epoch;
+      const notes = [];
+
+      // 1. Is the board this page publishes the board players submit to?
+      //    Three answers, and "cannot confirm" is a real one -- not a soft version of "no".
+      if (!liveness) {
+        notes.push(
+          `<strong>No live check on record.</strong> Nothing has verified this board ` +
+          `against the score API, so an empty board here is not evidence that no scores exist.`
+        );
+      } else if (!key.epoch_known) {
+        notes.push(
+          `<strong>Cannot confirm this is the current board.</strong> Scores are grouped by ` +
+          `season (a "ladder epoch"), and nothing yet tells this site which season is live. ` +
+          `So this page cannot promise that a run you finish today would show up here. ` +
+          `It is not claiming a mismatch either &mdash; it genuinely does not know.`
+        );
+      } else if (boardVersion && epoch && boardVersion !== epoch) {
+        notes.push(
+          `<strong>This board is not the current season.</strong> It is keyed ` +
+          `<code>${escapeHTML(boardVersion)}</code>, and the live season is ` +
+          `<code>${escapeHTML(epoch)}</code>. Runs submitted now go to ` +
+          `<code>${escapeHTML(epoch)}</code> and will not appear on this board.`
+        );
+      }
+
+      // 2. What the local files refused to publish, and why -- named, with counts.
+      //    These are BUILD stamps on stored result files, a separate thing from the board
+      //    key; they gate what may be republished, not which board a score lands on.
+      const ex = data && data.exclusions;
+      if (ex && ex.version_mismatched_files > 0) {
+        const vers = (ex.version_mismatched_versions || []).map(escapeHTML).join(', ');
+        notes.push(
+          `${ex.version_mismatched_files} stored result file(s) holding ` +
+          `${ex.version_mismatched_entries} entr${ex.version_mismatched_entries === 1 ? 'y' : 'ies'} ` +
+          `were withheld: they are stamped ${vers || 'an unrecorded build'} and the ` +
+          `deployed build is <code>${escapeHTML(ex.deployed_version || '?')}</code>. ` +
+          `They are not deleted and not re-stamped &mdash; re-stamping would fabricate history.`
+        );
+      }
+
+      // 3. The permanent anomaly archive. These players really did finish these runs, and
+      //    saying so is the difference between an honest gap and a silent one.
+      const arch = (liveness && liveness.archived_orphans) || {};
+      if (arch.entries_total > 0) {
+        const names = (arch.player_names || []).map(escapeHTML).join(', ');
+        notes.push(
+          `<strong>${arch.entries_total} earlier runs are preserved but not shown here.</strong> ` +
+          `They were submitted by ${(arch.player_names || []).length} player(s) ` +
+          `(${names}) before the current season scheme existed, so they sit on boards this ` +
+          `page does not publish. They are kept exactly as recorded, and deliberately not ` +
+          `re-stamped onto a newer board &mdash; that would fabricate history.`
+        );
+      }
+
+      // 4. The live check. This is the part that separates "nobody played" from
+      //    "scores landed on a board nobody reads".
+      if (liveness && liveness.checked_at) {
+        const when = new Date(liveness.checked_at);
+        const stamp = isNaN(when) ? escapeHTML(liveness.checked_at) : when.toLocaleString();
+        const newOrphans = (liveness.new_orphans && liveness.new_orphans.entries_total) || 0;
+        if (liveness.verdict === 'orphaned-scores' && newOrphans > 0) {
+          const boards = ((liveness.new_orphans || {}).boards || [])
+            .map(b => `<code>${escapeHTML(String(b.version))}</code> (${b.entries})`)
+            .join(', ');
+          notes.push(
+            `<strong>People are playing right now, and their scores are not shown here.</strong> ` +
+            `As of ${stamp}, the score API held ${newOrphans} recorded ` +
+            `entr${newOrphans === 1 ? 'y' : 'ies'} on board(s) this page does not publish ` +
+            `&mdash; ${boards}. Those runs were saved. This page cannot currently show them.`
+          );
+        } else if (liveness.verdict === 'unclassifiable') {
+          notes.push(
+            `<strong>Board state could not be classified</strong> at the last check (${stamp}). ` +
+            `Treat anything on this page as unverified.`
+          );
+        } else if (liveness.verdict === 'unreachable') {
+          notes.push(
+            `<strong>The score API could not be reached</strong> at the last check (${stamp}), ` +
+            `so whether any scores exist is unknown, not zero.`
+          );
+        } else if (liveness.verdict === 'genuinely-empty') {
+          notes.push(
+            `Checked against the live score API at ${stamp}: nobody has submitted a score ` +
+            `to the current board yet. This one really is empty rather than misrouted.`
+          );
+        } else if (liveness.verdict === 'epoch-unknown') {
+          // The "cannot confirm" case already spoke above; here we only date it, so the
+          // visitor knows the admission is current rather than stale.
+          notes.push(`Last checked against the live score API at ${stamp}.`);
+        }
+      }
+
+      // Render into a dedicated child and REPLACE it. The seed/week filter re-runs the
+      // loader, so appending here would stack a fresh copy of every notice on each change.
+      let host = document.getElementById('board-honesty-notes');
+      if (!host) {
+        host = document.createElement('div');
+        host.id = 'board-honesty-notes';
+        banner.appendChild(host);
+      }
+      if (!notes.length) { host.innerHTML = ''; return; }
+      host.style.cssText = 'margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--border-color);';
+      host.innerHTML = notes.map(n => `<p style="margin:0 0 0.5rem 0;">${n}</p>`).join('');
+      banner.style.display = 'block';
+    }
+
+    // Board/version strings come from data files; render them as text, never as markup.
+    function escapeHTML(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+      ));
     }
 
     function displayStats(data) {
@@ -897,15 +1148,15 @@
           <td>
             <div class="player-info">
               <div>
-                <div class="player-name" style="cursor: pointer; color: var(--accent-primary); text-decoration: underline;" onclick="showPlayerProfile(currentDisplayData[${index}])">${entry.player_name}</div>
-                <div class="player-id" style="color: var(--text-secondary); font-size: 0.8rem;">${entry.game_mode}</div>
+                <div class="player-name" style="cursor: pointer; color: var(--accent-primary); text-decoration: underline;" onclick="showPlayerProfile(currentDisplayData[${index}])">${identityHTML(entry)}</div>
+                <div class="player-id" style="color: var(--text-secondary); font-size: 0.8rem;">${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)}</div>
               </div>
             </div>
           </td>
-          <td class="score">${entry.score}</td>
+          <td class="score">${escapeHTML(entry.score)}</td>
           <td>
             <div style="font-size: 0.9rem;">
-              <div><strong>Turn ${entry.level_reached}</strong> in ${durationText}</div>
+              <div><strong>Turn ${escapeHTML(entry.level_reached)}</strong> in ${durationText}</div>
               <div class="outcome ${riskClass}" style="margin-top: 0.25rem;">
                 Doom: ${doomPercent.toFixed(1)}% | Rep: ${(entry.final_reputation || 0).toFixed(1)}
               </div>
@@ -917,7 +1168,7 @@
               <div><strong>Bootstrap Economics</strong></div>
               <div>Compute: ${(entry.final_compute || 0).toLocaleString()}</div>
               <div style="margin-top: 0.25rem; color: var(--text-secondary);">
-                Economic Model: ${entry.game_mode}
+                Economic Model: ${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)}
               </div>
             </div>
           </td>
@@ -937,22 +1188,42 @@
     async function loadLeaderboardWithFiltering() {
       try {
         const response = await fetch('data/leaderboard.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         originalData = await response.json();
         filteredData = originalData;
-        
+
+        // This call was MISSING, and loadLeaderboard() -- the only other caller of
+        // applyDataStatus -- is dead code that nothing invokes. Net effect until now:
+        // the honesty banner never rendered on the live page, while leaderboard.json
+        // carried data_status "pre-launch". A visitor saw an empty ranking table and a
+        // fully live-looking toolbar, with nothing telling them the board was not real.
+        applyDataStatus(filteredData);
         displayStats(filteredData);
         displayLeaderboard(filteredData);
-        
-        // Hide loading, show table
+
         document.getElementById('loading').style.display = 'none';
-        document.getElementById('leaderboard-table').style.display = 'table';
-        
+        // Only reveal the table if there is something in it. A bare header row reads as
+        // "these are the rankings and nobody is on them", which is a claim we cannot make.
+        document.getElementById('leaderboard-table').style.display =
+          (filteredData.entries && filteredData.entries.length) ? 'table' : 'none';
+
         // Set up search input listener
         document.getElementById('search-input').addEventListener('input', filterLeaderboard);
-        
+
+        // Independent of the snapshot: say plainly whether the board key matches the
+        // deployed build, and what the last live check of the score API actually saw.
+        applyBoardHonesty(filteredData);
+
       } catch (error) {
         console.error('Failed to load leaderboard:', error);
-        document.getElementById('loading').innerHTML = 'Failed to load leaderboard data';
+        // Say which failure this was. "Failed to load" alone leaves a visitor unable to
+        // tell a broken page from an empty board.
+        document.getElementById('loading').classList.remove('loading');
+        document.getElementById('loading').innerHTML =
+          'Could not load the leaderboard data file, so this page cannot say whether any ' +
+          'scores exist. This is a site fault, not an empty board.';
+        const controls = document.querySelector('.controls-section');
+        if (controls) controls.style.display = 'none';
       }
     }
     
@@ -970,10 +1241,11 @@
       
       // Apply search filter
       if (searchTerm) {
-        filtered = filtered.filter(entry => 
-          entry.player_name.toLowerCase().includes(searchTerm) ||
-          entry.game_mode.toLowerCase().includes(searchTerm)
-        );
+        // Every field is coerced: an entry that omits one (the API is unauthenticated and
+        // validates nothing) used to throw here and take the entire filter down with it.
+        const hay = (e) => [e.player_name, e.player_handle, e.lab_name, e.game_mode]
+          .filter(Boolean).join(' ').toLowerCase();
+        filtered = filtered.filter(entry => hay(entry).includes(searchTerm));
       }
       
       // Apply risk level filter
@@ -1034,9 +1306,9 @@
     function setViewMode(mode) {
       const tableView = document.getElementById('leaderboard-table');
       const cardsView = document.getElementById('cards-view') || createCardsView();
-      const tableButton = document.getElementById('table-view');
-      const cardsButton = document.getElementById('cards-view');
-      
+      const tableButton = document.getElementById('view-btn-table');
+      const cardsButton = document.getElementById('view-btn-cards');
+
       if (mode === 'table') {
         tableView.style.display = 'table';
         cardsView.style.display = 'none';
@@ -1065,11 +1337,13 @@
     function displayCardsView(data) {
       const cardsContainer = document.getElementById('cards-view') || createCardsView();
       cardsContainer.innerHTML = '';
-      
+
+      const entries = (data && data.entries) || [];
+
       // Store current data for player profile access
-      currentDisplayData = data.entries;
-      
-      data.entries.forEach((entry, index) => {
+      currentDisplayData = entries;
+
+      entries.forEach((entry, index) => {
         const rank = index + 1;
         const doomPercent = entry.final_doom;
         let riskClass = 'safe';
@@ -1087,18 +1361,18 @@
           </div>
           
           <div class="player-name" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; cursor: pointer; color: var(--accent-primary);" onclick="showPlayerProfile(currentDisplayData[${index}])">
-            ${entry.player_name}
+            ${identityHTML(entry)}
           </div>
-          
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
-            <div><strong>Score:</strong> ${entry.score}</div>
+            <div><strong>Score:</strong> ${escapeHTML(entry.score)}</div>
             <div><strong>Money:</strong> $${(entry.final_money || 0).toLocaleString()}</div>
             <div><strong>Staff:</strong> ${entry.final_staff || 0}</div>
             <div><strong>Papers:</strong> ${entry.research_papers_published || 0}</div>
           </div>
           
           <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
-            ${entry.game_mode} • ${new Date(entry.date).toLocaleDateString()}
+            ${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)} • ${escapeHTML(new Date(entry.date).toLocaleDateString())}
           </div>
         `;
         
@@ -1112,7 +1386,10 @@
       const modalName = document.getElementById('modal-player-name');
       const modalBody = document.getElementById('modal-body');
       
-      modalName.textContent = entry.player_name;
+      // textContent, so escaping is not needed here -- but the lab still has to show.
+      modalName.textContent = entry.player_handle
+        ? `${entry.player_handle} — ${entry.player_name}`
+        : (entry.lab_name ? `${entry.player_name} — ${entry.lab_name}` : entry.player_name);
       
       const durationMinutes = Math.floor(entry.duration_seconds / 60);
       const durationHours = Math.floor(durationMinutes / 60);
@@ -1125,8 +1402,8 @@
         <div class="profile-section">
           <h4>Game Performance</h4>
           <div class="profile-grid">
-            <div class="profile-item"><span>Score:</span> <strong>${entry.score}</strong></div>
-            <div class="profile-item"><span>Level Reached:</span> <strong>Turn ${entry.level_reached}</strong></div>
+            <div class="profile-item"><span>Score:</span> <strong>${escapeHTML(entry.score)}</strong></div>
+            <div class="profile-item"><span>Level Reached:</span> <strong>Turn ${escapeHTML(entry.level_reached)}</strong></div>
             <div class="profile-item"><span>Game Duration:</span> <strong>${durationText}</strong></div>
             <div class="profile-item"><span>Final Doom:</span> <strong>${entry.final_doom.toFixed(1)}%</strong></div>
           </div>
@@ -1153,7 +1430,7 @@
         <div class="profile-section">
           <h4>Game Details</h4>
           <div class="profile-grid">
-            <div class="profile-item"><span>Economic Model:</span> <strong>${entry.game_mode}</strong></div>
+            <div class="profile-item"><span>Economic Model:</span> <strong>${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)}</strong></div>
             <div class="profile-item"><span>Date Played:</span> <strong>${new Date(entry.date).toLocaleDateString()}</strong></div>
             <div class="profile-item"><span>Entry UUID:</span> <strong style="font-family: monospace; font-size: 0.8rem;">${entry.entry_uuid}</strong></div>
           </div>
@@ -1228,19 +1505,29 @@
           const weekData = await response.json();
           const seedsGroup = document.getElementById('recent-seeds-group');
 
-          // Only offer a week that has not already finished. The rollover cron fires
-          // Sunday 14:00 UTC and derives the week from `now`, so it re-publishes the
-          // week that ends hours later (TECH_DEBT A9) -- current.json therefore keeps
-          // claiming `is_current` for days after the week closed. Trusting that flag
-          // would show a fresh visitor a competition that is already over, so the
-          // end timestamp is the authority here, not the flag. Self-heals the moment
-          // the rollover cadence is fixed; no league logic is changed by this.
+          // Only offer a week that has not already finished. Historically the rollover
+          // cron fired Sunday 14:00 UTC and derived the week from `now`, so it
+          // re-published the week that ended hours later (TECH_DEBT A9) -- those
+          // records keep claiming `is_current` for days after the week closed. Trusting
+          // that flag would show a fresh visitor a competition that is already over, so
+          // the end timestamp is the authority here, not the flag. The rollover is now
+          // anchored to Friday 00:00 Australia/Hobart and no longer produces that skew,
+          // but the guard stays: it is cheap, and it is what makes a stalled rollover
+          // fail closed instead of advertising a dead week.
           const endsAt = Date.parse(
             weekData.week_info?.end_timestamp || weekData.meta?.end_date || ''
           );
           const weekStillOpen = Number.isFinite(endsAt) && endsAt > Date.now();
 
-          if (weekData.seed && weekStillOpen) {
+          // NEVER offer a seed the game side has not blessed. The website mints
+          // a placeholder seed for every week, and no client has ever submitted
+          // under one; offering it sends a player to a board that will always be
+          // empty, and the score API returns ok:true for any key, so nothing
+          // downstream can tell them apart. The blessed value is recorded in
+          // docs/LEAGUE_SEED_LEDGER.md and public/data/ladder-epochs.json.
+          const seedBlessed = weekData.seed_provenance?.blessed === true;
+
+          if (weekData.seed && weekStillOpen && seedBlessed) {
             const option = document.createElement('option');
             option.value = weekData.seed;
             option.textContent = `Week ${weekData.meta?.week_id || 'Current'} - ${weekData.seed}`;
