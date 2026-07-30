@@ -1,9 +1,22 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-29T18:34:40.310Z UTC
+Generated: 2026-07-30T00:49:05.447Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1037 | nomenclature: stale 'AP' vocabulary in player-facing text after the attention-economy migration (#996) -- scoped sweep + GLOSSARY.md is missing | documentation, ui-ux |  | 2026-07-29 23:55:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1037) |
+| 1036 | testing: which tests pass only by alphabetical ordering accident? GameManager autoload leaks between files | testing, technical-debt |  | 2026-07-29 23:55:33 | [link](https://github.com/PipFoweraker/pdoom1/issues/1036) |
+| 1035 | ascii(#744): player-facing non-ASCII survives in .tscn text -- check_no_emoji.py only blocks emoji there | ui-ux, technical-debt |  | 2026-07-29 23:55:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/1035) |
+| 1034 | scene_transition (latent): fade transition awaits a pausable tween -- would deadlock ALL navigation if called while paused | technical-debt |  | 2026-07-29 23:55:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1034) |
+| 1033 | scene_transition: is_transitioning released before the engine swaps; scene_load perf section excludes _ready | bug, technical-debt |  | 2026-07-29 23:55:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1033) |
+| 1032 | bug(config_confirmation): ENTER double-fires launch -- increment_games_played() runs twice per keyboard launch | bug |  | 2026-07-29 23:55:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/1032) |
+| 1031 | ui(tech-debt): 30 scene-authored placeholders read as real state -- sentinel convention, then a narrow gate | ui-ux, technical-debt |  | 2026-07-29 23:55:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1031) |
+| 1030 | ui(bug): 'Game not started...' is the permanent first line of every player's feed; 'Turn 1' label is dead | bug, ui-ux |  | 2026-07-29 23:55:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/1030) |
+| 1029 | dev+ux: no way to replay the cold-open intro -- add a reset for last_seen_intro_version | enhancement, ui-ux |  | 2026-07-29 23:55:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1029) |
+| 1028 | input(dev): ESC/pause disables ALL diagnostic surfaces -- root cause is process_mode, not input priority | bug, ui-ux |  | 2026-07-29 23:21:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1028) |
+| 1027 | architecture: the project has left explosive-growth phase -- design the guarded, review-heavy cycle before contributors arrive | documentation, technical-debt, post-launch |  | 2026-07-29 22:28:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/1027) |
+| 1026 | post-league mortem: #1023 boot failure -- five whys, captured | documentation, post-launch |  | 2026-07-29 22:31:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1026) |
+| 1025 | ritual: [Gate 2: THE FREEZE] can precede [Gate 4: PROVEN BUILD] -- Council of Elders vote before next league | documentation |  | 2026-07-29 22:25:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1025) |
 | 1024 | art: regen the endgame poster batch under the provisional rules, THEN decide which rules survive | post-launch |  | 2026-07-29 12:44:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1024) |
 | 1023 | LEAGUE-CRITICAL: game does not initialise on launch -- full UI, Phase: Not Started, no action buttons | bug, priority:critical |  | 2026-07-29 12:30:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/1023) |
 | 1020 | ADR-0005 seed schedules are INERT in real play: nothing passes a schedule to GameState, so event_schedule is always empty | bug, technical-debt |  | 2026-07-29 06:04:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1020) |
