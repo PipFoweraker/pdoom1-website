@@ -141,6 +141,13 @@ Pip's stated top priority. Practically:
   (`timeline_events/alignment_research/`), which the sync has never read. See
   `docs/TECH_DEBT.md` §E-0. **Trace generated content back to its source before
   deleting it.**
+- **Event descriptions are raw PDF text, so they carry other people's PII.**
+  arXiv/ACM author blocks include institutional email addresses; 75 distinct
+  academics' addresses were live on 44 pages until 2026-07-29. `sync-events.py`
+  now redacts them (`redact_pii()` walks the WHOLE event dict, not a field list,
+  so a new upstream field cannot leak). `scripts/check-published-emails.py`
+  re-verifies and imports the generator's one regex rather than copying it.
+  The addresses are still in pdoom-data — scrubbing here does not fix the source.
 - `public/design/tokens.json` is fetched at runtime by ~8 pages; the other ~2,190
   hardcode their colours in an inline `:root`. It is not a design system yet.
 
@@ -190,6 +197,7 @@ python  scripts/validate_data.py          # data contracts
 python  scripts/check-stale-facts.py      # hardcoded facts that rot
 python  scripts/check-platform-claims.py  # no reachable page claims an unshipped OS
 node    scripts/test-download-resolution.js # download buttons resolve/degrade right
+python  scripts/check-published-emails.py # no third party's address is served
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift
 python  scripts/generate-feeds.py --check # feeds in step with the blog
 node    scripts/test-header-consistency.js

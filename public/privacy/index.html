@@ -249,6 +249,35 @@
 			margin-bottom: 0.5rem;
 		}
 
+		/* "What We DON'T Collect" sits directly under "What We Collect". The
+		   negation is the whole point of the list, so it keeps a visible
+		   negative marker -- without one the two lists render identically and
+		   a skimming reader can read the second as more things we DO collect.
+		   The marker is drawn in CSS (two crossed bars) rather than set as a
+		   pictograph, because this site ships no emoji in its chrome, and
+		   because a screen reader announcing "cross mark" on every line is
+		   noise: the <h3> above already states the negation in words. */
+		.exclusion-list {
+			list-style: none;
+		}
+
+		.exclusion-list li {
+			position: relative;
+			padding-left: 1.6rem;
+		}
+
+		.exclusion-list li::before {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 0.45em;
+			width: 0.7em;
+			height: 0.7em;
+			background:
+				linear-gradient(to bottom right, transparent calc(50% - 1px), var(--accent-danger) calc(50% - 1px), var(--accent-danger) calc(50% + 1px), transparent calc(50% + 1px)),
+				linear-gradient(to bottom left, transparent calc(50% - 1px), var(--accent-danger) calc(50% - 1px), var(--accent-danger) calc(50% + 1px), transparent calc(50% + 1px));
+		}
+
 		code {
 			background: var(--bg-tertiary);
 			padding: 0.2rem 0.5rem;
@@ -313,19 +342,19 @@
 
 			<div class="feature-list">
 				<div class="feature-item">
-					<h4>🚫 No Cookies</h4>
+					<h4>No Cookies</h4>
 					<p>We don't use cookies or persistent identifiers.</p>
 				</div>
 				<div class="feature-item">
-					<h4>🔒 No Personal Data</h4>
+					<h4>No Personal Data</h4>
 					<p>Our analytics never collect personally identifiable information.</p>
 				</div>
 				<div class="feature-item">
-					<h4>✅ Privacy by Design</h4>
+					<h4>Privacy by Design</h4>
 					<p>No cookies and no personal data means no consent banner to click through &mdash; and nothing about you stored to misuse.</p>
 				</div>
 				<div class="feature-item">
-					<h4>🌍 Respects DNT</h4>
+					<h4>Respects DNT</h4>
 					<p>If your browser sends Do Not Track, we tell the tracker to ignore your visits. That check runs on our main pages, so a visit landing straight on an event page may be counted first.</p>
 				</div>
 			</div>
@@ -343,12 +372,12 @@
 			</ul>
 			
 			<h3>What We DON'T Collect</h3>
-			<ul>
-				<li>❌ IP addresses (anonymized immediately)</li>
-				<li>❌ Cookies or local storage (except for opt-out preference)</li>
-				<li>❌ Personal information (names, emails, etc.)</li>
-				<li>❌ Cross-site tracking data</li>
-				<li>❌ Fingerprinting data</li>
+			<ul class="exclusion-list">
+				<li>IP addresses (anonymized immediately)</li>
+				<li>Cookies or local storage (except for opt-out preference)</li>
+				<li>Personal information (names, emails, etc.)</li>
+				<li>Cross-site tracking data</li>
+				<li>Fingerprinting data</li>
 			</ul>
 			<p>
 				<strong>That covers analytics only.</strong> If you use one of our forms or email us, we receive
@@ -495,7 +524,7 @@
 			const hasOptedOut = window.pdoom1Analytics && window.pdoom1Analytics.hasOptedOut();
 
 			if (hasOptedOut) {
-				statusIndicator.textContent = 'Analytics Opted Out ✓';
+				statusIndicator.textContent = 'Analytics Opted Out';
 				statusIndicator.className = 'status-indicator status-opted-out';
 				statusDescription.textContent = 'You have opted out of analytics. No data is being collected from your visits.';
 				optOutBtn.style.display = 'none';
