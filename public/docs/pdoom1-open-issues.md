@@ -1,9 +1,14 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-30T00:49:05.447Z UTC
+Generated: 2026-07-30T07:09:28.563Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1043 | ui(layout): the Plan screen wastes its middle and scatters its text -- legibility-first layout brief | ui-ux |  | 2026-07-30 06:59:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1043) |
+| 1042 | Score payload: emit player name AND lab name, plus a dev-mode-used flag (website side is built) |  |  | 2026-07-30 02:55:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1042) |
+| 1041 | playtest 2026-07-30 (v0.13.2 artifact): UI/UX findings from the Gate 4 run | ui-ux |  | 2026-07-30 02:43:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/1041) |
+| 1040 | macOS HOW-TO-RUN still tells testers to right-click -> Open, which Sequoia 15.x removed |  |  | 2026-07-30 02:12:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1040) |
+| 1038 | trust: make provable declarations about what the game touches -- exit surfaces, provenance, signing | documentation, post-launch |  | 2026-07-30 01:17:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1038) |
 | 1037 | nomenclature: stale 'AP' vocabulary in player-facing text after the attention-economy migration (#996) -- scoped sweep + GLOSSARY.md is missing | documentation, ui-ux |  | 2026-07-29 23:55:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1037) |
 | 1036 | testing: which tests pass only by alphabetical ordering accident? GameManager autoload leaks between files | testing, technical-debt |  | 2026-07-29 23:55:33 | [link](https://github.com/PipFoweraker/pdoom1/issues/1036) |
 | 1035 | ascii(#744): player-facing non-ASCII survives in .tscn text -- check_no_emoji.py only blocks emoji there | ui-ux, technical-debt |  | 2026-07-29 23:55:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/1035) |
