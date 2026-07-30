@@ -100,7 +100,7 @@ jobs:
               }
 
               # Write version.json
-              with open('public/data/version.json', 'w') as f:
+              with open('public/data/version.json', 'w', encoding="utf-8") as f:
                   json.dump(version_json, f, indent=2)
               print("✓ Updated version.json")
 
@@ -120,7 +120,7 @@ jobs:
                   "last_updated": datetime.utcnow().isoformat()
               }
 
-              with open('public/data/issues-cache.json', 'w') as f:
+              with open('public/data/issues-cache.json', 'w', encoding="utf-8") as f:
                   json.dump(issues_cache, f, indent=2)
               print("✓ Updated issues-cache.json")
 

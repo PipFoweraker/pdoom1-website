@@ -1,6 +1,80 @@
 {
   "issues": [
     {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/962",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/962/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/962/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/962/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/962",
+      "id": 4982506427,
+      "node_id": "I_kwDOPVWa588AAAABKPsDuw",
+      "number": 962,
+      "title": "feat(engine): integrate frontier-labs dataset (pdoom-data#37); expose a list the website can pull to fix calculate-game-stats",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [],
+      "state": "open",
+      "locked": false,
+      "assignees": [],
+      "milestone": null,
+      "comments": 2,
+      "created_at": "2026-07-26T21:00:25Z",
+      "updated_at": "2026-07-30T13:12:46Z",
+      "closed_at": null,
+      "assignee": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "body": "## Ask (follow-on from pdoom-data#37)\n\nOnce pdoom-data ships its first-pass frontier-labs dataset (**PipFoweraker/pdoom-data#37** \u2014 foundation dates 2000\u2192present), build the follow-on:\n\n1. **Integrate** the frontier-labs list + foundation dates into the game engine (labs as timeline entities that come into existence on their founding dates).\n2. **As soon as the MVP is enough for the website to consume it**, expose it so pdoom1-website can pull the list \u2014 so we can retire the hardcoded lab list in `calculate-game-stats.py` and drive `frontier_labs_count` (and future stats) from real data.\n\n## Why\n\npdoom1-website currently hardcodes the frontier-labs list in `scripts/calculate-game-stats.py` to produce a stubbed count. Per the cross-repo protocol (game/data own truth; the website derives), that count should come from the canonical dataset. This also feeds the website's planned \"state of doom\" stats page.\n\n## Sequencing (please don't block the website on full engine work)\n\n`pdoom-data#37` \u2192 **engine integration** \u2192 **expose a consumable artifact**. The website does **not** need the full engine integration \u2014 it just needs a **stable, fetchable list** of `{id, name, founded, status}`. Please ship that consumable early (a served JSON, or simply point us at the pdoom-data serveable if that's cleaner) even if the richer engine timeline mechanics land later.\n\n## Definition of done (for the website's needs)\n\n- A documented, fetchable artifact of frontier labs + foundation dates.\n- The URL + shape noted in a comment here so the pdoom1-website session can wire `calculate-game-stats.py` to it.\n\n---\n_Depends on pdoom-data#37. Filed as cross-repo work at Pip's direction (contact-protocol override, 2026-07-27) by the pdoom1-website session._\n",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/962/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/962/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null,
+      "pinned_comment": null
+    },
+    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1046",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1046/labels{/name}",
@@ -1199,101 +1273,8 @@
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
-    },
-    {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1030",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1030/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1030/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1030/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/1030",
-      "id": 5014402545,
-      "node_id": "I_kwDOPVWa588AAAABKuG18Q",
-      "number": 1030,
-      "title": "ui(bug): 'Game not started...' is the permanent first line of every player's feed; 'Turn 1' label is dead",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 9028221041,
-          "node_id": "LA_kwDOPVWa588AAAACGh-4cQ",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/bug",
-          "name": "bug",
-          "color": "d73a4a",
-          "default": true,
-          "description": "Something isn't working"
-        },
-        {
-          "id": 9227754225,
-          "node_id": "LA_kwDOPVWa588AAAACJgRa8Q",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/ui-ux",
-          "name": "ui-ux",
-          "color": "bfd4f2",
-          "default": false,
-          "description": "User interface and user experience"
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2026-07-29T23:21:25Z",
-      "updated_at": "2026-07-29T23:55:16Z",
-      "closed_at": null,
-      "assignee": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "body": "Two concrete bugs found by the read-only scene audit in\n`docs/UI_PLACEHOLDER_AUDIT_2026-07-30.md` (34 `.tscn` files, 224 `text =`\nassignments classified). Filed together because they are the same defect class,\nbut only (a) reaches players.\n\n## (a) PLAYER-FACING -- `Game not started...` is the permanent first line of every feed\n\nCONFIRMED.\n\n`godot/scenes/ui/watch_screen.tscn:25`:\n```\n[node name=\"MessageLog\" type=\"RichTextLabel\" parent=\"MessageScroll\"]\ntext = \"[color=gray]Game not started...[/color]\"\n```\n\nThe feed writer only ever appends:\n- `godot/scripts/ui/main_ui.gd:1359` -- `message_log.text += \"\\n\" + line`\n\n`grep -n 'message_log.text' godot --include=*.gd` returns exactly two writes:\nthat `+=`, and `main_ui.gd:1384` (`message_log.text = text`) inside\n`_render_feed()`, which is a full rebuild but only runs on\n`_on_feed_filter_changed` / `_on_rivals_filter_changed` -- i.e. only when the\nplayer happens to toggle a feed filter.\n\nConsequence: in a normal run the first line of the player's message log\npermanently reads `Game not started...`, above every real event line. Harm is\nmodest (it scrolls out of view) but it is false state shipped to players, and it\nis the same string that made the dead UI in #1023 look alive. It ships Friday\nunless fixed.\n\nIt also explains its own survival: anyone who flipped a feed filter while testing\nwatched it silently disappear.\n\nFix: author the scene text empty, and add an unconditional clear on the boot path\nin `main_ui.gd`. The unconditional `=` is the load-bearing half -- authoring it\nempty alone would leave the same hole open for the next person.\n\n## (b) DEV-VISIBLE ONLY -- `Turn 1` is never assigned; the node is hidden instead\n\nCONFIRMED.\n\n`godot/scenes/main.tscn:103`:\n```\n[node name=\"TurnCountLabel\" type=\"Label\" parent=\"TabManager/MainUI/TopBar\"]\ntext = \"Turn 1\"\n```\n\n`godot/scripts/ui/main_ui.gd:1060` does `turn_count_label.visible = false` (the\ndate badge at `TurnLabel` supersedes it; the merge is explained in the comment at\n`main_ui.gd:1057`). The `.text` is written nowhere in the tree.\n\nSo: when the UI is alive the label is hidden; when boot fails the label is\nvisible reading `Turn 1`. No live-player impact -- but it is the worst-behaved\nvariant of the class, because the placeholder is displayed **only** in the\nfailure case. It contributed directly to #1023 reading as a gameplay bug rather\nthan a boot failure.\n\nFix: delete the `text` property (or the node -- it is dead UI). Not a sentinel\nchange; there is nothing to sentinel.\n\n## The generalisable rule this exposes\n\n**`+=` does not establish runtime ownership of a node's text.** Only an\nunconditional `=` on a boot path does. Any node written exclusively via `+=` must\nbe authored empty in the scene and cleared explicitly at boot.\n\nThis rule matters beyond these two nodes: it is the one invariant that an\nautomated checker could use to distinguish \"runtime owns this label\" from\n\"runtime decorates this label\", and it is why the audit's ownership-analysis\ndesign (Design B) was the only proposed gate that would have flagged (a) at all.\n\n## Priority\n\n(a) is small but is live player-facing wrongness in the Friday build. (b) is\ncosmetic-until-something-breaks and can ride any later cleanup.\n\nRelated: #1023 (the boot failure these dressed up), #1027 (silent wrongness as\nthe dominant failure mode), and #1031 (the remaining 30 DANGEROUS placeholders + the proposed sentinel convention).\n",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1030/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1030/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null,
-      "pinned_comment": null
     }
   ],
   "count": 15,
-  "last_updated": "2026-07-30T12:29:32.293429"
+  "last_updated": "2026-07-30T18:25:54.696525"
 }

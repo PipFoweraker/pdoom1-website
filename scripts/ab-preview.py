@@ -39,7 +39,7 @@ for _s in (sys.stdout, sys.stderr):
 
 def git(*args, check=True):
     return subprocess.run(["git", *args], cwd=REPO_ROOT, check=check,
-                          capture_output=True, text=True)
+                          capture_output=True, text=True, encoding="utf-8", errors="replace")
 
 
 def stop():

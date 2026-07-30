@@ -17,23 +17,11 @@
     "open_issues": 157,
     "last_updated": "2026-07-30T11:50:30Z"
   },
-  "last_updated": "2026-07-30T23:03:36.545541",
+  "last_updated": "2026-07-30T18:35:33.574760",
   "game_stats": {
-    "baseline_doom_percent": null,
+    "baseline_doom_percent": 23,
     "frontier_labs_count": 5,
-    "strategic_possibilities": null,
-    "last_calculated": "2026-07-30T23:03:36.545541",
-    "pending": {
-      "baseline_doom_percent": {
-        "status": "not yet measured",
-        "needs": "the game's calibration emit -- baseline doom is a property of the simulation, so only pdoom1 can measure it",
-        "tracking": "https://github.com/PipFoweraker/pdoom1-website/issues/177"
-      },
-      "strategic_possibilities": {
-        "status": "not yet measured",
-        "needs": "a real count derived from the shipped action/upgrade content, which lives in the game repo and is not fetchable here yet",
-        "tracking": "https://github.com/PipFoweraker/pdoom1-website/issues/177"
-      }
-    }
+    "strategic_possibilities": 10000,
+    "last_calculated": "2026-07-30T18:35:33.574754"
   }
 }

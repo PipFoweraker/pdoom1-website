@@ -1,12 +1,12 @@
 {
-  "last_updated": "2026-07-30T12:41:06.677170Z",
+  "last_updated": "2026-07-30T18:35:33.627454Z",
   "jobs": {
     "auto-update-data": {
-      "last_run": "2026-07-30T12:41:06.677170Z",
-      "last_success": "2026-07-30T12:41:06.677170Z",
+      "last_run": "2026-07-30T18:35:33.627454Z",
+      "last_success": "2026-07-30T18:35:33.627454Z",
       "last_failure": null,
-      "total_runs": 1093,
-      "success_count": 1093,
+      "total_runs": 1094,
+      "success_count": 1094,
       "failure_count": 0
     },
     "sync-leaderboards": {
@@ -18,11 +18,11 @@
       "failure_count": 272
     },
     "weekly-league-rollover": {
-      "last_run": "2026-07-26T14:28:04.586873Z",
-      "last_success": "2026-07-26T14:28:04.586873Z",
+      "last_run": "2026-07-30T14:46:39.832050Z",
+      "last_success": "2026-07-30T14:46:39.832050Z",
       "last_failure": null,
-      "total_runs": 38,
-      "success_count": 38,
+      "total_runs": 39,
+      "success_count": 39,
       "failure_count": 0
     }
   },

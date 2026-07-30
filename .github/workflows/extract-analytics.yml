@@ -107,7 +107,7 @@ jobs:
 
           for file_path in all_files:
               try:
-                  with open(file_path) as f:
+                  with open(file_path, encoding="utf-8") as f:
                       data = json.load(f)
 
                   file_info = {
@@ -131,7 +131,7 @@ jobs:
           }
 
           # Save summary
-          with open(analytics_dir / "summary.json", "w") as f:
+          with open(analytics_dir / "summary.json", "w", encoding="utf-8") as f:
               json.dump(summary, f, indent=2)
 
           print(f"Summary created: {len(all_files)} files processed")

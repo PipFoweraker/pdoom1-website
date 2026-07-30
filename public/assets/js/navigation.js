@@ -46,7 +46,8 @@
 					<ul class="dropdown-menu" role="menu">
 						<li role="none"><a href="/about/" role="menuitem">About</a></li>
 						<li role="none"><a href="/resources/" role="menuitem">AI Safety Resources</a></li>
-						<li role="none"><a href="/docs/roadmap.md" role="menuitem">Roadmap</a></li>
+						<li role="none"><a href="/events/" role="menuitem">AI Safety Timeline</a></li>
+						<li role="none"><a href="/docs/roadmap/" role="menuitem">Roadmap</a></li>
 						<li role="none"><a href="/docs/" role="menuitem">Documentation</a></li>
 						<li role="none"><a href="/press/" role="menuitem">Press Kit</a></li>
 					</ul>

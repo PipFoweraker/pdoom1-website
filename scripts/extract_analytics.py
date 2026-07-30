@@ -22,6 +22,17 @@ from typing import Dict, List, Tuple
 from urllib.parse import urlparse
 import hashlib
 
+import sys
+
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 class AnalyticsExtractor:
     """Extract and process analytics from DreamHost web server logs."""
 
@@ -83,7 +94,8 @@ class AnalyticsExtractor:
                     ["ssh", "-i", self.ssh_key, self.ssh_host, cmd],
                     capture_output=True,
                     text=True,
-                    timeout=60
+                    timeout=60,
+                    encoding="utf-8", errors="replace"
                 )
 
                 if result.returncode == 0:
@@ -286,7 +298,7 @@ class AnalyticsExtractor:
         """Save analytics data to JSON file."""
         output_path = self.output_dir / filename
 
-        with open(output_path, 'w') as f:
+        with open(output_path, 'w', encoding="utf-8") as f:
             json.dump(analytics, f, indent=2)
 
         print(f"Analytics saved to {output_path}")

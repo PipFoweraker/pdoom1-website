@@ -9,6 +9,17 @@ import os
 from datetime import datetime
 from typing import Dict, Any, List
 
+import sys
+
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 
 def count_frontier_labs() -> int:
     """Count frontier labs mentioned in the resources section"""
@@ -77,7 +88,7 @@ def update_game_stats() -> Dict[str, Any]:
     
     # Load existing version data
     if os.path.exists(version_file):
-        with open(version_file, 'r') as f:
+        with open(version_file, 'r', encoding="utf-8") as f:
             version_data: Dict[str, Any] = json.load(f)
     else:
         print('version.json not found, creating basic structure')
@@ -131,7 +142,7 @@ def update_game_stats() -> Dict[str, Any]:
     
     # Save updated data
     os.makedirs(data_dir, exist_ok=True)
-    with open(version_file, 'w') as f:
+    with open(version_file, 'w', encoding="utf-8") as f:
         json.dump(version_data, f, indent=2)
     
     print(f"✓ Updated frontier labs count to: {frontier_count}")

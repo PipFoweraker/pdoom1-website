@@ -161,7 +161,7 @@ def update_version_data() -> Dict[str, Any]:
     
     # Write version data
     version_file = os.path.join(DATA_DIR, 'version.json')
-    with open(version_file, 'w') as f:
+    with open(version_file, 'w', encoding="utf-8") as f:
         json.dump(version_data, f, indent=2)
     
     print(f"✓ Version data updated: {release['version']}")
