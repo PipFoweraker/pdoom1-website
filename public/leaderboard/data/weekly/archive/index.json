@@ -1381,13 +1381,162 @@
           "rollover-off-by-one": "week_id/date range describe the week that was ENDING when the rollover ran, not the week that was starting -- the record is one week behind the competition it claims to represent (docs/TECH_DEBT.md A9, fixed 2026-07-28)."
         }
       }
+    },
+    {
+      "week_id": "2026_W31",
+      "season": "2025_Q4",
+      "year": 2026,
+      "week_number": 31,
+      "start_date": "2026-07-27",
+      "end_date": "2026-08-02",
+      "file": "2026_W31_league.json",
+      "archived_at": "2026-07-30T14:46:39.387568Z",
+      "game_version": "v0.13.1",
+      "entry_count": 0,
+      "epoch": {
+        "id": "pre-regularisation",
+        "anomalous": true,
+        "ladder_version": null,
+        "boundary_ladder_version": "L3",
+        "boundary_local": "2026-07-31T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-07-30T14:00:00Z",
+        "reason": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+        "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+        "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
+        "observed_defects": {
+          "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
+          "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
+          "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it."
+        }
+      }
     }
   ],
-  "total_archives": 42,
+  "total_archives": 43,
   "seasons": [
     "2025_Q4"
   ],
-  "preserved_boards": [],
+  "preserved_boards": [
+    {
+      "file": "2026-07-29-orphaned-boards/league_2026-07_7d6ced29__L2.json",
+      "captured": "2026-07-29-orphaned-boards",
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L2",
+      "key_kind": "ladder",
+      "board_key": "(league_2026-07_7d6ced29, L2)",
+      "entry_count": 0,
+      "players": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "file": "2026-07-29-orphaned-boards/weekly-2026-w0__v0.11.0.json",
+      "captured": "2026-07-29-orphaned-boards",
+      "seed": "weekly-2026-w0",
+      "version": "v0.11.0",
+      "key_kind": "build-version (pre-split keying)",
+      "board_key": "(weekly-2026-w0, v0.11.0)",
+      "entry_count": 20,
+      "players": [
+        "CogDerp",
+        "Cognitive Development",
+        "Laboratory of Autonomous Systems"
+      ],
+      "first_entry": "2026-07-19T19:40:08",
+      "last_entry": "2026-07-22T15:56:46"
+    },
+    {
+      "file": "2026-07-29-orphaned-boards/weekly-2026-w0__v0.12.0.json",
+      "captured": "2026-07-29-orphaned-boards",
+      "seed": "weekly-2026-w0",
+      "version": "v0.12.0",
+      "key_kind": "build-version (pre-split keying)",
+      "board_key": "(weekly-2026-w0, v0.12.0)",
+      "entry_count": 3,
+      "players": [
+        "AI Safety Lab",
+        "Laboratory of Autonomous Systems"
+      ],
+      "first_entry": "2026-07-22T21:03:57",
+      "last_entry": "2026-07-22T23:36:37"
+    },
+    {
+      "file": "2026-07-29-orphaned-boards/weekly-2026-w0__v0.13.0.json",
+      "captured": "2026-07-29-orphaned-boards",
+      "seed": "weekly-2026-w0",
+      "version": "v0.13.0",
+      "key_kind": "build-version (pre-split keying)",
+      "board_key": "(weekly-2026-w0, v0.13.0)",
+      "entry_count": 0,
+      "players": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "file": "2026-07-29-orphaned-boards/weekly-2026-w0__v0.13.1.json",
+      "captured": "2026-07-29-orphaned-boards",
+      "seed": "weekly-2026-w0",
+      "version": "v0.13.1",
+      "key_kind": "build-version (pre-split keying)",
+      "board_key": "(weekly-2026-w0, v0.13.1)",
+      "entry_count": 0,
+      "players": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "file": "2026-07-29-orphaned-boards/weekly-2026-w30__L2.json",
+      "captured": "2026-07-29-orphaned-boards",
+      "seed": "weekly-2026-w30",
+      "version": "L2",
+      "key_kind": "ladder",
+      "board_key": "(weekly-2026-w30, L2)",
+      "entry_count": 4,
+      "players": [
+        "AI Safety Lab",
+        "Division of Intelligent Agents",
+        "Hamthropic"
+      ],
+      "first_entry": "2026-07-24T11:02:52",
+      "last_entry": "2026-07-26T18:30:47"
+    },
+    {
+      "file": "2026-07-29-orphaned-boards/weekly-2026-w30__v0.13.0.json",
+      "captured": "2026-07-29-orphaned-boards",
+      "seed": "weekly-2026-w30",
+      "version": "v0.13.0",
+      "key_kind": "build-version (pre-split keying)",
+      "board_key": "(weekly-2026-w30, v0.13.0)",
+      "entry_count": 0,
+      "players": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "file": "2026-07-29-orphaned-boards/weekly-2026-w30__v0.13.1.json",
+      "captured": "2026-07-29-orphaned-boards",
+      "seed": "weekly-2026-w30",
+      "version": "v0.13.1",
+      "key_kind": "build-version (pre-split keying)",
+      "board_key": "(weekly-2026-w30, v0.13.1)",
+      "entry_count": 0,
+      "players": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "file": "2026-07-29-orphaned-boards/weekly_2026_W30_18a08709__v0.13.1.json",
+      "captured": "2026-07-29-orphaned-boards",
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.13.1",
+      "key_kind": "build-version (pre-split keying)",
+      "board_key": "(weekly_2026_W30_18a08709, v0.13.1)",
+      "entry_count": 0,
+      "players": [],
+      "first_entry": null,
+      "last_entry": null
+    }
+  ],
   "epochs": {
     "ladder_version": "L3",
     "board_key": {
@@ -1409,7 +1558,7 @@
     "boundary_why": "The unit being flagged is a whole league week (Fri 00:00 -> Thu 23:59:59 Australia/Hobart). Cutting at board_opens_local instead would put the boundary 17 hours inside the first L3 week, so that week would start before its own boundary and be flagged pre-L3 -- and a week half under L2 rules and half under L3 would be exactly the cross-epoch blend the ladder split exists to prevent. The board-open time is therefore recorded separately and stated on the page, so nothing claims the board was accepting scores from midnight.",
     "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
     "pre-regularisation": {
-      "count": 42,
+      "count": 43,
       "anomalous": true,
       "reason": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result."
     },
@@ -1419,5 +1568,5 @@
       "reason": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L3), by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py."
     }
   },
-  "last_updated": "2026-07-28T23:54:01.695944Z"
+  "last_updated": "2026-07-30T14:46:39.657713Z"
 }
