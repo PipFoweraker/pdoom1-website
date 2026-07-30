@@ -32,6 +32,15 @@ import json
 import sys
 from pathlib import Path
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BLOG_INDEX = REPO_ROOT / "public" / "blog" / "index.json"
 QUEUE = REPO_ROOT / "content" / "syndication"

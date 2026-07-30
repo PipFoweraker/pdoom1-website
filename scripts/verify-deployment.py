@@ -12,6 +12,15 @@ import urllib.request
 import urllib.error
 from datetime import datetime
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 class DeploymentVerifier:
     def __init__(self):
         self.checks_passed = 0
@@ -62,7 +71,7 @@ class DeploymentVerifier:
         for file_path in json_files:
             if os.path.exists(file_path):
                 try:
-                    with open(file_path, 'r') as f:
+                    with open(file_path, 'r', encoding="utf-8") as f:
                         json.load(f)
                     self.log_check(f"JSON {file_path}", True, "Valid JSON")
                 except json.JSONDecodeError as e:
@@ -126,7 +135,7 @@ class DeploymentVerifier:
         version_file = 'public/data/version.json'
         if os.path.exists(version_file):
             try:
-                with open(version_file, 'r') as f:
+                with open(version_file, 'r', encoding="utf-8") as f:
                     data = json.load(f)
                 
                 # Check required fields
@@ -220,7 +229,7 @@ class DeploymentVerifier:
         report_file = 'public/data/deployment-verification.json'
         os.makedirs(os.path.dirname(report_file), exist_ok=True)
         
-        with open(report_file, 'w') as f:
+        with open(report_file, 'w', encoding="utf-8") as f:
             json.dump(report, f, indent=2)
             
         print(f"📄 Deployment report saved: {report_file}")
