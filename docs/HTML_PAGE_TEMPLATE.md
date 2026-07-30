@@ -24,10 +24,10 @@ All HTML pages on the pdoom1.com website should follow this template to ensure c
 	</style>
 </head>
 <body>
-	<!-- Navigation goes here -->
-	<nav role="navigation" aria-label="Main navigation">
-		<!-- Copy from /includes/navigation.html -->
-	</nav>
+	<!-- Leave this EMPTY. navigation.js injects the nav and its styles. -->
+	<header>
+		<!-- Navigation loaded by navigation.js -->
+	</header>
 
 	<!-- Page content -->
 	<main>
@@ -39,6 +39,7 @@ All HTML pages on the pdoom1.com website should follow this template to ensure c
 		<!-- Footer content -->
 	</footer>
 
+	<script src="/assets/js/navigation.js"></script>
 	<script>
 		// Page-specific JavaScript
 	</script>
@@ -87,9 +88,31 @@ document.getElementById('download-btn').addEventListener('click', function() {
 
 ## Navigation Component
 
-Copy the navigation from `/public/includes/navigation.html` to ensure consistency across all pages.
+**Do NOT copy nav markup into a page.** This section used to say "copy the
+navigation from `/public/includes/navigation.html`", and that instruction is
+what produced ten divergent navs across the hand-written pages (TECH_DEBT B1).
+A copy cannot be kept in step; it can only drift. `navigation.html` was deleted
+on 2026-07-28.
 
-**DO NOT** modify navigation manually in individual pages - update `/public/includes/navigation.html` and then copy to all pages that need updating.
+The nav is a runtime-injected component. Two lines adopt it:
+
+```html
+<header>
+	<!-- Navigation loaded by navigation.js -->
+</header>
+...
+<script src="/assets/js/navigation.js"></script>
+```
+
+The header must stay **empty** — `navigation.js` overwrites its contents, so
+markup left inside is dead but reads as live. The script also ships its own
+styles, so the host page does not need `.nav-links` / `.dropdown` /
+`.logo-container` rules of its own.
+
+To change the nav for the whole site, edit `navigationHTML` in
+`/public/assets/js/navigation.js`. Full recipe and rationale:
+`public/includes/README.md`. Enforcement:
+`node scripts/test-header-consistency.js`.
 
 ## SEO Best Practices
 
@@ -118,7 +141,7 @@ When creating a new page:
 1. Copy this template
 2. Update title, meta tags, canonical URL
 3. **Ensure Plausible script is present in `<head>`**
-4. Add navigation from `/public/includes/navigation.html`
+4. Add the empty `<header>` and the `navigation.js` script tag (see above)
 5. Build page content
 6. Test analytics:
    - Visit https://analytics.pdoom1.com
