@@ -1,10 +1,10 @@
 {
-  "generated": "2026-07-30T06:59:28.242604+00:00",
-  "overall_status": "FAIL",
+  "generated": "2026-07-30T12:22:23.517169+00:00",
+  "overall_status": "WARN",
   "summary": {
-    "fail": 1,
-    "warn": 4,
-    "ok": 29
+    "fail": 0,
+    "warn": 2,
+    "ok": 32
   },
   "checks": [
     {
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 2.1 days ago"
+      "detail": "generated 2.3 days ago"
     },
     {
       "name": "league:current_week",
@@ -139,23 +139,23 @@
     },
     {
       "name": "board:key",
-      "status": "WARN",
-      "detail": "published board key version is 'v0.11.0' (build-shaped, 0 entries), but no artifact tells this site which ladder epoch is current -- so it CANNOT confirm the board it publishes is the board players submit to. Reported as unconfirmed, deliberately NOT as a mismatch. Needs pdoom1 to publish the current epoch."
+      "status": "OK",
+      "detail": "published board key matches the current ladder epoch L3"
     },
     {
       "name": "board:exclusions",
-      "status": "WARN",
-      "detail": "leaderboard.json carries no exclusions block (written before ingest_scores.py started reporting them) -- cannot tell how many results were withheld; re-run scripts/ingest_scores.py"
+      "status": "OK",
+      "detail": "nothing withheld on version (0 test/dev files excluded by design)"
     },
     {
       "name": "board:status_integrity",
       "status": "OK",
-      "detail": "data_status=pre-launch consistent with 0 entries"
+      "detail": "data_status=live consistent with 3 entries"
     },
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 4.8h ago"
+      "detail": "live API checked 0.0h ago"
     },
     {
       "name": "board:archived_anomaly",
@@ -164,8 +164,8 @@
     },
     {
       "name": "board:liveness",
-      "status": "FAIL",
-      "detail": "NEW orphaned board(s): 3 score entries on 1 board(s) that are NOT in the anomaly archive. Scores are being lost RIGHT NOW. (weekly-2026-w30, L3): 3 entries. The board key is (seed, ladder_epoch). Do not re-stamp."
+      "status": "OK",
+      "detail": "deployed board (weekly-2026-w30, L3) holds 3 entries"
     },
     {
       "name": "seed_leaderboards:parse",
