@@ -27,7 +27,19 @@ const fs = require('fs');
 const path = require('path');
 
 const PAGE = path.join(__dirname, '..', 'public', 'leaderboard', 'index.html');
-const src = fs.readFileSync(PAGE, 'utf8');
+
+// Normalise CRLF -> LF before anything looks at this.
+//
+// `core.autocrlf=true` on Windows, so a fresh checkout writes CRLF into the working tree.
+// Several extractors below anchor on `;\n` or `\n    }`; under CRLF the byte after `;` is
+// `\r`, so those patterns can never match and the test dies at extraction with
+// "could not extract isDevBuild()" -- exit 1, before a single assertion runs.
+//
+// That is worse than a failing test: it fails on the ONLY platform CLAUDE.md tells you to
+// run it on, while passing in a Linux CI that does not run it either. The guard on the
+// one escaper protecting an unauthenticated API would have been permanently inert while
+// looking like it existed. Found 2026-07-31 by an audit, not by the test.
+const src = fs.readFileSync(PAGE, 'utf8').replace(/\r\n/g, '\n');
 
 let failures = 0;
 const check = (cond, msg) => {
