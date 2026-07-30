@@ -55,11 +55,23 @@ def load_json(p):
 
 
 def real_game_version():
+    """The deployed version, or None. NEVER a literal.
+
+    This value gates every publish decision (is_publishable). It used to degrade to the
+    string "unknown" on any failure, which then compared unequal to every seed file's
+    stamp -- so an unreadable version.json silently excluded 100% of scores and published
+    an empty board that looked exactly like "nobody is playing". Returning None lets
+    main() say so out loud instead.
+    """
     try:
         v = load_json(PUBLIC / "data" / "version.json")
-        return (v.get("latest_release") or {}).get("version") or "unknown"
-    except Exception:
-        return "unknown"
+    except Exception as e:
+        print(f"  !! cannot read version.json ({e})")
+        return None
+    ver = (v.get("latest_release") or {}).get("version")
+    if not ver:
+        print("  !! version.json has no latest_release.version")
+    return ver
 
 
 def validate_entry_schema():
@@ -109,14 +121,30 @@ def main():
     args = ap.parse_args()
 
     version = real_game_version()
+    if version is None:
+        # Refuse rather than publish. Writing an empty board here would overwrite a good
+        # snapshot with a fabricated "nobody played" caused purely by a failed lookup.
+        print("ingest_scores: ABORTED -- the deployed version could not be determined.")
+        print("  Every publish decision compares a seed file's stamp to that version, so")
+        print("  continuing would exclude 100% of scores and publish an empty board that")
+        print("  is indistinguishable from 'nobody is playing'. Nothing was written.")
+        print("  Fix public/data/version.json (latest_release.version), then re-run.")
+        return 2
     validator = validate_entry_schema()
     all_files, seed_files = gather_seed_files(args.input, args.include_tests)
     excluded_test = len(all_files) - len(seed_files)
 
-    entries, bad, seeds_used, excluded_ver = {}, 0, [], 0
+    # excluded_ver is a LIST of (filename, its version, its entry count), not a bare
+    # count. "3 seed files excluded" is not actionable; "3 excluded, stamped v0.13.0,
+    # deployed is v0.13.1, holding 27 entries" tells you what you are not seeing and why.
+    entries, bad, seeds_used, excluded_ver = {}, 0, [], []
     for f in seed_files:
         if not is_publishable(f, version, args.include_legacy):
-            excluded_ver += 1
+            excluded_ver.append({
+                "file": Path(f).name,
+                "game_version": _seed_version(f) or "unstamped",
+                "entries": _seed_entry_count(f),
+            })
             continue
         try:
             d = load_json(f)
@@ -144,6 +172,12 @@ def main():
     else:
         status = "legacy" if args.include_legacy else "live"
 
+    # Everything this run refused to publish, named. The leaderboard page reads this to
+    # tell a visitor WHY the board is empty, so "0 entries" can never again mean both
+    # "nobody played" and "scores landed on a key nothing reads".
+    excluded_entries = sum(x["entries"] for x in excluded_ver)
+    excluded_versions = sorted({x["game_version"] for x in excluded_ver})
+
     out = {
         "meta": {
             "generated": datetime.now(timezone.utc).isoformat(),
@@ -153,6 +187,15 @@ def main():
             "total_entries": len(merged),
             "seeds_aggregated": len(seeds_used),
             "note": "Aggregated + contract-validated by the website. See docs/GAME_UPLIFT_PLAN.md.",
+        },
+        "exclusions": {
+            "deployed_version": version,
+            "version_mismatched_files": len(excluded_ver),
+            "version_mismatched_entries": excluded_entries,
+            "version_mismatched_versions": excluded_versions,
+            "test_dev_files": excluded_test,
+            "invalid_entries_dropped": bad,
+            "detail": excluded_ver,
         },
         "data_status": status,               # live | pre-launch | legacy  (drives the honesty banner)
         "legacy": status != "live",
@@ -168,11 +211,27 @@ def main():
         shown = outpath
 
     print(f"ingest_scores: status={status} version={version}")
-    print(f"  seeds: {len(seeds_used)} published, {excluded_ver} version-mismatched, "
+    print(f"  seeds: {len(seeds_used)} published, {len(excluded_ver)} version-mismatched, "
           f"{excluded_test} test/dev excluded, {bad} invalid entries dropped")
     print(f"  published {len(merged)} entries -> {shown}")
+
+    # Name the mismatch. A silent exclusion is the exact failure this file exists to
+    # avoid: the data is right there and the operator is told only that it is absent.
+    if excluded_ver:
+        print(f"  !! {len(excluded_ver)} seed file(s) EXCLUDED on version: their version is "
+              f"{', '.join(excluded_versions)}, deployed is {version} "
+              f"({excluded_entries} entries withheld)")
+        for x in excluded_ver:
+            print(f"       - {x['file']}: {x['game_version']} ({x['entries']} entries)")
+        print(f"     These entries are not lost, they are unpublishable under the deployed")
+        print(f"     version. Do NOT re-stamp them -- that fabricates history.")
     if status != "live":
         print(f"  data_status={status} -> the page shows an honest banner, not stale data as live")
+
+    # ingest_scores only ever sees LOCAL seed files. It cannot observe the live API, so
+    # it must not let its own silence read as evidence about the API.
+    print(f"  note: this reports local seed files only. For what the live score API "
+          f"actually holds, run scripts/check-board-liveness.py")
 
 
 def _seed_version(f):
@@ -182,5 +241,16 @@ def _seed_version(f):
         return None
 
 
+def _seed_entry_count(f):
+    """How many entries an excluded file was holding -- the number that makes an
+    exclusion report actionable rather than merely true."""
+    try:
+        return len(load_json(f).get("entries") or [])
+    except Exception:
+        return 0
+
+
 if __name__ == "__main__":
-    main()
+    # main() returns non-zero only when it REFUSED to publish (see the version guard).
+    # A normal publish returns None -> exit 0, which is what test_ingest_scores.py asserts.
+    sys.exit(main() or 0)
