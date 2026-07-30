@@ -1,0 +1,145 @@
+{
+  "_README": "Sibling to clocks.json. This file holds ONLY the cadences that cannot be derived from a machine-readable source inside this repo -- upstream rules that live in another repository, and maintainer observations with no in-repo measurement. Everything on /metabolism/ that CAN be derived (workflow crons, league config, the seed ledger, clocks.json) is read by scripts/generate-metabolism.py from the file that actually runs, never from here. IF YOU ARE TEMPTED TO ADD AN ENTRY WHOSE RULE LIVES IN A FILE IN THIS REPO, DO NOT -- teach the generator to read that file instead. Every entry must carry `source` (where the rule really lives) and `derived_from` (how this copy came to exist and what would invalidate it).",
+  "version": 1,
+  "siblings": {
+    "clocks": "public/data/clocks.json"
+  },
+
+  "period_seconds": {
+    "_note": "Named periods, in seconds, used ONLY to place rings on the diagram. `monthly` is the mean Gregorian month (365.2425/12 days); no calendar claim is made by it.",
+    "weekly": 604800,
+    "monthly": 2629746
+  },
+
+  "dst_probe_instants": {
+    "_note": "Two fixed instants used to read Australia/Hobart's UTC offset in each half of the year, so the page can state both offsets without asserting which one is in force today. These are probes, not claims about now. They are fixed so the generated page is byte-stable; only the offsets they reveal are used.",
+    "southern_summer": "2026-01-15T00:00:00+00:00",
+    "southern_winter": "2026-07-15T00:00:00+00:00"
+  },
+
+  "mirrored_cycles": [
+    {
+      "id": "seed-weekly",
+      "title": "Seed",
+      "layer": "game (pdoom1)",
+      "when": "weekly, every Friday",
+      "period": "weekly",
+      "phase_window": {
+        "origin": "Monday 00:00 UTC",
+        "from_days": 4,
+        "to_days": 5,
+        "why": "The day is published; the time of day is not. The map covers the whole of Friday rather than asserting an hour nobody stated."
+      },
+      "forks_board": false,
+      "version_effect": "new seed, same ladder_version",
+      "source": "pdoom1/docs/RELEASE_NOMENCLATURE.md",
+      "derived_from": "Hand-mirrored from pdoom1's release nomenclature. pdoom1 publishes NO machine-readable artifact for this rule -- no feed, no repository_dispatch, no committed JSON -- so this repo cannot derive it and holds a declared copy instead. Re-check whenever pdoom1 changes its nomenclature; the game side is authoritative and this copy is not.",
+      "status": "mirrored"
+    },
+    {
+      "id": "epoch-monthly",
+      "title": "Epoch (monthly Theme)",
+      "layer": "game (pdoom1)",
+      "when": "1st Friday of the month",
+      "period": "monthly",
+      "phase_window": {
+        "origin": "the start of the month",
+        "from_days": 0,
+        "to_days": 7,
+        "why": "The 1st Friday of a month lands on day 1 through 7 depending on the month, so there is no single phase to draw. The map covers the whole window it can land in. Placing it on one day would be a guess dressed as a schedule."
+      },
+      "forks_board": true,
+      "version_effect": "minor +1 AND ladder_version +1",
+      "source": "pdoom1/docs/RELEASE_NOMENCLATURE.md",
+      "derived_from": "Hand-mirrored from pdoom1's release nomenclature, same as the seed rule above. Forking the board is definitional for an epoch, not a side effect. The ladder bump is what the leaderboard board key depends on -- see docs/LEAGUE_SEED_LEDGER.md, which this repo DOES own and which the generator reads.",
+      "status": "mirrored"
+    },
+    {
+      "id": "big-milestone",
+      "title": "Big Milestone",
+      "layer": "game (pdoom1)",
+      "when": "multi-month",
+      "period": null,
+      "period_unknown_reason": "pdoom1 defines a Big Milestone as a multi-month container spanning several minors. No fixed length is published, so no number exists to derive or to mirror. Rendered as unquantified rather than rounded to a guess.",
+      "forks_board": null,
+      "version_effect": "spans several minors",
+      "source": "pdoom1/docs/RELEASE_NOMENCLATURE.md",
+      "derived_from": "Hand-mirrored from pdoom1's release nomenclature.",
+      "status": "mirrored"
+    }
+  ],
+
+  "cross_repo": {
+    "id": "triumvirate",
+    "title": "Triumvirate metabolic cycle",
+    "shape": "pdoom1 -> pdoom-data -> website",
+    "ratification_ladder": ["PROPOSED", "AGREED-PER-LEG", "ACTIVE"],
+    "our_state": "AGREED-PER-LEG",
+    "our_leg": "Hop B",
+    "source": "pdoom1/docs/TRIUMVIRATE_METABOLIC_CYCLE.md",
+    "our_ratification_record": "pdoom1-website#165",
+    "derived_from": "The proposal lives in pdoom1 and is not published as an artifact this repo can fetch. This repo's acceptance of its own leg is recorded as a comment on pdoom1-website#165 (2026-07-28), which is also not machine-readable. Both are therefore declared here with pointers rather than derived. The website is PUBLISHER, never SOURCE: it reads pdoom1, never the reverse.",
+    "hops": [
+      {
+        "id": "hop-a",
+        "name": "Hop A -- World-Update Pack",
+        "owner": "pdoom1 -> pdoom-data",
+        "trigger": "each real month: collect events -> author a world-update pack -> the game's frontier advances one month",
+        "cadence": "monthly",
+        "cadence_source_file": "public/design-notes/adr-0016-league-metabolism.html",
+        "cadence_source_needle": "Monthly league cycle",
+        "derived_from": "Unlike the rest of this block, this cadence IS derivable in-repo: ADR-0016 is published to /design-notes/ from pdoom1's own decision records, unedited, and states the monthly world-update cycle directly. The generator reads the ADR's live status line rather than restating it, so a re-synced ADR moves this row.",
+        "our_state": "not our leg -- owned by pdoom1 and pdoom-data"
+      },
+      {
+        "id": "hop-b",
+        "name": "Hop B -- monthly publication",
+        "owner": "pdoom1 -> website",
+        "trigger": "after each Epoch Friday (E+1..E+4)",
+        "cadence": "monthly",
+        "our_state": "AGREED-PER-LEG",
+        "fires_by": "human memory",
+        "fires_by_note": "There is no machine signal on Epoch Friday. Zero pdoom1 workflows reference this repo and zero emit a repository_dispatch to it; sync-pdoom1-docs.yml on this side is PARKED. The proposal sanctions manual-first for Aug-Oct, so this is the acknowledged exception, not a violation -- but the leg's reliability is a person remembering, and the page says so.",
+        "known_gaps": [
+          "League notes do not exist as an artifact in pdoom1 -- half the monthly pull has nothing to pull. This repo will not invent them.",
+          "public/blog/post.html cannot render tables, and release bodies contain them; reshaping is the publisher's job, not a renderer bug."
+        ]
+      }
+    ],
+    "extra_edges": [
+      {
+        "id": "edge-pdoom-data-clocks",
+        "name": "pdoom-data -> website (countdown milestones)",
+        "note": "The fourth edge the proposal reserved, now open: public/data/clocks.json reads milestone dates direct from pdoom-data#38. Outside Hop B.",
+        "status": "pending upstream data"
+      },
+      {
+        "id": "edge-pdoom1-calibration",
+        "name": "pdoom1 -> website (calibration artifact)",
+        "note": "A fifth edge: pdoom1#994 asks the game to attach calibration.json to each release. The game leads calibration; the website only derives it. One arrow, not a new hop.",
+        "status": "requested, not shipping"
+      }
+    ]
+  },
+
+  "documented_facts": [
+    {
+      "id": "deploy-latency",
+      "claim": "A push to main reaches production in roughly 20 seconds.",
+      "value": "~20 s",
+      "confidence": "documented, not measured",
+      "cite_file": "CLAUDE.md",
+      "cite_needle": "(~20s)",
+      "caveat": "No measurement of this exists in the repository. It is a maintainer observation recorded in CLAUDE.md. Deriving it live would mean querying the Actions API at build time, which would make the generated page non-deterministic and defeat the --check guard, so it stays a labelled observation rather than a fabricated precision."
+    },
+    {
+      "id": "bot-commits-dont-deploy",
+      "claim": "A commit made by a workflow using the default GITHUB_TOKEN does not trigger another workflow, so bot-committed artifacts reach the repository but not pdoom1.com until the next human push.",
+      "value": "asymmetry",
+      "confidence": "platform behaviour, documented",
+      "cite_file": "CLAUDE.md",
+      "cite_needle": "Bot commits do not trigger deploys",
+      "caveat": "This is GitHub Actions' documented recursion guard, not something this repo can measure. It affects every committing workflow listed on this page."
+    }
+  ]
+}
