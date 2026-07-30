@@ -7,6 +7,17 @@ Converts large PNGs to web-optimized formats while keeping originals
 from PIL import Image
 import os
 
+import sys
+
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 def optimize_screenshot(input_path, output_base, max_width=1200, quality=85):
     """
     Optimize a screenshot for web use

@@ -1,6 +1,6 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-30T12:50:25.583Z UTC
+Generated: 2026-07-30T18:46:01.183Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
@@ -42,7 +42,7 @@ Generated: 2026-07-30T12:50:25.583Z UTC
 | 986 | ADR-0015 M-ticket: risk_events re-author + rebalance (20 live fields) + #967 finance fix + political_pressure dead-write |  |  | 2026-07-27 19:45:02 | [link](https://github.com/PipFoweraker/pdoom1/issues/986) |
 | 984 | Half-day workshop: audit mechanics deep-dive (next epoch) -- something amazing under the smell |  |  | 2026-07-27 11:44:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/984) |
 | 967 | finance_engine desperation_payroll promises '-N doom now' but writes to the clobbered inert sink (silently never fires) | bug |  | 2026-07-28 10:11:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/967) |
-| 962 | feat(engine): integrate frontier-labs dataset (pdoom-data#37); expose a list the website can pull to fix calculate-game-stats |  |  | 2026-07-29 01:07:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/962) |
+| 962 | feat(engine): integrate frontier-labs dataset (pdoom-data#37); expose a list the website can pull to fix calculate-game-stats |  |  | 2026-07-30 13:12:46 | [link](https://github.com/PipFoweraker/pdoom1/issues/962) |
 | 961 | design(hiring): W3 -- revisit the candidate pool cap (MAX_CANDIDATES=6); stale once networking changes, and cap-hits are partly silent |  |  | 2026-07-26 11:42:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/961) |
 | 959 | feat(ux): Surrender button on the in-game menu -- end run to leaderboard instead of abandoning |  |  | 2026-07-26 09:00:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/959) |
 | 958 | content(leaderboard): massively more lab-name variety; randomly generate player lab name by default |  |  | 2026-07-26 09:00:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/958) |

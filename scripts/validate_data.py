@@ -29,6 +29,15 @@ import sys
 from datetime import datetime, timezone, date
 from pathlib import Path
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 if sys.platform.startswith("win"):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
@@ -418,6 +427,45 @@ def check_board_liveness():
             f"{dep.get('entries')} entries")
     else:
         add("board:liveness", WARN, f"unrecognised verdict {verdict!r} in board-liveness.json")
+
+    # ---- does what we SERVE match what the probe SAW? -----------------------------
+    # publish-live-board.py is deliberately built to refuse rather than guess: unknown
+    # epoch or unreadable API means it writes nothing. That is the right behaviour and it
+    # introduces a silent failure mode of its own -- a publisher that correctly declines
+    # every run is externally identical to one that is broken. Both just sit there.
+    #
+    # This is the escalation. It needs no history and no timer: if the probe is FRESH and
+    # saw N entries on the deployed board, and the file we actually serve holds a
+    # different number, then publishing is broken RIGHT NOW and visitors are looking at
+    # the wrong board. That is a fail, not a warning -- it is the same class of harm as
+    # the orphan check above, just on our side of the wire.
+    dep = d.get("deployed_board") or {}
+    live_n = dep.get("entries")
+    if live_n is not None and checked:
+        age_h = (datetime.now(timezone.utc) - checked).total_seconds() / 3600
+        served = load_json_or_none(PUBLIC / "leaderboard" / "data" / "leaderboard.json") or {}
+        served_n = len(served.get("entries") or [])
+        served_key = ((served.get("meta") or {}).get("board_key") or {})
+        if served_n != live_n:
+            detail = (f"the live board ({key.get('seed')}, {key.get('ladder_epoch')}) holds "
+                      f"{live_n} entries; leaderboard.json serves {served_n}")
+            if age_h <= 12:
+                add("board:publish", FAIL,
+                    f"PUBLISHING IS BEHIND: {detail}. The probe ran {age_h:.1f}h ago, so the "
+                    f"API is reachable and this is not an outage -- the publisher is "
+                    f"declining or failing. Run: python scripts/publish-live-board.py")
+            else:
+                add("board:publish", WARN,
+                    f"{detail}, but the probe is {age_h/24:.1f} days old so the difference "
+                    f"may just be stale observation. Re-run check-board-liveness.py first.")
+        elif served_key.get("ladder_epoch") and served_key.get("ladder_epoch") != key.get("ladder_epoch"):
+            add("board:publish", FAIL,
+                f"we serve epoch {served_key.get('ladder_epoch')} while the live epoch is "
+                f"{key.get('ladder_epoch')} -- scores are being set on a board we do not show.")
+        else:
+            add("board:publish", OK,
+                f"what we serve matches what the probe saw ({served_n} entries on "
+                f"{key.get('ladder_epoch')})")
 
 
 def check_seed_leaderboards():

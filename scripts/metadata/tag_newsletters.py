@@ -12,6 +12,15 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 # Force UTF-8 for Windows console
 if sys.platform == 'win32':
     import io

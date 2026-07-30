@@ -834,49 +834,29 @@ t	.hero {
 </head>
 <body>
 	<a href="#main-content" class="skip-link">Skip to main content</a>
+	<!-- CONVERGED onto the shared nav spine (assets/js/navigation.js), 2026-07-31.
+	     This page previously carried its own hand-written nav, which had drifted: it
+	     linked Events (the shared nav did not) and commented out Press Kit (the shared
+	     nav shows it). A visitor moving from the front door to any other page saw the
+	     header change under them.
+
+	     The <nav> below is a NO-JS FALLBACK, not the real nav. navigation.js replaces
+	     the whole header when it runs; this is what a reader sees if it does not. It
+	     deliberately has no .nav-links class -- that is the signal navigation.js uses to
+	     know it may overwrite. Pattern copied from design-notes/, which is the reference
+	     implementation. Every other spine page still renders NOTHING with JS off
+	     (TECH_DEBT B1b); the front door should not be one of them. -->
 	<header>
 		<nav role="navigation" aria-label="Main navigation">
 			<div class="logo-container">
 				<div class="designer-credit">Pip Foweraker's</div>
-				<a href="#" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
+				<a href="/" class="logo" aria-label="p(Doom)1 home">p(Doom)1</a>
 			</div>
-			<!-- Ships empty: loadVersionInfo() fills these from /data/version.json.
-			     A hardcoded literal here asserts a stale release on every load before
-			     the fetch resolves, and forever if it fails -- silence beats a
-			     confident wrong number. (Previously carried a hardcoded version and
-			     date that had gone two releases stale.) -->
-			<div class="version-info" id="versionInfo">
-				<span class="version-number" id="versionNumber"></span>
-				<span id="versionDate"></span>
-			</div>
-			<ul class="nav-links" role="menubar">
-				<li role="none"><a href="#home" role="menuitem">Game</a></li>
-				<li role="none"><a href="/events/" role="menuitem">Events</a></li>
-				<li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
-				<li role="none"><a href="/game-stats/" role="menuitem">Stats</a></li>
-				<li role="none"><a href="/dashboard/" role="menuitem">Risk Dashboard</a></li>
-				<!-- Forum link hidden until forum.pdoom1.com (DNS + HTTPS) is live -->
-				<li role="none" class="dropdown">
-					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
-					<ul class="dropdown-menu" role="menu">
-						<li role="none"><a href="/issues/" role="menuitem">Issues & Feedback</a></li>
-						<li role="none"><a href="/blog/" role="menuitem">Dev Blog</a></li>
-						<li role="none"><a href="/game-changelog/" role="menuitem">Updates</a></li>
-						<li role="none"><a href="/cats/" role="menuitem">Cat Custodians</a></li>
-						<li role="none"><a href="https://github.com/PipFoweraker/pdoom1" role="menuitem" target="_blank">GitHub</a></li>
-					</ul>
-				</li>
-				<li role="none" class="dropdown">
-					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
-					<ul class="dropdown-menu" role="menu">
-						<li role="none"><a href="/about/" role="menuitem">About</a></li>
-						<li role="none"><a href="/resources/" role="menuitem">AI Safety Resources</a></li>
-						<li role="none"><a href="/docs/roadmap.md" role="menuitem">Roadmap</a></li>
-						<li role="none"><a href="/docs/" role="menuitem">Documentation</a></li>
-						<!-- <li role="none"><a href="/press/" role="menuitem">Press Kit</a></li> -->
-					</ul>
-				</li>
-			</ul>
+			<a href="/leaderboard/">Leaderboard</a> &middot;
+			<a href="/game-stats/">Stats</a> &middot;
+			<a href="/events/">AI Safety Timeline</a> &middot;
+			<a href="/about/">About</a> &middot;
+			<a href="/blog/">Dev Blog</a>
 		</nav>
 	</header>
 
@@ -1886,14 +1866,12 @@ t	.hero {
 				const publishedDate = new Date(data.latest_release.published_at);
 				const formattedDate = publishedDate.toISOString().split('T')[0];
 
-				document.getElementById('versionNumber').textContent = version;
-				document.getElementById('versionDate').textContent = formattedDate;
-
-				// Make it clickable to view release notes
-				const versionInfo = document.getElementById('versionInfo');
-				versionInfo.style.cursor = 'pointer';
-				versionInfo.title = 'View release notes';
-				versionInfo.onclick = () => window.open(data.latest_release.html_url, '_blank');
+				// The nav version badge is owned by assets/js/navigation.js, which fetches
+				// the same version.json and fills it (and keeps it hidden until it has a
+				// real value). This page must NOT also write it: the elements live in the
+				// injected header, so this code raced nav injection and referenced
+				// #versionInfo, which the shared nav does not have -- a guaranteed
+				// TypeError on null once the header converged. One writer, one badge.
 			}
 		} catch (error) {
 			console.error('Failed to load version info:', error);
@@ -1910,6 +1888,7 @@ t	.hero {
 
 	<!-- Privacy-preserving analytics -->
 	<script src="/assets/js/analytics.js"></script>
+	<script src="/assets/js/navigation.js"></script>
 </body>
 </html>
 

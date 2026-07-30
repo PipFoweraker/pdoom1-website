@@ -25,6 +25,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 
 def deployed_game_version(website_dir: Path) -> str:
     """Read the deployed game version from the site's own source of truth.

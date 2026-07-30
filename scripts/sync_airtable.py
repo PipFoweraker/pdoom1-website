@@ -9,6 +9,15 @@ import json, os, sys, time
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 API_KEY = os.getenv('AIRTABLE_API_KEY')
 BASE_ID = os.getenv('AIRTABLE_BASE_ID')
 BLOG_TABLE = os.getenv('AIRTABLE_BLOG_TABLE', 'Blog')
