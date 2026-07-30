@@ -93,10 +93,37 @@ def update_game_stats() -> Dict[str, Any]:
     if 'game_stats' not in version_data:
         version_data['game_stats'] = {}
         
+    # baseline_doom_percent and strategic_possibilities used to ship here as the literals
+    # 23 and 10000, commented "Keep stubbed for now". They rendered on three reader-facing
+    # pages as "23%" under the label "Baseline Doom" and "10k+" under "Strategic
+    # Possibilities" -- presented to a visitor as measurements of the game, with nothing
+    # on the page marking them as invented. Nobody ever measured either one.
+    #
+    # They are now emitted as null, with the reason and the tracking issue alongside, and
+    # the pages render "not yet measured" rather than a number. A stat we have not taken
+    # is not a small inaccuracy: on a site whose entire pitch is that it does not lie to
+    # you, an invented number under a confident label is the whole credibility gone.
+    #
+    # DO NOT restore a literal here "temporarily". That is exactly how these two survived
+    # for months. If a value cannot be derived, it stays null and says so.
     version_data['game_stats'].update({
         'frontier_labs_count': frontier_count,
-        'baseline_doom_percent': 23,  # Keep stubbed for now
-        'strategic_possibilities': 10000,  # Keep large number for now
+        'baseline_doom_percent': None,
+        'strategic_possibilities': None,
+        'pending': {
+            'baseline_doom_percent': {
+                'status': 'not yet measured',
+                'needs': "the game's calibration emit -- baseline doom is a property of "
+                         "the simulation, so only pdoom1 can measure it",
+                'tracking': 'https://github.com/PipFoweraker/pdoom1-website/issues/177',
+            },
+            'strategic_possibilities': {
+                'status': 'not yet measured',
+                'needs': 'a real count derived from the shipped action/upgrade content, '
+                         'which lives in the game repo and is not fetchable here yet',
+                'tracking': 'https://github.com/PipFoweraker/pdoom1-website/issues/177',
+            },
+        },
         'last_calculated': datetime.now().isoformat()
     })
     
