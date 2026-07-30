@@ -16,6 +16,7 @@ Usage:
 
 import json
 import os
+import re
 import sys
 import argparse
 import shutil
@@ -97,6 +98,77 @@ def filter_events(events: Dict[str, Any]) -> Dict[str, Any]:
         log(f"Filtered out {excluded_count} excluded/newsletter events")
 
     return filtered
+
+
+# ---------------------------------------------------------------------------
+# PII redaction
+#
+# Many event descriptions are raw text scraped out of paper PDFs, and arXiv/ACM
+# author blocks carry the authors' institutional email addresses. Republishing
+# those on a public static site hands a spam harvester 75 academics' addresses
+# that they never agreed to have listed here. So every string that reaches a
+# generated page or events.json is swept before it is written.
+#
+# Two properties this pattern is built for, both from the real corpus:
+#
+#   * PDF extraction glues the next author's given name onto the TLD --
+#     "madry@mit.eduAleksandar". A greedy [A-Za-z]{2,} TLD eats "Aleksandar"
+#     too and silently deletes a name. Requiring the TLD to be one letter
+#     followed by LOWERCASE letters stops the match at the capital, so the
+#     redaction removes the address and leaves the name.
+#   * Line breaks are extracted as a literal "\n" two-character sequence in
+#     some records, which is why the corpus contains "nroman.yampolskiy@..."
+#     with a leading n. The local part matches whatever precedes the @, so
+#     that stray n is left behind as text -- ugly, but it is not an address,
+#     and inventing a rule to strip it risks eating real initials.
+REDACTION_MARKER = "[email removed]"
+
+EMAIL_PATTERN = re.compile(
+    r"(?:mailto:)?"                            # swallow a mailto: prefix too
+    r"[A-Za-z0-9._%+\-]+"                      # local part
+    r"@"
+    r"[A-Za-z0-9\-]+(?:\.[A-Za-z0-9\-]+)*"     # domain labels
+    r"\.[A-Za-z][a-z]{1,23}"                   # TLD (see note above)
+)
+
+
+def redact_emails_in_text(text: str) -> str:
+    """Replace every email address in a string with REDACTION_MARKER.
+
+    Marking rather than deleting: a reader who sees a gap in an author block
+    should be able to tell that something was taken out deliberately, not that
+    the page is broken. The site's rule is to never mislead a visitor, and a
+    silent deletion is a small lie about what the source said.
+    """
+    return EMAIL_PATTERN.sub(REDACTION_MARKER, text)
+
+
+def redact_pii(value: Any) -> Any:
+    """Recursively redact email addresses in any nested str/list/dict value.
+
+    Deliberately walks the WHOLE event rather than a named list of fields:
+    write_events_json() serialises the entire event dict, so a field added
+    upstream tomorrow would otherwise ship unscrubbed. Fail closed.
+    """
+    if isinstance(value, str):
+        return redact_emails_in_text(value)
+    if isinstance(value, list):
+        return [redact_pii(v) for v in value]
+    if isinstance(value, dict):
+        return {k: redact_pii(v) for k, v in value.items()}
+    return value
+
+
+def count_emails(value: Any) -> int:
+    """Count email addresses in a nested structure (for the sync log)."""
+    if isinstance(value, str):
+        return len(EMAIL_PATTERN.findall(value))
+    if isinstance(value, list):
+        return sum(count_emails(v) for v in value)
+    if isinstance(value, dict):
+        return sum(count_emails(v) for v in value.values())
+    return 0
+
 
 
 def sanitize_urls_in_text(text: str) -> str:
@@ -780,7 +852,7 @@ def write_events_json(events: Dict[str, Any]):
     """Write events.json for the events index page"""
     output_file = DATA_DIR / "events.json"
 
-    with open(output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, 'w', encoding='utf-8', newline='\n') as f:
         json.dump(events, f, indent=2)
 
     log(f"Wrote events index to {output_file}")
@@ -860,13 +932,36 @@ def main():
     if url_changes > 0:
         log(f"Sanitized URLs in {url_changes} events")
 
+    # Redact third-party email addresses harvested out of paper PDFs.
+    # Runs AFTER the URL pass so the https rewrite still sees whole strings,
+    # and BEFORE page generation and write_events_json() so neither surface
+    # can publish one. See redact_pii() for why it walks the whole record.
+    log("Redacting third-party email addresses...")
+    emails_found = 0
+    events_with_emails = 0
+    for event_id, event in events.items():
+        n = count_emails(event)
+        if n:
+            emails_found += n
+            events_with_emails += 1
+            events[event_id] = redact_pii(event)
+    if emails_found:
+        log(f"Redacted {emails_found} email addresses across {events_with_emails} events")
+    else:
+        log("No email addresses found in event data")
+
     # Generate individual event detail pages
     log("Generating event detail pages...")
     for event_id, event in events.items():
         html_content = generate_event_detail_page(event_id, event)
         output_file = EVENTS_DIR / f"{event_id}.html"
 
-        with open(output_file, 'w', encoding='utf-8') as f:
+        # newline='\n' pins LF output. Without it, a Windows run writes CRLF;
+        # git's autocrlf clean filter silently REFUSES to normalise any file
+        # that already contains a lone CR (one arXiv description does), so that
+        # page alone would be committed with CRLF and show up as a whole-file
+        # rewrite in every future diff.
+        with open(output_file, 'w', encoding='utf-8', newline='\n') as f:
             f.write(html_content)
 
     log(f"Generated {len(events)} event detail pages")
@@ -949,7 +1044,7 @@ def main():
     }
 
     summary_file = DATA_DIR / "events-sync-summary.json"
-    with open(summary_file, 'w') as f:
+    with open(summary_file, 'w', encoding='utf-8', newline='\n') as f:
         json.dump(summary, f, indent=2)
 
     log(f"Summary report: {summary_file}")

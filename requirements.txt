@@ -18,6 +18,20 @@ PyYAML>=6.0            # Blog post front matter (scripts/build-blog-index.py)
 Pillow>=10.0.0         # Image optimization (optimize-screenshots.py, blog assets)
 
 # ============================================================================
+# Timezone database (scripts/weekly-league-manager.py, CI + local)
+# ============================================================================
+# REQUIRED ON WINDOWS. The weekly league week is anchored to Friday 00:00
+# Australia/Hobart -- a real IANA zone, not a fixed offset, because Tasmania
+# observes daylight saving (UTC+10 AEST in winter, UTC+11 AEDT Oct-Apr).
+# Python's `zoneinfo` reads the *system* tz database, which Linux and macOS have
+# and Windows does not: without this package ZoneInfo("Australia/Hobart") raises
+# `No time zone found with key Australia/Hobart`. That is the worst kind of
+# dependency -- CI (ubuntu-latest) passes while the same code dies on the
+# maintainer's box -- so it is pinned here rather than left to chance.
+# The code refuses to fall back to a hardcoded +10:00; see league_tz().
+tzdata>=2025.1         # IANA tz database for zoneinfo (no-op where the OS has one)
+
+# ============================================================================
 # Optional Dependencies (Future Features)
 # ============================================================================
 

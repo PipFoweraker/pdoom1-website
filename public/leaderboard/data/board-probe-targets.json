@@ -1,0 +1,30 @@
+{
+  "_comment": "Extra board keys for scripts/check-board-liveness.py to probe, BEYOND what it derives on its own. Normally empty: the probe derives seeds from the preserved captures, weekly/current.json and leaderboard.json, and derives ladder epochs from the epoch-shaped keys it has already seen plus a forward window. Add something here only when a value genuinely cannot be derived, and always with a source.",
+  "_rules": [
+    "Every entry MUST carry a `source` saying who published the value and when. A value with no source is a hardcoded literal wearing a costume.",
+    "Do NOT pre-populate a seed before the ceremony that draws it has happened. An unconfirmed guess published here is a claim the site cannot support.",
+    "Remove entries once the probe can derive them (i.e. once a capture or a data file carries them). This file is a patch, not a registry."
+  ],
+  "board_key_shapes": {
+    "_comment": "How to read the `version` half of a board key. The client sends the LADDER EPOCH, not the build. GameConfig.get_board_version() returns 'L' + LADDER_VERSION. Both shapes exist live: historical boards are build-shaped, current boards are epoch-shaped. Neither is an error.",
+    "ladder_epoch": {
+      "pattern": "^L\\d+$",
+      "example": "L2",
+      "meaning": "current shape. The board key half the game actually sends. A build bump does NOT fork the board -- that was the point of the build-vs-ladder split.",
+      "source": "pdoom1 via pdoom1-website issue #151, comment 2026-07-28T23:13"
+    },
+    "build_version": {
+      "pattern": "^v?\\d+\\.\\d+\\.\\d+$",
+      "example": "v0.11.0",
+      "meaning": "historical shape, from before the build-vs-ladder split. Boards keyed this way are frozen history and must never be re-stamped.",
+      "source": "observed live 2026-07-28/29; captures in preserved/2026-07-29-orphaned-boards/"
+    }
+  },
+  "current_ladder_epoch": {
+    "value": null,
+    "_comment": "THE GAP. The website has no artifact telling it which ladder epoch is current, so it CANNOT confirm that the board it publishes is the board players submit to. While this is null every surface must say 'cannot confirm' -- never 'mismatch', because asserting a mismatch on correct data burns the alarm. Populating this requires pdoom1 to publish the current epoch (see the artifact request in PR #190).",
+    "source": null
+  },
+  "extra_seeds": [],
+  "extra_versions": []
+}

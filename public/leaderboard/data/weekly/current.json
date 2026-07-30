@@ -1,29 +1,65 @@
 {
   "meta": {
-    "week_id": "2026_W30",
+    "week_id": "2026_W31",
     "season": "2025_Q4",
-    "generated": "2026-07-26T14:28:04.392677Z",
+    "generated": "2026-07-28T04:42:47.484642Z",
     "game_version": "v0.13.1",
     "competition_type": "weekly_league",
-    "start_date": "2026-07-20T00:00:00",
-    "end_date": "2026-07-26T23:59:59",
+    "start_date": "2026-07-27T00:00:00+00:00",
+    "end_date": "2026-08-02T23:59:59+00:00",
     "total_participants": 0,
     "total_submissions": 0
   },
-  "seed": "weekly_2026_W30_18a08709",
+  "epoch": {
+    "id": "pre-regularisation",
+    "anomalous": true,
+    "ladder_version": null,
+    "boundary_ladder_version": "L3",
+    "boundary_local": "2026-07-31T00:00:00+10:00",
+    "boundary_tz": "Australia/Hobart",
+    "boundary_utc": "2026-07-30T14:00:00Z",
+    "reason": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+    "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+    "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
+    "observed_defects": {
+      "monday-anchored-utc-week": "the week runs Monday 00:00 -> Sunday 23:59:59 UTC. The competition cadence is a Seed roll every Friday (pdoom1/docs/RELEASE_NOMENCLATURE.md), anchored to Friday 00:00 Australia/Hobart from 2026-07-30 -- so this record's week is two days out of phase with the competition it claims to describe, independently of the off-by-one below.",
+      "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
+      "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it."
+    }
+  },
+  "seed": "weekly_2026_W31_f148a5b6",
+  "seed_provenance": {
+    "blessed": false,
+    "derivation": "sha256('pdoom1_weekly_<week_id>_<season>')[:8], website-side",
+    "canonical_source": "the shipped game client, recorded in docs/LEAGUE_SEED_LEDGER.md",
+    "note": "Placeholder. Do NOT present this to players as the competitive seed. The board key scores are actually submitted under is blessed in docs/LEAGUE_SEED_LEDGER.md; a seed that is not in that ledger routes submissions to a board nobody displays, with no error shown to the player."
+  },
   "economic_model": "unknown",
   "week_info": {
-    "week_id": "2026_W30",
+    "week_id": "2026_W31",
     "year": 2026,
-    "week_number": 30,
-    "start_date": "2026-07-20",
-    "end_date": "2026-07-26",
-    "start_timestamp": "2026-07-20T00:00:00",
-    "end_timestamp": "2026-07-26T23:59:59",
-    "days_remaining": 0,
-    "hours_remaining": 9,
+    "week_number": 31,
+    "start_date": "2026-07-27",
+    "end_date": "2026-08-02",
+    "start_timestamp": "2026-07-27T00:00:00+00:00",
+    "end_timestamp": "2026-08-02T23:59:59+00:00",
+    "days_remaining": 5,
+    "hours_remaining": 19,
     "is_current": true,
-    "season": "2025_Q4"
+    "status": "running",
+    "season": "2025_Q4",
+    "epoch": {
+      "id": "pre-regularisation",
+      "anomalous": true,
+      "ladder_version": null,
+      "boundary_ladder_version": "L3",
+      "boundary_local": "2026-07-31T00:00:00+10:00",
+      "boundary_tz": "Australia/Hobart",
+      "boundary_utc": "2026-07-30T14:00:00Z",
+      "reason": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
+      "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+      "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z"
+    }
   },
   "entries": [],
   "statistics": {

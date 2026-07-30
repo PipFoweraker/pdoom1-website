@@ -66,52 +66,8 @@
 			z-index: 100;
 		}
 
-		nav {
-			max-width: 1200px;
-			margin: 0 auto;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 0 2rem;
-		}
-
-		.logo-container {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-		}
-
-		.designer-credit {
-			font-size: 0.75rem;
-			color: var(--text-muted);
-			font-weight: normal;
-			margin-bottom: -0.2rem;
-			letter-spacing: 0.5px;
-		}
-
-		.logo {
-			font-size: 1.5rem;
-			font-weight: bold;
-			color: var(--accent-primary);
-			text-decoration: none;
-			text-shadow: 0 0 10px var(--accent-primary);
-		}
-
-		.nav-links {
-			display: flex;
-			gap: 2rem;
-			list-style: none;
-		}
-
-		.nav-links a {
-			color: var(--text-secondary);
-			text-decoration: none;
-			transition: color var(--duration-fast) var(--easing);
-		}
-
-		.nav-links a:hover {
-			color: var(--accent-primary);
-		}
+		/* Nav styling lives in navigation.js, scoped to
+		   header[data-nav-injected]. Do not re-add nav rules here. */
 
 		main {
 			max-width: 900px;
@@ -249,6 +205,35 @@
 			margin-bottom: 0.5rem;
 		}
 
+		/* "What We DON'T Collect" sits directly under "What We Collect". The
+		   negation is the whole point of the list, so it keeps a visible
+		   negative marker -- without one the two lists render identically and
+		   a skimming reader can read the second as more things we DO collect.
+		   The marker is drawn in CSS (two crossed bars) rather than set as a
+		   pictograph, because this site ships no emoji in its chrome, and
+		   because a screen reader announcing "cross mark" on every line is
+		   noise: the <h3> above already states the negation in words. */
+		.exclusion-list {
+			list-style: none;
+		}
+
+		.exclusion-list li {
+			position: relative;
+			padding-left: 1.6rem;
+		}
+
+		.exclusion-list li::before {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 0.45em;
+			width: 0.7em;
+			height: 0.7em;
+			background:
+				linear-gradient(to bottom right, transparent calc(50% - 1px), var(--accent-danger) calc(50% - 1px), var(--accent-danger) calc(50% + 1px), transparent calc(50% + 1px)),
+				linear-gradient(to bottom left, transparent calc(50% - 1px), var(--accent-danger) calc(50% - 1px), var(--accent-danger) calc(50% + 1px), transparent calc(50% + 1px));
+		}
+
 		code {
 			background: var(--bg-tertiary);
 			padding: 0.2rem 0.5rem;
@@ -260,15 +245,6 @@
 		@media (max-width: 768px) {
 			.hero h1 {
 				font-size: 2rem;
-			}
-			
-			nav {
-				flex-direction: column;
-				gap: 1rem;
-			}
-			
-			.nav-links {
-				gap: 1rem;
 			}
 			
 			.section {
@@ -283,18 +259,7 @@
 </head>
 <body>
 	<header>
-		<nav role="navigation" aria-label="Main navigation">
-			<div class="logo-container">
-				<div class="designer-credit">Pip Foweraker's</div>
-				<a href="/" class="logo">p(Doom)1</a>
-			</div>
-			<ul class="nav-links">
-				<li><a href="/about/">About</a></li>
-				<li><a href="/blog/">Blog</a></li>
-				<li><a href="/leaderboard/">Leaderboard</a></li>
-				<li><a href="/docs/">Docs</a></li>
-			</ul>
-		</nav>
+		<!-- Navigation loaded by navigation.js -->
 	</header>
 
 	<main>
@@ -313,19 +278,19 @@
 
 			<div class="feature-list">
 				<div class="feature-item">
-					<h4>🚫 No Cookies</h4>
+					<h4>No Cookies</h4>
 					<p>We don't use cookies or persistent identifiers.</p>
 				</div>
 				<div class="feature-item">
-					<h4>🔒 No Personal Data</h4>
+					<h4>No Personal Data</h4>
 					<p>Our analytics never collect personally identifiable information.</p>
 				</div>
 				<div class="feature-item">
-					<h4>✅ Privacy by Design</h4>
+					<h4>Privacy by Design</h4>
 					<p>No cookies and no personal data means no consent banner to click through &mdash; and nothing about you stored to misuse.</p>
 				</div>
 				<div class="feature-item">
-					<h4>🌍 Respects DNT</h4>
+					<h4>Respects DNT</h4>
 					<p>If your browser sends Do Not Track, we tell the tracker to ignore your visits. That check runs on our main pages, so a visit landing straight on an event page may be counted first.</p>
 				</div>
 			</div>
@@ -343,12 +308,12 @@
 			</ul>
 			
 			<h3>What We DON'T Collect</h3>
-			<ul>
-				<li>❌ IP addresses (anonymized immediately)</li>
-				<li>❌ Cookies or local storage (except for opt-out preference)</li>
-				<li>❌ Personal information (names, emails, etc.)</li>
-				<li>❌ Cross-site tracking data</li>
-				<li>❌ Fingerprinting data</li>
+			<ul class="exclusion-list">
+				<li>IP addresses (anonymized immediately)</li>
+				<li>Cookies or local storage (except for opt-out preference)</li>
+				<li>Personal information (names, emails, etc.)</li>
+				<li>Cross-site tracking data</li>
+				<li>Fingerprinting data</li>
 			</ul>
 			<p>
 				<strong>That covers analytics only.</strong> If you use one of our forms or email us, we receive
@@ -495,7 +460,7 @@
 			const hasOptedOut = window.pdoom1Analytics && window.pdoom1Analytics.hasOptedOut();
 
 			if (hasOptedOut) {
-				statusIndicator.textContent = 'Analytics Opted Out ✓';
+				statusIndicator.textContent = 'Analytics Opted Out';
 				statusIndicator.className = 'status-indicator status-opted-out';
 				statusDescription.textContent = 'You have opted out of analytics. No data is being collected from your visits.';
 				optOutBtn.style.display = 'none';
@@ -540,5 +505,6 @@
 			updateStatus();
 		}
 	</script>
+	<script src="/assets/js/navigation.js"></script>
 </body>
 </html>
