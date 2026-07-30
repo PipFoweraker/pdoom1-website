@@ -240,7 +240,39 @@ node    scripts/test-header-consistency.js
 python  scripts/sync/sync-keybinds.py --check # keybind mirror fresh + no typed keys
 python  scripts/test-weekly-league-boundary.py  # rollover run-time -> week mapping (A9)
 python  scripts/stamp-league-epoch.py --check   # every weekly record carries its epoch
+node    scripts/test-board-escaping.js    # no API field reaches innerHTML unescaped
 ```
+
+## Testing discipline
+Every line below was earned by something that actually went wrong here, mostly on
+2026-07-30. They are cheap to follow and expensive to relearn.
+
+- **A claimed safety property needs a forced failure.** If a script says it "fails
+  loudly", "refuses rather than guesses" or "never overwrites good data", there must be a
+  test that FORCES that path and observes it. A docstring is documentation, not evidence.
+  Copy `scripts/test-board-escaping.js` or `scripts/test_ingest_scores.py`: build inputs
+  in a temp dir, assert the refusal, never mutate a committed fixture.
+- **A guard seen only in its passing state has not been shown to work.** Green is equally
+  consistent with "the condition is safe" and "the check never fires". Make it fail on
+  purpose once and keep that as the test.
+- **Never assert a literal against a value that moves.** `test_ingest_scores.py` pinned a
+  fixture to `v0.11.0` while the rule under test was "matches the DEPLOYED version"; it
+  went red at v0.12.0 and stayed red through two more releases. Read the moving value and
+  assert the *rule*.
+- **A red test in the suite above is worse than no test** — it teaches everyone to skip
+  the suite, so the one failure that matters is skipped with it. Fix it or delete it.
+- **Refusing to act is itself a silent-failure mode.** A script that correctly declines
+  every run is externally identical to one that is broken. Anything that can refuse needs
+  a staleness escalation, not just a warning in a job summary.
+- **Absence of a marker is never a clean bill of health.** Everything predating a marker
+  is unmarked too, so a missing flag must render as *unknown*, never as *fine*.
+- **Check sibling branches before writing a fix.** Two agents independently rewrote the
+  same test on 2026-07-30, one better than the other. With parallel work here, duplicated
+  effort is a more common waste than merge conflicts are.
+- **Anything rendering data from the score API must escape it.** That API is
+  unauthenticated and validates nothing — `GET ?seed=x&version=L9` returns `ok:true` for
+  a board that never existed — so every field is attacker-controlled. There is exactly
+  ONE escaper on the leaderboard page; do not add a second.
 
 **`/metabolism/` is generated, never hand-edited.** `scripts/generate-metabolism.py`
 derives every cadence on that page at build time from the thing that actually runs —
