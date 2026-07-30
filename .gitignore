@@ -12,3 +12,9 @@ scripts/game-integration-config.json
 .claude/settings.local.json
 content_audit.json
 page_audit.json
+
+# Internal review builds. These live INSIDE the deploy root (public/), so they are
+# one `git add -A` away from being published to pdoom1.com -- and two workflows
+# (weekly-league-reset.yml, weekly-deployment.yml) stage the whole tree that way.
+# Untracked is not enough on its own; ignored is.
+public/_review/
