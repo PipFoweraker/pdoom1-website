@@ -1,15 +1,20 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-30T18:46:01.183Z UTC
+Generated: 2026-07-31T00:55:05.001Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1057 | bug reports die on the player's disk: the website intake is built, the game never calls it | bug |  | 2026-07-31 00:25:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/1057) |
+| 1056 | convention: printed docs carry a next-review date and its TRIGGER, not just a print date | documentation |  | 2026-07-31 00:13:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/1056) |
+| 1055 | Ecosystem coherence: pdoom-data ADR-007 (anti-corruption layer) and ADR-008 (provenance/annotation model) |  |  | 2026-07-31 00:07:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1055) |
+| 1053 | build_release: refuse to build from a stale or dirty tree -- prove build-matches-INTENT, not just pack-matches-build | technical-debt |  | 2026-07-30 23:26:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/1053) |
+| 1052 | ADR-0015 / DQ-21: what should a pdoom-data event carry, now that literal doom fields are deprecated? |  |  | 2026-07-30 23:15:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/1052) |
+| 1049 | ADR set: correctness/staleness/cohesion pass, and an implementation-status field the website can render |  |  | 2026-07-30 21:50:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/1049) |
 | 1046 | Main-screen warnings: tell players the ladder can fork BEFORE they play (draft copy inside) |  |  | 2026-07-30 12:11:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1046) |
-| 1044 | design(tempo): actions resolve instantly, so the early game has no rhythm -- time, sequencing, and the queue's promise | game-mechanics |  | 2026-07-30 08:49:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1044) |
+| 1044 | design(tempo): actions resolve instantly, so the early game has no rhythm -- time, sequencing, and the queue's promise | game-mechanics |  | 2026-07-30 21:35:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1044) |
 | 1043 | ui(layout): the Plan screen wastes its middle and scatters its text -- legibility-first layout brief | ui-ux |  | 2026-07-30 06:59:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1043) |
 | 1042 | Score payload: emit player name AND lab name, plus a dev-mode-used flag (website side is built) |  |  | 2026-07-30 02:55:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1042) |
 | 1041 | playtest 2026-07-30 (v0.13.2 artifact): UI/UX findings from the Gate 4 run | ui-ux |  | 2026-07-30 02:43:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/1041) |
-| 1040 | macOS HOW-TO-RUN still tells testers to right-click -> Open, which Sequoia 15.x removed |  |  | 2026-07-30 02:12:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1040) |
 | 1038 | trust: make provable declarations about what the game touches -- exit surfaces, provenance, signing | documentation, post-launch |  | 2026-07-30 01:17:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1038) |
 | 1037 | nomenclature: stale 'AP' vocabulary in player-facing text after the attention-economy migration (#996) -- scoped sweep + GLOSSARY.md is missing | documentation, ui-ux |  | 2026-07-29 23:55:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1037) |
 | 1036 | testing: which tests pass only by alphabetical ordering accident? GameManager autoload leaks between files | testing, technical-debt |  | 2026-07-29 23:55:33 | [link](https://github.com/PipFoweraker/pdoom1/issues/1036) |
