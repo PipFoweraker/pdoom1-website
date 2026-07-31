@@ -169,6 +169,9 @@ def git_commit(repo: Path) -> str:
         out = subprocess.run(
             ["git", "-C", str(repo), "rev-parse", "--short", "HEAD"],
             capture_output=True, text=True, timeout=20,
+            # text=True decodes with the LOCALE codec; on a cp1252 console a child
+            # writing UTF-8 raises UnicodeDecodeError. Be explicit.
+            encoding="utf-8", errors="replace",
         )
         if out.returncode == 0:
             return out.stdout.strip()
