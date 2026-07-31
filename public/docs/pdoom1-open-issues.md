@@ -1,16 +1,23 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-31T07:15:04.396Z UTC
+Generated: 2026-07-31T12:54:07.790Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
-| 1066 | League: test seeds are visible in the public seed filter, on the GLOBAL board, and survive Clear Local Scores |  |  | 2026-07-31 07:01:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1066) |
+| 1073 | Player guide still says "action points" -- #1050 did not reach it -- and it requires scrolling to read |  |  | 2026-07-31 08:19:37 | [link](https://github.com/PipFoweraker/pdoom1/issues/1073) |
+| 1072 | build_release.py hardcodes the output name PDoom.exe regardless of --preset |  |  | 2026-07-31 08:11:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1072) |
+| 1071 | No macOS build has ever been verified to run; the Steam framework breaks on non-mac checkouts |  |  | 2026-07-31 08:11:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1071) |
+| 1070 | Test suite writes REAL leaderboard files into the developer's player profile | bug |  | 2026-07-31 08:10:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/1070) |
+| 1069 | enhanced-release.yml builds its own assets, bypassing build_release.py's freshness proof | bug |  | 2026-07-31 08:09:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/1069) |
+| 1068 | The site's Linux download button 404s (PDoom.x86_64 is not a release asset) | bug |  | 2026-07-31 08:09:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1068) |
+| 1067 | Release builds ship a STALE build_stamp.txt -- CI never runs write_build_stamp.py | bug |  | 2026-07-31 08:09:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1067) |
+| 1066 | League: test seeds are visible in the public seed filter, on the GLOBAL board, and survive Clear Local Scores |  |  | 2026-07-31 07:51:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1066) |
 | 1065 | UNRESOLVED from the 10:24 playtest: "critical ladder bug, it's translated into the local thing" |  |  | 2026-07-31 06:15:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1065) |
 | 1064 | Play Again / Back after a run ends: "there wasn't a game to play again from" | ui-ux |  | 2026-07-31 06:15:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/1064) |
 | 1063 | Let the player set player name + lab name on the FIRST screen (not only in setup) | ui-ux |  | 2026-07-31 06:15:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/1063) |
 | 1062 | Leaderboard: the Duration column is meaningless when the score is turns survived | ui-ux |  | 2026-07-31 06:15:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/1062) |
 | 1061 | IP / trademark follow-up -- Australian lawyers, DUE Monday 2026-08-03 | priority:high |  | 2026-07-31 06:13:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1061) |
-| 1057 | bug reports die on the player's disk: the website intake is built, the game never calls it | bug |  | 2026-07-31 00:25:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/1057) |
+| 1057 | bug reports die on the player's disk: the website intake is built, the game never calls it | bug |  | 2026-07-31 07:48:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1057) |
 | 1056 | convention: printed docs carry a next-review date and its TRIGGER, not just a print date | documentation |  | 2026-07-31 00:13:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/1056) |
 | 1055 | Ecosystem coherence: pdoom-data ADR-007 (anti-corruption layer) and ADR-008 (provenance/annotation model) |  |  | 2026-07-31 00:07:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1055) |
 | 1053 | build_release: refuse to build from a stale or dirty tree -- prove build-matches-INTENT, not just pack-matches-build | technical-debt |  | 2026-07-30 23:26:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/1053) |
@@ -126,7 +133,6 @@ Generated: 2026-07-31T07:15:04.396Z UTC
 | 755 | UI: theme the event popup / dialog buttons (still default grey after menu theme) | ship:hotpatch-48h | First Contact | 2026-07-22 08:04:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/755) |
 | 753 | chore: docs typographic ASCII cleanup (em-dashes, box-drawing) -- low priority | ship:next-release | Technical Debt Cleanup | 2026-07-24 23:35:42 | [link](https://github.com/PipFoweraker/pdoom1/issues/753) |
 | 745 | Art tooling: compare-and-contrast mode for kept assets (batch style reviews) | ship:next-release | Technical Debt Cleanup | 2026-07-24 23:35:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/745) |
-| 735 | Leaderboard: enable remote board + hardening minimums | ship:tonight | First Contact | 2026-07-22 08:04:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/735) |
 | 724 | Cross-repo sync: fold player-guide mapping into the #545 cleanup pass | ship:next-release | Rivals & News | 2026-07-22 08:05:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/724) |
 | 723 | Website: publish the player guide to pdoom1.com with pdoom1 -> website sync | ship:next-release | Rivals & News | 2026-07-22 08:05:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/723) |
 | 722 | Onboarding: opt-in Tutorial Mode (relaunchable guided steps) | ship:next-release | Rivals & News | 2026-07-22 08:05:01 | [link](https://github.com/PipFoweraker/pdoom1/issues/722) |
