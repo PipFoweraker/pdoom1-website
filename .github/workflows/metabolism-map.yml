@@ -1,0 +1,75 @@
+name: Metabolism map is in step
+
+# /metabolism/ is a GENERATED page. Every cadence on it is read at build time
+# from the file that actually runs -- the cron expressions in this directory,
+# the league config, the seed ledger, clocks.json -- so the page cannot state a
+# rhythm the project does not have.
+#
+# That guarantee only holds if the committed HTML is regenerated whenever a
+# source moves. This workflow is that guarantee: it re-derives the page and
+# fails if a single byte differs. Same idiom as generate-feeds.yml.
+#
+# It deliberately does NOT auto-commit a regenerated page. A commit made with
+# the default GITHUB_TOKEN does not trigger the deploy workflow, so an
+# auto-commit would fix the repository and leave pdoom1.com stale -- the exact
+# asymmetry the page itself documents. Failing the pull request puts the fix in
+# front of a human instead.
+#
+# Read-only: no secrets, no write permissions, no issue creation.
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'public/data/clocks.json'
+      - 'public/data/metabolism.json'
+      - 'public/metabolism/**'
+      - 'scripts/generate-metabolism.py'
+      - 'scripts/weekly-league-config.json'
+      - 'scripts/weekly-league-manager.py'
+      - 'docs/LEAGUE_SEED_LEDGER.md'
+      - 'CLAUDE.md'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'public/data/clocks.json'
+      - 'public/data/metabolism.json'
+      - 'public/metabolism/**'
+      - 'scripts/generate-metabolism.py'
+      - 'scripts/weekly-league-config.json'
+      - 'scripts/weekly-league-manager.py'
+      - 'docs/LEAGUE_SEED_LEDGER.md'
+      - 'CLAUDE.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: metabolism-map-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PyYAML
+        run: python -m pip install --quiet 'PyYAML>=6.0'
+
+      - name: Check /metabolism/ against its sources
+        run: python scripts/generate-metabolism.py --check
+
+      - name: How to fix
+        if: failure()
+        run: |
+          echo "::error::/metabolism/ no longer matches what its sources produce."
+          echo "A cron, a park notice, a cadence or a cited line moved."
+          echo "Run this locally and commit the result:"
+          echo "    python scripts/generate-metabolism.py"

@@ -1,0 +1,74 @@
+name: Encoding Safety
+
+# Keeps the cp1252 trap dead.
+#
+# Windows consoles default to cp1252, and this repo's data is full of em dashes,
+# arrows and curly quotes. Two failure modes follow:
+#   - a print() of any non-ASCII char raises UnicodeEncodeError on the FIRST
+#     print, killing the script before it does any work (health-check.py died
+#     this way for months, and the traceback was published to pdoom1.com);
+#   - open() with no encoding= decodes as cp1252 on Windows and utf-8 on Linux,
+#     so a UTF-8 file silently mojibakes. That one produced a false bug report
+#     on 2026-07-28 -- it does not crash, it makes people believe wrong things
+#     about the data.
+#
+# CI runs on ubuntu, where NEITHER symptom appears. A green ubuntu check is
+# therefore no evidence at all that the bug is gone, which is exactly why the
+# second job runs the real scripts on windows-latest with stdout forced to
+# cp1252. Do not drop that job to save minutes; it is the only part of this
+# workflow that can observe the actual failure.
+#
+# Read-only, no secrets. A red check is the whole signal; it opens no issues.
+
+on:
+  pull_request:
+    paths:
+      - '**/*.py'
+      - '.github/workflows/**'
+  push:
+    branches: [main]
+    paths:
+      - '**/*.py'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Static sweep (AST)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: The checker still detects each violation
+        run: python scripts/check-encoding-safety.py --self-test
+      - name: Every Python module is encoding-safe
+        run: python scripts/check-encoding-safety.py --check
+
+  windows-cp1252:
+    name: Real scripts under a cp1252 stdout
+    runs-on: windows-latest
+    env:
+      # Forces the exact console encoding Pip's machine uses, so the failure
+      # mode is reproduced rather than assumed. The preamble reconfigures
+      # stdout to utf-8 over the top of this; that is the thing being tested.
+      PYTHONIOENCODING: cp1252
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: check-encoding-safety self-test
+        run: python scripts/check-encoding-safety.py --self-test
+      - name: check-encoding-safety sweep
+        run: python scripts/check-encoding-safety.py --check
+      - name: test-changelog-structure (prints U+2713 on its first line)
+        run: python scripts/test-changelog-structure.py
+      - name: test-design-notes
+        run: python scripts/test-design-notes.py
+      - name: check-platform-claims
+        run: python scripts/check-platform-claims.py

@@ -353,6 +353,14 @@
     text-shadow:0 0 2px #000;
   }
 
+  /* Development log appends BELOW the calibrated situation analysis; it never
+     replaces it. Empty (and so invisible) until loadEventLog() populates it. */
+  #devLog:not(:empty) {
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid rgba(246, 168, 0,0.35);
+  }
+
   .highlight {
     color:#2fd4c2;
     font-weight:bold;
@@ -922,6 +930,10 @@
           <div class="narrative-text">
             Three major factors could reduce risk: increased AI safety research funding, international coordination on development pace, and stronger regulatory frameworks. At that October 2025 snapshot, levels remained <span class="highlight">insufficient</span> relative to the scale of the challenge (<a href="https://www.anthropic.com" target="_blank" class="source-link">Anthropic safety research</a>).
           </div>
+          <!-- loadEventLog() fills this. It must NOT write to #narrativeBox itself:
+               doing so destroyed the calibrated Situation Analysis above on every
+               page load (TECH_DEBT A6). Empty until the fetch succeeds. -->
+          <div id="devLog"></div>
         </div>
       </div>
     </div>
@@ -1073,34 +1085,66 @@ function compileShader(source, type) {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
+  // A shader that fails to compile used to fail SILENTLY to a black canvas.
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.warn('[dashboard] shader did not compile:', gl.getShaderInfoLog(shader));
+    return null;
+  }
   return shader;
 }
 
-const vs = compileShader(vsSource, gl.VERTEX_SHADER);
-const fs = compileShader(fsSource, gl.FRAGMENT_SHADER);
-const program = gl.createProgram();
-gl.attachShader(program, vs);
-gl.attachShader(program, fs);
-gl.linkProgram(program);
-gl.useProgram(program);
-
-const positions = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
-const buffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-
-const posLoc = gl.getAttribLocation(program, 'pos');
-gl.enableVertexAttribArray(posLoc);
-gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-const resolutionLoc = gl.getUniformLocation(program, 'resolution');
-const timeLoc = gl.getUniformLocation(program, 'time');
-const pdoomLevelLoc = gl.getUniformLocation(program, 'pdoomLevel');
-
+// GUARD: everything below is BACKGROUND DECORATION, and it used to be able to kill the
+// whole page. `gl` is null whenever WebGL is unavailable -- a phone with it disabled,
+// iOS Safari shedding contexts under memory pressure, a locked-down browser, a headless
+// checker. `gl.createProgram()` on null throws a TypeError, and because the sliders, the
+// Plotly chart, the Manifold fetch and the clock all live in this SAME inline <script>,
+// that exception aborted every one of them. The visible result was not "no background"
+// but a dead page: frozen sliders, empty chart, "Loading markets..." forever.
+//
+// Decoration must never be able to take the content with it. If WebGL is missing we skip
+// the shader entirely and the page runs; the canvas simply stays the CSS background.
+// These two stay OUTSIDE the guard: currentPdoomLevel is assigned by updateAll() further
+// down, so it must exist whether or not the shader initialised.
 let startTime = Date.now();
 let currentPdoomLevel = 0.121;
 
+let shaderReady = false;
+let resolutionLoc = null, timeLoc = null, pdoomLevelLoc = null;
+
+if (gl) {
+  const vs = compileShader(vsSource, gl.VERTEX_SHADER);
+  const fs = compileShader(fsSource, gl.FRAGMENT_SHADER);
+  if (vs && fs) {
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      gl.useProgram(program);
+
+      const positions = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+      const posLoc = gl.getAttribLocation(program, 'pos');
+      gl.enableVertexAttribArray(posLoc);
+      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+      resolutionLoc = gl.getUniformLocation(program, 'resolution');
+      timeLoc = gl.getUniformLocation(program, 'time');
+      pdoomLevelLoc = gl.getUniformLocation(program, 'pdoomLevel');
+      shaderReady = true;
+    } else {
+      console.warn('[dashboard] shader program did not link:', gl.getProgramInfoLog(program));
+    }
+  }
+} else {
+  console.info('[dashboard] WebGL unavailable — background shader skipped. Page is fine.');
+}
+
 function animateShader() {
+  if (!shaderReady) { return; }
   const time = (Date.now() - startTime) * 0.001;
   gl.uniform2f(resolutionLoc, shaderCanvas.width, shaderCanvas.height);
   gl.uniform1f(timeLoc, time);
@@ -1108,7 +1152,7 @@ function animateShader() {
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   requestAnimationFrame(animateShader);
 }
-animateShader();
+if (shaderReady) { animateShader(); }
 
 /* ========== Data & Functions ========== */
 function pdoomFunc(year) {
@@ -1422,10 +1466,12 @@ async function loadEventLog() {
     const data = await response.json();
 
     // Get the 3 most recent entries
-    const recentEvents = data.entries.slice(0, 3);
+    const recentEvents = (data.entries || []).slice(0, 3);
+    if (!recentEvents.length) return;   // nothing to say -> say nothing, leave the box alone
 
-    // Update narrative box with event log
-    const narrativeBox = document.getElementById('narrativeBox');
+    // Append BELOW the situation analysis. Writing to #narrativeBox would wipe the
+    // calibrated, deliberately re-dated copy above it (TECH_DEBT A6).
+    const devLog = document.getElementById('devLog');
     let eventHTML = '<div class="narrative-title">Recent Development Log</div>';
 
     recentEvents.forEach(event => {
@@ -1443,7 +1489,7 @@ async function loadEventLog() {
       </div>
     `;
 
-    narrativeBox.innerHTML = eventHTML;
+    devLog.innerHTML = eventHTML;
   } catch (error) {
     console.error('Failed to load event log:', error);
   }

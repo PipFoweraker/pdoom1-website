@@ -89,11 +89,40 @@ Two loose ends this does **not** close:
   Backwards, and now doubly so. Fixing it means a change in
   `scripts/generate-sitemap.js`.
 
+## DECIDED 2026-07-28 — the league trio: option 3, formalised
+
+Pip's call: `league/index.html`, `league/archive.html` and `players/index.html`
+are **retired and kept hidden — not deleted, not revived**. Everything they show
+that predates the **L2 → L3 ladder fork** (the week beginning Fri 2026-07-31 in
+Hobart — the ladder forked mid-month on gameplay changes; see
+pdoom1-website#151, 2026-07-28T23:13Z) is now labelled
+**anomalous pre-history** by a machine-readable `epoch` block in the data, and
+the archive page renders it in a separate, explicitly-labelled anomaly section.
+
+This closes the "permanently hidden page is dead weight" objection above: the
+pages now state what they are, so a visitor who reaches one is not misled, and
+the record survives for anyone tracing the history.
+
+Two corrections to this file, found while doing that work:
+
+- `league/archive.html` did **not** show "Failed to load archive data". Its index
+  was present and parseable — but listed **3** of the **41** archive files, with
+  `last_updated` frozen at 2025-10-31, because nothing ever rewrote it. So it
+  rendered 3 weeks and looked fine. The index is now derived from the directory.
+- The precondition named below (TECH_DEBT A9, rollover cadence) is **fixed** as
+  of 2026-07-28.
+
+Full account: `docs/LEAGUE_EPOCH_ANOMALY.md`.
+
+`changelog/index.html` and `dev-notes/index.html` are untouched by that decision
+and still need one.
+
 ## Related
 
-- The league trio's staleness is **downstream of the weekly rollover off-by-one**
-  (cron fires Sunday 14:00 UTC and derives the week from `now`, so it republishes
-  the week that ends hours later — TECH_DEBT A9). Fixing that is a precondition
-  for reviving them honestly.
+- The league trio's staleness was **downstream of the weekly rollover off-by-one**
+  (the cron fired Sunday 14:00 UTC and derived the week from `now`, so it
+  republished the week that ended hours later — TECH_DEBT A9). Fixed 2026-07-28;
+  the anchor also moved to Friday 00:00 `Australia/Hobart` (cron `0 14 * * 4`) on
+  2026-07-29 so the website's week matches the game's Seed cadence.
 - `docs/L2_CUTOVER_RUNBOOK.md` covers the epoch move that will change what a
   revived league page should read from.

@@ -11,10 +11,19 @@ import os
 import subprocess
 from typing import Dict, Tuple, Optional
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 def get_current_version() -> str:
     """Get current version from package.json"""
     try:
-        with open('package.json', 'r') as f:
+        with open('package.json', 'r', encoding="utf-8") as f:
             data = json.load(f)
             return data.get('version', '0.0.0')
     except FileNotFoundError:
@@ -29,7 +38,8 @@ def get_previous_version() -> Optional[str]:
             ['git', 'tag', '-l', 'v*', '--sort=-version:refname'],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
+            encoding="utf-8", errors="replace"
         )
         tags = result.stdout.strip().split('\n')
         if tags and tags[0]:
@@ -135,7 +145,7 @@ def check_file_requirements(requirements: Dict) -> Dict:
     
     # Check if changelog is updated
     try:
-        with open('public/data/website-changes.json', 'r') as f:
+        with open('public/data/website-changes.json', 'r', encoding="utf-8") as f:
             changelog = json.load(f)
             latest_entry = changelog.get('entries', [{}])[0]
             if latest_entry.get('version') == current_version:
@@ -145,7 +155,7 @@ def check_file_requirements(requirements: Dict) -> Dict:
     
     # Check if blog post exists for this version
     try:
-        with open('public/blog/index.json', 'r') as f:
+        with open('public/blog/index.json', 'r', encoding="utf-8") as f:
             blog_data = json.load(f)
             for post in blog_data.get('posts', []):
                 if 'website' in post.get('tags', []) and current_version in post.get('title', ''):
@@ -156,7 +166,7 @@ def check_file_requirements(requirements: Dict) -> Dict:
     
     # Check if version files are synced
     try:
-        with open('public/data/status.json', 'r') as f:
+        with open('public/data/status.json', 'r', encoding="utf-8") as f:
             status = json.load(f)
             if status.get('website', {}).get('version') == current_version:
                 checks["version_files_synced"] = True

@@ -1,0 +1,233 @@
+name: Board liveness (score API)
+
+# Answers ONE question on a schedule: are scores being recorded on a board that no
+# visitor to pdoom1.com can see?
+#
+# A board is keyed by (seed, LADDER EPOCH) -- the client sends "L3", not a build version
+# (pdoom1 via issue #151, 2026-07-28). When a submitting client's key does not match the
+# board this site publishes, the run is saved to a key nothing reads and the player is
+# shown no error. From the outside that is indistinguishable from "nobody is playing",
+# and it had already happened: 27 entries from 6 players are now in the permanent anomaly
+# archive at public/leaderboard/data/preserved/.
+#
+# READ-ONLY. scripts/check-board-liveness.py issues GETs only. This repo is a read-only
+# consumer of one score API (pdoom1 PR #679) and must not stand up a second score store.
+#
+# RED ONLY FOR NEW LOSS. The archived orphans stay archived permanently (Pip's ruling),
+# so failing on them would leave this workflow red forever -- and a job that is always red
+# is a job nobody looks at. Exit 1 (a NEW, unacknowledged orphan) fails. Exit 2 (unknown:
+# no epoch artifact yet, or the API unreadable) is reported in the job summary and stays
+# green, because "we cannot tell" is not the same as "we are losing scores".
+#
+# The game ships ladder breaks regularly, so this runs often enough to catch a bump within
+# a few hours rather than after a week of apparent silence.
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/check-board-liveness.py'
+      - 'public/data/version.json'
+      - 'public/leaderboard/data/weekly/current.json'
+
+permissions:
+  contents: write
+  # Required, or the alert job below 403s and the whole point of this workflow -- being
+  # heard -- is lost silently. CLAUDE.md workflow trap #3.
+  issues: write
+
+concurrency:
+  group: board-liveness
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    name: Probe the live score API
+    runs-on: ubuntu-latest
+    outputs:
+      verdict: ${{ steps.probe.outputs.verdict }}
+      orphaned: ${{ steps.probe.outputs.orphaned }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Probe boards
+        id: probe
+        run: |
+          set +e
+          python scripts/check-board-liveness.py | tee probe.log
+          code=${PIPESTATUS[0]}
+          set -e
+          echo "probe exit code: $code"
+          # Emit the three numbers via a file rather than nested heredocs/command
+          # substitution -- indented heredoc terminators and backslash mangling are a
+          # documented time sink here (CLAUDE.md, "Encoding gremlin").
+          python scripts/board_liveness_summary.py > summary.env
+          . ./summary.env
+          echo "verdict=$verdict"   >> "$GITHUB_OUTPUT"
+          echo "new_orphans=$newn"  >> "$GITHUB_OUTPUT"
+          echo "archived=$archn"    >> "$GITHUB_OUTPUT"
+          echo "exit_code=$code"    >> "$GITHUB_OUTPUT"
+
+          # Loud every run, in the place a human actually looks.
+          {
+            echo "## Board liveness: \`$verdict\`"
+            echo ""
+            echo "- **New (unacknowledged) orphaned entries: $newn** -- non-zero fails this job."
+            echo "- Archived anomaly entries: $archn (acknowledged history, never fails)."
+            echo ""
+            echo '```'
+            cat probe.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Publishing is deliberately part of THIS workflow rather than a second one. The
+      # probe already fetched and classified every board; a separate publisher would
+      # re-derive the same board key from the same API minutes later and could reach a
+      # different answer, which is precisely the split-brain the board key cannot afford.
+      #
+      # It runs even when the probe found new orphans -- publishing is how an orphan STOPS
+      # being one. The failure gate below still fires on the probe's verdict, so a genuine
+      # loss is still red; it just gets fixed in the same run that reports it.
+      - name: Publish the live board
+        id: publish
+        run: |
+          set +e
+          python scripts/publish-live-board.py | tee publish.log
+          code=$?
+          set -e
+          echo "publish exit code: $code"
+          # 0 published / 1 nothing publishable / 2 epoch unknown / 3 fetch failed.
+          # None of these are failures HERE: 2 and 3 mean the script correctly refused to
+          # write rather than guessing, and it leaves the last known-good file untouched.
+          # A refusal to publish is the safe outcome, so it must not go red and train
+          # anyone to ignore this job.
+          {
+            echo "## Board publish"
+            echo ""
+            echo '```'
+            cat publish.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::No artifact says which ladder epoch is current, so the board was NOT published. Populate current_ladder_epoch in public/leaderboard/data/board-probe-targets.json."
+          elif [ "$code" -eq 3 ]; then
+            echo "::warning::The score API could not be read. The previously published board is untouched -- not overwritten with an empty one."
+          fi
+
+      - name: Commit the observation and the published board
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action [Board Liveness]"
+          # Stage BEFORE testing: these are untracked on their first run and `git diff`
+          # cannot see untracked files (CLAUDE.md workflow trap #1).
+          git add public/leaderboard/data/board-liveness.json \
+                  public/leaderboard/data/leaderboard.json \
+                  public/leaderboard/data/published-board.json
+          if git diff --cached --quiet; then
+            echo "No change in board state since the last run."
+            exit 0
+          fi
+          git commit -m "chore(board): record live score-API observation and publish the live board"
+          git push
+
+      # Only NEW loss is red. `epoch-unknown` and `unreachable` are genuine unknowns and
+      # stay green (they are already in the job summary above); the archived anomaly is
+      # permanent by ruling and must never fail. A job that is red forever gets muted, and
+      # then the one run that matters is muted with it.
+      - name: Fail only if NEW scores are landing where nobody can see them
+        env:
+          VERDICT: ${{ steps.probe.outputs.verdict }}
+          NEW_ORPHANS: ${{ steps.probe.outputs.new_orphans }}
+          ARCHIVED: ${{ steps.probe.outputs.archived }}
+        run: |
+          echo "verdict=$VERDICT  new=$NEW_ORPHANS  archived=$ARCHIVED"
+          if [ "$ARCHIVED" -gt 0 ] 2>/dev/null; then
+            echo "::notice::$ARCHIVED archived anomaly entries (acknowledged history, not a failure)."
+          fi
+          case "$VERDICT" in
+            orphaned-scores|unclassifiable)
+              echo "::error::$NEW_ORPHANS score entries are recorded on board(s) this site does not publish, and are NOT in the anomaly archive."
+              exit 1 ;;
+            epoch-unknown)
+              echo "::warning::No artifact publishes the current ladder epoch, so this site cannot confirm it publishes the board players submit to. Unknown, not a mismatch."
+              ;;
+            unreachable|unreadable)
+              echo "::warning::Score API state could not be read. Unknown, not empty." ;;
+            *)
+              echo "Board state consistent." ;;
+          esac
+
+  alert:
+    name: Alert on NEW orphaned scores (de-duplicated)
+    needs: probe
+    # Fires only on a real failure, which by the case statement above means a NEW,
+    # unacknowledged orphan. The archived anomaly never reaches here.
+    if: failure() && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          # Untrusted-shaped values go through env, never spliced into the script body
+          # (CLAUDE.md workflow trap #5).
+          VERDICT: ${{ needs.probe.outputs.verdict }}
+          NEW_ORPHANS: ${{ needs.probe.outputs.new_orphans }}
+          ARCHIVED: ${{ needs.probe.outputs.archived }}
+        with:
+          script: |
+            const title = 'NEW scores are landing on a board nobody can see';
+            const label = 'board-liveness';
+            const verdict = process.env.VERDICT || 'unknown';
+            const orphaned = process.env.NEW_ORPHANS || '?';
+            const archived = process.env.ARCHIVED || '0';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              `The live score API probe reported \`${verdict}\`.`,
+              '',
+              `**${orphaned} score entries** are recorded on board(s) that pdoom1.com does not`,
+              'publish, and are **not** in the anomaly archive. Players finished those runs.',
+              'No visitor can see them, and no error was shown to anyone.',
+              '',
+              `(Separately, ${archived} entries sit in the permanent anomaly archive. Those are`,
+              'acknowledged history and are NOT what this issue is about.)',
+              '',
+              `Run: ${runUrl}`,
+              '',
+              'Reproduce locally: `python scripts/check-board-liveness.py`',
+              'Details, with counts: `public/leaderboard/data/board-liveness.json`',
+              '',
+              'A board is keyed by `(seed, ladder_epoch)` — the client sends `L3`, not a build',
+              'version. Either the game must submit to the board this site publishes, or this',
+              'site must publish the board the game submits to.',
+              '',
+              '**Do not resolve this by re-stamping a version.** That fabricates history.',
+              '',
+              '_Single rolling issue -- reused, not duplicated, per run._'
+            ].join('\n');
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 10,
+            });
+            const found = existing.data.find(i => i.title === title);
+            if (found) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: found.number,
+                body: `Still true as of ${new Date().toUTCString()} (${orphaned} orphaned entries).\n\nRun: ${runUrl}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label, 'automation', 'priority:high'],
+              });
+            }

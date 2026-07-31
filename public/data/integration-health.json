@@ -1,10 +1,10 @@
 {
-  "generated": "2026-07-27T07:16:23.729362+00:00",
-  "overall_status": "OK",
+  "generated": "2026-07-30T12:22:23.517169+00:00",
+  "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 0,
-    "ok": 10
+    "warn": 2,
+    "ok": 32
   },
   "checks": [
     {
@@ -25,22 +25,102 @@
     {
       "name": "encoding:events",
       "status": "OK",
-      "detail": "no mojibake"
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
     },
     {
       "name": "encoding:league_weekly",
       "status": "OK",
-      "detail": "no mojibake"
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:board",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:202537_c53217a3",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:202538_21062d2e",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:202538_747962e3",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:202539_25079545",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:202540_8fb1684c",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:final-verification_21062d2e",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:natural-game-over-c53217a3",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:party-c53217a3",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:party-demo-c53217a3",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:test-turn7_01463e1d",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:test-turn7_8fb1684c",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:test_01463e1d",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:test_8fb1684c",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:test_session_01463e1d",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
+    },
+    {
+      "name": "encoding:seed:test_session_8fb1684c",
+      "status": "OK",
+      "detail": "valid UTF-8, no mojibake, no U+FFFD"
     },
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 0.7 days ago"
+      "detail": "generated 2.3 days ago"
     },
     {
       "name": "league:current_week",
       "status": "OK",
-      "detail": "week 2026_W30 current"
+      "detail": "week 2026_W31 current"
     },
     {
       "name": "league:version_drift",
@@ -48,14 +128,54 @@
       "detail": "game_version v0.13.1 matches deployed"
     },
     {
+      "name": "league:seed",
+      "status": "OK",
+      "detail": "weekly seed weekly_2026_W31_f148a5b6"
+    },
+    {
       "name": "league:integrity",
       "status": "OK",
       "detail": "0 entries, 0 unique players consistent"
     },
     {
+      "name": "board:key",
+      "status": "OK",
+      "detail": "published board key matches the current ladder epoch L3"
+    },
+    {
+      "name": "board:exclusions",
+      "status": "OK",
+      "detail": "nothing withheld on version (0 test/dev files excluded by design)"
+    },
+    {
+      "name": "board:status_integrity",
+      "status": "OK",
+      "detail": "data_status=live consistent with 3 entries"
+    },
+    {
+      "name": "board:liveness_freshness",
+      "status": "OK",
+      "detail": "live API checked 0.0h ago"
+    },
+    {
+      "name": "board:archived_anomaly",
+      "status": "WARN",
+      "detail": "27 score entries across 3 board(s) from 6 player(s) sit in the permanent anomaly archive (AI Safety Lab, CogDerp, Cognitive Development, Division of Intelligent Agents, Hamthropic, Laboratory of Autonomous Systems). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
+    },
+    {
+      "name": "board:liveness",
+      "status": "OK",
+      "detail": "deployed board (weekly-2026-w30, L3) holds 3 entries"
+    },
+    {
       "name": "seed_leaderboards:parse",
       "status": "OK",
       "detail": "15 files parse OK"
+    },
+    {
+      "name": "seed_leaderboards:version_census",
+      "status": "WARN",
+      "detail": "NO stored seed file is stamped with the deployed version v0.13.1, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
     }
   ]
 }

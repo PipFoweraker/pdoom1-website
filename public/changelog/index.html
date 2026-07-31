@@ -52,7 +52,7 @@
     *{margin:0;padding:0;box-sizing:border-box}
     html{color-scheme:dark}
     body{background:var(--bg); color:var(--ink); font-family:var(--mono); line-height:1.6;
-         min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem}
+         min-height:100vh; display:flex; flex-direction: column; align-items:center; justify-content:center; padding:1.5rem}
     main{max-width:min(560px,92vw); background:var(--panel); border:1px solid var(--hair);
          border-radius:14px; padding:1.8rem}
     h1{font-size:1.3rem; letter-spacing:.01em; text-wrap:balance}
@@ -66,6 +66,9 @@
   </style>
 </head>
 <body>
+  <header>
+    <!-- Navigation loaded by navigation.js -->
+  </header>
   <main>
     <h1>This page has moved</h1>
     <p>The p(Doom)1 release notes now live at <b>/game-changelog/</b>, where they are read
@@ -79,5 +82,6 @@
     // someone in a redirect loop when they try to go back.
     location.replace('/game-changelog/');
   </script>
+  <script src="/assets/js/navigation.js"></script>
 </body>
 </html>

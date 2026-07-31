@@ -19,6 +19,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 class WeeklyDeploymentPrep:
     """Prepares for weekly Friday deployment."""
     
@@ -55,7 +64,8 @@ class WeeklyDeploymentPrep:
                 capture_output=True,
                 text=True,
                 cwd=self.project_root,
-                timeout=60 if not self.quick else 30
+                timeout=60 if not self.quick else 30,
+                encoding="utf-8", errors="replace"
             )
             return result.returncode == 0, result.stdout + result.stderr
         except subprocess.TimeoutExpired:
@@ -118,7 +128,7 @@ class WeeklyDeploymentPrep:
             return False
         
         try:
-            with open(package_json) as f:
+            with open(package_json, encoding="utf-8") as f:
                 data = json.load(f)
                 version = data.get("version", "unknown")
                 self.log_check("Version found", True, f"v{version}")
@@ -306,7 +316,7 @@ class WeeklyDeploymentPrep:
         
         report_file = self.project_root / "deployment-prep-report.json"
         try:
-            with open(report_file, 'w') as f:
+            with open(report_file, 'w', encoding="utf-8") as f:
                 json.dump(report, f, indent=2)
             print(f"\n📄 Report saved to: {report_file}")
         except Exception as e:

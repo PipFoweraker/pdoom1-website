@@ -450,6 +450,13 @@
         // health-checks.yml is scheduled every 6 hours. Anything older than four
         // missed runs is reported as stale rather than presented as live health.
         const HEALTH_STALE_AFTER_HOURS = 24;
+
+        // data-contract-validation.yml is scheduled daily (06:00 UTC). Two missed
+        // runs -> report the snapshot as stale. This matters more than it looks:
+        // the workflow commits integration-health.json as a BOT, and bot commits do
+        // not trigger the deploy, so the copy this page fetches only refreshes on
+        // the next human push. A frozen "OK" would otherwise read as live green.
+        const INTEGRATION_STALE_AFTER_HOURS = 48;
         
         async function updateWebsiteStatus() {
             try {
@@ -731,14 +738,30 @@
                         <span style="color:var(--text-muted);flex:1;">${c.detail || ''}</span>
                     </div>`).join('');
                 const s = h.summary || {};
+
+                // Never present a committed artefact as live health. Without this the
+                // page shows a green "OK" forever if the snapshot ever stops refreshing.
+                const ts = h.generated;
+                const ageHours = ts ? (new Date() - new Date(ts)) / 3600000 : Infinity;
+                const stale = !(ageHours < INTEGRATION_STALE_AFTER_HOURS);
+                const staleNote = !ts
+                    ? 'This snapshot carries no timestamp, so its age cannot be verified. Treat it as unknown rather than current.'
+                    : (stale ? 'Data-contract validation runs daily. This snapshot is older than that, so it describes a past state and not the current health of the data seams.' : '');
+                const staleBanner = staleNote
+                    ? `<div style="color:#ffb000;font-weight:bold;margin-bottom:0.35rem;">STALE SNAPSHOT</div>
+                       <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.75rem;">${staleNote}</div>`
+                    : '';
+
                 container.innerHTML = `
-                    <div style="margin-bottom:0.75rem;">
+                    ${staleBanner}
+                    <div style="margin-bottom:0.75rem;${stale ? 'opacity:0.6;' : ''}">
                         Overall: ${badge(h.overall_status)} &nbsp;
                         <span style="color:var(--text-muted);">
                             ${s.fail||0} fail &middot; ${s.warn||0} warn &middot; ${s.ok||0} ok
-                            &nbsp;|&nbsp; checked ${h.generated ? new Date(h.generated).toLocaleString() : 'n/a'}
+                            &nbsp;|&nbsp; checked ${ts ? new Date(ts).toLocaleString() : 'n/a'}
+                            ${ts ? '(' + formatAgeLong(ts) + ')' : ''}
                         </span>
-                    </div>${rows}`;
+                    </div>${stale ? `<div style="opacity:0.6;">${rows}</div>` : rows}`;
             } catch (e) {
                 container.innerHTML = '<span style="color:var(--text-muted);">integration-health.json not available yet (populated by the Data Contract Validation workflow).</span>';
             }

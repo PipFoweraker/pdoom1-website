@@ -121,7 +121,7 @@ class HealthChecker:
 
             # Test Python script syntax
             result = subprocess.run([sys.executable, '-m', 'py_compile', script_path],
-                                  capture_output=True, text=True, timeout=30)
+                                  capture_output=True, text=True, timeout=30, encoding="utf-8", errors="replace")
 
             if result.returncode == 0:
                 self.log_result(test_name, True, f"✓ Script compiles: {shown}")

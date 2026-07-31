@@ -24,6 +24,15 @@ import urllib.error
 import socket
 from contextlib import contextmanager
 
+# Windows consoles default to cp1252: the first non-ASCII byte written to stdout
+# raises UnicodeEncodeError and kills the script before it does any work. No-op
+# on UTF-8 platforms. See CLAUDE.md "Environment / tooling".
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 
 class IntegrationTestSuite:
     """Comprehensive integration test suite for website components."""
@@ -71,7 +80,7 @@ class IntegrationTestSuite:
         try:
             result = subprocess.run([
                 "python", str(bridge_script), "--refresh"
-            ], capture_output=True, text=True, timeout=30)
+            ], capture_output=True, text=True, timeout=30, encoding="utf-8", errors="replace")
             
             if result.returncode == 0:
                 self.log_result("Bridge Data Generation", True, "Generated fresh data")
@@ -110,7 +119,7 @@ class IntegrationTestSuite:
         try:
             result = subprocess.run([
                 "python", str(bridge_script), "--validate"
-            ], capture_output=True, text=True, timeout=10)
+            ], capture_output=True, text=True, timeout=10, encoding="utf-8", errors="replace")
             
             if result.returncode == 0:
                 self.log_result("Bridge Validation", True, "Validation passed")
@@ -219,7 +228,7 @@ class IntegrationTestSuite:
         try:
             result = subprocess.run([
                 "python", "scripts/health-check.py"
-            ], capture_output=True, text=True, timeout=30, cwd=self.base_dir)
+            ], capture_output=True, text=True, timeout=30, cwd=self.base_dir, encoding="utf-8", errors="replace")
             
             if result.returncode == 0:
                 # Check if results file was created
