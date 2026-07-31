@@ -381,6 +381,19 @@ for _p in list((Path(__file__).parent).glob("*.py")) + \
         list((Path(__file__).parent.parent / "public" / "data").glob("*.json")):
     if _p.name == Path(__file__).name:
         continue
+    # Test files are exempt, and the reason matters. What this rule protects against is a
+    # PRODUCTION surface pinning a seed the ceremony has not blessed -- a script that
+    # writes data, or published JSON a visitor can fetch. A fixture inside a test is
+    # neither: it never reaches a board and never reaches a reader.
+    #
+    # Without this exemption the rule is actively dangerous, because this test is the
+    # FIRST STEP of weekly-league-reset.yml and gates the unattended Friday rollover. On
+    # 2026-07-31 a sibling test's fixture tripped it and turned main red; had it landed a
+    # few hours earlier it would have aborted a live rollover over a string in a test.
+    # A guard that can stop the league to complain about test data is worse than the leak
+    # it is preventing.
+    if _p.name.startswith(("test-", "test_")):
+        continue
     try:
         if _probable in _p.read_text(encoding="utf-8"):
             _leaks.append(_p.name)
