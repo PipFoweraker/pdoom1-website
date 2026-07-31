@@ -9,17 +9,17 @@
     "status": "stable",
     "repository": "https://github.com/PipFoweraker/pdoom1",
     "latestRelease": {
-      "version": "v0.11.0",
-      "date": "2025-12-07",
+      "version": "v0.13.1",
+      "date": "2026-07-26",
       "downloadUrl": "https://github.com/PipFoweraker/pdoom1/releases/latest",
       "changelog": "See CHANGELOG.md for details"
     },
     "development": {
       "phase": "Ongoing feature development",
-      "progress": "v0.11.0 released",
+      "progress": "v0.13.1 released",
       "nextMilestone": "Steam release preparation"
     },
-    "lastUpdated": "2026-07-17T06:47:10.682842"
+    "lastUpdated": "2026-07-31T14:49:27.290341"
   },
   "api": {
     "bugReporting": "https://pdoom1-website-app.netlify.app/.netlify/functions/report-bug",

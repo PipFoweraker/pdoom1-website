@@ -68,6 +68,14 @@ jobs:
           fi
 
           git add public/data/version.json
+          # status.json is REWRITTEN by update-version-info.py's sync_status_json(), and
+          # was never staged -- so every run recomputed it and every run threw the result
+          # away. It froze on 2026-07-17 and the live site told visitors the latest
+          # release was v0.11.0 (2025-12-07) while version.json said v0.13.1. The
+          # homepage renders BOTH, so a reader saw two answers eight months apart.
+          # The script already refuses to write a fallback over it; the missing line was
+          # only ever this one.
+          git add public/data/status.json || true
           git add public/data/health-check.json || true
           git add public/monitoring/data/ || true
 
