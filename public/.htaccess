@@ -14,6 +14,30 @@ RewriteCond %{HTTP_HOST} ^www\.pdoom1\.com$ [NC]
 RewriteRule ^(.*)$ https://pdoom1.com/$1 [R=301,L]
 
 # ---------------------------------------------------------------------------
+# Retired URLs.
+#
+# /changelog/ -> /game-changelog/ (issue #141, Pip's call 2026-07-28).
+# The site grew three changelog-ish URLs. /game-changelog/ is the live one (it
+# is what navigation.js links as "Updates"); /changelog/ was orphaned, and the
+# Airtable pipeline that fed its data has never once run successfully. It stays
+# on disk rather than being deleted -- deploy is `rsync --delete`, so removing it
+# from public/ would remove it from production and this is meant to be reversible.
+#
+# 301, not 302: the move is permanent, and the game's in-game "What's New"
+# fallback now tells players "Visit pdoom1.com for the latest updates" -- so
+# /changelog is the URL a person guesses. A 301 lets crawlers and browsers retire
+# the old URL for good; a 302 would ask them to keep checking a dead page forever.
+#
+# The `^` anchor is what stops this looping: the target `game-changelog/` cannot
+# match this pattern. Covered forms: /changelog, /changelog/, /changelog/index.html
+# (a request for /changelog gets mod_dir's DirectorySlash 301 first, then this one).
+#
+# public/changelog/index.html ALSO carries a meta-refresh to the same target, as
+# a fallback in case this directive does not take effect on the shared host.
+# That page is not the mechanism -- this is -- but it must not be a dead end.
+RewriteRule ^changelog(/|/index\.html)?$ /game-changelog/ [R=301,L]
+
+# ---------------------------------------------------------------------------
 # Compression -- the single biggest spike lever.
 # events.json is ~1.18 MB uncompressed and is fetched on every /events/ visit;
 # gzip takes it to ~200 KB. HTML/CSS/JS/SVG compress 70-80%.

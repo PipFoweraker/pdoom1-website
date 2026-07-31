@@ -16,7 +16,7 @@ pipelines someone may intend to revive. **Decide before deleting.**
 | `public/league/index.html` | 0 (nav, homepage, sitemap all absent) | Presents a **live** weekly competition: a running countdown (`DAYS HOURS MINUTES SECONDS`) for a week that **ended 5 days ago**, plus visible "Failed to load standings." |
 | `public/league/archive.html` | 0 | Reads `leaderboard/data/weekly/archive/index.json`, whose `last_updated` is **2025-10-31** — nine months stale. Shows "Failed to load archive data." |
 | `public/players/index.html` | 0 | Player profile with all-zero stats and "Failed to load player profile." |
-| `public/changelog/index.html` | 0 | 7 words of visible copy; its `data/changes.json` holds a single entry. |
+| ~~`public/changelog/index.html`~~ | 0 | **RESOLVED 2026-07-28 — now redirects to `/game-changelog/`.** Was 7 words of visible copy over a `data/changes.json` holding a single entry, fed by `scripts/sync_airtable.py`, whose workflow was parked after 1,264 consecutive failures against an Airtable base that does not exist. See the note below. |
 | `public/dev-notes/index.html` | 0 | 11 words of visible copy; renders `docs/DEV_NOTES.md` client-side. |
 
 One human path in survives and is intentionally unbroken: `stats/competition.html`
@@ -36,6 +36,58 @@ For each, pick one:
    the `robots.txt` entries. Check nothing links in first.
 3. **Keep hidden** — fine as a holding state, but revisit; a permanently hidden
    page is dead weight that still ships in the deploy.
+
+## `/changelog/` specifically — one extra decision, from the #141 audit
+
+The site has **three** changelog-ish URLs. Audited 2026-07-28 while building the
+player-facing release notes for issue #141:
+
+| URL | data | who writes the data | reachable? |
+|---|---|---|---|
+| `/game-changelog/` | now derived at runtime from `data/version.json` + the pdoom1 releases API | `update-version-info.py` (every 6h) | **yes** — nav "Updates", homepage footer "Releases", `/press/` ×2, `/dashboard/` |
+| `/website-changelog/` | `data/website-changes.json` | nobody; hand-typed, newest entry 2025-10-09 | yes — homepage footer "Changelog", `/press/` ×1 |
+| `/changelog/` | `data/changes.json` | `sync_airtable.py` — **dead** (see above) | no — `noindex` + `Disallow`, 0 inbound links |
+
+`/game-changelog/` is the live player-facing one and is where #141 was built.
+`/website-changelog/` is a different audience (site infrastructure), so it is not a
+duplicate. That left `/changelog/` as the only genuinely redundant URL.
+
+**DECIDED (Pip, 2026-07-28): `/changelog/` redirects to `/game-changelog/`.** What
+sharpened it was one fact from #141 — the game's in-game "What's New" fallback now
+tells players *"Visit pdoom1.com for the latest updates."* `/changelog` is the URL a
+person guesses from that, and it was serving a near-empty page. Redirecting was
+preferred over deleting because it is reversible and removes nothing.
+
+How it is implemented (three layers, in order of authority):
+
+1. **`RewriteRule ^changelog/?$ /game-changelog/ [R=301,L]` in `public/.htaccess`** —
+   the real mechanism. `301` because the move is permanent; a `302` would ask
+   crawlers to keep re-checking a dead page forever.
+2. A **meta-refresh + canonical** in `public/changelog/index.html`, as a fallback if
+   the directive does not take effect on DreamHost shared hosting.
+3. A `location.replace()` in that page, so the dead URL does not enter back-button
+   history.
+
+The page keeps a real visible message ("This page has moved") and a working manual
+link, so it degrades honestly with JavaScript off and meta-refresh ignored. It no
+longer fetches `changes.json` — flashing that stale entry before redirecting would
+show a visitor an old version as if it were current.
+
+**Neither Netlify previews nor any local test can verify layer 1** — Netlify ignores
+`.htaccess` entirely. This needs a post-merge check against production:
+`curl -I https://pdoom1.com/changelog/` → expect `301` and
+`Location: https://pdoom1.com/game-changelog/`. If it does not, layers 2 and 3 are
+still carrying it and the visitor still arrives; the fix would be a DreamHost
+`AllowOverride` question, not a code change.
+
+Two loose ends this does **not** close:
+
+- `public/robots.txt` still carries `Disallow: /changelog/`, which forbids crawling
+  the redirect. Being removed separately in **PR #181**, which should merge before or
+  with the redirect.
+- `public/sitemap.xml` lists `/changelog/` and does **not** list `/game-changelog/`.
+  Backwards, and now doubly so. Fixing it means a change in
+  `scripts/generate-sitemap.js`.
 
 ## DECIDED 2026-07-28 — the league trio: option 3, formalised
 

@@ -18,51 +18,335 @@
 	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
 	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+  <!--
+    DERIVED PAGE. Every version string, date and platform fact on this page is read
+    at runtime from public/data/version.json (kept current by update-version-info.py /
+    auto-update-data.yml) and from the pdoom1 releases API. There is deliberately no
+    version literal anywhere in this file: a hardcoded fallback ships exactly when the
+    real lookup failed, which is the moment nobody is able to notice it is wrong.
+    If a source is unavailable this page says so and points at GitHub, rather than
+    substituting a stale value. See CLAUDE.md, "The prime directive: never lie".
+  -->
   <style>
-    :root { --bg-primary:#12100f; --bg-secondary:#1c1917; --text-primary:#fff; --text-muted:#888; --accent-primary:#f6a800; --border-color:#444; --radius-md:6px; }
-    body { font-family: 'Courier New', monospace; background: var(--bg-primary); color: var(--text-primary); }
-    a { color: var(--accent-primary); text-decoration: none; }
-    header { background: var(--bg-secondary); border-bottom: 2px solid var(--accent-primary); padding: 1rem; }
-    main { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
-    .entry { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem; }
-    .entry h2 { margin: 0 0 .25rem 0; color: var(--accent-primary); }
-    .meta { color: var(--text-muted); font-size: .9rem; margin-bottom: .5rem; }
-    ul { margin: 0 0 0 1.25rem; }
+    /* Fallbacks are the shipped palette; the loader at the end overrides each from
+       /design/tokens.json (the token channel synced from the game), so this page's
+       colours follow the game's art without being pinned here. */
+    :root{
+      --bg:#12100F; --panel:#1C1917; --panel-2:#262220; --hair:#3A342E; --hair-2:#2a2622;
+      --ink:#E9F2F2; --ink-2:#CFC7BB; --ink-3:#A79E92;
+      --amber:#F6A800; --teal:#2FD4C2; --doom:#E2524A; --phosphor:#5BE87A;
+      --radius:10px;
+      --mono:ui-monospace,"SFMono-Regular",Menlo,"Courier New",monospace;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{color-scheme:dark}
+    body{
+      background:var(--bg); color:var(--ink); font-family:var(--mono); line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      background-image:radial-gradient(60rem 40rem at 50% -10%, rgba(246,168,0,.05), transparent 60%);
+      background-attachment:fixed;
+    }
+    main{max-width:min(820px,92vw); margin:0 auto; padding:2rem 0 4rem}
+    a{color:var(--amber); text-decoration:none}
+    a:hover{text-decoration:underline}
+    a:focus-visible{outline:2px solid var(--amber); outline-offset:3px}
+
+    .intro{margin-bottom:1.6rem}
+    .intro h1{font-size:clamp(1.8rem,5vw,2.6rem); letter-spacing:.01em; text-wrap:balance}
+    .intro p{color:var(--ink-2); max-width:46rem; margin-top:.6rem; text-wrap:pretty}
+
+    .rack{background:var(--panel); border:1px solid var(--hair); border-radius:14px; padding:1.4rem 1.5rem; margin-top:1.4rem}
+    .rack > h2{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); margin-bottom:1rem; font-weight:700}
+
+    .relhead{display:flex; align-items:baseline; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+    .relhead .ver{font-size:1.6rem; font-weight:800; color:var(--amber); font-variant-numeric:tabular-nums}
+    .relhead .when{color:var(--ink-3); font-size:.82rem; white-space:nowrap}
+    .relname{color:var(--ink-2); font-size:.9rem; margin-top:.15rem}
+
+    .chips{display:flex; flex-wrap:wrap; gap:.4rem; margin:.9rem 0 .2rem}
+    .chip{font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; padding:.22rem .55rem;
+          border-radius:999px; border:1px solid var(--hair); color:var(--ink-3)}
+    .chip.yes{color:var(--phosphor); border-color:color-mix(in srgb,var(--phosphor) 40%,transparent)}
+    .chip.no{color:var(--ink-3); opacity:.75}
+    .chip-note{font-size:.76rem; color:var(--ink-3); margin-top:.5rem; text-wrap:pretty}
+
+    .body{margin-top:1rem; border-top:1px solid var(--hair-2); padding-top:1rem; color:var(--ink-2); font-size:.92rem}
+    .body h3,.body h4,.body h5{color:var(--ink); font-size:.95rem; margin:1.1rem 0 .4rem; letter-spacing:.02em}
+    .body p{margin:.6rem 0; text-wrap:pretty}
+    .body ul,.body ol{margin:.5rem 0 .5rem 1.3rem}
+    .body li{margin:.2rem 0}
+    .body code{background:var(--panel-2); border:1px solid var(--hair-2); border-radius:4px; padding:.05em .35em; font-size:.88em; word-break:break-all}
+    .body pre{background:var(--panel-2); border:1px solid var(--hair-2); border-radius:var(--radius); padding:.8rem; overflow-x:auto; margin:.6rem 0}
+    .body pre code{background:none; border:0; padding:0; word-break:normal}
+    .body strong{color:var(--ink)}
+    .tw{overflow-x:auto; margin:.7rem 0}
+    .body table{border-collapse:collapse; font-size:.85rem; min-width:100%}
+    .body th,.body td{border:1px solid var(--hair-2); padding:.4rem .6rem; text-align:left; vertical-align:top}
+    .body th{color:var(--ink); background:var(--panel-2); white-space:nowrap}
+
+    .permalink{margin-top:1rem; font-size:.8rem; color:var(--ink-3)}
+
+    details.rel{border-top:1px solid var(--hair-2); padding:.7rem 0}
+    details.rel:first-of-type{border-top:0}
+    details.rel > summary{cursor:pointer; list-style:none; display:flex; align-items:baseline;
+                          justify-content:space-between; gap:1rem; flex-wrap:wrap}
+    details.rel > summary::-webkit-details-marker{display:none}
+    details.rel > summary::before{content:"▸"; color:var(--ink-3); margin-right:.5rem}
+    details.rel[open] > summary::before{content:"▾"}
+    details.rel summary .ver{color:var(--ink); font-weight:700}
+    details.rel summary .when{color:var(--ink-3); font-size:.8rem; white-space:nowrap}
+    details.rel summary .pre{font-size:.64rem; letter-spacing:.12em; text-transform:uppercase;
+                             color:var(--amber); border:1px solid color-mix(in srgb,var(--amber) 45%,transparent);
+                             border-radius:4px; padding:.05rem .35rem; margin-left:.5rem}
+
+    .status{color:var(--ink-3); font-size:.88rem}
+    .status.bad{color:var(--doom)}
+    .note{margin-top:1.4rem; font-size:.82rem; color:var(--ink-3); text-wrap:pretty}
+    .note b{color:var(--ink-2)}
+    @media (prefers-reduced-motion:reduce){*{transition:none!important}}
   </style>
 </head>
 <body>
-  <header>
-    <!-- Navigation loaded by navigation.js -->
-  </header>
+  <header></header>
   <main>
-    <h1>Game Changelog</h1>
-    <p>Track all the latest features, fixes, and improvements in our AI Safety Strategy Game.</p>
-    <div id="changes"></div>
-  </main>
-  <script>
-    async function load(){
-      try{
-        const res = await fetch('/data/game-changes.json', { cache:'no-store' });
-        const data = await res.json();
-        const entries = data.entries || [];
-        const el = document.getElementById('changes');
-        if(entries.length===0){ el.innerHTML='<p style="color:#ccc">No changes yet.</p>'; return; }
-        el.innerHTML = entries.map(x=>{
-          const date = x.date ? new Date(x.date).toLocaleDateString() : '';
-          const items = (x.items||[]).map(i=>`<li>${String(i).replace(/</g,'&lt;')}</li>`).join('');
-          return `<section class="entry">
-            <h2>${x.version || 'Unversioned'}</h2>
-            <div class="meta">${date} ${x.channel? ' · '+x.channel : ''}</div>
-            ${x.summary? `<p>${String(x.summary).replace(/</g,'&lt;')}</p>`:''}
-            ${items? `<ul>${items}</ul>`:''}
-          </section>`;
-        }).join('');
-      }catch(e){ document.getElementById('changes').innerHTML='<p style="color:#ff4444">Failed to load changelog.</p>'; }
-    }
-    load();
-  </script>
+    <div class="intro">
+      <h1>Game Changelog</h1>
+      <p>Track all the latest features, fixes, and improvements in our AI Safety Strategy Game.</p>
+      <p>These are the release notes as written on each build, read straight from the game's releases &mdash; nothing on this page is retyped by hand.</p>
+    </div>
 
-  <!-- Standard Navigation -->
+    <section class="rack" aria-labelledby="cur-h">
+      <h2 id="cur-h">Current release</h2>
+      <div id="current"><p class="status">Loading the current release&hellip;</p></div>
+    </section>
+
+    <section class="rack" aria-labelledby="prev-h">
+      <h2 id="prev-h">Earlier releases</h2>
+      <div id="history"><p class="status">Loading release history&hellip;</p></div>
+    </section>
+
+    <p class="note"><b>How this stays honest:</b> the current release is read from this site's
+    own <a href="/data/version.json">version data</a>, which a scheduled job refreshes from the
+    game repository; the earlier releases are fetched live from GitHub when you open this page.
+    No version, date, or build-availability fact is typed into this page, so none of them can
+    quietly go stale. When a source can't be reached, this page says so instead of showing you
+    an old value.</p>
+  </main>
+
   <script src="/assets/js/navigation.js"></script>
+  <script>
+  (function(){
+    'use strict';
+
+    // Repository identity, not a fact that rots. Every version/date/platform value
+    // below is fetched; none is written here.
+    var OWNER = 'PipFoweraker', REPO = 'pdoom1';
+    var RELEASES_PAGE = 'https://github.com/' + OWNER + '/' + REPO + '/releases';
+    var RELEASES_API  = 'https://api.github.com/repos/' + OWNER + '/' + REPO + '/releases?per_page=20';
+    var HISTORY_MAX = 12;
+
+    // ---- palette: follow the game's shipped tokens, fail safe to the CSS above ----
+    fetch('/design/tokens.json', {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(t){
+        if(!t || !t.colors) return;
+        var c = t.colors, s = document.documentElement.style;
+        var map = {'--bg':'bgPrimary','--panel':'bgSecondary','--panel-2':'bgTertiary',
+                   '--ink':'textPrimary','--ink-2':'textSecondary','--ink-3':'textMuted',
+                   '--amber':'accentPrimary','--teal':'accentSecondary','--doom':'accentDanger',
+                   '--hair':'border','--phosphor':'phosphor'};
+        Object.keys(map).forEach(function(k){ if(c[map[k]]) s.setProperty(k, c[map[k]]); });
+      }).catch(function(){});
+
+    // ---- tiny markdown subset, enough for a release body -------------------------
+    // Everything is HTML-escaped BEFORE any transform, so release text can never
+    // inject markup, however the upstream body is authored.
+    function esc(s){
+      return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function inline(s){
+      return s
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+                 '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+    }
+    var FENCE = /^CB(\d+)$/;
+    function isBlockStart(l){
+      return !l.trim() || /^#{1,6}\s/.test(l) || /^\s*\|/.test(l) ||
+             /^\s*([-*+]|\d+\.)\s+/.test(l) || FENCE.test(l.trim());
+    }
+    function md(src){
+      if(!src) return '';
+      var blocks = [];
+      var text = esc(src).replace(/\r\n/g,'\n')
+        .replace(/```[^\n]*\n([\s\S]*?)```/g, function(m, code){
+          blocks.push('<pre><code>' + code.replace(/\n+$/,'') + '</code></pre>');
+          return 'CB' + (blocks.length - 1) + '';
+        });
+      var lines = text.split('\n'), out = [], i = 0;
+      function cells(row){
+        return row.trim().replace(/^\|/,'').replace(/\|\s*$/,'')
+                  .split('|').map(function(c){ return inline(c.trim()); });
+      }
+      while(i < lines.length){
+        var ln = lines[i], m;
+        if((m = FENCE.exec(ln.trim()))){ out.push(blocks[+m[1]]); i++; continue; }
+        if(!ln.trim()){ i++; continue; }
+        if((m = /^(#{1,6})\s+(.*)$/.exec(ln))){
+          // Release bodies start at h1/h2; demote so the page keeps one h1.
+          var lvl = Math.min(6, m[1].length + 2);
+          out.push('<h' + lvl + '>' + inline(m[2].replace(/\s*#+\s*$/,'')) + '</h' + lvl + '>');
+          i++; continue;
+        }
+        if(/^\s*\|/.test(ln) && i + 1 < lines.length &&
+           /^\s*\|?[\s:|-]+$/.test(lines[i+1]) && lines[i+1].indexOf('-') >= 0){
+          var head = cells(ln), rows = '';
+          i += 2;
+          while(i < lines.length && /^\s*\|/.test(lines[i])){
+            rows += '<tr>' + cells(lines[i]).map(function(c){ return '<td>' + c + '</td>'; }).join('') + '</tr>';
+            i++;
+          }
+          out.push('<div class="tw"><table><thead><tr>' +
+                   head.map(function(c){ return '<th>' + c + '</th>'; }).join('') +
+                   '</tr></thead><tbody>' + rows + '</tbody></table></div>');
+          continue;
+        }
+        if(/^\s*[-*+]\s+/.test(ln)){
+          var ul = '';
+          while(i < lines.length && /^\s*[-*+]\s+/.test(lines[i])){
+            ul += '<li>' + inline(lines[i].replace(/^\s*[-*+]\s+/,'')) + '</li>'; i++;
+          }
+          out.push('<ul>' + ul + '</ul>'); continue;
+        }
+        if(/^\s*\d+\.\s+/.test(ln)){
+          var ol = '';
+          while(i < lines.length && /^\s*\d+\.\s+/.test(lines[i])){
+            ol += '<li>' + inline(lines[i].replace(/^\s*\d+\.\s+/,'')) + '</li>'; i++;
+          }
+          out.push('<ol>' + ol + '</ol>'); continue;
+        }
+        var para = [];
+        while(i < lines.length && !isBlockStart(lines[i])){ para.push(lines[i]); i++; }
+        out.push('<p>' + inline(para.join(' ')) + '</p>');
+      }
+      return out.join('\n');
+    }
+
+    // ---- formatting helpers ------------------------------------------------------
+    function isoDay(s){
+      if(!s) return '';
+      var d = new Date(s);
+      return isNaN(d) ? esc(String(s).split('T')[0]) : d.toISOString().slice(0,10);
+    }
+
+    // Build availability is DERIVED, never asserted. version.json carries
+    // latest_release.platforms, which update-version-info.py computes from the
+    // release's actual attached assets. If the key is absent (some writers of
+    // version.json omit it) we say the fact is unrecorded rather than guessing --
+    // an absent field is not evidence that nothing shipped.
+    var PLATFORM_LABEL = {windows:'Windows', macos:'macOS', linux:'Linux'};
+    function platformsHtml(rel){
+      var p = rel && rel.platforms;
+      if(!p || typeof p !== 'object'){
+        return '<p class="chip-note">Which builds are attached to this release isn’t recorded in ' +
+               'this site’s data. The <a href="' + esc(rel && rel.html_url || RELEASES_PAGE) +
+               '" target="_blank" rel="noopener noreferrer">release page</a> lists the actual files.</p>';
+      }
+      var keys = Object.keys(PLATFORM_LABEL).filter(function(k){ return k in p; });
+      if(!keys.length) return '';
+      var chips = keys.map(function(k){
+        var yes = !!p[k];
+        return '<span class="chip ' + (yes ? 'yes' : 'no') + '">' + PLATFORM_LABEL[k] +
+               (yes ? ' · build attached' : ' · not in this release') + '</span>';
+      }).join('');
+      return '<div class="chips">' + chips + '</div>' +
+             '<p class="chip-note">Derived from the files actually attached to this release, not from ' +
+             'a claim typed on this page.</p>';
+    }
+
+    function releaseBodyHtml(rel){
+      var body = rel && rel.body;
+      if(!body || !String(body).trim()){
+        return '<div class="body"><p class="status">This release shipped without written notes. ' +
+               'The <a href="' + esc(rel && rel.html_url || RELEASES_PAGE) +
+               '" target="_blank" rel="noopener noreferrer">release page</a> has the files and commit range.</p></div>';
+      }
+      return '<div class="body">' + md(body) + '</div>';
+    }
+
+    // ---- current release ---------------------------------------------------------
+    var currentTag = null;
+
+    function renderCurrent(rel){
+      var el = document.getElementById('current');
+      if(!rel || !rel.version){
+        // No literal substitute. Say what is missing and point at the real source.
+        el.innerHTML = '<p class="status bad">The current release couldn’t be read from this ' +
+          'site’s data just now, so this page won’t guess at it.</p>' +
+          '<p class="status">Every release, straight from the source: ' +
+          '<a href="' + RELEASES_PAGE + '" target="_blank" rel="noopener noreferrer">' + RELEASES_PAGE + '</a></p>';
+        return;
+      }
+      currentTag = String(rel.version);
+      var when = isoDay(rel.published_at);
+      el.innerHTML =
+        '<div class="relhead"><span class="ver">' + esc(rel.version) + '</span>' +
+        (when ? '<span class="when">released ' + when + '</span>' : '') + '</div>' +
+        (rel.name && rel.name !== rel.version ? '<div class="relname">' + esc(rel.name) + '</div>' : '') +
+        platformsHtml(rel) +
+        releaseBodyHtml(rel) +
+        '<p class="permalink"><a href="' + esc(rel.html_url || RELEASES_PAGE) +
+        '" target="_blank" rel="noopener noreferrer">Downloads and files for this release on GitHub →</a></p>';
+    }
+
+    // ---- earlier releases --------------------------------------------------------
+    function renderHistory(list){
+      var el = document.getElementById('history');
+      var older = (list || []).filter(function(r){
+        return r && r.tag_name && r.tag_name !== currentTag;
+      }).slice(0, HISTORY_MAX);
+
+      if(!older.length){
+        el.innerHTML = '<p class="status">No earlier releases came back from GitHub. ' +
+          'The full list lives at <a href="' + RELEASES_PAGE +
+          '" target="_blank" rel="noopener noreferrer">' + RELEASES_PAGE + '</a>.</p>';
+        return;
+      }
+      el.innerHTML = older.map(function(r){
+        var when = isoDay(r.published_at || r.created_at);
+        return '<details class="rel"><summary><span><span class="ver">' + esc(r.tag_name) + '</span>' +
+          (r.prerelease ? '<span class="pre">pre-release</span>' : '') + '</span>' +
+          (when ? '<span class="when">' + when + '</span>' : '') + '</summary>' +
+          releaseBodyHtml({body: r.body, html_url: r.html_url}) +
+          '<p class="permalink"><a href="' + esc(r.html_url || RELEASES_PAGE) +
+          '" target="_blank" rel="noopener noreferrer">Files for ' + esc(r.tag_name) + ' on GitHub →</a></p>' +
+          '</details>';
+      }).join('');
+    }
+
+    function historyUnavailable(why){
+      document.getElementById('history').innerHTML =
+        '<p class="status">Couldn’t reach GitHub for the older releases just now' +
+        (why ? ' (' + esc(why) + ')' : '') + '. Nothing is cached here, so rather than show you a ' +
+        'stale list: <a href="' + RELEASES_PAGE + '" target="_blank" rel="noopener noreferrer">' +
+        'every p(Doom)1 release on GitHub</a>.</p>';
+    }
+
+    // ---- go ----------------------------------------------------------------------
+    fetch('/data/version.json', {cache:'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(d){ renderCurrent(d && d.latest_release); })
+      .catch(function(){ renderCurrent(null); })
+      .then(function(){
+        return fetch(RELEASES_API, {headers:{'Accept':'application/vnd.github+json'}})
+          .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .then(function(list){ renderHistory(Array.isArray(list) ? list : []); })
+          .catch(function(e){ historyUnavailable(e && e.message); });
+      });
+  })();
+  </script>
 </body>
 </html>
