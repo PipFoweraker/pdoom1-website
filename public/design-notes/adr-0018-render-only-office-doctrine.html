@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0018 -- Render-only office doctrine: no spatial fact becomes a gameplay input | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0018-render-only-office-doctrine.html" />
+	<meta name="description" content="The office floor (godot/scripts/ui/office_floor/office_sandbox.gd) is a dev-tool sandbox for placing props and previewing worker sprites on a 32px snap gri" />
+	<meta property="og:title" content="ADR-0018 -- Render-only office doctrine: no spatial fact becomes a gameplay input | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="The office floor (godot/scripts/ui/office_floor/office_sandbox.gd) is a dev-tool sandbox for placing props and previewing worker sprites on a 32px snap gri" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0018-render-only-office-doctrine.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #12100f;
+			--bg-secondary: #1c1917;
+			--bg-tertiary: #262220;
+			--text-primary: #ffffff;
+			--text-secondary: #cfc7bb;
+			--text-muted: #a79e92;
+			--accent-primary: #f6a800;
+			--accent-secondary: #2fd4c2;
+			--accent-danger: #ff4444;
+			--border-color: #3a342e;
+			--success-color: #4fb37a;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(47, 212, 194, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0018 -- Render-only office doctrine: no spatial fact becomes a gameplay input</h1>
+		<div class="meta"><strong>Status:</strong> DRAFT (formal confirm at 2026-07-27 R3a block; review-by 2027-07-27) &middot; <strong>Decided:</strong> 2026-07-27</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> DRAFT (formal confirm at 2026-07-27 R3a block; review-by 2027-07-27)</li>
+<li><strong>Date:</strong> 2026-07-27</li>
+</ul>
+<h2>Context</h2>
+<p>The office floor (<code>godot/scripts/ui/office_floor/office_sandbox.gd</code>) is a dev-tool sandbox for placing props and previewing worker sprites on a 32px snap grid (<code>GRID := 32.0</code>, <code>_snap_to_grid()</code>, <code>_cell_of()</code> at lines 52-58 and 874-893). It already computes pixel coordinates, grid cells, and occupancy keys. Two spatial build lanes were provisionally on Tuesday's plan: a first-class tile-grid implementation and a camera/real-estate application of it to shipped gameplay.</p>
+<p><code>docs/game-design/OFFICE_ECONOMY_PROPOSAL.md</code> section 7 ("Out of scope") already named the target precedent: <em>"Per-desk/per-room placement, pathfinding gameplay -- the office floor stays a RENDER surface, not a sim (Rams #10)."</em> That line covered the office-economy proposal specifically. This ADR generalizes it into standing doctrine for the whole engine, and rules explicitly on the sandbox's grid, on click-driven interaction, and on Wednesday's decorating math.</p>
+<p>Pip, 2026-07-27 ~0950 (verbatim intent): <em>"No spatial fact will ever become a gameplay input."</em></p>
+<p>The structural precedent is the 2026-07-25 modal soft-locks: bugs caused by a second, UI-side notion of state drifting out of sync with the sim's actual state (a dual-source-of-truth failure class -- two stores of "what is true," reconciled imperfectly, produce exactly the class of bug where the screen and the sim disagree and the player gets stuck). A spatial layer that fed gameplay would recreate the same shape of risk at a larger scale: coordinates as a second, render-side state store that the sim would have to trust.</p>
+<h2>Decision</h2>
+<p>The office view is a render surface driven one-way from the deterministic sim. <strong>The sim owns counts and quantities; the render owns coordinates.</strong></p>
+<p><strong>Amendment 2026-07-27 (Pip ruling 1143 + facilitator reweight, "a(3)-lite"):</strong> a first-class integer grid type -- <code>Vector2i</code> col/row addressing, footprint occupancy, snap -- <strong>is approved as render-layer infrastructure.</strong> Its consumers are prop placement, decorating render, walk theatre, and click-targets. This is chosen over both rejected options it replaces: formalizing the sandbox's ad hoc string-keyed 32px snap (that debt is retired by this grid superseding it), and the original tier-integers-only clause (overturned 2026-07-27 by Pip: <em>"having the sim be a useful part of the game is growing on me and this gives me room downstream to explore with less technical debt"</em>). Scope guard, non-negotiable: this grid is explicitly <strong>not</strong> a pathfinding or simulation grid; nothing sim-side may read cell state -- the doctrine's arrow rule (sim owns counts and quantities; the render owns coordinates) governs it fully, unchanged. Tile addressing for anything sim-facing remains <strong>tier integers only</strong> (ADR-0014's presence/location tiers, office-era tiers) -- never (x, y) coordinates, never grid cells, never pixel positions, as sim-side input.</p>
+<h3>Three riders (part of the ruling)</h3>
+<p><strong>(a) Review clause.</strong> This decision is re-reviewed within one year, by <strong>2027-07-27</strong>, as part of standing decision reviews. If office gameplay has by then out-grown tier integers, that review is where a spatial model gets re-litigated -- not an ad hoc exception beforehand.</p>
+<p><strong>(b) Render-local cosmetic interactions are unrestricted.</strong> Clicking a coffee pot and having it boil, a worker idling into a new pose, ambient office flavor -- none of this touches the sim. This is <strong>not an exception</strong> to the doctrine; it is <strong>outside its scope</strong>. The doctrine governs the input -&gt; sim boundary. A render-local effect is input -&gt; render only: no sim read, no sim write, nothing serialized, nothing replayed. If an interaction never crosses into the sim, this ADR has nothing to say about it.</p>
+<p><strong>(c) Click-the-render as a command surface is permitted, under the entity-ID invariant.</strong> A click on a rendered object MAY dispatch a sim action -- but the action serializes as <code>(action, entity_id)</code>, never as coordinates. Replays record entity-scoped actions, not click positions. Every render-click command must also have a non-spatial path (an action menu reachable without touching the render at all), so the render is always a convenience input method, never the only way to issue the command.</p>
+<p>Two named rot modes are forbidden under this rider, because both smuggle a spatial fact back into gameplay through the side door:</p>
+<ol>
+<li><strong>Clickability conditioned on placement</strong> -- e.g. "a worker is only assignable when their sprite is near a desk." The moment eligibility depends on rendered position, position has become a gameplay input.</li>
+<li><strong>Command availability conditioned on placement</strong> -- e.g. "the coffee pot is only usable if it has been placed in the kitchen." Same failure: a spatial fact (which room a prop's sprite sits in) is gating a sim action.</li>
+</ol>
+<p>Eligibility and availability may depend only on sim-owned state (tier, ownership, unlocked/owned flags, resource costs) -- never on where something is drawn.</p>
+<h2>Beacons served / violated</h2>
+<ul>
+<li><strong>Rams #10 (as little design as possible):</strong> hardens the office-economy proposal's own stated precedent (section 7) into an engine-wide rule instead of letting a spatial-gameplay system grow by increment. Directly cancels two planned build lanes rather than building them and pruning later.</li>
+<li><strong>Rams #6 (honest):</strong> the entity-ID invariant keeps replays and the leaderboard honest about what actually happened (an action on an entity), instead of encoding an incidental rendering detail (where a sprite happened to be) as if it were part of the game's history.</li>
+<li>Cost: the office floor's affordances are permanently render-flavor-only; future proposals wanting spatial gameplay (base-building, pathing puzzles) are foreclosed by default and must clear the 2027-07-27 review, not tack on quietly.</li>
+</ul>
+<h2>Interaction contract</h2>
+<ul>
+<li><strong>Reads:</strong> <code>godot/scripts/ui/office_floor/office_sandbox.gd</code> (the dev-tool grid this ADR declines to promote), <code>docs/game-design/OFFICE_ECONOMY_PROPOSAL.md</code> section 7 (the precedent this ADR generalizes), ADR-0006 (replay/versioning -- entity-scoped actions must stay replayable under its format), ADR-0014 (presence/location tiers -- the only spatial addressing that ships).</li>
+<li><strong>Writes:</strong> no engine code (doctrine-only ADR). Constrains future writes to <code>godot/scripts/ui/office_floor/**</code>, any future decorating/placement system, and the action-serialization format (must stay <code>(action, entity_id)</code> for any render-click command).</li>
+</ul>
+<h2>Rejected alternatives</h2>
+<ul>
+<li><strong>Promote the sandbox's existing ad hoc string-keyed 32px snap-hack to first-class, as-is.</strong> Rejected: that hack was a dev-preview convenience, not a designed type, and formalizing it unchanged would carry its string-keyed debt into production. This is distinct from what the a(3)-lite amendment approves -- a fresh <code>Vector2i</code> grid type that replaces and retires the hack, not the hack itself promoted wholesale.</li>
+<li><strong>Camera/real-estate application built on that grid.</strong> Rejected for the same reason and on the same day -- it is downstream of the grid becoming first-class, so it falls with it.</li>
+<li><strong>Allow click-to-command without the entity-ID invariant (record raw click coordinates in the action/replay).</strong> Rejected: coordinates in the replay log make the render surface part of the game's deterministic history, and any future re-layout of the office view would silently change what old replays mean. Entity IDs are layout-independent by construction.</li>
+<li><strong>Gate room-scoped flavor text or clickability on placement ("in the kitchen").</strong> Rejected as one of the two named rot modes -- flavor is fine, but the moment placement gates a <em>command</em> or <em>eligibility</em>, position has become a gameplay input through the side door.</li>
+<li><strong>No review clause (treat this as permanent).</strong> Rejected: Pip's ruling was explicitly scoped to be re-examined in a year, not enshrined as unchangeable canon; a hardcoded review-by date keeps the door open on the record rather than requiring a future ADR to discover it needs reopening.</li>
+</ul>
+<h2>Consequences / open questions</h2>
+<ul>
+<li><strong>Tuesday's two planned spatial build lanes are cancelled as unnecessary</strong>: the tile-grid implementation and the camera/real-estate application built on it. Neither reaches production; the sandbox's existing 32px snap remains a dev-tool only.</li>
+<li><strong>Wednesday's decorating math is constrained</strong> to tier/ownership-keyed inputs only -- props owned, spend, tier -- never positions, never coordinates, never grid cells. Any decorating-math design that wants "where a prop sits" as an input needs to first clear this ADR's review, not route around it. Wednesday's decorating-math block must hold the doctrine line explicitly: decor value keys off ownership/tier/spend (sim-side counts), never off placement; placement is expression only. A placement-priced decor bonus would be a spatial fact becoming a gameplay input, which this ADR forbids.</li>
+<li><strong>The camera question is a triggered decision</strong>, not a standing one: a Camera2D enters consideration only when a ruled office tier exceeds one fixed-rect screen; until then fixed-rect Control + duplicate-instance compare (lease-upsell) stand. Nothing built under those is discarded by a later camera -- the Control becomes viewport content.</li>
+<li><strong>The determinism/replay/leaderboard system (ADR-0006) is the load-bearing beneficiary.</strong> Spatial state, if it existed as a gameplay input, would need its own serialization and deterministic replay path (coordinates, grid state, occupancy) alongside the existing sim state -- a second thing to keep byte-identical across runs and version-stable across leaderboard epochs. This doctrine removes that entire surface from the replay contract by construction.</li>
+<li><strong>The dual-source-of-truth failure class (2026-07-25 modal soft-locks) is the structural precedent</strong> for refusing a second state store here: those soft-locks came from UI-side state drifting from sim-side state under imperfect reconciliation. A spatial render layer promoted to a gameplay input would be exactly that pattern -- render-side coordinates as a second "what is true" the sim would need to stay synced with -- at a larger and more failure-prone surface than a single modal.</li>
+<li>Open: the entity-ID invariant's exact serialization shape for render-click commands (which action verbs, which entity types) is not specified here -- that is implementation detail for whichever future ADR or ticket introduces the first render-click command, constrained to land inside this doctrine.</li>
+<li>Open: what "clears the 2027-07-27 review" looks like procedurally (who convenes it, what evidence would justify reopening) is not specified; parked for the standing decision-review process to pick up.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

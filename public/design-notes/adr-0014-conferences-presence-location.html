@@ -3,11 +3,11 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ADR-0014 — Conferences, presence, and minimal location | p(Doom)1 Design Notes</title>
+	<title>ADR-0014 -- Conferences, presence, and minimal location | p(Doom)1 Design Notes</title>
 	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0014-conferences-presence-location.html" />
-	<meta name="description" content="ADR-0010 made socialization the mandatory middle of the research→adoption value chain with no ruling on what attending is. Pip&#x27;s rulings, this beat, with o" />
-	<meta property="og:title" content="ADR-0014 — Conferences, presence, and minimal location | p(Doom)1 Design Notes" />
-	<meta property="og:description" content="ADR-0010 made socialization the mandatory middle of the research→adoption value chain with no ruling on what attending is. Pip&#x27;s rulings, this beat, with o" />
+	<meta name="description" content="ADR-0010 made socialization the mandatory middle of the research-&gt;adoption value chain with no ruling on what attending is. Pip&#x27;s rulings, this beat, with " />
+	<meta property="og:title" content="ADR-0014 -- Conferences, presence, and minimal location | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="ADR-0010 made socialization the mandatory middle of the research-&gt;adoption value chain with no ruling on what attending is. Pip&#x27;s rulings, this beat, with " />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0014-conferences-presence-location.html" />
 
@@ -96,7 +96,7 @@
 		</nav>
 	</header>
 	<main>
-		<h1>ADR-0014 — Conferences, presence, and minimal location</h1>
+		<h1>ADR-0014 -- Conferences, presence, and minimal location</h1>
 		<div class="meta"><strong>Status:</strong> ACCEPTED (v1 shape; yields/numbers owed to the sweep) &middot; <strong>Decided:</strong> 2026-07-12</div>
 <div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
 <ul>
@@ -104,24 +104,24 @@
 <li><strong>Date:</strong> 2026-07-12</li>
 </ul>
 <h2>Context</h2>
-<p>ADR-0010 made socialization the mandatory middle of the research→adoption value chain with no ruling on what attending <em>is</em>. Pip's rulings, this beat, with one ambition flagged: <em>"Part of me wants to make a conference attendance subgame, that's how critical I think these kinds of things are going to be for the game."</em> (Subgame parked; v1 is attendance + yields.)</p>
+<p>ADR-0010 made socialization the mandatory middle of the research-&gt;adoption value chain with no ruling on what attending <em>is</em>. Pip's rulings, this beat, with one ambition flagged: <em>"Part of me wants to make a conference attendance subgame, that's how critical I think these kinds of things are going to be for the game."</em> (Subgame parked; v1 is attendance + yields.)</p>
 <h2>Decision</h2>
 <ol>
-<li><strong>Conferences are scheduled world events on the seed timeline</strong> (ADR-0005 schedule entries — the geopolitics-as-content pattern, reused). Annual majors announce ~9 months ahead: plannable at plan speed, and opening theory can grow around known calendars. <strong>Smaller/exclusive gatherings unlock behind contacts or safety reputation</strong> — invitation-gated event stream.</li>
-<li><strong>Founder attendance ≫ delegate attendance.</strong> Founder pays founder-hours + travel cash and gets the full yield: meaningful options opened, first-degree connections, SA boosts. Delegates (a staff-month + travel cash) yield less but give coverage — the 2037 "5 delegates to 10 meetings" scarcity, seeded from turn one. Travel cash deliberately bites early (spiky cash flow, ADR-0012).</li>
-<li><strong>Conferences are accelerants and discovery venues, not the adoption roll itself.</strong> Adoption happens out in the world (ADR-0010); attendance <em>speeds</em> adoption of your published work, builds reputation mechanically faster (especially introductions), and <strong>mints contacts-as-receivables</strong> — the Ledger's friendly column gets its content source (DQ-9's customer).</li>
+<li><strong>Conferences are scheduled world events on the seed timeline</strong> (ADR-0005 schedule entries -- the geopolitics-as-content pattern, reused). Annual majors announce ~9 months ahead: plannable at plan speed, and opening theory can grow around known calendars. <strong>Smaller/exclusive gatherings unlock behind contacts or safety reputation</strong> -- invitation-gated event stream.</li>
+<li><strong>Founder attendance &gt;&gt; delegate attendance.</strong> Founder pays founder-hours + travel cash and gets the full yield: meaningful options opened, first-degree connections, SA boosts. Delegates (a staff-month + travel cash) yield less but give coverage -- the 2037 "5 delegates to 10 meetings" scarcity, seeded from turn one. Travel cash deliberately bites early (spiky cash flow, ADR-0012).</li>
+<li><strong>Conferences are accelerants and discovery venues, not the adoption roll itself.</strong> Adoption happens out in the world (ADR-0010); attendance <em>speeds</em> adoption of your published work, builds reputation mechanically faster (especially introductions), and <strong>mints contacts-as-receivables</strong> -- the Ledger's friendly column gets its content source (DQ-9's customer).</li>
 <li><strong>Discovery-by-presence.</strong> You discover actors, alliances, and intentions by being where they are (the units-moving-on-the-map analog); news/newsletters are the cheaper, lower-fidelity discovery channel. Presence is effectively an SA channel flavor alongside espionage/alliance/media/research.</li>
-<li><strong>Location exists minimally in v1:</strong> HQ defaults American (park foreign legal-regime modeling); the player can substantially base teams overseas — cheaper hires, with different downstream influence/politics effects (mid/late-game payoff). Event schema carries <code>where</code> from day one.</li>
-<li><strong>Ad-hoc meetings/opportunities stay instant-speed windows</strong> (ADR-0009/0012), some gated by contacts/rep. (Pip's "book a longer trip for planned meetings" instinct is week-grain thinking — at month grain the trip is a plan allocation.)</li>
+<li><strong>Location exists minimally in v1:</strong> HQ defaults American (park foreign legal-regime modeling); the player can substantially base teams overseas -- cheaper hires, with different downstream influence/politics effects (mid/late-game payoff). Event schema carries <code>where</code> from day one.</li>
+<li><strong>Ad-hoc meetings/opportunities stay instant-speed windows</strong> (ADR-0009/0012), some gated by contacts/rep. (Pip's "book a longer trip for planned meetings" instinct is week-grain thinking -- at month grain the trip is a plan allocation.)</li>
 </ol>
 <h2>Beacons served / violated</h2>
 <ul>
-<li><strong>MaRo Interaction:</strong> conferences interlock papers (ADR-0010), reputation, SA, receivables, travel cash, and founder-hours — six systems, zero new currencies.</li>
+<li><strong>MaRo Interaction:</strong> conferences interlock papers (ADR-0010), reputation, SA, receivables, travel cash, and founder-hours -- six systems, zero new currencies.</li>
 <li><strong>Rams #10:</strong> accelerant not a new mechanic; schedule entries not a system; subgame parked; foreign law parked.</li>
-<li><strong>Rams #6:</strong> this is how the field actually works — the hallway track is where adoption starts.</li>
+<li><strong>Rams #6:</strong> this is how the field actually works -- the hallway track is where adoption starts.</li>
 </ul>
 <h2>Interaction contract</h2>
-<p>Reads/writes: <strong>seed schedule</strong> (ADR-0005 entries + 9-month announcements), <strong>founder hours</strong> (ADR-0011), <strong>cash</strong> (travel), <strong>reputation</strong> (typed, per-person — delegate yield should scale with the delegate's own reputation), <strong>SA</strong> (presence channel), <strong>Ledger receivables</strong> (contacts; DQ-9), <strong>adoption pipeline</strong> (ADR-0010 accelerant).</p>
+<p>Reads/writes: <strong>seed schedule</strong> (ADR-0005 entries + 9-month announcements), <strong>founder hours</strong> (ADR-0011), <strong>cash</strong> (travel), <strong>reputation</strong> (typed, per-person -- delegate yield should scale with the delegate's own reputation), <strong>SA</strong> (presence channel), <strong>Ledger receivables</strong> (contacts; DQ-9), <strong>adoption pipeline</strong> (ADR-0010 accelerant).</p>
 <h2>Rejected alternatives</h2>
 <ul>
 <li><strong>Adoption rolls at the conference itself:</strong> adoption lives in the world; conferences only accelerate it.</li>
@@ -130,11 +130,16 @@
 </ul>
 <h2>Consequences / open questions</h2>
 <ul>
-<li>Yield numbers, invitation thresholds, travel prices — sweep-tuned (after EE-8).</li>
-<li>Receivable/contact object format — design with DQ-9 + ADR-0007 counterparties.</li>
-<li>Delegate yield scaling with per-person reputation (hires as reputation seeds, ADR-0011) — natural, verify it doesn't make star-delegate spam dominant.</li>
-<li>Overseas-basing downstream effects (influence/politics) — mid/late-game content, design at workshop #3.</li>
+<li>Yield numbers, invitation thresholds, travel prices -- sweep-tuned (after EE-8).</li>
+<li>Receivable/contact object format -- design with DQ-9 + ADR-0007 counterparties.</li>
+<li>Delegate yield scaling with per-person reputation (hires as reputation seeds, ADR-0011) -- natural, verify it doesn't make star-delegate spam dominant.</li>
+<li>Overseas-basing downstream effects (influence/politics) -- mid/late-game content, design at workshop #3.</li>
 </ul>
+<h2>Amendment 2026-07-27</h2>
+<p>Three rulings from the WS-3a day (day-log: <code>WS3A_DAYLOG_2026-07-27.md</code>), dated additions only -- the Decision section above is unchanged.</p>
+<p><strong>(a) Rhythm-break placeholder shape RULED.</strong> Pip's ruling on ADR-0014's parked "conference subgame" ambition: fade-out -&gt; mini-scene -&gt; return with a single stacked-backlog panel, middle auto-resolved or near-zero interaction -- "much like combat in Heroes of Might and Magic compared to the normal turn structure" [PIP]. Full design seed: <code>SEED_CONFERENCE_RHYTHM_BREAK.md</code>. <strong>Shell built PR #979</strong> (commit -&gt; sim resolves synchronously -&gt; text vignette via SceneTransition -&gt; "while you were away" single panel, modal-disciplined; anti-free-button guards: travel cash + all attention drained, re-drained per month away, unignorable windows cut the trip short). Real yields (adoption-accelerant multiplier, contacts-as-receivables into the Ledger) stay sequenced AFTER ADR-0010 v1 exists, per the existing shell-vs- yields seam in the seed doc -- nothing here reopens that sequencing.</p>
+<p><strong>(b) Travel ruling.</strong> R4 ballot 3: attending a conference spends ALL attention for the trip, a travel day is charged on each side (departure + return), and the founder/delegate is EXPOSED while travelling -- world developments fire during travel exactly as they would if present (no travel-immunity window). This is the concrete mechanism behind rider 2's "travel cash bites early" and closes the free-button risk the seed doc's section 5 flags.</p>
+<p><strong>(c) #980 refinement, ACCEPTED PENDING IMPLEMENTATION.</strong> Pip's noticing on the #979 shell (captured as issue #980): being away is loss of OPERATOR PRESENCE, not loss of PLANNER MIND. Next-month planning stays allowed while away; in-flight reallocation and break-in operating while away are forbidden. This distinction is routed to the Tuesday founder-hour-typing lane (ADR-0011, the "doors" hour type) as the owning seam -- that lane implements the planner-mind-travels / operator-presence-does-not split, not this ADR. Not yet built; tracked at #980.</p>
 	</main>
 	<footer>
 		Design notes are generated from the game repository's decision records.

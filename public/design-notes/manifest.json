@@ -1,5 +1,5 @@
 {
-  "count": 17,
+  "count": 18,
   "generated_by": "scripts/sync/sync-design-notes.py",
   "records": [
     {
@@ -88,7 +88,7 @@
       "scrubbed_items": 1,
       "slug": "adr-0011-effort-economy",
       "status": "ACCEPTED (shape); researcher archetype roster content owed (DQ-15)",
-      "title": "ADR-0011 \u2014 The effort economy: founder hours, staff lanes, manager compression"
+      "title": "ADR-0011 -- The effort economy: founder hours, staff lanes, manager compression"
     },
     {
       "date": "2026-07-12",
@@ -112,7 +112,7 @@
       "scrubbed_items": 1,
       "slug": "adr-0014-conferences-presence-location",
       "status": "ACCEPTED (v1 shape; yields/numbers owed to the sweep)",
-      "title": "ADR-0014 \u2014 Conferences, presence, and minimal location"
+      "title": "ADR-0014 -- Conferences, presence, and minimal location"
     },
     {
       "date": "2026-07-13",
@@ -137,6 +137,14 @@
       "slug": "adr-0017-anti-hollow-test-strategy",
       "status": "ACCEPTED",
       "title": "ADR-0017 -- Anti-hollow test strategy (load-time smoke + property-based invariants)"
+    },
+    {
+      "date": "2026-07-27",
+      "id": "ADR-0018-render-only-office-doctrine",
+      "scrubbed_items": 1,
+      "slug": "adr-0018-render-only-office-doctrine",
+      "status": "DRAFT (formal confirm at 2026-07-27 R3a block; review-by 2027-07-27)",
+      "title": "ADR-0018 -- Render-only office doctrine: no spatial fact becomes a gameplay input"
     }
   ],
   "source_path": "docs/game-design/decisions",

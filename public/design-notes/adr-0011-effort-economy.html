@@ -3,10 +3,10 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ADR-0011 — The effort economy: founder hours, staff lanes, manager compression | p(Doom)1 Design Notes</title>
+	<title>ADR-0011 -- The effort economy: founder hours, staff lanes, manager compression | p(Doom)1 Design Notes</title>
 	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0011-effort-economy.html" />
 	<meta name="description" content="Current build: one global AP pool, spent instantly; staff add to the pool; researchers are single-function; banking exists but does nothing. The sweep&#x27;s di" />
-	<meta property="og:title" content="ADR-0011 — The effort economy: founder hours, staff lanes, manager compression | p(Doom)1 Design Notes" />
+	<meta property="og:title" content="ADR-0011 -- The effort economy: founder hours, staff lanes, manager compression | p(Doom)1 Design Notes" />
 	<meta property="og:description" content="Current build: one global AP pool, spent instantly; staff add to the pool; researchers are single-function; banking exists but does nothing. The sweep&#x27;s di" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0011-effort-economy.html" />
@@ -96,7 +96,7 @@
 		</nav>
 	</header>
 	<main>
-		<h1>ADR-0011 — The effort economy: founder hours, staff lanes, manager compression</h1>
+		<h1>ADR-0011 -- The effort economy: founder hours, staff lanes, manager compression</h1>
 		<div class="meta"><strong>Status:</strong> ACCEPTED (shape); researcher archetype roster content owed (DQ-15) &middot; <strong>Decided:</strong> 2026-07-12</div>
 <div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
 <ul>
@@ -104,44 +104,64 @@
 <li><strong>Date:</strong> 2026-07-12</li>
 </ul>
 <h2>Context</h2>
-<p>Current build: one global AP pool, spent instantly; staff add to the pool; researchers are single-function; banking exists but does nothing. The sweep's diagnosis in mechanism terms: one fungible currency + state-independent payoffs ⇒ constant-policy argmax (<code>safety_lean</code>) dominates. Pip's rulings across beats 1–2: banking is dead (ADR-0009); <em>"I have never been around unassigned workers before, because there's always been a backlog"</em>; <em>"each new employee is kinda cutting down the time I need to do other things"</em>; managers <em>"stop employees from annoying me with employee things."</em></p>
+<p>Current build: one global AP pool, spent instantly; staff add to the pool; researchers are single-function; banking exists but does nothing. The sweep's diagnosis in mechanism terms: one fungible currency + state-independent payoffs =&gt; constant-policy argmax (<code>safety_lean</code>) dominates. Pip's rulings across beats 1-2: banking is dead (ADR-0009); <em>"I have never been around unassigned workers before, because there's always been a backlog"</em>; <em>"each new employee is kinda cutting down the time I need to do other things"</em>; managers <em>"stop employees from annoying me with employee things."</em></p>
 <h2>Decision</h2>
 <ol>
 <li><strong>No global AP pool.</strong> The pool illusion dies; staff never add founder AP.</li>
-<li><strong>Founder hours</strong> (sacred, roughly fixed per month — canon since ADR-0008): spent on <strong>doors</strong> (stakeholder face-time; which rooms you're in locks strategic paths), <strong>approvals</strong> (hires, direction rulings — "approve this salary," not paperwork clicks), <strong>audits</strong> (skip-level ground-truthing), and <strong>reserve</strong> (instant-speed firefighting, ADR-0009).</li>
-<li><strong>Staff effort is per-person</strong>, assigned at plan speed to workstreams from a backlog. <strong>Idle staff don't exist; unmanaged staff do</strong> — unassigned researchers self-direct per their agenda (whose ordering of the backlog wins?).</li>
-<li><strong>Workstreams</strong> run multi-month and produce artifacts (papers, systems, campaigns) — ADR-0009's no-instant-strategy rule, cashed out.</li>
-<li><strong>Managers are interrupt shields with agenda riders:</strong> they absorb their team's class of response windows (ADR-0009 economy), compress the plan screen (team → allocation a <strong>Celine's-law channel</strong> — an inward SA channel with fidelity loss. The sim never lies; <em>characters do</em>. Skip-level audits (founder hours) re-ground truth. Folds ADR-0008's deferred inward-SA into existing SA machinery.
+<li><strong>Founder hours</strong> (sacred, roughly fixed per month -- canon since ADR-0008): spent on <strong>doors</strong> (stakeholder face-time; which rooms you're in locks strategic paths), <strong>approvals</strong> (hires, direction rulings -- "approve this salary," not paperwork clicks), <strong>audits</strong> (skip-level ground-truthing), and <strong>reserve</strong> (instant-speed firefighting, ADR-0009).</li>
+<li><strong>Staff effort is per-person</strong>, assigned at plan speed to workstreams from a backlog. <strong>Idle staff don't exist; unmanaged staff do</strong> -- unassigned researchers self-direct per their agenda (whose ordering of the backlog wins?).</li>
+<li><strong>Workstreams</strong> run multi-month and produce artifacts (papers, systems, campaigns) -- ADR-0009's no-instant-strategy rule, cashed out.</li>
+<li><strong>Managers are interrupt shields with agenda riders:</strong> they absorb their team's class of response windows (ADR-0009 economy), compress the plan screen (team -&gt; allocation a <strong>Celine's-law channel</strong> -- an inward SA channel with fidelity loss. The sim never lies; <em>characters do</em>. Skip-level audits (founder hours) re-ground truth. Folds ADR-0008's deferred inward-SA into existing SA machinery.
 <ul>
 <li>standing policy; members visually housed under the manager), and report upward via</li>
 </ul></li>
 <li><strong>Ops/admin staff reduce the founder-price of routine actions</strong> and automate whole classes over time (endpoint: 2037 vignette's "payroll is automated").</li>
 <li><strong>The dual-use lane is priced:</strong> capabilities work pays money/compute/hype and bills doom (with ADR-0010's typed attention: accel VCs fund reckless success).</li>
-<li><strong>Researcher model (shape):</strong> <em>lane preference</em> (fictionalized real agendas — e.g. interpretability, evals, theory/agent-foundations, governance) × <em>appetites</em> (compute, prestige/first-author, mentees, money, mission purity — <strong>promises made to retain staff are ledger entries</strong>) × rare <em>quirk riders</em> (philosophical stances, secret successionist — an exposure-event genre reusing ADR-0003 machinery, not a lane).</li>
+<li><strong>Researcher model (shape):</strong> <em>lane preference</em> (fictionalized real agendas -- e.g. interpretability, evals, theory/agent-foundations, governance) x <em>appetites</em> (compute, prestige/first-author, mentees, money, mission purity -- <strong>promises made to retain staff are ledger entries</strong>) x rare <em>quirk riders</em> (philosophical stances, secret successionist -- an exposure-event genre reusing ADR-0003 machinery, not a lane).</li>
 </ol>
 <h2>Beacons served / violated</h2>
 <ul>
-<li><strong>Rams #10:</strong> managers reuse the window economy + SA channels; quirks reuse exposure events; banking deleted; no new player-facing currency — typed effort is a <em>split</em> of an existing one.</li>
+<li><strong>Rams #10:</strong> managers reuse the window economy + SA channels; quirks reuse exposure events; banking deleted; no new player-facing currency -- typed effort is a <em>split</em> of an existing one.</li>
 <li><strong>MaRo Interaction:</strong> typed lanes force a portfolio; with ADR-0010, the constant policy is structurally unavailable, not merely under-rewarded.</li>
-<li><strong>Honest:</strong> "nobody wants to bring the boss bad news" — late-discovered doom via rosy reporting mirrors the real failure mode.</li>
+<li><strong>Honest:</strong> "nobody wants to bring the boss bad news" -- late-discovered doom via rosy reporting mirrors the real failure mode.</li>
 </ul>
 <h2>Interaction contract</h2>
-<p>Reads/writes: <strong>response windows</strong> (ADR-0009 — manager value denominated there), <strong>SA</strong> (inward channel, fidelity, audits), <strong>Liability Ledger</strong> (agenda riders, retention promises, dual-use bills), <strong>reputation</strong> (per-person, ADR-0010 — hires are reputation seeds who recruit juniors), <strong>replay/exploit-finder</strong> (assignment policies join the policy space).</p>
+<p>Reads/writes: <strong>response windows</strong> (ADR-0009 -- manager value denominated there), <strong>SA</strong> (inward channel, fidelity, audits), <strong>Liability Ledger</strong> (agenda riders, retention promises, dual-use bills), <strong>reputation</strong> (per-person, ADR-0010 -- hires are reputation seeds who recruit juniors), <strong>replay/exploit-finder</strong> (assignment policies join the policy space).</p>
 <h2>Rejected alternatives</h2>
 <ul>
 <li><strong>Global pool with staff as AP-adders:</strong> sweep-proven degenerate; also violates founder-hours canon.</li>
 <li><strong>Idle unassigned staff:</strong> no such thing ("there's always a backlog").</li>
-<li><strong>Managers as output multipliers:</strong> rejected — their value is founder-attention arbitrage, not throughput.</li>
+<li><strong>Managers as output multipliers:</strong> rejected -- their value is founder-attention arbitrage, not throughput.</li>
 <li><strong>Soft reserve fallback:</strong> already rejected in ADR-0009.</li>
 </ul>
 <h2>Consequences / open questions</h2>
 <ul>
-<li><strong>DQ-15:</strong> researcher archetype roster — Pip to author 3–5 vignette-style archetypes (lane / unmanaged drift / appetite / optional quirk).</li>
+<li><strong>DQ-15:</strong> researcher archetype roster -- Pip to author 3-5 vignette-style archetypes (lane / unmanaged drift / appetite / optional quirk).</li>
 <li>Plan-screen redesign: assignment UI, manager housing, team-satisfaction report replacing per-member detail under management.</li>
 <li>Retention/morale stays minimal v1: appetites bite through promises (ledger) and departure riders, not a mood sim (ADR-0008 register: "bother," not HR gravity).</li>
 <li>Sweep target: a managed portfolio must beat every constant line; new bot policy axes (assignment + response + publish/socialize).</li>
-<li>Balance seam: founder-hour prices for doors/audits/approvals are the new tuning surface — they set the whole game's attention economy.</li>
+<li>Balance seam: founder-hour prices for doors/audits/approvals are the new tuning surface -- they set the whole game's attention economy.</li>
 </ul>
+<h2>Amendment 2026-07-27</h2>
+<p>WS-3a day rulings (day-log: <code>WS3A_DAYLOG_2026-07-27.md</code>), dated additions only -- the Decision section above is unchanged.</p>
+<p><strong>(a) AP pool dead as a design concept, 2026-07-27 11:37.</strong> Pip's R1 ruling: "AP confirmed dead (RIP AP, dead 1h03m. Long live A!)." This is the design death, not the code death -- <code>action_points</code> remains what actions actually spend today (verified: Workstream objects, founder-hour typing, and manager shields were all unbuilt at time of ruling). <strong>Deletion rides the T2 migration</strong> (LADDER_0011.md's 4-rung ladder): AP cannot die in code before its replacement plumbing exists to spend against.</p>
+<p><strong>(b) T3 rung picked.</strong> Of the 4-rung effort-economy ladder (LADDER_0011.md, A1-A17), Pip picked <strong>T3 as the absolute minimum</strong> -- "to kill AP and keep Attention," reading only the T3 headline before deciding (deliberate). T3 = Workstream substrate + AP pool deletion (8 JSONs + ~94 <code>.gd</code> refs migrating to typed Attention) + founder-hour typing + a CARVE-1 gate on the higher rungs. Substrate core landed same day: PR #981 (Workstream object, 8-entry backlog.json, one-person-one-bet assignment, self-direction with <code>reported_progress</code> vs <code>actual_progress</code> fields, compute_intensity billing; AP itself untouched by this PR, deferred to T2).</p>
+<p><strong>(c) FOUR-WAY founder hours ruled</strong> (R4 ballot 4, ~1615), overriding the 2-way default in LADDER_0011.md's T3 recommendation. The 4-way split (doors/approvals/audits/reserve, this ADR's point 2) is enabled by <strong>optimistic self-reporting as the first distortion source</strong>: unassigned researchers self-direct AND report progress optimistically (already being built in T1's substrate core, per (b) above); AUDIT hours ground-truth reported-vs-actual. This is the concrete mechanism this ADR's point 5 ("nobody wants to bring the boss bad news") cashes out as, one epoch early -- picked the same day the repo's own silent-promise audit ran (thematic resonance Pip flagged explicitly). Later T4 managers add a SECOND distortion source; audits generalize rather than rework. <strong>Reported-vs-actual seam shipped in PR #981</strong> (deterministic per-person optimism hash, no new RNG).</p>
+<p><strong>Formal review timer: 2026-08-31</strong> (post-v0.14 epoch; adjustable), carrying the ADR-0018 review-by-clause pattern. Review question: did optimistic self-reporting + audits earn its complexity, or does 4-way collapse to 2-way</p>
+<ul>
+<li>manager-era audits? A half-day workshop, <strong>#984</strong>, is scheduled against</li>
+</ul>
+<p>this review.</p>
+<p>Risk accepted knowingly: this is extra scope inside a break-everything week, covered by the day's audacity ruling (daily ladder bumps, 3-4 accepted breaks priced in, logged as lessons).</p>
+<p>Founder-hour-typing lane itself (the mechanism that spends the 4-way split) is scheduled <strong>Tuesday</strong> -- it consumes T1's merged substrate and was deliberately not parallelized with T1 the same night.</p>
+<h2>Amendment 2026-07-28 -- T2 landed: AP deleted in code, 2-way hours live</h2>
+<p>Build record for the T2 lane. The Decision section above is unchanged; this records what shipped and the calls the lane had to make.</p>
+<p><strong>(d) The AP pool is DELETED in code</strong>, closing amendment (a). Gone: <code>GameState.action_points</code> / <code>max_action_points</code> / <code>committed_ap</code> / <code>reserved_ap</code> / <code>used_event_ap</code> and their reserve methods; <code>turn_manager._step_grant_action_points</code> (there is now NO per-turn founder grant of any kind -- point 1's "the pool illusion dies" is now structural, not a convention); the Balance keys <code>starting_resources.action_points</code> and <code>action_points.per_staff</code>. The cost key in all action / event / scenario data is <code>attention</code> (72 keys, 13 files). <code>action_points</code> survives ONLY as a read-only alias in <code>GameActions.attention_cost()</code> for content that lags the code; nothing writes it. Difficulty now scales the monthly Attention grant (24 / 20 / 16) rather than a per-turn cap. Removing the grant step is RNG-safe -- it drew nothing from <code>state.rng</code>, so recorded replay streams are unchanged.</p>
+<p><strong>(e) 2-way founder hours shipped as the floor</strong>, ahead of the 4-way split ruled in (c). Every Attention spend is <strong>PLANNING</strong> (planner mind: queuing strategic work, direction, approvals) or <strong>OPERATING</strong> (presence: response windows, hiring loop, travel, interviews). Typed pools are <strong>additive accounting over the authoritative scalar</strong> -- the shape N2 used for typed reputation -- so <code>attention_total</code>/<code>attention_spent</code> stay authoritative and every caller that only knows the aggregate still works. <strong>Overflow is asymmetric</strong>: operating may eat planning hours (a crisis costs you the month you meant to spend thinking), planning may never eat operating (you cannot retroactively have been in the room). The 4-way split subdivides these two in a later lane; <code>GameActions.hour_type()</code> and <code>GameState._cost_hour_type()</code> are the single points that lane changes.</p>
+<p>This also closes the seam <strong>#980</strong> named: conference travel drains OPERATING hours only, with overflow forbidden. Away costs operator presence, not planner mind.</p>
+<p><strong>(f) The crisp reserve is deliberately UNTYPED.</strong> Gating <code>set_reserve</code> on the operating pool was built, then reverted: the reserve is the emergency channel, and an emergency is exactly where the type wall is allowed to break (cannibalizing already lets operating overflow into planning). Capping the pre-declared reserve at operating hours forbids at PLAN time what the overflow rule permits at CRISIS time, and it silently truncated the implicit end-of-month reserve #789's hiring flow depends on. Pinned by a test so the call cannot be reverted silently.</p>
+<p><strong>(g) <code>staff_rider</code> re-expressed.</strong> The contractor action used to mint +2 into the founder pool, which point 1 forbids outright. It now grants +2 OPERATING hours for the month (point 6: ops/admin staff reduce the founder- price of routine work -- bought presence). It cannot buy planner mind.</p>
+<p><strong>Balance is knowingly disturbed</strong> under the day's audacity ruling: the planning pool is a real cap on strategic cards per month, and <code>attention.planning_share</code> (0.6) is hand-set, not swept. Re-price with the exploit-finder before the ADR's own review date.</p>
 	</main>
 	<footer>
 		Design notes are generated from the game repository's decision records.
