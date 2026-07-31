@@ -353,16 +353,35 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
     rarity = rarity_emoji.get(event['rarity'], event['rarity'])
 
     # Generate impacts table
+    # VARIANT B, ruled by Pip 2026-07-31 after an A/B: show the DIRECTION, never the
+    # magnitude.
+    #
+    # Why the number goes and the row stays. Of 1,194 events the calculated effects reach
+    # gameplay in one branch -- 7 events. The other 1,174 are flavour, and flavour is
+    # hidden by default. So a precise figure like "-80" was presented on ~2,190 pages for
+    # events that move nothing. Direction is the part that is probably right; magnitude is
+    # the part that is definitely unverified, and precision reads as authority regardless
+    # of the caveat above it. A stamp over a number still shows the number, and the number
+    # was the false part.
+    #
+    # The magnitudes are NOT deleted -- they live in the corpus, and the suggestion links
+    # at the foot of every page go straight there. Nothing is hidden; it is just no longer
+    # asserted here.
+    #
+    # Precedent from the game's own repo (events.gd:290): displayed doom numbers were
+    # removed there for the same reason -- clobbered at resolve, so "every (+/-N doom)
+    # message in event content was a silent lie".
     impacts_html = ""
     for impact in event['impacts']:
-        sign = '+' if impact['change'] > 0 else ''
-        color_class = 'positive' if impact['change'] > 0 else 'negative'
+        change = impact['change']
+        direction = 'up' if change > 0 else ('down' if change < 0 else 'unchanged')
+        color_class = 'positive' if change > 0 else 'negative'
         condition_text = f" (if {impact['condition']})" if impact.get('condition') else ""
 
         impacts_html += f"""
 				<tr>
 					<td>{impact['variable'].replace('_', ' ').title()}</td>
-					<td class="impact-{color_class}">{sign}{impact['change']}</td>
+					<td class="impact-{color_class}">proposed: {direction}</td>
 					<td>{condition_text or 'Always'}</td>
 				</tr>
 		"""
@@ -882,7 +901,9 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 			<h2>📊 Game Impacts</h2>
 			<span class="stamp stamp--restricted stamp--sm">Not verified in game</span>
 			<p class="stamp-body">
-				These values come from the event corpus in
+				Which variables this event was <em>proposed</em> to move, and in which
+				direction. The magnitudes are held in the corpus but are not shown here,
+				because they have not been verified against the shipped game. They come from
 				<a href="https://github.com/PipFoweraker/pdoom-data" target="_blank" rel="noopener">pdoom-data</a>.
 				They describe what an event was <em>proposed</em> to do, not what the
 				shipped game does with it. <strong>Most events in the corpus are flavour:
@@ -897,7 +918,7 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 				<thead>
 					<tr>
 						<th>Variable</th>
-						<th>Change</th>
+						<th>Direction</th>
 						<th>Condition</th>
 					</tr>
 				</thead>
