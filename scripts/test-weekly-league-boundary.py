@@ -394,6 +394,16 @@ for _p in list((Path(__file__).parent).glob("*.py")) + \
     # it is preventing.
     if _p.name.startswith(("test-", "test_")):
         continue
+    # Mirrors of upstream PROSE are exempt for the same reason. issues-cache.json is a
+    # verbatim copy of pdoom1's GitHub issues, so the seed appears there the moment anyone
+    # *discusses* it in an issue -- which is exactly what we want people to do before a
+    # ceremony. Failing on that would mean the guard fires because the seed was talked
+    # about correctly, and the only way to keep it green would be to stop writing issues.
+    #
+    # The rule is about a surface that SUPPLIES a seed to code or to a reader as a value,
+    # not about any file in which the characters occur. Discussion is not pinning.
+    if _p.name in ("issues-cache.json",):
+        continue
     try:
         if _probable in _p.read_text(encoding="utf-8"):
             _leaks.append(_p.name)
