@@ -187,22 +187,22 @@ with Sandbox(boards={}):
 print("\n4. Cross-epoch: a BUSIER old-epoch board must never be published")
 with Sandbox(epoch="L3", boards={
         ("weekly-2026-w30", "L2"): {"rows": ROWS * 50, "last_entry": "2026-07-29T23:59:59"},
-        ("weekly-2026-w31", "L3"): {"rows": ROWS * 2, "last_entry": "2026-07-30T10:00:00"}}):
+        ("weekly-fixture-later", "L3"): {"rows": ROWS * 2, "last_entry": "2026-07-30T10:00:00"}}):
     code, _ = run()
     d = board_on_disk()
     check(code == 0, "publishes the current-epoch board")
     check(d["meta"]["board_key"]["ladder_epoch"] == "L3", "published epoch is L3")
-    check(d["meta"]["board_key"]["seed"] == "weekly-2026-w31",
+    check(d["meta"]["board_key"]["seed"] == "weekly-fixture-later",
           "chose the L3 board, NOT the 50-entry L2 one -- epochs are never merged")
     check(len(d["entries"]) == 2, f"published 2 entries, not 50 (got {len(d['entries'])})")
 
 print("\n5. Several live boards on the epoch -> most recently active wins")
 with Sandbox(epoch="L3", boards={
         ("weekly-2026-w30", "L3"): {"rows": ROWS * 9, "last_entry": "2026-07-30T08:00:00"},
-        ("weekly-2026-w31", "L3"): {"rows": ROWS * 1, "last_entry": "2026-07-30T11:00:00"}}):
+        ("weekly-fixture-later", "L3"): {"rows": ROWS * 1, "last_entry": "2026-07-30T11:00:00"}}):
     code, _ = run()
     d = board_on_disk()
-    check(d["seed"] == "weekly-2026-w31",
+    check(d["seed"] == "weekly-fixture-later",
           "recency beats volume -- a fresh league board outranks a busy stale one")
 
 print("\n6. Happy path -> both artifacts, honest metadata, no invented fields")
