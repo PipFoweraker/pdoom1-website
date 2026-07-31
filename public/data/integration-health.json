@@ -1,10 +1,10 @@
 {
-  "generated": "2026-07-31T08:45:16.155518+00:00",
-  "overall_status": "WARN",
+  "generated": "2026-07-31T23:50:40.903507+00:00",
+  "overall_status": "FAIL",
   "summary": {
-    "fail": 0,
-    "warn": 2,
-    "ok": 33
+    "fail": 1,
+    "warn": 3,
+    "ok": 31
   },
   "checks": [
     {
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 0.7 days ago"
+      "detail": "generated 1.4 days ago"
     },
     {
       "name": "league:current_week",
@@ -124,8 +124,8 @@
     },
     {
       "name": "league:version_drift",
-      "status": "OK",
-      "detail": "game_version v0.13.1 matches deployed"
+      "status": "WARN",
+      "detail": "weekly league game_version=v0.13.1 but deployed game=v0.13.2 -- a v0.13.2 client's scores cannot land on a v0.13.1 board"
     },
     {
       "name": "league:seed",
@@ -155,7 +155,7 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 1.4h ago"
+      "detail": "live API checked 0.2h ago"
     },
     {
       "name": "board:archived_anomaly",
@@ -164,8 +164,8 @@
     },
     {
       "name": "board:liveness",
-      "status": "OK",
-      "detail": "deployed board (weekly-2026-w30, L3) holds 3 entries"
+      "status": "FAIL",
+      "detail": "NEW orphaned board(s): 3 score entries on 1 board(s) that are NOT in the anomaly archive. Scores are being lost RIGHT NOW. (weekly-2026-w30, L3): 3 entries. The board key is (seed, ladder_epoch). Do not re-stamp."
     },
     {
       "name": "board:publish",
@@ -180,7 +180,7 @@
     {
       "name": "seed_leaderboards:version_census",
       "status": "WARN",
-      "detail": "NO stored seed file is stamped with the deployed version v0.13.1, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
+      "detail": "NO stored seed file is stamped with the deployed version v0.13.2, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
     }
   ]
 }
