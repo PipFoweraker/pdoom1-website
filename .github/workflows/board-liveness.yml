@@ -24,7 +24,21 @@ name: Board liveness (score API)
 
 on:
   schedule:
-    - cron: '17 */6 * * *'
+    # HOURLY FOR THE OPENING LEAGUE WINDOW, set 2026-07-31 19:05 AEST.
+    #
+    # Was '17 */6 * * *'. On league night the seed rolled at ~18:45 and the site kept
+    # serving the previous board; the six-hour gap meant a score submitted at 19:00 would
+    # not have DISPLAYED until 22:17. Nothing is lost by that -- the API holds it -- but on
+    # an opening night "I played and I am not on the board" reads as broken, and that
+    # misreading is the exact thing this subsystem exists to prevent.
+    #
+    # Cost is negligible: ~108 small GETs per run against an API on a VPS already paid for
+    # flat, and rsync deploys are incremental. The real constraint was never money.
+    #
+    # REVERT TO '17 */6 * * *' after the opening weekend (~2026-08-03) unless the hourly
+    # cadence proves worth keeping. Left as a dated note rather than a silent permanent
+    # change, because an unexplained hourly cron is how cadence creep starts.
+    - cron: '17 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
