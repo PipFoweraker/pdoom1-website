@@ -1,9 +1,15 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-31T00:55:05.001Z UTC
+Generated: 2026-07-31T07:15:04.396Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1066 | League: test seeds are visible in the public seed filter, on the GLOBAL board, and survive Clear Local Scores |  |  | 2026-07-31 07:01:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1066) |
+| 1065 | UNRESOLVED from the 10:24 playtest: "critical ladder bug, it's translated into the local thing" |  |  | 2026-07-31 06:15:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1065) |
+| 1064 | Play Again / Back after a run ends: "there wasn't a game to play again from" | ui-ux |  | 2026-07-31 06:15:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/1064) |
+| 1063 | Let the player set player name + lab name on the FIRST screen (not only in setup) | ui-ux |  | 2026-07-31 06:15:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/1063) |
+| 1062 | Leaderboard: the Duration column is meaningless when the score is turns survived | ui-ux |  | 2026-07-31 06:15:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/1062) |
+| 1061 | IP / trademark follow-up -- Australian lawyers, DUE Monday 2026-08-03 | priority:high |  | 2026-07-31 06:13:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1061) |
 | 1057 | bug reports die on the player's disk: the website intake is built, the game never calls it | bug |  | 2026-07-31 00:25:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/1057) |
 | 1056 | convention: printed docs carry a next-review date and its TRIGGER, not just a print date | documentation |  | 2026-07-31 00:13:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/1056) |
 | 1055 | Ecosystem coherence: pdoom-data ADR-007 (anti-corruption layer) and ADR-008 (provenance/annotation model) |  |  | 2026-07-31 00:07:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1055) |
