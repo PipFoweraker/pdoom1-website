@@ -1,15 +1,14 @@
 {
   "meta": {
-    "generated": "2026-07-31T07:18:42+00:00",
+    "generated": "2026-07-31T08:43:02+00:00",
     "export_source": "website:publish-live-board.py",
-    "total_players": 2,
+    "total_players": 3,
     "total_entries": 3,
     "board_key": {
-      "seed": "weekly-2026-w30",
+      "seed": "weekly-2026-w31",
       "ladder_epoch": "L3"
     },
     "builds_seen": [
-      "v0.13.1",
       "v0.13.2"
     ],
     "note": "Fetched read-only from the score API. The board key is (seed, ladder_epoch); the build version is NOT part of it, which is why one board legitimately spans several builds. Scores from other epochs are not merged in -- different rules produced them.",
@@ -17,7 +16,7 @@
   },
   "data_status": "live",
   "legacy": false,
-  "seed": "weekly-2026-w30",
+  "seed": "weekly-2026-w31",
   "economic_model": "unknown",
   "exclusions": {
     "version_mismatched_files": 0,
@@ -29,38 +28,38 @@
   },
   "entries": [
     {
-      "score": 153,
-      "doom_integral": 10571,
-      "player_name": "Applied AI Safety",
-      "date": "2026-07-30T09:10:04",
-      "level_reached": 153,
+      "score": 47,
+      "doom_integral": 3566,
+      "player_name": "Notkilleveryone Inc",
+      "date": "2026-07-31T18:11:23",
+      "level_reached": 47,
       "game_mode": "v0.13.2",
-      "duration_seconds": 475.814,
-      "entry_uuid": "11281372212-11529-31163-44148-13245981131071213",
+      "duration_seconds": 288.619,
+      "entry_uuid": "837415359-61348-154137-971211-9106615121461361414",
       "baseline_score": 0,
       "baseline_doom_integral": 0
     },
     {
-      "score": 109,
-      "doom_integral": 8119,
-      "player_name": "Applied AI Safety",
-      "date": "2026-07-30T09:36:29",
-      "level_reached": 109,
+      "score": 20,
+      "doom_integral": 723,
+      "player_name": "Cognitive Systems Studies II",
+      "date": "2026-07-31T10:36:28",
+      "level_reached": 20,
       "game_mode": "v0.13.2",
-      "duration_seconds": 1027.894,
-      "entry_uuid": "4201212376-31500-6073-1411211-115120146958410",
+      "duration_seconds": 652.344,
+      "entry_uuid": "1368141551512-1161010-0111414-813110-151213141112431041314",
       "baseline_score": 0,
       "baseline_doom_integral": 0
     },
     {
-      "score": 65,
-      "doom_integral": 4951,
-      "player_name": "Intelligent Agents Studies",
-      "date": "2026-07-30T08:32:01",
-      "level_reached": 65,
-      "game_mode": "v0.13.1",
-      "duration_seconds": 264.312,
-      "entry_uuid": "12831112622-98144-111595-5251-2599813421421511",
+      "score": 8,
+      "doom_integral": 238,
+      "player_name": "Cognitive Systems Studies",
+      "date": "2026-07-31T10:35:08",
+      "level_reached": 8,
+      "game_mode": "v0.13.2",
+      "duration_seconds": 572.426,
+      "entry_uuid": "1715121412211-115149-12141515-31451-133015152439694",
       "baseline_score": 0,
       "baseline_doom_integral": 0
     }
