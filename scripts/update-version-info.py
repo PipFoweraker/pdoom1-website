@@ -4,6 +4,7 @@ Updates version information from the pdoom1 game repository
 Fetches latest release info and updates website data files
 """
 
+import html
 import json
 import os
 import re
@@ -60,10 +61,49 @@ _PLATFORM_PATTERNS = {
     # '\.exe$' catches a bare PDoom.exe (v0.13.1+ dropped "windows" from the name);
     # 'win' still catches PDoom-...-windows.zip (v0.13.0 style).
     'windows': re.compile(r'win|\.exe$', re.I),
-    'macos':   re.compile(r'mac|osx|darwin|\.app|\.dmg', re.I),
+    # '\.app(?![a-z])' not '\.app': the bare form also matches ".AppImage", so a
+    # Linux-only AppImage release published platforms.macos: true. Second false
+    # positive of the same kind as the x86_64 one below, in the field
+    # check-platform-claims.py trusts. The lookahead still allows "Game.app" and
+    # "Game.app.zip", which are the real macOS bundle shapes.
+    'macos':   re.compile(r'mac|osx|darwin|\.app(?![a-z])|\.dmg', re.I),
     'linux':   re.compile(r'linux|x86_64|\.appimage', re.I),
 }
 _BUILD_SUFFIX = re.compile(r'\.(zip|dmg|appimage|x86_64|exe|tar\.gz)$', re.I)
+
+# 'x86_64' is an ARCHITECTURE, not an operating system. It is in the linux pattern
+# because a Godot Linux export is literally named `PDoom.x86_64`, but it also appears
+# in Intel Mac and Windows build names -- `PDoom-<version>-macos-x86_64.dmg` matched
+# BOTH macos and linux, so one Mac-only release would have published
+# `platforms.linux: true`. check-platform-claims.py trusts this field, so that is not
+# a cosmetic slip: it is the honesty guard being handed a false positive, which is
+# the exact class the field was introduced to prevent.
+#
+# So an asset is attributed to a platform only if no OTHER platform claims it by
+# name. Explicit OS names always win over an architecture hint.
+_EXPLICIT_OS = {
+    'windows': re.compile(r'win|\.exe$', re.I),
+    # '\.app(?![a-z])' not '\.app': the bare form also matches ".AppImage", so a
+    # Linux-only AppImage release published platforms.macos: true. Second false
+    # positive of the same kind as the x86_64 one below, in the field
+    # check-platform-claims.py trusts. The lookahead still allows "Game.app" and
+    # "Game.app.zip", which are the real macOS bundle shapes.
+    'macos':   re.compile(r'mac|osx|darwin|\.app(?![a-z])|\.dmg', re.I),
+    'linux':   re.compile(r'linux|\.appimage', re.I),
+}
+
+
+def _attributable(name: str, os_key: str) -> bool:
+    """True if `name` is a build for `os_key` and for no other OS."""
+    if not (_PLATFORM_PATTERNS[os_key].search(name) and _BUILD_SUFFIX.search(name)):
+        return False
+    others = [k for k in _EXPLICIT_OS if k != os_key and _EXPLICIT_OS[k].search(name)]
+    if not others:
+        return True
+    # Another OS is named explicitly. Yield unless THIS platform is named too --
+    # a genuinely ambiguous name (e.g. "windows-and-linux.zip") is not something to
+    # silently resolve, and counting it for both is the honest reading.
+    return bool(_EXPLICIT_OS[os_key].search(name))
 
 
 def derive_platforms(assets: List[Dict[str, Any]]) -> Dict[str, bool]:
@@ -78,8 +118,8 @@ def derive_platforms(assets: List[Dict[str, Any]]) -> Dict[str, bool]:
     than write all-False. See get_latest_release()."""
     names = [a.get('name', '') for a in (assets or [])]
     return {
-        os_key: any(pat.search(n) and _BUILD_SUFFIX.search(n) for n in names)
-        for os_key, pat in _PLATFORM_PATTERNS.items()
+        os_key: any(_attributable(n, os_key) for n in names)
+        for os_key in _PLATFORM_PATTERNS
     }
 
 
@@ -148,14 +188,23 @@ def update_version_data() -> Dict[str, Any]:
         'latest_release': release,
         'repository_stats': stats,
         'last_updated': datetime.now().isoformat(),
-        'game_stats': {
-            # These will be calculated separately or stubbed for now
-            'baseline_doom_percent': 23,
-            'frontier_labs_count': 7,
-            'strategic_possibilities': 10000
-        }
     }
-    
+
+    # game_stats is NOT this script's to write. It used to hardcode
+    # baseline_doom_percent: 23, frontier_labs_count: 7, strategic_possibilities: 10000
+    # -- three invented numbers published under a confident label, which is the exact
+    # thing calculate-game-stats.py was rewritten to stop ("DO NOT restore a literal
+    # here 'temporarily'. That is exactly how these two survived for months.").
+    # Because both scripts write the same file, re-asserting the literals here undid
+    # that fix on every run where this script happened to go last: the honest `null`
+    # and its `pending` explanation were silently replaced with a number.
+    # Carry forward whatever the calculator last derived; if it has never run, omit
+    # the key entirely so a reader sees nothing rather than a fiction.
+    existing_stats = read_existing_version_json().get('game_stats')
+    if existing_stats:
+        version_data['game_stats'] = existing_stats
+
+
     # Ensure data directory exists
     os.makedirs(DATA_DIR, exist_ok=True)
     
@@ -223,26 +272,29 @@ def update_download_links(version_data: Dict[str, Any]) -> None:
         print('index.html not found, skipping link updates')
         return
     
-    with open(index_file, 'r', encoding='utf-8') as f:
+    # newline='' so an existing CRLF file round-trips unchanged. Without it, a
+    # Windows run rewrites every line ending in index.html and the diff is the whole
+    # file -- the same trap sync-events.py pins with newline='\n'.
+    with open(index_file, 'r', encoding='utf-8', newline='') as f:
         content = f.read()
-    
+
     version = version_data['latest_release']['version']
-    
-    # Update download button text to show current version
-    content = re.sub(
-        r'Download Latest Release',
-        f'Download {version} (Latest)',
-        content
-    )
-    
-    # Update any hardcoded version references
-    content = re.sub(
-        r'Download v[\d\.]+',
-        f'Download {version}',
-        content
-    )
-    
-    with open(index_file, 'w', encoding='utf-8') as f:
+
+    # The version string is a GitHub tag_name -- upstream data, not ours. Two things
+    # follow, and the old code got both wrong:
+    #
+    #  1. In re.sub() the third argument is a REPLACEMENT TEMPLATE, not a literal.
+    #     A tag containing \1, \g<0> or a lone backslash was interpreted, and a bad
+    #     escape raised re.error, so a mistyped tag could rewrite or crash the
+    #     homepage. Passing a function makes the replacement literal by construction.
+    #  2. It lands in HTML, so it is escaped. A tag is not allowed to open an element
+    #     on the front page.
+    safe = html.escape(version, quote=True)
+
+    content = re.sub(r'Download Latest Release', lambda _m: f'Download {safe} (Latest)', content)
+    content = re.sub(r'Download v[\d\.]+', lambda _m: f'Download {safe}', content)
+
+    with open(index_file, 'w', encoding='utf-8', newline='') as f:
         f.write(content)
     
     print(f"✓ Updated download links to {version}")

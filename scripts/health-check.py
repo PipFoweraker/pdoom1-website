@@ -57,8 +57,24 @@ class HealthChecker:
 
     # Absolute paths in free text we did not construct (subprocess output,
     # exception strings). Belt and braces alongside rel().
+    #
+    # A directory segment MAY CONTAIN SPACES. The previous pattern used
+    # `[^\s'"]+` for the whole tail, which stops dead at the first space -- so
+    # "C:\Users\gday\Documents\A Local Code\pdoom1-website\..." matched only as far
+    # as "...\Documents\A" and the scrubbed message still read
+    # "A Local Code\pdoom1-website\public\data\version.json". That is the maintainer's
+    # directory layout, and it is literally the path CLAUDE.md quotes as the leak
+    # this guard was written for. The guard was inert against its own founding case.
+    #
+    # So: consume whole segments (spaces allowed, quotes and newlines not) as long as
+    # each is followed by a separator, then a final space-free component. The segment
+    # loop only extends across further separators, so ordinary prose after a path
+    # ("C:\a\b.json failed at line 3") is not swallowed, and a relative path
+    # ("public/data/version.json") never matches at all. {0,64} bounds the segment so
+    # a pathological string cannot make this backtrack for a long time.
     _ABS_PATH = re.compile(
-        r"([A-Za-z]:[\\/][^\s'\"]+|/(?:home|Users|root|mnt|var/folders)/[^\s'\"]+)")
+        r"([A-Za-z]:[\\/](?:[^\\/'\"\r\n]{0,64}[\\/])*[^\s'\"\\/\r\n]*"
+        r"|/(?:home|Users|root|mnt|var/folders)/(?:[^/'\"\r\n]{0,64}/)*[^\s'\"/\r\n]*)")
 
     @classmethod
     def scrub(cls, text: str) -> str:
@@ -67,7 +83,21 @@ class HealthChecker:
                                  str(text))
 
     def log_result(self, test_name: str, passed: bool, message: str = "", is_warning: bool = False) -> None:
-        """Log a test result"""
+        """Log a test result.
+
+        EVERY message is scrubbed here, at the one place they all pass through,
+        rather than at each call site. That is deliberate. rel() and scrub() were
+        added after absolute paths reached pdoom1.com, and each caller was expected
+        to remember to use them -- but four `except Exception as e:` handlers
+        interpolated the raw exception string instead (`f"Error reading {shown}:
+        {e}"`, `f"Error testing script: {e}"`, and two more), and an OSError's str()
+        embeds the absolute path it failed on. The redaction was therefore only as
+        good as the last person to remember it, in a file whose output is committed
+        by a 6-hourly cron and served publicly.
+        A chokepoint cannot be forgotten by a handler written next year.
+        """
+        message = self.scrub(message)
+        test_name = self.scrub(test_name)
         if is_warning:
             self.warnings.append(f"{test_name}: {message}")
 

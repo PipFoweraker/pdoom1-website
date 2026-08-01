@@ -127,6 +127,16 @@ SKIP_FILES = {
     # exact file, for this exact reason -- and this guard did not. Worth noting as its own
     # small lesson: an exemption reasoned out in one guard does not propagate to the next.
     "issues-cache.json",
+    # Test fixtures. These files exist to feed SYNTHETIC releases (v9.9.9, v1.2.3) and
+    # historical asset-naming shapes to a generator and assert what it does with them.
+    # Every version string in them is an input, never a claim about what is current --
+    # and the rules under test are deliberately written against the value READ from the
+    # fixture, never against a literal, which is the actual protection here. Flagging
+    # them would add ~20 permanent known-noise findings to a report whose whole value
+    # is that people still read it.
+    "test-update-version-info.py",
+    "test-health-check.py",
+    "test-sync-events.py",
 }
 
 # Line-level false positives: (file substring, line substring, reason). Same contract as
