@@ -44,8 +44,32 @@ on:
     branches: [main]
     paths:
       - 'scripts/check-board-liveness.py'
+      - 'scripts/publish-live-board.py'
+      - 'scripts/test-publish-live-board.py'
+      - 'scripts/test-board-escaping.js'
+      - 'scripts/test-board-honesty.js'
+      - 'public/leaderboard/index.html'
+      # The escaper is no longer inline on that page (2026-08-01). A change to the
+      # shared file changes the board's escaping, so it must re-run these guards.
+      - 'public/assets/js/escape.js'
       - 'public/data/version.json'
       - 'public/leaderboard/data/weekly/current.json'
+  # PRs get the offline `guards` job ONLY -- see the `if:` on probe/alert below. The
+  # probe talks to a live score API and writes to the repo; neither belongs on a PR.
+  # Before 2026-08-01 the board guards ran nowhere in CI at all, so a PR could break
+  # the leaderboard's HTML escaping or the publisher's refusal paths and merge green.
+  pull_request:
+    paths:
+      - 'scripts/publish-live-board.py'
+      - 'scripts/test-publish-live-board.py'
+      - 'scripts/test-board-escaping.js'
+      - 'scripts/test-board-honesty.js'
+      - 'scripts/check-board-liveness.py'
+      - 'scripts/board_liveness_summary.py'
+      - 'public/leaderboard/**'
+      - 'public/assets/js/escape.js'
+      - 'public/data/ladder-epochs.json'
+      - '.github/workflows/board-liveness.yml'
 
 permissions:
   contents: write
@@ -58,12 +82,63 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # OFFLINE. No network, no secrets, no writes -- these are the unit guards on the code
+  # that stands between a player's score and a visible board. They run on every event,
+  # including pull_request, and they are BLOCKING: each one passes today and a red mark
+  # means a real regression.
+  #
+  # This is the only job on this workflow that runs on a PR. Kept here rather than in a
+  # new workflow so that "everything about the board" stays in one file -- a reviewer
+  # looking at why a board check fired should not have to find a second place.
+  guards:
+    name: Board guards (offline)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # The score API is unauthenticated and validates nothing, so every field it
+      # returns is attacker-controlled and every field reaching innerHTML must be
+      # escaped. There is exactly ONE escaper SITE-WIDE as of 2026-08-01 --
+      # public/assets/js/escape.js, which this page loads with a blocking <script src>.
+      # The same rule on the other 14 pages is enforced by escaping.yml.
+      - name: No API field reaches innerHTML unescaped
+        run: node scripts/test-board-escaping.js
+
+      # A board-key mismatch must stay VISIBLE. Reading as "nobody is playing" is the
+      # exact failure this whole subsystem exists to prevent, and it already stranded
+      # 27 real submissions.
+      - name: A board-key mismatch cannot read as "nobody is playing"
+        run: node scripts/test-board-honesty.js
+
+      # Forced-failure tests: the publisher must refuse rather than guess, and must
+      # never replace a board holding real scores with an empty one on a network blip.
+      - name: The publisher refuses rather than guesses
+        run: python scripts/test-publish-live-board.py
+
   probe:
     name: Probe the live score API
+    # Never on a PR: it issues ~108 GETs against the live API and the job writes back
+    # to the repo. A fork PR could not do either, and a branch PR should not.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     outputs:
       verdict: ${{ steps.probe.outputs.verdict }}
-      orphaned: ${{ steps.probe.outputs.orphaned }}
+      # The probe step writes `new_orphans` and `archived` (see the GITHUB_OUTPUT lines
+      # below). This previously mapped `steps.probe.outputs.orphaned`, which is never
+      # written -- and the alert then read `needs.probe.outputs.new_orphans`, which did
+      # not exist either. Both ends wrong, so every alert rendered "**? score entries**"
+      # and every follow-up comment said "(? orphaned entries)". An alarm that cannot
+      # state its own magnitude is barely an alarm.
+      new_orphans: ${{ steps.probe.outputs.new_orphans }}
+      archived: ${{ steps.probe.outputs.archived }}
     steps:
       - uses: actions/checkout@v4
 
@@ -245,3 +320,70 @@ jobs:
                 title, body, labels: [label, 'automation', 'priority:high'],
               });
             }
+
+  # ---------------------------------------------------------------------------------
+  # CLOSE THE ROLLING ISSUE WHEN THE CONDITION CLEARS.
+  #
+  # This did not exist, and its absence is why #149, #204 and #230 all sat open
+  # describing conditions that had already resolved. The alert opened an issue or
+  # commented "Still true" on it, and NOTHING ever closed it -- so an alarm that was
+  # correct once stayed lit forever, and reading it told you nothing about now.
+  #
+  # That is exactly the failure Pip named this week: he had trained himself to ignore
+  # red because the redness never forced him to slow down. A rolling alert with no
+  # close path manufactures precisely that.
+  #
+  # De-dupes the same way the alert does (open + label + exact title), so the two
+  # halves cannot disagree about which issue they are managing.
+  # ---------------------------------------------------------------------------------
+  resolve:
+    name: Close the rolling issue when the board is clean
+    needs: probe
+    if: needs.probe.outputs.verdict == 'live' || needs.probe.outputs.verdict == 'genuinely-empty'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          VERDICT: ${{ needs.probe.outputs.verdict }}
+          ARCHIVED: ${{ needs.probe.outputs.archived }}
+        with:
+          script: |
+            const label = 'board-liveness';
+            const title = 'NEW scores are landing on a board nobody can see';
+            const runUrl = process.env.GITHUB_SERVER_URL + '/' + process.env.GITHUB_REPOSITORY +
+                           '/actions/runs/' + process.env.GITHUB_RUN_ID;
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 10,
+            });
+            const found = existing.data.find(i => i.title === title);
+            if (!found) { core.info('No open rolling issue to close.'); return; }
+
+            const lines = [
+              '**Resolved automatically** -- verdict is `' + process.env.VERDICT + '` as of ' +
+                new Date().toUTCString() + '.',
+              '',
+              'Every populated board outside the anomaly archive is one this site publishes.',
+              'The archive still holds ' + process.env.ARCHIVED + ' acknowledged entries; those',
+              'are known history, are never failed on, and are not what this issue tracked.',
+              '',
+              'Run: ' + runUrl,
+              '',
+              '_Closed by the same workflow that opened it. If the condition recurs a FRESH',
+              'issue is filed rather than this one reopened -- so an open issue here always',
+              'describes a live condition, never a historical one._',
+            ];
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: found.number, body: lines.join('\n'),
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: found.number, state: 'closed', state_reason: 'completed',
+            });
+            core.info('Closed #' + found.number + '.');

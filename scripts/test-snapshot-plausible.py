@@ -301,7 +301,8 @@ def test_git_add_ordering():
     try:
         def git(*args):
             return subprocess.run(["git", "-C", tmp] + list(args),
-                                  capture_output=True, text=True)
+                                  capture_output=True, text=True,
+                                  encoding="utf-8", errors="replace")
 
         git("init", "-q")
         git("config", "user.email", "t@example.com")

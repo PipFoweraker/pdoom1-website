@@ -1,10 +1,10 @@
 {
-  "generated": "2026-07-31T08:45:16.155518+00:00",
+  "generated": "2026-08-01T21:47:37.773094+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 2,
-    "ok": 33
+    "warn": 3,
+    "ok": 32
   },
   "checks": [
     {
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 0.7 days ago"
+      "detail": "generated 2.3 days ago"
     },
     {
       "name": "league:current_week",
@@ -124,8 +124,8 @@
     },
     {
       "name": "league:version_drift",
-      "status": "OK",
-      "detail": "game_version v0.13.1 matches deployed"
+      "status": "WARN",
+      "detail": "weekly league game_version=v0.13.1 but deployed game=v0.13.2 -- a v0.13.2 client's scores cannot land on a v0.13.1 board"
     },
     {
       "name": "league:seed",
@@ -155,17 +155,17 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 1.4h ago"
+      "detail": "live API checked 0.2h ago"
     },
     {
       "name": "board:archived_anomaly",
       "status": "WARN",
-      "detail": "27 score entries across 3 board(s) from 6 player(s) sit in the permanent anomaly archive (AI Safety Lab, CogDerp, Cognitive Development, Division of Intelligent Agents, Hamthropic, Laboratory of Autonomous Systems). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
+      "detail": "30 score entries across 4 board(s) from 8 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, CogDerp, Cognitive Development, Division of Intelligent Agents, Hamthropic, Intelligent Agents Studies, Laboratory of Autonomous Systems). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
     },
     {
       "name": "board:liveness",
       "status": "OK",
-      "detail": "deployed board (weekly-2026-w30, L3) holds 3 entries"
+      "detail": "deployed board (weekly-2026-w31, L3) holds 3 entries"
     },
     {
       "name": "board:publish",
@@ -180,7 +180,7 @@
     {
       "name": "seed_leaderboards:version_census",
       "status": "WARN",
-      "detail": "NO stored seed file is stamped with the deployed version v0.13.1, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
+      "detail": "NO stored seed file is stamped with the deployed version v0.13.2, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
     }
   ]
 }

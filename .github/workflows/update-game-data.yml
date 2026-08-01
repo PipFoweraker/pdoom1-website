@@ -63,46 +63,38 @@ jobs:
               repo_response.raise_for_status()
               repo_data = repo_response.json()
 
-              # Build version.json
-              # NO literal version fallbacks here. This file is written straight to the
-              # live site, so a hardcoded default would publish a wrong version at exactly
-              # the moment we are least able to notice. If the payload is not a real
-              # release, fail the step and leave the existing cached data in place.
-              tag_name = release_data.get("tag_name")
-              published_at = release_data.get("published_at")
-              if not tag_name or not published_at:
-                  raise RuntimeError(
-                      "GitHub release payload missing tag_name/published_at "
-                      f"(keys: {sorted(release_data)[:10]}) -- refusing to write a guessed version"
-                  )
-
-              version_json = {
-                  "latest_release": {
-                      "version": tag_name,
-                      "name": release_data.get("name") or f"P(Doom) {tag_name}",
-                      "published_at": published_at,
-                      "html_url": release_data.get("html_url", "https://github.com/PipFoweraker/pdoom1/releases/latest"),
-                      "body": release_data.get("body", "See CHANGELOG.md for details.")
-                  },
-                  "repository_stats": {
-                      "stars": repo_data.get("stargazers_count", 0),
-                      "forks": repo_data.get("forks_count", 0),
-                      "open_issues": repo_data.get("open_issues_count", 0),
-                      "last_updated": repo_data.get("updated_at", datetime.utcnow().isoformat() + "Z")
-                  },
-                  "last_updated": datetime.utcnow().isoformat(),
-                  "game_stats": {
-                      "baseline_doom_percent": 23,
-                      "frontier_labs_count": 5,
-                      "strategic_possibilities": 10000,
-                      "last_calculated": datetime.utcnow().isoformat()
-                  }
-              }
-
-              # Write version.json
-              with open('public/data/version.json', 'w', encoding="utf-8") as f:
-                  json.dump(version_json, f, indent=2)
-              print("✓ Updated version.json")
+              # version.json is NOT written here any more. Removed 2026-08-02.
+              #
+              # This block rebuilt the whole file from scratch on `cron 0 */6 * * *` -- the
+              # SAME cron minute as auto-update-data.yml, which runs update-version-info.py.
+              # Two writers, one file, alternating. Measured on the real history:
+              #
+              #   08-01 18:24  HAS platforms      Auto-update: version info and game stats
+              #   08-01 18:16  MISSING platforms  chore: Update cached game data [skip ci]
+              #   08-01 12:27  HAS platforms
+              #   08-01 12:16  MISSING platforms
+              #
+              # unbroken, four times a day, since the field was introduced.
+              #
+              # WHY THAT MATTERED. This payload carried no `latest_release.platforms` key.
+              # check-platform-claims.py -- the guard that stops the site advertising an OS
+              # with no build -- prints "SKIP: version.json has no latest_release.platforms"
+              # and returns 0 when the key is absent. So the honesty guard was INERT for
+              # roughly half of every day, and its green carried no information at all.
+              #
+              # It also hardcoded game_stats {23, 5, 10000}: numbers nobody ever measured,
+              # re-asserted every six hours, overwriting the honest nulls that
+              # calculate-game-stats.py writes with the comment "DO NOT restore a literal
+              # here". And it disagreed with the other writer, which used
+              # frontier_labs_count 7 against this one's 5 -- two workflows publishing
+              # different values for the same public statistic.
+              #
+              # SOLE OWNER IS NOW scripts/update-version-info.py (via auto-update-data.yml).
+              # It is the only writer that derives `platforms` from the release's actual
+              # ASSETS rather than asserting them, and it refuses to write a guessed
+              # version rather than substituting a literal.
+              #
+              # This workflow keeps issues-cache.json below, which nothing else produces.
 
               # Fetch open issues for issues page
               print("Fetching GitHub issues...")
@@ -145,7 +137,10 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
-          git add public/data/version.json public/data/issues-cache.json
+          # No longer stages version.json -- this workflow does not write it any
+          # more (see the note above). Staging it would re-commit whatever the
+          # checkout happened to contain and reintroduce the race by the back door.
+          git add public/data/issues-cache.json
           git commit -m "chore: Update cached game data [skip ci]
 
           Auto-updated by GitHub Actions

@@ -1,19 +1,23 @@
 name: Escaping
 
-# Guards the XSS sink class site-wide.
+# Guards the XSS sink class on every page that is NOT the leaderboard.
+#
+# DIVISION OF LABOUR -- read this before adding a step here.
+#   board-liveness.yml  -> test-board-escaping.js   (/leaderboard/ specifically)
+#   content-honesty.yml -> test-changelog-render.js
+#   generate-feeds.yml  -> test-blog-render.js
+#   THIS FILE           -> test-escaping.js  (site-wide) + test-roadmap-render.js
+# Grouped by what each guards, per #233. Nothing is run twice: a check that appears
+# in two workflows doubles the noise and halves the trust in either.
 #
 # WHY THIS EXISTS
 # A live stored-XSS hole was found in /leaderboard/ on 2026-07-30 and fixed in PRs #202
 # and #208. The score API (api.pdoom1.com) is UNAUTHENTICATED and validates nothing, so
 # every field it returns is attacker-controlled; /dashboard/ additionally renders
 # third-party Manifold market titles, and /issues/ renders GitHub issue text, which
-# anyone with a GitHub account can write.
-#
-# The guard on all of that was, until now, a local-only script. Nothing in CI ran it, and
-# `core.autocrlf=true` had already made it silently unable to run on Windows -- the only
-# platform CLAUDE.md tells you to run it on. So the one check protecting an unauthenticated
-# API was inert in both places at once. This workflow is the second half of that fix: the
-# rule now runs somewhere that is not a developer's memory.
+# anyone with a GitHub account can write. Fourteen other pages had the same sink class,
+# and the site carried FIVE separately-written escapers, three of which did not escape
+# quotes while feeding attribute contexts.
 #
 # scripts/test-escaping.js enforces the CLASS, not a field list:
 #   - exactly one escaper exists (public/assets/js/escape.js); a page defining its own fails
@@ -26,23 +30,29 @@ name: Escaping
 #     threw a TypeError that took whole render loops down -- denial of service, no
 #     injection required)
 #
+# `public/assets/js/escape.js` is in the path filter of this workflow AND of
+# board-liveness.yml and content-honesty.yml, because every renderer on the site now
+# depends on it: a change there must re-run all of them, not just this one.
+#
 # Fails the PR check on violation. No secrets, read-only, opens no issues.
 
 on:
   pull_request:
     paths:
       - 'public/**/*.html'
-      - 'public/assets/js/**'
+      - 'public/assets/js/escape.js'
+      - 'public/docs/roadmap.md'
       - 'scripts/test-escaping.js'
-      - 'scripts/test-board-escaping.js'
+      - 'scripts/test-roadmap-render.js'
       - '.github/workflows/escaping.yml'
   push:
     branches: [main]
     paths:
       - 'public/**/*.html'
-      - 'public/assets/js/**'
+      - 'public/assets/js/escape.js'
+      - 'public/docs/roadmap.md'
       - 'scripts/test-escaping.js'
-      - 'scripts/test-board-escaping.js'
+      - 'scripts/test-roadmap-render.js'
       - '.github/workflows/escaping.yml'
   workflow_dispatch:
 
@@ -58,12 +68,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Site-wide -- one escaper, every interpolation, every fetch declared
+
+      # One escaper site-wide; every interpolation of external data escaped; every
+      # fetch declared; every markdown renderer inert against hostile input.
+      - name: Site-wide escaping contract
         run: node scripts/test-escaping.js
-      - name: Leaderboard -- board rendering, identity and dev-marker honesty
-        run: node scripts/test-board-escaping.js
-      - name: Renderers still render (escaping must not break the pages)
-        run: |
-          node scripts/test-blog-render.js
-          node scripts/test-roadmap-render.js
-          node scripts/test-changelog-render.js
+
+      # The roadmap renderer was the only markdown surface wired to no workflow at
+      # all. It shares the escaper with the others, so a change there must exercise it.
+      - name: /docs/roadmap/ still renders, and still escapes
+        run: node scripts/test-roadmap-render.js
