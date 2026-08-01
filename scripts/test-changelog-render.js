@@ -22,6 +22,7 @@ const path = require('path');
 
 const PAGE = path.join(__dirname, '..', 'public', 'game-changelog', 'index.html');
 const src = fs.readFileSync(PAGE, 'utf8');
+const SHARED = require(path.join(__dirname, '..', 'public', 'assets', 'js', 'escape.js'));
 
 // The renderer is the last inline <script> on the page.
 const scripts = [...src.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
@@ -64,7 +65,13 @@ function makeFetch({ version, versionFails = false, releases, releasesFails = fa
 async function run(opts) {
   const document = makeDoc();
   const fetch = makeFetch(opts);
-  new Function('document', 'fetch', code)(document, fetch);
+  // escapeHTML/safeUrl/isSafeUrl are no longer inline on the page: as of 2026-08-01 they
+  // are the shared public/assets/js/escape.js, loaded by a blocking <script src>. Passing
+  // them in is the node-side equivalent of that tag. Without them the renderer throws
+  // ReferenceError -- the page's intended fail-closed behaviour, not a test artefact.
+  new Function('document', 'fetch', 'escapeHTML', 'safeUrl', 'safeUrlRaw', 'isSafeUrl', 'toNumber', code)(
+    document, fetch,
+    SHARED.escapeHTML, SHARED.safeUrl, SHARED.safeUrlRaw, SHARED.isSafeUrl, SHARED.toNumber);
   // All shimmed fetches settle immediately; flush the microtask/macrotask queue.
   for (let i = 0; i < 20; i++) await new Promise(r => setTimeout(r, 0));
   return { current: document.els.current.innerHTML, history: document.els.history.innerHTML };

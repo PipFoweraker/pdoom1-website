@@ -700,6 +700,10 @@
   ::-webkit-scrollbar-thumb {background:#f6a800;border-radius:5px;}
   ::-webkit-scrollbar-thumb:hover {background:#f6a800ee;box-shadow:0 0 10px #f6a800;}
 </style>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
 
@@ -1477,7 +1481,7 @@ async function loadEventLog() {
     recentEvents.forEach(event => {
       eventHTML += `
         <div class="narrative-text">
-          <span class="highlight">v${event.version}</span> (${event.date}): ${event.summary}
+          <span class="highlight">v${escapeHTML(event.version)}</span> (${escapeHTML(event.date)}): ${escapeHTML(event.summary)}
         </div>
       `;
     });
@@ -1520,9 +1524,15 @@ async function loadManifoldMarkets() {
         const probability = (market.probability * 100).toFixed(0);
         const marketDiv = document.createElement('div');
         marketDiv.className = 'stock-ticker';
-        marketDiv.onclick = () => window.open(market.url, '_blank');
+        // market.url and market.question are written by a THIRD PARTY -- whoever owns
+        // that Manifold market can edit its title, and Manifold hands us whatever URL
+        // it likes. This is a top-level nav page, so both go through the site escaper:
+        // safeUrl drops any scheme that is not http(s) (window.open('javascript:...')
+        // runs in this origin), and escapeHTML makes the title inert text.
+        const url = safeUrlRaw(market.url, 'https://manifold.markets/');
+        marketDiv.onclick = () => window.open(url, '_blank', 'noopener');
         marketDiv.innerHTML = `
-          <div class="stock-name" style="font-size:10px;">${market.question.substring(0, 50)}...</div>
+          <div class="stock-name" style="font-size:10px;">${escapeHTML(String(market.question == null ? '' : market.question).substring(0, 50))}...</div>
           <div class="stock-price" style="font-size:16px;">${probability}%</div>
           <div class="stock-change" style="font-size:9px;">Manifold Markets</div>
         `;

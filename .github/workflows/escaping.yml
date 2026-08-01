@@ -1,0 +1,69 @@
+name: Escaping
+
+# Guards the XSS sink class site-wide.
+#
+# WHY THIS EXISTS
+# A live stored-XSS hole was found in /leaderboard/ on 2026-07-30 and fixed in PRs #202
+# and #208. The score API (api.pdoom1.com) is UNAUTHENTICATED and validates nothing, so
+# every field it returns is attacker-controlled; /dashboard/ additionally renders
+# third-party Manifold market titles, and /issues/ renders GitHub issue text, which
+# anyone with a GitHub account can write.
+#
+# The guard on all of that was, until now, a local-only script. Nothing in CI ran it, and
+# `core.autocrlf=true` had already made it silently unable to run on Windows -- the only
+# platform CLAUDE.md tells you to run it on. So the one check protecting an unauthenticated
+# API was inert in both places at once. This workflow is the second half of that fix: the
+# rule now runs somewhere that is not a developer's memory.
+#
+# scripts/test-escaping.js enforces the CLASS, not a field list:
+#   - exactly one escaper exists (public/assets/js/escape.js); a page defining its own fails
+#   - every interpolation of a declared external-data ROOT is escaped -- so a NEW FIELD is
+#     covered the day it is added, with no test edit
+#   - every fetch() target is declared -- so a NEW DATA SOURCE fails until someone says
+#     where its result lands, which is the loop a field-list check cannot close
+#   - each markdown renderer is run against hostile input and checked STRUCTURALLY
+#   - no numeric method is called on a raw API field (a hostile POST of {"score":"x"}
+#     threw a TypeError that took whole render loops down -- denial of service, no
+#     injection required)
+#
+# Fails the PR check on violation. No secrets, read-only, opens no issues.
+
+on:
+  pull_request:
+    paths:
+      - 'public/**/*.html'
+      - 'public/assets/js/**'
+      - 'scripts/test-escaping.js'
+      - 'scripts/test-board-escaping.js'
+      - '.github/workflows/escaping.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'public/**/*.html'
+      - 'public/assets/js/**'
+      - 'scripts/test-escaping.js'
+      - 'scripts/test-board-escaping.js'
+      - '.github/workflows/escaping.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  escaping:
+    name: One escaper, every external field escaped
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Site-wide -- one escaper, every interpolation, every fetch declared
+        run: node scripts/test-escaping.js
+      - name: Leaderboard -- board rendering, identity and dev-marker honesty
+        run: node scripts/test-board-escaping.js
+      - name: Renderers still render (escaping must not break the pages)
+        run: |
+          node scripts/test-blog-render.js
+          node scripts/test-roadmap-render.js
+          node scripts/test-changelog-render.js

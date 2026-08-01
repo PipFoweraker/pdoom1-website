@@ -19,6 +19,10 @@
 	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
 	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
   <style>
     :root {
       /* Default theme colors */
@@ -1081,19 +1085,21 @@
       banner.style.display = 'block';
     }
 
-    // Board/version strings come from data files; render them as text, never as markup.
-    function escapeHTML(s) {
-      return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
-        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
-      ));
-    }
+    // escapeHTML() and toNumber() come from /assets/js/escape.js, loaded blocking in the
+    // <head>. This page used to carry its own copy; the 2026-08-01 sweep found FIVE such
+    // copies across the site with three different coverages, so there is now exactly one
+    // implementation and every page loads it. If the file fails to load, escapeHTML is
+    // undefined, the templates below throw, and the board renders nothing -- fail closed.
 
     function displayStats(data) {
       const entries = data.entries || [];
       const totalPlayers = new Set(entries.map(entry => entry.player_name)).size;
       const totalGames = entries.length;
-      const avgScore = totalGames ? Math.round(entries.reduce((sum, entry) => sum + entry.score, 0) / totalGames) : 0;
-      const avgDoom = totalGames ? (entries.reduce((sum, entry) => sum + (entry.final_doom || 0), 0) / totalGames).toFixed(1) : '0.0';
+      // toNumber, not bare `+`: a string score makes `sum + entry.score` a STRING
+      // concatenation, so the average silently becomes nonsense (or NaN) rather than
+      // failing. The score API validates nothing, so field names promise no types.
+      const avgScore = totalGames ? Math.round(entries.reduce((sum, entry) => sum + toNumber(entry.score), 0) / totalGames) : 0;
+      const avgDoom = totalGames ? (entries.reduce((sum, entry) => sum + toNumber(entry.final_doom), 0) / totalGames).toFixed(1) : '0.0';
       
       document.getElementById('total-players').textContent = totalPlayers.toLocaleString();
       document.getElementById('total-games').textContent = totalGames.toLocaleString();
@@ -1120,7 +1126,7 @@
         const rank = index + 1;
         
         // Determine risk level class based on doom percentage
-        const doomPercent = entry.final_doom;
+        const doomPercent = toNumber(entry.final_doom);
         let riskClass = 'safe';
         if (doomPercent > 30) riskClass = 'risky';
         if (doomPercent > 50) riskClass = 'dangerous';
@@ -1136,7 +1142,7 @@
         // Generate economic metrics display
         const economicMetrics = `
           <div class="economic-metrics" style="font-size: 0.85rem; margin-top: 0.5rem;">
-            <div><strong>Money:</strong> $${escapeHTML((entry.final_money || 0).toLocaleString())}</div>
+            <div><strong>Money:</strong> $${escapeHTML(toNumber(entry.final_money).toLocaleString())}</div>
             <div><strong>Staff:</strong> ${escapeHTML(entry.final_staff || 0)}</div>
             <div><strong>Papers:</strong> ${escapeHTML(entry.research_papers_published || 0)}</div>
             <div><strong>Tech Debt:</strong> ${escapeHTML(entry.technical_debt_accumulated || 0)}</div>
@@ -1158,7 +1164,7 @@
             <div style="font-size: 0.9rem;">
               <div><strong>Turn ${escapeHTML(entry.level_reached)}</strong> in ${durationText}</div>
               <div class="outcome ${riskClass}" style="margin-top: 0.25rem;">
-                Doom: ${doomPercent.toFixed(1)}% | Rep: ${escapeHTML((entry.final_reputation || 0).toFixed(1))}
+                Doom: ${doomPercent.toFixed(1)}% | Rep: ${escapeHTML(toNumber(entry.final_reputation).toFixed(1))}
               </div>
               ${economicMetrics}
             </div>
@@ -1166,7 +1172,7 @@
           <td>
             <div class="bootstrap-metrics" style="font-size: 0.85rem;">
               <div><strong>Bootstrap Economics</strong></div>
-              <div>Compute: ${escapeHTML((entry.final_compute || 0).toLocaleString())}</div>
+              <div>Compute: ${escapeHTML(toNumber(entry.final_compute).toLocaleString())}</div>
               <div style="margin-top: 0.25rem; color: var(--text-secondary);">
                 Economic Model: ${escapeHTML(entry.game_mode)}${devBadgeHTML(entry)}
               </div>
@@ -1345,7 +1351,7 @@
 
       entries.forEach((entry, index) => {
         const rank = index + 1;
-        const doomPercent = entry.final_doom;
+        const doomPercent = toNumber(entry.final_doom);
         let riskClass = 'safe';
         if (doomPercent > 30) riskClass = 'risky';
         if (doomPercent > 50) riskClass = 'dangerous';
@@ -1366,7 +1372,7 @@
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
             <div><strong>Score:</strong> ${escapeHTML(entry.score)}</div>
-            <div><strong>Money:</strong> $${escapeHTML((entry.final_money || 0).toLocaleString())}</div>
+            <div><strong>Money:</strong> $${escapeHTML(toNumber(entry.final_money).toLocaleString())}</div>
             <div><strong>Staff:</strong> ${escapeHTML(entry.final_staff || 0)}</div>
             <div><strong>Papers:</strong> ${escapeHTML(entry.research_papers_published || 0)}</div>
           </div>
@@ -1405,17 +1411,17 @@
             <div class="profile-item"><span>Score:</span> <strong>${escapeHTML(entry.score)}</strong></div>
             <div class="profile-item"><span>Level Reached:</span> <strong>Turn ${escapeHTML(entry.level_reached)}</strong></div>
             <div class="profile-item"><span>Game Duration:</span> <strong>${durationText}</strong></div>
-            <div class="profile-item"><span>Final Doom:</span> <strong>${escapeHTML(Number(entry.final_doom || 0).toFixed(1))}%</strong></div>
+            <div class="profile-item"><span>Final Doom:</span> <strong>${escapeHTML(toNumber(entry.final_doom).toFixed(1))}%</strong></div>
           </div>
         </div>
         
         <div class="profile-section">
           <h4>Economic Metrics</h4>
           <div class="profile-grid">
-            <div class="profile-item"><span>Final Money:</span> <strong>$${escapeHTML((entry.final_money || 0).toLocaleString())}</strong></div>
+            <div class="profile-item"><span>Final Money:</span> <strong>$${escapeHTML(toNumber(entry.final_money).toLocaleString())}</strong></div>
             <div class="profile-item"><span>Final Staff:</span> <strong>${escapeHTML(entry.final_staff || 0)}</strong></div>
-            <div class="profile-item"><span>Final Reputation:</span> <strong>${escapeHTML((entry.final_reputation || 0).toFixed(1))}</strong></div>
-            <div class="profile-item"><span>Final Compute:</span> <strong>${escapeHTML((entry.final_compute || 0).toLocaleString())}</strong></div>
+            <div class="profile-item"><span>Final Reputation:</span> <strong>${escapeHTML(toNumber(entry.final_reputation).toFixed(1))}</strong></div>
+            <div class="profile-item"><span>Final Compute:</span> <strong>${escapeHTML(toNumber(entry.final_compute).toLocaleString())}</strong></div>
           </div>
         </div>
         

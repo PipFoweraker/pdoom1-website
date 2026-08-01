@@ -474,6 +474,10 @@
       }
     })();
   </script>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
   <header>
@@ -700,15 +704,15 @@
           playerEntries.push(playerEntry);
           
           // Calculate rank
-          const sortedEntries = [...entries].sort((a, b) => b.score - a.score);
+          const sortedEntries = [...entries].sort((a, b) => toNumber(b.score) - toNumber(a.score));
           const rank = sortedEntries.findIndex(e => e.player_name === playerName) + 1;
           
           weeklyRanks.push({
             week: week.meta?.week_id || 'Unknown',
             rank: rank,
-            score: playerEntry.score,
-            doom: playerEntry.final_doom || 0,
-            turns: playerEntry.level_reached || 0
+            score: toNumber(playerEntry.score),
+            doom: toNumber(playerEntry.final_doom),
+            turns: toNumber(playerEntry.level_reached)
           });
         }
       });
@@ -717,10 +721,12 @@
         return { totalGames: 0 };
       }
 
-      // Calculate statistics
-      const scores = playerEntries.map(e => e.score);
-      const dooms = playerEntries.map(e => e.final_doom || 0);
-      const turns = playerEntries.map(e => e.level_reached || 0);
+      // Calculate statistics. toNumber(), not `|| 0`: the score API validates nothing,
+      // and a string field is truthy, so `|| 0` leaves it a string -- Math.max then
+      // yields NaN and every stat below renders "NaN" to the reader.
+      const scores = playerEntries.map(e => toNumber(e.score));
+      const dooms = playerEntries.map(e => toNumber(e.final_doom));
+      const turns = playerEntries.map(e => toNumber(e.level_reached));
       const ranks = weeklyRanks.map(w => w.rank);
 
       return {
@@ -790,9 +796,11 @@
         const badge = document.createElement('div');
         badge.className = `achievement-badge ${achievement.rarity}`;
         badge.title = achievement.description;
+        // Hardcoded literals from calculateAchievements(); escaped anyway so the class
+        // rule holds without anyone having to re-derive that fact later.
         badge.innerHTML = `
-          <div class="achievement-icon">${achievement.icon}</div>
-          <div class="achievement-name">${achievement.name}</div>
+          <div class="achievement-icon">${escapeHTML(achievement.icon)}</div>
+          <div class="achievement-name">${escapeHTML(achievement.name)}</div>
         `;
         grid.appendChild(badge);
       });
@@ -913,12 +921,15 @@
       weeklyRanks.slice(0, 5).forEach(week => {
         const item = document.createElement('div');
         item.className = 'participation-item';
-        
-        const rankClass = week.rank <= 3 ? `rank-${week.rank}` : '';
-        
+
+        // week.rank is computed here (a 1-based index), but week.week is meta.week_id
+        // straight out of the weekly JSON, which is written from the unauthenticated
+        // score API. Escape it.
+        const rankClass = week.rank <= 3 ? `rank-${toNumber(week.rank)}` : '';
+
         item.innerHTML = `
-          <span class="week-label">${week.week}</span>
-          <span class="rank-badge ${rankClass}">#${week.rank}</span>
+          <span class="week-label">${escapeHTML(week.week)}</span>
+          <span class="rank-badge ${rankClass}">#${toNumber(week.rank)}</span>
         `;
         
         list.appendChild(item);

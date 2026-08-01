@@ -314,6 +314,10 @@
 			}
 		}
 	</style>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
 	<header>
@@ -531,13 +535,30 @@
 			}
 
 			formatIssueCard(issue) {
-				const labels = issue.labels.map(label =>
-					`<span class="issue-label" style="background: #${label.color}; color: ${this.getContrastColor(label.color)};">${label.name}</span>`
-				).join('');
+				// Anyone with a GitHub account can open an issue on a public repo, so
+				// EVERY field here is third-party text: title, body, number, labels, urls.
+				// The 2026-08-01 sweep found only `title` escaped.
+				//
+				// label.color lands inside style="background: #...", which is a CSS context
+				// -- escapeHTML is not sufficient there (a `}` or `;` needs no HTML
+				// metacharacter to inject a new declaration, and url() can fetch). GitHub
+				// promises six hex digits; anything else is not rendered at all rather than
+				// pushed through an escaper that was never meant for CSS.
+				const labels = (issue.labels || []).map(label => {
+					const hex = /^[0-9a-fA-F]{6}$/.test(String(label && label.color))
+						? String(label.color)
+						: null;
+					const style = hex
+						? ` style="background: #${hex}; color: ${this.getContrastColor(hex)};"`
+						: '';
+					return `<span class="issue-label"${style}>${escapeHTML(label && label.name)}</span>`;
+				}).join('');
 
+				// A label with no `name` used to throw here and take the whole grid down.
+				const labelNames = (issue.labels || []).map(l => String((l && l.name) || ''));
 				const updatedDate = new Date(issue.updated_at).toLocaleDateString();
-				const isPriority = issue.labels.some(l => l.name.includes('priority-high') || l.name.includes('critical'));
-				const isBug = issue.labels.some(l => l.name === 'bug');
+				const isPriority = labelNames.some(n => n.includes('priority-high') || n.includes('critical'));
+				const isBug = labelNames.some(n => n === 'bug');
 				const icon = isBug ? '🐛' : isPriority ? '⚠️' : '📋';
 				const cardClass = isPriority ? 'priority-issue' : '';
 
@@ -547,15 +568,15 @@
 							<span style="font-size: 1.2rem;">${icon}</span>
 							<div style="flex: 1; min-width: 0;">
 								<h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; line-height: 1.3;">
-									<a href="${issue.html_url}" target="_blank" rel="noopener" style="color: var(--text-primary); text-decoration: none;">
-										${this.escapeHtml(issue.title)}
+									<a href="${safeUrl(issue.html_url, 'https://github.com/PipFoweraker/pdoom1/issues')}" target="_blank" rel="noopener" style="color: var(--text-primary); text-decoration: none;">
+										${escapeHTML(issue.title)}
 									</a>
 								</h4>
 								<div style="margin-bottom: 0.5rem;">
 									${labels}
 								</div>
 								<div style="color: var(--text-muted); font-size: 0.8rem;">
-									#${issue.number} - Updated ${updatedDate}
+									#${escapeHTML(issue.number)} - Updated ${escapeHTML(updatedDate)}
 								</div>
 							</div>
 						</div>
@@ -564,12 +585,12 @@
 				`;
 			}
 
-			escapeHtml(text) {
-				const div = document.createElement('div');
-				div.textContent = text;
-				return div.innerHTML;
-			}
+			// This class used to carry its own escapeHtml(), built on textContent ->
+			// innerHTML. That escapes & < > but NOT quotes, so it could not have
+			// protected the href/style attributes above even if it had been applied to
+			// them. Replaced by the site's one escaper, /assets/js/escape.js.
 
+			// Only ever called with a validated six-hex-digit string (see formatIssueCard).
 			getContrastColor(hexColor) {
 				const r = parseInt(hexColor.substr(0, 2), 16);
 				const g = parseInt(hexColor.substr(2, 2), 16);

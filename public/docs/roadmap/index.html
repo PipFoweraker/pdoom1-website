@@ -64,6 +64,10 @@
 		.src{margin-top:2.5rem; padding-top:1.2rem; border-top:1px solid var(--border-color); font-size:.78rem; color:var(--text-muted)}
 		.src a{color:var(--accent-primary); text-decoration:none}
 	</style>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
 	<!-- navigation.js injects the shared header here (see CLAUDE.md). -->
@@ -93,17 +97,21 @@
 	(function () {
 		'use strict';
 
-		function esc(s) {
-			return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-		}
+		// This page used to define its own esc(), covering & < > only. Its output went
+		// straight into href="...", and the URL pattern below is [^)\s]+ -- which accepts
+		// a double quote, so `[x](https://a"onmouseover=alert(1))` passed the scheme test
+		// and then ended the attribute. Replaced by the site's one escaper
+		// (/assets/js/escape.js), which covers " and ' as well.
 
 		// Inline spans, applied AFTER escaping so the source can never inject markup.
 		function inline(s) {
-			return esc(s)
+			return escapeHTML(s)
 				.replace(/`([^`]+)`/g, '<code>$1</code>')
 				.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, text, href) {
 					// Same-origin or http(s) only; anything else renders as plain text.
-					if (!/^(https?:\/\/|\/|#)/.test(href)) { return m; }
+					// `href` is already escaped by escapeHTML() above, so a quote in it is
+					// &quot; and can no longer break out of the attribute.
+					if (!/^(https?:\/\/|\/|#)/.test(href) || !isSafeUrl(href)) { return m; }
 					var ext = /^https?:\/\//.test(href) ? ' target="_blank" rel="noopener"' : '';
 					return '<a href="' + href + '"' + ext + '>' + text + '</a>';
 				})

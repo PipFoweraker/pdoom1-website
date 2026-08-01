@@ -35,6 +35,12 @@ if (!source) {
 const sandbox = { document: { getElementById: () => null }, window: {}, console };
 sandbox.window = sandbox;
 vm.createContext(sandbox);
+// The page's escaper is no longer inline: as of 2026-08-01 it is the shared
+// public/assets/js/escape.js, pulled in by a blocking <script src> in the head. Load it
+// FIRST, exactly as the browser does -- without it the renderer below throws
+// ReferenceError, which is the intended fail-closed behaviour and not a test artefact.
+vm.runInContext(
+  fs.readFileSync(path.join(ROOT, 'public', 'assets', 'js', 'escape.js'), 'utf8'), sandbox);
 // Only evaluate the function declarations; skip page bootstrapping that needs a DOM.
 vm.runInContext(source.replace(/^\s*(document|window)\.[\s\S]*$/m, ''), sandbox);
 const render = sandbox.renderMarkdown;

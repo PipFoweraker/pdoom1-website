@@ -105,6 +105,10 @@
     .note b{color:var(--ink-2)}
     @media (prefers-reduced-motion:reduce){*{transition:none!important}}
   </style>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
   <header></header>
@@ -161,15 +165,23 @@
     // ---- tiny markdown subset, enough for a release body -------------------------
     // Everything is HTML-escaped BEFORE any transform, so release text can never
     // inject markup, however the upstream body is authored.
-    function esc(s){
-      return String(s == null ? '' : s)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
+    //
+    // escapeHTML() now comes from /assets/js/escape.js. The copy that used to live here
+    // covered & < > and not quotes, while the page put its output inside href="..." in
+    // five places and the link rule below accepts [^\s)]+ as a URL -- a double quote
+    // included. One implementation, site-wide, is the rule (CLAUDE.md).
     function inline(s){
       return s
         .replace(/`([^`]+)`/g, '<code>$1</code>')
         .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-                 '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+                 function (m, label, href) {
+                   // `href` arrived through escapeHTML already (md() escapes the whole
+                   // body first), so a quote in it is &quot; and cannot end the
+                   // attribute; isSafeUrl re-checks the scheme.
+                   return isSafeUrl(href)
+                     ? '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + label + '</a>'
+                     : m;
+                 })
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
         .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
     }
@@ -181,7 +193,7 @@
     function md(src){
       if(!src) return '';
       var blocks = [];
-      var text = esc(src).replace(/\r\n/g,'\n')
+      var text = escapeHTML(src).replace(/\r\n/g,'\n')
         .replace(/```[^\n]*\n([\s\S]*?)```/g, function(m, code){
           blocks.push('<pre><code>' + code.replace(/\n+$/,'') + '</code></pre>');
           return 'CB' + (blocks.length - 1) + '';
@@ -239,7 +251,7 @@
     function isoDay(s){
       if(!s) return '';
       var d = new Date(s);
-      return isNaN(d) ? esc(String(s).split('T')[0]) : d.toISOString().slice(0,10);
+      return isNaN(d) ? escapeHTML(String(s).split('T')[0]) : d.toISOString().slice(0,10);
     }
 
     // Build availability is DERIVED, never asserted. version.json carries
@@ -252,7 +264,7 @@
       var p = rel && rel.platforms;
       if(!p || typeof p !== 'object'){
         return '<p class="chip-note">Which builds are attached to this release isn’t recorded in ' +
-               'this site’s data. The <a href="' + esc(rel && rel.html_url || RELEASES_PAGE) +
+               'this site’s data. The <a href="' + safeUrl(rel && rel.html_url, RELEASES_PAGE) +
                '" target="_blank" rel="noopener noreferrer">release page</a> lists the actual files.</p>';
       }
       var keys = Object.keys(PLATFORM_LABEL).filter(function(k){ return k in p; });
@@ -271,7 +283,7 @@
       var body = rel && rel.body;
       if(!body || !String(body).trim()){
         return '<div class="body"><p class="status">This release shipped without written notes. ' +
-               'The <a href="' + esc(rel && rel.html_url || RELEASES_PAGE) +
+               'The <a href="' + safeUrl(rel && rel.html_url, RELEASES_PAGE) +
                '" target="_blank" rel="noopener noreferrer">release page</a> has the files and commit range.</p></div>';
       }
       return '<div class="body">' + md(body) + '</div>';
@@ -293,12 +305,12 @@
       currentTag = String(rel.version);
       var when = isoDay(rel.published_at);
       el.innerHTML =
-        '<div class="relhead"><span class="ver">' + esc(rel.version) + '</span>' +
+        '<div class="relhead"><span class="ver">' + escapeHTML(rel.version) + '</span>' +
         (when ? '<span class="when">released ' + when + '</span>' : '') + '</div>' +
-        (rel.name && rel.name !== rel.version ? '<div class="relname">' + esc(rel.name) + '</div>' : '') +
+        (rel.name && rel.name !== rel.version ? '<div class="relname">' + escapeHTML(rel.name) + '</div>' : '') +
         platformsHtml(rel) +
         releaseBodyHtml(rel) +
-        '<p class="permalink"><a href="' + esc(rel.html_url || RELEASES_PAGE) +
+        '<p class="permalink"><a href="' + safeUrl(rel.html_url, RELEASES_PAGE) +
         '" target="_blank" rel="noopener noreferrer">Downloads and files for this release on GitHub →</a></p>';
     }
 
@@ -317,12 +329,12 @@
       }
       el.innerHTML = older.map(function(r){
         var when = isoDay(r.published_at || r.created_at);
-        return '<details class="rel"><summary><span><span class="ver">' + esc(r.tag_name) + '</span>' +
+        return '<details class="rel"><summary><span><span class="ver">' + escapeHTML(r.tag_name) + '</span>' +
           (r.prerelease ? '<span class="pre">pre-release</span>' : '') + '</span>' +
           (when ? '<span class="when">' + when + '</span>' : '') + '</summary>' +
           releaseBodyHtml({body: r.body, html_url: r.html_url}) +
-          '<p class="permalink"><a href="' + esc(r.html_url || RELEASES_PAGE) +
-          '" target="_blank" rel="noopener noreferrer">Files for ' + esc(r.tag_name) + ' on GitHub →</a></p>' +
+          '<p class="permalink"><a href="' + safeUrl(r.html_url, RELEASES_PAGE) +
+          '" target="_blank" rel="noopener noreferrer">Files for ' + escapeHTML(r.tag_name) + ' on GitHub →</a></p>' +
           '</details>';
       }).join('');
     }
@@ -330,7 +342,7 @@
     function historyUnavailable(why){
       document.getElementById('history').innerHTML =
         '<p class="status">Couldn’t reach GitHub for the older releases just now' +
-        (why ? ' (' + esc(why) + ')' : '') + '. Nothing is cached here, so rather than show you a ' +
+        (why ? ' (' + escapeHTML(why) + ')' : '') + '. Nothing is cached here, so rather than show you a ' +
         'stale list: <a href="' + RELEASES_PAGE + '" target="_blank" rel="noopener noreferrer">' +
         'every p(Doom)1 release on GitHub</a>.</p>';
     }

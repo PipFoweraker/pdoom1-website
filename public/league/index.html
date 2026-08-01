@@ -566,6 +566,10 @@
       }
     })();
   </script>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
   <header>
@@ -869,8 +873,10 @@
 
       // Update week statistics
       if (data.statistics) {
-        document.getElementById('highest-score').textContent = data.statistics.highest_score || 0;
-        document.getElementById('average-score').textContent = (data.statistics.average_score || 0).toFixed(1);
+        // toNumber, not `|| 0`: a string from the API is truthy, so `|| 0` leaves it a
+        // string and .toFixed() throws -- which aborted this whole function.
+        document.getElementById('highest-score').textContent = toNumber(data.statistics.highest_score).toLocaleString();
+        document.getElementById('average-score').textContent = toNumber(data.statistics.average_score).toFixed(1);
         document.getElementById('total-games').textContent = data.statistics.total_games || 0;
         document.getElementById('unique-players').textContent = data.statistics.unique_players || 0;
       }
@@ -901,8 +907,19 @@
         return;
       }
 
-      // Sort by score (highest first) and take top 10
-      const topEntries = entries.sort((a, b) => b.score - a.score).slice(0, 10);
+      // Sort by score (highest first) and take top 10.
+      //
+      // EVERY FIELD BELOW IS ATTACKER-CONTROLLED. This page can fall back to
+      // ${API_BASE_URL}/api/league/current, and that score API is unauthenticated and
+      // validates nothing, so player_name, game_mode, score, level_reached and final_doom
+      // are whatever the last POST said they were. Two separate failure modes:
+      //   - markup      -> escapeHTML(), because a name is text, never HTML
+      //   - wrong type  -> toNumber(), because `entry.score.toLocaleString()` and
+      //                    `(entry.final_doom || 0).toFixed(1)` both throw a TypeError on
+      //                    a string, and one throw here aborts the WHOLE loop: the
+      //                    standings never appear. That is a denial of service by a
+      //                    single hostile POST, with no injection involved.
+      const topEntries = entries.slice().sort((a, b) => toNumber(b.score) - toNumber(a.score)).slice(0, 10);
 
       tbody.innerHTML = '';
       topEntries.forEach((entry, index) => {
@@ -910,28 +927,30 @@
         const row = document.createElement('tr');
 
         // Determine risk level
-        const doomPercent = entry.final_doom || 0;
+        const doomPercent = toNumber(entry.final_doom);
         let riskClass = 'safe';
         if (doomPercent > 30) riskClass = 'risky';
         if (doomPercent > 50) riskClass = 'dangerous';
 
         // Calculate achievements for this entry
         const achievements = getAchievements(entry, rank);
-        const achievementBadges = achievements.map(a => `<span title="${a.name}: ${a.description}" style="font-size: 1.2rem; margin-right: 0.25rem;">${a.icon}</span>`).join('');
+        // a.name/a.description/a.icon are hardcoded literals from getAchievements()
+        // below, not API data -- escaped anyway so the rule holds if that ever changes.
+        const achievementBadges = achievements.map(a => `<span title="${escapeHTML(a.name)}: ${escapeHTML(a.description)}" style="font-size: 1.2rem; margin-right: 0.25rem;">${escapeHTML(a.icon)}</span>`).join('');
 
         row.innerHTML = `
           <td class="rank ${rank <= 3 ? 'top-3 rank-' + rank : ''}">#${rank}</td>
           <td>
             <div class="player-name">
               ${achievementBadges}
-              ${entry.player_name}
+              ${escapeHTML(entry.player_name)}
             </div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">${entry.game_mode || 'Unknown'}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">${escapeHTML(entry.game_mode || 'Unknown')}</div>
           </td>
-          <td class="score">${entry.score.toLocaleString()}</td>
+          <td class="score">${escapeHTML(toNumber(entry.score).toLocaleString())}</td>
           <td>
             <div style="font-size: 0.9rem;">
-              <div>Turn ${entry.level_reached || 1}</div>
+              <div>Turn ${escapeHTML(toNumber(entry.level_reached, 1).toLocaleString())}</div>
               <div style="color: ${riskClass === 'safe' ? 'var(--success-color)' : riskClass === 'risky' ? 'var(--accent-secondary)' : 'var(--accent-danger)'}">
                 Doom: ${doomPercent.toFixed(1)}%
               </div>
@@ -986,8 +1005,8 @@
     // Get achievements for a player entry
     function getAchievements(entry, rank) {
       const achievements = [];
-      const score = entry.score || 0;
-      const doom = entry.final_doom || 0;
+      const score = toNumber(entry.score);
+      const doom = toNumber(entry.final_doom);
 
       // Competition achievements
       if (rank === 1) {

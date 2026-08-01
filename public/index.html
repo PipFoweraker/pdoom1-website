@@ -766,14 +766,16 @@ t	.hero {
 			if (aboutSection && status.game.development) {
 				const statusInfo = document.createElement('div');
 				statusInfo.style.cssText = 'margin-top: 2rem; padding: 1.5rem; background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 4px solid var(--accent-primary);';
+				// data/status.json is repo-controlled, but it is fetched data reaching
+				// innerHTML -- including an href. Same rule as everywhere else on the site.
 				statusInfo.innerHTML = `
 					<h3 style="color: var(--accent-primary); margin-bottom: 1rem;">[WIP] Current Development Status</h3>
-					<p><strong>Phase:</strong> ${status.game.development.phase}</p>
-					<p><strong>Progress:</strong> ${status.game.development.progress}</p>
-					<p><strong>Latest Release:</strong> <a href="${status.game.latestRelease?.downloadUrl || status.game.repository}" style="color: var(--accent-primary);">${status.game.latestRelease?.version || 'Check GitHub'}</a></p>
+					<p><strong>Phase:</strong> ${escapeHTML(status.game.development.phase)}</p>
+					<p><strong>Progress:</strong> ${escapeHTML(status.game.development.progress)}</p>
+					<p><strong>Latest Release:</strong> <a href="${safeUrl(status.game.latestRelease?.downloadUrl || status.game.repository, 'https://github.com/PipFoweraker/pdoom1/releases')}" style="color: var(--accent-primary);">${escapeHTML(status.game.latestRelease?.version || 'Check GitHub')}</a></p>
 					<p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
-						Released: ${status.game.latestRelease?.date || 'N/A'} | 
-						${status.game.latestRelease?.changelog || 'See repository for details'}
+						Released: ${escapeHTML(status.game.latestRelease?.date || 'N/A')} |
+						${escapeHTML(status.game.latestRelease?.changelog || 'See repository for details')}
 					</p>
 				`;
 				aboutSection.appendChild(statusInfo);
@@ -831,6 +833,10 @@ t	.hero {
 	<link rel="stylesheet" href="/assets/css/game-integration.css">
 	<link rel="stylesheet" href="/assets/css/ui-enhancements.css">
 	<link rel="stylesheet" href="/css/site.css">
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
 	<a href="#main-content" class="skip-link">Skip to main content</a>
