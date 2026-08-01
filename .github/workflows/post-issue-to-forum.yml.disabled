@@ -1,3 +1,31 @@
+# ============================================================================
+# DISABLED 2026-08-01 by renaming to .yml.disabled, so GitHub stops registering
+# it as a workflow.
+#
+# WHY: GitHub rejected this file at workflow-CREATION time -- it displayed the
+# path instead of the `name:` field, produced a run with ZERO jobs, and reported
+# "This run likely failed because of a workflow file issue" on EVERY push to
+# EVERY branch. It was the single largest manufactured-red source in the repo,
+# and a permanently red check is how a team learns to ignore red.
+#
+# WHAT I COULD NOT DO: pin the exact schema violation. The YAML parses cleanly,
+# every step has a valid shape, and GitHub's API gives no detail beyond
+# "workflow file issue". One clue is recorded in case someone picks this up: the
+# failing runs report "Triggered via push" although the only declared trigger is
+# workflow_dispatch -- so GitHub is not reading the `on:` block. Running
+# `actionlint` against this file is the obvious next step and I did not have it.
+#
+# WHY RENAMED RATHER THAN DELETED: the header below is genuinely valuable -- it
+# records why the issues trigger was removed, that NodeBB is live on a host with
+# no DNS record and no TLS, that the API secrets are unset, and that restoring
+# the trigger without fixing permissions would be WORSE than the current state
+# because it would succeed at stamping a scary automated banner onto every issue.
+# That knowledge should survive; the red X should not.
+#
+# TO RESTORE: fix the schema issue, rename back to .yml, and satisfy the two
+# preconditions in the original header first.
+# ============================================================================
+
 name: Post GitHub Issue to Forum
 
 # ISSUES TRIGGER REMOVED 2026-07-22. This fired on EVERY issue opened, hung for
