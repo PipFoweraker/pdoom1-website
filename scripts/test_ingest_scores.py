@@ -97,7 +97,8 @@ def publish(seed_files, *flags):
     r = subprocess.run(
         [PY, str(ROOT / "scripts" / "ingest_scores.py"),
          "--input", str(indir), "--output", str(out), *flags],
-        capture_output=True, text=True, cwd=str(ROOT),
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        cwd=str(ROOT),
     )
     assert r.returncode == 0, f"ingest_scores exited {r.returncode}\n{r.stdout}\n{r.stderr}"
     return json.loads(out.read_text(encoding="utf-8"))

@@ -52,6 +52,12 @@ ALLOWED = re.compile(
     r"[A-Za-z0-9._%+\-]+@pdoom1\.com"          # our own contact addresses
     r"|you@example\.com"                        # bug-report form placeholder
     r"|[A-Za-z0-9._%+\-]+@example\.(?:com|org)" # documentation placeholders
+    # The maintainer's own address, published on purpose. /bug-report/ tells a player
+    # to mail their saved report to "the address the game's confirmation message shows
+    # you -- it currently names pip@beacongcr.org". Withholding it would make the page
+    # useless; it is first-party, not a third party's address harvested out of a PDF,
+    # which is the disclosure this script exists to prevent. Landed in #197.
+    r"|pip@beacongcr\.org"
     r")$"
 )
 

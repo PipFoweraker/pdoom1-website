@@ -1,40 +1,79 @@
 name: Content Honesty
 
-# Guards claims that silently rot into lies.
+# Guards claims that silently rot into lies -- the prime directive, "never lie to a
+# visitor", expressed as CI.
 #
-# 1. No page a visitor can reach may advertise a platform that has no shipped
-#    build. The source of truth is public/data/version.json ->
-#    latest_release.platforms (derived from the release's actual assets by
-#    update-version-info.py), so this can never drift from what actually shipped.
-# 2. The analytics-to-git backup must keep failing LOUDLY. Its script only ever
-#    runs for real in CI, where the API key lives, so the failure paths are
-#    unreachable by hand -- test-snapshot-plausible.py stubs the API to assert
-#    every exit code, and asserts the workflow contract (stage-before-diff,
-#    issues:write, no dispatch input spliced into a run: block). Needs no secret.
+# TWO JOBS, TWO SEVERITIES, and the split is the point.
 #
-# Fails the PR check on violation -- that is the whole signal; it does not open
-# issues (unlike the data-contract workflow, this runs only on human-driven events,
-# so a red check is seen immediately). No secrets, read-only.
+#   honesty (BLOCKING)   Every check here is currently true and stays true. A red mark
+#                        means a specific reader-facing claim is now false, and the fix
+#                        is an edit in this repo.
+#   advisory (NEVER RED) Reports that are useful to a reviewer but whose findings are
+#                        NOT all defects -- prose drift against a frozen baseline, the
+#                        long tail of correct-history version literals, nav/emoji drift.
+#                        Rendered into the job summary and explicitly labelled ADVISORY.
+#
+# CLAUDE.md's rule: a check is blocking-and-true or advisory-and-labelled, never
+# red-but-tolerated. "A red test in the suite is worse than no test -- it teaches
+# everyone to skip the suite, so the one failure that matters is skipped with it."
+# check-stale-facts.py is the worked example: 213 findings, 0 of them HIGH, so the
+# blocking step gates on --min-severity HIGH and the full report goes to advisory.
+#
+# Wired 2026-08-01 (branch ci/wire-the-guards): before that, 10 of the checks CLAUDE.md
+# lists as the pre-PR suite ran only if a human remembered.
+#
+# No secrets, read-only. It does not open issues: it runs only on human-driven events,
+# so a red check is seen immediately (unlike the data-contract workflow, which also runs
+# on a cron with nobody watching).
 
 on:
   pull_request:
     paths:
+      # Reader-facing surfaces. `public/*.html` is listed separately from
+      # `public/**/*.html` deliberately -- do not "simplify" it away; the top-level
+      # index.html is the single page most of these guards exist for.
+      - 'public/*.html'
       - 'public/**/*.html'
-      - 'public/data/version.json'
+      - 'public/assets/js/**'          # analytics.js opt-out, navigation.js, keybinds JS
+      - 'public/data/version.json'     # platform availability + changelog derivation
+      - 'public/data/keybinds.json'    # the mirror the <kbd> placeholders read
+      - 'docs/copy-baseline/**'        # the frozen prose snapshot itself
       - 'scripts/check-platform-claims.py'
-      - 'scripts/test-download-resolution.js'
+      - 'scripts/test-platform-claims.py'
+      - 'scripts/check-published-emails.py'
+      - 'scripts/check-stale-facts.py'
+      - 'scripts/snapshot-copy.py'
       - 'scripts/snapshot-plausible.py'
       - 'scripts/test-snapshot-plausible.py'
+      - 'scripts/test-analytics-optout.js'
+      - 'scripts/test-changelog-render.js'
+      - 'scripts/test-download-resolution.js'
+      - 'scripts/test-header-consistency.js'
+      - 'scripts/sync/sync-keybinds.py'
+      - '.github/workflows/content-honesty.yml'
       - '.github/workflows/snapshot-analytics.yml'
   push:
     branches: [main]
     paths:
+      - 'public/*.html'
       - 'public/**/*.html'
+      - 'public/assets/js/**'
       - 'public/data/version.json'
+      - 'public/data/keybinds.json'
+      - 'docs/copy-baseline/**'
       - 'scripts/check-platform-claims.py'
-      - 'scripts/test-download-resolution.js'
+      - 'scripts/test-platform-claims.py'
+      - 'scripts/check-published-emails.py'
+      - 'scripts/check-stale-facts.py'
+      - 'scripts/snapshot-copy.py'
       - 'scripts/snapshot-plausible.py'
       - 'scripts/test-snapshot-plausible.py'
+      - 'scripts/test-analytics-optout.js'
+      - 'scripts/test-changelog-render.js'
+      - 'scripts/test-download-resolution.js'
+      - 'scripts/test-header-consistency.js'
+      - 'scripts/sync/sync-keybinds.py'
+      - '.github/workflows/content-honesty.yml'
       - '.github/workflows/snapshot-analytics.yml'
   workflow_dispatch:
 
@@ -43,7 +82,7 @@ permissions:
 
 jobs:
   honesty:
-    name: Platform-claims, downloads, analytics-backup contract
+    name: BLOCKING -- reader-facing claims
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,9 +92,126 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      # FIRST, because it is the guard on the guard. check-platform-claims.py returns 0
+      # before opening a single page whenever every platform in version.json is true --
+      # which is the state today -- so its green carries no information on its own. This
+      # forces a platform to false and asserts the rejection actually happens.
+      - name: The platform guard can still fail (forced-failure test)
+        run: python scripts/test-platform-claims.py
+
       - name: No reachable page claims an unshipped platform
         run: python scripts/check-platform-claims.py
+
       - name: Download buttons resolve/degrade correctly
         run: node scripts/test-download-resolution.js
+
+      # /game-changelog/ is the player-facing changelog and derives every version at
+      # runtime. A hardcoded literal there is a release-day lie.
+      - name: The game changelog derives, never hardcodes
+        run: node scripts/test-changelog-render.js
+
+      # The privacy promise: opt-out works, DNT is honoured, and nothing injects a
+      # second tracker (two trackers race and the loser's events vanish).
+      - name: Analytics opt-out and no-second-tracker regression
+        run: node scripts/test-analytics-optout.js
+
+      # Third parties' addresses scraped out of paper PDFs must never be served.
+      - name: No third party's email address is published
+        run: python scripts/check-published-emails.py
+
+      # --ci, not --check: drift and freshness are only fixable by re-running the sync
+      # against a local pdoom1 checkout, which no runner has, so they print as WARN.
+      # The blocking half is no-hardcoding -- no page may type a key as a literal --
+      # and that IS fixable here. See scripts/sync/sync-keybinds.py.
+      - name: No page types a keybind as a literal
+        run: python scripts/sync/sync-keybinds.py --ci
+
+      # HIGH only. A HIGH finding is a literal presented as CURRENT: a fallback that
+      # ships exactly when the real lookup failed, or a stale date next to "latest".
+      # The other ~213 findings are correct history and are reported in the advisory
+      # job, not failed on.
+      - name: No stale fact is presented as current (HIGH severity)
+        run: python scripts/check-stale-facts.py --min-severity HIGH
+
+      # The analytics-to-git backup must keep failing LOUDLY. Its script only ever runs
+      # for real in CI where the API key lives, so its failure paths are unreachable by
+      # hand -- this stubs the API and asserts every exit code, plus the workflow
+      # contract (stage-before-diff, issues:write, no dispatch input spliced into run:).
       - name: The analytics-to-git backup still fails loudly
         run: python scripts/test-snapshot-plausible.py
+
+  advisory:
+    name: ADVISORY -- reported, never blocks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # snapshot-copy.py --check diffs prose against the frozen baseline, which
+          # needs more than a shallow tip.
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # WHY THESE ARE NOT BLOCKING
+      # --------------------------
+      # snapshot-copy --check          reports 24 pages of prose drift against a
+      #                                2026-07-22 baseline. Most of that drift is
+      #                                deliberate ("this was false, now it is true").
+      #                                It is a REVIEW AID: Pip wants to see copy changes,
+      #                                not be blocked by them.
+      # check-stale-facts (full)       213 findings, none HIGH. Blog titles naming old
+      #                                versions are correct history.
+      # test-header-consistency        19/27 today. The nav contract is 22/25 and the
+      #                                remainder is content emoji inside frozen prose --
+      #                                real drift, but not a lie to a visitor, and
+      #                                blocking on it would freeze content work.
+      #
+      # Each runs with continue-on-error so the job stays green. Green here means
+      # "reported", NOT "clean" -- read the summary.
+      - name: Prose drift vs the frozen copy baseline
+        continue-on-error: true
+        run: |
+          {
+            echo '## ADVISORY: prose drift vs docs/copy-baseline/'
+            echo
+            echo 'Reader-facing copy that moved since the 2026-07-22 snapshot. Every diff'
+            echo 'should be justifiable as "this was false, now it is true" -- tone and'
+            echo 'phrasing rewrites are what this is here to surface for review.'
+            echo
+            echo '```'
+            python scripts/snapshot-copy.py --check 2>&1 | tail -n 120 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Full stale-facts report (all severities)
+        continue-on-error: true
+        run: |
+          {
+            echo '## ADVISORY: hardcoded facts that will rot'
+            echo
+            echo 'The BLOCKING job already gated on HIGH. Everything below is MEDIUM/LOW:'
+            echo 'mostly correct history. Worth a skim when a release lands.'
+            echo
+            echo '```'
+            python scripts/check-stale-facts.py 2>&1 | tail -n 120 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Header / nav contract drift
+        continue-on-error: true
+        run: |
+          {
+            echo '## ADVISORY: header + nav contract'
+            echo
+            echo 'navigation.js is the single layout spine. Failures here are pages that'
+            echo 'have drifted off it, or content emoji in frozen prose.'
+            echo
+            echo '```'
+            node scripts/test-header-consistency.js 2>&1 | tail -n 80 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

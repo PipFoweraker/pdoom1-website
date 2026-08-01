@@ -871,11 +871,12 @@ t	.hero {
 
 			<!-- Download Options - Platform-Specific CTAs -->
 			<div class="download-ctas" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.4rem;">
-				<!-- All three platforms have a shipped build (v0.13.1), so each defaults
-				     live to the release PAGE (never 404s on any asset naming);
-				     resolveDownloads() upgrades each to its direct asset URL, and would
-				     degrade a platform to "coming soon" only if a future release dropped
-				     its build. -->
+				<!-- Every platform defaults to the release PAGE (never 404s on any asset
+				     naming); resolveDownloads() upgrades each to its direct asset URL,
+				     and degrades a platform to "coming soon" when the current release
+				     carries no build for it. Deliberately no version literal here: this
+				     comment said "(v0.13.1)" while v0.13.2 was live, which is the exact
+				     rot check-stale-facts.py exists to catch. -->
 				<a id="download-windows" data-platform-label="Windows" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for Windows
 				</a>
