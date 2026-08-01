@@ -242,31 +242,71 @@ Pip's stated top priority. Practically:
   process artefact. A loose match would train everyone to ignore the guard.
 
 ## Local test suite (run these before opening a PR)
-```
-python scripts/test-design-notes.py       # ADR scrubber + markdown subset
-node    scripts/test-analytics-optout.js  # opt-out, DNT, no-injection regression
-python  scripts/test_ingest_scores.py     # leaderboard read path
-python  scripts/validate_data.py          # data contracts
-python  scripts/check-stale-facts.py      # hardcoded facts that rot
-python  scripts/check-platform-claims.py  # no reachable page claims an unshipped OS
-node    scripts/test-download-resolution.js # download buttons resolve/degrade right
-node    scripts/test-changelog-render.js  # /game-changelog/ derives, never hardcodes
 
-python  scripts/check-published-emails.py # no third party's address is served
-python  scripts/snapshot-copy.py --check  # reader-facing prose drift
-python  scripts/generate-feeds.py --check # feeds in step with the blog
-python  scripts/generate-metabolism.py --check # /metabolism/ in step with crons+configs
-python  scripts/test-snapshot-plausible.py # analytics backup still fails loudly
-node    scripts/test-header-consistency.js
-python  scripts/test-changelog-structure.py   # changelog files + data shape
-python  scripts/check-encoding-safety.py      # cp1252 preamble + explicit encodings
+**Every line below is now also wired to CI** (PR #TBD, `ci/wire-the-guards`,
+2026-08-01). Before that audit, **10 of them ran only if a human remembered** —
+and this file claimed otherwise for at least one. The bracket says which workflow
+runs it, so a claim here can be checked against `.github/workflows/` in one grep.
+`[ADVISORY]` means it is reported into the job summary and **never blocks**.
 
-python  scripts/sync/sync-keybinds.py --check # keybind mirror fresh + no typed keys
-python  scripts/test-weekly-league-boundary.py  # rollover run-time -> week mapping (A9)
-python  scripts/stamp-league-epoch.py --check   # every weekly record carries its epoch
-node    scripts/test-board-escaping.js    # no API field reaches innerHTML unescaped
-python  scripts/test-publish-live-board.py # publisher refuses rather than guesses
 ```
+python scripts/test-design-notes.py       # ADR scrubber + markdown subset   [encoding-safety]
+node    scripts/test-analytics-optout.js  # opt-out, DNT, no-injection       [content-honesty]
+python  scripts/test_ingest_scores.py     # leaderboard read path            [data-contract]
+python  scripts/validate_data.py          # data contracts                   [data-contract]
+python  scripts/check-stale-facts.py      # hardcoded facts that rot         [content-honesty ADVISORY]
+python  scripts/check-stale-facts.py --min-severity HIGH  # the gate         [content-honesty]
+python  scripts/check-platform-claims.py  # no page claims an unshipped OS   [content-honesty, encoding-safety]
+python  scripts/test-platform-claims.py   # ...and that guard can still FAIL [content-honesty]
+node    scripts/test-download-resolution.js # download buttons resolve/degrade [content-honesty]
+node    scripts/test-changelog-render.js  # /game-changelog/ derives         [content-honesty]
+
+python  scripts/check-published-emails.py # no third party's address served  [content-honesty]
+python  scripts/snapshot-copy.py --check  # reader-facing prose drift        [content-honesty ADVISORY]
+python  scripts/generate-feeds.py --check # feeds in step with the blog      [generate-feeds]
+python  scripts/generate-metabolism.py --check # /metabolism/ in step        [metabolism-map]
+python  scripts/test-snapshot-plausible.py # analytics backup fails loudly   [content-honesty, snapshot-analytics]
+node    scripts/test-header-consistency.js # nav contract + emoji            [content-honesty ADVISORY]
+python  scripts/test-changelog-structure.py   # changelog files + data shape [encoding-safety]
+python  scripts/check-encoding-safety.py      # cp1252 preamble + encodings  [encoding-safety]
+
+python  scripts/sync/sync-keybinds.py --check # FULL gate; needs ../pdoom1   [local only]
+python  scripts/sync/sync-keybinds.py --ci    # no-typed-keys half only      [content-honesty]
+python  scripts/test-weekly-league-boundary.py  # run-time -> week (A9)      [weekly-league-reset]
+python  scripts/stamp-league-epoch.py --check   # weekly records carry epoch [data-contract]
+node    scripts/test-board-escaping.js    # no API field reaches innerHTML   [board-liveness]
+node    scripts/test-board-honesty.js     # key mismatch stays visible       [board-liveness]
+python  scripts/test-publish-live-board.py # publisher refuses, never guesses [board-liveness]
+```
+
+**Severity model — the rule that decides where a check goes.** A check is
+**blocking-and-true** or **advisory-and-labelled**. Never red-but-tolerated: "a
+red test in the suite is worse than no test", and that applies to a permanently
+red CI job with double force, because nobody can even skip it deliberately —
+they just learn the red square means nothing. Three checks are advisory for
+concrete reasons, not because they are unimportant:
+- `check-stale-facts.py` — 213 findings, **0 HIGH**. A blog post titled "v0.6.0"
+  is correct history. The blocking form is `--min-severity HIGH`; the full report
+  goes to the job summary.
+- `snapshot-copy.py --check` — 24 pages of prose have legitimately moved since
+  the 2026-07-22 baseline. It is a **review aid** so Pip can see copy drift, not
+  a gate.
+- `test-header-consistency.js` — 19/27 today. Real drift, but content emoji in
+  frozen prose is not a lie to a visitor, and blocking on it would freeze content
+  work.
+
+**Not wired, on purpose:**
+- `check-control-characters.py` — red (28 control chars across generated
+  `public/events/arxiv_*.html`). Genuine, but the fix belongs in
+  `sync/sync-events.py` at the generator, and wiring it before that lands would
+  create exactly the permanent red this section forbids.
+- `sync-keybinds.py --check`'s **drift** and **freshness** halves — both are only
+  fixable by re-running the sync against a **local pdoom1 checkout**, which no
+  runner has and this repo cannot produce. Blocking on them would make an
+  unrelated content PR un-mergeable until a human with the game repo intervenes.
+  `--ci` runs all three and lets only no-hardcoding set the exit code, printing
+  the other two as `WARN`. Same reasoning applies to anything else needing
+  `$PDOOM1_REPO`.
 
 ## Testing discipline
 Every line below was earned by something that actually went wrong here, mostly on
@@ -294,6 +334,15 @@ Every line below was earned by something that actually went wrong here, mostly o
 - **Check sibling branches before writing a fix.** Two agents independently rewrote the
   same test on 2026-07-30, one better than the other. With parallel work here, duplicated
   effort is a more common waste than merge conflicts are.
+- **"It is in the pre-PR suite" is not "it runs".** The 2026-08-01 audit found 10 of
+  the checks listed above wired to no workflow at all, and this file asserting CI
+  coverage for one that had none. A documented suite is a suite a human runs when they
+  remember; CI is the only thing that runs when they do not. When adding a check, wire
+  it in the same commit, and grep `.github/workflows/` before believing a claim here.
+- **A guard that returns early can be green having checked nothing.** Look for the
+  cheap exit before the expensive scan — `check-platform-claims.py` had one, and it
+  was reached on every real run. The test for such a guard has to force the state that
+  gets past the early return.
 - **Anything rendering data from the score API must escape it.** That API is
   unauthenticated and validates nothing — `GET ?seed=x&version=L9` returns `ok:true` for
   a board that never existed — so every field is attacker-controlled. There is exactly
@@ -317,8 +366,15 @@ parses `godot/autoload/keybind_manager.gd` out of a **local pdoom1 checkout**
 artifact yet — the ask is **pdoom1#1011**. Until that lands the file is stamped
 `"mirror": true` with source path, source commit and `verified_on`.
 `--check` fails on three things: drift vs the game source (skipped when no
-checkout is present), a mirror older than 90 days, and — the one that runs
-everywhere, including CI — **any key typed as a literal into a page**. Pages must
+checkout is present), a mirror older than 90 days, and **any key typed as a
+literal into a page**.
+**CORRECTED 2026-08-01:** an earlier version of this file called that third check
+"the one that runs everywhere, including CI". It ran in CI nowhere —
+`grep -rn keybind .github/workflows/` returned nothing. It now genuinely does, via
+`content-honesty.yml` calling the new `--ci` mode, which blocks on no-hardcoding
+and demotes drift/freshness to `WARN` because their only fix is a local game
+checkout. Treat any "runs in CI" claim in this file as a hypothesis until grepped.
+Pages must
 use `<kbd data-keybind="<action>">…</kbd>` and let the JS fill it; typing `N` into
 HTML is exactly how pdoom1's own `CONTRIBUTING.md` came to say "backslash" long
 after the bind moved. If the fetch fails the placeholder deliberately **stands**
@@ -335,6 +391,16 @@ actual **assets** (a build is either attached or it is not). Pages must not hard
 the field (see `about/index.html`'s `platforms-available` stat). `check-platform-claims.py`
 (also wired to CI via `content-honesty.yml`) fails if a reachable page advertises a
 platform that has no build.
+
+- **Its green was vacuous until 2026-08-01.** `scan()` returns 0 *before opening a
+  single page* when every platform is `true` — which is the state today — so the
+  passing run said nothing whatsoever about the pages. That is CLAUDE.md's "a guard
+  seen only in its passing state has not been shown to work", live in the repo.
+  `scripts/test-platform-claims.py` now forces `macos: false` and asserts the guard
+  rejects a page advertising it, accepts `"macOS — coming soon"`, ignores element ids
+  and JS strings, and prints `SKIP` (not silence) in the disarmed no-`platforms` state.
+  It also asserts every path in the live `REACHABLE` list still exists — a renamed page
+  would otherwise drop out of coverage silently. Run it BEFORE the guard, not after.
 
 - **`version.json` has TWO writers, and one of them disarms the guard.**
   `update-version-info.py` (via `auto-update-data.yml`) writes `latest_release.platforms`.

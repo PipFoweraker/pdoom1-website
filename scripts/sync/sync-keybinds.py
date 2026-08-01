@@ -37,14 +37,22 @@ USAGE
 -----
     python scripts/sync/sync-keybinds.py            # regenerate the JSON
     python scripts/sync/sync-keybinds.py --check    # verify; non-zero on drift
+    python scripts/sync/sync-keybinds.py --ci       # the CI gate (see below)
 
---check is the CI/pre-PR mode and performs three independent checks:
+--check is the pre-PR mode and performs three independent checks:
     1. drift    -- committed JSON still matches keybind_manager.gd (needs checkout)
     2. freshness-- the mirror was verified recently enough to be trusted
     3. no-hardcoding -- no page renders a key as a literal instead of from data
 
 Check 3 runs everywhere, including CI without a game checkout, and is the one
 that structurally enforces Pip's "use variables, don't hardcode" rule.
+
+--ci runs all three but only lets check 3 set the exit code. Checks 1 and 2 are
+fixable ONLY by re-running the sync against a local pdoom1 checkout; a runner has
+none, so blocking on them would make every unrelated PR wait on a human with the
+game repo. They print as WARN instead. Until 2026-08-01 nothing in
+.github/workflows/ ran this script at all, despite CLAUDE.md claiming check 3
+"runs everywhere, including CI" -- it now genuinely does, via content-honesty.yml.
 """
 
 import argparse
@@ -168,7 +176,8 @@ def git_commit(repo: Path) -> str:
     try:
         out = subprocess.run(
             ["git", "-C", str(repo), "rev-parse", "--short", "HEAD"],
-            capture_output=True, text=True, timeout=20,
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=20,
         )
         if out.returncode == 0:
             return out.stdout.strip()
@@ -402,23 +411,50 @@ def check_no_hardcoded_keys(committed, problems, notes):
     notes.append(f"OK no-hardcoding: {checked} <kbd> element(s) across {len(KEYBIND_PAGES)} page(s)")
 
 
-def run_check(repo):
+def run_check(repo, ci=False):
+    """Verify the mirror. `ci=True` splits the checks by WHERE THE FIX LIVES.
+
+    drift and freshness are only fixable by re-running the sync against a local pdoom1
+    checkout, which a GitHub runner does not have and this repo cannot produce. Making
+    them block a PR would mean an unrelated content change is un-mergeable until someone
+    with a game checkout intervenes -- a merge gate on an external repo. So in --ci mode
+    they are REPORTED (loudly, as WARN lines) and the exit code is decided only by
+    no-hardcoding, whose fix is always an edit in this repo.
+
+    That is a deliberate advisory/blocking split, not a suppression: the full `--check`
+    still fails on all three, and it is what the pre-PR suite and the scheduled staleness
+    job run. Absence of a WARN here is not a clean bill of health for drift -- see
+    CLAUDE.md, "Absence of a marker is never a clean bill of health".
+    """
     committed = load_committed()
     if committed is None:
         print(f"FAIL: {OUT_PATH.relative_to(REPO_ROOT)} does not exist. "
               f"Run: python scripts/sync/sync-keybinds.py")
         return 1
-    problems, notes = [], []
-    check_drift(repo, committed, problems, notes)
-    check_freshness(committed, problems, notes)
-    check_no_hardcoded_keys(committed, problems, notes)
+
+    blocking, notes = [], []
+    advisory = []
+    checkout_bound = advisory if ci else blocking
+    check_drift(repo, committed, checkout_bound, notes)
+    check_freshness(committed, checkout_bound, notes)
+    check_no_hardcoded_keys(committed, blocking, notes)
+
     for n in notes:
         print(n)
-    if problems:
+    if advisory:
+        print("\nWARN (advisory in --ci: the fix needs a local pdoom1 checkout, which no "
+              "runner has):")
+        for p in advisory:
+            print(f"  - {p}")
+    if blocking:
         print("\nFAIL: keybind mirror problems:")
-        for p in problems:
+        for p in blocking:
             print(f"  - {p}")
         return 1
+    if ci:
+        print("\nPASS (--ci): no page types a key as a literal. Drift and freshness were "
+              "checked but are advisory here; run plain --check locally for the full gate.")
+        return 0
     print("\nPASS: keybind data is consistent, fresh, and rendered from data.")
     return 0
 
@@ -427,14 +463,18 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--check", action="store_true",
                     help="verify instead of writing; non-zero exit on any problem")
+    ap.add_argument("--ci", action="store_true",
+                    help="like --check, but only no-hardcoding decides the exit code; "
+                         "drift/freshness are reported as advisory because their fix "
+                         "requires a local pdoom1 checkout no runner has")
     ap.add_argument("--game-repo", default=None,
                     help="path to the pdoom1 checkout (else $PDOOM1_REPO, else ../pdoom1)")
     args = ap.parse_args()
 
     repo = find_game_repo(args.game_repo)
 
-    if args.check:
-        return run_check(repo)
+    if args.check or args.ci:
+        return run_check(repo, ci=args.ci and not args.check)
 
     if repo is None:
         print("ERROR: no pdoom1 checkout found. Pass --game-repo or set PDOOM1_REPO.\n"

@@ -20,11 +20,31 @@ This finds three classes of rot:
             share prices, model names, "expert consensus" figures.
 
 Usage:
-    python scripts/check-stale-facts.py                 # report
+    python scripts/check-stale-facts.py                 # report everything
     python scripts/check-stale-facts.py --json          # machine-readable
     python scripts/check-stale-facts.py --max-age 120   # date staleness threshold
+    python scripts/check-stale-facts.py --min-severity HIGH   # the CI gate
 
-Exit code 1 if anything is found, so it can gate CI later.
+SEVERITY IS THE GATE, NOT THE FINDING COUNT
+-------------------------------------------
+Most of what this reports is correct history, not rot: a blog post titled
+"v0.6.0" is a true statement about the past, a comment naming the version it
+was written against is documentation. Those are LOW. On 2026-08-01 the full
+report was 214 findings, of which 2 were HIGH -- so gating on "any finding"
+would have meant a check that is red on every PR forever, which CLAUDE.md's
+testing discipline calls worse than no check at all ("a red test in the suite
+teaches everyone to skip the suite").
+
+So the exit code is severity-gated:
+
+    --min-severity LOW     (default) exit 1 on any finding    -- the full report
+    --min-severity MEDIUM  exit 1 on MEDIUM or HIGH
+    --min-severity HIGH    exit 1 only on HIGH                -- what CI blocks on
+
+HIGH means the literal is presented as CURRENT: a fallback that ships when the
+real lookup failed, or a date sitting next to "as of"/"latest". That is the
+class that actually lies to a visitor. Everything printed below the gate is
+still printed -- demoting a severity is not the same as hiding it.
 """
 
 import argparse
@@ -78,6 +98,22 @@ SKIP_FILES = {
     # versions that bracket a ladder fork by design.
     "board-probe-targets.json",
 }
+
+# Line-level false positives: (file substring, line substring, reason). Same contract as
+# check-platform-claims.py's ALLOWLIST -- an entry needs a REASON, and the fix for a
+# recurring false positive is an entry here, never a loosened heuristic. Matched as plain
+# substrings against the repo-relative path and the raw line.
+LINE_ALLOWLIST = [
+    (".github/workflows/health-checks.yml",
+     "while the page presented it as current health",
+     "Past-tense narrative: the date is WHEN the published file was frozen, and the "
+     "word 'current' belongs to the bug being described, not to a claim being made. "
+     "Re-stamping it would erase the evidence for why the step exists."),
+]
+
+
+def line_allowlisted(rel_path, line):
+    return any(f in rel_path and l in line for f, l, _ in LINE_ALLOWLIST)
 
 SCRIPT_OR_STYLE = re.compile(r"<(script|style)\b.*?</\1>", re.S | re.I)
 
@@ -181,6 +217,8 @@ def scan(max_age_days):
             stripped = line.strip()
             if len(stripped) > 400:
                 continue
+            if line_allowlisted(rel, line):
+                continue
 
             # --- VERSION ---------------------------------------------------
             ip_spans = [mm.span() for mm in IPV4_RE.finditer(line)]
@@ -257,21 +295,33 @@ def main():
     ap.add_argument("--max-age", type=int, default=180,
                     help="flag date literals older than N days (default: %(default)s)")
     ap.add_argument("--json", action="store_true", help="machine-readable output")
+    ap.add_argument("--min-severity", choices=("HIGH", "MEDIUM", "LOW"), default="LOW",
+                    help="lowest severity that makes the exit code non-zero "
+                         "(default: %(default)s -- i.e. any finding). Findings below "
+                         "the gate are still reported.")
     args = ap.parse_args()
 
+    order = {"HIGH": 0, "MEDIUM": 1, "LOW": 2}
+    gate = order[args.min_severity]
+
     cur, findings = scan(args.max_age)
+    gating = [f for f in findings if order[f["severity"]] <= gate]
 
     if args.json:
-        print(json.dumps({"current_version": cur, "findings": findings}, indent=2))
-        return 1 if findings else 0
+        print(json.dumps({"current_version": cur,
+                          "min_severity": args.min_severity,
+                          "gating_count": len(gating),
+                          "findings": findings}, indent=2))
+        return 1 if gating else 0
 
     print("Current game version (from public/data/version.json): %s"
           % (cur or "UNKNOWN"))
+    print("Gate: --min-severity %s (findings below this are reported, not failed on)"
+          % args.min_severity)
     if not findings:
         print("No stale hardcoded facts found.")
         return 0
 
-    order = {"HIGH": 0, "MEDIUM": 1, "LOW": 2}
     findings.sort(key=lambda f: (order[f["severity"]], f["kind"], f["file"], f["line"]))
 
     groups = {}
@@ -293,7 +343,13 @@ def main():
             print("  %s:%s  %s%s" % (f["file"], f["line"], f["found"], extra))
             print("      %s" % f["text"])
 
-    print("\n%d finding(s)." % len(findings))
+    print("\n%d finding(s); %d at or above the %s gate."
+          % (len(findings), len(gating), args.min_severity))
+    if not gating:
+        print("PASS: nothing at or above %s. The rest is reported, not failed on --"
+              " re-run without --min-severity to gate on everything."
+              % args.min_severity)
+        return 0
     return 1
 
 

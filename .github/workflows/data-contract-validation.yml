@@ -10,15 +10,25 @@ on:
     branches: [main]
     paths:
       - 'public/data/events.json'
+      - 'public/data/ladder-epochs.json'
       - 'public/leaderboard/data/**'
       - 'schemas/**'
       - 'scripts/validate_data.py'
+      - 'scripts/ingest_scores.py'
+      - 'scripts/test_ingest_scores.py'
+      - 'scripts/stamp-league-epoch.py'
+      - '.github/workflows/data-contract-validation.yml'
   pull_request:
     paths:
       - 'public/data/events.json'
+      - 'public/data/ladder-epochs.json'
       - 'public/leaderboard/data/**'
       - 'schemas/**'
       - 'scripts/validate_data.py'
+      - 'scripts/ingest_scores.py'
+      - 'scripts/test_ingest_scores.py'
+      - 'scripts/stamp-league-epoch.py'
+      - '.github/workflows/data-contract-validation.yml'
   schedule:
     - cron: '0 6 * * *'   # daily 06:00 UTC -- catches drift even with no commits
   workflow_dispatch:
@@ -28,6 +38,45 @@ permissions:
   issues: write
 
 jobs:
+  # A SEPARATE JOB ON PURPOSE.
+  #
+  # These are code contracts, not live-data observations: they read fixtures in a temp
+  # dir and pass or fail deterministically. validate_data.py in the job below reads the
+  # REAL board and can legitimately go red on a live-data condition nobody introduced in
+  # the PR (today: `board:liveness` NEW orphaned board). If these were steps in that job
+  # they would never run on such a day -- a step after a failing step is skipped -- so a
+  # genuine ingest-path regression would hide behind an unrelated data alarm.
+  #
+  # Wired 2026-08-01. Both ran only on someone's laptop before that.
+  unit:
+    name: Leaderboard code contracts (offline)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      # Both scripts are otherwise stdlib-only. stamp-league-epoch.py side-loads
+      # weekly-league-manager.py, which derives the week with
+      # ZoneInfo("Australia/Hobart") -- a real IANA zone, never a fixed offset -- and
+      # raises rather than falling back if the tz database is absent.
+      - name: Install tz database
+        run: pip install --quiet 'tzdata>=2025.1'
+
+      # The read path from stored seed files to the published board. Asserts the RULE
+      # (matches the deployed version) rather than a literal -- pinning a literal here
+      # is what left this test red across three releases.
+      - name: Leaderboard read path
+        run: python scripts/test_ingest_scores.py
+
+      # Every weekly record must carry the ladder epoch it belongs to. An unstamped
+      # record renders as "unknown", never as "fine" -- everything predating the marker
+      # is unmarked too. --check verifies without writing.
+      - name: Every weekly record carries its ladder epoch
+        run: python scripts/stamp-league-epoch.py --check
+
   validate:
     name: Validate data contracts
     runs-on: ubuntu-latest
@@ -76,7 +125,10 @@ jobs:
 
   alert:
     name: Alert on failure (de-duplicated)
-    needs: validate
+    # `unit` is in needs so that a code-contract regression found by the 06:00 cron --
+    # when no human is watching an Actions tab -- escalates to the same rolling issue.
+    # Without it a scheduled unit failure would be a red square nobody is subscribed to.
+    needs: [validate, unit]
     if: failure() && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -92,8 +144,12 @@ jobs:
               '',
               `Run: ${runUrl}`,
               '',
-              'This means a data seam broke its schema, contains encoding corruption, or is self-contradictory.',
-              'Reproduce locally: `python scripts/validate_data.py`.',
+              'A data seam broke its schema, contains encoding corruption, or is self-contradictory --',
+              'OR a leaderboard code contract regressed. Check which job is red, then reproduce locally:',
+              '',
+              '- `python scripts/validate_data.py` (live-data seams)',
+              '- `python scripts/test_ingest_scores.py` (leaderboard read path)',
+              '- `python scripts/stamp-league-epoch.py --check` (every weekly record carries its epoch)',
               '',
               '_This is a single rolling issue -- it is reused, not duplicated, per run._'
             ].join('\n');
