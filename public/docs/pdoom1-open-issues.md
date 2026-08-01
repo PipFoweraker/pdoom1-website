@@ -1,9 +1,25 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-07-31T18:45:28.895Z UTC
+Generated: 2026-08-01T00:55:38.563Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1093 | art(review): generation was paid for and the outputs were never reviewed -- inventory the backlog and package a decision session | enhancement |  | 2026-08-01 00:43:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1093) |
+| 1092 | art(sweep): events name physical things the office never shows -- install a security system, no cameras appear; sweep events for asset refs, then bulk-generate | enhancement |  | 2026-08-01 00:43:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1092) |
+| 1091 | design(hiring): no hire may be onboarded-by-silence -- every hiring route must surface the choice; arrivals come through a door | enhancement, game-mechanics |  | 2026-08-01 00:43:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1091) |
+| 1090 | design(research): Research Quality (Rushed/Standard/Thorough) is still a global Plan-screen toggle -- the ruling moved it to research-project level | game-mechanics, ui-ux |  | 2026-08-01 00:43:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1090) |
+| 1089 | ui(fanfare): 'Strategic Moves Unlocked' -- the game's biggest milestone beat renders as bare text on black | enhancement, ui-ux |  | 2026-08-01 00:43:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1089) |
+| 1088 | Rivals appear for the first time in the month summary, having never been introduced | game-mechanics, ui-ux, tutorial |  | 2026-08-01 00:43:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1088) |
+| 1087 | ui(numbers): no format policy -- '$197,207.69' sits beside '82.0', '* 70' and 'money: 3000.0' on one screen | ui-ux |  | 2026-08-01 00:42:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1087) |
+| 1086 | ux(hiring): onboard-now window -- tooltip omits the Attention cost (costs dict has money only), prints raw 'money: 3000.0', and Q/W read as the same option | bug, ui-ux |  | 2026-08-01 00:42:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1086) |
+| 1085 | bug(window): minimising v0.13.2 does not minimise -- window left in a wrong state until re-maximised (first run after #1079) | bug, ui-ux |  | 2026-08-01 00:42:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1085) |
+| 1084 | The difficulty lock (#1058) is enforced at a UI screen, not where difficulty is consumed -- Settings can still write Easy/Hard | bug |  | 2026-08-01 00:20:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1084) |
+| 1082 | The GDScript syntax gate does not compile-check -- a hard parse error passed it clean | bug |  | 2026-07-31 23:24:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1082) |
+| 1078 | Postmortem contribution from pdoom1-website: the league opened, and the site hid it for 90 minutes |  |  | 2026-07-31 23:01:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1078) |
+| 1077 | Postmortem contribution from pdoom-data: load-bearing breakage, false greens, and asking the person |  |  | 2026-07-31 22:59:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1077) |
+| 1076 | Postmortem input: one failure shape across both workstreams, and why the register didn't stop it |  |  | 2026-07-31 22:46:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1076) |
+| 1075 | Postmortem input: one failure signature, five times this week -- a check whose input comes from the system it checks |  |  | 2026-07-31 22:46:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1075) |
+| 1074 | Postmortem input: the coordination layer on league day -- what the paper/voice loop did well, and six ways it failed |  |  | 2026-07-31 22:20:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/1074) |
 | 1073 | Player guide still says "action points" -- #1050 did not reach it -- and it requires scrolling to read |  |  | 2026-07-31 08:19:37 | [link](https://github.com/PipFoweraker/pdoom1/issues/1073) |
 | 1072 | build_release.py hardcodes the output name PDoom.exe regardless of --preset |  |  | 2026-07-31 08:11:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1072) |
 | 1071 | No macOS build has ever been verified to run; the Steam framework breaks on non-mac checkouts |  |  | 2026-07-31 08:11:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1071) |
@@ -22,10 +38,10 @@ Generated: 2026-07-31T18:45:28.895Z UTC
 | 1055 | Ecosystem coherence: pdoom-data ADR-007 (anti-corruption layer) and ADR-008 (provenance/annotation model) |  |  | 2026-07-31 00:07:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1055) |
 | 1053 | build_release: refuse to build from a stale or dirty tree -- prove build-matches-INTENT, not just pack-matches-build | technical-debt |  | 2026-07-30 23:26:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/1053) |
 | 1052 | ADR-0015 / DQ-21: what should a pdoom-data event carry, now that literal doom fields are deprecated? |  |  | 2026-07-30 23:15:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/1052) |
-| 1049 | ADR set: correctness/staleness/cohesion pass, and an implementation-status field the website can render |  |  | 2026-07-30 21:50:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/1049) |
+| 1049 | ADR set: correctness/staleness/cohesion pass, and an implementation-status field the website can render |  |  | 2026-08-01 00:45:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1049) |
 | 1046 | Main-screen warnings: tell players the ladder can fork BEFORE they play (draft copy inside) |  |  | 2026-07-30 12:11:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1046) |
 | 1044 | design(tempo): actions resolve instantly, so the early game has no rhythm -- time, sequencing, and the queue's promise | game-mechanics |  | 2026-07-30 21:35:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1044) |
-| 1043 | ui(layout): the Plan screen wastes its middle and scatters its text -- legibility-first layout brief | ui-ux |  | 2026-07-30 06:59:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1043) |
+| 1043 | ui(layout): the Plan screen wastes its middle and scatters its text -- legibility-first layout brief | ui-ux |  | 2026-08-01 00:45:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1043) |
 | 1042 | Score payload: emit player name AND lab name, plus a dev-mode-used flag (website side is built) |  |  | 2026-07-30 02:55:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1042) |
 | 1041 | playtest 2026-07-30 (v0.13.2 artifact): UI/UX findings from the Gate 4 run | ui-ux |  | 2026-07-30 02:43:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/1041) |
 | 1038 | trust: make provable declarations about what the game touches -- exit surfaces, provenance, signing | documentation, post-launch |  | 2026-07-30 01:17:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1038) |
@@ -102,7 +118,7 @@ Generated: 2026-07-31T18:45:28.895Z UTC
 | 822 | feat(mechanic): overbook TEETH -- forcing-function instead of a flat reject |  | First Contact | 2026-07-24 23:32:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/822) |
 | 820 | feat(display): window mode options (windowed / borderless / fullscreen) |  | First Contact | 2026-07-24 23:32:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/820) |
 | 819 | feat(ux): action-queue visual feedback -- work-card flies to the queue (A/B dev toggle) |  | First Contact | 2026-07-24 23:32:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/819) |
-| 818 | fast-follow(music): drop BPM 10-15%, consider 2 layered tracks |  | First Contact | 2026-07-24 23:33:01 | [link](https://github.com/PipFoweraker/pdoom1/issues/818) |
+| 818 | fast-follow(music): drop BPM 10-15%, consider 2 layered tracks |  | First Contact | 2026-08-01 00:45:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/818) |
 | 817 | feat(cold-open): cycle hero backgrounds per text beat |  | First Contact | 2026-07-24 23:33:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/817) |
 | 816 | feat(cat): scene flashover on cat adoption (curled-cat asset) |  | First Contact | 2026-07-24 23:33:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/816) |
 | 815 | feat(cat): photo->pixel cat pipeline, 3 base models |  | First Contact | 2026-07-24 23:33:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/815) |
@@ -120,7 +136,6 @@ Generated: 2026-07-31T18:45:28.895Z UTC
 | 801 | Onboarding: narrative cold-open + first-turn direction (playtest #1: 'lots of info, not a lot of direction') | league:v0.13 | First Contact | 2026-07-24 23:33:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/801) |
 | 800 | In-game bug reporter (F8) does not transmit -- reports die on player's local disk, confirmation text lies | league:v0.13 | First Contact | 2026-07-24 23:33:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/800) |
 | 798 | Put 'Buy Compute' under an operations-style submenu (action grouping) | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:33:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/798) |
-| 796 | Office cat 'Missy' (web-missy.jpg) does not render, though present + imported | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:33:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/796) |
 | 794 | PLAN operations gantt: bigger font/area + a 'what's next / ETA to land' indicator | ship:next-release | First Contact | 2026-07-24 23:34:01 | [link](https://github.com/PipFoweraker/pdoom1/issues/794) |
 | 793 | Office floor: all staff render as the same character + sprites oversized vs the room | ship:hotpatch-48h, patch:ui | First Contact | 2026-07-24 23:34:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/793) |
 | 791 | Early economy: force a small early lease spend; bedroom/basement start hard-caps hires; unlocks small-now, bigger-over-time | ship:next-release, league:next | First Contact | 2026-07-24 23:34:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/791) |
