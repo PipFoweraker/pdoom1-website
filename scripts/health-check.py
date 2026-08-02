@@ -40,6 +40,19 @@ class HealthChecker:
         self.public_dir = os.path.join(self.base_dir, 'public')
         self.data_dir = os.path.join(self.public_dir, 'data')
 
+    @staticmethod
+    def last_segment(value: Any) -> str:
+        """Final path component, splitting on BOTH separators on every host.
+
+        `os.path.basename` is host-OS dependent: on POSIX it splits on '/' only, so
+        "C:\\Users\\<name>\\...\\version.json" comes back UNCHANGED. This file runs on
+        a Linux runner on a 6-hourly cron that commits its output, and the text it
+        scrubs is not all locally produced -- exception strings and committed data can
+        carry Windows paths from the maintainer's box. Using basename there published
+        the whole path while reading as if it had been redacted.
+        """
+        return re.split(r"[\\/]", str(value).rstrip("\\/"))[-1] or str(value)
+
     def rel(self, filepath: str) -> str:
         """Repo-relative form of a path, for use in any message we might publish.
 
@@ -50,24 +63,68 @@ class HealthChecker:
         call this instead.
         """
         try:
-            return os.path.relpath(os.path.abspath(filepath), self.base_dir).replace('\\', '/')
+            out = os.path.relpath(os.path.abspath(filepath), self.base_dir).replace('\\', '/')
         except (ValueError, TypeError):
             # Different drive on Windows, or a non-path string.
-            return os.path.basename(str(filepath))
+            return self.last_segment(filepath)
+        # relpath will happily CLIMB OUT of the repo rather than fail, and what it
+        # emits then is the layout above base_dir -- "../../home/runner/work/..." on a
+        # runner, "../../Users/<name>/..." on the maintainer's box. That is the exact
+        # disclosure this function exists to prevent, and it is not a Windows-only
+        # case: only Windows raises ValueError for a foreign drive, so on POSIX a
+        # "Z:\..." string climbs instead of falling back. Anything above the root
+        # degrades to its last segment.
+        if out == '..' or out.startswith('../'):
+            return self.last_segment(filepath)
+        return out
 
     # Absolute paths in free text we did not construct (subprocess output,
     # exception strings). Belt and braces alongside rel().
+    #
+    # A directory segment MAY CONTAIN SPACES. The previous pattern used
+    # `[^\s'"]+` for the whole tail, which stops dead at the first space -- so
+    # "C:\Users\gday\Documents\A Local Code\pdoom1-website\..." matched only as far
+    # as "...\Documents\A" and the scrubbed message still read
+    # "A Local Code\pdoom1-website\public\data\version.json". That is the maintainer's
+    # directory layout, and it is literally the path CLAUDE.md quotes as the leak
+    # this guard was written for. The guard was inert against its own founding case.
+    #
+    # So: consume whole segments (spaces allowed, quotes and newlines not) as long as
+    # each is followed by a separator, then a final space-free component. The segment
+    # loop only extends across further separators, so ordinary prose after a path
+    # ("C:\a\b.json failed at line 3") is not swallowed, and a relative path
+    # ("public/data/version.json") never matches at all. {0,64} bounds the segment so
+    # a pathological string cannot make this backtrack for a long time.
     _ABS_PATH = re.compile(
-        r"([A-Za-z]:[\\/][^\s'\"]+|/(?:home|Users|root|mnt|var/folders)/[^\s'\"]+)")
+        r"([A-Za-z]:[\\/](?:[^\\/'\"\r\n]{0,64}[\\/])*[^\s'\"\\/\r\n]*"
+        r"|/(?:home|Users|root|mnt|var/folders)/(?:[^/'\"\r\n]{0,64}/)*[^\s'\"/\r\n]*)")
 
     @classmethod
     def scrub(cls, text: str) -> str:
-        """Replace any absolute path in arbitrary text with its basename."""
-        return cls._ABS_PATH.sub(lambda m: os.path.basename(m.group(0).rstrip('\\/')),
-                                 str(text))
+        """Replace any absolute path in arbitrary text with its last segment.
+
+        The pattern deliberately matches BOTH a Windows drive path and a POSIX home
+        path regardless of which host is running, so the replacement has to be
+        host-independent too -- see last_segment().
+        """
+        return cls._ABS_PATH.sub(lambda m: cls.last_segment(m.group(0)), str(text))
 
     def log_result(self, test_name: str, passed: bool, message: str = "", is_warning: bool = False) -> None:
-        """Log a test result"""
+        """Log a test result.
+
+        EVERY message is scrubbed here, at the one place they all pass through,
+        rather than at each call site. That is deliberate. rel() and scrub() were
+        added after absolute paths reached pdoom1.com, and each caller was expected
+        to remember to use them -- but four `except Exception as e:` handlers
+        interpolated the raw exception string instead (`f"Error reading {shown}:
+        {e}"`, `f"Error testing script: {e}"`, and two more), and an OSError's str()
+        embeds the absolute path it failed on. The redaction was therefore only as
+        good as the last person to remember it, in a file whose output is committed
+        by a 6-hourly cron and served publicly.
+        A chokepoint cannot be forgotten by a handler written next year.
+        """
+        message = self.scrub(message)
+        test_name = self.scrub(test_name)
         if is_warning:
             self.warnings.append(f"{test_name}: {message}")
 

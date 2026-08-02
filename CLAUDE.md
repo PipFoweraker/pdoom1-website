@@ -210,6 +210,22 @@ Pip's stated top priority. Practically:
   so a new upstream field cannot leak). `scripts/check-published-emails.py`
   re-verifies and imports the generator's one regex rather than copying it.
   The addresses are still in pdoom-data — scrubbing here does not fix the source.
+  - **`check-published-emails.py` checks the OUTPUT, not the generator.** It walks
+    what is already committed under `public/`, so it can only tell you a leak has
+    already shipped. `redact_pii()` is the thing that stops one. That is why
+    `scripts/test-sync-events.py` forces the leak rather than watching the guard
+    pass. (An earlier draft of this bullet said the guard "is run by no workflow,
+    verified 2026-08-01" — that was true when written and is now false:
+    `content-honesty.yml:121` runs it as a BLOCKING step. Grep before believing
+    a CI claim here, in either direction.)
+- **The event page template escapes nothing by itself** — it is one 500-line
+  f-string, so the data decides where the markup ends, and arXiv descriptions are
+  raw PDF text uploaded by anyone. `escape_event_for_html()` walks the whole
+  record (same shape as `redact_pii()`) and runs once at the top of
+  `generate_event_detail_page()`. `esc()` escapes `& < > "` but **not** the
+  apostrophe, because every attribute in the template is double-quoted — a rule
+  `test-sync-events.py` asserts, so writing `style='…'` in the template fails the
+  test rather than silently reopening the hole.
 - **Events were not the only mirror.** `public/data/issues-cache.json` is a verbatim
   copy of pdoom1's issue bodies, rendered by `/issues/`, and it was written raw. On
   2026-08-02 a `Co-Authored-By` trailer inside an issue body put a live address on the
@@ -320,6 +336,10 @@ node    scripts/test-blog-render.js       # blog markdown subset               [
 
 python  scripts/check-deploy-excludes.py  # nothing deployed points at an excluded file [content-honesty]
 python  scripts/make-og-card.py --check   # share card is 1200x630 and under budget [content-honesty]
+
+python  scripts/test-sync-events.py         # PII redaction; no event text reshapes a page [content-honesty]
+python  scripts/test-update-version-info.py # refuses to guess a version; platforms derived [content-honesty]
+python  scripts/test-health-check.py        # no absolute path reaches published JSON [content-honesty]
 ```
 
 **Severity model — the rule that decides where a check goes.** A check is
@@ -350,6 +370,17 @@ concrete reasons, not because they are unimportant:
   `--ci` runs all three and lets only no-hardcoding set the exit code, printing
   the other two as `WARN`. Same reasoning applies to anything else needing
   `$PDOOM1_REPO`.
+
+**Naming a script in a test file is not coverage.** `test-orchestrator.py` and
+`test-integration.py` between them "cover" `update-version-info.py`,
+`calculate-game-stats.py`, `health-check.py`, `verify-deployment.py` and
+`export-leaderboard-bridge.py` — by shelling out to each one against the LIVE
+GitHub API, writing into the real `public/` tree, and checking only the exit
+code. Neither asserts anything about the output; a run that fetched garbage and
+published it passes both. `test-changelog-structure.py` likewise asserts that
+four committed files exist, which says nothing about the generator that wrote
+them. Neither file is run by any workflow. When auditing coverage, grep for the
+script name *and then read what the match does*.
 
 ## Testing discipline
 Every line below was earned by something that actually went wrong here, mostly on
@@ -476,7 +507,22 @@ platform that has no build.
   and JS strings, and prints `SKIP` (not silence) in the disarmed no-`platforms` state.
   It also asserts every path in the live `REACHABLE` list still exists — a renamed page
   would otherwise drop out of coverage silently. Run it BEFORE the guard, not after.
-
+- **`platforms` is derived by pattern-matching asset FILENAMES, which is fragile.**
+  Two false positives were live until 2026-08-01: `.AppImage` contains `.app`, so a
+  Linux-only release published `macos: true`; and `x86_64` is an architecture, so
+  `PDoom-<version>-macos-x86_64.dmg` published `linux: true`. Both handed
+  `check-platform-claims.py` — the guard whose entire job is to stop a false platform
+  claim — a false positive. The rule now is that an explicit OS name in a filename
+  always beats an architecture hint, and `scripts/test-update-version-info.py` pins it
+  with a table of real asset-name shapes.
+- **`update-version-info.py` used to re-publish invented `game_stats`** —
+  `baseline_doom_percent: 23`, `frontier_labs_count: 7`,
+  `strategic_possibilities: 10000` — on every run, overwriting the honest `null` +
+  `pending` block that `calculate-game-stats.py` writes to the same file. In
+  `auto-update-data.yml` the calculator happens to run second and win; anywhere else
+  (`npm run update:version`, `weekly-deployment.yml`) the fiction won. It now carries
+  forward whatever the calculator derived and omits the key when nothing has been
+  derived. A scan in the test fails on any numeric literal re-added to that function.
 - **`version.json` has TWO writers, and one of them disarms the guard.**
   `update-version-info.py` (via `auto-update-data.yml`) writes `latest_release.platforms`.
   `update-game-data.yml` has its own inline Python that rebuilds `version.json` **from

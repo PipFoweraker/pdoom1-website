@@ -14,6 +14,7 @@ Usage:
     python scripts/sync/sync-events.py [--pdoom-data-path PATH] [--sync-icons]
 """
 
+import html
 import json
 import os
 import re
@@ -171,6 +172,66 @@ def count_emails(value: Any) -> int:
 
 
 
+# ---------------------------------------------------------------------------
+# HTML escaping
+#
+# Every string below reaches a generated page through an f-string, so the page
+# is built by concatenation and the data decides where the markup ends. Event
+# descriptions are raw text extracted from paper PDFs -- arXiv accepts uploads
+# from anyone -- so "the data is first-party" is not true of the *contents* of
+# these fields, only of the pipeline that carries them.
+#
+# This was not hypothetical. Before this pass, in the shipped corpus:
+#   * arxiv_73643a60bb86bf2f's description contains "<<number to be assigned>>",
+#     which the browser parses as a tag start in <p class="description"> AND
+#     inside the <meta name="description" content="..."> attribute.
+#   * arxiv_aa8c44de8cf70353's description contains a double quote inside the
+#     first 155 characters, which TERMINATES the meta content attribute early
+#     and turns the rest of the sentence into bogus tag attributes.
+# Both were live on pdoom1.com.
+#
+# escape_event_for_html() mirrors redact_pii(): it walks the WHOLE record rather
+# than a named list of fields, so a field added upstream tomorrow is covered on
+# the day it appears. Fail closed. Non-strings pass through untouched, so ints
+# (year, impact deltas) still render as numbers.
+def esc(value: Any) -> str:
+    """HTML-escape a single value for text OR attribute context.
+
+    Escaping the double quote is not optional: several slots are attribute values
+    (content="...", href="..."), and an unescaped double quote in an attribute is
+    an injection, not a typo.
+
+    The apostrophe is deliberately NOT escaped, which is where this differs from
+    html.escape(s, quote=True). Every attribute in this template is double-quoted
+    (test-sync-events.py asserts that as a rule, so the exemption cannot rot), and
+    inside a double-quoted attribute an apostrophe is an ordinary character. Escaping
+    it anyway would rewrite ~1,194 published pages for no reader-visible change --
+    prose is full of apostrophes -- and burying a real fix in a diff that large is
+    how a real fix stops getting reviewed.
+    """
+    return (str(value).replace("&", "&amp;")
+                      .replace("<", "&lt;")
+                      .replace(">", "&gt;")
+                      .replace('"', "&quot;"))
+
+
+def escape_event_for_html(value: Any) -> Any:
+    """Recursively HTML-escape every string in a nested str/list/dict value.
+
+    Deliberately mirrors redact_pii(): whole-record, not a field list. The page
+    template interpolates ~20 distinct expressions off the event dict and gains
+    more over time; enumerating them is how the leaderboard shipped six escaped
+    fields and thirteen unescaped ones.
+    """
+    if isinstance(value, str):
+        return esc(value)
+    if isinstance(value, list):
+        return [escape_event_for_html(v) for v in value]
+    if isinstance(value, dict):
+        return {k: escape_event_for_html(v) for k, v in value.items()}
+    return value
+
+
 def sanitize_urls_in_text(text: str) -> str:
     """Convert HTTP URLs to HTTPS where safe to do so"""
     import re
@@ -221,6 +282,16 @@ def sanitize_event_urls(event: Dict[str, Any]) -> Dict[str, Any]:
 def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
     """Generate HTML for individual event detail page"""
 
+    # Escape ONCE, at the top, for the whole record -- see escape_event_for_html().
+    # `raw` keeps the unescaped values for the two contexts where escaping would be
+    # wrong: urllib.parse.quote() percent-encodes for a URL (double-escaping would
+    # put "%26amp%3B" in a prefilled GitHub issue title), and the meta-description
+    # truncation must slice the source text BEFORE escaping or it can cut an entity
+    # in half. Everything else below reads the escaped `event`.
+    raw = event
+    event = escape_event_for_html(event)
+    event_id_esc = esc(event_id)
+
     # Category icons
     category_icons = {
         'funding_catastrophe': '💸',
@@ -269,15 +340,19 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
     # Generate metadata suggestion URLs
     from urllib.parse import quote
 
-    category_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20category%20for%20{quote(event_id)}&body=Event%3A%20{quote(event['title'])}%0A%0ACurrent%20category%3A%20{quote(event['category'])}%0A%0ASuggested%20category%3A%20%0A%0AReason%3A%20"
+    # These read `raw`, not `event`: quote() is the escaper for a URL context, and
+    # running it over already-HTML-escaped text would prefill the GitHub issue with
+    # "%26amp%3B" where the source said "&". The percent-encoding quote() produces
+    # contains no <, > or " , so the finished URL is safe in an href attribute.
+    category_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20category%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20category%3A%20{quote(raw['category'])}%0A%0ASuggested%20category%3A%20%0A%0AReason%3A%20"
 
-    rarity_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20rarity%20for%20{quote(event_id)}&body=Event%3A%20{quote(event['title'])}%0A%0ACurrent%20rarity%3A%20{quote(event['rarity'])}%0A%0ASuggested%20rarity%3A%20%0A%0AReason%3A%20"
+    rarity_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20rarity%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20rarity%3A%20{quote(raw['rarity'])}%0A%0ASuggested%20rarity%3A%20%0A%0AReason%3A%20"
 
-    tags_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20tags%20for%20{quote(event_id)}&body=Event%3A%20{quote(event['title'])}%0A%0ACurrent%20tags%3A%20{quote(', '.join(event['tags']))}%0A%0ASuggested%20tags%3A%20%0A%0AReason%3A%20"
+    tags_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20tags%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20tags%3A%20{quote(', '.join(raw['tags']))}%0A%0ASuggested%20tags%3A%20%0A%0AReason%3A%20"
 
-    impacts_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events,game-balance&title=Metadata%3A%20Change%20impacts%20for%20{quote(event_id)}&body=Event%3A%20{quote(event['title'])}%0A%0ACurrent%20impacts%3A%20{len(event['impacts'])}%20game%20variable%20changes%0A%0ASuggested%20changes%3A%20%0A-%20Variable%3A%20%0A-%20Change%3A%20%0A%0AReason%3A%20"
+    impacts_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events,game-balance&title=Metadata%3A%20Change%20impacts%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20impacts%3A%20{len(event['impacts'])}%20game%20variable%20changes%0A%0ASuggested%20changes%3A%20%0A-%20Variable%3A%20%0A-%20Change%3A%20%0A%0AReason%3A%20"
 
-    pdoom_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events,game-balance&title=Metadata%3A%20Change%20p(doom)%20impact%20for%20{quote(event_id)}&body=Event%3A%20{quote(event['title'])}%0A%0ACurrent%20p(doom)%20impact%3A%20{event.get('pdoom_impact', 'null')}%0A%0ASuggested%20p(doom)%20impact%3A%20%0A%0AReason%3A%20"
+    pdoom_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events,game-balance&title=Metadata%3A%20Change%20p(doom)%20impact%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20p(doom)%20impact%3A%20{quote(str(raw.get('pdoom_impact', 'null')))}%0A%0ASuggested%20p(doom)%20impact%3A%20%0A%0AReason%3A%20"
 
     # Build reaction provenance badges and source info
     def build_reaction_html(reaction_text: str, reaction_key: str) -> str:
@@ -326,8 +401,8 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{event['title']} | p(Doom)1 Events</title>
-	<link rel="canonical" href="https://pdoom1.com/events/{event_id}.html" />
-	<meta name="description" content="{event['description'][:155]}" />
+	<link rel="canonical" href="https://pdoom1.com/events/{event_id_esc}.html" />
+	<meta name="description" content="{esc(raw['description'][:155])}" />
 
 	<!-- Plausible Analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
@@ -768,7 +843,7 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 				{media_source}
 			</div>
 
-			<a href="/events/suggest-quote.html?event={event_id}" class="suggest-quote-button">
+			<a href="/events/suggest-quote.html?event={quote(event_id)}" class="suggest-quote-button">
 				💡 Found a Real Quote? Suggest it here
 			</a>
 		</div>
@@ -820,7 +895,7 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 				<div class="metadata-item">
 					<span class="metadata-label">📝 General Metadata</span>
 					<span class="metadata-value">Year, description, reactions</span>
-					<a href="/events/suggest-metadata.html?event={event_id}" class="suggest-link">→ Comprehensive review</a>
+					<a href="/events/suggest-metadata.html?event={quote(event_id)}" class="suggest-link">→ Comprehensive review</a>
 				</div>
 			</div>
 		</div>
@@ -828,8 +903,8 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 		<div class="contribute-section">
 			<h2>🤝 Found an Issue?</h2>
 			<p>This event data is sourced from the pdoom-data repository. If you notice errors or want to suggest improvements:</p>
-			<a href="https://github.com/PipFoweraker/pdoom-data/issues/new?title=Event%20Issue:%20{event_id}" class="cta-button" target="_blank">GitHub Issue (Preferred)</a>
-			<a href="mailto:team@pdoom1.com?subject=Event%20Data%20Issue:%20{event_id}&body=Event:%20{quote(event['title'])}%0A%0AWhat's wrong:%20%0A%0ASuggested fix:%20" class="cta-button">📧 Email (No GitHub)</a>
+			<a href="https://github.com/PipFoweraker/pdoom-data/issues/new?title=Event%20Issue:%20{quote(event_id)}" class="cta-button" target="_blank">GitHub Issue (Preferred)</a>
+			<a href="mailto:team@pdoom1.com?subject=Event%20Data%20Issue:%20{quote(event_id)}&amp;body=Event:%20{quote(raw['title'])}%0A%0AWhat's wrong:%20%0A%0ASuggested fix:%20" class="cta-button">📧 Email (No GitHub)</a>
 		</div>
 
 		<div style="text-align: center; margin-top: 2rem;">
