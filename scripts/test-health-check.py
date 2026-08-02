@@ -245,6 +245,25 @@ with FakeRepo(version_json=GOOD_VERSION) as fr:
           f"a cross-drive path degrades to something non-absolute (got {other!r})")
     check(fr.c.rel(None) and not hc.HealthChecker._ABS_PATH.search(fr.c.rel(None)),
           "rel(None) returns a harmless string rather than raising")
+    # relpath does not raise for a path merely OUTSIDE the repo -- it climbs, and what
+    # it emits then is the layout above base_dir ("../../home/runner/work/..." on a
+    # runner). Same disclosure, different branch, and the branch a POSIX host takes
+    # for the Z: case above, since only Windows raises ValueError for a foreign drive.
+    above = fr.c.rel(os.path.join(os.path.dirname(fr.c.base_dir), "elsewhere", "x.json"))
+    check(not above.startswith("..") and not hc.HealthChecker._ABS_PATH.search(above),
+          f"a path above the repo root does not climb out (got {above!r})")
+
+    # last_segment must not be os.path.basename: on POSIX that splits on '/' only, so a
+    # Windows path passes through WHOLE while reading as if it had been redacted. This
+    # file's output is committed by a cron running on Linux, and the text it scrubs is
+    # not all locally produced. Asserted on both hosts, so neither can regress alone.
+    check(hc.HealthChecker.last_segment(
+              r"C:\Users\someone\Documents\A Local Code\repo\public\data\version.json")
+          == "version.json",
+          "last_segment splits a WINDOWS path on any host")
+    check(hc.HealthChecker.last_segment(
+              "/home/runner/work/repo/repo/public/data/version.json") == "version.json",
+          "last_segment splits a POSIX path on any host")
 
 
 # =========================================================================== 4

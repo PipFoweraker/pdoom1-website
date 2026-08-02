@@ -40,6 +40,19 @@ class HealthChecker:
         self.public_dir = os.path.join(self.base_dir, 'public')
         self.data_dir = os.path.join(self.public_dir, 'data')
 
+    @staticmethod
+    def last_segment(value: Any) -> str:
+        """Final path component, splitting on BOTH separators on every host.
+
+        `os.path.basename` is host-OS dependent: on POSIX it splits on '/' only, so
+        "C:\\Users\\<name>\\...\\version.json" comes back UNCHANGED. This file runs on
+        a Linux runner on a 6-hourly cron that commits its output, and the text it
+        scrubs is not all locally produced -- exception strings and committed data can
+        carry Windows paths from the maintainer's box. Using basename there published
+        the whole path while reading as if it had been redacted.
+        """
+        return re.split(r"[\\/]", str(value).rstrip("\\/"))[-1] or str(value)
+
     def rel(self, filepath: str) -> str:
         """Repo-relative form of a path, for use in any message we might publish.
 
@@ -50,10 +63,20 @@ class HealthChecker:
         call this instead.
         """
         try:
-            return os.path.relpath(os.path.abspath(filepath), self.base_dir).replace('\\', '/')
+            out = os.path.relpath(os.path.abspath(filepath), self.base_dir).replace('\\', '/')
         except (ValueError, TypeError):
             # Different drive on Windows, or a non-path string.
-            return os.path.basename(str(filepath))
+            return self.last_segment(filepath)
+        # relpath will happily CLIMB OUT of the repo rather than fail, and what it
+        # emits then is the layout above base_dir -- "../../home/runner/work/..." on a
+        # runner, "../../Users/<name>/..." on the maintainer's box. That is the exact
+        # disclosure this function exists to prevent, and it is not a Windows-only
+        # case: only Windows raises ValueError for a foreign drive, so on POSIX a
+        # "Z:\..." string climbs instead of falling back. Anything above the root
+        # degrades to its last segment.
+        if out == '..' or out.startswith('../'):
+            return self.last_segment(filepath)
+        return out
 
     # Absolute paths in free text we did not construct (subprocess output,
     # exception strings). Belt and braces alongside rel().
@@ -78,9 +101,13 @@ class HealthChecker:
 
     @classmethod
     def scrub(cls, text: str) -> str:
-        """Replace any absolute path in arbitrary text with its basename."""
-        return cls._ABS_PATH.sub(lambda m: os.path.basename(m.group(0).rstrip('\\/')),
-                                 str(text))
+        """Replace any absolute path in arbitrary text with its last segment.
+
+        The pattern deliberately matches BOTH a Windows drive path and a POSIX home
+        path regardless of which host is running, so the replacement has to be
+        host-independent too -- see last_segment().
+        """
+        return cls._ABS_PATH.sub(lambda m: cls.last_segment(m.group(0)), str(text))
 
     def log_result(self, test_name: str, passed: bool, message: str = "", is_warning: bool = False) -> None:
         """Log a test result.
