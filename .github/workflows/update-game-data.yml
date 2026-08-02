@@ -106,6 +106,39 @@ jobs:
               issues_response.raise_for_status()
               issues_data = issues_response.json()
 
+              # Redact third-party email addresses BEFORE the mirror is committed.
+              #
+              # issues-cache.json is a VERBATIM MIRROR of other people's issue text, and
+              # /issues/ renders those bodies to readers. On 2026-08-02 a Co-Authored-By
+              # trailer inside a pdoom1 issue body put a live address into this file, which
+              # turned check-published-emails.py -- a BLOCKING step in content-honesty.yml --
+              # red on main and on every open PR. Nothing in THIS repo could clear it: the
+              # only edit that fixes the literal is editing an issue in another repo, and the
+              # next run of this workflow would reinstate it. Same shape as the unclearable
+              # HIGH that #239 had to unblock, one guard over.
+              #
+              # An exemption was the wrong answer here. Publishing somebody's address is the
+              # exact disclosure that guard exists to prevent (75 academics' addresses were
+              # live on 44 event pages until 2026-07-29), and it does not stop being one
+              # because a bot copied it instead of a human. So it is fixed where the page is
+              # owned, which is what the guard's own failure message tells you to do.
+              #
+              # redact_pii() is IMPORTED from scripts/sync/sync-events.py rather than
+              # reimplemented, so this repo keeps exactly ONE definition of "what an email
+              # address looks like" -- the same one check-published-emails.py imports to
+              # verify the result. It walks the WHOLE payload rather than a named field
+              # list, so a field GitHub adds tomorrow is covered the day it appears, and it
+              # substitutes a visible "[email removed]" marker rather than deleting, so a
+              # reader can tell something was taken out on purpose.
+              import importlib.util
+              _spec = importlib.util.spec_from_file_location(
+                  "sync_events", "scripts/sync/sync-events.py")
+              _sync_events = importlib.util.module_from_spec(_spec)
+              _spec.loader.exec_module(_sync_events)
+              _found = _sync_events.count_emails(issues_data)
+              issues_data = _sync_events.redact_pii(issues_data)
+              print(f"Redacted {_found} email address(es) from the issues mirror")
+
               issues_cache = {
                   "issues": issues_data,
                   "count": len(issues_data),

@@ -96,6 +96,17 @@ Pip's stated top priority. Practically:
   commits reaches the repo but not pdoom1.com until the next human push. Affects
   every committing workflow here. Fix would be a deploy key/PAT or a
   `workflow_run` trigger.
+- **Never write the skip-CI marker in a commit message — not even quoting it.**
+  Several bot workflows here commit with `[` + `skip ci` + `]` in the subject, so
+  it is natural to name that marker when explaining what a bot commit did. GitHub
+  matches the token **anywhere in the message, including the body and inside
+  backticks**, and silently runs **nothing**: on 2026-08-02 a push to a PR
+  produced 3 check runs (all Netlify's) and **zero** Actions runs, with no
+  skipped/queued entry anywhere in `gh run list` — which reads exactly like an
+  Actions outage and cost a diagnostic cycle to tell apart. Refer to it as "the
+  skip-CI marker", or name the commit SHA. Symptom to recognise: Netlify checks
+  appear on the SHA and Actions checks do not exist at all (not pending, not
+  skipped — absent).
 
 ## Environment / tooling
 - Python is **`python`** (3.11), not `python3`. **Pillow IS installed** (12.3.0,
@@ -183,6 +194,15 @@ Pip's stated top priority. Practically:
   so a new upstream field cannot leak). `scripts/check-published-emails.py`
   re-verifies and imports the generator's one regex rather than copying it.
   The addresses are still in pdoom-data — scrubbing here does not fix the source.
+- **Events were not the only mirror.** `public/data/issues-cache.json` is a verbatim
+  copy of pdoom1's issue bodies, rendered by `/issues/`, and it was written raw. On
+  2026-08-02 a `Co-Authored-By` trailer inside an issue body put a live address on the
+  site and turned the BLOCKING honesty job red on main and on every open PR — nothing
+  in this repo could clear it, because the only edit that fixes the literal is in
+  another repo and the next sync reinstates it. `update-game-data.yml` now calls the
+  same `redact_pii()` (imported from `sync-events.py`, not reimplemented) before
+  committing. **When a guard is written for one mirror, check whether a second mirror
+  exists** — this is the twin of the exemption lesson #239 recorded one guard over.
 - `public/design/tokens.json` is fetched at runtime by ~8 pages; the other ~2,190
   hardcode their colours in an inline `:root`. It is not a design system yet.
 
