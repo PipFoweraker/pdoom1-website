@@ -124,8 +124,23 @@ To change the nav for the whole site, edit `navigationHTML` in
    <meta property="og:title" content="Page Title" />
    <meta property="og:description" content="Description" />
    <meta property="og:url" content="https://pdoom1.com/path/" />
-   <meta property="og:image" content="https://pdoom1.com/assets/pdoom_logo_1.png" />
+   <meta property="og:image" content="https://pdoom1.com/assets/og-card.jpg" />
    ```
+
+   **`og:image` is `/assets/og-card.jpg` and nothing else.** This line used to say
+   `/assets/pdoom_logo_1.png`, and that is a re-infection vector, not a typo:
+   `pdoom_logo_1.png` is the **2.6 MB, 1024x1536 source painting**. Every page
+   written from this template pointed a share card at it, so a link preview cost a
+   reader 2.6 MB for an image the scraper then rejected — the wrong aspect ratio
+   for a card. TECH_DEBT B5 closed that twice, and both times it came back from
+   here.
+
+   `og-card.jpg` is the derived card: 1200x630, ~94 KB, generated from the same
+   painting by `scripts/make-og-card.py`, and held to its dimensions and byte
+   budget by `python scripts/make-og-card.py --check`, which blocks in CI
+   (`content-honesty.yml`). Do NOT "improve" this back to the full-resolution
+   logo: the card is the derived artefact, the PNG is the source, and pointing
+   readers at source material is the bug.
 
 ## Privacy Considerations
 
@@ -169,5 +184,5 @@ Consider implementing:
 
 ---
 
-**Last Updated**: 2025-11-10
+**Last Updated**: 2026-08-03
 **Maintained by**: Development Team
