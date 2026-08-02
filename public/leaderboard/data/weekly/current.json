@@ -24,7 +24,7 @@
     "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
     "board_opens_local": "2026-07-31T17:00:00+10:00",
     "board_opens_utc": "2026-07-31T07:00:00Z",
-    "board_opens_confirmed": false,
+    "board_opens_confirmed": true,
     "observed_defects": {
       "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
       "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it."
@@ -76,7 +76,7 @@
       "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
       "board_opens_local": "2026-07-31T17:00:00+10:00",
       "board_opens_utc": "2026-07-31T07:00:00Z",
-      "board_opens_confirmed": false
+      "board_opens_confirmed": true
     }
   },
   "entries": [],
