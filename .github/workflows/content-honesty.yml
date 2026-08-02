@@ -54,6 +54,7 @@ on:
       - 'scripts/test-snapshot-plausible.py'
       - 'scripts/test-analytics-optout.js'
       - 'scripts/test-changelog-render.js'
+      - 'scripts/test-dashboard-devlog.js'
       - 'scripts/test-download-resolution.js'
       - 'scripts/test-header-consistency.js'
       - 'scripts/sync/sync-keybinds.py'
@@ -95,6 +96,7 @@ on:
       - 'scripts/test-snapshot-plausible.py'
       - 'scripts/test-analytics-optout.js'
       - 'scripts/test-changelog-render.js'
+      - 'scripts/test-dashboard-devlog.js'
       - 'scripts/test-download-resolution.js'
       - 'scripts/test-header-consistency.js'
       - 'scripts/sync/sync-keybinds.py'
@@ -143,6 +145,14 @@ jobs:
       # runtime. A hardcoded literal there is a release-day lie.
       - name: The game changelog derives, never hardcodes
         run: node scripts/test-changelog-render.js
+
+      # /dashboard/ carries a SECOND release surface -- the "Recent Development Log"
+      # box -- and it is in the nav. Until 2026-08-03 it read a hand-typed file that
+      # had frozen nine minor versions back, so the site contradicted itself one click
+      # from the changelog it links to. Deriving is not enough on its own: this also
+      # forces the freshness gate, because a derived source can stop moving.
+      - name: The dashboard development log derives AND is freshness-gated
+        run: node scripts/test-dashboard-devlog.js
 
       # The privacy promise: opt-out works, DNT is honoured, and nothing injects a
       # second tracker (two trackers race and the loser's events vanish).
