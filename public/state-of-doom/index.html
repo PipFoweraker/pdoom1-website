@@ -64,6 +64,10 @@
 		a:focus-visible{outline:2px solid var(--amber); outline-offset:3px}
 		@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 	</style>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
 	<header></header>
@@ -116,23 +120,27 @@
 			live.sort(function(a,b){return a.t-b.t});
 			var maxMs=live.reduce(function(m,o){return Math.max(m,o.t-new Date())},1);
 			var out='';
+			// Every value below comes out of /data/clocks.json and lands in innerHTML --
+			// several of them inside ATTRIBUTES (data-id, id, href), which is why the
+			// escaper has to cover quotes and the link has to have its scheme checked.
 			live.forEach(function(o){
-				var id=o.c.id, act=o.c.kind==='act';
-				out+='<div class="row '+(act?'act':'live')+'" data-id="'+id+'" data-t="'+o.t.getTime()+'">'
-					+'<div class="row-top"><div class="label"><b>'+o.c.title+'</b>'
+				var id=escapeHTML(o.c.id), act=o.c.kind==='act';
+				out+='<div class="row '+(act?'act':'live')+'" data-id="'+id+'" data-t="'+toNumber(o.t.getTime())+'">'
+					+'<div class="row-top"><div class="label"><b>'+escapeHTML(o.c.title)+'</b>'
 					+'<span class="kindtag '+(act?'kind-act':'kind-watch')+'">'+(act?'act':'watch')+'</span></div>'
 					+'<div class="val"><span class="n" id="n-'+id+'">—</span><span class="u">days</span></div></div>'
 					+'<div class="track"><div class="fill" id="f-'+id+'" style="width:0"></div></div>'
-					+(o.c.note?'<div class="src">'+o.c.note+'</div>':'')+'</div>';
+					+(o.c.note?'<div class="src">'+escapeHTML(o.c.note)+'</div>':'')+'</div>';
 			});
 			pend.forEach(function(o){
-				var src=o.c.date_source||{}, ref=src.issue?('awaiting '+src.issue):(o.c.calibration?'awaiting game calibration':'awaiting data');
-				var link=o.c.link?' · <a href="'+o.c.link+'" target="_blank" rel="noopener">source</a>':'';
-				out+='<div class="row pending" data-id="'+o.c.id+'">'
-					+'<div class="row-top"><div class="label">'+o.c.title
-					+'<span class="kindtag '+(o.c.kind==='act'?'kind-act':'kind-watch')+'">'+(o.c.kind||'watch')+'</span></div>'
+				var src=o.c.date_source||{}, ref=src.issue?('awaiting '+escapeHTML(src.issue)):(o.c.calibration?'awaiting game calibration':'awaiting data');
+				var href=safeUrl(o.c.link);
+				var link=href?' · <a href="'+href+'" target="_blank" rel="noopener">source</a>':'';
+				out+='<div class="row pending" data-id="'+escapeHTML(o.c.id)+'">'
+					+'<div class="row-top"><div class="label">'+escapeHTML(o.c.title)
+					+'<span class="kindtag '+(o.c.kind==='act'?'kind-act':'kind-watch')+'">'+escapeHTML(o.c.kind||'watch')+'</span></div>'
 					+'<div class="val"><span class="n">'+ref+'</span></div></div>'
-					+'<div class="src">'+(o.c.metabolism||'')+link+'</div></div>';
+					+'<div class="src">'+escapeHTML(o.c.metabolism||'')+link+'</div></div>';
 			});
 			document.getElementById('rows').innerHTML=out;
 			document.getElementById('early').textContent = live.length+' live · '+pend.length+' coming online';

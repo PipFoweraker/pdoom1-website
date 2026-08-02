@@ -54,6 +54,10 @@
         article hr { border: none; border-top: 1px solid var(--border-color); margin: 1.6rem 0; }
         .post-error { color: var(--accent-secondary); text-align: center; padding: 3rem 1rem; }
     </style>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
     <div class="container">
@@ -63,18 +67,29 @@
     <script>
         // Minimal, dependency-free Markdown renderer. Covers the subset used by
         // p(Doom)1 dev-blog posts: headings, bold/italic, links, images, inline
-        // code, fenced code, lists, blockquotes, hr, paragraphs. Content is our
-        // own trusted markdown; HTML is escaped before formatting for safety.
-        function escapeHtml(s) {
-            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        }
+        // code, fenced code, lists, blockquotes, hr, paragraphs.
+        //
+        // This page used to define its own escapeHtml() that handled & < > and NOT
+        // quotes -- while its two link rules put $1 and $2 straight inside alt="" and
+        // href="". The URL pattern is [^)\s]+, which happily accepts a double quote, so
+        //     [x](a"onmouseover=alert(1))
+        // ended the href and started a new attribute. The escaper could not defend its
+        // own primary sink. It now uses the site's one escaper, which covers " and ',
+        // plus isSafeUrl() for the scheme, which no amount of escaping can substitute for.
         function inline(text) {
-            let t = escapeHtml(text);
+            let t = escapeHTML(text);
             // images before links (both use bracket syntax)
-            t = t.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g,
-                '<img src="$2" alt="$1" loading="lazy" decoding="async">');
-            t = t.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,
-                '<a href="$2" rel="noopener">$1</a>');
+            t = t.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function (m, alt, src) {
+                // alt and src are already escaped; isSafeUrl rejects javascript:/data:.
+                return isSafeUrl(src)
+                    ? '<img src="' + src + '" alt="' + alt + '" loading="lazy" decoding="async">'
+                    : m;
+            });
+            t = t.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, label, href) {
+                return isSafeUrl(href)
+                    ? '<a href="' + href + '" rel="noopener">' + label + '</a>'
+                    : m;
+            });
             t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
             t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
             t = t.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
@@ -115,7 +130,7 @@
                     const buf = []; i++;
                     while (i < lines.length && !/^```/.test(lines[i])) { buf.push(lines[i]); i++; }
                     i++; // skip closing fence
-                    out.push('<pre><code>' + escapeHtml(buf.join('\n')) + '</code></pre>');
+                    out.push('<pre><code>' + escapeHTML(buf.join('\n')) + '</code></pre>');
                     continue;
                 }
                 const h = line.match(/^(#{1,6})\s+(.*)$/);

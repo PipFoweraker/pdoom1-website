@@ -13,12 +13,22 @@ on:
     paths:
       - 'public/blog/index.json'
       - 'public/blog/*.md'
+      - 'public/blog/post.html'
+      # test-blog-render.js runs the PAGE's renderer, which since 2026-08-01 depends
+      # on the shared escaper. A change to either must re-run it.
+      - 'public/assets/js/escape.js'
       - 'scripts/generate-feeds.py'
+      - 'scripts/test-blog-render.js'
   pull_request:
     paths:
       - 'public/blog/index.json'
       - 'public/blog/*.md'
+      - 'public/blog/post.html'
+      # test-blog-render.js runs the PAGE's renderer, which since 2026-08-01 depends
+      # on the shared escaper. A change to either must re-run it.
+      - 'public/assets/js/escape.js'
       - 'scripts/generate-feeds.py'
+      - 'scripts/test-blog-render.js'
   workflow_dispatch:
 
 permissions:

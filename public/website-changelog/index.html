@@ -29,6 +29,10 @@
     .meta { color: var(--text-muted); font-size: .9rem; margin-bottom: .5rem; }
     ul { margin: 0 0 0 1.25rem; }
   </style>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
   <header>
@@ -47,13 +51,17 @@
         const entries = data.entries || [];
         const el = document.getElementById('changes');
         if(entries.length===0){ el.innerHTML='<p style="color:#ccc">No changes yet.</p>'; return; }
+        // This page carried a hand-rolled half-escaper: .replace(/</g,'&lt;'), applied to
+        // two of the five fields. It leaves `>` and both quotes alone and is exactly the
+        // kind of thing that reads as "escaped" in review. Replaced by the site's one
+        // escaper, applied to all of them.
         el.innerHTML = entries.map(x=>{
           const date = x.date ? new Date(x.date).toLocaleDateString() : '';
-          const items = (x.items||[]).map(i=>`<li>${String(i).replace(/</g,'&lt;')}</li>`).join('');
+          const items = (x.items||[]).map(i=>`<li>${escapeHTML(i)}</li>`).join('');
           return `<section class="entry">
-            <h2>${x.version || 'Unversioned'}</h2>
-            <div class="meta">${date} ${x.channel? ' · '+x.channel : ''}</div>
-            ${x.summary? `<p>${String(x.summary).replace(/</g,'&lt;')}</p>`:''}
+            <h2>${escapeHTML(x.version || 'Unversioned')}</h2>
+            <div class="meta">${escapeHTML(date)} ${x.channel? ' · '+escapeHTML(x.channel) : ''}</div>
+            ${x.summary? `<p>${escapeHTML(x.summary)}</p>`:''}
             ${items? `<ul>${items}</ul>`:''}
           </section>`;
         }).join('');

@@ -51,9 +51,16 @@ if (!rendererTag) {
 const code = rendererTag.replace(/^<script>/, '').replace(/<\/script>$/, '');
 
 const fakeModule = { exports: {} };
+// The escaper is no longer inline on this page: as of 2026-08-01 it is the shared
+// public/assets/js/escape.js, loaded by a blocking <script src>. It is passed in here as
+// a parameter, which is the node-side equivalent of that tag -- without it the renderer
+// throws ReferenceError, which is the page's intended fail-closed behaviour.
+const SHARED = require(path.join(ROOT, 'public', 'assets', 'js', 'escape.js'));
 // `document` is genuinely undefined here, so the page's own guard short-circuits
 // the fetch calls and only the pure function is exercised.
-new Function('module', 'exports', code)(fakeModule, fakeModule.exports);
+new Function('module', 'exports', 'escapeHTML', 'safeUrl', 'isSafeUrl', 'toNumber', code)(
+  fakeModule, fakeModule.exports,
+  SHARED.escapeHTML, SHARED.safeUrl, SHARED.isSafeUrl, SHARED.toNumber);
 
 check('renderer is exported for testing', typeof fakeModule.exports.render === 'function');
 if (typeof fakeModule.exports.render !== 'function') { process.exit(1); }

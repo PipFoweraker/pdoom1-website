@@ -60,6 +60,9 @@ on:
       - 'scripts/test-board-escaping.js'
       - 'scripts/test-board-honesty.js'
       - 'public/leaderboard/index.html'
+      # The escaper is no longer inline on that page (2026-08-01). A change to the
+      # shared file changes the board's escaping, so it must re-run these guards.
+      - 'public/assets/js/escape.js'
       - 'public/data/version.json'
       - 'public/leaderboard/data/weekly/current.json'
   # PRs get the offline `guards` job ONLY -- see the `if:` on probe/alert below. The
@@ -75,6 +78,7 @@ on:
       - 'scripts/check-board-liveness.py'
       - 'scripts/board_liveness_summary.py'
       - 'public/leaderboard/**'
+      - 'public/assets/js/escape.js'
       - 'public/data/ladder-epochs.json'
       - '.github/workflows/board-liveness.yml'
 
@@ -113,7 +117,9 @@ jobs:
 
       # The score API is unauthenticated and validates nothing, so every field it
       # returns is attacker-controlled and every field reaching innerHTML must be
-      # escaped. There is exactly ONE escaper on the leaderboard page.
+      # escaped. There is exactly ONE escaper SITE-WIDE as of 2026-08-01 --
+      # public/assets/js/escape.js, which this page loads with a blocking <script src>.
+      # The same rule on the other 14 pages is enforced by escaping.yml.
       - name: No API field reaches innerHTML unescaped
         run: node scripts/test-board-escaping.js
 

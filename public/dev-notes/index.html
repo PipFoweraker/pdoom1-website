@@ -32,6 +32,10 @@
     .muted { color: var(--muted); }
     pre { background:#111; padding:1rem; border-radius: var(--radius); overflow-x:auto; }
   </style>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
   <header>
@@ -49,8 +53,20 @@
         const res = await fetch('/docs/DEV_NOTES.md', { cache: 'no-store' });
         if(!res.ok){ document.getElementById('notes').innerHTML = '<p class="muted">No notes found.</p>'; return; }
         const md = await res.text();
-        // Lightweight render: convert basic markdown headings/links/code to HTML
-        let html = md
+        // Lightweight render: basic markdown headings/links/code to HTML.
+        //
+        // ESCAPE FIRST, THEN FORMAT. Before 2026-08-01 this renderer did neither: the
+        // whole of DEV_NOTES.md went into innerHTML verbatim, so any <script> or
+        // onerror= in the markdown was live markup, and the link rule handed $2 straight
+        // into href="" -- which made both `[x](javascript:alert(1))` and a `"` in the URL
+        // slot work. The file is repo-controlled, so this was a contributor-reachable
+        // hole rather than an internet-reachable one; that is a smaller blast radius,
+        // not a different bug.
+        //
+        // Order matters: escapeHTML() runs on the raw text, so the tags added below are
+        // the ONLY tags in the output. safeUrl() then handles the one thing escaping
+        // cannot -- javascript:, which contains no HTML metacharacter.
+        let html = escapeHTML(md)
           .replace(/^### (.*$)/gim, '<h3>$1</h3>')
           .replace(/^## (.*$)/gim, '<h2>$1</h2>')
           .replace(/^# (.*$)/gim, '<h1>$1</h1>')
@@ -58,7 +74,14 @@
           .replace(/\*(.*?)\*/gim, '<em>$1</em>')
           .replace(/`([^`]+)`/g, '<code>$1</code>')
           .replace(/\n\n/g, '<br/><br/>' )
-          .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+          .replace(/\[(.*?)\]\((.*?)\)/g, function (m, text, href) {
+            // `href` is already escaped (escapeHTML ran over the whole document above),
+            // so a " in it is &quot; and cannot end the attribute. isSafeUrl adds the
+            // one thing escaping cannot: rejecting the scheme. A rejected link renders
+            // as its literal markdown, which a reader can see, rather than silently
+            // becoming a dead anchor.
+            return isSafeUrl(href) ? '<a href="' + href + '">' + text + '</a>' : m;
+          });
         document.getElementById('notes').innerHTML = html;
       } catch (e) {
         document.getElementById('notes').innerHTML = '<p class="muted">Failed to load notes.</p>';

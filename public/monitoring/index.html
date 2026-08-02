@@ -238,6 +238,10 @@
             }
         }
     </style>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
     <header>
@@ -579,10 +583,16 @@
                     ? `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">${noteText}</div>`
                     : '';
 
+                // Every ${} below that carries a value out of a JSON file goes through
+                // escapeHTML. These files are committed artefacts, but they are WRITTEN BY
+                // MACHINES from whatever the world handed them -- health-check.json once
+                // captured a raw Python traceback, and the weekly files are built from the
+                // unauthenticated score API. "Repo-controlled" is about who can commit,
+                // not about what the bytes are.
                 const banner = `
                     <div class="check-item">
                         <div>
-                            <div class="check-name">Last checked: ${when} (${formatAgeLong(ts)})</div>
+                            <div class="check-name">Last checked: ${escapeHTML(when)} (${escapeHTML(formatAgeLong(ts))})</div>
                             ${note}
                         </div>
                         <span class="check-status ${stale ? 'warn' : 'pass'}">${stale ? 'STALE' : 'CURRENT'}</span>
@@ -595,7 +605,7 @@
 
                     return `
                         <div class="check-item"${stale ? ' style="opacity: 0.6;"' : ''}>
-                            <span class="check-name">${check.test}</span>
+                            <span class="check-name">${escapeHTML(check.test)}</span>
                             <span class="check-status ${statusClass}">${statusText}</span>
                         </div>
                     `;
@@ -629,19 +639,21 @@
                 const jobs = Object.entries(automationData.jobs);
 
                 container.innerHTML = jobs.map(([jobName, job]) => {
-                    const successRate = job.total_runs > 0
-                        ? Math.round((job.success_count / job.total_runs) * 100)
-                        : 0;
+                    // The job NAME is a JSON object key, so it is data too -- and object
+                    // keys are the sink people forget, because they read like identifiers.
+                    const runs = toNumber(job.total_runs);
+                    const wins = toNumber(job.success_count);
+                    const successRate = runs > 0 ? Math.round((wins / runs) * 100) : 0;
 
                     const statusClass = successRate >= 80 ? 'pass' : (successRate >= 50 ? 'warn' : 'fail');
 
                     return `
                         <div class="check-item">
                             <div>
-                                <div class="check-name">${jobName.replace(/-/g, ' ')}</div>
+                                <div class="check-name">${escapeHTML(String(jobName).replace(/-/g, ' '))}</div>
                                 <div style="font-size: 0.8rem; color: var(--text-muted);">
-                                    Last run: ${formatAge(job.last_run)} |
-                                    Success rate: ${successRate}% (${job.success_count}/${job.total_runs})
+                                    Last run: ${escapeHTML(formatAge(job.last_run))} |
+                                    Success rate: ${successRate}% (${wins}/${runs})
                                 </div>
                             </div>
                             <span class="check-status ${statusClass}">
@@ -671,15 +683,15 @@
                 const container = document.getElementById('league-status');
 
                 const weekInfo = league.week_info || {};
-                const daysRemaining = weekInfo.days_remaining || 0;
+                const daysRemaining = toNumber(weekInfo.days_remaining);
                 const statusClass = daysRemaining > 2 ? 'pass' : (daysRemaining > 0 ? 'warn' : 'fail');
 
                 container.innerHTML = `
                     <div class="check-item">
                         <div>
-                            <div class="check-name">Current Week: ${weekInfo.week_id || 'Unknown'}</div>
+                            <div class="check-name">Current Week: ${escapeHTML(weekInfo.week_id || 'Unknown')}</div>
                             <div style="font-size: 0.8rem; color: var(--text-muted);">
-                                ${weekInfo.start_date} to ${weekInfo.end_date}
+                                ${escapeHTML(weekInfo.start_date)} to ${escapeHTML(weekInfo.end_date)}
                             </div>
                         </div>
                         <span class="check-status ${statusClass}">
@@ -689,19 +701,19 @@
                     <div class="check-item">
                         <span class="check-name">Weekly Seed</span>
                         <span style="font-family: monospace; color: var(--accent-primary);">
-                            ${league.seed || 'Not generated'}
+                            ${escapeHTML(league.seed || 'Not generated')}
                         </span>
                     </div>
                     <div class="check-item">
                         <span class="check-name">Participants</span>
                         <span class="metric-value">
-                            ${league.meta?.total_participants || 0}
+                            ${toNumber(league.meta && league.meta.total_participants)}
                         </span>
                     </div>
                     <div class="check-item">
                         <span class="check-name">Submissions</span>
                         <span class="metric-value">
-                            ${league.meta?.total_submissions || 0}
+                            ${toNumber(league.meta && league.meta.total_submissions)}
                         </span>
                     </div>
                 `;
@@ -729,15 +741,18 @@
                 const res = await fetch('/data/integration-health.json', { cache: 'no-store' });
                 if (!res.ok) throw new Error(res.status);
                 const h = await res.json();
-                const color = s => s === 'FAIL' ? '#ff4444' : (s === 'WARN' ? '#ffb000' : '#f6a800');
-                const badge = s => `<span style="color:${color(s)};font-weight:bold;">${s}</span>`;
+                // color() returns one of three hardcoded hexes, never the input, so the
+                // style="" attribute here can only ever hold a literal. The visible label
+                // is the untrusted half, and it is escaped.
+                const color = st => st === 'FAIL' ? '#ff4444' : (st === 'WARN' ? '#ffb000' : '#f6a800');
+                const badge = st => `<span style="color:${color(st)};font-weight:bold;">${escapeHTML(st)}</span>`;
                 const rows = (h.checks || []).map(c => `
                     <div style="display:flex;gap:0.75rem;padding:0.35rem 0;border-bottom:1px solid var(--border-color);flex-wrap:wrap;">
                         <span style="min-width:52px;">${badge(c.status)}</span>
-                        <span style="min-width:190px;color:var(--text-primary);">${c.name}</span>
-                        <span style="color:var(--text-muted);flex:1;">${c.detail || ''}</span>
+                        <span style="min-width:190px;color:var(--text-primary);">${escapeHTML(c.name)}</span>
+                        <span style="color:var(--text-muted);flex:1;">${escapeHTML(c.detail || '')}</span>
                     </div>`).join('');
-                const s = h.summary || {};
+                const summary = h.summary || {};
 
                 // Never present a committed artefact as live health. Without this the
                 // page shows a green "OK" forever if the snapshot ever stops refreshing.
@@ -757,9 +772,9 @@
                     <div style="margin-bottom:0.75rem;${stale ? 'opacity:0.6;' : ''}">
                         Overall: ${badge(h.overall_status)} &nbsp;
                         <span style="color:var(--text-muted);">
-                            ${s.fail||0} fail &middot; ${s.warn||0} warn &middot; ${s.ok||0} ok
-                            &nbsp;|&nbsp; checked ${ts ? new Date(ts).toLocaleString() : 'n/a'}
-                            ${ts ? '(' + formatAgeLong(ts) + ')' : ''}
+                            ${toNumber(summary.fail)} fail &middot; ${toNumber(summary.warn)} warn &middot; ${toNumber(summary.ok)} ok
+                            &nbsp;|&nbsp; checked ${ts ? escapeHTML(new Date(ts).toLocaleString()) : 'n/a'}
+                            ${ts ? '(' + escapeHTML(formatAgeLong(ts)) + ')' : ''}
                         </span>
                     </div>${stale ? `<div style="opacity:0.6;">${rows}</div>` : rows}`;
             } catch (e) {

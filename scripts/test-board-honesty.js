@@ -37,7 +37,13 @@ function extract(re, name) {
 }
 const srcApply = extract(/    function applyDataStatus\(data\) \{[\s\S]*?\n    \}/, 'applyDataStatus');
 const srcHonesty = extract(/    async function applyBoardHonesty\(data\) \{[\s\S]*?\n    \}/, 'applyBoardHonesty');
-const srcEscape = extract(/    function escapeHTML\(s\) \{[\s\S]*?\n    \}/, 'escapeHTML');
+
+// escapeHTML() is no longer inline on this page. As of 2026-08-01 it is the shared
+// public/assets/js/escape.js, loaded by a blocking <script src> in the head -- the site
+// carried FIVE separately-written escapers with three different coverages, and three of
+// them could not protect the attribute contexts they fed. It is passed in below as a
+// function parameter, which is the node-side equivalent of that <script> tag.
+const SHARED = require(path.join(__dirname, '..', 'public', 'assets', 'js', 'escape.js'));
 
 // ---- minimal DOM shim --------------------------------------------------------
 function makeDOM() {
@@ -79,11 +85,12 @@ function makeFetch(fetchMap) {
 async function run(data, fetchMap, { status } = {}) {
   const dom = makeDOM();
   const build = new Function(
-    'document', 'fetch',
-    srcEscape + '\n' + srcApply + '\n' + srcHonesty +
+    'document', 'fetch', 'escapeHTML', 'safeUrl', 'isSafeUrl', 'toNumber',
+    srcApply + '\n' + srcHonesty +
     '\nreturn { applyDataStatus, applyBoardHonesty, escapeHTML };'
   );
-  const api = build(dom.document, makeFetch(fetchMap));
+  const api = build(dom.document, makeFetch(fetchMap),
+    SHARED.escapeHTML, SHARED.safeUrl, SHARED.isSafeUrl, SHARED.toNumber);
   api.applyDataStatus(data);
   await api.applyBoardHonesty(data);
   return { dom, api, text: dom.banner._visible, shown: dom.banner.style.display };
@@ -249,10 +256,11 @@ const BOARD_V11 = { data_status: 'pre-launch', entries: [], meta: { game_version
   // 11. Idempotence: the seed/week filter re-runs the loader.
   console.log('11. Re-running does not stack duplicate notices');
   const dom = makeDOM();
-  const api = new Function('document', 'fetch',
-    srcEscape + '\n' + srcApply + '\n' + srcHonesty +
+  const api = new Function('document', 'fetch', 'escapeHTML', 'safeUrl', 'isSafeUrl', 'toNumber',
+    srcApply + '\n' + srcHonesty +
     '\nreturn { applyDataStatus, applyBoardHonesty };')(
-    dom.document, makeFetch({ 'board-liveness.json': LIVENESS_EPOCH_UNKNOWN }));
+    dom.document, makeFetch({ 'board-liveness.json': LIVENESS_EPOCH_UNKNOWN }),
+    SHARED.escapeHTML, SHARED.safeUrl, SHARED.isSafeUrl, SHARED.toNumber);
   api.applyDataStatus(BOARD_V11);
   await api.applyBoardHonesty(BOARD_V11);
   const once = (dom.banner._visible.match(/Cannot confirm/g) || []).length;

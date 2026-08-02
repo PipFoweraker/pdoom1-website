@@ -53,18 +53,31 @@ function extract(re, name) {
   if (!m) { console.error('FAIL: could not extract ' + name + ' from the page'); process.exit(1); }
   return m[0];
 }
-const srcEscape   = extract(/    function escapeHTML\(s\) \{[\s\S]*?\n    \}/, 'escapeHTML()');
+// escapeHTML() NO LONGER LIVES ON THIS PAGE. As of 2026-08-01 it is
+// public/assets/js/escape.js, loaded by a blocking <script src> in the head -- the site
+// had FIVE separately-written escapers with three different coverages, and three of them
+// could not protect the attribute contexts they fed. This test now loads the shared
+// module the same way the browser does, so it exercises the code that actually ships.
+// Site-wide coverage of the same rule lives in scripts/test-escaping.js.
+const SHARED = require(path.join(__dirname, '..', 'public', 'assets', 'js', 'escape.js'));
+const { escapeHTML, toNumber } = SHARED;
+
 const srcIdentity = extract(/    const identityHTML = \(entry\) => \{[\s\S]*?\n    \};/, 'identityHTML()');
 const srcMarker   = extract(/    const DEV_MARKER = .*/, 'DEV_MARKER');
 const srcIsDev    = extract(/    const isDevBuild = \(entry\) =>[\s\S]*?;\n/, 'isDevBuild()');
 const srcBadge    = extract(/    const devBadgeHTML = \(entry\) =>[\s\S]*?;\n/, 'devBadgeHTML()');
 
-const sandbox = {};
-new Function('S', 'with (S) { ' + srcEscape + '\n' + srcIdentity + '\n' + srcMarker + '\n'
+const sandbox = { escapeHTML, toNumber };
+new Function('S', 'with (S) { ' + srcIdentity + '\n' + srcMarker + '\n'
   + srcIsDev + '\n' + srcBadge + '\n'
-  + 'S.escapeHTML = escapeHTML; S.identityHTML = identityHTML;'
+  + 'S.identityHTML = identityHTML;'
   + 'S.isDevBuild = isDevBuild; S.devBadgeHTML = devBadgeHTML; }')(sandbox);
-const { escapeHTML, identityHTML, isDevBuild, devBadgeHTML } = sandbox;
+const { identityHTML, isDevBuild, devBadgeHTML } = sandbox;
+
+// The page must actually load the shared escaper, or every template below throws at
+// runtime. That is fail-closed, but it is still a broken page.
+check(/<script src="\/assets\/js\/escape\.js"><\/script>/.test(src),
+  'the page loads /assets/js/escape.js with a blocking <script src>');
 
 // A payload of the shapes an attacker would actually try.
 const HOSTILE = [
@@ -123,8 +136,8 @@ check(unescaped.length === 0,
     : `${unescaped.length} UNESCAPED: ${unescaped.slice(0, 4).join('  ')}`);
 check(/modalName\.textContent =/.test(src),
   'the modal name still goes through textContent, not innerHTML');
-check(!/const esc =/.test(src),
-  'exactly ONE escaper on the page -- no second helper to drift from escapeHTML');
+check(!/(?:function|const|let|var)\s+(?:esc|escape[A-Za-z]*|sanitize[A-Za-z]*)\s*[=(]/.test(src),
+  'the page defines NO escaper of its own -- the one implementation is escape.js');
 
 console.log('\n3. identityHTML escapes BOTH slots');
 for (const h of HOSTILE.slice(0, 5)) {

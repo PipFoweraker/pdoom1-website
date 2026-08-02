@@ -96,6 +96,17 @@ Pip's stated top priority. Practically:
   commits reaches the repo but not pdoom1.com until the next human push. Affects
   every committing workflow here. Fix would be a deploy key/PAT or a
   `workflow_run` trigger.
+- **Never write the skip-CI marker in a commit message — not even quoting it.**
+  Several bot workflows here commit with `[` + `skip ci` + `]` in the subject, so
+  it is natural to name that marker when explaining what a bot commit did. GitHub
+  matches the token **anywhere in the message, including the body and inside
+  backticks**, and silently runs **nothing**: on 2026-08-02 a push to a PR
+  produced 3 check runs (all Netlify's) and **zero** Actions runs, with no
+  skipped/queued entry anywhere in `gh run list` — which reads exactly like an
+  Actions outage and cost a diagnostic cycle to tell apart. Refer to it as "the
+  skip-CI marker", or name the commit SHA. Symptom to recognise: Netlify checks
+  appear on the SHA and Actions checks do not exist at all (not pending, not
+  skipped — absent).
 
 ## Environment / tooling
 - Python is **`python`** (3.11), not `python3`. **Pillow IS installed** (12.3.0,
@@ -183,6 +194,15 @@ Pip's stated top priority. Practically:
   so a new upstream field cannot leak). `scripts/check-published-emails.py`
   re-verifies and imports the generator's one regex rather than copying it.
   The addresses are still in pdoom-data — scrubbing here does not fix the source.
+- **Events were not the only mirror.** `public/data/issues-cache.json` is a verbatim
+  copy of pdoom1's issue bodies, rendered by `/issues/`, and it was written raw. On
+  2026-08-02 a `Co-Authored-By` trailer inside an issue body put a live address on the
+  site and turned the BLOCKING honesty job red on main and on every open PR — nothing
+  in this repo could clear it, because the only edit that fixes the literal is in
+  another repo and the next sync reinstates it. `update-game-data.yml` now calls the
+  same `redact_pii()` (imported from `sync-events.py`, not reimplemented) before
+  committing. **When a guard is written for one mirror, check whether a second mirror
+  exists** — this is the twin of the exemption lesson #239 recorded one guard over.
 - `public/design/tokens.json` is fetched at runtime by ~8 pages; the other ~2,190
   hardcode their colours in an inline `:root`. It is not a design system yet.
 
@@ -277,6 +297,10 @@ python  scripts/stamp-league-epoch.py --check   # weekly records carry epoch [da
 node    scripts/test-board-escaping.js    # no API field reaches innerHTML   [board-liveness]
 node    scripts/test-board-honesty.js     # key mismatch stays visible       [board-liveness]
 python  scripts/test-publish-live-board.py # publisher refuses, never guesses [board-liveness]
+
+node    scripts/test-escaping.js          # the SAME rule on the other 14 pages [escaping]
+node    scripts/test-roadmap-render.js    # roadmap markdown subset + escaping  [escaping]
+node    scripts/test-blog-render.js       # blog markdown subset               [generate-feeds]
 ```
 
 **Severity model — the rule that decides where a check goes.** A check is
@@ -345,8 +369,40 @@ Every line below was earned by something that actually went wrong here, mostly o
   gets past the early return.
 - **Anything rendering data from the score API must escape it.** That API is
   unauthenticated and validates nothing — `GET ?seed=x&version=L9` returns `ok:true` for
-  a board that never existed — so every field is attacker-controlled. There is exactly
-  ONE escaper on the leaderboard page; do not add a second.
+  a board that never existed — so every field is attacker-controlled.
+
+## Escaping: there is exactly ONE escaper, and it is a file
+`public/assets/js/escape.js` — `escapeHTML`, `safeUrl`, `safeUrlRaw`, `isSafeUrl`,
+`toNumber`. Every page that renders fetched data loads it with a **plain blocking**
+`<script src="/assets/js/escape.js">` in the head (not defer, not async — the inline
+renderers call it). If it fails to load, `escapeHTML` is undefined, the template throws
+and the page renders nothing: **fail closed**.
+
+- **Do not write a second one.** Before 2026-08-01 there were FIVE, with three different
+  coverages, and **three of them did not escape quotes while feeding attribute contexts**
+  (`href="…"`, `style="background:#…"`, `alt="…"`), where a bare `"` ends the attribute
+  and the next token is read as a new attribute. They could not protect their own primary
+  sink. `league/archive.html` had the only complete one — applied to 9 interpolations and
+  skipped on 11, which is *worse* than none because it defeats a reviewer's spot check.
+- **Pick by sink, not by habit:** `escapeHTML` for element text and quoted attributes;
+  `safeUrl` for an href/src inside an HTML string; `safeUrlRaw` for a JS sink like
+  `window.open` (`safeUrl` would turn the query `&` into `&amp;`); `isSafeUrl` when the
+  string is already escaped in place. Escaping alone can never make a URL safe —
+  `javascript:alert(1)` contains no HTML metacharacter.
+- **`toNumber` is an availability fix, not an escaping one.** `entry.score.toLocaleString()`
+  and `(entry.final_doom || 0).toFixed(1)` both throw a `TypeError` on a string, and one
+  throw inside a render loop kills the **whole** list. `|| 0` does not help: a non-empty
+  string is truthy, and `String.toLocaleString` is the identity function. A single POST of
+  `{"score":"x"}` was a denial of service on `/league/`, `/league/archive.html` and
+  `/leaderboard/` with no injection involved.
+- **`escapeHTML` is not correct in every context.** Unquoted attributes, `<script>`,
+  `<style>`, and `on*` handlers need restructuring, not escaping. `/issues/` validates
+  `label.color` as six hex digits instead, because a `style=` value is CSS, not HTML.
+- Enforced by `scripts/test-escaping.js` + `.github/workflows/escaping.yml`. It enforces
+  the **class**: interpolations are checked by declared external-data ROOT (so a new field
+  is covered the day it lands) and every `fetch()` target must be declared (so a new data
+  source fails until someone says where its result goes). Adding a page that renders
+  fetched data means adding it to `GUARDED` in that file.
 
 **`/metabolism/` is generated, never hand-edited.** `scripts/generate-metabolism.py`
 derives every cadence on that page at build time from the thing that actually runs —

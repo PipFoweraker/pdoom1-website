@@ -562,6 +562,10 @@
       }
     })();
   </script>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
+	     PLAIN blocking script: the inline renderers below call it, so it has to be
+	     defined before they run. Not defer, not async. -->
+	<script src="/assets/js/escape.js"></script>
 </head>
 <body>
   <header>
@@ -728,11 +732,13 @@
   <script>
     // Archive JSON is repo-controlled, but it is still data being spliced into
     // innerHTML -- escape it rather than trust the pipeline that produced it.
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, c => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[c]));
-    }
+    //
+    // This page had the only COMPLETE escaper on the site (it covered " and '), which
+    // made it look protected -- but the 2026-08-01 sweep found it applied to nine
+    // interpolations and skipped on eleven, including winner.player_name in the toast
+    // (click any archive card) and every field of the card grid. A partially-applied
+    // escaper is worse than none: it defeats a reader's spot check. It now uses the
+    // site's single escaper from /assets/js/escape.js, applied to all of them.
 
     // Pagination state
     let currentPage = 1;
@@ -865,23 +871,23 @@
         const entries = (data && data.entries) || [];
         const rows = entries
           .slice()
-          .sort((x, y) => (y.score || 0) - (x.score || 0))
+          .sort((x, y) => toNumber(y.score) - toNumber(x.score))
           .map(e => `<tr>
-              <td>${escapeHtml(e.player_name || 'Unknown')}</td>
-              <td style="text-align:right">${escapeHtml(String(e.score ?? ''))}</td>
-              <td>${escapeHtml(String(e.date || '').slice(0, 10))}</td>
-              <td><code>${escapeHtml(String(e.game_mode || ''))}</code></td>
+              <td>${escapeHTML(e.player_name || 'Unknown')}</td>
+              <td style="text-align:right">${escapeHTML(String(e.score ?? ''))}</td>
+              <td>${escapeHTML(String(e.date || '').slice(0, 10))}</td>
+              <td><code>${escapeHTML(String(e.game_mode || ''))}</code></td>
             </tr>`).join('');
 
         const block = document.createElement('div');
         block.className = 'preserved-board';
         block.innerHTML = `
-          <h3><code>${escapeHtml(b.board_key || '')}</code></h3>
+          <h3><code>${escapeHTML(b.board_key || '')}</code></h3>
           <p class="preserved-meta">
-            ${b.entry_count} submission${b.entry_count === 1 ? '' : 's'}
-            &middot; ${escapeHtml(String(b.first_entry || '').slice(0, 10))}
-            &ndash; ${escapeHtml(String(b.last_entry || '').slice(0, 10))}
-            &middot; key type: ${escapeHtml(b.key_kind || '')}
+            ${toNumber(b.entry_count)} submission${toNumber(b.entry_count) === 1 ? '' : 's'}
+            &middot; ${escapeHTML(String(b.first_entry || '').slice(0, 10))}
+            &ndash; ${escapeHTML(String(b.last_entry || '').slice(0, 10))}
+            &middot; key type: ${escapeHTML(b.key_kind || '')}
           </p>
           ${rows ? `<div style="overflow-x:auto"><table class="preserved-table">
             <thead><tr><th>Player</th><th style="text-align:right">Score</th><th>Date</th><th>Build</th></tr></thead>
@@ -1002,57 +1008,64 @@
 
       const defects = (archive.epoch && archive.epoch.observed_defects) || {};
       const defectItems = Object.values(defects)
-        .map(text => `<li>${escapeHtml(text)}</li>`).join('');
+        .map(text => `<li>${escapeHTML(text)}</li>`).join('');
 
       card.innerHTML = `
         ${anomalous ? '<div class="anomaly-badge">Anomalous pre-history — not a result</div>' : ''}
         <div class="archive-card-header">
-          <div class="week-id">${meta.week_id || 'Unknown Week'}</div>
-          <div class="season-badge">${meta.season || 'Unknown'}</div>
+          <div class="week-id">${escapeHTML(meta.week_id || 'Unknown Week')}</div>
+          <div class="season-badge">${escapeHTML(meta.season || 'Unknown')}</div>
         </div>
         <div class="archive-stats">
           ${anomalous ? `
           <div class="stat-item">
             <span class="stat-label">Version stamp</span>
-            <span class="stat-value">${escapeHtml(meta.game_version || 'unknown')}</span>
+            <span class="stat-value">${escapeHTML(meta.game_version || 'unknown')}</span>
           </div>` : ''}
           <div class="stat-item">
             <span class="stat-label">Date Range</span>
-            <span class="stat-value">${weekInfo.start_date || '-'} to ${weekInfo.end_date || '-'}</span>
+            <span class="stat-value">${escapeHTML(weekInfo.start_date || '-')} to ${escapeHTML(weekInfo.end_date || '-')}</span>
           </div>
           <div class="stat-item">
             <span class="stat-label">Participants</span>
-            <span class="stat-value">${meta.total_participants || 0}</span>
+            <span class="stat-value">${toNumber(meta.total_participants).toLocaleString()}</span>
           </div>
           <div class="stat-item">
             <span class="stat-label">Submissions</span>
-            <span class="stat-value">${meta.total_submissions || 0}</span>
+            <span class="stat-value">${toNumber(meta.total_submissions).toLocaleString()}</span>
           </div>
           <div class="stat-item">
             <span class="stat-label">High Score</span>
-            <span class="stat-value">${(stats.highest_score || 0).toLocaleString()}</span>
+            <span class="stat-value">${toNumber(stats.highest_score).toLocaleString()}</span>
           </div>
           <div class="stat-item">
             <span class="stat-label">Avg Score</span>
-            <span class="stat-value">${(stats.average_score || 0).toFixed(1)}</span>
+            <span class="stat-value">${toNumber(stats.average_score).toFixed(1)}</span>
           </div>
         </div>
         ${winner ? `
           <div class="winner-highlight">
             <div class="winner-label">[WIN] Winner</div>
-            <div class="winner-name">${escapeHtml(winner.player_name || 'Unknown')}</div>
+            <div class="winner-name">${escapeHTML(winner.player_name || 'Unknown')}</div>
           </div>
         ` : ''}
         ${defectItems ? `<ul class="defect-list">${defectItems}</ul>` : ''}
       `;
 
-      // Add click handler to view details (using toast instead of alert)
+      // Add click handler to view details (using toast instead of alert).
+      // showToast() puts `body` into innerHTML, so this is a live XSS sink reached by
+      // clicking any archive card -- and it was the one interpolation of player_name on
+      // this page that the old escaper was NOT applied to. `winner.score` was also a
+      // crash here: .toLocaleString() on a missing/string score throws inside the click
+      // handler and the toast never opens.
       card.addEventListener('click', () => {
-        const header = `${meta.week_id} Details`;
+        // showToast puts `header` into textContent, which the DOM escapes for us --
+        // built with concatenation rather than a template so that fact is legible.
+        const header = (meta.week_id || 'Archive') + ' Details';
         let body = 'Detailed archive view coming soon!';
-        
+
         if (winner) {
-          body += `<br><br><strong>Winner:</strong> ${winner.player_name}<br><strong>Score:</strong> ${winner.score.toLocaleString()}`;
+          body += `<br><br><strong>Winner:</strong> ${escapeHTML(winner.player_name || 'Unknown')}<br><strong>Score:</strong> ${toNumber(winner.score).toLocaleString()}`;
         } else {
           body += '<br><br>No winner data available';
         }
