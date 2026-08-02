@@ -304,6 +304,108 @@ def find_published_emails(rendered: Dict[str, str], is_allowed) -> Dict[str, Lis
 
 
 # ---------------------------------------------------------------------------
+# Markdown image syntax
+#
+# Upstream descriptions are Markdown source, not plain prose. The generator
+# emits them into HTML contexts that render Markdown NOWHERE -- the body of
+# <p class="description"> and the content="..." of three <meta> tags -- so an
+# embedded image arrives at the reader as the literal characters
+# "![](https://res.cloudinary.com/lesswrong-2-0/image/upload/...png)".
+#
+# Two things are wrong with that, and only the first is cosmetic:
+#   * it reads as a broken page;
+#   * it publishes a third party's CDN URL as VISIBLE TEXT, on a site whose
+#     rule is not to hand out other people's identifiers (same family as the
+#     75 academics' email addresses redact_pii() exists for).
+#
+# Live in the shipped corpus on 2026-08-03: 12 pages, and 7 of them also fed
+# `/events/` its browse-list snippet through events.json. One
+# (alignmentforum_d32b2cc700b53f60) is a run of EIGHT images and no prose at
+# all, and its description is truncated upstream mid-URL, which is why the
+# unterminated form has to be handled too -- otherwise stripping the complete
+# images leaves a bare CDN path behind as the tail of the sentence.
+#
+# MARKING, NOT DELETING -- the same rule as REDACTION_MARKER. A reader who sees
+# a gap should be able to tell that something was taken out on purpose. Silently
+# dropping the image leaves "Figure 1: Something happens at future time T",
+# which reads as prose about a figure that was never there. "[image]" is true:
+# the source had an image here and this page does not reproduce it. It also
+# means the result is never the empty string, so a description is never
+# silently truncated to nothing.
+#
+# Deliberately NOT rendering the image: these are third-party CDNs, so an <img>
+# would leak every reader's IP and referrer to Cloudinary/imgur/Google, and half
+# the URLs are relative paths (`images/multiple-pages.svg`) that resolve to
+# nothing on this origin.
+MARKDOWN_IMAGE_MARKER = "[image]"
+
+# A URL inside Markdown link parentheses contains no whitespace and no bare
+# parenthesis; the optional trailing "title" is quoted. Keeping the body that
+# tight matters: a loose [^)]* would run past an unmatched "(" in ordinary prose
+# and eat the rest of the sentence, which is exactly the silent truncation this
+# is supposed to prevent.
+MARKDOWN_IMAGE_PATTERN = re.compile(
+    r"!\[[^\]\n]*\]"                 # ![alt]
+    r"\([^()\s]*"                    # (url
+    r"(?:\s+\"[^\"\n]*\")?"          # optional "title"
+    r"\)"                            # )
+)
+
+# The same thing with its closing paren cut off by an upstream length budget.
+# Anchored to end-of-string so it can only ever consume a genuine tail.
+TRUNCATED_MARKDOWN_IMAGE_PATTERN = re.compile(r"!\[[^\]\n]*\]\([^()\s]*$")
+
+_MARKER_RE = re.escape(MARKDOWN_IMAGE_MARKER)
+_MARKER_RUN = re.compile(r"%s(?:[ \t]*%s)+" % (_MARKER_RE, _MARKER_RE))
+
+
+def strip_markdown_images_in_text(text: str) -> str:
+    """Replace Markdown image syntax with MARKDOWN_IMAGE_MARKER.
+
+    Prose either side is preserved verbatim -- only the "![...](...)" run is
+    replaced -- and a run of adjacent images collapses to one marker, because
+    eight consecutive "[image]"s tell the reader nothing the first one did not.
+    """
+    out = MARKDOWN_IMAGE_PATTERN.sub(MARKDOWN_IMAGE_MARKER, text)
+    out = TRUNCATED_MARKDOWN_IMAGE_PATTERN.sub(MARKDOWN_IMAGE_MARKER, out)
+    out = _MARKER_RUN.sub(MARKDOWN_IMAGE_MARKER, out)
+    # Upstream writes "![](url)The bridge to AGI control" with no separator, so
+    # without this the marker fuses onto the first word of the sentence.
+    out = re.sub(r"(%s)(?=[^\s])" % _MARKER_RE, r"\1 ", out)
+    out = re.sub(r"(?<=[^\s])(%s)" % _MARKER_RE, r" \1", out)
+    return out.strip()
+
+
+def strip_markdown_images(value: Any) -> Any:
+    """Recursively strip Markdown images from any nested str/list/dict value.
+
+    Walks the WHOLE record for the same reason redact_pii() does: events.json
+    serialises every field, `description` is merely where the corpus happens to
+    carry images today, and a field added upstream tomorrow must be covered on
+    the day it appears rather than the day someone notices.
+    """
+    if isinstance(value, str):
+        return strip_markdown_images_in_text(value)
+    if isinstance(value, list):
+        return [strip_markdown_images(v) for v in value]
+    if isinstance(value, dict):
+        return {k: strip_markdown_images(v) for k, v in value.items()}
+    return value
+
+
+def count_markdown_images(value: Any) -> int:
+    """Count Markdown images in a nested structure (for the sync log)."""
+    if isinstance(value, str):
+        return (len(MARKDOWN_IMAGE_PATTERN.findall(value))
+                + len(TRUNCATED_MARKDOWN_IMAGE_PATTERN.findall(value)))
+    if isinstance(value, list):
+        return sum(count_markdown_images(v) for v in value)
+    if isinstance(value, dict):
+        return sum(count_markdown_images(v) for v in value.values())
+    return 0
+
+
+# ---------------------------------------------------------------------------
 # HTML escaping
 #
 # Every string below reaches a generated page through an f-string, so the page
@@ -1275,6 +1377,26 @@ def main():
         )
     else:
         log("No obfuscated contact strings detected")
+
+    # Replace Markdown image syntax with a marker. Upstream descriptions are
+    # Markdown; neither <p class="description"> nor a <meta content="..."> slot
+    # renders it, so an image arrives as a literal CDN URL in the reader's face.
+    # Runs AFTER redaction (so an address inside an image title is still caught
+    # by the address pass) and BEFORE page generation and write_events_json(),
+    # so neither surface can publish one. See strip_markdown_images().
+    log("Stripping Markdown image syntax from event text...")
+    images_found = 0
+    events_with_images = 0
+    for event_id, event in events.items():
+        n = count_markdown_images(event)
+        if n:
+            images_found += n
+            events_with_images += 1
+            events[event_id] = strip_markdown_images(event)
+    if images_found:
+        log(f"Replaced {images_found} Markdown images across {events_with_images} events")
+    else:
+        log("No Markdown image syntax found in event data")
 
     # Render EVERYTHING to memory first. Nothing touches disk until the
     # verification below has passed -- see the "Pre-write verification" block.
