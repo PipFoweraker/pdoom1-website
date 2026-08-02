@@ -42,6 +42,13 @@ on:
       - 'scripts/test-platform-claims.py'
       - 'scripts/check-published-emails.py'
       - 'scripts/check-stale-facts.py'
+      # The three committing generators and the tests that force their refusals.
+      - 'scripts/sync/sync-events.py'
+      - 'scripts/test-sync-events.py'
+      - 'scripts/update-version-info.py'
+      - 'scripts/test-update-version-info.py'
+      - 'scripts/health-check.py'
+      - 'scripts/test-health-check.py'
       - 'scripts/snapshot-copy.py'
       - 'scripts/snapshot-plausible.py'
       - 'scripts/test-snapshot-plausible.py'
@@ -76,6 +83,13 @@ on:
       - 'scripts/test-platform-claims.py'
       - 'scripts/check-published-emails.py'
       - 'scripts/check-stale-facts.py'
+      # The three committing generators and the tests that force their refusals.
+      - 'scripts/sync/sync-events.py'
+      - 'scripts/test-sync-events.py'
+      - 'scripts/update-version-info.py'
+      - 'scripts/test-update-version-info.py'
+      - 'scripts/health-check.py'
+      - 'scripts/test-health-check.py'
       - 'scripts/snapshot-copy.py'
       - 'scripts/snapshot-plausible.py'
       - 'scripts/test-snapshot-plausible.py'
@@ -138,6 +152,21 @@ jobs:
       # Third parties' addresses scraped out of paper PDFs must never be served.
       - name: No third party's email address is published
         run: python scripts/check-published-emails.py
+
+      # The three generators that publish reader-facing data on committing crons.
+      # check-published-emails.py above walks what is ALREADY COMMITTED, so it can only
+      # report a leak that has already shipped; these force the failure at the generator,
+      # which is the only place it can still be prevented. All stdlib, all offline --
+      # each stubs its inputs in a temp dir and asserts the refusal, so none of them
+      # needs network, a pdoom1 checkout, or the `requests` this job does not install.
+      - name: sync-events redacts PII and no event text can reshape a page
+        run: python scripts/test-sync-events.py
+
+      - name: update-version-info refuses to guess, and derives platforms from assets
+        run: python scripts/test-update-version-info.py
+
+      - name: health-check publishes no absolute path
+        run: python scripts/test-health-check.py
 
       # --ci, not --check: drift and freshness are only fixable by re-running the sync
       # against a local pdoom1 checkout, which no runner has, so they print as WARN.
