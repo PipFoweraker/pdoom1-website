@@ -14,7 +14,6 @@ Usage:
     python scripts/sync/sync-events.py [--pdoom-data-path PATH] [--sync-icons]
 """
 
-import html
 import json
 import os
 import re
@@ -23,7 +22,7 @@ import argparse
 import shutil
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 # Force UTF-8 for Windows console
 if sys.platform == 'win32':
@@ -42,6 +41,20 @@ ICONS_DIR = PUBLIC_DIR / "assets" / "icons" / "events"
 # Default pdoom-data location (sibling directory)
 DEFAULT_PDOOM_DATA = WEBSITE_ROOT.parent / "pdoom-data"
 DEFAULT_PDOOM1 = WEBSITE_ROOT.parent / "pdoom1"
+
+# Canonical origin, used to build absolute og:url / og:image values (the
+# OpenGraph spec requires absolute URLs -- a relative path is silently ignored
+# by every scraper).
+SITE_ORIGIN = "https://pdoom1.com"
+
+# The site-wide share card already referenced by index/about/press. Deliberately
+# NOT a per-event image: no per-event art exists, and pointing at one that does
+# not exist is worse than pointing at the generic card.
+OG_IMAGE_URL = f"{SITE_ORIGIN}/assets/og-card.jpg"
+
+# Length budget for the description reused by <meta name="description">,
+# og:description and twitter:description.
+META_DESCRIPTION_CHARS = 155
 
 
 def log(message: str, level: str = "INFO"):
@@ -232,6 +245,31 @@ def escape_event_for_html(value: Any) -> Any:
     return value
 
 
+def meta_text(value: Any, limit: Optional[int] = None) -> str:
+    """Prepare an arbitrary event string for a <meta content="..."> slot.
+
+    Escaping alone is not enough for the meta block, which is why this exists
+    alongside esc() rather than instead of it. Two extra problems, both present
+    in the shipped corpus:
+      * newlines and runs of whitespace -- many arXiv-derived descriptions are
+        multi-line, so the raw value emitted an attribute spanning six physical
+        lines and rendered as a mangled share-card snippet;
+      * length -- og:description and twitter:description want a snippet, not the
+        whole abstract.
+
+    It does NOT define a second notion of escaping: the last step calls esc(),
+    the single escaper this module owns. Order matters -- collapse and truncate
+    FIRST, escape LAST, so the character budget counts what a reader sees and a
+    cut can never land inside an entity. That means meta_text() must be handed
+    the UNESCAPED value (`raw[...]`), never the pre-escaped `event[...]`, or the
+    ampersands get escaped twice.
+    """
+    collapsed = " ".join(str(value).split())
+    if limit is not None and len(collapsed) > limit:
+        collapsed = collapsed[:limit].rstrip() + "…"
+    return esc(collapsed)
+
+
 def sanitize_urls_in_text(text: str) -> str:
     """Convert HTTP URLs to HTTPS where safe to do so"""
     import re
@@ -395,14 +433,45 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
     safety_badge, safety_source = build_reaction_html(event['safety_researcher_reaction'], 'safety_researcher_reaction')
     media_badge, media_source = build_reaction_html(event['media_reaction'], 'media_reaction')
 
+    # Values shared by <meta name="description"> and the OpenGraph / Twitter
+    # card block. Built from `raw`, NOT from the already-escaped `event`:
+    # meta_text() collapses and truncates before escaping (see its docstring),
+    # so handing it a pre-escaped string would double-escape the ampersands and
+    # let a cut land inside an entity. `event_id_esc` is reused rather than
+    # re-derived so the canonical URL and og:url cannot drift apart.
+    page_url = f"{SITE_ORIGIN}/events/{event_id_esc}.html"
+    og_title = meta_text(raw['title'])
+    og_description = meta_text(raw['description'], META_DESCRIPTION_CHARS)
+
     html_content = f"""<!DOCTYPE html>
 <html lang="en-AU">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{event['title']} | p(Doom)1 Events</title>
-	<link rel="canonical" href="https://pdoom1.com/events/{event_id_esc}.html" />
-	<meta name="description" content="{esc(raw['description'][:155])}" />
+	<link rel="canonical" href="{page_url}" />
+	<meta name="description" content="{og_description}" />
+
+	<!-- Share cards. Without these an event link pastes as a bare URL. -->
+	<meta property="og:type" content="article" />
+	<meta property="og:site_name" content="p(Doom)1" />
+	<meta property="og:title" content="{og_title}" />
+	<meta property="og:description" content="{og_description}" />
+	<meta property="og:url" content="{page_url}" />
+	<meta property="og:image" content="{OG_IMAGE_URL}" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="{og_title}" />
+	<meta name="twitter:description" content="{og_description}" />
+	<!-- twitter:site intentionally omitted until the handle is finalized,
+	     matching public/index.html. -->
+
+	<!-- Analytics consent shim. MUST stay above the deferred tracker below:
+	     this tag is parser-blocking, so it sets localStorage.plausible_ignore
+	     (from Do-Not-Track or an explicit opt-out) before the deferred script
+	     runs and fires its pageview. Without it on this page, a deep-linked
+	     visitor is counted before the privacy page's promise can be honoured.
+	     It never injects a tracker -- see public/assets/js/analytics.js. -->
+	<script src="/assets/js/analytics.js"></script>
 
 	<!-- Plausible Analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
