@@ -166,12 +166,25 @@ GOOD_VERSION = json.dumps({
 # =========================================================================== 1
 print("\n1. scrub() removes an absolute path wherever it appears in free text")
 
+def expected_filename(p):
+    """The last segment, computed WITHOUT os.path and WITHOUT the code under test.
+
+    `os.path.basename` was the original spelling here and it is host-dependent: on a
+    Linux runner it splits on '/' only, so for the Windows entries above it returns
+    the WHOLE path and this assertion silently demanded the leak it was written to
+    forbid -- directly contradicting the check on the line before. Spelled out here
+    rather than calling HealthChecker.last_segment, which would make the test agree
+    with the implementation by construction instead of checking it.
+    """
+    return p.rstrip("\\/").replace("\\", "/").rsplit("/", 1)[-1]
+
+
 for p in SECRET_PATHS:
     out = hc.HealthChecker.scrub(f"[Errno 13] Permission denied: '{p}'")
     check(not any(s in out for s in SECRETS),
           f"nothing identifying survives: {p[:44]}")
-    check(os.path.basename(p.rstrip("\\/")) in out,
-          f"the BASENAME survives, so the message still says which file: {p[:34]}")
+    check(expected_filename(p) in out,
+          f"the FILENAME survives, so the message still says which file: {p[:34]}")
 
 check(hc.HealthChecker.scrub("public/data/version.json") == "public/data/version.json",
       "a repo-relative path is left alone -- scrubbing is not blanket deletion")
