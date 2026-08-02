@@ -189,6 +189,16 @@ Pip's stated top priority. Practically:
    `"$VAR"` (bash) / `process.env` (github-script); build JSON with `jq --arg`;
    never `eval`. Trusted GitHub contexts (`github.sha`, `github.run_id`) may stay
    inline. Sweep command: `grep -rnE 'head_commit\.message|github\.event\.(issue|comment|client_payload|pull_request)|github\.head_ref|github\.ref_name' .github/workflows/`.
+6. **`[skip ci]` on a bot commit makes every `push`-triggered guard blind to that
+   path — permanently and silently.** `sync-events.yml` writes 1,194 pages a day
+   and commits with `[skip ci]`; `content-honesty.yml`'s email guard triggers on
+   `push` to `public/**/*.html`. The guard therefore ran on human pushes and
+   **never once** on the output it exists to check (#240, fixed 2026-08-03).
+   `update-game-data.yml` did the same to `issues-cache.json`. **A check must
+   take at least one output from inside the system it is checking.** When adding
+   a guard, ask which commits reach its trigger — and if the producer is a bot
+   with `[skip ci]`, put the check *inside the producer, before it writes*.
+   Sweep: `grep -rn 'skip ci' .github/workflows/`.
 
 ## Data flow & generated files (don't hand-edit blindly)
 - `public/data/events.json` + `public/events/*.html` are **generated** by
@@ -209,15 +219,51 @@ Pip's stated top priority. Practically:
   now redacts them (`redact_pii()` walks the WHOLE event dict, not a field list,
   so a new upstream field cannot leak). `scripts/check-published-emails.py`
   re-verifies and imports the generator's one regex rather than copying it.
-  The addresses are still in pdoom-data — scrubbing here does not fix the source.
+  The addresses are still in pdoom-data — scrubbing here does not fix the source,
+  though pdoom-data now redacts at source too (pdoom-data#50), so on most days the
+  generator's own pass finds nothing. Do not read that as "the guard is unnecessary":
+  pdoom-data#52 records that `all_events.json` has no reproducible producer.
   - **`check-published-emails.py` checks the OUTPUT, not the generator.** It walks
     what is already committed under `public/`, so it can only tell you a leak has
     already shipped. `redact_pii()` is the thing that stops one. That is why
     `scripts/test-sync-events.py` forces the leak rather than watching the guard
     pass. (An earlier draft of this bullet said the guard "is run by no workflow,
     verified 2026-08-01" — that was true when written and is now false:
-    `content-honesty.yml:121` runs it as a BLOCKING step. Grep before believing
+    `content-honesty.yml` runs it as a BLOCKING step. Grep before believing
     a CI claim here, in either direction.)
+  - **The marker string is a CROSS-REPO AGREEMENT: `[email address redacted]`.**
+    This repo used to write `[email removed]`, so the same corpus carried two
+    markers depending on which side caught the address first. Pip ruled on
+    2026-08-03 that both repos use pdoom-data's string (#240). Changing it here
+    means changing it there, and rewriting the visible text on every page carrying
+    one. Two orphan pages that no generator regenerates
+    (`alignmentforum_5cf6dbe41151b29e`, `alignmentforum_7154aca101dbeb10`) had to
+    be rewritten by hand; nothing will do it for them next time either.
+  - **The guard was blind to the path that writes the pages** until 2026-08-03
+    (#240). `content-honesty.yml` fires on `push` to `public/**/*.html`; the sync
+    commits with `[skip ci]`, so it never once ran on the ~1,194 pages the sync
+    generates daily. Now fixed in three layers, prevention first:
+    `sync-events.py` renders every page **to memory**, verifies the rendered
+    output, and **refuses to write anything at all** if a disallowed address
+    survived; `sync-events.yml` runs `check-published-emails.py` over the whole
+    tree *before* its commit step; `content-honesty.yml` has a daily `schedule`
+    as a backstop, with a de-duplicated alert job because a cron red has nobody
+    watching. `scripts/test-sync-events-pii.py` forces the refusal and asserts
+    an existing `events.json` survives it byte-identical.
+  - The refusal scans the **rendered HTML**, not the redacted dict — a re-scan of
+    the dict is vacuous, since `.sub()` has just removed every match by
+    construction and it could only ever report zero. What it catches is a
+    regression in the redaction path, which is why the test simulates one.
+    Watch out for the same trap in the log: `count_emails()` reports what the
+    pattern *matched*, so `Redacted N email addresses` prints happily on a run
+    where `redact_pii()` did nothing.
+  - `redact_pii()` fails **closed** against a new upstream field and **open**
+    against a new address *form*: `name [at] domain.edu` is not matched. That is
+    unsolved; what exists is `OBFUSCATED_CONTACT_PATTERN`, an **advisory** count
+    in the sync log and in `events-sync-summary.json` (counts only — that file is
+    served from pdoom1.com, so naming the events would republish a pointer to the
+    thing that was redacted). Deliberately narrow: a `\s+at\s+` alternative fires
+    on prose like "aimed at arxiv.org", and a noisy advisory gets ignored.
 - **The event page template escapes nothing by itself** — it is one 500-line
   f-string, so the data decides where the markup ends, and arXiv descriptions are
   raw PDF text uploaded by anyone. `escape_event_for_html()` walks the whole
@@ -235,6 +281,9 @@ Pip's stated top priority. Practically:
   same `redact_pii()` (imported from `sync-events.py`, not reimplemented) before
   committing. **When a guard is written for one mirror, check whether a second mirror
   exists** — this is the twin of the exemption lesson #239 recorded one guard over.
+  **The generalisation (#240): any `[skip ci]` bot commit into `public/` is a
+  candidate for this class.** Grep `grep -rn 'skip ci' .github/workflows/` before
+  believing a `push`-triggered guard covers a surface.
 - `public/design/tokens.json` is fetched at runtime by ~8 pages; the other ~2,190
   hardcode their colours in an inline `:root`. It is not a design system yet.
 
@@ -336,7 +385,8 @@ node    scripts/test-download-resolution.js # download buttons resolve/degrade [
 node    scripts/test-changelog-render.js  # /game-changelog/ derives         [content-honesty]
 node    scripts/test-dashboard-devlog.js  # /dashboard/ derives + freshness  [content-honesty]
 
-python  scripts/check-published-emails.py # no third party's address served  [content-honesty]
+python  scripts/check-published-emails.py # no third party's address served  [content-honesty, sync-events]
+python  scripts/test-sync-events-pii.py   # ...and the sync REFUSES to write [content-honesty, sync-events]
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift        [content-honesty ADVISORY]
 python  scripts/generate-feeds.py --check # feeds in step with the blog      [generate-feeds]
 node    scripts/test-blog-render.js       # blog markdown -> the right tags  [generate-feeds]

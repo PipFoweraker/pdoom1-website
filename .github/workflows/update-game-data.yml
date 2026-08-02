@@ -128,8 +128,9 @@ jobs:
               # address looks like" -- the same one check-published-emails.py imports to
               # verify the result. It walks the WHOLE payload rather than a named field
               # list, so a field GitHub adds tomorrow is covered the day it appears, and it
-              # substitutes a visible "[email removed]" marker rather than deleting, so a
-              # reader can tell something was taken out on purpose.
+              # substitutes a visible REDACTION_MARKER -- "[email address redacted]", the
+              # string pdoom-data also uses (#240) -- rather than deleting, so a reader can
+              # tell something was taken out on purpose.
               import importlib.util
               _spec = importlib.util.spec_from_file_location(
                   "sync_events", "scripts/sync/sync-events.py")
@@ -144,6 +145,22 @@ jobs:
                   "count": len(issues_data),
                   "last_updated": datetime.utcnow().isoformat()
               }
+
+              # THIS FILE IS SERVED FROM pdoom1.com, and it is a verbatim dump of
+              # 15 GitHub issue objects -- full bodies, full user objects, written
+              # by whoever opened them. Anything address-shaped in an issue body
+              # gets republished as a static file on a public site.
+              #
+              # That is not hypothetical: the cache committed on 2026-08-02 carried
+              # `noreply@anthropic.com` out of a Co-Authored-By trailer pasted into
+              # an issue body, and scripts/check-published-emails.py was RED on main
+              # because of it. Same shape as pdoom1-website#240 item 1 -- a `[skip ci]`
+              # bot commit writing into public/ on a path no guard trigger watches.
+              #
+              # redact_pii() walks the WHOLE structure rather than a named field
+              # list, so a field the GitHub API adds tomorrow cannot leak.
+              issues_cache = _sync.redact_pii(issues_cache)
+              print(f"✓ Redacted email addresses in issues cache")
 
               with open('public/data/issues-cache.json', 'w', encoding="utf-8") as f:
                   json.dump(issues_cache, f, indent=2)

@@ -1,5 +1,30 @@
 name: Sync Events from pdoom-data
 
+# Regenerates the ~1,194 pages under public/events/ from the pdoom-data corpus.
+#
+# THIS WORKFLOW IS THE ONLY PLACE THE PII GUARD CAN RUN ON ITS OWN OUTPUT.
+# content-honesty.yml runs scripts/check-published-emails.py on `push` to
+# public/**/*.html -- but the commit below carries `[skip ci]`, so that workflow
+# has never once fired on the pages this job writes. The guard was live for human
+# pushes and blind to the automated path, i.e. blind to the path that actually
+# produces the pages whose descriptions are raw PDF text full of other people's
+# institutional addresses (pdoom1-website#240).
+#
+# Fixed in three layers, prevention first:
+#   1. sync-events.py itself renders every page to MEMORY, verifies, and refuses
+#      to write anything at all if a disallowed address survived redaction. A
+#      detector that runs after the write can only tell you what you published.
+#   2. the "No third party's email address is published" step below re-checks the
+#      WHOLE public/ tree -- including the ~1,000 orphaned alignmentforum_* pages
+#      no generator owns -- and it runs BEFORE the commit step, so a find means
+#      nothing is committed.
+#   3. content-honesty.yml now also runs on a daily `schedule` as a backstop, in
+#      case someone later reorders the steps here.
+#
+# `[skip ci]` STAYS on the commit: re-running every content workflow over a
+# 1,194-file commit daily is what it is there to avoid. Layers 1-3 are what make
+# that safe, so do not delete them and leave the skip.
+
 on:
   schedule:
     # Run daily at 3 AM UTC
@@ -37,12 +62,32 @@ jobs:
           git clone https://github.com/PipFoweraker/pdoom1.git
           echo "✅ Cloned pdoom1 repository"
 
+      # FIRST, because it is the guard on the guard. The sync's pre-write refusal
+      # is only ever seen in its PASSING state on a real run -- green there is
+      # equally consistent with "the corpus is clean" and "the check never
+      # fires". This forces a redaction regression against a fixture corpus in a
+      # temp dir and asserts the sync exits non-zero, writes no page, and leaves
+      # an existing events.json byte-identical. Same reasoning as
+      # test-platform-claims.py in content-honesty.yml.
+      - name: The sync's PII gate can still refuse (forced-failure test)
+        run: python scripts/test-sync-events-pii.py
+
+      # Exits non-zero WITHOUT writing anything if a third party's address
+      # survived redaction into the rendered output. Nothing on disk means
+      # nothing to commit means nothing deployed.
       - name: Sync events
         run: |
           python scripts/sync/sync-events.py \
             --pdoom-data-path ../pdoom-data \
             --pdoom1-path ../pdoom1 \
             --sync-icons
+
+      # BEFORE the commit, never after. The step above covers what this run
+      # generated; this covers the whole served tree, including the ~1,000
+      # orphaned alignmentforum_* pages that no generator regenerates
+      # (docs/TECH_DEBT.md E-0) and anything a future step starts writing.
+      - name: No third party's email address is published
+        run: python scripts/check-published-emails.py
 
       - name: Check for changes
         id: git-check
@@ -79,3 +124,66 @@ jobs:
           else
             echo "⚠️ Sync summary not generated" >> $GITHUB_STEP_SUMMARY
           fi
+
+  # A refusal is externally identical to a broken script: both produce no commit.
+  # This job is what makes the difference visible. Without it, the sync declining
+  # to publish -- exactly the behaviour we just built -- would look like a quiet
+  # day, on a 03:00 UTC cron nobody watches.
+  #
+  # Single rolling issue, reused not duplicated, same shape as
+  # data-contract-validation.yml's alert job. Only trusted GitHub contexts are
+  # spliced into the script (CLAUDE.md workflow trap #5).
+  alert:
+    name: Alert on failure (de-duplicated)
+    needs: [sync-events]
+    if: failure() && github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the single events-sync issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🔴 Events sync from pdoom-data is failing';
+            const label = 'events-sync';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              'The scheduled events sync did not complete.',
+              '',
+              `Run: ${runUrl}`,
+              '',
+              'Check which step is red:',
+              '',
+              '- **The sync\'s PII gate can still refuse** -- the guard on the guard broke.',
+              '  Reproduce: `python scripts/test-sync-events-pii.py`',
+              '- **Sync events** -- if the log says `REFUSING TO WRITE`, a third party\'s',
+              '  email address survived redaction and reached the rendered output. Nothing',
+              '  was written and nothing was committed; that is the intended behaviour.',
+              '  Fix `redact_pii()` / `EMAIL_PATTERN` in `scripts/sync/sync-events.py`, or',
+              '  the data in pdoom-data, then re-run. Do NOT weaken the check.',
+              '- **No third party\'s email address is published** -- a page somewhere under',
+              '  `public/` carries an address. Reproduce:',
+              '  `python scripts/check-published-emails.py`',
+              '- anything else -- probably the pdoom-data clone or the corpus shape.',
+              '',
+              '_This is a single rolling issue -- it is reused, not duplicated, per run._'
+            ].join('\n');
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 10,
+            });
+            const found = existing.data.find(i => i.title === title);
+            if (found) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: found.number,
+                body: `Still failing as of ${new Date().toUTCString()}.\n\nRun: ${runUrl}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label, 'automation', 'priority:high'],
+              });
+            }
