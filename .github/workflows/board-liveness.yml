@@ -35,10 +35,21 @@ on:
     # Cost is negligible: ~108 small GETs per run against an API on a VPS already paid for
     # flat, and rsync deploys are incremental. The real constraint was never money.
     #
-    # REVERT TO '17 */6 * * *' after the opening weekend (~2026-08-03) unless the hourly
-    # cadence proves worth keeping. Left as a dated note rather than a silent permanent
-    # change, because an unexplained hourly cron is how cadence creep starts.
-    - cron: '17 * * * *'
+    # REVERTED 2026-08-02 on Pip's ruling (pdoom1-website#238, ask 5), one day inside the
+    # dated window above. The hourly cadence did its job for the opening weekend and is not
+    # being kept: the board is live and correct on (weekly-2026-w31, L3), and the only
+    # alarms hourly running produced after the roll were about the Gate 4 proving runs --
+    # a decision already made, re-reported 24 times a day. That is the failure mode this
+    # repo keeps relearning: a guard firing about a settled question trains people to stop
+    # reading it.
+    #
+    # Note what hourly polling did NOT fix, because it is the reason the cadence was never
+    # the real answer. The probe derives candidate seeds only from files that have already
+    # seen one, so a NEWLY DRAWN seed is invisible to it at any frequency -- on league night
+    # it probed 108 boards, never asked about weekly-2026-w31, and reported OK about the
+    # wrong board. Polling faster re-asks the same wrong question more often. Issue #229
+    # carries the fix, and its shape is push-not-poll: the blessing tells the monitor.
+    - cron: '17 */6 * * *'
   workflow_dispatch:
   push:
     branches: [main]

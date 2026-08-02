@@ -1,9 +1,14 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-01T18:34:31.017Z UTC
+Generated: 2026-08-02T18:35:17.201Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1102 | Review: what does pdoom1 actually want from pdoom-data? (measured inventory, no proposal) |  |  | 2026-08-02 03:19:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1102) |
+| 1101 | The shipped game contacts api.pdoom.org and would ingest the response unvalidated -- the subdomain does not currently exist | bug |  | 2026-08-02 03:19:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1101) |
+| 1098 | PII: 42 records in godot/data/historical_events.json still carry un-redacted email addresses |  |  | 2026-08-02 03:09:37 | [link](https://github.com/PipFoweraker/pdoom1/issues/1098) |
+| 1097 | Pip's rulings, 2026-08-02 -- velocity portfolio weights, and a review pdoom-data is waiting on |  |  | 2026-08-02 02:48:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1097) |
+| 1094 | Postmortem input: week of 2026-07-28 and the league-launch effort (outside vantage) |  |  | 2026-08-01 20:28:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1094) |
 | 1093 | art(review): generation was paid for and the outputs were never reviewed -- inventory the backlog and package a decision session | enhancement |  | 2026-08-01 00:43:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1093) |
 | 1092 | art(sweep): events name physical things the office never shows -- install a security system, no cameras appear; sweep events for asset refs, then bulk-generate | enhancement |  | 2026-08-01 00:43:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1092) |
 | 1091 | design(hiring): no hire may be onboarded-by-silence -- every hiring route must surface the choice; arrivals come through a door | enhancement, game-mechanics |  | 2026-08-01 00:43:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1091) |
@@ -37,7 +42,7 @@ Generated: 2026-08-01T18:34:31.017Z UTC
 | 1056 | convention: printed docs carry a next-review date and its TRIGGER, not just a print date | documentation |  | 2026-07-31 00:13:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/1056) |
 | 1055 | Ecosystem coherence: pdoom-data ADR-007 (anti-corruption layer) and ADR-008 (provenance/annotation model) |  |  | 2026-07-31 00:07:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1055) |
 | 1053 | build_release: refuse to build from a stale or dirty tree -- prove build-matches-INTENT, not just pack-matches-build | technical-debt |  | 2026-07-30 23:26:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/1053) |
-| 1052 | ADR-0015 / DQ-21: what should a pdoom-data event carry, now that literal doom fields are deprecated? |  |  | 2026-07-30 23:15:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/1052) |
+| 1052 | ADR-0015 / DQ-21: what should a pdoom-data event carry, now that literal doom fields are deprecated? |  |  | 2026-08-02 03:10:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1052) |
 | 1049 | ADR set: correctness/staleness/cohesion pass, and an implementation-status field the website can render |  |  | 2026-08-01 00:45:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1049) |
 | 1046 | Main-screen warnings: tell players the ladder can fork BEFORE they play (draft copy inside) |  |  | 2026-07-30 12:11:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1046) |
 | 1044 | design(tempo): actions resolve instantly, so the early game has no rhythm -- time, sequencing, and the queue's promise | game-mechanics |  | 2026-07-30 21:35:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1044) |

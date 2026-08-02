@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-01T21:47:37.773094+00:00",
+  "generated": "2026-08-02T06:58:05.119652+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 2.3 days ago"
+      "detail": "generated 2.7 days ago"
     },
     {
       "name": "league:current_week",
@@ -155,7 +155,7 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 0.2h ago"
+      "detail": "live API checked 4.9h ago"
     },
     {
       "name": "board:archived_anomaly",
