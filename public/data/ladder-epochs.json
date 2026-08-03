@@ -4,7 +4,11 @@
   "board_key": {
     "shape": "(seed, L<n>)",
     "example": "(weekly-2026-w30, L2)",
-    "is_not": ["v0.13.2", "L3.0", "(seed, game_version)"],
+    "is_not": [
+      "v0.13.2",
+      "L3.0",
+      "(seed, game_version)"
+    ],
     "note": "The client sends the LADDER epoch, not the build version: GameConfig.get_board_version() returns \"L\" + LADDER_VERSION. Local board file leaderboard_<seed>__L3.json; remote POST body field version=L3; remote GET query version=L3. The build version never touches the board key again -- that is the whole point of the build-vs-ladder split, so a cosmetic patch bump can never again fork a board.",
     "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z"
   },
@@ -15,13 +19,16 @@
     "boundary_rule": "A league week is anomalous iff it STARTS before boundary_local. The boundary is the Hobart-midnight anchor of the first L3 week, NOT board_opens_local -- see boundary_why.",
     "boundary_why": "The unit being flagged is a whole league week (Fri 00:00 -> Thu 23:59:59 Australia/Hobart). Cutting at board_opens_local instead would put the boundary 17 hours inside the first L3 week, so that week would start before its own boundary and be flagged pre-L3 -- and a week half under L2 rules and half under L3 would be exactly the cross-epoch blend the ladder split exists to prevent. The board-open time is therefore recorded separately and stated on the page, so nothing claims the board was accepting scores from midnight.",
     "board_opens_local": "2026-07-31T17:00:00+10:00",
-    "board_opens_confirmed": false,
+    "board_opens_confirmed": true,
     "board_opens_note": "Approximate, from pdoom1: 'Fri ~1700: board opens', with the seed blessed at a ceremony ~1645 AEST the same day. Treat as approximate until the game side confirms.",
-    "seed": null,
-    "seed_status": "unblessed",
-    "seed_note": "The L3 seed is drawn and spoken at the ceremony ~1645 AEST Fri 2026-07-31 and posted by the game side. pdoom1: 'Please do not hardcode it anywhere before then.' This field stays null until a human blesses it into docs/LEAGUE_SEED_LEDGER.md and copies it here. Anything the website derives in the meantime is a placeholder and is marked unblessed in seed_provenance.",
+    "seed": "weekly-2026-w31",
+    "seed_status": "blessed",
+    "seed_note": "ROLLED, not blessed in place. The previous seed weekly-2026-w30 carried three Gate 4 proving runs; Pip ruled they must not open the league, and since the site does not filter a live board, the only honest exclusion was to open on a different seed. Those three runs are preserved as acknowledged history at public/leaderboard/data/preserved/2026-08-01-gate4-proving-runs/.",
     "reason_pre": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
-    "reason_post": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L3), by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py."
+    "reason_post": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L3), by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py.",
+    "seed_blessed_on": "2026-07-31",
+    "seed_blessed_by": "Pip",
+    "seed_evidence": "Confirmed at ARTIFACT level, not from memory or an issue comment: v0.13.2:godot/autoload/game_config.gd:462 pins const FEATURED_SEED_OVERRIDE: String = \"weekly-2026-w31\". Read from the released tag (published 2026-07-31T07:53Z), which is the standard the ceremony checklist requires -- artifact beats intention. Pip confirmed all gates blessed the same evening. Per coordination/WALKPACK_2026-08-02, the release manifest is now the seed publication surface with weekly-2026-w31 canonical."
   },
   "epochs": [
     {

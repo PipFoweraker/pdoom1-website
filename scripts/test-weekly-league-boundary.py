@@ -30,6 +30,7 @@ Run: python scripts/test-weekly-league-boundary.py
 """
 
 import importlib.util
+import json
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -344,8 +345,16 @@ if _opens is not None:
           _w32_start <= _opens <= _w32_end, True)
     check("the regularised stamp carries the open time",
           post["epoch"]["board_opens_local"], _opens.isoformat())
-    check("...and flags that the open time is not yet confirmed",
-          post["epoch"]["board_opens_confirmed"], False)
+    # This asserted `False` until 2026-08-02, i.e. it pinned the state the world happened
+    # to be in the day it was written. The flag legitimately flips to True the moment Pip
+    # confirms the open, so the assertion was a timer set to go red at the ceremony -- and
+    # it did. The RULE is that the stamp mirrors the contract rather than deciding for
+    # itself; which way the flag currently points is data, not a property of the code.
+    check("...and mirrors the contract's confirmed flag, whichever way it points",
+          post["epoch"]["board_opens_confirmed"],
+          bool(wlm.ladder_contract()["regularised_from"].get("board_opens_confirmed")))
+    check("...as a real bool, so a truthy string can never stand in for confirmation",
+          isinstance(post["epoch"]["board_opens_confirmed"], bool), True)
 check("a PRE-fork week does not claim a board-open time",
       "board_opens_local" in pre["epoch"], False)
 
@@ -362,20 +371,89 @@ check("board key shape is (seed, L<n>)", _contract["board_key"]["shape"], "(seed
 check("the shape explicitly excludes a build-version key",
       "v0.13.2" in _contract["board_key"]["is_not"], True)
 check("current ladder version", _cut["ladder_version"], "L3")
-check("the L3 seed is NOT set -- it is blessed at a ceremony on the day",
-      _cut["seed"], None)
-check("...and is labelled unblessed", _cut["seed_status"], "unblessed")
+# CORRECTED 2026-08-02. These three assertions used to read:
+#
+#     check("the L3 seed is NOT set", _cut["seed"], None)
+#     check("...and is labelled unblessed", _cut["seed_status"], "unblessed")
+#     check("with no blessed seed, the manager falls back", _sb["seed"], <placeholder>)
+#
+# Every one pinned a LITERAL against a value the ceremony is DESIGNED to move, so all
+# three went red the moment the ceremony succeeded -- the guard reporting the system
+# working as intended as a failure. Same defect as test_ingest_scores.py pinning v0.11.0
+# while testing "matches the DEPLOYED version". CLAUDE.md already names the rule ("never
+# assert a literal against a value that moves") and this file broke it anyway, which is
+# Pip's document-vs-mechanism point sitting in the repo: writing the lesson down did not
+# install it.
+#
+# The invariant that actually holds in BOTH states is the pairing: a seed is present if
+# and only if the status is blessed. Unblessed-with-a-seed is the genuinely dangerous
+# state -- a value sitting where code will read it as canonical that nobody has blessed.
+check("seed_status is one of the two legal values",
+      _cut.get("seed_status") in ("blessed", "unblessed"), True)
+check("a seed is present IFF the status is blessed",
+      bool(_cut.get("seed")), _cut.get("seed_status") == "blessed")
 
 # A derived seed must never be presented as the competitive one.
-_seed_block = wlm.seed_for_week("weekly_2026_W32_deadbeef")
-check("with no blessed seed, the manager falls back to its placeholder",
-      _seed_block["seed"], "weekly_2026_W32_deadbeef")
-check("...and marks it blessed: false", _seed_block["seed_provenance"]["blessed"], False)
+#
+# Testing this against the live file only ever exercised whichever state the ceremony
+# happened to be in -- so the BLESSED branch of seed_for_week() had never once been run by
+# a test, in either direction. Forcing both states covers both branches whatever the
+# ceremony is doing today or next Friday.
+import copy as _copy
+_saved_seed = list(wlm._CONTRACT_CACHE)
+try:
+    _unblessed = _copy.deepcopy(_contract)
+    _unblessed["regularised_from"]["seed"] = None
+    _unblessed["regularised_from"]["seed_status"] = "unblessed"
+    wlm._CONTRACT_CACHE[:] = [_unblessed]
+    _sb = wlm.seed_for_week("weekly_2026_W32_deadbeef")
+    check("with NO blessed seed, the manager falls back to the derived placeholder",
+          _sb["seed"], "weekly_2026_W32_deadbeef")
+    check("...and marks it blessed: false",
+          _sb["seed_provenance"]["blessed"], False)
+    check("...and names the state, so a reader is never left to infer it",
+          _sb["seed_provenance"]["seed_status"], "unblessed")
 
-# Ruling: nothing may hardcode Friday's probable seed before the game side posts
-# it. Grep the scripts and the published data for it -- a test is the only thing
-# that will still be enforcing this next week.
+    _blessed = _copy.deepcopy(_contract)
+    _blessed["regularised_from"]["seed"] = "weekly_2026_W99_blessed"
+    _blessed["regularised_from"]["seed_status"] = "blessed"
+    wlm._CONTRACT_CACHE[:] = [_blessed]
+    _sb = wlm.seed_for_week("weekly_2026_W32_deadbeef")
+    check("with a blessed seed, the manager returns the BLESSED one",
+          _sb["seed"], "weekly_2026_W99_blessed")
+    check("...and never the derived placeholder it was handed",
+          "deadbeef" in str(_sb["seed"]), False)
+    check("...and marks it blessed: true", _sb["seed_provenance"]["blessed"], True)
+    check("...and states the board key it implies",
+          _sb["seed_provenance"]["board_key"], "(weekly_2026_W99_blessed, L3)")
+finally:
+    wlm._CONTRACT_CACHE[:] = _saved_seed
+
+# Ruling: nothing may hardcode Friday's probable seed BEFORE the game side posts it.
+#
+# The words "before" and "probable" are the whole rule, and until 2026-08-02 this check
+# ignored both -- it grepped unconditionally, forever. That cost four false positives in
+# three days: a sibling test's fixture, a mirror of GitHub issue text, a generated health
+# report, and finally the ledger row recording the blessing itself. Each was
+# indistinguishable from a real leak until a human read it, and the last one fired because
+# the seed had been written down in exactly the place the ceremony says to write it.
+#
+# So the rule now reads the state it is about. Once `seed_status` is `blessed`, the seed is
+# canonical: it BELONGS in the ledger, in published-board.json, and in any health report
+# that names the live board. Enforcing "do not write it down" past that point is enforcing
+# the opposite of what we want.
+#
+# This is the shape Pip ruled on 2026-08-02: a check must take at least one output from
+# inside the system it is checking. This one now does.
 _probable = "weekly-" + "2026-w31"      # assembled so this file does not contain it
+try:
+    _epochs = json.loads(
+        (Path(__file__).parent.parent / "public" / "data" / "ladder-epochs.json")
+        .read_text(encoding="utf-8"))
+    _seed_status = (_epochs.get("regularised_from") or {}).get("seed_status")
+except (OSError, ValueError):
+    _seed_status = None      # unreadable -> assume unblessed, i.e. keep enforcing
+
 _leaks = []
 for _p in list((Path(__file__).parent).glob("*.py")) + \
         list((Path(__file__).parent.parent / "public" / "data").glob("*.json")):
@@ -409,8 +487,12 @@ for _p in list((Path(__file__).parent).glob("*.py")) + \
             _leaks.append(_p.name)
     except (UnicodeDecodeError, OSError):
         pass
-check("the unblessed L3 seed is hardcoded nowhere in scripts/ or public/data/",
-      _leaks, [])
+if _seed_status == "blessed":
+    check("seed is BLESSED, so the no-hardcoding rule no longer applies "
+          f"(found in {len(_leaks)} file(s), which is correct)", True, True)
+else:
+    check("the UNBLESSED seed is hardcoded nowhere in scripts/ or public/data/",
+          _leaks, [])
 
 # The offset written in the contract is checked against the real tz database,
 # not trusted. Prove the guard bites.
