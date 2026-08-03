@@ -235,7 +235,36 @@ jobs:
             exit 0
           fi
           git commit -m "chore(board): record live score-API observation and publish the live board"
-          git push
+          # Push with rebase-and-retry. A bare `git push` LOSES THE OBSERVATION whenever a
+          # human merges anything between this job's checkout and its push: on 2026-08-02
+          # 21:08 it hit `! [rejected] main -> main (fetch first)` because three PRs landed
+          # that morning, so the run went red and the board was never republished.
+          #
+          # This job is the leaderboard's publisher, so a dropped write is not cosmetic --
+          # it means the site keeps serving the previous board until the next run, which is
+          # the exact "I played and I am not on the board" misreading the subsystem exists
+          # to prevent. It self-heals in <=6h, which is precisely what makes it easy to
+          # ignore: a red square that always goes green on its own trains people to stop
+          # reading it.
+          #
+          # --rebase --autostash rather than a merge: this job's commits are a linear record
+          # of observations, and a merge bubble in that history makes `git log` on the board
+          # files unreadable. Nothing else writes these three files, so a genuine content
+          # conflict is not expected -- if one occurs the rebase fails loudly rather than
+          # resolving it, which is correct.
+          for attempt in 1 2 3; do
+            if git push; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "::notice::push rejected (attempt $attempt) -- main moved; rebasing onto it and retrying."
+            git pull --rebase --autostash origin main || {
+              echo "::error::rebase onto origin/main failed. NOT force-pushing -- a human must look."
+              exit 1
+            }
+          done
+          echo "::error::Could not push the board observation after 3 attempts. The published board is STALE until the next run."
+          exit 1
 
       # Only NEW loss is red. `epoch-unknown` and `unreachable` are genuine unknowns and
       # stay green (they are already in the job summary above); the archived anomaly is
