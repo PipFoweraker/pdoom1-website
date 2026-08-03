@@ -1,12 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-02T18:35:17.201Z UTC
+Generated: 2026-08-03T00:55:59.832Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
 | 1102 | Review: what does pdoom1 actually want from pdoom-data? (measured inventory, no proposal) |  |  | 2026-08-02 03:19:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1102) |
-| 1101 | The shipped game contacts api.pdoom.org and would ingest the response unvalidated -- the subdomain does not currently exist | bug |  | 2026-08-02 03:19:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1101) |
-| 1098 | PII: 42 records in godot/data/historical_events.json still carry un-redacted email addresses |  |  | 2026-08-02 03:09:37 | [link](https://github.com/PipFoweraker/pdoom1/issues/1098) |
 | 1097 | Pip's rulings, 2026-08-02 -- velocity portfolio weights, and a review pdoom-data is waiting on |  |  | 2026-08-02 02:48:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1097) |
 | 1094 | Postmortem input: week of 2026-07-28 and the league-launch effort (outside vantage) |  |  | 2026-08-01 20:28:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1094) |
 | 1093 | art(review): generation was paid for and the outputs were never reviewed -- inventory the backlog and package a decision session | enhancement |  | 2026-08-01 00:43:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1093) |
@@ -18,7 +16,6 @@ Generated: 2026-08-02T18:35:17.201Z UTC
 | 1087 | ui(numbers): no format policy -- '$197,207.69' sits beside '82.0', '* 70' and 'money: 3000.0' on one screen | ui-ux |  | 2026-08-01 00:42:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1087) |
 | 1086 | ux(hiring): onboard-now window -- tooltip omits the Attention cost (costs dict has money only), prints raw 'money: 3000.0', and Q/W read as the same option | bug, ui-ux |  | 2026-08-01 00:42:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1086) |
 | 1085 | bug(window): minimising v0.13.2 does not minimise -- window left in a wrong state until re-maximised (first run after #1079) | bug, ui-ux |  | 2026-08-01 00:42:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1085) |
-| 1084 | The difficulty lock (#1058) is enforced at a UI screen, not where difficulty is consumed -- Settings can still write Easy/Hard | bug |  | 2026-08-01 00:20:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1084) |
 | 1082 | The GDScript syntax gate does not compile-check -- a hard parse error passed it clean | bug |  | 2026-07-31 23:24:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1082) |
 | 1078 | Postmortem contribution from pdoom1-website: the league opened, and the site hid it for 90 minutes |  |  | 2026-07-31 23:01:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1078) |
 | 1077 | Postmortem contribution from pdoom-data: load-bearing breakage, false greens, and asking the person |  |  | 2026-07-31 22:59:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1077) |
