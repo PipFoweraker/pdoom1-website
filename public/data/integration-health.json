@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-02T06:58:05.119652+00:00",
+  "generated": "2026-08-03T05:51:34.593166+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 2.7 days ago"
+      "detail": "generated 3.6 days ago"
     },
     {
       "name": "league:current_week",
