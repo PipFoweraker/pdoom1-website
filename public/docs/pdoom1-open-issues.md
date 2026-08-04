@@ -1,6 +1,6 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-04T12:55:16.054Z UTC
+Generated: 2026-08-04T18:48:14.877Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
@@ -23,7 +23,6 @@ Generated: 2026-08-04T12:55:16.054Z UTC
 | 1087 | ui(numbers): no format policy -- '$197,207.69' sits beside '82.0', '* 70' and 'money: 3000.0' on one screen | ui-ux |  | 2026-08-01 00:42:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1087) |
 | 1086 | ux(hiring): onboard-now window -- tooltip omits the Attention cost (costs dict has money only), prints raw 'money: 3000.0', and Q/W read as the same option | bug, ui-ux |  | 2026-08-01 00:42:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1086) |
 | 1085 | bug(window): minimising v0.13.2 does not minimise -- window left in a wrong state until re-maximised (first run after #1079) | bug, ui-ux |  | 2026-08-01 00:42:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1085) |
-| 1082 | The GDScript syntax gate does not compile-check -- a hard parse error passed it clean | bug |  | 2026-08-03 03:54:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/1082) |
 | 1078 | Postmortem contribution from pdoom1-website: the league opened, and the site hid it for 90 minutes |  |  | 2026-07-31 23:01:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1078) |
 | 1077 | Postmortem contribution from pdoom-data: load-bearing breakage, false greens, and asking the person |  |  | 2026-08-03 23:57:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1077) |
 | 1076 | Postmortem input: one failure shape across both workstreams, and why the register didn't stop it |  |  | 2026-07-31 22:46:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1076) |
