@@ -17,10 +17,12 @@ USAGE
   python scripts/render-content-review.py                 # the default review set
   python scripts/render-content-review.py --ref BRANCH    # add a branch's content
   python scripts/render-content-review.py --path FILE     # add one working-tree file
-  python scripts/render-content-review.py --open          # print the localhost URL
+  python scripts/render-content-review.py --port 9000     # if 8137 is taken
 
-Then:  python -m http.server 8080 --directory public
-       http://localhost:8080/_review/content.html
+Then:  python -m http.server 8137 --bind 127.0.0.1 --directory public
+       http://127.0.0.1:8137/_review/content.html
+
+  127.0.0.1 and 8137 are deliberate, not arbitrary -- see REVIEW_HOST below.
 
 DESIGN NOTES
 - Markdown rendering is deliberately a SMALL subset, matching what the site's own
@@ -49,6 +51,21 @@ for _s in (sys.stdout, sys.stderr):
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "public" / "_review" / "content.html"
+
+# Where the reviewer is told to point a browser.
+#
+# 127.0.0.1, NOT localhost. On this box `localhost` resolves to ::1 first, so a
+# server bound to :: wins the name and a server bound to 0.0.0.0 does not -- i.e.
+# "localhost:PORT" can reach a DIFFERENT process than the one you just started.
+# The literal address removes that ambiguity.
+#
+# 8137, NOT 8080. Port 8080 on Pip's box belongs to another project's dev server,
+# so the old hint sent the reviewer to someone else's site, which either 404s or
+# (worse) renders an unrelated page under the URL you expected.
+#
+# Override with --host/--port when either is already taken.
+REVIEW_HOST = "127.0.0.1"
+REVIEW_PORT = 8137
 
 # Content known to be awaiting a human read. Add to this rather than remembering.
 DEFAULT_SET = [
@@ -242,6 +259,10 @@ def main():
                     help="extra 'branch:path' to include (repeatable)")
     ap.add_argument("--path", action="append", default=[],
                     help="extra working-tree file to include (repeatable)")
+    ap.add_argument("--host", default=REVIEW_HOST,
+                    help=f"host in the printed view URL (default {REVIEW_HOST})")
+    ap.add_argument("--port", type=int, default=REVIEW_PORT,
+                    help=f"port in the printed view URL (default {REVIEW_PORT})")
     args = ap.parse_args()
 
     items = list(DEFAULT_SET)
@@ -310,8 +331,8 @@ finding, not a formatting preference.
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(page, encoding="utf-8")
     print(f"\nwrote {OUT.relative_to(ROOT)}")
-    print("view: http://localhost:8080/_review/content.html")
-    print("      (python -m http.server 8080 --directory public)")
+    print(f"view: http://{args.host}:{args.port}/_review/content.html")
+    print(f"      (python -m http.server {args.port} --bind {args.host} --directory public)")
     return 0
 
 
