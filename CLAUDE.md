@@ -123,6 +123,24 @@ Pip's stated top priority. Practically:
   skip-CI marker", or name the commit SHA. Symptom to recognise: Netlify checks
   appear on the SHA and Actions checks do not exist at all (not pending, not
   skipped — absent).
+  - **The PR BODY becomes the squash commit message.** `gh pr merge --squash`
+    (and the GitHub UI's squash button) compose the merge commit from the PR
+    title plus the PR **body**, so a body that merely *quotes* the marker while
+    explaining a workflow poisons a commit nobody proof-read. That is not
+    hypothetical: **#244** discussed `sync-events.yml`'s own `[` + `skip ci` + `]`
+    three times in its body, and its merge commit `d3556d1e` ran **1** check run
+    (an unrelated scheduled workflow) where its neighbours ran 8, 9 and 15. The
+    PR's own CI had been fully green — the suppression happens at merge, after
+    every gate you were watching.
+  - **The damage is a missed deploy, not a missed test.** `#244` changed three
+    files under `public/`; with Auto-Deploy suppressed, and the next four merges
+    touching no `public/` path, pdoom1.com kept serving the old bytes — it was
+    still showing the superseded `[email removed]` redaction marker after the
+    fix had been on `main` for hours. **Check `gh api repos/OWNER/REPO/commits/
+    <merge-sha>/check-runs --jq .total_count` after any squash merge**; a
+    suspiciously low count means re-read the commit message. Recovery is
+    `gh workflow run "Deploy to DreamHost (manual)" --ref main -f dry_run=true`
+    (confirm no `deleting ` lines), then the same with `dry_run=false`.
 
 ## Environment / tooling
 - Python is **`python`** (3.11), not `python3`. **Pillow IS installed** (12.3.0,
