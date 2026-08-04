@@ -1,9 +1,11 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-04T07:09:57.608Z UTC
+Generated: 2026-08-04T12:55:16.054Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1121 | The dot-matrix printer: a diegetic anti-rot machine that cannot report quietly | ui-ux |  | 2026-08-04 12:38:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/1121) |
+| 1117 | Dead-path sweep leftovers: the tests/ Python suite CI pretends to run, and ~25 docs naming files that do not exist |  |  | 2026-08-04 07:26:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1117) |
 | 1115 | No working re-sync path from pdoom-data (dead sync script deleted; capability still needed) |  |  | 2026-08-04 07:01:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1115) |
 | 1113 | art request: jocular interior art personifying the three sister repos — let them grow their own lore |  |  | 2026-08-04 05:44:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1113) |
 | 1112 | Pip's rulings on intro + poster art, 2026-08-04 11:34 -- B1/B2 approved, dev-vs-alpha tool split, and a prior story beat |  |  | 2026-08-04 02:38:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1112) |
