@@ -274,9 +274,31 @@ Pip's stated top priority. Practically:
 ## Blog & feeds
 - Posts are `.md` in `public/blog/`, listed in `public/blog/index.json` (keys:
   filename, title, date, tags, summary, commit, featured). `public/blog/post.html`
-  renders client-side with a **very** limited markdown parser: links, images,
-  inline code, bold, italic. **No tables, no fenced code blocks, no headings.**
-  Anything else renders as raw text. Links go to `/blog/post.html?p=<file>`.
+  renders client-side with a small hand-written markdown parser. Links go to
+  `/blog/post.html?p=<file>`.
+- **CORRECTED 2026-08-03.** This file said the parser handled only "links, images,
+  inline code, bold, italic — **no tables, no fenced code blocks, no headings**".
+  That had been wrong since **cf38e315**, which replaced the parser: headings, fenced
+  code, lists, blockquotes and `hr` all already worked, and the note steered content
+  work away from constructs that were fine. Tables were the one true gap; they now
+  work too (2026-08-03). Supported set: `#`–`######`, `**bold**`, `*i*`/`_i_`,
+  `[link]()`, `![img]()`, `` `code` ``, ```` ``` ```` fences, `-`/`1.` lists,
+  `>` quotes, `---`, GitHub-style pipe tables.
+  **Still unsupported** (renders as literal text): nested lists, reference links,
+  footnotes, escaped pipes `\|` inside a table cell, and raw HTML — which is escaped
+  on purpose, not missing.
+  **Do not trust this paragraph over the test.** `scripts/test-blog-render.js` asserts
+  each construct against its output tag; that list is the source of truth, and it is
+  what should be edited when the parser changes. The stale bullet above survived
+  because nothing tested the positive direction — the test only asserted that tables
+  did *not* work.
+- **The renderer is a markdown → `innerHTML` path.** It uses the site's ONE escaper
+  (`public/assets/js/escape.js`, loaded by a plain blocking `<script src>`) plus
+  `isSafeUrl()` for link/image schemes — do **not** give this page its own escaper
+  again; it had one covering `& < >` and not quotes, while feeding `alt=""` and
+  `href=""`. `scripts/test-escaping.js` runs a hostile corpus through
+  `renderMarkdown()` and `escaping.yml` gates it. Table cells route through the same
+  `inline()` as a paragraph, so tables added no new sink.
 - `scripts/generate-feeds.py` emits `feed.xml` (RSS) and `atom.xml` from
   `index.json`; `generate-feeds.yml` keeps them current and verifies on PRs.
   Feeds are the **privacy-first** subscribe option — no account, no address, no
@@ -316,6 +338,7 @@ node    scripts/test-changelog-render.js  # /game-changelog/ derives         [co
 python  scripts/check-published-emails.py # no third party's address served  [content-honesty]
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift        [content-honesty ADVISORY]
 python  scripts/generate-feeds.py --check # feeds in step with the blog      [generate-feeds]
+node    scripts/test-blog-render.js       # blog markdown -> the right tags  [generate-feeds]
 python  scripts/generate-metabolism.py --check # /metabolism/ in step        [metabolism-map]
 python  scripts/test-snapshot-plausible.py # analytics backup fails loudly   [content-honesty, snapshot-analytics]
 node    scripts/test-header-consistency.js # nav contract + emoji            [content-honesty ADVISORY]

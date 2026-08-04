@@ -37,6 +37,11 @@
             margin: 0 0 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.8rem; }
         article h2 { color: var(--accent-primary); font-size: 1.4rem; margin: 2rem 0 0.8rem; }
         article h3 { color: var(--text-primary); font-size: 1.15rem; margin: 1.6rem 0 0.6rem; }
+        /* h4-h6 were EMITTED by the renderer but had no rule, so a #### heading was
+           visually indistinguishable from body text -- a structural promise the page
+           did not keep. */
+        article h4, article h5, article h6 { color: var(--text-primary); font-size: 1rem;
+            margin: 1.3rem 0 0.5rem; text-transform: uppercase; letter-spacing: 0.04em; }
         article p { margin: 0 0 1rem; color: var(--text-secondary); }
         article a { color: var(--accent-secondary); }
         article strong { color: var(--text-primary); }
@@ -52,6 +57,13 @@
         article blockquote { border-left: 3px solid var(--accent-primary); margin: 0 0 1rem;
             padding: 0.2rem 0 0.2rem 1rem; color: var(--text-muted); font-style: italic; }
         article hr { border: none; border-top: 1px solid var(--border-color); margin: 1.6rem 0; }
+        /* The WRAPPER scrolls, not the table -- a wide table must never make the whole
+           page scroll sideways on a phone. */
+        .table-wrap { overflow-x: auto; margin: 0 0 1rem; }
+        article table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+        article th, article td { border: 1px solid var(--border-color);
+            padding: 0.45rem 0.7rem; text-align: left; color: var(--text-secondary); }
+        article th { color: var(--text-primary); background: var(--bg-tertiary); }
         .post-error { color: var(--accent-secondary); text-align: center; padding: 3rem 1rem; }
     </style>
 	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
@@ -135,6 +147,37 @@
                 }
                 const h = line.match(/^(#{1,6})\s+(.*)$/);
                 if (h) { flushPara(); closeList(); const n = h[1].length; out.push('<h' + n + '>' + inline(h[2]) + '</h' + n + '>'); i++; continue; }
+                // GitHub-style pipe table (added 2026-08-03; before that a table shipped
+                // its literal pipe characters at the reader).
+                //
+                // The DELIMITER ROW is what makes a table a table, and requiring it is the
+                // whole safety of this rule: several existing posts contain a `|` in prose
+                // and in shell pipelines, and treating those as tables would silently
+                // restructure published pages. So the next line must consist of nothing but
+                // pipes, dashes, colons and spaces, AND contain at least one of each of `|`
+                // and `-`. Alignment colons are accepted and ignored -- honouring them would
+                // mean a style="" attribute built from post text, and this page has no
+                // business generating one.
+                //
+                // Every cell goes through inline(), so cell content is escaped by the site's
+                // one escaper on exactly the same path as a paragraph. There is no second
+                // sink here. Not supported, deliberately: escaped pipes (\|) inside a cell.
+                if (line.indexOf('|') !== -1 && i + 1 < lines.length
+                    && lines[i + 1].indexOf('|') !== -1 && /-/.test(lines[i + 1])
+                    && /^[\s|:-]+$/.test(lines[i + 1])) {
+                    flushPara(); closeList();
+                    const cells = (s) => s.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map((c) => c.trim());
+                    const head = cells(line);
+                    i += 2;
+                    const body = [];
+                    while (i < lines.length && lines[i].indexOf('|') !== -1 && !/^\s*$/.test(lines[i])) { body.push(cells(lines[i])); i++; }
+                    out.push('<div class="table-wrap"><table><thead><tr>'
+                        + head.map((c) => '<th>' + inline(c) + '</th>').join('')
+                        + '</tr></thead><tbody>'
+                        + body.map((r) => '<tr>' + r.map((c) => '<td>' + inline(c) + '</td>').join('') + '</tr>').join('')
+                        + '</tbody></table></div>');
+                    continue;
+                }
                 if (/^\s*(---+|\*\*\*+)\s*$/.test(line)) { flushPara(); closeList(); out.push('<hr>'); i++; continue; }
                 const bq = line.match(/^>\s?(.*)$/);
                 if (bq) { flushPara(); closeList(); out.push('<blockquote>' + inline(bq[1]) + '</blockquote>'); i++; continue; }
