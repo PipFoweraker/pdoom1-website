@@ -1,13 +1,17 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-04T00:53:30.901Z UTC
+Generated: 2026-08-04T07:09:57.608Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1115 | No working re-sync path from pdoom-data (dead sync script deleted; capability still needed) |  |  | 2026-08-04 07:01:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1115) |
+| 1113 | art request: jocular interior art personifying the three sister repos — let them grow their own lore |  |  | 2026-08-04 05:44:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1113) |
+| 1112 | Pip's rulings on intro + poster art, 2026-08-04 11:34 -- B1/B2 approved, dev-vs-alpha tool split, and a prior story beat |  |  | 2026-08-04 02:38:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1112) |
+| 1111 | Pip's rulings on the event-promotion pack, 2026-08-04 11:17 -- approved, plus the turn-pacing premise is wrong |  |  | 2026-08-04 02:38:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/1111) |
 | 1109 | art: promotion adds ~105 MB to the pack -- subtle refinement pass owed for a future epoch | ship:next-release |  | 2026-08-03 20:24:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1109) |
 | 1102 | Review: what does pdoom1 actually want from pdoom-data? (measured inventory, no proposal) |  |  | 2026-08-02 03:19:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1102) |
 | 1097 | Pip's rulings, 2026-08-02 -- velocity portfolio weights, and a review pdoom-data is waiting on |  |  | 2026-08-02 02:48:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1097) |
-| 1094 | Postmortem input: week of 2026-07-28 and the league-launch effort (outside vantage) |  |  | 2026-08-01 20:28:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1094) |
+| 1094 | Postmortem input: week of 2026-07-28 and the league-launch effort (outside vantage) |  |  | 2026-08-04 06:01:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1094) |
 | 1093 | art(review): generation was paid for and the outputs were never reviewed -- inventory the backlog and package a decision session | enhancement |  | 2026-08-01 00:43:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1093) |
 | 1092 | art(sweep): events name physical things the office never shows -- install a security system, no cameras appear; sweep events for asset refs, then bulk-generate | enhancement |  | 2026-08-01 00:43:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1092) |
 | 1091 | design(hiring): no hire may be onboarded-by-silence -- every hiring route must surface the choice; arrivals come through a door | enhancement, game-mechanics |  | 2026-08-01 00:43:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1091) |
@@ -27,7 +31,6 @@ Generated: 2026-08-04T00:53:30.901Z UTC
 | 1072 | build_release.py hardcodes the output name PDoom.exe regardless of --preset |  |  | 2026-07-31 08:11:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1072) |
 | 1071 | No macOS build has ever been verified to run; the Steam framework breaks on non-mac checkouts |  |  | 2026-07-31 08:11:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1071) |
 | 1070 | Test suite writes REAL leaderboard files into the developer's player profile | bug |  | 2026-07-31 08:10:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/1070) |
-| 1069 | enhanced-release.yml builds its own assets, bypassing build_release.py's freshness proof | bug |  | 2026-07-31 08:09:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/1069) |
 | 1068 | The site's Linux download button 404s (PDoom.x86_64 is not a release asset) | bug |  | 2026-07-31 08:09:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1068) |
 | 1067 | Release builds ship a STALE build_stamp.txt -- CI never runs write_build_stamp.py | bug |  | 2026-07-31 08:09:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1067) |
 | 1066 | League: test seeds are visible in the public seed filter, on the GLOBAL board, and survive Clear Local Scores |  |  | 2026-07-31 07:51:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1066) |
@@ -77,7 +80,7 @@ Generated: 2026-08-04T00:53:30.901Z UTC
 | 994 | feat(emit): calibration artifact — baseline p(Doom), sim 100%-topout date, ladder version (unblocks the website's doom clock + pdoom1-website#177) |  |  | 2026-07-28 04:48:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/994) |
 | 987 | Bureaucratic tells: bodies telegraph doom via procedural anomaly (design, Wed W-block) |  |  | 2026-07-27 19:45:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/987) |
 | 986 | ADR-0015 M-ticket: risk_events re-author + rebalance (20 live fields) + #967 finance fix + political_pressure dead-write |  |  | 2026-07-27 19:45:02 | [link](https://github.com/PipFoweraker/pdoom1/issues/986) |
-| 984 | Half-day workshop: audit mechanics deep-dive (next epoch) -- something amazing under the smell |  |  | 2026-07-27 11:44:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/984) |
+| 984 | Half-day workshop: audit mechanics deep-dive (next epoch) -- something amazing under the smell |  |  | 2026-08-04 05:42:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/984) |
 | 967 | finance_engine desperation_payroll promises '-N doom now' but writes to the clobbered inert sink (silently never fires) | bug |  | 2026-07-28 10:11:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/967) |
 | 962 | feat(engine): integrate frontier-labs dataset (pdoom-data#37); expose a list the website can pull to fix calculate-game-stats |  |  | 2026-07-30 13:12:46 | [link](https://github.com/PipFoweraker/pdoom1/issues/962) |
 | 961 | design(hiring): W3 -- revisit the candidate pool cap (MAX_CANDIDATES=6); stale once networking changes, and cap-hits are partly silent |  |  | 2026-07-26 11:42:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/961) |
