@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-03T18:52:52.318Z UTC
+Generated: 2026-08-04T00:53:30.901Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1109 | art: promotion adds ~105 MB to the pack -- subtle refinement pass owed for a future epoch | ship:next-release |  | 2026-08-03 20:24:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1109) |
 | 1102 | Review: what does pdoom1 actually want from pdoom-data? (measured inventory, no proposal) |  |  | 2026-08-02 03:19:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1102) |
 | 1097 | Pip's rulings, 2026-08-02 -- velocity portfolio weights, and a review pdoom-data is waiting on |  |  | 2026-08-02 02:48:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1097) |
 | 1094 | Postmortem input: week of 2026-07-28 and the league-launch effort (outside vantage) |  |  | 2026-08-01 20:28:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1094) |
@@ -18,7 +19,7 @@ Generated: 2026-08-03T18:52:52.318Z UTC
 | 1085 | bug(window): minimising v0.13.2 does not minimise -- window left in a wrong state until re-maximised (first run after #1079) | bug, ui-ux |  | 2026-08-01 00:42:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1085) |
 | 1082 | The GDScript syntax gate does not compile-check -- a hard parse error passed it clean | bug |  | 2026-08-03 03:54:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/1082) |
 | 1078 | Postmortem contribution from pdoom1-website: the league opened, and the site hid it for 90 minutes |  |  | 2026-07-31 23:01:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1078) |
-| 1077 | Postmortem contribution from pdoom-data: load-bearing breakage, false greens, and asking the person |  |  | 2026-07-31 22:59:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1077) |
+| 1077 | Postmortem contribution from pdoom-data: load-bearing breakage, false greens, and asking the person |  |  | 2026-08-03 23:57:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1077) |
 | 1076 | Postmortem input: one failure shape across both workstreams, and why the register didn't stop it |  |  | 2026-07-31 22:46:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1076) |
 | 1075 | Postmortem input: one failure signature, five times this week -- a check whose input comes from the system it checks |  |  | 2026-07-31 22:46:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1075) |
 | 1074 | Postmortem input: the coordination layer on league day -- what the paper/voice loop did well, and six ways it failed |  |  | 2026-07-31 22:20:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/1074) |
