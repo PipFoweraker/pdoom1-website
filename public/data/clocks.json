@@ -21,7 +21,7 @@
     { "id": "unga",        "title": "Next UN General Assembly",           "kind": "watch", "metabolism": "gov",     "date_source": { "provider": "pdoom-data", "ref": "milestones/unga_next", "status": "pending", "issue": "pdoom-data#38" } },
     { "id": "metaculus-agi","title": "Metaculus AGI community median",    "kind": "watch", "metabolism": "company", "date_source": { "provider": "pdoom-data", "ref": "milestones/metaculus_agi", "status": "pending", "issue": "pdoom-data#38", "live": true } },
 
-    { "id": "league",      "title": "Next league",             "kind": "watch", "metabolism": "internal", "cadence": { "type": "weekly",  "anchor_utc": "Sun 14:00" }, "note": "New seed, same engine." },
+    { "id": "league",      "title": "Next league",             "kind": "watch", "metabolism": "internal", "cadence": { "type": "weekly",  "anchor_utc": "Thu 14:00" }, "note": "New seed, same engine. Thu 14:00 UTC is Fri 00:00 in Australia/Hobart (Fri 01:00 under daylight saving) -- the league week is anchored to Friday local, not to a UTC weekday." },
     { "id": "patch",       "title": "Next patch",              "kind": "watch", "metabolism": "internal", "cadence": { "type": "monthly", "note": "monthly metabolism; messy this week, then settles" } },
     { "id": "pdoom-data",  "title": "Next pdoom-data update",  "kind": "watch", "metabolism": "internal", "cadence": { "type": "from_source", "provider": "pdoom-data" }, "note": "the dataset behind the events" },
 
