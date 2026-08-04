@@ -1,7 +1,7 @@
 <!--
 This file is automatically synced from pdoom1/docs/shared/ECOSYSTEM_OVERVIEW.md
-Last synced: 2026-06-27T03:17:43.685116
-Source commit: a84ec294e6ad57cfb82779bf75cdc8b5b8b304b0
+Last synced: 2026-08-04T12:04:55.309282
+Source commit: 6cb6472ebaedf71f5d303e7d8c672d4aa440903e
 DO NOT EDIT DIRECTLY - Changes will be overwritten by sync
 -->
 
