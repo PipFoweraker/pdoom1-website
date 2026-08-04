@@ -19,6 +19,7 @@ import os
 import re
 import sys
 import argparse
+import importlib.util
 import shutil
 from pathlib import Path
 from datetime import datetime
@@ -135,7 +136,16 @@ def filter_events(events: Dict[str, Any]) -> Dict[str, Any]:
 #     with a leading n. The local part matches whatever precedes the @, so
 #     that stray n is left behind as text -- ugly, but it is not an address,
 #     and inventing a rule to strip it risks eating real initials.
-REDACTION_MARKER = "[email removed]"
+#
+# THE MARKER STRING IS A CROSS-REPO AGREEMENT, not a local style choice.
+# pdoom-data redacts the same addresses at source (pdoom-data#50) and writes
+# "[email address redacted]" into all_events.json. This repo used to write
+# "[email removed]", so the same corpus carried two different markers depending
+# on which side caught the address first, and a reader had no way to tell they
+# meant the same thing. Pip ruled on 2026-08-03 that both repos use pdoom-data's
+# string. If you change it here, change it there too -- and expect the next sync
+# to rewrite the visible text on every page that carries one.
+REDACTION_MARKER = "[email address redacted]"
 
 EMAIL_PATTERN = re.compile(
     r"(?:mailto:)?"                            # swallow a mailto: prefix too
@@ -183,6 +193,114 @@ def count_emails(value: Any) -> int:
         return sum(count_emails(v) for v in value.values())
     return 0
 
+
+# ---------------------------------------------------------------------------
+# Obfuscated contact strings -- ADVISORY ONLY, never blocks.
+#
+# redact_pii() fails CLOSED against a new upstream FIELD (it recurses the whole
+# record) but OPEN against a new address FORM: "name [at] domain.edu" is a
+# contact string a human reads as an address and EMAIL_PATTERN does not match,
+# so today it ships untouched AND UNREPORTED (pdoom1-website#240). Solving
+# obfuscated-address detection properly is out of scope -- the ambiguity is
+# real and a blocking check would fire on prose.
+#
+# What is cheap, and what this is, is removing the SILENCE. A count in the log
+# and in the sync summary means "something address-shaped got through" is a
+# thing someone can notice, instead of a thing nobody can see.
+#
+# Deliberately narrow: only bracketed markers ([at] (at) {at}) and the all-caps
+# "name AT domain DOT edu" form. A general "\s+at\s+" alternative would match
+# ordinary prose ("aimed at arxiv.org") and a noisy advisory is one everybody
+# learns to ignore, which is worse than no advisory.
+OBFUSCATED_CONTACT_PATTERN = re.compile(
+    r"[A-Za-z0-9._%+\-]{2,}"
+    r"(?:"
+    r"\s*(?i:\[at\]|\(at\)|\{at\})\s*"           # name [at] domain.edu
+    r"|"
+    r"\s+AT\s+"                                   # name AT domain DOT edu
+    r")"
+    r"[A-Za-z0-9\-]{2,}"
+    r"(?:\s*(?:(?i:\[dot\]|\(dot\)|\{dot\})|\s+DOT\s+|\.)\s*[A-Za-z0-9\-]{2,})+"
+)
+
+
+def count_obfuscated_contacts(value: Any) -> int:
+    """Count address-shaped strings that EMAIL_PATTERN cannot redact."""
+    if isinstance(value, str):
+        return len(OBFUSCATED_CONTACT_PATTERN.findall(value))
+    if isinstance(value, list):
+        return sum(count_obfuscated_contacts(v) for v in value)
+    if isinstance(value, dict):
+        return sum(count_obfuscated_contacts(v) for v in value.values())
+    return 0
+
+
+# ---------------------------------------------------------------------------
+# Pre-write verification
+#
+# WHY THIS EXISTS AT ALL, given redact_pii() runs first.
+#
+# scripts/check-published-emails.py is the repo's blocking guard against serving
+# a third party's address, and it is wired into content-honesty.yml on `push` to
+# public/**/*.html. But the daily sync commits with `[skip ci]`
+# (.github/workflows/sync-events.yml), so that workflow NEVER FIRED on the 1,194
+# pages this generator writes every day. The guard was live for human pushes and
+# blind to the automated path -- i.e. blind to the only path that actually
+# produces these pages (pdoom1-website#240).
+#
+# The fix has to PREVENT, not detect: this refuses to write ANY page if the
+# rendered output carries a disallowed address. Nothing reaches disk, so nothing
+# reaches the commit, so nothing reaches production. A detector that runs after
+# the write can only tell you what you already published.
+#
+# It scans the RENDERED HTML, not the redacted event dict. Re-scanning the dict
+# would be vacuous -- EMAIL_PATTERN.sub() has just removed every match by
+# construction, so it could only ever report zero. The rendered page is a
+# different artefact: it is the template plus the data, and the failure this
+# catches is a REGRESSION IN THE REDACTION PATH (someone narrows redact_pii()
+# to a field list, someone interpolates from `all_events` instead of `events`,
+# someone adds a template field). scripts/test-sync-events-pii.py forces exactly
+# that regression and asserts this refuses.
+
+
+def load_allowlist():
+    """Import is_allowed() from scripts/check-published-emails.py.
+
+    The checker owns the list of addresses this project publishes ON PURPOSE
+    (team@pdoom1.com in every page footer, the maintainer's address, form
+    placeholders). This generator's own template emits one of them per page, so
+    the verification below has to know the same list -- and there must be
+    exactly one copy of it, for the same reason there is exactly one
+    EMAIL_PATTERN. The checker imports the pattern from here; this imports the
+    allowlist from there; neither is forked.
+
+    Imported lazily INSIDE the function on purpose: check-published-emails.py
+    exec_module()s this file at call time, so a module-level import here would
+    be a cycle.
+
+    Deliberately does NOT degrade if the checker is missing. A verification step
+    that silently disarms itself is the failure mode this whole change exists to
+    remove.
+    """
+    path = SCRIPT_DIR.parent / "check-published-emails.py"
+    if not path.exists():
+        log(f"Cannot verify published emails: {path} is missing", "ERROR")
+        log("Refusing to generate pages without the allowlist.", "ERROR")
+        sys.exit(1)
+    spec = importlib.util.spec_from_file_location("check_published_emails", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.is_allowed
+
+
+def find_published_emails(rendered: Dict[str, str], is_allowed) -> Dict[str, List[str]]:
+    """{artefact_name: [address, ...]} for disallowed addresses in rendered output."""
+    findings: Dict[str, List[str]] = {}
+    for name, text in rendered.items():
+        hits = [m for m in EMAIL_PATTERN.findall(text) if not is_allowed(m)]
+        if hits:
+            findings[name] = hits
+    return findings
 
 
 # ---------------------------------------------------------------------------
@@ -1027,12 +1145,22 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
     return html_content
 
 
-def write_events_json(events: Dict[str, Any]):
+def render_events_json(events: Dict[str, Any]) -> str:
+    """Serialise events.json.
+
+    Split from the write so the verification below inspects the EXACT bytes that
+    will be written. Verifying a second, separately-produced serialisation would
+    leave a gap between what was checked and what shipped.
+    """
+    return json.dumps(events, indent=2)
+
+
+def write_events_json(text: str):
     """Write events.json for the events index page"""
     output_file = DATA_DIR / "events.json"
 
     with open(output_file, 'w', encoding='utf-8', newline='\n') as f:
-        json.dump(events, f, indent=2)
+        f.write(text)
 
     log(f"Wrote events index to {output_file}")
 
@@ -1129,11 +1257,68 @@ def main():
     else:
         log("No email addresses found in event data")
 
-    # Generate individual event detail pages
+    # ADVISORY: address-shaped strings EMAIL_PATTERN cannot match. Never blocks;
+    # see OBFUSCATED_CONTACT_PATTERN for why the alternative is a noisy gate.
+    obfuscated_count = sum(count_obfuscated_contacts(e) for e in events.values())
+    obfuscated_events = sorted(
+        event_id for event_id, event in events.items()
+        if count_obfuscated_contacts(event)
+    )
+    if obfuscated_count:
+        log(
+            f"ADVISORY: {obfuscated_count} obfuscated contact string(s) across "
+            f"{len(obfuscated_events)} event(s) were NOT redacted -- "
+            f"EMAIL_PATTERN does not match forms like 'name [at] domain.edu'. "
+            f"Events: {', '.join(obfuscated_events[:20])}"
+            + (" ..." if len(obfuscated_events) > 20 else ""),
+            "WARN",
+        )
+    else:
+        log("No obfuscated contact strings detected")
+
+    # Render EVERYTHING to memory first. Nothing touches disk until the
+    # verification below has passed -- see the "Pre-write verification" block.
     log("Generating event detail pages...")
+    rendered: Dict[str, str] = {}
     for event_id, event in events.items():
-        html_content = generate_event_detail_page(event_id, event)
-        output_file = EVENTS_DIR / f"{event_id}.html"
+        rendered[f"public/events/{event_id}.html"] = generate_event_detail_page(event_id, event)
+
+    events_json_text = render_events_json(events)
+    rendered["public/data/events.json"] = events_json_text
+
+    # THE GATE. Refuse to publish rather than publish-and-alert: an address that
+    # reaches public/ has already been committed, deployed and crawled by the
+    # time any detector speaks up.
+    log("Verifying no third party's email address reached the rendered output...")
+    is_allowed = load_allowlist()
+    leaks = find_published_emails(rendered, is_allowed)
+    if leaks:
+        distinct = {a for hits in leaks.values() for a in hits}
+        log("=" * 60, "ERROR")
+        log(
+            f"REFUSING TO WRITE: {len(distinct)} disallowed email address(es) "
+            f"survived redaction and reached {len(leaks)} rendered artefact(s).",
+            "ERROR",
+        )
+        for name in sorted(leaks)[:20]:
+            log(f"  {name}: {len(leaks[name])} occurrence(s)", "ERROR")
+        if len(leaks) > 20:
+            log(f"  ... and {len(leaks) - 20} more artefact(s)", "ERROR")
+        log("", "ERROR")
+        log("NOTHING WAS WRITTEN. public/ is unchanged and there is nothing to "
+            "commit. Fix redact_pii() / EMAIL_PATTERN in this file, or the data "
+            "in pdoom-data, then re-run.", "ERROR")
+        log("The addresses themselves are deliberately not printed -- CI logs "
+            "are public.", "ERROR")
+        log("=" * 60, "ERROR")
+        sys.exit(1)
+    log(f"Verified {len(rendered)} rendered artefacts: no disallowed addresses")
+
+    # Verification passed. Only now does anything reach disk.
+    for name, html_content in rendered.items():
+        if not name.startswith("public/events/"):
+            continue
+        output_file = EVENTS_DIR / Path(name).name
 
         # newline='\n' pins LF output. Without it, a Windows run writes CRLF;
         # git's autocrlf clean filter silently REFUSES to normalise any file
@@ -1146,7 +1331,7 @@ def main():
     log(f"Generated {len(events)} event detail pages")
 
     # Write events.json for index page
-    write_events_json(events)
+    write_events_json(events_json_text)
 
     # Optionally sync icons
     if args.sync_icons:
@@ -1196,6 +1381,21 @@ def main():
         "included_events": len(events),
         "excluded_events": len(all_events) - len(events),
         "categories": len(set(e['category'] for e in events.values())),
+        # Counts only, never the strings or the event ids: this file is written
+        # under public/ and is served from pdoom1.com, so naming which events
+        # carry a contact string would republish a pointer to the thing that was
+        # just redacted. The ids go to the job log, which is not a web page.
+        "pii": {
+            "emails_redacted": emails_found,
+            "events_with_emails": events_with_emails,
+            "obfuscated_contact_suspects": obfuscated_count,
+            "_note": (
+                "emails_redacted are addresses EMAIL_PATTERN matched and replaced. "
+                "obfuscated_contact_suspects are address-shaped strings it cannot "
+                "match (e.g. 'name [at] domain.edu') and therefore did NOT redact -- "
+                "advisory, non-blocking, see pdoom1-website#240."
+            ),
+        },
         "events_by_rarity": {
             rarity: len([e for e in events.values() if e['rarity'] == rarity])
             for rarity in ['common', 'rare', 'legendary']
