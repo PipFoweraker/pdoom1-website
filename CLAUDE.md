@@ -334,6 +334,7 @@ python  scripts/check-platform-claims.py  # no page claims an unshipped OS   [co
 python  scripts/test-platform-claims.py   # ...and that guard can still FAIL [content-honesty]
 node    scripts/test-download-resolution.js # download buttons resolve/degrade [content-honesty]
 node    scripts/test-changelog-render.js  # /game-changelog/ derives         [content-honesty]
+node    scripts/test-dashboard-devlog.js  # /dashboard/ derives + freshness  [content-honesty]
 
 python  scripts/check-published-emails.py # no third party's address served  [content-honesty]
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift        [content-honesty ADVISORY]
@@ -556,7 +557,10 @@ platform that has no build.
   half the time. A page reading `latest_release.platforms` must therefore treat absence as
   "unrecorded", never as "nothing shipped". (Found 2026-07-28; not yet fixed.)
 
-## Changelog surfaces — there are three, and only one is live
+## Changelog surfaces — there are FOUR (this said "three" until 2026-08-03)
+The count itself was the bug: `/dashboard/`'s development-log box is a release surface
+and nobody was counting it. Enumerate by grepping for consumers, not from this list.
+
 - **`/game-changelog/` is the player-facing one.** It is in `navigation.js` ("Updates"),
   the homepage footer ("Releases"), `/press/` and `/dashboard/`, and in
   `check-platform-claims.py`'s REACHABLE list. It renders release notes **derived at
@@ -573,8 +577,27 @@ platform that has no build.
   `rsync --delete` makes deletion a production removal. **`.htaccess` cannot be tested on
   a Netlify preview — Netlify ignores it.** Any change to it needs
   `curl -I https://pdoom1.com/<path>` against production after merge.
-- `public/data/game-changes.json` is now read by nothing (it carries a `_deprecated`
-  note saying so). Kept, not deleted: `rsync --delete`.
+- **`/dashboard/` carries a SECOND release surface**, and it is in the nav
+  ("Risk Dashboard") and in the homepage footer. Its "Recent Development Log" box now
+  derives from the SAME two sources as `/game-changelog/` — `public/data/version.json`
+  plus the pdoom1 releases API — and adds a **freshness gate**: if the newest release
+  it can see is undated, future-dated, or older than `DEVLOG_MAX_AGE_DAYS`, it renders
+  **no release at all** and links out, because deriving correctly from a source that has
+  stopped moving reproduces the bug. `scripts/test-dashboard-devlog.js` forces every one
+  of those states (`content-honesty.yml`).
+- **CORRECTED 2026-08-03:** this file said `public/data/game-changes.json` "is now read
+  by nothing (it carries a `_deprecated` note saying so)". **Both were false, and both
+  were false when written.** `/dashboard/` had fetched that file since 2025-11-06 and
+  rendered its newest three entries under the word "Recent" — by 2026-08-02 that meant
+  v0.4.1 (2025-09-13) presented as current while the shipping build was v0.13.2, nine
+  minor versions and ~324 days newer, one click from the changelog the same box links to.
+  The `_deprecated` note was written by someone who migrated `/game-changelog/` off the
+  file, verified **that one page**, and generalised. The lesson is the one already
+  recorded two sections up for `redact_pii()`: **when a mirror is retired, grep for every
+  consumer** — `grep -rn "<filename>" public/ scripts/ .github/` — do not infer "nothing"
+  from "not this page". `game-changes.json` is still on disk and is still read by nothing
+  as of 2026-08-03; deleting it is a separate decision Pip has not made, and
+  `scripts/test-changelog-structure.py` opens it.
 
 ## Automation notes
 - Weekly-league rollover only opens a GitHub issue **on failure**

@@ -1463,40 +1463,216 @@ setTimeout(positionOverlays, 300);
 
 updateAll();
 
-/* ========== Event Log Integration ========== */
-async function loadEventLog() {
-  try {
-    const response = await fetch('/data/game-changes.json');
-    const data = await response.json();
+/* ========== Development log: DERIVED, and freshness-gated =====================
 
-    // Get the 3 most recent entries
-    const recentEvents = (data.entries || []).slice(0, 3);
-    if (!recentEvents.length) return;   // nothing to say -> say nothing, leave the box alone
+   WHAT THIS BOX USED TO DO, AND WHY IT WAS A LIE
+   Until 2026-08-03 it read /data/game-changes.json -- a hand-typed file that no
+   script or workflow has ever written -- and rendered its newest three entries
+   under the heading "Recent Development Log". Those entries had frozen where the
+   typing stopped, nine minor versions and ~324 days behind the shipping build,
+   while the "View Full Changelog" link *inside this same box* went to
+   /game-changelog/, which showed the truth. The site contradicted itself one
+   click apart, on a page that is in the main nav.
 
-    // Append BELOW the situation analysis. Writing to #narrativeBox would wipe the
-    // calibrated, deliberately re-dated copy above it (TECH_DEBT A6).
-    const devLog = document.getElementById('devLog');
-    let eventHTML = '<div class="narrative-title">Recent Development Log</div>';
+   WHAT IT DOES NOW: the same two derived sources /game-changelog/ uses.
+     /data/version.json ..... the current release; update-version-info.py writes it
+                              from the GitHub release itself
+     the pdoom1 releases API  everything older
+   No version, date or summary is typed on this page. Nothing to re-freeze.
 
-    recentEvents.forEach(event => {
-      eventHTML += `
-        <div class="narrative-text">
-          <span class="highlight">v${escapeHTML(event.version)}</span> (${escapeHTML(event.date)}): ${escapeHTML(event.summary)}
-        </div>
-      `;
-    });
+   TWO GUARDS, because "derived" is not the same as "fresh":
+     1. Nothing renders that did not come back from one of those two lookups. If
+        both fail, the box says it could not read them and links out. There is
+        deliberately NO remembered value to fall back to -- a fallback ships
+        exactly when the real lookup failed, i.e. when nobody can notice it is
+        wrong (CLAUDE.md, "Fallback literals are the dangerous ones").
+     2. FRESHNESS. If the newest release carries no readable date, or is older
+        than DEVLOG_MAX_AGE_DAYS, the box states that plainly instead of printing
+        an old release under the word "Recent". An unreadable date reads as
+        UNKNOWN, never as fine.
 
-    // Add link to full changelog
-    eventHTML += `
-      <div class="narrative-text" style="margin-top:12px;">
-        <a href="/game-changelog/" target="_blank" class="source-link">View Full Changelog →</a>
-      </div>
-    `;
+   Every value below is escaped with the site's one escaper
+   (/assets/js/escape.js, loaded blocking in the head). The releases API is remote
+   and unauthenticated, so every field it returns is treated as hostile text.
+============================================================================= */
 
-    devLog.innerHTML = eventHTML;
-  } catch (error) {
-    console.error('Failed to load event log:', error);
+// Repository identity, not a fact that rots -- same constants /game-changelog/ uses.
+const DEVLOG_RELEASES_PAGE = 'https://github.com/PipFoweraker/pdoom1/releases';
+const DEVLOG_RELEASES_API =
+  'https://api.github.com/repos/PipFoweraker/pdoom1/releases?per_page=10';
+const DEVLOG_ENTRIES = 3;
+// Policy, not an observation: pdoom1 has shipped roughly one minor a month, so this
+// is ~3x the observed gap between releases. Wide enough that a quiet patch cycle
+// does not blank the box; far tighter than the ~324-day rot it exists to catch.
+const DEVLOG_MAX_AGE_DAYS = 90;
+
+// Age of a release record in days, or null when the date cannot be read at all.
+// null means UNKNOWN and the caller must treat it as such; it must never collapse
+// into 0 ("brand new") or into a number that lets a stale record render.
+function devlogAgeDays(when) {
+  if (when === null || when === undefined || typeof when === 'object') { return null; }
+  const t = new Date(when).getTime();
+  if (!isFinite(t)) { return null; }
+  return (Date.now() - t) / 86400000;
+}
+
+// YYYY-MM-DD, or '' when the value is not a date. Returns plain text; the caller
+// escapes it, so a hostile "date" string can only ever land as inert text.
+function devlogDay(when) {
+  if (when === null || when === undefined || typeof when === 'object') { return ''; }
+  const d = new Date(when);
+  return isFinite(d.getTime()) ? d.toISOString().slice(0, 10) : '';
+}
+
+// The first PARAGRAPH of a release body that is actually prose, flattened to one
+// line with markdown punctuation removed -- this box has room for a sentence, not a
+// rendered changelog. (Per-line would cut mid-sentence: release bodies here are hard
+// wrapped, so the first line is half a thought.) Leading headings, tables, fences and
+// rules are skipped; the first blank line or block after real text ends it.
+//
+// Returns PLAIN TEXT and introduces no markup of its own, so nothing here can inject:
+// the call site escapes the result, which turns any <script> in an upstream body into
+// visible, inert characters.
+function devlogSummary(body) {
+  if (typeof body !== 'string') { return ''; }
+  const lines = body.replace(/\r\n/g, '\n').split('\n');
+  const para = [];
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i].trim();
+    if (!raw || /^(#{1,6}\s|\||```|>|-{3,}|={3,}|<!--)/.test(raw)) {
+      if (para.length) { break; }
+      continue;
+    }
+    const t = raw.replace(/^[-*+]\s+/, '')
+                 .replace(/^\d+\.\s+/, '')
+                 .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+                 .replace(/[*_`]/g, '')
+                 .trim();
+    if (t) { para.push(t); }
+    if (para.join(' ').length > 200) { break; }  // already past the truncation point
   }
+  const text = para.join(' ').replace(/\s+/g, ' ').trim();
+  if (!text) { return ''; }
+  return text.length > 140 ? text.slice(0, 137) + '…' : text;
+}
+
+/* The two fragments that carry release data into the box. Each takes the WHOLE
+   entry rather than a pre-extracted field, so scripts/test-escaping.js sees the
+   external root at the call site: a new field read off `ent` is covered the day it
+   is added, with no edit to the test. Each returns ALREADY-ESCAPED html, or '' --
+   which is why the punctuation lives in here too, rather than the caller having to
+   know whether the value came back empty. */
+function devlogWhenHtml(ent) {
+  const day = devlogDay(ent && ent.when);
+  return day ? ' (' + escapeHTML(day) + ')' : '';
+}
+
+function devlogSummaryHtml(ent) {
+  const line = devlogSummary(ent && ent.body);
+  return line ? ': ' + escapeHTML(line) : '';
+}
+
+function devlogFooter() {
+  return '<div class="narrative-text" style="margin-top:12px;">' +
+    '<a href="/game-changelog/" target="_blank" rel="noopener" class="source-link">' +
+    'View Full Changelog →</a></div>';
+}
+
+// The honest empty state. Says what could not be established and points at the
+// live source; shows no release, no version, no date.
+function devlogUnavailable(devLog, why) {
+  devLog.innerHTML =
+    '<div class="narrative-title">Development Log</div>' +
+    '<div class="narrative-text">' + escapeHTML(why) +
+    ' Nothing is cached here, so rather than show you something out of date: ' +
+    '<a href="' + DEVLOG_RELEASES_PAGE + '" target="_blank" rel="noopener noreferrer" ' +
+    'class="source-link">every p(Doom)1 release on GitHub</a>.</div>' +
+    devlogFooter();
+}
+
+async function loadEventLog() {
+  // Append BELOW the situation analysis. Writing to #narrativeBox would wipe the
+  // calibrated, deliberately re-dated copy above it (TECH_DEBT A6).
+  const devLog = document.getElementById('devLog');
+  if (!devLog) { return; }
+
+  const found = [];
+
+  // 1. This site's own record of the current release.
+  try {
+    const vres = await fetch('/data/version.json', {cache: 'no-store'});
+    if (!vres.ok) { throw new Error('HTTP ' + vres.status); }
+    const vdata = await vres.json();
+    const rel = vdata && vdata.latest_release;
+    if (rel && rel.version) {
+      found.push({tag: rel.version, when: rel.published_at, body: rel.body});
+    }
+  } catch (err) {
+    console.warn('devlog: /data/version.json unavailable:', err);
+  }
+
+  // 2. Older releases, straight from the game repository.
+  try {
+    const gres = await fetch(DEVLOG_RELEASES_API, {headers: {'Accept': 'application/vnd.github+json'}});
+    if (!gres.ok) { throw new Error('HTTP ' + gres.status); }
+    const list = await gres.json();
+    (Array.isArray(list) ? list : []).forEach(function (rel) {
+      if (rel && rel.tag_name) {
+        found.push({tag: rel.tag_name, when: rel.published_at || rel.created_at, body: rel.body});
+      }
+    });
+  } catch (err) {
+    console.warn('devlog: pdoom1 releases API unavailable:', err);
+  }
+
+  if (!found.length) {
+    devlogUnavailable(devLog, 'This page could not read the release history just now, ' +
+      'so it will not guess at what shipped.');
+    return;
+  }
+
+  // Newest first. A record whose date cannot be read sorts last and can never
+  // become the entry the freshness gate is measured against.
+  const seen = {};
+  const entries = found
+    .filter(function (ent) {
+      const key = String(ent.tag);
+      if (seen[key]) { return false; }
+      seen[key] = true;
+      return true;
+    })
+    .sort(function (a, b) {
+      const ta = devlogAgeDays(a.when), tb = devlogAgeDays(b.when);
+      if (ta === null && tb === null) { return 0; }
+      if (ta === null) { return 1; }
+      if (tb === null) { return -1; }
+      return ta - tb;
+    })
+    .slice(0, DEVLOG_ENTRIES);
+
+  // THE FRESHNESS GATE. Unknown age and stale age take the same exit: no release
+  // is rendered at all. Presenting a year-old build under "Recent" is the exact
+  // defect this rewrite exists to remove, and deriving it correctly from a source
+  // that has stopped moving would reproduce it.
+  const age = devlogAgeDays(entries[0].when);
+  if (age === null) {
+    devlogUnavailable(devLog, 'The newest release this page can see carries no readable ' +
+      'date, so it cannot tell whether it is current.');
+    return;
+  }
+  if (age > DEVLOG_MAX_AGE_DAYS || age < -1) {
+    devlogUnavailable(devLog, 'The newest release this page can see is dated ' +
+      Math.abs(Math.round(age)) + ' days ' + (age < 0 ? 'in the future' : 'ago') +
+      ', which is too far out to present as recent.');
+    return;
+  }
+
+  let html = '<div class="narrative-title">Recent Development Log</div>';
+  entries.forEach(function (ent) {
+    html += `<div class="narrative-text"><span class="highlight">${escapeHTML(ent.tag)}</span>` +
+            `${devlogWhenHtml(ent)}${devlogSummaryHtml(ent)}</div>`;
+  });
+  devLog.innerHTML = html + devlogFooter();
 }
 
 /* ========== Manifold Markets Integration ========== */

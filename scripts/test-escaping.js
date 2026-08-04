@@ -89,9 +89,15 @@ const GUARDED = [
     page: 'public/dashboard/index.html',
     // market.* is THIRD-PARTY: any Manifold user who owns one of those markets can
     // edit its title, and this is a top-level nav page.
-    roots: ['market', 'event'],
-    safeHelpers: [],
-    fetches: ['https://api.manifold.markets/v0/slug/', '/data/game-changes.json'],
+    // rel.*/ent.* are the development-log entries. As of 2026-08-03 that box no
+    // longer reads the hand-typed /data/game-changes.json (which had frozen nine
+    // minor versions behind the shipping build); it derives from version.json plus
+    // the pdoom1 releases API, which is remote and unauthenticated like every other
+    // source on this list.
+    roots: ['market', 'rel', 'ent'],
+    safeHelpers: ['devlogWhenHtml', 'devlogSummaryHtml'],
+    fetches: ['https://api.manifold.markets/v0/slug/', '/data/version.json',
+              'https://api.github.com/repos/PipFoweraker/pdoom1/releases'],
   },
   {
     page: 'public/issues/index.html',

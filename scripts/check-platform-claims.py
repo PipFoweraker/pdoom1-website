@@ -52,6 +52,11 @@ REACHABLE = [
     "public/cats/index.html",
     "public/issues/index.html",
     "public/game-changelog/index.html",
+    # In navigation.js ("Risk Dashboard") and in the homepage footer, so a visitor
+    # walks to it. Added 2026-08-03: it was missing, which meant every
+    # reachability-scoped guard was structurally unable to see the page -- and the
+    # page was carrying a release log frozen ~324 days in the past.
+    "public/dashboard/index.html",
     "public/docs/index.html",
     "public/blog/index.html",
     "public/resources/index.html",
