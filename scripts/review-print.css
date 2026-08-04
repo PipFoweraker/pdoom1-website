@@ -1,0 +1,61 @@
+/*
+  review-print.css -- the @page block shared by every print-first memo in
+  public/_review/. Page numbers, and the paper size they sit on.
+
+  WHY THIS FILE IS HERE AND NOT IN public/_review/
+  ------------------------------------------------
+  public/_review/ is gitignored on purpose -- .gitignore calls it "Internal review
+  builds. These live INSIDE the deploy root (public/), so they are one `git add -A`
+  away from being published to pdoom1.com". Nothing in that directory can be the
+  tracked source of anything. THIS file is the tracked source;
+  scripts/apply-review-print-css.py inlines it into each memo between BEGIN/END
+  markers. Inlined rather than <link>ed so a memo stays one self-contained file
+  that still prints right if it is copied to a USB stick or mailed to someone.
+
+  WHY A MARGIN BOX AND NOT A FIXED-POSITION FOOTER
+  ------------------------------------------------
+  The received wisdom is that Chromium does not implement CSS paged-media margin
+  boxes. That was true for years. It is NOT true of the Edge on this machine.
+  Verified 2026-08-02 against Edge 150.0.4078.105 by rendering a deliberately
+  three-page probe with `--headless=new --print-to-pdf` and extracting the text of
+  each page separately:
+
+      page 1 -> "MARGINBOX 1 / 3"   page 2 -> "2 / 3"   page 3 -> "3 / 3"
+
+  A `position: fixed` footer DID also repeat on all three pages in the same probe,
+  so that fallback exists -- but it cannot produce "N / M", because counter(pages)
+  is only defined inside a margin box, and it sits on top of body content instead
+  of in the margin. So: margin box.
+
+  If a future Edge regresses this, re-run that probe. The failure mode is a sheet
+  with NO number on it, never a wrong number -- an unsupported margin box renders
+  nothing rather than something misleading.
+
+  "N / M" rather than a bare "N" because Pip is tracking whether sheets are
+  missing: a lone "3" tells you nothing, "3 / 5" tells you two sheets did not
+  come out of the printer.
+*/
+
+@page {
+  /* A4, not Letter.
+     Measured 2026-08-02: five of the six memos declared no page size at all, so
+     Edge fell back to its Letter default and produced 215.9 x 279.4 mm PDFs.
+     SumatraPDF is then handed `paper=A4` per job, so it shrink-to-fits Letter
+     onto A4: 210/215.9 = x0.973, which takes 12.5pt body type down to ~12.16pt
+     and quietly breaks the one constraint that is not negotiable. Only
+     walkpack-2026-08-02.html already said `size: A4`.
+     This rule MERGES with each memo's own `@page { margin: ... }` -- it does not
+     replace it. Verified by re-rendering and re-measuring every memo. */
+  size: A4;
+
+  @bottom-center {
+    content: counter(page) " / " counter(pages);
+    /* Matches the memo body face so the number does not read as an artifact. */
+    font-family: Georgia, "Times New Roman", serif;
+    /* 9.5pt. The floor for this footer is 9pt -- do not go under it, and never
+       shrink it to buy space. The memos' 12.5pt body floor is likewise fixed;
+       density comes from margins and prose, never from smaller type. */
+    font-size: 9.5pt;
+    color: #000;
+  }
+}
