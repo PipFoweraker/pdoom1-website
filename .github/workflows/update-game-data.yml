@@ -159,7 +159,16 @@ jobs:
               #
               # redact_pii() walks the WHOLE structure rather than a named field
               # list, so a field the GitHub API adds tomorrow cannot leak.
-              issues_cache = _sync.redact_pii(issues_cache)
+              # NOTE 2026-08-04: this read `_sync`, a name that was never bound --
+              # two parallel branches each added a redaction block and the union merge
+              # kept both bodies but only one importer. It raised
+              # `name '_sync' is not defined` and failed this workflow on every
+              # 6-hourly run from 2026-08-03. Corrected to the module actually
+              # imported above. Kept rather than deleted as redundant: the call above
+              # walks the API payload, this one walks the FINAL written object, so a
+              # future wrapper field is covered too. Belt and braces on the one file
+              # here that is a verbatim public dump of other people's prose.
+              issues_cache = _sync_events.redact_pii(issues_cache)
               print(f"✓ Redacted email addresses in issues cache")
 
               with open('public/data/issues-cache.json', 'w', encoding="utf-8") as f:
