@@ -434,11 +434,107 @@ with Sandbox({}) as sb:
           "wrote no events.json on the refusal path")
 
 
+# =========================================================================== 8
+print("\n8. Markdown image syntax never reaches a reader as literal text")
+
+# Neither <p class="description"> nor a <meta content="..."> slot renders Markdown,
+# so an image in an upstream description was published as the characters
+# "![](https://res.cloudinary.com/...png)" -- broken-looking, and a third party's
+# CDN URL handed out as visible text. 12 pages were live like that on 2026-08-03.
+
+MK = se.MARKDOWN_IMAGE_MARKER
+
+# The two real shapes from the corpus.
+one = se.strip_markdown_images_in_text("![](https://i.imgur.com/Rgc4aOs.png)")
+check(one == MK, f"an image-only description becomes exactly the marker (got {one!r})")
+check(one != "", "and is never the empty string -- a description is never silently "
+                 "truncated to nothing")
+
+prose = se.strip_markdown_images_in_text(
+    "![](https://cdn.example.net/a.jpg)The bridge to AGI control. Mind the gaps!!")
+check("cdn.example.net" not in prose, "the CDN URL is gone")
+check("The bridge to AGI control. Mind the gaps!!" in prose,
+      f"the prose either side survives verbatim (got {prose!r})")
+check(prose.startswith(MK + " T"),
+      f"a marker fused to the next word gets separated (got {prose!r})")
+
+run = se.strip_markdown_images_in_text(
+    "![](https://cdn.example.net/1.png)![](https://cdn.example.net/2.png)"
+    "![](https://cdn.example.net/3.png)")
+check(run == MK, f"a run of adjacent images collapses to ONE marker (got {run!r})")
+
+# alignmentforum_d32b2cc700b53f60's description is truncated upstream mid-URL. If
+# only the complete form were handled, the tail would stay behind as a bare CDN
+# path in the middle of the sentence -- the leak, minus the syntax that made it
+# obvious.
+cut = se.strip_markdown_images_in_text(
+    "Figure 1. ![](https://res.cloudinary.com/lesswrong-2-0/image/upload/v167/sHpi")
+check("cloudinary" not in cut, f"an unterminated trailing image is stripped too (got {cut!r})")
+check(cut.startswith("Figure 1."), "and the prose before it is kept")
+
+# THE GUARD AGAINST THE FIX: a loose [^)]* body would run from a "![" past an
+# unmatched "(" and swallow the rest of the paragraph. That is silent truncation,
+# which is worse than the defect.
+safe = "See ![diagram](x.png) and note (this parenthetical) plus a lone ( bracket."
+got = se.strip_markdown_images_in_text(safe)
+check("(this parenthetical)" in got and "lone ( bracket." in got,
+      f"prose parentheses are not eaten (got {got!r})")
+
+untouched = "Cost! [1] is a citation, and f(x) = 3 -- no images here."
+check(se.strip_markdown_images_in_text(untouched) == untouched,
+      "text with '!' and '[' but no image syntax is returned byte-identical")
+
+# Whole-record, not a field list -- same contract as redact_pii().
+walked = se.strip_markdown_images(
+    {"future_field_added_upstream": {"nested": ["![](https://cdn.example.net/x.png)"]},
+     "year": 2024})
+check(walked["future_field_added_upstream"]["nested"][0] == MK,
+      "strips inside a field that does not exist in today's schema")
+check(walked["year"] == 2024, "and leaves non-strings alone")
+
+check(se.count_markdown_images(
+    {"a": "![](x.png)![](y.png)", "b": "![alt](z.png"}) == 3,
+      "count_markdown_images counts complete and truncated forms")
+
+# Forced end to end: publish an event whose description is nothing but images and
+# assert no published BYTE carries the syntax or the host.
+IMG_CORPUS = {
+    "evt_img": make_event(
+        "![](https://cdn.example.net/one.png)![](https://cdn.example.net/two.png)"
+        "Figure 1: something happens at future time T"),
+}
+with Sandbox(IMG_CORPUS) as sb:
+    out = run_main(sb)
+    published = [p for p in sb.tmp.rglob("*") if p.is_file()
+                 and "pdoom-data" not in p.parts]
+    offenders = []
+    for p in published:
+        body = p.read_bytes().decode("utf-8")
+        if "![" in body:
+            offenders.append(p.name + " :: markdown image syntax")
+        if "cdn.example.net" in body:
+            offenders.append(p.name + " :: third-party CDN URL")
+    check(not offenders,
+          f"no published page or json carries image syntax or the CDN host "
+          f"(offenders: {offenders[:3]})")
+
+    page = (sb.tmp / "events" / "evt_img.html").read_text(encoding="utf-8")
+    check("Figure 1: something happens at future time T" in page,
+          "the surrounding prose is still on the page")
+    check(MK in page, "and the marker says an image was taken out on purpose")
+    ejson = json.loads((sb.tmp / "data" / "events.json").read_text(encoding="utf-8"))
+    check("![" not in json.dumps(ejson),
+          "events.json is clean too -- /events/ renders description.substring(0,150) "
+          "from it, so the browse list was a third surface for the same defect")
+    check("Replaced" in out, "the run says out loud that it replaced something")
+
+
 print()
 if failures:
     print(f"{len(failures)} FAILURE(S)")
     for f in failures:
         print("  -", f)
     sys.exit(1)
-print("OK: sync-events redacts every address in the whole record, and no event text "
-      "can change the shape of a published page.")
+print("OK: sync-events redacts every address in the whole record, strips Markdown "
+      "image syntax from every string it publishes, and no event text can change "
+      "the shape of a published page.")
