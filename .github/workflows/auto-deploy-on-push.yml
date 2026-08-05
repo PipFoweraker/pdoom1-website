@@ -10,7 +10,11 @@ on:
       - '.github/workflows/auto-deploy-on-push.yml'
 
   # A push made by a workflow using the default GITHUB_TOKEN does NOT trigger another
-  # workflow (CLAUDE.md, "Bot commits do not trigger deploys"). Board Liveness commits the
+  # workflow -- the reason this `push` trigger alone is insufficient. (That used to cite
+  # CLAUDE.md's "Bot commits do not trigger deploys". PR #260 REWROTE that section,
+  # because this very `workflow_run` block is what made it false: bot commits now DO
+  # reach production, ~4x/day. The quote was dangling; the reasoning below still holds.)
+  # Board Liveness commits the
   # live leaderboard under public/, so without this trigger the board would reach the repo
   # and never reach pdoom1.com -- during a league, that means a board frozen at whatever a
   # human last pushed while players watch it not update. This closes that gap for the one
