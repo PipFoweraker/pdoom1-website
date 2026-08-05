@@ -3,10 +3,31 @@ name: Sync Leaderboards
 # Tier 1 Automation: Fully automatic daily sync
 # Syncs all leaderboard data from game repository
 
+# PARKED 2026-08-04 -- schedule removed, workflow_dispatch only.
+#
+# WHY: 0 of 6 runs succeeded since 2026-07-30. Every failure is the same line --
+#   ERROR: No game repository configured. Run --setup first.
+# Root cause (pdoom1-website#254, finding 3): scripts/game-integration.py:126-132
+# validates a game checkout by requiring main.py / src / ui.py. pdoom1 is a GODOT
+# project and has none of them, so validate_game_repo() returns False against the
+# real game repo and game_repo_path is always None. No runner has a local pdoom1
+# checkout either, so this cannot succeed on GitHub Actions as written.
+#
+# It was GREEN for weeks while doing nothing -- it only went red on 2026-07-30 when
+# PR #190 made board-key loss loud. So the redness is a LOUDNESS improvement
+# exposing a workflow that never worked, not a new break.
+#
+# WHY PARKED RATHER THAN FIXED: fixing it means first deciding what this repo should
+# read from the game at all -- which is live in #249 (the image/asset contract) and
+# #229 (the board-probe scope fix). Parking costs nothing; leaving it costs a red
+# square every day, and CLAUDE.md's severity model is explicit that a permanently
+# red job trains everyone to ignore the Actions tab.
+#
+# TO REVIVE: resolve #254 finding 3 (make validate_game_repo recognise a Godot
+# layout, or drop the local-checkout requirement entirely), then restore:
+#     schedule:
+#       - cron: '0 2 * * *'
 on:
-  schedule:
-    # Daily at 2:00 AM UTC
-    - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
       sync_type:

@@ -16,6 +16,13 @@ on:
 
 permissions:
   contents: write
+  # REQUIRED, or the failure handler below 403s and the failure is invisible
+  # (CLAUDE.md workflow trap #3). This matters more here than almost anywhere:
+  # this workflow writes version.json -- read by the homepage, /game-changelog/
+  # and check-platform-claims.py -- and it carries three `continue-on-error`
+  # steps, so it can report SUCCESS while having written nothing. A workflow
+  # that can be green while broken needs its alarm to actually reach someone.
+  issues: write
 
 jobs:
   update-data:

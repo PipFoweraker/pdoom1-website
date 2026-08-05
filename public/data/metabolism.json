@@ -138,7 +138,7 @@
       "value": "asymmetry",
       "confidence": "platform behaviour, documented",
       "cite_file": "CLAUDE.md",
-      "cite_needle": "Bot commits do not trigger deploys",
+      "cite_needle": "bot commits DO reach production now",
       "caveat": "This is GitHub Actions' documented recursion guard, not something this repo can measure. It affects every committing workflow listed on this page."
     }
   ]

@@ -107,11 +107,20 @@ Pip's stated top priority. Practically:
 - Use branch + PR (Pip's default). Every PR gets a Netlify **deploy-preview** —
   verify there before merge. Can't render a browser in-session, so verify by
   `curl`-ing the preview/prod asset and node-testing any JS.
-- **Bot commits do not trigger deploys.** GitHub Actions will not fire a workflow
-  from a push made with the default `GITHUB_TOKEN`, so anything a workflow
-  commits reaches the repo but not pdoom1.com until the next human push. Affects
-  every committing workflow here. Fix would be a deploy key/PAT or a
-  `workflow_run` trigger.
+- **CORRECTED 2026-08-04: bot commits DO reach production now.** This section
+  used to say they did not, and that a `workflow_run` trigger "would be" the fix.
+  That fix has since landed: `auto-deploy-on-push.yml` carries a `workflow_run`
+  trigger on **Board liveness (score API)** completion, which runs `17 */6 * * *`.
+  So a full `rsync --delete` of `public/` fires **4x/day regardless of who
+  committed**, and max staleness for anything under `public/` is ~6 hours, not
+  "until a human pushes". Verified against production 2026-08-04: bot commits
+  written at 00:46Z were live by 00:57Z.
+  **The risk inverted rather than disappeared.** There are now ~4 unattended
+  production deploys a day gated by nothing: `types: [completed]` has no
+  conclusion filter, so the deploy fires whether board-liveness passed or failed,
+  and the deploy job itself runs no tests -- content-honesty, escaping and
+  data-contract failures do not block it. Treat "it will not reach production
+  until someone looks" as FALSE.
 - **Never write the skip-CI marker in a commit message — not even quoting it.**
   Several bot workflows here commit with `[` + `skip ci` + `]` in the subject, so
   it is natural to name that marker when explaining what a bot commit did. GitHub

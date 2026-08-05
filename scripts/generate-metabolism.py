@@ -1342,17 +1342,33 @@ def build():
     })
 
     # 5. Bot-committed artifacts vs the deploy trigger.
+    #
+    # CORRECTED 2026-08-04. This check used to render verdict NO -- "none of them
+    # reaches pdoom1.com until the next human push". That was true when written and
+    # is now false: auto-deploy-on-push.yml carries a `workflow_run` trigger on the
+    # board-liveness workflow, which runs 6-hourly, so a full rsync --delete of
+    # public/ fires ~4x/day whoever committed. Verified against production: bot
+    # commits written 00:46Z were live by 00:57Z.
+    #
+    # The verdict flips to YES, but the CLASS stays a warning, because the risk
+    # inverted rather than went away: `types: [completed]` carries no conclusion
+    # filter and the deploy job runs no tests, so those ~4 daily unattended
+    # production deploys are gated by nothing.
     committing = sorted(w["name"] for w in workflows if w["commits"] and not w["park"])
     checks.append({
         "name": "Automated commits reach production on their own",
-        "verdict": "NO",
+        "verdict": "YES",
         "cls": "p-warn",
-        "detail": ("%d live workflow(s) commit to the repository. A commit made "
-                   "with the default GITHUB_TOKEN does not trigger another "
-                   "workflow, so none of them reaches pdoom1.com until the next "
-                   "human push: %s." % (len(committing), ", ".join(committing))),
+        "detail": ("%d live workflow(s) commit to the repository, and all of them "
+                   "now reach pdoom1.com without a human: auto-deploy-on-push.yml "
+                   "triggers on the 6-hourly board-liveness run, so public/ is "
+                   "rsynced ~4x a day whoever committed. The flip side is that "
+                   "those deploys are gated by nothing -- the trigger has no "
+                   "conclusion filter and the deploy job runs no tests. "
+                   "Committing workflows: %s."
+                   % (len(committing), ", ".join(committing))),
         "cites": [cite(REPO_ROOT / "CLAUDE.md",
-                       "Bot commits do not trigger deploys", render_line=False)],
+                       "bot commits DO reach production now", render_line=False)],
     })
 
     # 6. A commit step with no write permission is a beat that looks live and
