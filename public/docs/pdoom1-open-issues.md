@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-04T18:48:14.877Z UTC
+Generated: 2026-08-05T00:48:32.785Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1125 | GO: retime first (the pack's turn-pacing premise is wrong), promotions ruled, F4-F7 deferred |  |  | 2026-08-05 00:43:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1125) |
 | 1121 | The dot-matrix printer: a diegetic anti-rot machine that cannot report quietly | ui-ux |  | 2026-08-04 12:38:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/1121) |
 | 1117 | Dead-path sweep leftovers: the tests/ Python suite CI pretends to run, and ~25 docs naming files that do not exist |  |  | 2026-08-04 07:26:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1117) |
 | 1115 | No working re-sync path from pdoom-data (dead sync script deleted; capability still needed) |  |  | 2026-08-04 07:01:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1115) |
@@ -20,7 +21,6 @@ Generated: 2026-08-04T18:48:14.877Z UTC
 | 1090 | design(research): Research Quality (Rushed/Standard/Thorough) is still a global Plan-screen toggle -- the ruling moved it to research-project level | game-mechanics, ui-ux |  | 2026-08-01 00:43:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1090) |
 | 1089 | ui(fanfare): 'Strategic Moves Unlocked' -- the game's biggest milestone beat renders as bare text on black | enhancement, ui-ux |  | 2026-08-01 00:43:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1089) |
 | 1088 | Rivals appear for the first time in the month summary, having never been introduced | game-mechanics, ui-ux, tutorial |  | 2026-08-01 00:43:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1088) |
-| 1087 | ui(numbers): no format policy -- '$197,207.69' sits beside '82.0', '* 70' and 'money: 3000.0' on one screen | ui-ux |  | 2026-08-01 00:42:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1087) |
 | 1086 | ux(hiring): onboard-now window -- tooltip omits the Attention cost (costs dict has money only), prints raw 'money: 3000.0', and Q/W read as the same option | bug, ui-ux |  | 2026-08-01 00:42:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1086) |
 | 1085 | bug(window): minimising v0.13.2 does not minimise -- window left in a wrong state until re-maximised (first run after #1079) | bug, ui-ux |  | 2026-08-01 00:42:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1085) |
 | 1078 | Postmortem contribution from pdoom1-website: the league opened, and the site hid it for 90 minutes |  |  | 2026-07-31 23:01:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1078) |
@@ -28,7 +28,6 @@ Generated: 2026-08-04T18:48:14.877Z UTC
 | 1076 | Postmortem input: one failure shape across both workstreams, and why the register didn't stop it |  |  | 2026-07-31 22:46:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1076) |
 | 1075 | Postmortem input: one failure signature, five times this week -- a check whose input comes from the system it checks |  |  | 2026-07-31 22:46:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1075) |
 | 1074 | Postmortem input: the coordination layer on league day -- what the paper/voice loop did well, and six ways it failed |  |  | 2026-07-31 22:20:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/1074) |
-| 1073 | Player guide still says "action points" -- #1050 did not reach it -- and it requires scrolling to read |  |  | 2026-07-31 08:19:37 | [link](https://github.com/PipFoweraker/pdoom1/issues/1073) |
 | 1072 | build_release.py hardcodes the output name PDoom.exe regardless of --preset |  |  | 2026-07-31 08:11:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1072) |
 | 1071 | No macOS build has ever been verified to run; the Steam framework breaks on non-mac checkouts |  |  | 2026-07-31 08:11:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1071) |
 | 1070 | Test suite writes REAL leaderboard files into the developer's player profile | bug |  | 2026-07-31 08:10:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/1070) |
