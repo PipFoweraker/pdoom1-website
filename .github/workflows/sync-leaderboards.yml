@@ -23,6 +23,15 @@ name: Sync Leaderboards
 # square every day, and CLAUDE.md's severity model is explicit that a permanently
 # red job trains everyone to ignore the Actions tab.
 #
+# RETURN DATE: 2026-09-02. Required by coordination PRINT_AND_PROCESS_REFERENCE
+# section 5c (RULED 2026-08-05): a park without a return date renders as ABANDONED --
+# "parking without a date is abandonment with better manners". This park originally
+# carried a revival CONDITION and no date, which under that rule is not a park at all.
+#
+# On 2026-09-02 one of three things must happen, and drifting past it is not one of
+# them: revive it, re-park it with a NEW date and a reason the old one lapsed, or
+# delete it and say so. The date exists to force a re-decision, not to express a hope.
+#
 # TO REVIVE: resolve #254 finding 3 (make validate_game_repo recognise a Godot
 # layout, or drop the local-checkout requirement entirely), then restore:
 #     schedule:
