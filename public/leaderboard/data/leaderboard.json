@@ -1,9 +1,9 @@
 {
   "meta": {
-    "generated": "2026-08-05T07:12:35+00:00",
+    "generated": "2026-08-05T12:55:47+00:00",
     "export_source": "website:publish-live-board.py",
-    "total_players": 3,
-    "total_entries": 3,
+    "total_players": 5,
+    "total_entries": 5,
     "board_key": {
       "seed": "weekly-2026-w31",
       "ladder_epoch": "L3"
@@ -28,6 +28,18 @@
   },
   "entries": [
     {
+      "score": 65,
+      "doom_integral": 3934,
+      "player_name": "AI Safety Lab",
+      "date": "2026-08-05T14:01:39",
+      "level_reached": 65,
+      "game_mode": "v0.13.2",
+      "duration_seconds": 1148.214,
+      "entry_uuid": "471014275-157107-615152-141372-544315710148600",
+      "baseline_score": 0,
+      "baseline_doom_integral": 0
+    },
+    {
       "score": 47,
       "doom_integral": 3566,
       "player_name": "Notkilleveryone Inc",
@@ -36,6 +48,18 @@
       "game_mode": "v0.13.2",
       "duration_seconds": 288.619,
       "entry_uuid": "837415359-61348-154137-971211-9106615121461361414",
+      "baseline_score": 0,
+      "baseline_doom_integral": 0
+    },
+    {
+      "score": 44,
+      "doom_integral": 3351,
+      "player_name": "Division of Machine Learning",
+      "date": "2026-08-05T20:54:42",
+      "level_reached": 44,
+      "game_mode": "v0.13.2",
+      "duration_seconds": 118.871,
+      "entry_uuid": "61412105139-141123-111037-41508-136672801463114",
       "baseline_score": 0,
       "baseline_doom_integral": 0
     },
