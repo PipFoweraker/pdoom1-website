@@ -43,3 +43,9 @@ assets/screenshots/*.png
 
 # 1.7 MB animation referenced by nothing on the site.
 assets/8-bit-effect.gif
+
+# Internal review artefacts. These live INSIDE the deploy root but are gitignored
+# (.gitignore:20). Excluded here as defence in depth: gitignore stops them being
+# committed, this stops them shipping if one ever is. They are runsheets, decision
+# packs and copy reviews written for Pip -- not for visitors.
+public/_review/
