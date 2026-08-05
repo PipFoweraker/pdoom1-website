@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-05T07:10:12.734Z UTC
+Generated: 2026-08-05T12:53:43.092Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1128 | sync-documentation.yml commits arbitrary dirty state into pdoom1-website (git add . in a foreign checkout) |  |  | 2026-08-05 08:01:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1128) |
 | 1126 | The Local/Global toggle silently un-presses itself on fetch failure -- indistinguishable from a dead button | bug, ui-ux |  | 2026-08-05 05:13:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1126) |
 | 1125 | GO: retime first (the pack's turn-pacing premise is wrong), promotions ruled, F4-F7 deferred |  |  | 2026-08-05 00:43:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1125) |
 | 1121 | The dot-matrix printer: a diegetic anti-rot machine that cannot report quietly | ui-ux |  | 2026-08-04 12:38:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/1121) |
