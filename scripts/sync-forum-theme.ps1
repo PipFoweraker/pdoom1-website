@@ -1,3 +1,37 @@
+# ============================================================================
+# PARKED 2026-08-06 -- RETURN DATE: 2026-09-02
+#
+# Pip's ruling, 2026-08-06: "Park with a date." Recorded per coordination's
+# PRINT_AND_PROCESS_REFERENCE section 5c, binding 2026-08-05: a park REQUIRES a
+# return date, and "parking without a date is abandonment with better manners".
+#
+# WHY IT CANNOT RUN TODAY
+#   The three paths below point at C:\Users\gday\Documents\A Local Code\...
+#   That directory does not exist -- this repo lives at D:\Local_Code -- so the
+#   script exits at its first file read. It has been broken since the repo moved
+#   and nobody noticed, because nothing calls it: no workflow, no package.json
+#   script, no other script.
+#
+# WHY IT IS PARKED RATHER THAN DELETED
+#   The forum is DORMANT, not dead, and the distinction is load-bearing here.
+#   NodeBB is running right now on port 80 of 208.113.200.215. What it lacks is
+#   a DNS record for forum.pdoom1.com. So this script targets a LIVE service by
+#   a broken LOCAL path -- deleting it would discard the only theming recipe for
+#   a forum that still exists. forum-theme.css is still at the repo root,
+#   unreferenced by anything else.
+#
+# WHAT FORCES THE RE-DECISION ON 2026-09-02
+#   The forum's keep-or-kill call -- issues #60, #63 and #71, which are one
+#   decision wearing three tickets -- is on Pip's outstanding rulings list. On
+#   that date one of three things must happen, and drifting past is not one:
+#     1. Forum revived  -> fix the three paths and unpark.
+#     2. Forum retired  -> delete this and forum-theme.css, close #60/#63/#71.
+#     3. Still undecided -> re-park with a NEW date and why the old one lapsed.
+#
+# DO NOT RUN IT before fixing the paths. The sshKey and server values are still
+# CORRECT, so a path fix alone would point it at production NodeBB.
+# ============================================================================
+
 # Sync Forum Theme from Main Site CSS
 # Run this script after updating main site colors
 
