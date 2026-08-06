@@ -41,6 +41,9 @@ on:
     paths:
       - 'public/**/*.html'
       - 'public/assets/js/escape.js'
+      # authorship.js hands plain strings to the blog pages, which escape them at the
+      # sink. A change there changes what reaches those sinks.
+      - 'public/assets/js/authorship.js'
       - 'public/docs/roadmap.md'
       - 'scripts/test-escaping.js'
       - 'scripts/test-roadmap-render.js'
@@ -50,6 +53,9 @@ on:
     paths:
       - 'public/**/*.html'
       - 'public/assets/js/escape.js'
+      # authorship.js hands plain strings to the blog pages, which escape them at the
+      # sink. A change there changes what reaches those sinks.
+      - 'public/assets/js/authorship.js'
       - 'public/docs/roadmap.md'
       - 'scripts/test-escaping.js'
       - 'scripts/test-roadmap-render.js'

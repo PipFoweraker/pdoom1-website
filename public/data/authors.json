@@ -1,0 +1,25 @@
+{
+  "_what": "The author identities pdoom1.com can attribute a piece of writing to.",
+  "_why_not_a_boolean": "A human/not-human flag has nowhere to put a third party. Pip expects the game, the website and the repos to develop their own voice and contributions over time, and to be endorsed as authors when they do. An identity is a data addition here; a boolean would have been a migration.",
+  "_rendering": "Only kind == \"human\" receives the marked treatment. Every other kind renders as a plain byline, and an absent author renders as unattributed. That inversion is the point: most of this site is drafted by an assistant, so marking the drafted text would mark nearly everything and the mark would become furniture. Marking the human text keeps it scarce by construction, and makes it a claim about the ratio that is checkable against volume.",
+  "_absence": "A post with no author key is NOT drafted-by-default and NOT hand-written-by-default. It is unattributed, and the pages say so in those words. Nothing here supplies a fallback identity.",
+  "_not_a_shield": "The mark says who held the pen. It never lowers the accuracy bar for anything published under it.",
+  "_adding_one": "Add a key under \"authors\" and set author: <that key> in a post's front matter. scripts/build-blog-index.py refuses to publish a post naming an identity that is not in this file.",
+
+  "colophon": "Everything published here ships with Pip Foweraker's approval, and the mistakes are his — including the mistakes of things working under his direction.",
+
+  "authors": {
+    "pip": {
+      "name": "Pip Foweraker",
+      "kind": "human",
+      "byline": "Written by hand, by Pip Foweraker",
+      "note": "Most of this site is drafted by an assistant. This piece was not."
+    },
+    "assistant": {
+      "name": "Claude",
+      "kind": "assistant",
+      "byline": "Drafted by Claude, published with Pip's approval",
+      "note": ""
+    }
+  }
+}

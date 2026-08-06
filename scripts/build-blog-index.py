@@ -28,6 +28,20 @@ DRAFTS
 of the feed). That is how a post exists in the repo without being published:
 publishing is a deliberate act, not a side effect of adding a file.
 
+AUTHORSHIP
+----------
+`author: <id>` in front matter is OPTIONAL and is carried through to index.json
+only when it is present. The key is OMITTED, never written as "", when a post
+records no author -- because "" and "absent" would then be the same thing on the
+page, and they are not: absent means nobody has said who wrote it, and the site
+renders that as unattributed rather than defaulting it to anyone.
+
+An id that is present must resolve: it has to be a plain slug AND be a key in
+public/data/authors.json, or the build refuses. The pages degrade honestly on an
+unresolvable id (they quote it back rather than inventing a name), but that is a
+backstop for a fetch that failed at read time -- it is not a licence to publish
+an id that points at nobody.
+
 Usage:
     python scripts/build-blog-index.py            # write index.json
     python scripts/build-blog-index.py --check    # exit 1 if stale or invalid
@@ -57,9 +71,16 @@ except ImportError:
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BLOG_DIR = REPO_ROOT / "public" / "blog"
 INDEX = BLOG_DIR / "index.json"
+AUTHORS = REPO_ROOT / "public" / "data" / "authors.json"
 
 REQUIRED = ("title", "date", "summary")
 FM_FENCE = re.compile(r"^\s*---\s*$")
+
+# An author id is a lookup key, not prose: lowercase slug, so it can never carry
+# whitespace, punctuation or markup into a page. The pages escape it anyway --
+# this is the earlier of the two gates, and it fails the BUILD rather than
+# leaving a reader to notice.
+AUTHOR_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,31}$")
 
 # Constructs public/blog/post.html mishandles. Keep in step with that file --
 # scripts/test-blog-render.js pins the table case against the real renderer.
@@ -105,8 +126,27 @@ def split_front_matter(text):
     return None, text, "front matter opened with --- but never closed"
 
 
+def known_author_ids():
+    """Return the set of identities in the registry, or None if it cannot be read.
+
+    None is NOT an empty set. An empty set would mean "no identity exists", which
+    would silently pass every post that records no author and reject every post
+    that does -- the same answer for two different worlds. None makes the caller
+    say which one it is looking at.
+    """
+    try:
+        data = json.loads(AUTHORS.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    authors = data.get("authors") if isinstance(data, dict) else None
+    if not isinstance(authors, dict):
+        return None
+    return set(authors)
+
+
 def collect():
     posts, problems, drafts, warnings = [], [], [], []
+    author_ids = known_author_ids()
 
     for path in sorted(BLOG_DIR.glob("*.md")):
         name = path.name
@@ -152,10 +192,28 @@ def collect():
                                  % (label, why, body[:m.start()].count("\n") + 1)))
                 break
 
+        # Authorship. Optional, and absent by default -- see the AUTHORSHIP note in
+        # the module docstring for why the key is omitted rather than emptied.
+        author = str(fm.get("author") or "").strip()
+        if author:
+            if not AUTHOR_ID_RE.match(author):
+                problems.append((name, "author %r is not a plain id "
+                                       "(lowercase letters, digits, - and _)" % author))
+                continue
+            if author_ids is None:
+                problems.append((name, "declares author %r but %s could not be read"
+                                 % (author, AUTHORS.relative_to(REPO_ROOT))))
+                continue
+            if author not in author_ids:
+                problems.append((name, "author %r is not in %s -- add the identity there "
+                                       "first, or the page can only quote the id back"
+                                 % (author, AUTHORS.relative_to(REPO_ROOT))))
+                continue
+
         tags = fm.get("tags") or []
         if isinstance(tags, str):
             tags = [t.strip() for t in tags.split(",") if t.strip()]
-        posts.append({
+        entry = {
             "filename": name,
             "title": str(fm["title"]).strip(),
             "date": date,
@@ -163,7 +221,10 @@ def collect():
             "summary": str(fm["summary"]).strip(),
             "commit": str(fm.get("commit", "")).strip(),
             "featured": bool(fm.get("featured", False)),
-        })
+        }
+        if author:
+            entry["author"] = author
+        posts.append(entry)
 
     posts.sort(key=lambda p: (p["date"], p["filename"]), reverse=True)
     return posts, problems, drafts, warnings
