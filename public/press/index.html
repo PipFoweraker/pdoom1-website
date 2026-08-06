@@ -6,12 +6,12 @@
 	<title>Press Kit - p(Doom)1</title>
 	<link rel="canonical" href="https://pdoom1.com/press/" />
 	<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-	<meta name="description" content="Press kit for p(Doom)1 - AI Safety Strategy Game. Download assets, screenshots, and factsheet." />
+	<meta name="description" content="Press kit for p(Doom)1 - a satirical bureaucracy simulator about AI safety. Factsheet, assets, what p(doom) means, and how to get in touch." />
 	<meta name="author" content="p(Doom)1" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="p(Doom)1" />
 	<meta property="og:title" content="Press Kit - p(Doom)1" />
-	<meta property="og:description" content="Press kit and media assets for p(Doom)1 - AI Safety Strategy Game." />
+	<meta property="og:description" content="Press kit and media assets for p(Doom)1 - a satirical bureaucracy simulator about AI safety." />
 	<meta property="og:url" content="https://pdoom1.com/press/" />
 	<meta property="og:image" content="https://pdoom1.com/assets/og-card.jpg" />
 	<meta name="twitter:card" content="summary_large_image" />
@@ -52,7 +52,7 @@
 			background: var(--bg-primary);
 			color: var(--text-primary);
 			line-height: 1.6;
-			background-image: 
+			background-image:
 				radial-gradient(circle at 25% 25%, rgba(246, 168, 0, 0.02) 0%, transparent 50%),
 				radial-gradient(circle at 75% 75%, rgba(47, 212, 194, 0.02) 0%, transparent 50%);
 		}
@@ -90,7 +90,7 @@
 		.hero p {
 			font-size: 1.2rem;
 			color: var(--text-secondary);
-			max-width: 600px;
+			max-width: 640px;
 			margin: 0 auto;
 		}
 
@@ -114,6 +114,15 @@
 			margin-top: 2rem;
 		}
 
+		.press-section p {
+			margin-bottom: 1rem;
+			max-width: 72ch;
+		}
+
+		.press-section a {
+			color: var(--accent-secondary);
+		}
+
 		.factsheet {
 			display: grid;
 			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -131,6 +140,19 @@
 			color: var(--accent-primary);
 			display: block;
 			margin-bottom: 0.5rem;
+		}
+
+		/* A value read at runtime from /data/version.json. It ships as an em dash
+		   so a failed fetch shows "unknown", never a stale literal. */
+		.derived {
+			color: var(--text-primary);
+		}
+
+		.derived-note {
+			display: block;
+			margin-top: 0.4rem;
+			font-size: 0.8rem;
+			color: var(--text-muted);
 		}
 
 		.download-grid {
@@ -157,6 +179,10 @@
 		.download-card h4 {
 			color: var(--accent-primary);
 			margin-bottom: 1rem;
+		}
+
+		.download-card p {
+			margin: 0 auto;
 		}
 
 		.download-btn {
@@ -234,21 +260,16 @@
 			padding: 2rem;
 			border-radius: var(--radius-lg);
 			border: 1px solid var(--border-color);
-			text-align: center;
 		}
 
 		.contact-info h3 {
 			color: var(--accent-primary);
 			margin-bottom: 1rem;
+			margin-top: 0;
 		}
 
 		.contact-info a {
 			color: var(--accent-secondary);
-			text-decoration: none;
-		}
-
-		.contact-info a:hover {
-			text-decoration: underline;
 		}
 
 		.rating-info {
@@ -259,15 +280,68 @@
 			margin-top: 2rem;
 		}
 
+		/* The explainer reads as an article, not as a marketing block. */
+		.explainer {
+			border-left: 4px solid var(--accent-primary);
+		}
+
+		.explainer p {
+			color: var(--text-secondary);
+		}
+
+		.source-rail {
+			margin-top: 2rem;
+			padding-top: 1.5rem;
+			border-top: 1px dashed var(--border-color);
+			font-size: 0.95rem;
+		}
+
+		.source-rail ul {
+			margin: 0.75rem 0 0 1.25rem;
+			color: var(--text-muted);
+		}
+
+		.source-rail li {
+			margin-bottom: 0.6rem;
+		}
+
+		.pullquote {
+			border-left: 4px solid var(--accent-secondary);
+			padding-left: 1.25rem;
+			margin: 1.5rem 0;
+			color: var(--text-primary);
+			font-size: 1.05rem;
+		}
+
+		.lineage {
+			list-style: none;
+			margin-top: 1rem;
+		}
+
+		.lineage li {
+			padding: 0.75rem 0;
+			border-bottom: 1px solid var(--border-color);
+			color: var(--text-secondary);
+			max-width: 72ch;
+		}
+
+		.lineage li:last-child {
+			border-bottom: none;
+		}
+
+		.lineage strong {
+			color: var(--accent-primary);
+		}
+
 		@media (max-width: 768px) {
 			.hero h1 {
 				font-size: 2rem;
 			}
-			
+
 			.factsheet {
 				grid-template-columns: 1fr;
 			}
-			
+
 			.legal-links {
 				justify-content: center;
 			}
@@ -282,7 +356,39 @@
 	<main>
 		<section class="hero">
 			<h1>Press Kit</h1>
-			<p>Media resources, factsheet, and press information for p(Doom)1 - the AI Safety Strategy Game</p>
+			<p>p(Doom)1 is a satirical bureaucracy simulator about running an AI safety lab. Factsheet, assets, context, and a real person at the other end of the email address.</p>
+		</section>
+
+		<section class="press-section explainer">
+			<h2>What p(doom) actually means</h2>
+
+			<p>Because the name is doing a lot of work, and a press kit that assumes you already know is not much of a press kit.</p>
+
+			<p><strong>p(doom)</strong> is shorthand for <em>the probability of doom</em> &mdash; one person's estimate of the chance that advanced artificial intelligence causes an existential catastrophe: human extinction, or a permanent loss of humanity's ability to steer its own future. It is written as a percentage, it is offered without much ceremony, and the striking thing about it is how wide the spread is between people who have thought hardest about it.</p>
+
+			<p>The term started as in-group shorthand on the LessWrong forums around 2010 and spread through AI safety research circles, where it was half a serious estimate and half a joke about putting a number on the unquantifiable. It stopped being a joke in 2023. After GPT-4 shipped and senior researchers began saying in public what they had been saying at conferences, journalists noticed that people in the industry were exchanging p(doom) values the way other professions exchange golf handicaps. It is now a mainstream term, which is a strange thing to be able to write.</p>
+
+			<p>The numbers are genuinely all over the place, and that is the point rather than a flaw in the metric. The largest survey of its kind asked 2,778 researchers who had published at top AI venues, and reported that &quot;between 38% and 51% of respondents gave at least a 10% chance to advanced AI leading to outcomes as bad as human extinction&quot;. The median answer to its &quot;extremely bad outcomes&quot; question was 5%. Individual public estimates, meanwhile, run from effectively zero to above ninety per cent &mdash; from people with comparable credentials, looking at the same evidence. Nobody has a proof. Everybody has a number.</p>
+
+			<p class="pullquote">A field where the experts disagree by two orders of magnitude, and are making irreversible decisions anyway, is not a field crying out for another explainer. It is a field crying out for a strategy game.</p>
+
+			<h3>What led to the game</h3>
+
+			<p>The thing that makes AI safety hard to think about is not the maths. It is that the actual decisions are institutional. Nobody in that world spends their day at a whiteboard deciding whether humanity survives. They spend it deciding whether to hire the second researcher or buy the compute, whether to publish the finding or sit on it, whether this quarter's funder wants legible progress or genuine progress, and whether the rival lab is about to make the question moot. The existential risk gets decided in budget meetings.</p>
+
+			<p>That is a strategy game. It has always been a strategy game &mdash; the genre just usually points it at cities, plagues or empires instead. p(Doom)1 points it at an AI safety lab: you hire, you fund, you allocate compute, you manage a board and a public, and the number goes up anyway more often than it goes down. The satire and the sincerity are load-bearing at the same time. The joke is that saving the world is mostly paperwork. The non-joke is that this is approximately true.</p>
+
+			<p>The number the game is tuned to is our own estimate, it is published, it moves with each patch, and it is almost certainly wrong in the first decimal. We do not think it is wrong about the sign. Where the game asserts something about the world, we would rather you were able to check it &mdash; so the working is on the site, and the sources are below rather than paraphrased into our own voice.</p>
+
+			<div class="source-rail">
+				<p style="color: var(--text-muted); margin-bottom: 0;">Go to the primary sources. We would rather send you to the strongest version of an argument than be the only place you read it.</p>
+				<ul>
+					<li><a href="https://arxiv.org/abs/2401.02843" target="_blank" rel="noopener">Grace et al., <em>Thousands of AI Authors on the Future of AI</em></a> (AI Impacts, 2024) &mdash; the 2,778-researcher survey the figures above come from, including its own caveats about question wording.</li>
+					<li><a href="https://en.wikipedia.org/wiki/P(doom)" target="_blank" rel="noopener">Wikipedia: P(doom)</a> &mdash; the term's history, a table of named public estimates, and the standing criticism that the metric hides more than it reveals.</li>
+					<li><a href="https://pauseai.info/xrisk" target="_blank" rel="noopener">PauseAI, <em>The Extinction Risk of Superintelligent AI</em></a> &mdash; the case argued at length by people who campaign on it. It is advocacy and says so; read it as an argument to engage with, not as a survey.</li>
+					<li><a href="https://pauseai.info/proposal" target="_blank" rel="noopener">PauseAI's treaty proposal</a> &mdash; a concrete, specific thing a group of people actually wrote down and are pushing for. Agree or disagree, it is more useful than another round of estimates.</li>
+				</ul>
+			</div>
 		</section>
 
 		<section class="press-section">
@@ -294,27 +400,50 @@
 				</div>
 				<div class="factsheet-item">
 					<strong>Genre:</strong>
-					Strategy, Simulation, Educational
-				</div>
-				<div class="factsheet-item">
-					<strong>Platform:</strong>
-					Windows, macOS &amp; Linux (Windows tested; macOS &amp; Linux experimental)
+					Bureaucracy simulator. Formally: strategy / management sim, with satire.
 				</div>
 				<div class="factsheet-item">
 					<strong>Developer:</strong>
-					Pip Foweraker (solo)
-				</div>
-				<div class="factsheet-item">
-					<strong>Release Status:</strong>
-					Early alpha, in active development
-				</div>
-				<div class="factsheet-item">
-					<strong>Engine:</strong>
-					Godot 4.5.1
+					Pip Foweraker, solo
 				</div>
 				<div class="factsheet-item">
 					<strong>Price:</strong>
-					Free & Open Source
+					Free, open source, non-commercial
+				</div>
+				<div class="factsheet-item">
+					<!-- DERIVED. Version and date are read at runtime from
+					     /data/version.json (latest_release.version / .published_at).
+					     They ship as em dashes: a failed fetch must show "unknown",
+					     never a version literal, because the literal would ship
+					     precisely when the lookup failed. -->
+					<strong>Release status:</strong>
+					Early alpha, in active development.
+					<span class="derived-note">
+						Latest build: <span class="derived" id="release-version">&mdash;</span>,
+						published <span class="derived" id="release-date">&mdash;</span>.
+						A dash means this page could not read the release data, not that there is no release.
+					</span>
+				</div>
+				<div class="factsheet-item">
+					<!-- DERIVED. Which platforms have a build is read from
+					     latest_release.platforms, which update-version-info.py derives
+					     from the release's actual attached assets. An ABSENT key means
+					     "unrecorded" (a second writer of version.json drops it), never
+					     "nothing shipped" - so the absent case says so explicitly. -->
+					<strong>Platforms:</strong>
+					<span class="derived" id="release-platforms">&mdash;</span>
+					<span class="derived-note">
+						Read from the builds actually attached to the latest release.
+						Testing coverage is a separate question and the release notes state it
+						honestly, build by build.
+					</span>
+				</div>
+				<div class="factsheet-item">
+					<!-- The engine major version is stable and true for years; the exact
+					     patch is lifted from the release body when it is parseable, so
+					     the page can only get MORE precise, never stale. -->
+					<strong>Engine:</strong>
+					<span id="engine-version">Godot 4</span>
 				</div>
 				<div class="factsheet-item">
 					<strong>Languages:</strong>
@@ -322,22 +451,64 @@
 				</div>
 			</div>
 
-			<h3>Game Description</h3>
-			<p>p(Doom)1 is a satirical meta-strategy game about AI Safety that challenges players to navigate the complex landscape of artificial intelligence development while managing existential risks. Players must balance research progress, policy decisions, and public perception while keeping the probability of doom (p(doom)) at manageable levels.</p>
+			<h3>Description</h3>
+			<p>p(Doom)1 puts you in charge of an AI safety lab. You hire researchers, chase funding, wrangle compute, manage a board, a public and a rival, and try to lower the probability of catastrophe &mdash; mostly via meetings, budgets and paperwork. The bureaucracy is the game. It is satirical about the institutions and sincere about the risk, and it does not think those two things are in tension.</p>
 
-			<h3>Key Features</h3>
-			<ul style="margin-left: 2rem; margin-top: 1rem;">
-				<li>Strategic gameplay focused on AI Safety scenarios</li>
-				<li>Economic simulation with resource management</li>
-				<li>Policy decision-making with real-world implications</li>
-				<li>Educational content about AI Safety concepts</li>
-				<li>Open source development model</li>
+			<h3>Key features</h3>
+			<ul style="margin-left: 2rem; margin-top: 1rem; color: var(--text-secondary);">
+				<li>Institutional strategy: headcount, budget, compute and reputation as the actual verbs</li>
+				<li>A published, moving p(doom) estimate you can argue with rather than a score you can only accept</li>
+				<li>Deterministic seeds &mdash; everyone playing a given week's seed gets the same world, so two players' decisions are directly comparable</li>
+				<li>Open source, in public, with the design decisions written down as they are made</li>
+				<li>Rough edges, honestly labelled &mdash; this is an early alpha and the site says so everywhere</li>
 			</ul>
 		</section>
 
 		<section class="press-section">
-			<h2>Download Game</h2>
-			<p>Get the latest version of p(Doom)1 from our official channels:</p>
+			<h2>Where it sits</h2>
+
+			<p>There are two claims we could make about this game's genre. We went and checked both before making either, and only one of them survived.</p>
+
+			<h3>&quot;A bureaucracy simulator&quot; &mdash; a good description, a bad rarity claim</h3>
+
+			<p>Steam's own tag list runs to roughly five hundred entries and not one of them is &quot;bureaucracy&quot;. That is not because the space is empty; it is because the space is unnamed. <a href="https://en.wikipedia.org/wiki/Papers,_Please" target="_blank" rel="noopener">Papers, Please</a> has sold over five million copies on its own. <em>Beholder</em>, <em>Orwell</em>, <em>Not Tonight</em> and <em>Yes, Your Grace</em> all work the same seam, and Douglas Adams wrote a text adventure called <a href="https://en.wikipedia.org/wiki/Bureaucracy_(video_game)" target="_blank" rel="noopener">Bureaucracy</a> in 1987 in which a rising blood-pressure meter eventually kills you with an aneurysm. We are not close to unique here and we are not going to say we are.</p>
+
+			<p>What is genuinely different is the vantage point. Nearly every game in that lineage puts you at the <em>bottom</em> of an institution &mdash; you are the clerk, the border guard, the informant, and the bureaucracy is an antagonist you cannot argue with. p(Doom)1 puts you in charge of one. The budget, the headcount, the org chart and the internal politics are the mechanics rather than the backdrop; you are the person the clerk is furious at. We could not find a tag or a list that isolates that slice, so treat it as a description of what the game does, not a claim about how rare it is.</p>
+
+			<h3>&quot;A game about AI safety&quot; &mdash; the rarer claim, and it holds with a boundary</h3>
+
+			<p>Games where AI existential risk is the actual subject, rather than a science-fiction setting, can genuinely be counted on one hand. <a href="https://en.wikipedia.org/wiki/Universal_Paperclips" target="_blank" rel="noopener">Universal Paperclips</a> (Frank Lantz, 2017) is the famous one and deservedly so. Past it there are a few browser and jam projects &mdash; itch.io's <code>ai-alignment</code> tag currently returns a single game. On Steam we are not aware of a released title where alignment is the mechanic rather than the scenery.</p>
+
+			<p>That boundary is doing real work in that sentence, which is why we stated it rather than quoting a number. Plenty of games have an AI antagonist. Very few make the difficulty of aiming one into the thing you play.</p>
+
+			<h3>Design debts</h3>
+
+			<p>Nobody builds in a vacuum, and not naming your influences is a quiet way of claiming credit that belongs somewhere else. Five we would name, with thanks:</p>
+
+			<ul class="lineage">
+				<li><strong><a href="https://en.wikipedia.org/wiki/Bureaucracy_(video_game)" target="_blank" rel="noopener">Bureaucracy</a></strong> (Infocom, written by Douglas Adams, 1987) &mdash; the proof, forty years ahead of us, that administrative friction is funny and that a health bar can be made of pure exasperation.</li>
+				<li><strong><a href="https://en.wikipedia.org/wiki/Papers,_Please" target="_blank" rel="noopener">Papers, Please</a></strong> (Lucas Pope, 2013) &mdash; the modern benchmark for making a player feel complicit through paperwork alone. It is also the game that proved this audience exists.</li>
+				<li><strong><a href="https://en.wikipedia.org/wiki/Plague_Inc." target="_blank" rel="noopener">Plague Inc.</a></strong> (Ndemic Creations, James Vaughan, 2012) &mdash; a legible model of a global process that you push on indirectly and watch propagate. Ours runs the other way round: their number going up is a win.</li>
+				<li><strong><a href="https://en.wikipedia.org/wiki/Democracy_4" target="_blank" rel="noopener">Democracy</a></strong> (Positech Games, Cliff Harris, 2005 onward) &mdash; the case that a visible web of interacting policy effects is more interesting than a hidden one. The design commitment to showing the working is inherited straight from here.</li>
+				<li><strong><a href="https://en.wikipedia.org/wiki/Universal_Paperclips" target="_blank" rel="noopener">Universal Paperclips</a></strong> (Frank Lantz, 2017) &mdash; the demonstration that an argument about AI risk can be made <em>as a mechanic</em>, and that this lands harder than making it as prose.</li>
+			</ul>
+
+			<p>If you are writing about the game and want a shelf to put it on, that is the shelf.</p>
+		</section>
+
+		<section class="press-section">
+			<h2>Who this is for</h2>
+			<p>Plainly: this is a niche game, and the niche is the point.</p>
+
+			<p class="pullquote">&quot;I'm building this game for about 80 people on the planet.&quot;</p>
+
+			<p>That is the developer's own framing and it is not false modesty. A satirical management sim about the internal politics of AI safety research, made by one person in Godot, is not a product with a large addressable market, and designing it as though it were would ruin the specific thing it is good at. The people it is for &mdash; researchers and the AI-safety-adjacent, management-sim obsessives, people who enjoyed being made to feel complicit by a game about paperwork &mdash; will recognise it immediately. Everyone else is very welcome, and should be warned that a substantial portion of the game is a budget.</p>
+
+			<p>Weirdness is treated here as a virtue rather than a phase to grow out of. If you are writing about the game and the angle you want is &quot;this is strange and specific and made for almost nobody&quot;, that is the correct angle and we will help you with it.</p>
+		</section>
+
+		<section class="press-section">
+			<h2>Download</h2>
 
 			<!-- The real download today is GitHub Releases. The Steam badge below is a
 			     NOT-YET marker, not a channel -- there is no store page to send press to,
@@ -348,8 +519,10 @@
 					Download from GitHub Releases &rarr;
 				</a>
 			</p>
-			<p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
-				Windows, macOS and Linux &mdash; Windows tested, macOS and Linux experimental. Free and open source &mdash; no store account needed.
+			<p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin: 0 auto 1.5rem;">
+				<!-- DERIVED: platform names come from version.json, never from prose here. -->
+				Builds attached to the latest release: <span class="derived" id="download-platforms">&mdash;</span>.
+				Free and open source &mdash; no store account needed.
 			</p>
 
 			<!-- Steam badge - Valve compliant -->
@@ -364,7 +537,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<!-- Required Valve Legal Attribution -->
 				<div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.3;">
 					©2025 Valve Corporation. Steam and the Steam logo are trademarks and/or<br>
@@ -374,13 +547,13 @@
 
 			<div class="download-grid">
 				<div class="download-card">
-					<h4>GitHub Releases (Fallback)</h4>
-					<p>Download the latest stable release directly from our GitHub repository.</p>
-					<a href="https://github.com/PipFoweraker/pdoom1/releases" class="download-btn" target="_blank" rel="noopener">Download Latest</a>
+					<h4>Releases</h4>
+					<p>Every published build, with its release notes and per-platform testing status.</p>
+					<a href="https://github.com/PipFoweraker/pdoom1/releases" class="download-btn" target="_blank" rel="noopener">All releases</a>
 				</div>
 				<div class="download-card">
 					<h4>Source Code</h4>
-					<p>Access the complete source code and contribute to development.</p>
+					<p>The whole game, in the open. Issues and pull requests genuinely get read.</p>
 					<a href="https://github.com/PipFoweraker/pdoom1" class="download-btn" target="_blank" rel="noopener">View Source</a>
 				</div>
 			</div>
@@ -388,42 +561,50 @@
 
 		<section class="press-section">
 			<h2>Press Assets</h2>
+			<p>Use anything here freely for coverage. If you need something at a size or crop we have not published, ask &mdash; it is faster than you think.</p>
 			<div class="download-grid">
 				<div class="download-card">
-					<h4>Logo Pack</h4>
-					<p>High-resolution logos in various formats (PNG, SVG)</p>
+					<h4>Logo</h4>
+					<p>The project logo at full resolution.</p>
 					<a href="/assets/pdoom_logo_1.png" class="download-btn" download>Download Logo</a>
 				</div>
-				<div class="download-card">
+				<div class="download-card" id="screenshots-card">
+					<!-- The old markup here linked "View Gallery" at "/" -- a lie, and one
+					     Pip called out by name. The gallery at /gallery/ is being built
+					     separately; rather than link ahead of it, the honest state ships
+					     statically and the script at the end of this page upgrades the
+					     card only once /gallery/ actually resolves. Degrading direction:
+					     no JS, or no gallery, leaves a true statement in place. -->
 					<h4>Screenshots</h4>
-					<p>In-game screenshots and interface examples</p>
-					<a href="/" class="download-btn">View Gallery</a>
+					<p id="screenshots-note">A browsable gallery is being built. Until it lands, the published screenshots are in the website repository.</p>
+					<a href="https://github.com/PipFoweraker/pdoom1-website/tree/main/public/assets/screenshots" class="download-btn" id="screenshots-link" target="_blank" rel="noopener">Screenshots on GitHub</a>
 				</div>
 			</div>
 		</section>
 
 		<section class="press-section">
-			<h2>Legal & Compliance</h2>
-			<div class="legal-links">
-				<a href="/privacy/">Privacy Policy</a>
-				<a href="mailto:press@pdoom1.com">Support Contact</a>
-			</div>
-
-			<div class="rating-info">
-				<h3>Age Rating & Content</h3>
-				<p><strong>Content Rating:</strong> Not yet rated by ESRB/PEGI</p>
-				<p><strong>Content Notes:</strong> Educational content about AI safety, strategic decision-making, no violent content. Suitable for ages 13+.</p>
-				<p><strong>Regional Compliance:</strong> GDPR compliant, no data collection beyond basic analytics.</p>
-			</div>
+			<h2>The developer</h2>
+			<p>p(Doom)1 is made by <strong>Pip Foweraker</strong>, solo, in Australia. His working life is in catastrophic and existential risk; the game is what happens when someone who spends their days inside those institutions builds a simulation of them and cannot resist making it funny.</p>
+			<p>Bio, other projects and contact: <a href="https://pipfoweraker.com" target="_blank" rel="noopener">pipfoweraker.com</a>.</p>
+			<p>The development is deliberately legible. Design decisions are written down as records and published to <a href="/design-notes/">design notes</a>; what is broken is tracked in the open; the blog is the working notebook rather than an announcements feed. If you want to write about how the thing is being made, there is unusually much to read.</p>
 		</section>
 
 		<section class="press-section">
-			<h2>Community & Contact</h2>
+			<h2>Get in touch</h2>
 			<div class="contact-info">
-				<h3>Press Inquiries</h3>
-				<p>For press inquiries, interviews, or review copies:</p>
-				<p><a href="mailto:press@pdoom1.com">press@pdoom1.com</a></p>
-				
+				<h3>Please do &mdash; we mean it</h3>
+				<p>There is no press office here and no review-copy process to navigate: the game is free, so you already have a copy. What we would genuinely like is for you to email us.</p>
+				<p>Good reasons to write, all equally welcome:</p>
+				<ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+					<li>You are writing about the game and want a quote, a fact checked, an asset, or an argument.</li>
+					<li>You are stuck, confused, or the game did something inexplicable. This is the most useful email we get.</li>
+					<li>You want to know how a mechanic works, or why it works that way.</li>
+					<li>You think the model is wrong. Say so, specifically. That is a feature request.</li>
+					<li>You are working on something adjacent and want to compare notes.</li>
+				</ul>
+				<p style="margin-top: 1rem;"><a href="mailto:team@pdoom1.com">team@pdoom1.com</a> &mdash; one small team, no auto-responder, and a reply from a person.</p>
+				<p>If you would rather not email, the <a href="/bug-report/">bug report form</a> and the <a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener">issue tracker</a> both reach the same place.</p>
+
 				<div class="social-links">
 					<a href="https://github.com/PipFoweraker/pdoom1" target="_blank" rel="noopener" title="GitHub">GitHub</a>
 				</div>
@@ -431,14 +612,29 @@
 		</section>
 
 		<section class="press-section">
-			<h2>Development & Updates</h2>
-			<p>p(Doom)1 is actively developed with regular updates. Track development progress:</p>
-			<ul style="margin-left: 2rem; margin-top: 1rem;">
-				<li><a href="/game-changelog/" style="color: var(--accent-primary);">Game Changelog</a> - Game version history and updates</li>
-				<li><a href="/website-changelog/" style="color: var(--accent-primary);">Website Changelog</a> - Website features and infrastructure updates</li>
-				<li><a href="/blog/" style="color: var(--accent-primary);">Development Blog</a> - Behind-the-scenes development</li>
-				<li><a href="/docs/" style="color: var(--accent-primary);">Documentation</a> - Technical documentation and guides</li>
-				<li><a href="https://github.com/PipFoweraker/pdoom1/issues" style="color: var(--accent-primary);" target="_blank" rel="noopener">Issue Tracker</a> - Bug reports and feature requests</li>
+			<h2>Legal &amp; compliance</h2>
+			<div class="legal-links">
+				<a href="/privacy/">Privacy Policy</a>
+				<a href="mailto:team@pdoom1.com">Email us</a>
+			</div>
+
+			<div class="rating-info">
+				<h3 style="margin-top: 0;">Age rating and content</h3>
+				<p><strong>Content rating:</strong> not rated by ESRB or PEGI, and unlikely to be while the game is free and unreleased on storefronts.</p>
+				<p><strong>Content notes:</strong> no violence and no graphic content. The subject matter is human extinction risk, handled as satire and as a serious argument by turns. Reasonable for teenagers upward; the barrier is interest, not content.</p>
+				<p><strong>Privacy:</strong> self-hosted, cookieless analytics; no accounts, no personal data collected, no third-party trackers. The <a href="/privacy/">privacy policy</a> spells out exactly what is and is not gathered.</p>
+			</div>
+		</section>
+
+		<section class="press-section">
+			<h2>Development &amp; updates</h2>
+			<p>Everything below is maintained rather than decorative.</p>
+			<ul style="margin-left: 2rem; margin-top: 1rem; color: var(--text-secondary);">
+				<li><a href="/game-changelog/">Game changelog</a> &mdash; release history, derived from the releases themselves</li>
+				<li><a href="/blog/">Development blog</a> &mdash; the working notebook. There is an <a href="/feed.xml">RSS feed</a> and an <a href="/atom.xml">Atom feed</a>; no account or email address required</li>
+				<li><a href="/design-notes/">Design notes</a> &mdash; the decision records, published as they are made</li>
+				<li><a href="/docs/">Documentation</a> &mdash; technical documentation and guides</li>
+				<li><a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener">Issue tracker</a> &mdash; what is broken, in public</li>
 			</ul>
 		</section>
 	</main>
@@ -455,6 +651,109 @@
 				}
 			});
 		});
+	</script>
+	<script>
+		// ------------------------------------------------------------------
+		// Release facts are DERIVED, never typed into this page.
+		//
+		// Source of truth: /data/version.json. Every derived slot ships as an
+		// em dash, and every failure path leaves the dash exactly where it is.
+		// A fallback literal would ship at precisely the moment the real lookup
+		// failed, which is the one moment it is most likely to be wrong.
+		// ------------------------------------------------------------------
+		(async function deriveReleaseFacts() {
+			const set = (id, text) => {
+				const el = document.getElementById(id);
+				if (el) el.textContent = text;
+			};
+
+			let data;
+			try {
+				const res = await fetch('/data/version.json', { cache: 'no-store' });
+				if (!res.ok) return;          // leave the dashes
+				data = await res.json();
+			} catch (e) {
+				return;                        // leave the dashes
+			}
+
+			const rel = (data && data.latest_release) || {};
+
+			// --- version -------------------------------------------------
+			if (typeof rel.version === 'string' && rel.version.trim()) {
+				set('release-version', rel.version.trim());
+			}
+
+			// --- publication date ----------------------------------------
+			if (typeof rel.published_at === 'string') {
+				const d = new Date(rel.published_at);
+				if (!isNaN(d.getTime())) {
+					set('release-date', d.toLocaleDateString('en-AU', {
+						year: 'numeric', month: 'long', day: 'numeric'
+					}));
+				}
+			}
+
+			// --- platforms ------------------------------------------------
+			// version.json has two writers and one of them omits this key, so an
+			// ABSENT platforms object means "unrecorded", never "nothing shipped".
+			// Saying "no builds" on a missing key would be the exact lie this
+			// derivation exists to prevent.
+			const LABEL = { windows: 'Windows', macos: 'macOS', linux: 'Linux' };
+			const p = rel.platforms;
+			let platformText;
+			if (p && typeof p === 'object') {
+				const shipped = Object.keys(LABEL).filter(k => p[k] === true).map(k => LABEL[k]);
+				const missing = Object.keys(LABEL).filter(k => k in p && p[k] !== true).map(k => LABEL[k]);
+				if (shipped.length) {
+					platformText = shipped.join(', ');
+					if (missing.length) {
+						platformText += ' (' + missing.join(', ') + ': not yet)';
+					}
+				} else {
+					platformText = 'none attached to the latest release yet';
+				}
+			} else {
+				platformText = 'not recorded in the release data — see the releases page';
+			}
+			set('release-platforms', platformText);
+			set('download-platforms', platformText);
+
+			// --- engine ---------------------------------------------------
+			// The page ships "Godot 4", which stays true for years. If the release
+			// body names the exact build, upgrade to it. This can only ever make
+			// the claim more precise; it can never introduce a stale one.
+			if (typeof rel.body === 'string') {
+				const m = rel.body.match(/Engine:\*{0,2}\s*Godot\s*([0-9]+(?:\.[0-9]+)*)/i);
+				if (m) set('engine-version', 'Godot ' + m[1]);
+			}
+		})();
+
+		// ------------------------------------------------------------------
+		// The screenshots card points at the repository until /gallery/ exists.
+		// Checked at runtime rather than assumed, so this page cannot start
+		// advertising a gallery that has not shipped -- the failure direction
+		// leaves a true statement on screen.
+		// ------------------------------------------------------------------
+		(async function upgradeToGallery() {
+			const link = document.getElementById('screenshots-link');
+			const note = document.getElementById('screenshots-note');
+			if (!link || !note) return;
+			try {
+				const res = await fetch('/gallery/', { method: 'GET', cache: 'no-store' });
+				if (!res.ok) return;
+				const html = await res.text();
+				// A soft-404 returns 200 with the site's own error page; require the
+				// response to look like a real gallery document before linking it.
+				if (!/<title[^>]*>[^<]*galler/i.test(html)) return;
+				note.textContent = 'In-game screenshots and interface shots, at full resolution.';
+				link.textContent = 'View Gallery';
+				link.setAttribute('href', '/gallery/');
+				link.removeAttribute('target');
+				link.removeAttribute('rel');
+			} catch (e) {
+				// Leave the honest repository link in place.
+			}
+		})();
 	</script>
 	<script src="/assets/js/navigation.js"></script>
 </body>
