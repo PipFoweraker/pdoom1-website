@@ -166,6 +166,18 @@ const GUARDED = [
     fetches: ['/design/tokens.json', '/data/clocks.json'],
   },
   {
+    page: 'public/metrics/index.html',
+    // `row` is a breakdown row and `snap` an archive entry -- both carry
+    // referrer sources and page paths, which come out of visitors' browsers via
+    // the Referer header. Anyone who can link to pdoom1.com from a page they
+    // control chooses that string, so it is external-origin text on a page that
+    // republishes it. `latest`/`idx`/`cov`/`series` are the two fetched
+    // documents and their sub-objects; `day` is one day of the series.
+    roots: ['latest', 'idx', 'row', 'day', 'snap', 'cov', 'series', 'errs'],
+    safeHelpers: ['num', 'pct', 'secs'],
+    fetches: ['/data/analytics/latest.json', '/data/analytics/history/index.json'],
+  },
+  {
     page: 'public/index.html',
     roots: ['status'],
     safeHelpers: [],

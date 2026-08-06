@@ -66,6 +66,11 @@ on:
       - 'scripts/test-analytics-optout.js'
       - 'scripts/test-changelog-render.js'
       - 'scripts/test-dashboard-devlog.js'
+      - 'scripts/test-metrics-render.js'
+      # /metrics/ renders these two files and nothing else. A snapshot landing
+      # without the index rebuilt is exactly the drift --check exists to catch.
+      - 'scripts/generate-analytics-index.py'
+      - 'public/data/analytics/**'
       - 'scripts/test-download-resolution.js'
       - 'scripts/test-header-consistency.js'
       - 'scripts/sync/sync-keybinds.py'
@@ -110,6 +115,11 @@ on:
       - 'scripts/test-analytics-optout.js'
       - 'scripts/test-changelog-render.js'
       - 'scripts/test-dashboard-devlog.js'
+      - 'scripts/test-metrics-render.js'
+      # /metrics/ renders these two files and nothing else. A snapshot landing
+      # without the index rebuilt is exactly the drift --check exists to catch.
+      - 'scripts/generate-analytics-index.py'
+      - 'public/data/analytics/**'
       - 'scripts/test-download-resolution.js'
       - 'scripts/test-header-consistency.js'
       - 'scripts/sync/sync-keybinds.py'
@@ -174,6 +184,24 @@ jobs:
       # forces the freshness gate, because a derived source can stop moving.
       - name: The dashboard development log derives AND is freshness-gated
         run: node scripts/test-dashboard-devlog.js
+
+      # /metrics/ publishes the site's own traffic numbers back to its readers,
+      # so every failure mode is a chance to state something false about
+      # ourselves. Nothing in this test checks a happy path and stops: it forces
+      # a dead fetch, a snapshot carrying `errors`, a non-empty `missing_dates`,
+      # a gap and a recorded zero side by side, two snapshots disagreeing, a
+      # hostile referrer string, and a string where a number belongs -- and
+      # asserts that each one renders as itself rather than as a number.
+      - name: The metrics page reports gaps as gaps and never falls back
+        run: node scripts/test-metrics-render.js
+
+      # The page reads a derived index of the snapshot archive, because a static
+      # host serves no directory listing and probing dates would make a 404
+      # indistinguishable from a day with no traffic. --check fails when a
+      # snapshot has landed and the index has not been rebuilt, which is the
+      # state where the page would quietly stop at an older last day.
+      - name: The analytics snapshot index is in step with the snapshots
+        run: python scripts/generate-analytics-index.py --check
 
       # The privacy promise: opt-out works, DNT is honoured, and nothing injects a
       # second tracker (two trackers race and the loser's events vanish).
