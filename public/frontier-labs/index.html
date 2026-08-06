@@ -12,7 +12,7 @@
 	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
 	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
-	<!-- THE escaper. Plain blocking <script src> on purpose -- not defer, not async:
+	<!-- THE escaper, loaded plain and blocking on purpose -- not defer, not async:
 	     the inline renderer at the end of this file calls escapeHTML/safeUrl directly,
 	     so it must already exist. If this fails to load the renderer throws and the
 	     page shows nothing rather than showing unescaped roster data. Fail closed. -->
