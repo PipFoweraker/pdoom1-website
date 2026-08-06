@@ -546,13 +546,17 @@ patched, because each is someone else's page to change.
    load archive data.'"** The index it reads was present and parseable, so the
    real failure mode was quieter: it rendered **3 of 41** weeks. The stale index
    was the bug, not a fetch error.
-4. **`public/robots.txt` claims the orphaned block's pages "also carry
+4. ~~**`public/robots.txt` claims the orphaned block's pages "also carry
    `<meta name="robots" content="noindex">`".** True for 5 of the 7 disallowed
    paths. **`public/stats/index.html` and `public/stats/competition.html` carry
-   no robots meta tag at all** — verified by grep. `Disallow` alone does not
-   prevent indexing of a URL discovered elsewhere, and `stats/competition.html`
-   is the one page that still links into `/league/`. That file is owned by
-   another agent this cycle; the exact requested lines are in the PR body.
+   no robots meta tag at all** — verified by grep.~~ **MOOT 2026-08-06:** both
+   files were deleted, `Disallow: /stats/` was dropped with them, and the
+   robots.txt claim is now true for every path it covers. The noindex gap could
+   not be closed by adding a tag, because adding one would have pre-empted the
+   retire-or-keep decision (TECH_DEBT A8); Pip took that decision and chose
+   retire. Root cause of the whole row: the entire `/stats/` path answered
+   `401 Unauthorized` from DreamHost's own panel statistics area, so no crawler
+   could read a meta tag there either.
 
 ---
 

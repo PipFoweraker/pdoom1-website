@@ -10,9 +10,16 @@ This document tracks future enhancements for the Weekly League UI that were iden
 
 ## Background
 
+> **STALE 2026-08-06.** `/stats/competition.html` no longer exists — `public/stats/`
+> was retired (TECH_DEBT A8) after it was established that DreamHost's panel
+> statistics area owns `/stats/` and answers `401` there, i.e. the page was never
+> loadable by anyone. Every task below that names that file is therefore work on a
+> deleted page; reviving it means first choosing a **reachable** path for it.
+> `/league/` itself is retired-and-hidden. Kept as a record of intent, not a plan.
+
 The core Weekly League UI was implemented with:
 - Weekly League Dashboard (`/league/index.html`)
-- Competition Statistics Page (`/stats/competition.html`)
+- Competition Statistics Page (`/stats/competition.html`) — **deleted 2026-08-06**
 - Enhanced Leaderboard with seed/week filtering (`/leaderboard/index.html`)
 
 However, several features were deferred to keep the initial implementation focused and manageable.

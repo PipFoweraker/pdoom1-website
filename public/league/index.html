@@ -583,13 +583,12 @@
           <li role="none"><a href="/" role="menuitem">Game</a></li>
           <li role="none"><a href="/league/" role="menuitem" aria-current="page" style="color: var(--accent-primary);">Weekly League</a></li>
           <li role="none"><a href="/leaderboard/" role="menuitem">Leaderboard</a></li>
-          <li role="none" class="dropdown">
-            <a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Stats ▾</a>
-            <ul class="dropdown-menu" role="menu">
-              <li role="none"><a href="/stats/" role="menuitem">Game Stats</a></li>
-              <li role="none"><a href="/stats/competition.html" role="menuitem">Competition Stats</a></li>
-            </ul>
-          </li>
+          <!-- Was a "Stats" dropdown over /stats/ + /stats/competition.html. Both
+               were retired 2026-08-06 (see public/.htaccess and TECH_DEBT A8): the
+               whole /stats/ path answered 401 from DreamHost's own panel stats
+               area, so neither was ever reachable. One item survives, and a
+               dropdown holding one link is just a link. -->
+          <li role="none"><a href="/game-stats/" role="menuitem">Game Stats</a></li>
           <li role="none" class="dropdown">
             <a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
             <ul class="dropdown-menu" role="menu">
@@ -756,12 +755,16 @@
         <p style="color: var(--text-secondary); margin-bottom: 1rem;">
           View more details and compete in the weekly league
         </p>
-        <a href="/leaderboard/" class="cta-button" style="display: inline-block; text-decoration: none; margin-right: 1rem;">
+        <a href="/leaderboard/" class="cta-button" style="display: inline-block; text-decoration: none;">
           View Full Leaderboard
         </a>
-        <a href="/stats/competition.html" class="cta-button" style="display: inline-block; text-decoration: none; background: linear-gradient(45deg, var(--accent-secondary), var(--accent-danger));">
-          Competition Stats
-        </a>
+        <!-- A second CTA pointed at /stats/competition.html until 2026-08-06.
+             That page is retired, and it is NOT replaced by /game-stats/ -- it
+             was competition/participation analysis, a different thing. Sending a
+             button labelled "Competition Stats" to the game-stats page would be
+             a lie about what is behind it, so the button is gone rather than
+             repointed. If competition stats are wanted again, the retired page
+             is recoverable from git history; see the commit that removed it. -->
       </div>
     </div>
 

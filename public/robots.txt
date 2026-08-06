@@ -38,15 +38,20 @@ Disallow: /monitoring/
 # Verified per file, 2026-07-28:
 #   league/index.html, league/archive.html, players/index.html and
 #     dev-notes/index.html DO carry <meta name="robots" content="noindex">.
-#   stats/index.html and stats/competition.html carry NO noindex tag. They are
-#     disallowed here and nothing more, so either could still be indexed
-#     snippet-less. Adding a noindex would quietly pre-empt an open product
-#     decision -- whether /stats/ is retired, kept, or pointed at
-#     /state-of-doom/ -- so do not add one without Pip's call.
+#
+# /stats/ was the fifth entry here until 2026-08-06. It is gone because the two
+# pages behind it are gone: Pip took the retire-or-keep decision this file used
+# to be holding open (TECH_DEBT A8) and chose retire. stats/index.html was a
+# near-duplicate of game-stats/index.html, and neither page was ever reachable --
+# DreamHost's own panel stats area owns /stats/ and answers 401 there. A
+# Disallow for a path with no files behind it protects nothing, so it goes
+# rather than lingering as a claim about content that no longer exists.
+# public/.htaccess now attempts a 301 /stats/ -> /game-stats/; a crawler that is
+# forbidden to fetch a redirect never learns the new location, which is the same
+# reason /changelog/ is deliberately crawlable above.
 Disallow: /league/
 Disallow: /players/
 Disallow: /dev-notes/
-Disallow: /stats/
 
 # Sitemap (update if domain differs)
 Sitemap: https://pdoom1.com/sitemap.xml
