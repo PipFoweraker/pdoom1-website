@@ -1,9 +1,9 @@
 {
   "meta": {
-    "generated": "2026-08-06T00:50:59+00:00",
+    "generated": "2026-08-06T07:14:45+00:00",
     "export_source": "website:publish-live-board.py",
     "total_players": 5,
-    "total_entries": 5,
+    "total_entries": 6,
     "board_key": {
       "seed": "weekly-2026-w31",
       "ladder_epoch": "L3"
@@ -72,6 +72,18 @@
       "game_mode": "v0.13.2",
       "duration_seconds": 652.344,
       "entry_uuid": "1368141551512-1161010-0111414-813110-151213141112431041314",
+      "baseline_score": 0,
+      "baseline_doom_integral": 0
+    },
+    {
+      "score": 12,
+      "doom_integral": 0,
+      "player_name": "AI Safety Lab",
+      "date": "2026-08-06T13:02:18",
+      "level_reached": 12,
+      "game_mode": "v0.13.2",
+      "duration_seconds": 13.344,
+      "entry_uuid": "1225101684-015514-1513312-321314-105121304112427",
       "baseline_score": 0,
       "baseline_doom_integral": 0
     },
