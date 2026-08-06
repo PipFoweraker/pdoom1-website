@@ -65,17 +65,44 @@
             padding: 0.45rem 0.7rem; text-align: left; color: var(--text-secondary); }
         article th { color: var(--text-primary); background: var(--bg-tertiary); }
         .post-error { color: var(--accent-secondary); text-align: center; padding: 3rem 1rem; }
+
+        /* AUTHORSHIP.
+           Most of this site is drafted by an assistant, so the mark goes on the HUMAN
+           pieces -- scarce by construction. A left rule and a slightly warmer text
+           colour, not a badge and not a warning: the claim is "a person wrote this",
+           not "handle with care". Everything else, including an unattributed post,
+           renders in the muted metadata voice the rest of the page already uses. */
+        .authorship { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.6rem;
+            line-height: 1.5; }
+        .authorship-note { display: block; color: var(--text-muted); opacity: 0.85;
+            font-size: 0.95em; margin-top: 0.15rem; }
+        .authorship-human { color: var(--text-secondary);
+            border-left: 2px solid var(--accent-secondary); padding: 0.15rem 0 0.15rem 0.85rem;
+            letter-spacing: 0.015em; }
+        .authorship-unattributed, .authorship-unresolved { font-style: italic; }
+        .colophon { max-width: 820px; margin: 1.6rem auto 0; padding: 0 1.5rem;
+            font-size: 0.85rem; color: var(--text-muted); line-height: 1.55; }
     </style>
 	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
 	     PLAIN blocking script: the inline renderers below call it, so it has to be
 	     defined before they run. Not defer, not async. -->
 	<script src="/assets/js/escape.js"></script>
+	<!-- Author identity resolution (returns plain strings; this page escapes them).
+	     Same blocking rule, same reason. -->
+	<script src="/assets/js/authorship.js"></script>
 </head>
 <body>
     <div class="container">
         <div class="post-nav"><a href="/blog/">&larr; All dev-blog posts</a></div>
         <article id="post"><p class="post-error">Loading post&hellip;</p></article>
     </div>
+    <!-- THE COLOPHON. One standing sentence, not per-post metadata: accountability here
+         never varies, so a field repeating it on every item would always hold the same
+         value. The identical sentence is the "colophon" key of /data/authors.json, and
+         scripts/test-blog-render.js fails if the two ever differ by a character. -->
+    <footer class="colophon">
+        Everything published here ships with Pip Foweraker's approval, and the mistakes are his — including the mistakes of things working under his direction.
+    </footer>
     <script>
         // Minimal, dependency-free Markdown renderer. Covers the subset used by
         // p(Doom)1 dev-blog posts: headings, bold/italic, links, images, inline
@@ -191,8 +218,44 @@
             flushPara(); closeList();
             return out.join('\n');
         }
+        // The authorship line, built from plain strings by /assets/js/authorship.js and
+        // escaped HERE, at the sink. resolveAuthorship() never invents an identity: no
+        // author key renders as "Authorship not recorded", an id the registry does not
+        // carry is quoted back as-is, and a registry that failed to load says so. None
+        // of those five states defaults to a person.
+        function authorshipBlockHTML(a) {
+            const note = a.note
+                ? '<span class="authorship-note">' + escapeHTML(a.note) + '</span>' : '';
+            return '<p class="authorship ' + escapeHTML(a.cls) + '">'
+                 + escapeHTML(a.text) + note + '</p>';
+        }
+
+        // Put the byline under the title, where a byline belongs -- not above it. Both
+        // arguments are strings this page generated, so the split lands on our own
+        // markup and never inside post text. ADDITIVE by contract: the rendered body
+        // comes out whole, which is what keeps this change invisible to the sixteen
+        // posts that record no author. scripts/test-blog-render.js asserts that.
+        function assemblePost(body, block) {
+            const at = body.indexOf('</h1>');
+            return at === -1
+                ? block + body
+                : body.slice(0, at + 5) + block + body.slice(at + 5);
+        }
+
+        // Never rejects: a failed or malformed registry resolves to null, which
+        // resolveAuthorship() renders as "registry unavailable" rather than as nobody.
+        async function loadAuthorRegistry() {
+            try {
+                const r = await fetch('/data/authors.json', { cache: 'no-store' });
+                if (!r.ok) { return null; }
+                const j = await r.json();
+                return (j && typeof j === 'object') ? j : null;
+            } catch (e) { return null; }
+        }
+
         (async function () {
             const el = document.getElementById('post');
+            const registryPromise = loadAuthorRegistry();
             const params = new URLSearchParams(location.search);
             let file = params.get('p') || '';
             // allow only a safe .md filename in the /blog/ folder (no path traversal)
@@ -204,7 +267,14 @@
                 const res = await fetch('/blog/' + file, { cache: 'no-store' });
                 if (!res.ok) throw new Error(res.status);
                 const md = await res.text();
-                el.innerHTML = renderMarkdown(md);
+                // The identity is read from the post's OWN front matter, not from
+                // index.json, so the two can never disagree about who wrote a piece --
+                // index.json is derived from that same front matter by
+                // scripts/build-blog-index.py.
+                const authorship = resolveAuthorship(
+                    authorFromFrontMatter(md), await registryPromise);
+                el.innerHTML = assemblePost(
+                    renderMarkdown(md), authorshipBlockHTML(authorship));
                 const h1 = el.querySelector('h1');
                 if (h1) document.title = h1.textContent + ' - p(Doom)1 Dev Blog';
             } catch (e) {

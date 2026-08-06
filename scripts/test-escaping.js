@@ -137,9 +137,14 @@ const GUARDED = [
   },
   {
     page: 'public/blog/index.html',
-    roots: ['post', 'tag'],
+    // `authorship` is the resolved author identity for a card: plain strings out of
+    // /data/authors.json via resolveAuthorship(). Registry text is repo-controlled
+    // today, but the rule here is about the SINK, not about who we trust -- and one of
+    // its two interpolations lands in a class="" attribute, where an unescaped quote
+    // starts a new attribute.
+    roots: ['post', 'tag', 'authorship'],
     safeHelpers: [],
-    fetches: ['/blog/index.json'],
+    fetches: ['/blog/index.json', '/data/authors.json'],
   },
   {
     page: 'public/game-changelog/index.html',

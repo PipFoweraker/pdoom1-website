@@ -280,7 +280,39 @@
             margin-bottom: 1rem;
             color: var(--text-secondary);
         }
-        
+
+        /* AUTHORSHIP -- see public/assets/js/authorship.js for why the HUMAN pieces are
+           the marked ones. Subtle by design: a left rule and a warmer text colour, not a
+           badge. An unattributed post is not silent about it; silence would read as a
+           default, and there is no default. */
+        .authorship {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .authorship-human {
+            color: var(--text-secondary);
+            border-left: 2px solid var(--accent-secondary);
+            padding-left: 0.6rem;
+            letter-spacing: 0.015em;
+        }
+
+        .authorship-unattributed,
+        .authorship-unresolved {
+            font-style: italic;
+        }
+
+        .colophon {
+            max-width: 1000px;
+            margin: 2.5rem auto 0;
+            padding: 1.2rem 2rem 0;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -310,6 +342,9 @@
 	     PLAIN blocking script: the inline renderers below call it, so it has to be
 	     defined before they run. Not defer, not async. -->
 	<script src="/assets/js/escape.js"></script>
+	<!-- Author identity resolution (returns plain strings; this page escapes them).
+	     Same blocking rule, same reason. -->
+	<script src="/assets/js/authorship.js"></script>
 </head>
 <body>
     <header>
@@ -357,11 +392,23 @@
             <div class="loading-skeleton" style="height: 200px; background: var(--bg-secondary); border-radius: var(--radius-lg);"></div>
         </main>
     </div>
-    
+
+    <!-- THE COLOPHON. One standing sentence, not per-post metadata: accountability here
+         never varies, so a field repeating it on every post would always hold the same
+         value. The identical sentence is the "colophon" key of /data/authors.json, and
+         scripts/test-blog-render.js fails if the two ever differ by a character. -->
+    <footer class="colophon">
+        Everything published here ships with Pip Foweraker's approval, and the mistakes are his — including the mistakes of things working under his direction.
+    </footer>
+
+
     <script>
         class DeveloperBlog {
             constructor() {
                 this.posts = [];
+                // null means "the author registry is unavailable", which
+                // resolveAuthorship() renders in those words. It never means "nobody".
+                this.authors = null;
                 this.currentFilter = 'all';
                 this.init();
             }
@@ -382,6 +429,15 @@
                 } catch (error) {
                     console.error('Failed to load blog posts:', error);
                     this.showError();
+                }
+                // Separate try: a missing author registry must not take the post list
+                // down with it. It degrades to an honest "registry unavailable" line.
+                try {
+                    const r = await fetch('/data/authors.json');
+                    const j = r.ok ? await r.json() : null;
+                    this.authors = (j && typeof j === 'object') ? j : null;
+                } catch (error) {
+                    this.authors = null;
                 }
             }
             
@@ -435,6 +491,12 @@
                 const commit = post.commit ?
                     `<span class="post-commit">commit: ${escapeHTML(post.commit)}</span>` : '';
 
+                // `author` is OPTIONAL and absent on every post written before
+                // 2026-08-06. Absent does NOT mean drafted and does not mean Pip --
+                // resolveAuthorship() renders it as "Authorship not recorded", which is
+                // the only true thing anyone can say about those posts today.
+                const authorship = resolveAuthorship(post.author, this.authors);
+
                 return `
                     <article class="blog-post" data-tags="${escapeHTML((post.tags || []).join(' '))}">
                         <div class="post-header">
@@ -444,6 +506,7 @@
                                 </h2>
                                 <div class="post-meta">
                                     <span class="post-date">${escapeHTML(this.formatDate(post.date))}</span>
+                                    <span class="authorship ${escapeHTML(authorship.cls)}">${escapeHTML(authorship.text)}</span>
                                     <div class="post-tags">${tags}</div>
                                 </div>
                             </div>

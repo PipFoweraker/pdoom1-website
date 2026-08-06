@@ -14,6 +14,13 @@ on:
       - 'public/blog/index.json'
       - 'public/blog/*.md'
       - 'public/blog/post.html'
+      # The listing page and the authorship surfaces. test-blog-render.js asserts the
+      # colophon on BOTH blog pages and resolves every post against the registry, so a
+      # change to any of these three can break it on its own.
+      - 'public/blog/index.html'
+      - 'public/assets/js/authorship.js'
+      - 'public/data/authors.json'
+      - 'scripts/build-blog-index.py'
       # test-blog-render.js runs the PAGE's renderer, which since 2026-08-01 depends
       # on the shared escaper. A change to either must re-run it.
       - 'public/assets/js/escape.js'
@@ -24,6 +31,13 @@ on:
       - 'public/blog/index.json'
       - 'public/blog/*.md'
       - 'public/blog/post.html'
+      # The listing page and the authorship surfaces. test-blog-render.js asserts the
+      # colophon on BOTH blog pages and resolves every post against the registry, so a
+      # change to any of these three can break it on its own.
+      - 'public/blog/index.html'
+      - 'public/assets/js/authorship.js'
+      - 'public/data/authors.json'
+      - 'scripts/build-blog-index.py'
       # test-blog-render.js runs the PAGE's renderer, which since 2026-08-01 depends
       # on the shared escaper. A change to either must re-run it.
       - 'public/assets/js/escape.js'
