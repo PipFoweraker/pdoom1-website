@@ -208,6 +208,30 @@ jobs:
       - name: Analytics opt-out and no-second-tracker regression
         run: node scripts/test-analytics-optout.js
 
+      # navigation.js is the layout spine -- 24 of 27 hand-written pages delegate
+      # their whole header to it -- so "it must ship its own CSS" is a property of
+      # the one file every page depends on. It previously injected markup only:
+      # pages that happened to carry their own nav rules (the homepage) looked
+      # fine, and pages that did not (the blog) rendered the nav as an unstyled
+      # block stack over the fold. That is the shape of failure this catches, and
+      # it is invisible to anyone checking the homepage.
+      #
+      # Wired 2026-08-06. It was written 2026-07-23 and had no caller in any
+      # workflow, package.json or CLAUDE.md for two weeks -- green the whole time,
+      # which is precisely the state CLAUDE.md warns reads as coverage and is not:
+      # "a documented suite is a suite a human runs when they remember".
+      - name: navigation.js is self-contained (ships its own CSS)
+        run: node scripts/test-navigation.js
+
+      # The syndication endpoints are deployed, publicly reachable, and post to
+      # real social accounts. This asserts the shared-secret gate is present on
+      # every one of them and fails CLOSED when unconfigured -- so a missing
+      # credential cannot become an open relay. Same orphan story as above: no
+      # caller since 2026-07-23. A security gate that nothing re-checks is a
+      # security gate that holds only until someone edits a handler.
+      - name: Syndication endpoints are gated and fail closed
+        run: node scripts/test-syndication-auth.js
+
       # Third parties' addresses scraped out of paper PDFs must never be served.
       #
       # The forced-failure test runs FIRST, for the same reason the platform one
