@@ -1,15 +1,20 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-06T07:10:42.361Z UTC
+Generated: 2026-08-06T12:54:15.865Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1152 | docs: ladder epoch columns are off by one from v0.14 down in ROADMAP.md and RELEASE_NOMENCLATURE.md |  |  | 2026-08-06 07:11:29 | [link](https://github.com/PipFoweraker/pdoom1/issues/1152) |
+| 1151 | events: four measured defects in the pdoom-data ingest path (rarity boundary case, dropped-but-counted variables, inert-sink doc disagreement, constant significance) |  |  | 2026-08-06 07:11:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1151) |
+| 1150 | content: promote the real-people/real-venue content guardrail from a closing issue comment to a tracked doc |  |  | 2026-08-06 07:11:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1150) |
+| 1149 | ui(input): sweep the '_input shortcut + focused Control' double-fire shape across godot/scripts/ui |  |  | 2026-08-06 07:11:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1149) |
+| 1148 | core: pending_events is an unguarded public queue -- give it one validated entry point (class fix behind #1134) |  |  | 2026-08-06 07:11:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/1148) |
+| 1147 | release: add a BEHAVIOURAL build-identity check to the release checklist (a feature the old build cannot have) |  |  | 2026-08-06 07:11:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1147) |
 | 1142 | Goal: Chinese localisation of the game before end of year -- scope undecided, worth an early estimate |  |  | 2026-08-06 04:30:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1142) |
 | 1141 | Playthrough of this afternoon's build: music works, save looks better -- but settings traps you into quitting, F3 will not close, and the cold open never fired |  |  | 2026-08-06 04:17:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/1141) |
 | 1140 | Pip's full response to the Fresh Eyes Teardown (26 min, from memory) -- meta dev cycle, month review becomes an expandable action log, winning does not exist |  |  | 2026-08-06 04:17:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1140) |
 | 1138 | take-loan duplicate is a symptom: the mechanic wants discrete options, not a slider. Plus: build clickable grouping mock-ups, and a question back on tech-debt cadence |  |  | 2026-08-06 03:54:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/1138) |
 | 1135 | Lab-name generator: future-epoch content pass -- more shapes, more pool, backfilled bacronyms | ship:next-release |  | 2026-08-05 22:54:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1135) |
-| 1134 | F3 event injection has no phase guard -- injecting in the wrong phase permalocks the run | bug |  | 2026-08-05 22:29:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1134) |
 | 1132 | Playtest 655/C55: icon bar lands; cap the top bar at 10 buttons; three actions want submenus; mouse-over jiggle is a regression |  |  | 2026-08-05 22:26:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/1132) |
 | 1131 | Pip's answers on the dot-matrix printer: ambient, texture only, and it must be structurally incapable of a false all-clear |  |  | 2026-08-05 22:24:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/1131) |
 | 1128 | sync-documentation.yml commits arbitrary dirty state into pdoom1-website (git add . in a foreign checkout) |  |  | 2026-08-05 08:01:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1128) |
@@ -181,17 +186,13 @@ Generated: 2026-08-06T07:10:42.361Z UTC
 | 613 | Build lane L2 · Effort economy: founder hours, staff lanes, managers (ADR-0011) |  |  | 2026-07-27 01:48:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/613) |
 | 608 | Architecture smell: two GameManager instances (scene-local + autoload); 'ready' prints twice | technical-debt |  | 2026-07-12 08:26:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/608) |
 | 603 | Popups: fanfare needs a dimming backdrop (events leak under it); bug-report 'thanks' Submit still clickable | bug, ui-ux, ship:hotpatch-48h |  | 2026-07-22 08:04:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/603) |
-| 602 | Navigation audit + universal principle (ESC/back consistency, mirrored toggle keys, unreachable Employee screen) | ui-ux, ship:hotpatch-48h |  | 2026-07-22 08:04:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/602) |
 | 601 | Ledger UX: layout wrong/cramped, L-to-close, critical-due popup, distinct warning colour | bug, ui-ux, ship:next-release |  | 2026-07-22 08:05:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/601) |
 | 600 | Dev overlays (DEV MODE + F3) can't read live game state; 29 runtime errors; nudge/advance-turn wiring | bug, ship:next-release |  | 2026-07-25 11:04:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/600) |
 | 595 | Audit strategic options/events/buttons that cost but have no meaningful game impact | game-mechanics, ship:next-release |  | 2026-07-22 08:05:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/595) |
 | 579 | Balance/design from session 2 (workshop #2): events depth, upgrade rebalance, compute economy, investor-pressure frequency | enhancement, game-mechanics, post-launch, ship:next-release |  | 2026-07-22 08:05:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/579) |
 | 578 | Legibility pass (buildable soon): doom blow-by-blow, ledger/overlay discoverability, researcher info, event fanfare | enhancement, ui-ux, ship:next-release |  | 2026-07-22 08:05:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/578) |
 | 577 | UI jitter on hover/button; layout realignment when new actions (Strategic moves) appear | bug, ui-ux, ship:next-release |  | 2026-07-22 08:05:28 | [link](https://github.com/PipFoweraker/pdoom1/issues/577) |
-| 575 | Keyboard input routing: hire-screen number keys dead + bug-report text field intercepted by global hotkeys | bug, ui-ux, ship:hotpatch-48h |  | 2026-07-22 08:04:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/575) |
 | 574 | Playtest design ideas: payroll depth, donor base, accounting-software introduces the ledger | enhancement, game-mechanics, post-launch |  | 2026-07-24 08:33:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/574) |
-| 567 | Event dialog keyboard: choice keys mismatch shown buttons ('key index out of range') | bug, ui-ux, ship:hotpatch-48h |  | 2026-07-22 08:04:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/567) |
-| 565 | Travel/Conferences only reachable by hotkey T, absent from menus | ui-ux, ship:hotpatch-48h |  | 2026-07-22 08:04:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/565) |
 | 545 | Cross-repo sync: careful cleanup pass (pdoom1 -> pdoom1-website / pdoom-data) | ship:next-release |  | 2026-07-22 08:05:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/545) |
 | 529 | Revisit terminal/CRT texture aesthetic (parked art package) | enhancement, ui-ux, worktree:player-experience |  | 2026-06-26 06:14:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/529) |
 | 528 | Lab Ledger: player-facing review page with insight-gated 'redacted' risk zone | enhancement |  | 2026-06-26 05:42:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/528) |
