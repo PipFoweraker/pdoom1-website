@@ -1,9 +1,13 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-06T00:46:37.469Z UTC
+Generated: 2026-08-06T07:10:42.361Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1142 | Goal: Chinese localisation of the game before end of year -- scope undecided, worth an early estimate |  |  | 2026-08-06 04:30:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1142) |
+| 1141 | Playthrough of this afternoon's build: music works, save looks better -- but settings traps you into quitting, F3 will not close, and the cold open never fired |  |  | 2026-08-06 04:17:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/1141) |
+| 1140 | Pip's full response to the Fresh Eyes Teardown (26 min, from memory) -- meta dev cycle, month review becomes an expandable action log, winning does not exist |  |  | 2026-08-06 04:17:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1140) |
+| 1138 | take-loan duplicate is a symptom: the mechanic wants discrete options, not a slider. Plus: build clickable grouping mock-ups, and a question back on tech-debt cadence |  |  | 2026-08-06 03:54:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/1138) |
 | 1135 | Lab-name generator: future-epoch content pass -- more shapes, more pool, backfilled bacronyms | ship:next-release |  | 2026-08-05 22:54:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1135) |
 | 1134 | F3 event injection has no phase guard -- injecting in the wrong phase permalocks the run | bug |  | 2026-08-05 22:29:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1134) |
 | 1132 | Playtest 655/C55: icon bar lands; cap the top bar at 10 buttons; three actions want submenus; mouse-over jiggle is a regression |  |  | 2026-08-05 22:26:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/1132) |
@@ -44,7 +48,7 @@ Generated: 2026-08-06T00:46:37.469Z UTC
 | 1064 | Play Again / Back after a run ends: "there wasn't a game to play again from" | ui-ux |  | 2026-07-31 06:15:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/1064) |
 | 1063 | Let the player set player name + lab name on the FIRST screen (not only in setup) | ui-ux |  | 2026-07-31 06:15:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/1063) |
 | 1062 | Leaderboard: the Duration column is meaningless when the score is turns survived | ui-ux |  | 2026-07-31 06:15:32 | [link](https://github.com/PipFoweraker/pdoom1/issues/1062) |
-| 1061 | IP / trademark follow-up -- Australian lawyers, DUE Monday 2026-08-03 | priority:high |  | 2026-07-31 06:13:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1061) |
+| 1061 | IP / trademark follow-up -- Australian lawyers, DUE Monday 2026-08-03 | priority:high |  | 2026-08-06 05:03:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1061) |
 | 1057 | bug reports die on the player's disk: the website intake is built, the game never calls it | bug |  | 2026-07-31 07:48:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1057) |
 | 1056 | convention: printed docs carry a next-review date and its TRIGGER, not just a print date | documentation |  | 2026-07-31 00:13:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/1056) |
 | 1055 | Ecosystem coherence: pdoom-data ADR-007 (anti-corruption layer) and ADR-008 (provenance/annotation model) |  |  | 2026-07-31 00:07:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1055) |
