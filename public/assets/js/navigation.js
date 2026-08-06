@@ -45,6 +45,14 @@
 					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Info ▾</a>
 					<ul class="dropdown-menu" role="menu">
 						<li role="none"><a href="/about/" role="menuitem">About</a></li>
+						<!--
+							"Site Metrics", not "Metrics": the main bar already has "Stats",
+							which is /game-stats/ and is about the GAME. This one is the
+							website's own traffic. Two links both called some form of
+							"stats" a few pixels apart is how a reader ends up on the wrong
+							page and concludes the numbers are wrong.
+						-->
+						<li role="none"><a href="/metrics/" role="menuitem">Site Metrics</a></li>
 						<li role="none"><a href="/resources/" role="menuitem">AI Safety Resources</a></li>
 						<li role="none"><a href="/events/" role="menuitem">AI Safety Timeline</a></li>
 						<li role="none"><a href="/docs/roadmap/" role="menuitem">Roadmap</a></li>

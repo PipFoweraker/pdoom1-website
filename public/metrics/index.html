@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Metrics - p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/metrics/" />
+	<meta name="description" content="What p(Doom)1 can actually measure about its own traffic, published from the same daily snapshots the site keeps as a backup. Aggregate counts only." />
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+
+	<!--
+		THE site escaper. Plain and blocking on purpose: the renderers below are
+		inline, so defer/async would run them first and break the page on every
+		load. If this 404s, escapeHTML is undefined, the templates throw, and the
+		page renders nothing rather than rendering unescaped data. Fail closed.
+	-->
+	<script src="/assets/js/escape.js"></script>
+
+	<style>
+		:root {
+			--bg-primary: #12100f;
+			--bg-secondary: #1c1917;
+			--bg-tertiary: #262220;
+			--text-primary: #ffffff;
+			--text-secondary: #cfc7bb;
+			--text-muted: #a79e92;
+			--accent-primary: #f6a800;
+			--accent-secondary: #2fd4c2;
+			--border-color: #3a342e;
+			--radius-lg: 10px;
+			--radius-md: 6px;
+
+			/*
+				CHART MARK COLOURS -- deliberately darker steps of the SAME two hues
+				as --accent-primary / --accent-secondary above.
+
+				The text accents sit at OKLCH L ~0.79, which is right for text on this
+				background and outside the 0.48-0.67 band a categorical chart palette
+				wants in dark mode. These two were snapped down to that band and then
+				validated rather than eyeballed: lightness band PASS, chroma floor
+				PASS, CVD separation dE 13.7 (protan) / 23.9 (tritan) PASS,
+				normal-vision separation dE 20.5 PASS, contrast vs #1c1917 >= 3:1 PASS.
+				If you change either, re-run the validator -- do not reason about it.
+
+				--chart-gap / --chart-conflict are STATUS, not series. They are never
+				reused for a third series, and they always ship with a hatch texture
+				plus a legend label, so neither is distinguished by colour alone.
+			*/
+			--chart-pageviews: #c07d00;
+			--chart-visitors: #199e92;
+			--chart-gap: #6d6459;
+			--chart-conflict: #d1603d;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			margin: 0;
+			line-height: 1.6;
+			/* The page body must never scroll sideways; wide things scroll inside
+			   their own container instead. */
+			overflow-x: hidden;
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem;
+		}
+
+		.container {
+			max-width: 1000px;
+			margin: 0 auto;
+			padding: 2rem 1.25rem 4rem;
+		}
+
+		h1 {
+			color: var(--accent-primary);
+			font-size: 2.4rem;
+			margin: 1.5rem 0 0.5rem;
+		}
+
+		.lede {
+			color: var(--text-secondary);
+			max-width: 60ch;
+			margin: 0 0 0.75rem;
+		}
+
+		h2 {
+			color: var(--accent-primary);
+			margin-top: 0;
+			font-size: 1.3rem;
+		}
+
+		h3 {
+			color: var(--text-primary);
+			font-size: 1rem;
+			margin: 1.5rem 0 0.5rem;
+		}
+
+		a { color: var(--accent-secondary); }
+
+		.section {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 1.5rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.window-line {
+			color: var(--text-muted);
+			font-size: 0.85rem;
+			margin: 0 0 1.25rem;
+		}
+
+		/* --- headline tiles ------------------------------------------------ */
+		.tiles {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+			gap: 1rem;
+		}
+
+		.tile {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 1rem;
+		}
+
+		.tile-value {
+			font-size: 2.1rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			display: block;
+			line-height: 1.2;
+		}
+
+		/* A value nobody has been able to read renders muted and non-numeric. It
+		   must not read as a measurement, and it must not read as zero. */
+		.tile-value.unknown {
+			color: var(--text-muted);
+			font-size: 1.6rem;
+			opacity: 0.75;
+		}
+
+		.tile-label {
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+			margin-top: 0.25rem;
+		}
+
+		.tile-note {
+			color: var(--text-muted);
+			font-size: 0.78rem;
+			margin-top: 0.5rem;
+			line-height: 1.45;
+		}
+
+		/* --- honest failure ------------------------------------------------ */
+		.failure {
+			border: 1px solid var(--chart-conflict);
+			border-left: 4px solid var(--chart-conflict);
+			background: rgba(209, 96, 61, 0.08);
+			border-radius: 0 var(--radius-md) var(--radius-md) 0;
+			padding: 0.9rem 1rem;
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+		}
+
+		.failure strong { color: var(--chart-conflict); }
+
+		.notice {
+			border-left: 4px solid var(--accent-secondary);
+			background: var(--bg-tertiary);
+			border-radius: 0 var(--radius-md) var(--radius-md) 0;
+			padding: 0.9rem 1rem;
+			margin: 1rem 0;
+			color: var(--text-secondary);
+			font-size: 0.88rem;
+		}
+
+		.loading {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+			font-style: italic;
+		}
+
+		/* --- chart --------------------------------------------------------- */
+		.scroller {
+			overflow-x: auto;
+			overflow-y: hidden;
+			-webkit-overflow-scrolling: touch;
+			padding-bottom: 0.5rem;
+		}
+
+		.chart-legend {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+			margin: 0.75rem 0 0;
+			font-size: 0.8rem;
+			color: var(--text-secondary);
+		}
+
+		.chart-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+		.swatch {
+			width: 12px; height: 12px;
+			border-radius: 2px;
+			display: inline-block;
+			flex: 0 0 auto;
+		}
+
+		.swatch.pageviews { background: var(--chart-pageviews); }
+		.swatch.visitors  { background: var(--chart-visitors); }
+		.swatch.gap {
+			background: repeating-linear-gradient(45deg, var(--chart-gap) 0 2px, transparent 2px 4px);
+			border: 1px solid var(--chart-gap);
+		}
+		.swatch.conflict {
+			background: repeating-linear-gradient(135deg, var(--chart-conflict) 0 2px, transparent 2px 4px);
+			border: 1px solid var(--chart-conflict);
+		}
+
+		/* --- tables -------------------------------------------------------- */
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.88rem;
+			min-width: 320px;
+		}
+
+		th, td {
+			text-align: left;
+			padding: 0.45rem 0.6rem;
+			border-bottom: 1px solid var(--border-color);
+			white-space: nowrap;
+		}
+
+		th {
+			color: var(--text-muted);
+			font-weight: normal;
+			font-size: 0.78rem;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+		}
+
+		td.n { text-align: right; font-variant-numeric: tabular-nums; }
+		td.wrap { white-space: normal; word-break: break-word; }
+
+		tbody tr:last-child td { border-bottom: none; }
+
+		.two-col {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 1.5rem;
+		}
+
+		details {
+			margin-top: 1rem;
+			border-top: 1px solid var(--border-color);
+			padding-top: 0.75rem;
+		}
+
+		summary {
+			cursor: pointer;
+			color: var(--accent-secondary);
+			font-size: 0.85rem;
+		}
+
+		.muted { color: var(--text-muted); }
+		.small { font-size: 0.85rem; }
+
+		ul.plain { padding-left: 1.1rem; margin: 0.5rem 0; }
+		ul.plain li { margin-bottom: 0.5rem; color: var(--text-secondary); }
+
+		code {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: 3px;
+			padding: 0.05rem 0.3rem;
+			font-size: 0.85em;
+		}
+
+		@media (max-width: 700px) {
+			h1 { font-size: 1.8rem; }
+			.container { padding: 1rem 0.9rem 3rem; }
+			.section { padding: 1.1rem; }
+			.tile-value { font-size: 1.8rem; }
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Navigation loaded by navigation.js -->
+	</header>
+
+	<div class="container">
+		<h1>Metrics</h1>
+		<p class="lede">
+			Everything this page shows about pdoom1.com&rsquo;s traffic is read out of the
+			daily snapshots the site already keeps in git. No number here is typed by hand,
+			and none is estimated.
+		</p>
+		<p class="lede">
+			The counts are small. They are also real people, and we would rather publish
+			them from the start than wait until they flatter us &mdash; a metrics page that
+			appears once the numbers look good is marketing, and one that starts small in
+			public is evidence.
+		</p>
+
+		<!-- ================= headline window ================= -->
+		<div class="section">
+			<h2>The last 30 days</h2>
+			<p class="window-line" id="window-line">
+				<span class="loading">Reading the latest snapshot&hellip;</span>
+			</p>
+
+			<div id="latest-failure"></div>
+
+			<div class="tiles" id="tiles">
+				<div class="tile">
+					<span class="tile-value unknown" id="t-visitors">&mdash;</span>
+					<div class="tile-label">Visitors</div>
+					<div class="tile-note">Distinct people, de-duplicated across the whole
+						window. This is why the daily numbers below cannot be added up to
+						reach it: one person visiting on two days is one visitor here and
+						two there.</div>
+				</div>
+				<div class="tile">
+					<span class="tile-value unknown" id="t-pageviews">&mdash;</span>
+					<div class="tile-label">Pageviews</div>
+					<div class="tile-note">Pages loaded. Higher than visitors when people
+						read more than one thing.</div>
+				</div>
+				<div class="tile">
+					<span class="tile-value unknown" id="t-visits">&mdash;</span>
+					<div class="tile-label">Visits</div>
+					<div class="tile-note">Sessions. A returning visitor adds a visit, not
+						a visitor.</div>
+				</div>
+				<div class="tile">
+					<span class="tile-value unknown" id="t-duration">&mdash;</span>
+					<div class="tile-label">Average visit</div>
+					<div class="tile-note">Short. Most people load the homepage and decide
+						from it, which is what the page is for &mdash; but it is not the
+						number of someone who read the thing.</div>
+				</div>
+				<div class="tile">
+					<span class="tile-value unknown" id="t-bounce">&mdash;</span>
+					<div class="tile-label">Bounce rate</div>
+					<div class="tile-note">The share who saw one page and left. Published
+						because the unflattering numbers are what make the flattering ones
+						worth believing.</div>
+				</div>
+			</div>
+
+			<div id="latest-errors"></div>
+		</div>
+
+		<!-- ================= daily series ================= -->
+		<div class="section">
+			<h2>Every day we can prove</h2>
+			<p class="small muted" id="series-line">
+				<span class="loading">Reading the snapshot index&hellip;</span>
+			</p>
+
+			<div id="series-failure"></div>
+
+			<div class="scroller" id="chart-scroller">
+				<div id="chart"></div>
+			</div>
+
+			<div class="chart-legend" id="chart-legend" hidden>
+				<span><i class="swatch pageviews"></i> Pageviews</span>
+				<span><i class="swatch visitors"></i> Visitors</span>
+				<span><i class="swatch gap"></i> No data recorded</span>
+				<span><i class="swatch conflict"></i> Snapshots disagree</span>
+			</div>
+
+			<div id="series-caveats"></div>
+
+			<details id="series-table-wrap" hidden>
+				<summary>Show the same numbers as a table</summary>
+				<div class="scroller">
+					<table id="series-table"></table>
+				</div>
+			</details>
+		</div>
+
+		<!-- ================= breakdowns ================= -->
+		<div class="section">
+			<h2>Where people came from, and what they read</h2>
+			<p class="small muted">
+				Same 30-day window as the tiles above. Referrer names come from visitors&rsquo;
+				browsers, so they are external text and are escaped before display.
+			</p>
+			<div id="breakdown-failure"></div>
+			<div class="two-col">
+				<div>
+					<h3>Sources</h3>
+					<div class="scroller"><table id="t-sources"></table></div>
+					<div id="sources-note"></div>
+				</div>
+				<div>
+					<h3>Pages</h3>
+					<div class="scroller"><table id="t-pages"></table></div>
+				</div>
+				<div>
+					<h3>Countries</h3>
+					<div class="scroller"><table id="t-countries"></table></div>
+				</div>
+				<div>
+					<h3>Tracked actions</h3>
+					<div class="scroller"><table id="t-goals"></table></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ================= what we track and why ================= -->
+		<div class="section">
+			<h2>What we track, and why</h2>
+			<p class="small">
+				Analytics is <a href="https://plausible.io/">Plausible</a>, self-hosted on
+				our own box at <code>analytics.pdoom1.com</code>. Not the hosted cloud, and
+				not Google. It sets no cookies, builds no cross-site profile, and stores no
+				identifier that can follow you between sessions.
+			</p>
+			<p class="small">
+				We track it because a small project needs to know whether anything it makes
+				reaches anyone. That is the whole reason. There is no advertising here, no
+				list to sell you to, and nothing on this page is personal data &mdash; every
+				figure is a count of events, not a record of a person.
+			</p>
+			<ul class="plain small">
+				<li><strong>What is collected:</strong> page path, referrer source, country,
+					and whether a download or outbound link was clicked. Aggregated before it
+					is ever written down.</li>
+				<li><strong>What is not:</strong> no cookies, no IP addresses at rest, no
+					cross-site tracking, no individual profile, no session that survives the
+					day.</li>
+				<li><strong>Do Not Track is honoured</strong>, and you can opt out
+					explicitly from the <a href="/privacy/">privacy page</a>. That button
+					drives the one flag the tracker actually reads, and it persists.</li>
+				<li><strong>The archive is public.</strong> These snapshots live under
+					<code>public/</code> in a public repository, so anyone can check this
+					page against its source rather than take our word for it.</li>
+			</ul>
+
+			<h3>Where these numbers come from</h3>
+			<p class="small muted">
+				A GitHub Action asks the Plausible API for the last 30 days once a day and
+				commits the answer to
+				<code>public/data/analytics/history/</code>. That exists as a backup &mdash;
+				the analytics box has no other one &mdash; and this page is a second reader
+				of the same files. It fetches
+				<code>/data/analytics/latest.json</code> and
+				<code>/data/analytics/history/index.json</code>, and nothing else. There is
+				no live API call from your browser to the analytics server.
+			</p>
+
+			<h3>What this page will not do</h3>
+			<ul class="plain small">
+				<li><strong>It never fills a gap.</strong> A day no snapshot recorded is
+					drawn as a gap and named as one. A recorded zero is a different fact from
+					a missing day and stays a different fact.</li>
+				<li><strong>It never remembers.</strong> If a file fails to load you get an
+					error saying so, not the last number we happened to know.</li>
+				<li><strong>It never adds windows together.</strong> Consecutive snapshots
+					overlap by 29 of their 30 days, so summing them would multiply the truth
+					by about thirty.</li>
+			</ul>
+		</div>
+
+		<!-- ================= the archive ================= -->
+		<div class="section">
+			<h2>The snapshots themselves</h2>
+			<p class="small muted" id="archive-line">
+				<span class="loading">Reading the snapshot index&hellip;</span>
+			</p>
+			<div id="archive-failure"></div>
+			<details id="archive-wrap" hidden>
+				<summary>Show every snapshot taken</summary>
+				<div class="scroller"><table id="t-archive"></table></div>
+			</details>
+		</div>
+	</div>
+
+	<script>
+	(function () {
+		'use strict';
+
+		// ------------------------------------------------------------------
+		// Formatting helpers. Every one of them is total: it is handed a value
+		// straight out of a JSON file and must return a string for ANY input,
+		// because one thrown TypeError inside a render loop takes down the whole
+		// section rather than one row. `|| 0` does not achieve that -- a non-empty
+		// string is truthy and String.prototype.toLocaleString is the identity
+		// function, so "13; DROP" would sail through it untouched.
+		//
+		// num/pct/secs are declared as safe helpers in scripts/test-escaping.js.
+		// They are safe BY CONSTRUCTION: each one routes through toNumber() and can
+		// only ever emit digits, separators and a unit, never caller-supplied text.
+		// ------------------------------------------------------------------
+
+		// A value that is absent is NOT a value of zero. Absent renders as an em
+		// dash so it cannot be misread as a measurement of nothing.
+		var ABSENT = '—';
+
+		function present(v) {
+			return v !== null && v !== undefined && v !== '' && isFinite(toNumber(v, NaN));
+		}
+
+		function num(v) {
+			if (!present(v)) { return ABSENT; }
+			return toNumber(v).toLocaleString('en-US');
+		}
+
+		function pct(v) {
+			if (!present(v)) { return ABSENT; }
+			return toNumber(v).toLocaleString('en-US') + '%';
+		}
+
+		function secs(v) {
+			if (!present(v)) { return ABSENT; }
+			var t = Math.round(toNumber(v));
+			if (t < 60) { return t + 's'; }
+			return Math.floor(t / 60) + 'm ' + (t % 60) + 's';
+		}
+
+		function el(id) { return document.getElementById(id); }
+
+		function setText(id, text) {
+			var node = el(id);
+			if (node) { node.textContent = text; }
+		}
+
+		// One shape for every failure on this page. It names the file and the
+		// reason, and it deliberately does not touch any value tile -- whatever a
+		// tile is showing stays showing, and every tile ships showing an em dash.
+		function fail(containerId, what, reason) {
+			var node = el(containerId);
+			if (!node) { return; }
+			node.innerHTML =
+				'<div class="failure"><strong>Couldn’t load ' + escapeHTML(what) + '.</strong> ' +
+				escapeHTML(reason) + ' Nothing is shown above rather than a remembered ' +
+				'number — if this persists, the file is missing from the site or the ' +
+				'deploy is behind.</div>';
+		}
+
+		function reasonFor(error) {
+			if (error && error.httpStatus) { return 'The server answered HTTP ' + toNumber(error.httpStatus) + '.'; }
+			if (error && error.message) { return 'The request failed: ' + String(error.message).slice(0, 120) + '.'; }
+			return 'The request failed.';
+		}
+
+		// Split from the fetch call on purpose. The two fetch() calls below each
+		// carry their URL as a literal rather than a variable, because
+		// scripts/test-escaping.js finds a page's data sources by reading the
+		// literal inside fetch(...) -- hiding them behind a variable would leave
+		// that guard passing while checking nothing.
+		async function okJson(res) {
+			if (!res.ok) {
+				var e = new Error('HTTP ' + res.status);
+				e.httpStatus = res.status;
+				throw e;
+			}
+			return res.json();
+		}
+
+		// ------------------------------------------------------------------
+		// 1. The latest 30-day window.
+		// ------------------------------------------------------------------
+		function renderTable(tableId, columns, rows, emptyText) {
+			var node = el(tableId);
+			if (!node) { return; }
+			if (!rows || !rows.length) {
+				node.innerHTML = '<tbody><tr><td class="muted">' + escapeHTML(emptyText) + '</td></tr></tbody>';
+				return;
+			}
+			var head = '<thead><tr>' + columns.map(function (c) {
+				return '<th' + (c.numeric ? ' style="text-align:right"' : '') + '>' + escapeHTML(c.label) + '</th>';
+			}).join('') + '</tr></thead>';
+
+			var body = rows.map(function (row) {
+				return '<tr>' + columns.map(function (c) {
+					// Two sinks, two treatments. A label is external text and is
+					// escaped; a count is coerced to a real number and can only
+					// emit digits. Neither path lets a field decide where the
+					// markup ends.
+					if (c.numeric) {
+						return '<td class="n">' + num(row[c.key]) + '</td>';
+					}
+					return '<td class="wrap">' + escapeHTML(row[c.key]) + '</td>';
+				}).join('') + '</tr>';
+			}).join('');
+
+			node.innerHTML = head + '<tbody>' + body + '</tbody>';
+		}
+
+		function rowsOf(latest, section) {
+			var s = ((latest && latest.sections) || {})[section] || {};
+			return Array.isArray(s.results) ? s.results : [];
+		}
+
+		function renderLatest(latest) {
+			var agg = (((latest || {}).sections || {}).aggregate || {}).results || {};
+			var read = function (key) {
+				var slot = agg[key];
+				return slot && typeof slot === 'object' ? slot.value : slot;
+			};
+
+			var pairs = [
+				['t-visitors', num(read('visitors'))],
+				['t-pageviews', num(read('pageviews'))],
+				['t-visits', num(read('visits'))],
+				['t-duration', secs(read('visit_duration'))],
+				['t-bounce', pct(read('bounce_rate'))]
+			];
+			pairs.forEach(function (p) {
+				var node = el(p[0]);
+				if (!node) { return; }
+				node.textContent = p[1];
+				// Only a real reading loses the "unknown" styling. An em dash keeps
+				// it, so a missing metric never renders in the same weight as a
+				// measured one.
+				if (p[1] === ABSENT) { node.classList.add('unknown'); }
+				else { node.classList.remove('unknown'); }
+			});
+
+			// The window line. Every part of it is read from the file; if the file
+			// did not record a part, the line says so rather than guessing.
+			var cov = (latest || {}).coverage || null;
+			var bits = [];
+			if (cov && cov.first_date && cov.last_date) {
+				bits.push('Window ' + escapeHTML(cov.first_date) + ' to ' + escapeHTML(cov.last_date));
+			} else {
+				bits.push('Window <span class="muted">not recorded in this snapshot</span>');
+			}
+			if (latest && latest.snapshot_date) {
+				bits.push('captured ' + escapeHTML(latest.snapshot_date));
+			}
+			if (latest && latest.captured_at_utc) {
+				bits.push('at ' + escapeHTML(latest.captured_at_utc));
+			}
+			var line = el('window-line');
+			if (line) {
+				line.innerHTML = bits.join(' &middot; ') +
+					'. These five totals are the snapshot&rsquo;s own, over that one window.';
+			}
+
+			// coverage.note is the pipeline's own statement of what it will and will
+			// not do with a missing day. It belongs in front of a reader, not buried
+			// in a JSON file nobody opens.
+			var caveats = [];
+			if (cov && cov.note) {
+				caveats.push('<div class="notice">' + escapeHTML(cov.note) + '</div>');
+			}
+			if (cov && Array.isArray(cov.missing_dates) && cov.missing_dates.length) {
+				caveats.push('<div class="notice"><strong>' + toNumber(cov.missing_dates.length) +
+					' day(s) missing from this window:</strong> ' +
+					cov.missing_dates.map(function (d) { return escapeHTML(d); }).join(', ') +
+					'. Recorded, not filled in.</div>');
+			}
+			if (cov && Array.isArray(cov.zero_dates) && cov.zero_dates.length) {
+				caveats.push('<div class="notice"><strong>' + toNumber(cov.zero_dates.length) +
+					' day(s) had genuinely zero traffic:</strong> ' +
+					cov.zero_dates.map(function (d) { return escapeHTML(d); }).join(', ') +
+					'. A recorded zero, not a gap.</div>');
+			}
+			if (!cov) {
+				caveats.push('<div class="notice">This snapshot predates the coverage block, ' +
+					'so whether any day was omitted is <strong>unrecorded</strong> — which is ' +
+					'not the same as none.</div>');
+			}
+
+			// A populated `errors` object means a section of the API call failed.
+			// Surfacing it is the point: the rest of the file still renders, and a
+			// reader has to be told which part of it is not there.
+			var errs = (latest || {}).errors;
+			if (errs && typeof errs === 'object' && Object.keys(errs).length) {
+				var items = Object.keys(errs).map(function (k) {
+					return '<li><code>' + escapeHTML(k) + '</code>: ' + escapeHTML(errs[k]) + '</li>';
+				}).join('');
+				caveats.push('<div class="failure"><strong>The snapshot recorded ' +
+					toNumber(Object.keys(errs).length) + ' failed section(s).</strong> ' +
+					'Anything below that depends on them is incomplete:<ul class="plain">' +
+					items + '</ul></div>');
+			}
+			var errNode = el('latest-errors');
+			if (errNode) { errNode.innerHTML = caveats.join(''); }
+		}
+
+		// The one editorial line on the page, and it is DERIVED rather than written.
+		// "DuckDuckGo beats Google here" is a real and characterful fact about this
+		// audience today; typed as prose it would become false the first week
+		// Google overtakes, and nobody would notice because prose does not fail.
+		// Computed from the same rows the table above renders, it states whatever
+		// is currently true -- including the reverse.
+		function sourcesNote(rows) {
+			if (!rows.length) { return ''; }
+			var ranked = rows.slice().filter(function (row) {
+				return row && !/^direct/i.test(String(row.source || ''));
+			}).sort(function (a, b) { return toNumber(b.visitors) - toNumber(a.visitors); });
+			if (!ranked.length) { return ''; }
+
+			var out = 'Setting aside direct traffic, the biggest referrer is <strong>' +
+				escapeHTML(ranked[0].source) + '</strong> with ' + num(ranked[0].visitors) + '.';
+
+			var find = function (name) {
+				return ranked.filter(function (row) {
+					return String(row.source || '').toLowerCase() === name;
+				})[0];
+			};
+			var ddg = find('duckduckgo');
+			var goog = find('google');
+			if (ddg && goog) {
+				var d = toNumber(ddg.visitors);
+				var g = toNumber(goog.visitors);
+				if (d > g) {
+					out += ' DuckDuckGo sends more people here than Google does (' +
+						num(d) + ' against ' + num(g) + ') — which says something about who turns up.';
+				} else if (g > d) {
+					out += ' Google is ahead of DuckDuckGo (' + num(g) + ' against ' + num(d) + ').';
+				} else {
+					out += ' DuckDuckGo and Google are level at ' + num(d) + ' each.';
+				}
+			}
+			return '<div class="notice small">' + out + '</div>';
+		}
+
+		function renderBreakdowns(latest) {
+			var sourceRows = rowsOf(latest, 'sources');
+			renderTable('t-sources',
+				[{ label: 'Source', key: 'source' }, { label: 'Visitors', key: 'visitors', numeric: true }],
+				sourceRows, 'No sources recorded in this window.');
+			var note = el('sources-note');
+			if (note) { note.innerHTML = sourcesNote(sourceRows); }
+
+			renderTable('t-pages',
+				[{ label: 'Page', key: 'page' }, { label: 'Views', key: 'pageviews', numeric: true }],
+				rowsOf(latest, 'pages'), 'No pages recorded in this window.');
+
+			renderTable('t-countries',
+				[{ label: 'Country', key: 'country' }, { label: 'Visitors', key: 'visitors', numeric: true }],
+				rowsOf(latest, 'countries'), 'No countries recorded in this window.');
+
+			renderTable('t-goals',
+				[{ label: 'Action', key: 'goal' }, { label: 'Events', key: 'events', numeric: true }],
+				rowsOf(latest, 'goals'), 'No tracked actions recorded in this window.');
+		}
+
+		// ------------------------------------------------------------------
+		// 2. The stitched daily series, hand-rolled SVG.
+		//    One y-axis, two series of the same unit. No second scale.
+		// ------------------------------------------------------------------
+		var SLOT_MAX = 20;  // horizontal space per day, at a comfortable width
+		var SLOT_MIN = 5;   // below this the marks stop being readable; scroll instead
+		var TARGET_W = 880; // the widest the plot tries to be before thinning bars
+		var PLOT_H = 170;   // plot area height
+		var PAD_T = 14;
+		var PAD_B = 30;
+		var PAD_L = 44;
+		var PAD_R = 10;
+
+		// The archive grows by one day every day and never shrinks, so a fixed
+		// slot width is a chart that walks off the right of the page a few months
+		// from now. Thinning the bars keeps the whole series visible; below
+		// SLOT_MIN it stops thinning and the container scrolls instead, because a
+		// 2px bar is not a mark a reader can compare.
+		function slotFor(n) {
+			if (n <= 0) { return SLOT_MAX; }
+			return Math.max(SLOT_MIN, Math.min(SLOT_MAX, Math.floor(TARGET_W / n)));
+		}
+
+		function chartSVG(days) {
+			var n = days.length;
+			var SLOT = slotFor(n);
+			var width = PAD_L + n * SLOT + PAD_R;
+			var height = PAD_T + PLOT_H + PAD_B;
+			var base = PAD_T + PLOT_H;
+
+			var max = 0;
+			days.forEach(function (day) {
+				if (day.conflict) { return; }
+				max = Math.max(max, toNumber(day.pageviews), toNumber(day.visitors));
+			});
+
+			var scale = function (v) {
+				if (max <= 0) { return 0; }
+				return (toNumber(v) / max) * PLOT_H;
+			};
+
+			var parts = [];
+			parts.push('<defs>' +
+				'<pattern id="hatch-gap" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+				'<rect width="2" height="6" fill="var(--chart-gap)"></rect></pattern>' +
+				'<pattern id="hatch-conflict" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(135)">' +
+				'<rect width="2" height="6" fill="var(--chart-conflict)"></rect></pattern>' +
+				'</defs>');
+
+			// Recessive gridlines and one labelled maximum. Not a full axis: the
+			// exact numbers are one click away in the table below.
+			var ticks = max > 0 ? [0, max / 2, max] : [0];
+			ticks.forEach(function (t) {
+				var y = base - scale(t);
+				parts.push('<line x1="' + PAD_L + '" y1="' + y.toFixed(1) + '" x2="' + (width - PAD_R) +
+					'" y2="' + y.toFixed(1) + '" stroke="var(--border-color)" stroke-width="1"></line>');
+				parts.push('<text x="' + (PAD_L - 8) + '" y="' + (y + 4).toFixed(1) +
+					'" text-anchor="end" font-size="10" fill="var(--text-muted)">' +
+					Math.round(t) + '</text>');
+			});
+
+			// Mark widths are FRACTIONS of the slot, not fixed pixel insets, so
+			// thinning the chart keeps the two bars in proportion instead of
+			// collapsing the inner one to a negative width. The surface ring is
+			// dropped once a slot is narrow enough that a 1.5px stroke would be
+			// most of the mark.
+			var wStatus = Math.max(1, SLOT * 0.8);
+			var wPV = Math.max(1, SLOT * 0.7);
+			var wVis = Math.max(1, SLOT * 0.34);
+			var ring = SLOT >= 12 ? 1.5 : 0;
+			var centre = function (w) { return (SLOT - w) / 2; };
+
+			days.forEach(function (day, i) {
+				var x = PAD_L + i * SLOT;
+				var label = escapeHTML(day.date);
+
+				if (day.conflict) {
+					parts.push('<rect x="' + (x + centre(wStatus)).toFixed(1) + '" y="' + PAD_T +
+						'" width="' + wStatus.toFixed(1) +
+						'" height="' + PLOT_H + '" fill="url(#hatch-conflict)" ' +
+						'stroke="var(--chart-conflict)" stroke-width="1">' +
+						'<title>' + label + ': snapshots disagree, so no value is published</title></rect>');
+					return;
+				}
+
+				if (day.gap) {
+					parts.push('<rect x="' + (x + centre(wStatus)).toFixed(1) + '" y="' + PAD_T +
+						'" width="' + wStatus.toFixed(1) +
+						'" height="' + PLOT_H + '" fill="url(#hatch-gap)" opacity="0.55" ' +
+						'stroke="var(--chart-gap)" stroke-width="1" stroke-dasharray="2 2">' +
+						'<title>' + label + ': no data recorded for this day</title></rect>');
+					return;
+				}
+
+				var pv = toNumber(day.pageviews);
+				var vis = toNumber(day.visitors);
+				var pvH = scale(pv);
+				var visH = scale(vis);
+				var title = label + ': ' + num(day.pageviews) + ' pageviews, ' + num(day.visitors) +
+					' visitors' + (pv === 0 && vis === 0 ? ' (a recorded zero, not a gap)' : '');
+
+				// A recorded zero draws a flat 2px rule on the baseline: visible, and
+				// unmistakably not a bar. Drawing nothing would make it identical to
+				// a gap, which is the exact confusion this page exists to avoid.
+				if (pvH < 2 && visH < 2) {
+					parts.push('<rect x="' + (x + centre(wPV)).toFixed(1) + '" y="' + (base - 2) +
+						'" width="' + wPV.toFixed(1) +
+						'" height="2" fill="var(--chart-gap)"><title>' + title + '</title></rect>');
+					return;
+				}
+
+				parts.push('<rect x="' + (x + centre(wPV)).toFixed(1) + '" y="' + (base - pvH).toFixed(1) +
+					'" width="' + wPV.toFixed(1) +
+					'" height="' + pvH.toFixed(1) + '" rx="2" fill="var(--chart-pageviews)">' +
+					'<title>' + title + '</title></rect>');
+				// The visitors bar sits in front, narrower, with a surface-coloured
+				// ring so the two marks never blur into one shape.
+				parts.push('<rect x="' + (x + centre(wVis)).toFixed(1) + '" y="' + (base - visH).toFixed(1) +
+					'" width="' + wVis.toFixed(1) +
+					'" height="' + visH.toFixed(1) + '" rx="2" fill="var(--chart-visitors)"' +
+					(ring ? ' stroke="var(--bg-secondary)" stroke-width="' + ring + '"' : '') + '>' +
+					'<title>' + title + '</title></rect>');
+			});
+
+			// Date labels, spaced so they never collide however thin the slots get:
+			// one every ceil(58 / SLOT) days, plus the last.
+			var labelEvery = Math.max(1, Math.ceil(58 / SLOT));
+			days.forEach(function (day, i) {
+				if (i % labelEvery !== 0 && i !== n - 1) { return; }
+				var x = PAD_L + i * SLOT + SLOT / 2;
+				parts.push('<text x="' + x + '" y="' + (base + 16) +
+					'" text-anchor="middle" font-size="9" fill="var(--text-muted)">' +
+					escapeHTML(String(day.date).slice(5)) + '</text>');
+			});
+
+			return '<svg role="img" aria-label="Daily pageviews and visitors" ' +
+				'width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" ' +
+				'style="display:block;min-width:' + width + 'px">' + parts.join('') + '</svg>';
+		}
+
+		// Expand the index's day list into one entry per calendar day, marking the
+		// dates it lists as gaps. The gap list is authoritative -- this never infers
+		// a value for a date, it only places the hole where the generator put it.
+		function expandDays(series) {
+			var known = {};
+			(series.days || []).forEach(function (day) {
+				if (day && day.date) { known[day.date] = day; }
+			});
+			var gaps = {};
+			(series.gap_dates || []).forEach(function (d) { gaps[d] = true; });
+
+			var all = Object.keys(known).concat(Object.keys(gaps));
+			if (!all.length) { return []; }
+			all.sort();
+
+			var out = [];
+			var cursor = new Date(all[0] + 'T00:00:00Z');
+			var end = new Date(all[all.length - 1] + 'T00:00:00Z');
+			if (isNaN(cursor.getTime()) || isNaN(end.getTime())) { return []; }
+			// A malformed index must not spin here; 20 years of days is a ceiling no
+			// real archive reaches and a loop bound a corrupt file cannot escape.
+			for (var guard = 0; cursor <= end && guard < 7300; guard++) {
+				var iso = cursor.toISOString().slice(0, 10);
+				if (known[iso]) {
+					var day = known[iso];
+					var disputed = day.conflict === true;
+					out.push({
+						date: iso,
+						// A disputed day is valueless HERE, once, rather than in each
+						// consumer. The generator already nulls these, but the page must
+						// not depend on that: if a record ever arrives carrying both
+						// conflict:true and a number, publishing the number would be
+						// picking a winner between two of our own records. Doing it at
+						// the normalisation point means the chart and the table cannot
+						// disagree about it. (The table did exactly that until the
+						// forced-conflict case in test-metrics-render.js caught it.)
+						pageviews: disputed ? null : day.pageviews,
+						visitors: disputed ? null : day.visitors,
+						conflict: disputed,
+						gap: false
+					});
+				} else {
+					out.push({ date: iso, pageviews: null, visitors: null, conflict: false, gap: true });
+				}
+				cursor = new Date(cursor.getTime() + 86400000);
+			}
+			return out;
+		}
+
+		function renderSeries(idx) {
+			var series = (idx || {}).series || {};
+			var days = expandDays(series);
+
+			var line = el('series-line');
+			if (!days.length) {
+				if (line) {
+					line.innerHTML = '<span class="muted">The index holds no daily records yet.</span>';
+				}
+				return;
+			}
+
+			var counted = days.filter(function (day) { return !day.gap && !day.conflict; }).length;
+			if (line) {
+				line.innerHTML =
+					'Stitched from <strong>' + toNumber(idx.snapshot_count) + '</strong> daily snapshots into one ' +
+					'series of <strong>' + toNumber(days.length) + '</strong> days, ' +
+					escapeHTML(String(days[0].date)) + ' to ' + escapeHTML(String(days[days.length - 1].date)) +
+					'. Each snapshot is a 30-day window, so they overlap almost entirely; ' +
+					'a day is carried across once, never added up. ' +
+					toNumber(counted) + ' of those days carry a recorded value.';
+			}
+
+			var chart = el('chart');
+			if (chart) { chart.innerHTML = chartSVG(days); }
+			var legend = el('chart-legend');
+			if (legend) { legend.hidden = false; }
+
+			var caveats = [];
+			var gapCount = (series.gap_dates || []).length;
+			if (gapCount) {
+				caveats.push('<div class="notice"><strong>' + toNumber(gapCount) +
+					' day(s) have no record at all</strong> and are drawn as hatched gaps: ' +
+					(series.gap_dates || []).map(function (d) { return escapeHTML(d); }).join(', ') +
+					'. They are not zeroes and are not estimated.</div>');
+			}
+			var conflicts = series.conflict_dates || [];
+			if (conflicts.length) {
+				caveats.push('<div class="failure"><strong>' + toNumber(conflicts.length) +
+					' day(s) are disputed between snapshots</strong>, so no value is published for them: ' +
+					conflicts.map(function (c) { return escapeHTML(c && c.date); }).join(', ') +
+					'. Two of our own records disagree and we cannot tell you which is right.</div>');
+			}
+			var reported = series.reported_missing_dates || [];
+			if (reported.length) {
+				caveats.push('<div class="notice"><strong>' + toNumber(reported.length) +
+					' day(s) were flagged missing by the analytics API</strong> when a snapshot ran: ' +
+					reported.map(function (d) { return escapeHTML(d); }).join(', ') +
+					'. Some may have been filled by a later snapshot, which is why this is ' +
+					'listed separately from the gaps above.</div>');
+			}
+			var cav = el('series-caveats');
+			if (cav) { cav.innerHTML = caveats.join(''); }
+
+			// The table view. Required so identity is never colour-alone, and it is
+			// the only place a reader can see a day's exact figures.
+			var body = days.map(function (day) {
+				var state = day.conflict ? 'disputed' : (day.gap ? 'no record' : 'recorded');
+				return '<tr><td>' + escapeHTML(String(day.date)) + '</td><td class="n">' +
+					num(day.pageviews) + '</td><td class="n">' + num(day.visitors) +
+					'</td><td class="muted">' + escapeHTML(state) + '</td></tr>';
+			}).join('');
+			var table = el('series-table');
+			if (table) {
+				table.innerHTML = '<thead><tr><th>Date</th><th style="text-align:right">Pageviews</th>' +
+					'<th style="text-align:right">Visitors</th><th>State</th></tr></thead><tbody>' +
+					body + '</tbody>';
+			}
+			var wrap = el('series-table-wrap');
+			if (wrap) { wrap.hidden = false; }
+		}
+
+		function renderArchive(idx) {
+			var snaps = Array.isArray((idx || {}).snapshots) ? idx.snapshots : [];
+			var line = el('archive-line');
+			if (line) {
+				line.innerHTML = 'The archive holds <strong>' + toNumber(snaps.length) +
+					'</strong> snapshot(s). It reaches back 30 days before the first one was ' +
+					'ever taken and no further — anything earlier exists only on the ' +
+					'analytics box itself.';
+			}
+
+			var body = snaps.slice().reverse().map(function (snap) {
+				// A snapshot with no coverage block did not claim zero omissions; it
+				// claimed nothing. That has to read as "not recorded".
+				var cov = snap.coverage;
+				var missing = cov
+					? (Array.isArray(cov.missing_dates) ? String(cov.missing_dates.length) : '0')
+					: 'not recorded';
+				var errs = Array.isArray(snap.error_sections) && snap.error_sections.length
+					? snap.error_sections.join(', ')
+					: 'none';
+				var span = cov && cov.first_date && cov.last_date
+					? cov.first_date + ' to ' + cov.last_date
+					: 'not recorded';
+				return '<tr>' +
+					'<td>' + escapeHTML(snap.snapshot_date) + '</td>' +
+					'<td class="wrap">' + escapeHTML(span) + '</td>' +
+					'<td class="n">' + num(snap.days_in_timeseries) + '</td>' +
+					'<td class="muted">' + escapeHTML(missing) + '</td>' +
+					'<td class="muted wrap">' + escapeHTML(errs) + '</td>' +
+					'</tr>';
+			}).join('');
+
+			var table = el('t-archive');
+			if (table) {
+				table.innerHTML = '<thead><tr><th>Snapshot</th><th>Window</th>' +
+					'<th style="text-align:right">Days</th><th>Missing</th><th>Failed sections</th>' +
+					'</tr></thead><tbody>' + body + '</tbody>';
+			}
+			var wrap = el('archive-wrap');
+			if (wrap && snaps.length) { wrap.hidden = false; }
+
+			var bad = Array.isArray(idx && idx.unreadable_files) ? idx.unreadable_files : [];
+			if (bad.length) {
+				var node = el('archive-failure');
+				if (node) {
+					node.innerHTML = '<div class="failure"><strong>' + toNumber(bad.length) +
+						' snapshot file(s) could not be read</strong> when the index was built: ' +
+						bad.map(function (b) { return escapeHTML(b && b.file); }).join(', ') +
+						'. Those days are absent from the series above.</div>';
+				}
+			}
+		}
+
+		// ------------------------------------------------------------------
+		// Boot. The two fetches are independent on purpose: losing the index must
+		// not blank the tiles, and losing the snapshot must not blank the chart.
+		// ------------------------------------------------------------------
+		async function boot() {
+			try {
+				var latest = await okJson(await fetch('/data/analytics/latest.json', { cache: 'no-store' }));
+				renderLatest(latest);
+				renderBreakdowns(latest);
+			} catch (error) {
+				setText('window-line', 'No window could be read.');
+				fail('latest-failure', 'the latest analytics snapshot', reasonFor(error));
+				fail('breakdown-failure', 'the source and page breakdowns', reasonFor(error));
+				['t-sources', 't-pages', 't-countries', 't-goals'].forEach(function (id) {
+					var node = el(id);
+					if (node) { node.innerHTML = ''; }
+				});
+			}
+
+			try {
+				var idx = await okJson(await fetch('/data/analytics/history/index.json', { cache: 'no-store' }));
+				renderSeries(idx);
+				renderArchive(idx);
+			} catch (error) {
+				setText('series-line', 'No daily series could be read.');
+				setText('archive-line', 'The snapshot archive could not be read.');
+				fail('series-failure', 'the snapshot index', reasonFor(error));
+			}
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', boot);
+		} else {
+			boot();
+		}
+	})();
+	</script>
+
+	<!-- Standard Navigation -->
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

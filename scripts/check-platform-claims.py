@@ -60,6 +60,10 @@ REACHABLE = [
     "public/docs/index.html",
     "public/blog/index.html",
     "public/resources/index.html",
+    # /metrics/ names platforms nowhere today, which is exactly why it belongs
+    # here: the cheap moment to add a page to a reachability-scoped guard is
+    # before someone writes "downloads on Windows, macOS and Linux" into it.
+    "public/metrics/index.html",
 ]
 
 # Word-boundary name matchers per platform key in version.json.

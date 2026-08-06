@@ -122,6 +122,23 @@ jobs:
           python -m json.tool "$FILE" > /dev/null
           echo "OK: $FILE ($(wc -c < "$FILE") bytes)"
 
+      # A static host serves no directory listing, so nothing in a browser can
+      # discover which snapshots exist. /metrics/ reads this derived index
+      # instead of probing dates -- probing would make a 404 indistinguishable
+      # from a day with no traffic, which is the exact confusion that page is
+      # built to avoid.
+      #
+      # This step is REQUIRED, not decorative. content-honesty.yml runs
+      # `--check`, so a snapshot committed without the index rebuilt turns that
+      # job red for everyone until a human notices. It runs before the commit so
+      # the index and the snapshot it describes land in the same commit and are
+      # never observed out of step.
+      - name: Rebuild the snapshot index
+        run: |
+          set -euo pipefail
+          python scripts/generate-analytics-index.py
+          python scripts/generate-analytics-index.py --check
+
       - name: Commit the snapshot
         run: |
           set -euo pipefail
