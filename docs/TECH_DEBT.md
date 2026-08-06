@@ -51,6 +51,30 @@ and still lost, as the live 401 proves. A `RewriteRule` in the docroot `.htacces
 a *weaker* lever than a directory-level auth override, so the prior should be that it
 does not fire either.
 
+**MEASURED 2026-08-06, after the deploy: the prediction held. The 301 did not fire.**
+
+    curl -I https://pdoom1.com/stats/                 -> 401
+    curl -I https://pdoom1.com/stats/competition.html -> 401
+    curl -I https://pdoom1.com/game-stats/            -> 200
+    curl -I https://pdoom1.com/metrics/               -> 200
+
+DreamHost's handler answers before our `.htaccess` is consulted, exactly as the prior
+said. **Recorded rather than quietly dropped, because a prediction that is never
+checked is indistinguishable from a guess** -- and this row's whole subject is a page
+nobody had checked was reachable.
+
+**What the retirement did and did not achieve.** It DID end the double maintenance:
+one page, one place, and this week's `23%` and frontier-labs corrections would now be
+single edits. It did NOT produce a clean redirect -- a visitor typing `/stats/` still
+gets DreamHost's auth prompt, exactly as before. That is unchanged, not worsened, and
+it is not fixable from inside this repo: the only lever above the docroot is the
+DreamHost panel.
+
+**No follow-up is scheduled and none is needed.** If a redirect is ever wanted, it has
+to be configured in the panel, which is a NEEDS-PIP action rather than a code change.
+Leaving the `RewriteRule` in place is harmless: it costs nothing and it starts working
+by itself if DreamHost ever stops shadowing the path.
+
 It is worth shipping regardless because the failure mode is the status quo: the path
 already fails closed, so a rule that never runs changes nothing, and if the panel's
 stats area is ever switched off for this domain the URL lands somewhere honest.
