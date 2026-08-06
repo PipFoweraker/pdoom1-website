@@ -402,6 +402,8 @@ runs it, so a claim here can be checked against `.github/workflows/` in one grep
 ```
 python scripts/test-design-notes.py       # ADR scrubber + markdown subset   [encoding-safety]
 node    scripts/test-analytics-optout.js  # opt-out, DNT, no-injection       [content-honesty]
+node    scripts/test-navigation.js        # navigation.js ships its own CSS  [content-honesty]
+node    scripts/test-syndication-auth.js  # syndication gate fails closed    [content-honesty]
 python  scripts/test_ingest_scores.py     # leaderboard read path            [data-contract]
 python  scripts/validate_data.py          # data contracts                   [data-contract]
 python  scripts/check-stale-facts.py      # hardcoded facts that rot         [content-honesty ADVISORY]

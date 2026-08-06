@@ -43,10 +43,27 @@ on the site is wrong, it is almost always because a data file is wrong or stale,
 because someone typed a lie into HTML. The critical property of a data file is **who
 writes it** — and the recurring bug in this repo is *more than one writer*.
 
-**Layer 3 — the scripts.** 68 of them. They fall into three natural groups: **generators**
+**Layer 3 — the scripts.** 83 of them. They fall into three natural groups: **generators**
 that produce pages or data, **guards** that check something and exit non-zero, and
-**one-shots** that were run once and never removed. About a third are orphaned — nothing
-invokes them.
+**one-shots** that were run once and never removed.
+
+**CORRECTED 2026-08-06 — "about a third are orphaned" was wrong, and the count it rested
+on was stale.** Every file under `scripts/` was checked against every workflow,
+`package.json`, CLAUDE.md's documented suite, and every other script: **69 of 83 were
+wired**. Of the 14 that were not, three were genuinely dead and were deleted
+(`update-version-info.js`, `test-header-consistency.sh`, `add_analytics.sh`), two were
+green guards that had simply never been wired and now are
+(`test-navigation.js`, `test-syndication-auth.js`), and **nine are unwired on purpose** —
+Pip's hand-run tooling (`ab-preview.py`, `print-doc.ps1`, `render-content-review.py`,
+`apply-review-print-css.py`, `test-review-print.py`), a VPS provisioning recipe
+(`deploy_plausible.sh`), the unexercised option for an open decision
+(`sync/merge-alignment-events.py`), a one-shot whose defect is still live
+(`bugfix_pass_20260715.py`), and one referred back to Pip (`sync-forum-theme.ps1`).
+
+**The lesson, which is the generalisable part: "nothing invokes it" is a fact about the
+repo, not a verdict about the script.** A third of the apparent orphans exist precisely to
+be run by a human, and one of them is the only rebuild recipe for a VPS with no backups.
+Counting callers finds candidates; only reading each one produces a verdict.
 
 **Layer 4 — the workflows.** 28 files, of which 11 carry a cron. **183 scheduled runs per
 week.** They are the metabolism: they fetch from upstream repos, run the generators,
@@ -112,7 +129,7 @@ Full per-item tables live in the audit outputs; this is the shape and the counts
 | Hand-written pages | 28 | all the risk |
 | Generated pages | 2,214 | 2,197 events + 17 ADRs; static, JS-free, safest thing here |
 | Data files under `public/` | ~40 | ~12 hand-edited, several dead |
-| Scripts | 68 | ~22 orphaned |
+| Scripts | 83 | **9** wired to nothing, all deliberate — see below |
 | Workflows | 28 | 11 scheduled → **183 runs/week** |
 | Guards / tests | 24 | **12 not wired to CI** |
 
