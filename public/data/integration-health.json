@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-05T07:58:27.952828+00:00",
+  "generated": "2026-08-06T07:00:00.610597+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 5.7 days ago"
+      "detail": "generated 6.7 days ago"
     },
     {
       "name": "league:current_week",
@@ -150,12 +150,12 @@
     {
       "name": "board:status_integrity",
       "status": "OK",
-      "detail": "data_status=live consistent with 3 entries"
+      "detail": "data_status=live consistent with 5 entries"
     },
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 0.8h ago"
+      "detail": "live API checked 6.2h ago"
     },
     {
       "name": "board:archived_anomaly",
@@ -165,12 +165,12 @@
     {
       "name": "board:liveness",
       "status": "OK",
-      "detail": "deployed board (weekly-2026-w31, L3) holds 3 entries"
+      "detail": "deployed board (weekly-2026-w31, L3) holds 5 entries"
     },
     {
       "name": "board:publish",
       "status": "OK",
-      "detail": "what we serve matches what the probe saw (3 entries on L3)"
+      "detail": "what we serve matches what the probe saw (5 entries on L3)"
     },
     {
       "name": "seed_leaderboards:parse",
