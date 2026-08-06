@@ -61,6 +61,37 @@ RewriteRule ^changelog(/|/index\.html)?$ /game-changelog/ [R=301,L]
 # would also match /docs/steam-readinessXmd.
 RewriteRule ^docs/steam-readiness\.md$ /docs/roadmap/ [R=301,L]
 
+# /stats/ -> /game-stats/ (Pip's call 2026-08-06; closes TECH_DEBT A8's remainder).
+#
+# THIS RULE IS UNVERIFIABLE BEFORE MERGE AND MAY NEVER FIRE. DreamHost's shared
+# hosting owns /stats/ itself: the path answers `401 Unauthorized` with
+# `WWW-Authenticate: Basic realm="Statistics Area"`, the panel's own web-stats
+# area, and that is configured above the document root. No visitor has ever been
+# able to load anything we published there. Measured 2026-08-06:
+#   curl -sI https://pdoom1.com/stats/                -> 401, realm "Statistics Area"
+#   curl -sI https://pdoom1.com/stats/competition.html -> 401, same realm
+#   curl -sI https://pdoom1.com/game-stats/            -> 200
+#
+# Evidence that the host wins: public/stats/.htaccess held an `AuthType None` /
+# `Satisfy Any` override written specifically to defeat that prompt. It deployed
+# and the 401 above is what it achieved. A docroot RewriteRule is a weaker lever
+# than a directory-level auth override, so expect this to lose too.
+#
+# It is here anyway because the downside is nil -- the path already fails closed,
+# so a rule that never fires leaves things exactly as they are -- and because if
+# DreamHost's stats area is ever disabled for this domain, the URL lands on the
+# page it should have been all along instead of a 404.
+#
+# VERIFY AFTER MERGE, NOT ON THE NETLIFY PREVIEW (Netlify ignores .htaccess):
+#   curl -sI https://pdoom1.com/stats/     # 301 -> /game-stats/ = it took
+#                                          # 401 (realm "Statistics Area") = host won
+#
+# The `^` anchor keeps the target /game-stats/ from matching, so this cannot
+# loop. It also, deliberately, does not match /stats/competition.html: that page
+# was NOT a duplicate of /game-stats/ and has no successor, so redirecting it
+# would promise competition data and deliver game stats. See the commit message.
+RewriteRule ^stats(/|/index\.html)?$ /game-stats/ [R=301,L]
+
 # ---------------------------------------------------------------------------
 # Compression -- the single biggest spike lever.
 # events.json is ~1.18 MB uncompressed and is fetched on every /events/ visit;

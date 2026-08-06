@@ -19,9 +19,23 @@ pipelines someone may intend to revive. **Decide before deleting.**
 | ~~`public/changelog/index.html`~~ | 0 | **RESOLVED 2026-07-28 — now redirects to `/game-changelog/`.** Was 7 words of visible copy over a `data/changes.json` holding a single entry, fed by `scripts/sync_airtable.py`, whose workflow was parked after 1,264 consecutive failures against an Airtable base that does not exist. See the note below. |
 | `public/dev-notes/index.html` | 0 | 11 words of visible copy; renders `docs/DEV_NOTES.md` client-side. |
 
-One human path in survives and is intentionally unbroken: `stats/competition.html`
-links to `/league/`. `noindex` stops search engines using these as entry points; it
-does not break that link.
+~~One human path in survives and is intentionally unbroken: `stats/competition.html`
+links to `/league/`.~~ **GONE 2026-08-06** — `public/stats/` was deleted (option 2,
+Retire), so the league trio now has **zero** inbound paths from anywhere on the site.
+`noindex` still stops search engines using them as entry points.
+
+**`public/stats/` — RETIRED 2026-08-06 (Pip's call).** Both files deleted, the
+`robots.txt` `Disallow` dropped with them, and a 301 `/stats/` → `/game-stats/`
+attempted in `public/.htaccess`. This closes TECH_DEBT A8's remainder. The
+decisive fact was not staleness but reachability: **DreamHost's own panel
+statistics area owns `/stats/` and answers `401 Unauthorized` there**
+(`WWW-Authenticate: Basic realm="Statistics Area"`, measured 2026-08-06), so
+neither page was ever loadable by a visitor. `stats/index.html` was a
+near-duplicate of `game-stats/index.html` — 14 differing lines out of ~310, all
+canonical URL, stylesheet links and whitespace — and that duplication was being
+paid for: fixes this week had to be applied twice.
+**`stats/competition.html` was NOT a duplicate** and has no successor page; it is
+recoverable from git history if competition stats are ever wanted again.
 
 ## The decision to make (per page)
 

@@ -189,6 +189,13 @@ places** and rendered on the homepage, `/stats/` and `/game-stats/` under confid
 labels, with a homepage aria-label announcing *"This week's baseline doom percentage"* —
 a weekly calculation that has never run. Nobody measured either number.
 
+**Update 2026-08-06:** two of those three surfaces were the *same page twice*.
+`public/stats/index.html` was a near-duplicate of `public/game-stats/index.html`
+behind a path DreamHost answers `401` on, so every correction to these numbers was
+being made twice for one visible page. `public/stats/` is now deleted (TECH_DEBT A8),
+which drops this row from three places to two and is the mechanical reason the
+double-edit stops.
+
 `frontier_labs_count` is subtler and arguably worse: it counts how many lab names from a
 hardcoded list appear **in this website's own homepage**, then floors the result at 5.
 The tile labelled "Frontier Labs" is the site counting mentions of itself.

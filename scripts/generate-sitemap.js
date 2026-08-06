@@ -257,7 +257,7 @@ function headSignals(absPath) {
   }
 }
 
-/** public/about/index.html -> /about/ ; public/stats/x.html -> /stats/x.html */
+/** public/about/index.html -> /about/ ; public/league/archive.html -> /league/archive.html */
 function toUrlPath(relPosix) {
   if (relPosix === 'index.html') return '/';
   if (relPosix.endsWith('/index.html')) return '/' + relPosix.slice(0, -'index.html'.length);
