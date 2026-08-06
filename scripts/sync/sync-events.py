@@ -621,15 +621,43 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
     # running it over already-HTML-escaped text would prefill the GitHub issue with
     # "%26amp%3B" where the source said "&". The percent-encoding quote() produces
     # contains no <, > or " , so the finished URL is safe in an href attribute.
-    category_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20category%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20category%3A%20{quote(raw['category'])}%0A%0ASuggested%20category%3A%20%0A%0AReason%3A%20"
+    #
+    # ROUTING RULE -- which repo a suggestion is addressed to.
+    #
+    # A suggest-link is this site letting a stranger author a value in another
+    # repo's vocabulary. It must therefore land in the repo that OWNS the field,
+    # not the repo that happens to store it. The ruling of 2026-08-02 (see
+    # pdoom-data#51, coordination#30) is that the direction of authority for
+    # game-mechanical fields runs pdoom1 -> pdoom-data. Until 2026-08-06 all five
+    # links here pointed at pdoom-data, which meant the public was being invited
+    # to file game-balance changes into the repo that is forbidden to decide them.
+    #
+    #   descriptive metadata about the real-world event  -> pdoom-data
+    #     category, tags
+    #   game-mechanical values pdoom1 owns               -> pdoom1
+    #     rarity, impacts, p(doom) impact
+    #
+    # Labels are checked against the TARGET repo's label set -- pdoom1 has no
+    # `metadata` or `game-balance` label, so reusing pdoom-data's would silently
+    # produce unlabelled issues.
+    #
+    # If coordination#30 item A1 rules differently on rarity -- keep, split, or
+    # null it -- the rarity link is the thing to change here, and the browse
+    # index's rarity sort tiebreaker and filter facet change with it.
+    DATA_LABELS = "metadata,events"
+    GAME_LABELS = "game-mechanics,event-system,community"
+    DATA_NEW = "https://github.com/PipFoweraker/pdoom-data/issues/new"
+    GAME_NEW = "https://github.com/PipFoweraker/pdoom1/issues/new"
 
-    rarity_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20rarity%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20rarity%3A%20{quote(raw['rarity'])}%0A%0ASuggested%20rarity%3A%20%0A%0AReason%3A%20"
+    category_suggestion_url = f"{DATA_NEW}?labels={DATA_LABELS}&title=Metadata%3A%20Change%20category%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20category%3A%20{quote(raw['category'])}%0A%0ASuggested%20category%3A%20%0A%0AReason%3A%20"
 
-    tags_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events&title=Metadata%3A%20Change%20tags%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20tags%3A%20{quote(', '.join(raw['tags']))}%0A%0ASuggested%20tags%3A%20%0A%0AReason%3A%20"
+    rarity_suggestion_url = f"{GAME_NEW}?labels={GAME_LABELS}&title=Event%20metadata%3A%20Change%20rarity%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0AThis%20is%20a%20game-mechanical%20field%20owned%20by%20pdoom1.%0A%0ACurrent%20rarity%3A%20{quote(raw['rarity'])}%0A%0ASuggested%20rarity%3A%20%0A%0AReason%3A%20"
 
-    impacts_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events,game-balance&title=Metadata%3A%20Change%20impacts%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20impacts%3A%20{len(event['impacts'])}%20game%20variable%20changes%0A%0ASuggested%20changes%3A%20%0A-%20Variable%3A%20%0A-%20Change%3A%20%0A%0AReason%3A%20"
+    tags_suggestion_url = f"{DATA_NEW}?labels={DATA_LABELS}&title=Metadata%3A%20Change%20tags%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20tags%3A%20{quote(', '.join(raw['tags']))}%0A%0ASuggested%20tags%3A%20%0A%0AReason%3A%20"
 
-    pdoom_suggestion_url = f"https://github.com/PipFoweraker/pdoom-data/issues/new?labels=metadata,events,game-balance&title=Metadata%3A%20Change%20p(doom)%20impact%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0ACurrent%20p(doom)%20impact%3A%20{quote(str(raw.get('pdoom_impact', 'null')))}%0A%0ASuggested%20p(doom)%20impact%3A%20%0A%0AReason%3A%20"
+    impacts_suggestion_url = f"{GAME_NEW}?labels={GAME_LABELS}&title=Event%20metadata%3A%20Change%20impacts%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0AThis%20is%20a%20game-balance%20change%20owned%20by%20pdoom1.%0A%0ACurrent%20impacts%3A%20{len(event['impacts'])}%20game%20variable%20changes%0A%0ASuggested%20changes%3A%20%0A-%20Variable%3A%20%0A-%20Change%3A%20%0A%0AReason%3A%20"
+
+    pdoom_suggestion_url = f"{GAME_NEW}?labels={GAME_LABELS}&title=Event%20metadata%3A%20Change%20p(doom)%20impact%20for%20{quote(event_id)}&body=Event%3A%20{quote(raw['title'])}%0A%0AThis%20is%20a%20game-balance%20change%20owned%20by%20pdoom1.%0A%0ACurrent%20p(doom)%20impact%3A%20{quote(str(raw.get('pdoom_impact', 'null')))}%0A%0ASuggested%20p(doom)%20impact%3A%20%0A%0AReason%3A%20"
 
     # Build reaction provenance badges and source info
     def build_reaction_html(reaction_text: str, reaction_key: str) -> str:
@@ -1182,7 +1210,7 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 		<div class="metadata-section">
 			<h2>🏷️ Event Metadata</h2>
 			<p style="color: var(--text-muted); margin-bottom: 1rem;">
-				Think this event's metadata could be improved? Suggest changes to category, rarity, tags, game impacts, or p(doom) effects.
+				Think this event's metadata could be improved? Category and tags describe the real-world event and are maintained in <a href="https://github.com/PipFoweraker/pdoom-data" target="_blank" rel="noopener">pdoom-data</a>. Rarity, game impacts and p(doom) effects are game-mechanical values owned by <a href="https://github.com/PipFoweraker/pdoom1" target="_blank" rel="noopener">pdoom1</a>. Each link below goes to the repository that decides that field.
 			</p>
 
 			<div class="metadata-grid">
