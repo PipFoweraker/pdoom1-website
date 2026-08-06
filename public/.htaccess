@@ -37,6 +37,30 @@ RewriteRule ^(.*)$ https://pdoom1.com/$1 [R=301,L]
 # That page is not the mechanism -- this is -- but it must not be a dead end.
 RewriteRule ^changelog(/|/index\.html)?$ /game-changelog/ [R=301,L]
 
+# /docs/steam-readiness.md -> /docs/roadmap/ (issue #17, Pip's ruling 2026-07-31,
+# landed 2026-08-06).
+#
+# That file was a 2025-09 build-checklist that had rotted into a straight
+# falsehood. It said "This site now links to Steam for downloads" and carried
+# three green ticks -- "Download CTAs: updated to prioritize Steam", "Steam
+# badges: implemented", "Steam store URL added to config.json". None of those
+# are true: config.json's `steamStoreUrl` is the empty string, the homepage Steam
+# badge is commented out behind a `#TODO-real-steam-appid` placeholder, and
+# p(Doom)1 has no store page. It returned HTTP 200 on production for nine days
+# after the ruling. A funder or journalist reading it concludes the game is on
+# Steam.
+#
+# Deleted rather than rewritten, because Pip's ruling is that Steam is off the
+# public site until he is comfortable integrating -- an honest Steam page is
+# still a Steam page. The truthful statement of where Steam sits lives on the
+# roadmap ("Beta -- a Steam 'coming soon' page"), which is the redirect target.
+#
+# Redirected rather than left to 404, because the URL was linked from /docs/ and
+# from the site nav for ~11 months, so it is a URL a person or a crawler holds.
+# Same reasoning as /changelog/ above. The escaped dot matters: an unescaped `.`
+# would also match /docs/steam-readinessXmd.
+RewriteRule ^docs/steam-readiness\.md$ /docs/roadmap/ [R=301,L]
+
 # ---------------------------------------------------------------------------
 # Compression -- the single biggest spike lever.
 # events.json is ~1.18 MB uncompressed and is fetched on every /events/ visit;
@@ -105,16 +129,23 @@ RewriteRule ^changelog(/|/index\.html)?$ /game-changelog/ [R=301,L]
 # download: clicking "Roadmap" in the site nav saved a file instead of showing
 # a page. Five routes are reachable this way and all are in the sitemap:
 #   /docs/DEV_NOTES.md  /docs/how-leaderboards-work.md
-#   /docs/pdoom1-open-issues.md  /docs/roadmap.md  /docs/steam-readiness.md
+#   /docs/pdoom1-open-issues.md  /docs/roadmap.md
+# (/docs/steam-readiness.md was the fifth; it is deleted and 301'd above.)
 #
 # Re-typing to text/plain makes every one of them render in the browser. This
 # is a floor, not the destination -- a reader gets raw markdown source, with
 # `##` and pipe tables visible. The proper fix is an HTML surface that renders
-# the markdown, which does NOT exist yet: /blog/post.html's client-side parser
-# handles only links, images, inline code, bold and italic -- no headings, no
-# tables, no fenced code -- and roadmap.md is mostly headings and a table, so
-# reusing it would render worse than plain text. Building that surface is a
-# separate piece of work; it is deliberately not invented here.
+# the markdown.
+#
+# CORRECTED 2026-08-06: this comment used to justify not building that surface
+# by claiming /blog/post.html's parser "handles only links, images, inline code,
+# bold and italic -- no headings, no tables, no fenced code". That was false when
+# written and is false now. The parser has handled headings, fenced code, lists,
+# blockquotes and hr since cf38e315, and GitHub-style pipe tables since
+# 2026-08-03; `scripts/test-blog-render.js` asserts each one. The same wrong
+# sentence lived in CLAUDE.md and was corrected there on 2026-08-03 -- this copy
+# was missed. So reusing that renderer for /docs/*.md is now a live option, not a
+# blocked one. It is still separate work and is deliberately not invented here.
 #
 # Content-type is chosen at the SERVER, so this fixes the routes without
 # touching a single .md file (public/docs/roadmap.md's content is owned
