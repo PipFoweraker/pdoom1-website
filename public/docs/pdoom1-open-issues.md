@@ -1,9 +1,13 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-05T18:47:34.941Z UTC
+Generated: 2026-08-06T00:46:37.469Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1135 | Lab-name generator: future-epoch content pass -- more shapes, more pool, backfilled bacronyms | ship:next-release |  | 2026-08-05 22:54:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1135) |
+| 1134 | F3 event injection has no phase guard -- injecting in the wrong phase permalocks the run | bug |  | 2026-08-05 22:29:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1134) |
+| 1132 | Playtest 655/C55: icon bar lands; cap the top bar at 10 buttons; three actions want submenus; mouse-over jiggle is a regression |  |  | 2026-08-05 22:26:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/1132) |
+| 1131 | Pip's answers on the dot-matrix printer: ambient, texture only, and it must be structurally incapable of a false all-clear |  |  | 2026-08-05 22:24:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/1131) |
 | 1128 | sync-documentation.yml commits arbitrary dirty state into pdoom1-website (git add . in a foreign checkout) |  |  | 2026-08-05 08:01:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1128) |
 | 1126 | The Local/Global toggle silently un-presses itself on fetch failure -- indistinguishable from a dead button | bug, ui-ux |  | 2026-08-05 05:13:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1126) |
 | 1125 | GO: retime first (the pack's turn-pacing premise is wrong), promotions ruled, F4-F7 deferred |  |  | 2026-08-05 00:43:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/1125) |
@@ -16,7 +20,7 @@ Generated: 2026-08-05T18:47:34.941Z UTC
 | 1109 | art: promotion adds ~105 MB to the pack -- subtle refinement pass owed for a future epoch | ship:next-release |  | 2026-08-03 20:24:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1109) |
 | 1102 | Review: what does pdoom1 actually want from pdoom-data? (measured inventory, no proposal) |  |  | 2026-08-02 03:19:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1102) |
 | 1097 | Pip's rulings, 2026-08-02 -- velocity portfolio weights, and a review pdoom-data is waiting on |  |  | 2026-08-02 02:48:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1097) |
-| 1094 | Postmortem input: week of 2026-07-28 and the league-launch effort (outside vantage) |  |  | 2026-08-04 06:01:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1094) |
+| 1094 | Postmortem input: week of 2026-07-28 and the league-launch effort (outside vantage) |  |  | 2026-08-05 23:54:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1094) |
 | 1093 | art(review): generation was paid for and the outputs were never reviewed -- inventory the backlog and package a decision session | enhancement |  | 2026-08-01 00:43:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1093) |
 | 1092 | art(sweep): events name physical things the office never shows -- install a security system, no cameras appear; sweep events for asset refs, then bulk-generate | enhancement |  | 2026-08-01 00:43:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1092) |
 | 1091 | design(hiring): no hire may be onboarded-by-silence -- every hiring route must surface the choice; arrivals come through a door | enhancement, game-mechanics |  | 2026-08-01 00:43:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1091) |
