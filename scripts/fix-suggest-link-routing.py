@@ -49,6 +49,16 @@ Usage:
 import sys
 from pathlib import Path
 
+# Copied verbatim per scripts/check-encoding-safety.py (W1). Not an import: this
+# module is run directly from several working directories, and an import that
+# raises defeats the point of a preamble whose job is to survive being first.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
+
 EVENTS_DIR = Path(__file__).resolve().parent.parent / "public" / "events"
 
 DATA_NEW = "https://github.com/PipFoweraker/pdoom-data/issues/new"
