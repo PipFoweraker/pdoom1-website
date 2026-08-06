@@ -167,6 +167,16 @@ const GUARDED = [
     fetches: ['config.json', 'data/status.json', 'design/tokens.json', '/data/version.json',
               'https://api.github.com/repos/PipFoweraker/pdoom1/releases/latest'],
   },
+  {
+    page: 'public/frontier-labs/index.html',
+    // lab/l/o/h are roster rows out of /data/frontier-labs.json. That file is ours and
+    // committed, not an unauthenticated API -- but it is fetched at runtime and spliced
+    // into innerHTML, which is the sink this rule is about, and `url`/`reference` are
+    // href values. Listing it here is what stops the NEXT field being added raw.
+    roots: ['lab', 'l', 'o', 'h'],
+    safeHelpers: ['labCard'],
+    fetches: ['/design/tokens.json', '/data/frontier-labs.json'],
+  },
 ];
 
 // Markdown renderers get behavioural tests instead of a root scan: their input is one
