@@ -1,0 +1,27 @@
+{
+  "game_version": "0.14.1",
+  "display_version": "v0.14.1",
+  "release_name": "Manual Sync: v0.14.1",
+  "release_date": "2026-08-07T16:08:56Z",
+  "release_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.14.1",
+  "is_prerelease": false,
+  "changelog_section": "**The board key does NOT move.** Ladder stays **L4**, featured seed stays\n`weekly-2026-w32`, board key stays `(weekly-2026-w32, L4)`. Your v0.14.0 scores\nare still valid and still on the same board. Nothing here touches scoring, run\noutcomes, or replay determinism -- these are UI, diagnosis and tooling fixes.\n\nPlayers on v0.14.0 could not see their own leaderboard. Six separate defects\nmade it invisible; this makes it visible. Every entry below is tied to a commit\nmerged between `v0.14.0` and this release.\n\nTest provenance: the fast gate was measured locally on the tagged tree. The\nsimulation tier was verified **in CI** on the same tree, not locally -- the local\nrunner's hardcoded 900s cap is not meetable on the machine this was cut from.\nNo local simulation pass is claimed.\n\n### Fixed\n- **The game-over screen scrolled, and the way out was inside the scroll**\n  (#1179). `> Press ENTER for Leaderboard` was line 32 of 32, 436px below the\n  bottom of its own box -- the only advertised route to the board, on the one\n  screen where you go looking for it. It is a **Leaderboard [ENTER]** button in\n  the button row now. The screen was cut from 32 lines to 16 rather than merely\n  enlarged, body text went 16pt -> 20pt, and two colours that failed WCAG AA on\n  the panel ground (Compute at 2.23:1, Research at 3.61:1) were replaced. No\n  scrollbar at any tested resolution from 1024x768 to 2560x1080.\n- **The leaderboard screen opened on LOCAL** and only fetched the global board if\n  you pressed a toggle (#1173). \"Here are your four scores\" reads as \"there is no\n  global board\", which is what it was read as. It opens on global now.\n- **Two different sources for one board key** (#1173). The global fetch keyed on\n  `GameConfig.get_display_seed()` while the local view keyed on the board file\n  being shown, and those two do diverge -- the seed dropdown changed one without\n  the other. There is one source now, `_global_board_identity()`: the board on\n  screen.\n- **A player who never opted in, and a player who declined, both saw nothing at\n  game over** (#1172, #1173). Both now get a standing readout saying where the\n  score went and where to change it. It is a readout, not a prompt: no dialog,\n  no re-nudge, and it does not opt anybody in.\n- **A successful submission looked like nothing happening** (#1173). The\n  confirmation was 12pt and appended below the button row, last line in the\n  panel. It is 16pt and sits above the buttons.\n- **Every remote failure claimed you were offline** (#1173). A rotated token\n  (403), a moved endpoint (404) and a server fault (500) all rendered the same\n  sentence, because the HTTP status was discarded. The status reaches the player\n  now, and \"offline\" is reserved for a request that never got to a server. Every\n  failure still says the score was kept locally.\n\n### Added\n- **In-game patch notes cover 0.12.0 onwards** (#1175), ending three releases\n  where the What's New screen said nothing about what changed.\n- **The release manifest publishes `league_seed`** from the version SSOT\n  (#1175), so the website can read the board key instead of inferring it.\n\n### Dev / tooling (no player-visible change)\n- **Headless test runs were writing into live player data** (#1173). Godot\n  derives `user://` from `config/name`, not the checkout path, so every worktree\n  shared one profile and `run_godot_tests.py` passed no `env=`; a test run took a\n  real 50-entry league board to 0. All four `subprocess.run` sites now pass an\n  isolated `APPDATA` keyed by a hash of the checkout path. The property tests\n  also stopped leaving ~1,300 board files behind per run.",
+  "sync_timestamp": "2026-08-07T16:08:56Z",
+  "sync_source": "pdoom1-game-release",
+  "assets": {
+    "download_url": "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.14.1",
+    "source_zip": "https://github.com/PipFoweraker/pdoom1/archive/refs/tags/v0.14.1.zip",
+    "changelog_url": "https://github.com/PipFoweraker/pdoom1/blob/main/CHANGELOG.md"
+  },
+  "requirements": {
+    "python": "3.9+",
+    "os": ["Windows 10+", "Linux", "macOS"],
+    "memory": "512MB",
+    "storage": "100MB"
+  },
+  "compatibility": {
+    "website_features": "full",
+    "data_integration": "ready",
+    "api_version": "1.0.0"
+  }
+}
