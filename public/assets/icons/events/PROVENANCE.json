@@ -1,0 +1,38 @@
+{
+  "_comment": "Provenance for the icons in this directory. Every field below is copied from the generation spec named in `prompt_file` in the `source_repo` repository; nothing here is inferred. These images are MACHINE-GENERATED art, not photographs or hand-drawn work.",
+  "source_repo": "pdoom1",
+  "prompt_file": "art_prompts/batch_2_actions_and_ui.yaml",
+  "asset_type": "game_icons",
+  "size_px": 128,
+  "machine_generated": true,
+  "selection_rule": "The spec records exactly one `selected_variant` per slot. Only that variant is kept here; the other generated variants were removed in chore/remove-rejected-icon-variants because publishing them made rejected art indistinguishable from chosen art.",
+  "icons": [
+    {
+      "file": "action_funding_grant_proposal_v2_128.png",
+      "slot_id": "action_funding_grant_proposal",
+      "display_name": "Grant Proposal",
+      "category": "actions_funding",
+      "theme": "funding_gold",
+      "selected_variant": "v2",
+      "machine_generated": true
+    },
+    {
+      "file": "action_funding_loan_v3_128.png",
+      "slot_id": "action_funding_loan",
+      "display_name": "Business Loan",
+      "category": "actions_funding",
+      "theme": "funding_gold",
+      "selected_variant": "v3",
+      "machine_generated": true
+    },
+    {
+      "file": "resource_research_small_v3_128.png",
+      "slot_id": "resource_research_small",
+      "display_name": "Research Points",
+      "category": "resources",
+      "theme": "base_corporate",
+      "selected_variant": "v3",
+      "machine_generated": true
+    }
+  ]
+}
