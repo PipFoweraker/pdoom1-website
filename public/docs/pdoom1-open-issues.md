@@ -1,9 +1,12 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-07T06:40:42.364Z UTC
+Generated: 2026-08-07T12:29:56.350Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1168 | Simulation tier cannot be run locally on Windows -- 15-min hardcoded timeout, and a timeout reports as '0 tests, 0 fail' |  |  | 2026-08-07 11:49:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/1168) |
+| 1165 | CHANGELOG.md can announce open issues as shipped -- six [Unreleased] headings + stray 2025 content inside the [0.13.2] section |  |  | 2026-08-07 07:24:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/1165) |
+| 1163 | godot/data/historical_events.json carries two mojibake titles; the upstream repair cannot reach a hand-carried copy |  |  | 2026-08-07 07:12:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/1163) |
 | 1152 | docs: ladder epoch columns are off by one from v0.14 down in ROADMAP.md and RELEASE_NOMENCLATURE.md |  |  | 2026-08-06 07:11:29 | [link](https://github.com/PipFoweraker/pdoom1/issues/1152) |
 | 1151 | events: four measured defects in the pdoom-data ingest path (rarity boundary case, dropped-but-counted variables, inert-sink doc disagreement, constant significance) |  |  | 2026-08-06 07:11:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1151) |
 | 1150 | content: promote the real-people/real-venue content guardrail from a closing issue comment to a tracked doc |  |  | 2026-08-06 07:11:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1150) |
