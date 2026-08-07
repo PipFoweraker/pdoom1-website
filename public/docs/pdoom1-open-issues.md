@@ -1,6 +1,6 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-06T12:54:15.865Z UTC
+Generated: 2026-08-07T01:26:29.073Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
@@ -27,7 +27,7 @@ Generated: 2026-08-06T12:54:15.865Z UTC
 | 1112 | Pip's rulings on intro + poster art, 2026-08-04 11:34 -- B1/B2 approved, dev-vs-alpha tool split, and a prior story beat |  |  | 2026-08-04 02:38:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1112) |
 | 1111 | Pip's rulings on the event-promotion pack, 2026-08-04 11:17 -- approved, plus the turn-pacing premise is wrong |  |  | 2026-08-04 02:38:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/1111) |
 | 1109 | art: promotion adds ~105 MB to the pack -- subtle refinement pass owed for a future epoch | ship:next-release |  | 2026-08-03 20:24:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1109) |
-| 1102 | Review: what does pdoom1 actually want from pdoom-data? (measured inventory, no proposal) |  |  | 2026-08-02 03:19:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1102) |
+| 1102 | Review: what does pdoom1 actually want from pdoom-data? (measured inventory, no proposal) |  |  | 2026-08-06 22:42:06 | [link](https://github.com/PipFoweraker/pdoom1/issues/1102) |
 | 1097 | Pip's rulings, 2026-08-02 -- velocity portfolio weights, and a review pdoom-data is waiting on |  |  | 2026-08-02 02:48:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1097) |
 | 1094 | Postmortem input: week of 2026-07-28 and the league-launch effort (outside vantage) |  |  | 2026-08-05 23:54:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1094) |
 | 1093 | art(review): generation was paid for and the outputs were never reviewed -- inventory the backlog and package a decision session | enhancement |  | 2026-08-01 00:43:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1093) |
