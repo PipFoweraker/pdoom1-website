@@ -429,6 +429,7 @@ python  scripts/sync/sync-keybinds.py --check # FULL gate; needs ../pdoom1   [lo
 python  scripts/sync/sync-keybinds.py --ci    # no-typed-keys half only      [content-honesty]
 python  scripts/test-weekly-league-boundary.py  # run-time -> week (A9)      [weekly-league-reset]
 python  scripts/stamp-league-epoch.py --check   # weekly records carry epoch [data-contract]
+python  scripts/test-stamp-league-epoch.py      # defect texts claim only what they verify [data-contract]
 node    scripts/test-board-escaping.js    # no API field reaches innerHTML   [board-liveness]
 node    scripts/test-board-honesty.js     # key mismatch stays visible       [board-liveness]
 python  scripts/test-publish-live-board.py # publisher refuses, never guesses [board-liveness]

@@ -76,8 +76,11 @@ DEFECT_TEXT = {
         "flag on archival, so every pre-cut archive claims to be the live week."
     ),
     "empty-shell": (
-        "zero entries. No shipped client ever submitted to this board key, so the "
-        "week ran with no participants -- the record is a container, not a result."
+        "this record's entries array is empty -- the record is a container, not a "
+        "result. That is a fact about THIS FILE and not about how many people "
+        "played: a week keyed to a blessed seed can be empty here while the live "
+        "board under the same key holds real rows, because nothing imports them. "
+        "For why no client could have posted, see unblessed-seed where it applies."
     ),
     "legacy-v0.4.1-stamps": (
         "meta.game_version 'v0.4.1' and/or economic_model 'Bootstrap_v0.4.1' from the "
@@ -119,7 +122,14 @@ def observed_defects(d, path):
             pass
     if wi.get("is_current") and d.get("archive_status") == "completed":
         found.append("is_current-stuck-true")
-    if not (d.get("entries") or []):
+    # Emptiness is only a defect once the week is OVER. current.json is stamped by
+    # this script too, and a running week legitimately starts with zero entries --
+    # W33 carried this flag seven hours into a week with 6d23h left to run.
+    # `archive_status` is the test rather than a clock, so the stamper's output does
+    # not depend on when it ran, and rather than path.parent because it is a property
+    # of the record: all 44 archive files carry it and current.json does not, so no
+    # existing record silently loses the flag.
+    if d.get("archive_status") == "completed" and not (d.get("entries") or []):
         found.append("empty-shell")
     if "v0.4.1" in raw:
         found.append("legacy-v0.4.1-stamps")

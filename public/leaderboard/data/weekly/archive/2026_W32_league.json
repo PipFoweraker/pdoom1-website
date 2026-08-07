@@ -26,7 +26,7 @@
     "board_opens_utc": "2026-07-31T07:00:00Z",
     "board_opens_confirmed": true,
     "observed_defects": {
-      "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result.",
+      "empty-shell": "this record's entries array is empty -- the record is a container, not a result. That is a fact about THIS FILE and not about how many people played: a week keyed to a blessed seed can be empty here while the live board under the same key holds real rows, because nothing imports them. For why no client could have posted, see unblessed-seed where it applies.",
       "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it."
     }
   },

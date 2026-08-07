@@ -25,9 +25,7 @@
     "board_opens_local": "2026-07-31T17:00:00+10:00",
     "board_opens_utc": "2026-07-31T07:00:00Z",
     "board_opens_confirmed": true,
-    "observed_defects": {
-      "empty-shell": "zero entries. No shipped client ever submitted to this board key, so the week ran with no participants -- the record is a container, not a result."
-    }
+    "observed_defects": {}
   },
   "seed": "weekly-2026-w31",
   "seed_provenance": {
