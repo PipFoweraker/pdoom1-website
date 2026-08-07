@@ -1,7 +1,7 @@
 ---
 title: "Manual Sync: v0.14.0"
 version: "0.14.0"
-release_date: "2026-08-07T12:53:17Z"
+release_date: "2026-08-07T12:54:37Z"
 type: "game-release"
 status: "stable"
 download_url: "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.14.0"
@@ -10,7 +10,7 @@ download_url: "https://github.com/PipFoweraker/pdoom1/releases/tag/v0.14.0"
 # Manual Sync: v0.14.0
 
 **Version:** v0.14.0
-**Release Date:** 2026-08-07T12:53:17Z
+**Release Date:** 2026-08-07T12:54:37Z
 **Status:** Stable Release
 
 ## Download
