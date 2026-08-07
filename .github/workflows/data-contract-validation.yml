@@ -17,6 +17,7 @@ on:
       - 'scripts/ingest_scores.py'
       - 'scripts/test_ingest_scores.py'
       - 'scripts/stamp-league-epoch.py'
+      - 'scripts/test-stamp-league-epoch.py'
       - '.github/workflows/data-contract-validation.yml'
   pull_request:
     paths:
@@ -28,6 +29,7 @@ on:
       - 'scripts/ingest_scores.py'
       - 'scripts/test_ingest_scores.py'
       - 'scripts/stamp-league-epoch.py'
+      - 'scripts/test-stamp-league-epoch.py'
       - '.github/workflows/data-contract-validation.yml'
   schedule:
     - cron: '0 6 * * *'   # daily 06:00 UTC -- catches drift even with no commits
@@ -76,6 +78,14 @@ jobs:
       # is unmarked too. --check verifies without writing.
       - name: Every weekly record carries its ladder epoch
         run: python scripts/stamp-league-epoch.py --check
+
+      # ...and every defect text says only what its trigger demonstrates. The
+      # empty-shell text used to assert "No shipped client ever submitted to this
+      # board key" off a bare `if not entries`, which was false for 2026_W33 while
+      # the live board under the same blessed key held 6 entries. Forces both the
+      # running-week and completed-week states rather than observing the tree.
+      - name: Defect stamps claim only what they verify
+        run: python scripts/test-stamp-league-epoch.py
 
   validate:
     name: Validate data contracts
@@ -150,6 +160,7 @@ jobs:
               '- `python scripts/validate_data.py` (live-data seams)',
               '- `python scripts/test_ingest_scores.py` (leaderboard read path)',
               '- `python scripts/stamp-league-epoch.py --check` (every weekly record carries its epoch)',
+              '- `python scripts/test-stamp-league-epoch.py` (defect stamps claim only what they verify)',
               '',
               '_This is a single rolling issue -- it is reused, not duplicated, per run._'
             ].join('\n');
