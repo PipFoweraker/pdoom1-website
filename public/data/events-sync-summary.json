@@ -1,9 +1,15 @@
 {
-  "sync_timestamp": "2026-08-03T08:02:21.309618",
+  "sync_timestamp": "2026-08-07T03:59:50.849634",
   "total_events_in_source": 1194,
   "included_events": 1194,
   "excluded_events": 0,
   "categories": 4,
+  "pii": {
+    "emails_redacted": 0,
+    "events_with_emails": 0,
+    "obfuscated_contact_suspects": 0,
+    "_note": "emails_redacted are addresses EMAIL_PATTERN matched and replaced. obfuscated_contact_suspects are address-shaped strings it cannot match (e.g. 'name [at] domain.edu') and therefore did NOT redact -- advisory, non-blocking, see pdoom1-website#240."
+  },
   "events_by_rarity": {
     "common": 77,
     "rare": 1076,

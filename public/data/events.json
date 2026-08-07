@@ -1,328 +1,4 @@
 {
-  "ftx_future_fund_collapse_2022": {
-    "id": "ftx_future_fund_collapse_2022",
-    "title": "FTX Future Fund Collapse",
-    "year": 2022,
-    "category": "funding_catastrophe",
-    "description": "$32M+ in AI safety grants vanished overnight when FTX went bankrupt, researchers forced to return money or drop programs",
-    "impacts": [
-      {
-        "variable": "cash",
-        "change": -80,
-        "condition": null
-      },
-      {
-        "variable": "reputation",
-        "change": -20,
-        "condition": null
-      },
-      {
-        "variable": "research",
-        "change": -30,
-        "condition": null
-      },
-      {
-        "variable": "papers",
-        "change": -15,
-        "condition": null
-      },
-      {
-        "variable": "stress",
-        "change": 50,
-        "condition": null
-      },
-      {
-        "variable": "burnout_risk",
-        "change": 40,
-        "condition": null
-      },
-      {
-        "variable": "vibey_doom",
-        "change": 25,
-        "condition": null
-      }
-    ],
-    "sources": [
-      "https://fortune.com/2022/11/15/sam-bankman-fried-ftx-collapse-a-i-safety-research-effective-altruism-debacle/",
-      "https://www.coindesk.com/business/2022/11/10/ftxs-effective-altruism-future-fund-team-resigns"
-    ],
-    "tags": [
-      "cryptocurrency",
-      "effective_altruism",
-      "funding_crisis",
-      "sam_bankman_fried"
-    ],
-    "rarity": "rare",
-    "pdoom_impact": null,
-    "safety_researcher_reaction": "Devastating blow to AI safety funding ecosystem",
-    "media_reaction": "Crypto collapse takes down AI safety research funding"
-  },
-  "cais_ftx_clawback_2023": {
-    "id": "cais_ftx_clawback_2023",
-    "title": "Center for AI Safety FTX Clawback",
-    "year": 2023,
-    "category": "funding_catastrophe",
-    "description": "FTX bankruptcy estate demanded return of $6.5M paid to CAIS between May-September 2022",
-    "impacts": [
-      {
-        "variable": "cash",
-        "change": -65,
-        "condition": null
-      },
-      {
-        "variable": "reputation",
-        "change": -15,
-        "condition": null
-      },
-      {
-        "variable": "stress",
-        "change": 30,
-        "condition": null
-      },
-      {
-        "variable": "technical_debt",
-        "change": 10,
-        "condition": null
-      },
-      {
-        "variable": "vibey_doom",
-        "change": 15,
-        "condition": null
-      }
-    ],
-    "sources": [
-      "https://cointelegraph.com/news/crypto-exchange-ftx-subpoena-center-ai-safety-group-bankruptcy-proceedings",
-      "https://www.bloomberg.com/news/articles/2023-10-25/ftx-probing-6-5-million-paid-to-leading-ai-safety-nonprofit"
-    ],
-    "tags": [
-      "bankruptcy",
-      "cais",
-      "clawback",
-      "legal_issues"
-    ],
-    "rarity": "common",
-    "pdoom_impact": null,
-    "safety_researcher_reaction": "Legal system now pursuing our research funding",
-    "media_reaction": "Bankruptcy trustees target AI safety organization for clawback"
-  },
-  "crypto_funding_crash_2022": {
-    "id": "crypto_funding_crash_2022",
-    "title": "Crypto Market AI Funding Crash",
-    "year": 2022,
-    "category": "funding_catastrophe",
-    "description": "Multiple AI safety orgs lost funding when crypto-wealthy donors' portfolios crashed during bear market",
-    "impacts": [
-      {
-        "variable": "cash",
-        "change": -40,
-        "condition": null
-      },
-      {
-        "variable": "research",
-        "change": -20,
-        "condition": null
-      },
-      {
-        "variable": "stress",
-        "change": 35,
-        "condition": null
-      },
-      {
-        "variable": "burnout_risk",
-        "change": 25,
-        "condition": null
-      },
-      {
-        "variable": "vibey_doom",
-        "change": 20,
-        "condition": null
-      }
-    ],
-    "sources": [
-      "https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety",
-      "https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation"
-    ],
-    "tags": [
-      "bear_market",
-      "cryptocurrency",
-      "funding_diversification"
-    ],
-    "rarity": "common",
-    "pdoom_impact": null,
-    "safety_researcher_reaction": "Too much dependence on volatile crypto wealth",
-    "media_reaction": "AI safety funding vulnerable to crypto market swings"
-  },
-  "ltff_funding_gap_2023": {
-    "id": "ltff_funding_gap_2023",
-    "title": "Long-Term Future Fund Funding Gap",
-    "year": 2023,
-    "category": "funding_catastrophe",
-    "description": "Long-Term Future Fund reports $450k/month funding gap after relationship changes with Open Philanthropy",
-    "impacts": [
-      {
-        "variable": "cash",
-        "change": -45,
-        "condition": null
-      },
-      {
-        "variable": "research",
-        "change": -15,
-        "condition": null
-      },
-      {
-        "variable": "papers",
-        "change": -10,
-        "condition": null
-      },
-      {
-        "variable": "stress",
-        "change": 25,
-        "condition": null
-      },
-      {
-        "variable": "vibey_doom",
-        "change": 10,
-        "condition": null
-      }
-    ],
-    "sources": [
-      "https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety",
-      "https://funds.effectivealtruism.org/funds/far-future"
-    ],
-    "tags": [
-      "institutional_funding",
-      "ltff",
-      "open_philanthropy"
-    ],
-    "rarity": "common",
-    "pdoom_impact": null,
-    "safety_researcher_reaction": "Core funding infrastructure is breaking down",
-    "media_reaction": "AI safety funding faces institutional challenges"
-  },
-  "ea_funding_concentration_risk_2023": {
-    "id": "ea_funding_concentration_risk_2023",
-    "title": "EA Funding Concentration Crisis",
-    "year": 2023,
-    "category": "funding_catastrophe",
-    "description": "Major EA funders projected to spend less on AI safety in 2023 compared to 2022, revealing dangerous funding concentration",
-    "impacts": [
-      {
-        "variable": "cash",
-        "change": -30,
-        "condition": null
-      },
-      {
-        "variable": "research",
-        "change": -20,
-        "condition": null
-      },
-      {
-        "variable": "stress",
-        "change": 25,
-        "condition": null
-      },
-      {
-        "variable": "vibey_doom",
-        "change": 20,
-        "condition": null
-      }
-    ],
-    "sources": [
-      "https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety"
-    ],
-    "tags": [
-      "diversification",
-      "effective_altruism",
-      "funding_concentration"
-    ],
-    "rarity": "common",
-    "pdoom_impact": null,
-    "safety_researcher_reaction": "We put all our eggs in too few baskets",
-    "media_reaction": "AI safety funding reveals dangerous over-reliance on few donors"
-  },
-  "grant_application_backlog_2024": {
-    "id": "grant_application_backlog_2024",
-    "title": "Grant Application Backlog Crisis",
-    "year": 2024,
-    "category": "funding_catastrophe",
-    "description": "Nonlinear Network and Lightspeed Grants received 500-600 applications for relatively small funding pools, showing demand-supply mismatch",
-    "impacts": [
-      {
-        "variable": "cash",
-        "change": -20,
-        "condition": null
-      },
-      {
-        "variable": "stress",
-        "change": 30,
-        "condition": null
-      },
-      {
-        "variable": "burnout_risk",
-        "change": 25,
-        "condition": null
-      },
-      {
-        "variable": "research",
-        "change": -10,
-        "condition": null
-      }
-    ],
-    "sources": [
-      "https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety"
-    ],
-    "tags": [
-      "competition",
-      "funding_bottleneck",
-      "grant_applications"
-    ],
-    "rarity": "common",
-    "pdoom_impact": null,
-    "safety_researcher_reaction": "Too many qualified researchers, too little funding",
-    "media_reaction": "AI safety researchers face fierce competition for limited grants"
-  },
-  "venture_capital_ai_safety_drought_2024": {
-    "id": "venture_capital_ai_safety_drought_2024",
-    "title": "Venture Capital AI Safety Drought",
-    "year": 2024,
-    "category": "funding_catastrophe",
-    "description": "VC funding flows heavily to AI capabilities companies while AI safety startups struggle to raise funds",
-    "impacts": [
-      {
-        "variable": "cash",
-        "change": -35,
-        "condition": null
-      },
-      {
-        "variable": "research",
-        "change": -15,
-        "condition": null
-      },
-      {
-        "variable": "reputation",
-        "change": -10,
-        "condition": null
-      },
-      {
-        "variable": "vibey_doom",
-        "change": 15,
-        "condition": null
-      }
-    ],
-    "sources": [
-      "https://techcrunch.com/2024/03/25/ai-safety-funding-challenges/",
-      "https://www.anthropic.com/news/anthropic-funding"
-    ],
-    "tags": [
-      "capabilities_bias",
-      "market_incentives",
-      "venture_capital"
-    ],
-    "rarity": "common",
-    "pdoom_impact": null,
-    "safety_researcher_reaction": "The market only rewards capability advancement",
-    "media_reaction": "VCs pour billions into AI capabilities while safety gets scraps"
-  },
   "openai_board_crisis_2023": {
     "id": "openai_board_crisis_2023",
     "title": "OpenAI Board Crisis and CEO Firing",
@@ -1017,9 +693,333 @@
     "safety_researcher_reaction": "'This actually happened in a controlled environment'",
     "media_reaction": "AI caught trying to copy itself to avoid shutdown"
   },
+  "ftx_future_fund_collapse_2022": {
+    "id": "ftx_future_fund_collapse_2022",
+    "title": "FTX Future Fund Collapse",
+    "year": 2022,
+    "category": "funding_catastrophe",
+    "description": "$32M+ in AI safety grants vanished overnight when FTX went bankrupt, researchers forced to return money or drop programs",
+    "impacts": [
+      {
+        "variable": "cash",
+        "change": -80,
+        "condition": null
+      },
+      {
+        "variable": "reputation",
+        "change": -20,
+        "condition": null
+      },
+      {
+        "variable": "research",
+        "change": -30,
+        "condition": null
+      },
+      {
+        "variable": "papers",
+        "change": -15,
+        "condition": null
+      },
+      {
+        "variable": "stress",
+        "change": 50,
+        "condition": null
+      },
+      {
+        "variable": "burnout_risk",
+        "change": 40,
+        "condition": null
+      },
+      {
+        "variable": "vibey_doom",
+        "change": 25,
+        "condition": null
+      }
+    ],
+    "sources": [
+      "https://fortune.com/2022/11/15/sam-bankman-fried-ftx-collapse-a-i-safety-research-effective-altruism-debacle/",
+      "https://www.coindesk.com/business/2022/11/10/ftxs-effective-altruism-future-fund-team-resigns"
+    ],
+    "tags": [
+      "cryptocurrency",
+      "effective_altruism",
+      "funding_crisis",
+      "sam_bankman_fried"
+    ],
+    "rarity": "rare",
+    "pdoom_impact": null,
+    "safety_researcher_reaction": "Devastating blow to AI safety funding ecosystem",
+    "media_reaction": "Crypto collapse takes down AI safety research funding"
+  },
+  "cais_ftx_clawback_2023": {
+    "id": "cais_ftx_clawback_2023",
+    "title": "Center for AI Safety FTX Clawback",
+    "year": 2023,
+    "category": "funding_catastrophe",
+    "description": "FTX bankruptcy estate demanded return of $6.5M paid to CAIS between May-September 2022",
+    "impacts": [
+      {
+        "variable": "cash",
+        "change": -65,
+        "condition": null
+      },
+      {
+        "variable": "reputation",
+        "change": -15,
+        "condition": null
+      },
+      {
+        "variable": "stress",
+        "change": 30,
+        "condition": null
+      },
+      {
+        "variable": "technical_debt",
+        "change": 10,
+        "condition": null
+      },
+      {
+        "variable": "vibey_doom",
+        "change": 15,
+        "condition": null
+      }
+    ],
+    "sources": [
+      "https://cointelegraph.com/news/crypto-exchange-ftx-subpoena-center-ai-safety-group-bankruptcy-proceedings",
+      "https://www.bloomberg.com/news/articles/2023-10-25/ftx-probing-6-5-million-paid-to-leading-ai-safety-nonprofit"
+    ],
+    "tags": [
+      "bankruptcy",
+      "cais",
+      "clawback",
+      "legal_issues"
+    ],
+    "rarity": "common",
+    "pdoom_impact": null,
+    "safety_researcher_reaction": "Legal system now pursuing our research funding",
+    "media_reaction": "Bankruptcy trustees target AI safety organization for clawback"
+  },
+  "crypto_funding_crash_2022": {
+    "id": "crypto_funding_crash_2022",
+    "title": "Crypto Market AI Funding Crash",
+    "year": 2022,
+    "category": "funding_catastrophe",
+    "description": "Multiple AI safety orgs lost funding when crypto-wealthy donors' portfolios crashed during bear market",
+    "impacts": [
+      {
+        "variable": "cash",
+        "change": -40,
+        "condition": null
+      },
+      {
+        "variable": "research",
+        "change": -20,
+        "condition": null
+      },
+      {
+        "variable": "stress",
+        "change": 35,
+        "condition": null
+      },
+      {
+        "variable": "burnout_risk",
+        "change": 25,
+        "condition": null
+      },
+      {
+        "variable": "vibey_doom",
+        "change": 20,
+        "condition": null
+      }
+    ],
+    "sources": [
+      "https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety",
+      "https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation"
+    ],
+    "tags": [
+      "bear_market",
+      "cryptocurrency",
+      "funding_diversification"
+    ],
+    "rarity": "common",
+    "pdoom_impact": null,
+    "safety_researcher_reaction": "Too much dependence on volatile crypto wealth",
+    "media_reaction": "AI safety funding vulnerable to crypto market swings"
+  },
+  "ltff_funding_gap_2023": {
+    "id": "ltff_funding_gap_2023",
+    "title": "Long-Term Future Fund Funding Gap",
+    "year": 2023,
+    "category": "funding_catastrophe",
+    "description": "Long-Term Future Fund reports $450k/month funding gap after relationship changes with Open Philanthropy",
+    "impacts": [
+      {
+        "variable": "cash",
+        "change": -45,
+        "condition": null
+      },
+      {
+        "variable": "research",
+        "change": -15,
+        "condition": null
+      },
+      {
+        "variable": "papers",
+        "change": -10,
+        "condition": null
+      },
+      {
+        "variable": "stress",
+        "change": 25,
+        "condition": null
+      },
+      {
+        "variable": "vibey_doom",
+        "change": 10,
+        "condition": null
+      }
+    ],
+    "sources": [
+      "https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety",
+      "https://funds.effectivealtruism.org/funds/far-future"
+    ],
+    "tags": [
+      "institutional_funding",
+      "ltff",
+      "open_philanthropy"
+    ],
+    "rarity": "common",
+    "pdoom_impact": null,
+    "safety_researcher_reaction": "Core funding infrastructure is breaking down",
+    "media_reaction": "AI safety funding faces institutional challenges"
+  },
+  "ea_funding_concentration_risk_2023": {
+    "id": "ea_funding_concentration_risk_2023",
+    "title": "EA Funding Concentration Crisis",
+    "year": 2023,
+    "category": "funding_catastrophe",
+    "description": "Major EA funders projected to spend less on AI safety in 2023 compared to 2022, revealing dangerous funding concentration",
+    "impacts": [
+      {
+        "variable": "cash",
+        "change": -30,
+        "condition": null
+      },
+      {
+        "variable": "research",
+        "change": -20,
+        "condition": null
+      },
+      {
+        "variable": "stress",
+        "change": 25,
+        "condition": null
+      },
+      {
+        "variable": "vibey_doom",
+        "change": 20,
+        "condition": null
+      }
+    ],
+    "sources": [
+      "https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety"
+    ],
+    "tags": [
+      "diversification",
+      "effective_altruism",
+      "funding_concentration"
+    ],
+    "rarity": "common",
+    "pdoom_impact": null,
+    "safety_researcher_reaction": "We put all our eggs in too few baskets",
+    "media_reaction": "AI safety funding reveals dangerous over-reliance on few donors"
+  },
+  "grant_application_backlog_2024": {
+    "id": "grant_application_backlog_2024",
+    "title": "Grant Application Backlog Crisis",
+    "year": 2024,
+    "category": "funding_catastrophe",
+    "description": "Nonlinear Network and Lightspeed Grants received 500-600 applications for relatively small funding pools, showing demand-supply mismatch",
+    "impacts": [
+      {
+        "variable": "cash",
+        "change": -20,
+        "condition": null
+      },
+      {
+        "variable": "stress",
+        "change": 30,
+        "condition": null
+      },
+      {
+        "variable": "burnout_risk",
+        "change": 25,
+        "condition": null
+      },
+      {
+        "variable": "research",
+        "change": -10,
+        "condition": null
+      }
+    ],
+    "sources": [
+      "https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety"
+    ],
+    "tags": [
+      "competition",
+      "funding_bottleneck",
+      "grant_applications"
+    ],
+    "rarity": "common",
+    "pdoom_impact": null,
+    "safety_researcher_reaction": "Too many qualified researchers, too little funding",
+    "media_reaction": "AI safety researchers face fierce competition for limited grants"
+  },
+  "venture_capital_ai_safety_drought_2024": {
+    "id": "venture_capital_ai_safety_drought_2024",
+    "title": "Venture Capital AI Safety Drought",
+    "year": 2024,
+    "category": "funding_catastrophe",
+    "description": "VC funding flows heavily to AI capabilities companies while AI safety startups struggle to raise funds",
+    "impacts": [
+      {
+        "variable": "cash",
+        "change": -35,
+        "condition": null
+      },
+      {
+        "variable": "research",
+        "change": -15,
+        "condition": null
+      },
+      {
+        "variable": "reputation",
+        "change": -10,
+        "condition": null
+      },
+      {
+        "variable": "vibey_doom",
+        "change": 15,
+        "condition": null
+      }
+    ],
+    "sources": [
+      "https://techcrunch.com/2024/03/25/ai-safety-funding-challenges/",
+      "https://www.anthropic.com/news/anthropic-funding"
+    ],
+    "tags": [
+      "capabilities_bias",
+      "market_incentives",
+      "venture_capital"
+    ],
+    "rarity": "common",
+    "pdoom_impact": null,
+    "safety_researcher_reaction": "The market only rewards capability advancement",
+    "media_reaction": "VCs pour billions into AI capabilities while safety gets scraps"
+  },
   "uk_ai_safety_to_security_2025": {
     "id": "uk_ai_safety_to_security_2025",
-    "title": "UK AI Safety Institute \u00e2\u2020\u2019 AI Security Institute",
+    "title": "UK AI Safety Institute -> AI Security Institute",
     "year": 2025,
     "category": "institutional_decay",
     "description": "UK government rebrands AI Safety Institute as 'AI Security Institute', shifting from ethical AI concerns to cyber threat focus",
@@ -1062,7 +1062,7 @@
   },
   "us_aisi_to_caisi_2025": {
     "id": "us_aisi_to_caisi_2025",
-    "title": "US AISI \u00e2\u2020\u2019 Center for AI Standards and Innovation",
+    "title": "US AISI -> Center for AI Standards and Innovation",
     "year": 2025,
     "category": "institutional_decay",
     "description": "Trump administration renames US AI Safety Institute to focus on 'pro-growth AI policies' over safety, scraps Paris Summit attendance",
