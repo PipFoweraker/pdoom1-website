@@ -1,9 +1,12 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-07T12:29:56.350Z UTC
+Generated: 2026-08-07T18:30:45.400Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1181 | run_godot_tests.py: the 900s sim cap has no flag, and reports a timeout as '0 tests, 0 fail (FAIL)' |  |  | 2026-08-07 16:07:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/1181) |
+| 1178 | check_ladder_bump.py runs with '\|\| true' -- the guard on the board-key invariant cannot fail, and it already missed one for 31 hours |  |  | 2026-08-07 15:42:02 | [link](https://github.com/PipFoweraker/pdoom1/issues/1178) |
+| 1171 | Ladder eligibility must be visible BEFORE the run starts, not delivered at death (ruled by Pip 2026-08-07) |  |  | 2026-08-07 13:20:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1171) |
 | 1168 | Simulation tier cannot be run locally on Windows -- 15-min hardcoded timeout, and a timeout reports as '0 tests, 0 fail' |  |  | 2026-08-07 11:49:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/1168) |
 | 1165 | CHANGELOG.md can announce open issues as shipped -- six [Unreleased] headings + stray 2025 content inside the [0.13.2] section |  |  | 2026-08-07 07:24:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/1165) |
 | 1163 | godot/data/historical_events.json carries two mojibake titles; the upstream repair cannot reach a hand-carried copy |  |  | 2026-08-07 07:12:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/1163) |
@@ -181,7 +184,6 @@ Generated: 2026-08-07T12:29:56.350Z UTC
 | 703 | Playtest v0.11.0: defeat-pacing drag + hiring pipeline feels gappy (coalesce/de-branch) | ship:next-release |  | 2026-07-22 08:05:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/703) |
 | 700 | Local Leaderboard.add_score does not dedupe by entry_uuid (remote PHP does) | ship:hotpatch-48h |  | 2026-07-22 08:04:49 | [link](https://github.com/PipFoweraker/pdoom1/issues/700) |
 | 648 | Check Godot port for team_player uncapped-stacking exploit + poaching rate (salvaged from pre-Godot notes) | ship:next-release | Rivals & News | 2026-07-22 08:05:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/648) |
-| 622 | Build lane L10 · main_ui decomposition: extract-before set + let-die map |  |  | 2026-07-22 06:09:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/622) |
 | 621 | Build lane L9 · Balance surface + data externalization (defs→JSON, Balance autoload) |  |  | 2026-07-12 08:38:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/621) |
 | 619 | Build lane L8 · Achievements skeleton (observer-only) |  |  | 2026-07-12 08:23:43 | [link](https://github.com/PipFoweraker/pdoom1/issues/619) |
 | 615 | Build lane L4 · Event taxonomy + ledger intake (ADR-0012) |  |  | 2026-07-12 08:23:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/615) |
