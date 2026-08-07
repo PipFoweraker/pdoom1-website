@@ -3,10 +3,10 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ADR-0009 — Turn structure: plan-months, two decision speeds, day as resolution tick | p(Doom)1 Design Notes</title>
+	<title>ADR-0009 -- Turn structure: plan-months, two decision speeds, day as resolution tick | p(Doom)1 Design Notes</title>
 	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0009-plan-months-two-speeds.html" />
 	<meta name="description" content="Workshop #1&#x27;s intent was a week-based planning loop; the build drifted to day-turns with the week surviving only as display (game_state.gd TURNS_PER_WEEK, " />
-	<meta property="og:title" content="ADR-0009 — Turn structure: plan-months, two decision speeds, day as resolution tick | p(Doom)1 Design Notes" />
+	<meta property="og:title" content="ADR-0009 -- Turn structure: plan-months, two decision speeds, day as resolution tick | p(Doom)1 Design Notes" />
 	<meta property="og:description" content="Workshop #1&#x27;s intent was a week-based planning loop; the build drifted to day-turns with the week surviving only as display (game_state.gd TURNS_PER_WEEK, " />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0009-plan-months-two-speeds.html" />
@@ -96,53 +96,54 @@
 		</nav>
 	</header>
 	<main>
-		<h1>ADR-0009 — Turn structure: plan-months, two decision speeds, day as resolution tick</h1>
+		<h1>ADR-0009 -- Turn structure: plan-months, two decision speeds, day as resolution tick</h1>
 		<div class="meta"><strong>Status:</strong> ACCEPTED &middot; <strong>Decided:</strong> 2026-07-12</div>
 <div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
 <ul>
 <li><strong>Status:</strong> ACCEPTED</li>
 <li><strong>Date:</strong> 2026-07-12</li>
+<li><strong>Summary:</strong> Formalizes the drift from week-based planning to day-tick resolution: a MONTH is the decision-cadence layer over day-grain sim ticks.</li>
 </ul>
 <h2>Context</h2>
 <p>Workshop #1's intent was a week-based planning loop; the build drifted to day-turns with the week surviving only as display (<code>game_state.gd</code> <code>TURNS_PER_WEEK</code>, "Day 3/5" HUD). The drift's real shape: <strong>decisions attached to the resolution tick.</strong> Evidence forcing the ruling: exploit-finder sweep (loan terms absurd at day cadence; only safety-spam beats passive), and Pip's playtest notes (repetitive event loop, weirdly slow pacing, <em>instantaneous</em> rewards from fundraising breaking time-feel, salary cadence off).</p>
-<p>Pip fixed the fiction anchors this session: <strong>2017 start; ~2027 early-competent loss, 2033 decent, 2037 hard, 2040 ≈ the 1% run.</strong> Wall-clock ruling: a decent run is a Civ/X-com-campaign 6–8 hours (Pip: "60% 6–8 hours, 30% evening, 10% other"). Grain arithmetic against those anchors: week ≈ 500+ turns to an early loss (dead); month ≈ 114 / 186 / 234 / 270 turns; quarter ≈ 38 / 62 / 78 / 90.</p>
+<p>Pip fixed the fiction anchors this session: <strong>2017 start; ~2027 early-competent loss, 2033 decent, 2037 hard, 2040 ~ the 1% run.</strong> Wall-clock ruling: a decent run is a Civ/X-com-campaign 6--8 hours (Pip: "60% 6--8 hours, 30% evening, 10% other"). Grain arithmetic against those anchors: week ~ 500+ turns to an early loss (dead); month ~ 114 / 186 / 234 / 270 turns; quarter ~ 38 / 62 / 78 / 90.</p>
 <h2>Decision</h2>
 <ol>
-<li><strong>The turn is a month (decision cadence — a plan LAYER over day-grain sim ticks, not a re-grain; see clarification below).</strong> Fixed grain, v1. Plan phase: allocate staff and founder hours, queue strategic actions, explicitly set reserve (slack). <em>Implementation clarification (2026-07-14, PR #636):</em> "the turn is a month" means the <strong>decision cadence</strong> — implemented as a plan <strong>layer</strong> over day-grain simulation ticks, not a literal re-grain of the sim step. Point 2 already requires this (days remain "sim substrate, calendar, animation, score resolution"), and the coarse-hands/ fine-scoreboard principle depends on day-grain scoring surviving. Recorded because the headline wording was misread as a hard re-grain during L1 build.</li>
-<li><strong>The day is demoted to resolution tick</strong> — sim substrate, calendar, animation, score resolution. <strong>Guard rule: no mechanic may hang a routine decision on the day tick.</strong> Days are for physics and comedy.</li>
-<li><strong>Two decision speeds</strong> (MtG taxonomy, none of its machinery): offers a costed menu: <strong>HANDLE from reserve</strong> (painless — what insurance was for) · <strong>HANDLE by cannibalizing</strong> (delay/kill planned WIP) · <strong>DEFER</strong> (mints a Liability Ledger entry with named terms) · <strong>IGNORE</strong> (stated immediate consequence at list price). Defer/ignore pricing is the ledger beat's to detail (ADR-0010, this workshop).
+<li><strong>The turn is a month (decision cadence -- a plan LAYER over day-grain sim ticks, not a re-grain; see clarification below).</strong> Fixed grain, v1. Plan phase: allocate staff and founder hours, queue strategic actions, explicitly set reserve (slack). <em>Implementation clarification (2026-07-14, PR #636):</em> "the turn is a month" means the <strong>decision cadence</strong> -- implemented as a plan <strong>layer</strong> over day-grain simulation ticks, not a literal re-grain of the sim step. Point 2 already requires this (days remain "sim substrate, calendar, animation, score resolution"), and the coarse-hands/ fine-scoreboard principle depends on day-grain scoring surviving. Recorded because the headline wording was misread as a hard re-grain during L1 build.</li>
+<li><strong>The day is demoted to resolution tick</strong> -- sim substrate, calendar, animation, score resolution. <strong>Guard rule: no mechanic may hang a routine decision on the day tick.</strong> Days are for physics and comedy.</li>
+<li><strong>Two decision speeds</strong> (MtG taxonomy, none of its machinery): offers a costed menu: <strong>HANDLE from reserve</strong> (painless -- what insurance was for) - <strong>HANDLE by cannibalizing</strong> (delay/kill planned WIP) - <strong>DEFER</strong> (mints a Liability Ledger entry with named terms) - <strong>IGNORE</strong> (stated immediate consequence at list price). Defer/ignore pricing is the ledger beat's to detail (ADR-0010, this workshop).
 <ul>
-<li><em>Plan speed</em> ("sorcery") — only castable at the month boundary.</li>
-<li><em>Response windows</em> ("instant") — an event fires mid-month and, if a window opens,</li>
+<li><em>Plan speed</em> ("sorcery") -- only castable at the month boundary.</li>
+<li><em>Response windows</em> ("instant") -- an event fires mid-month and, if a window opens,</li>
 </ul></li>
 <li><strong>Reserve is crisp.</strong> Unspent slack evaporates at month end. No banking ever (Pip: <em>"I don't think we can let players bank time"</em>). Overcommitting is a legal gamble.</li>
-<li><strong>Strategic actions have durations.</strong> Nothing strategic resolves instantaneously; effects land mid-period or at the month review (fundraising is a campaign, hiring is a search → offer-interrupt → onboarding drag).</li>
-<li><strong>The badge is the date.</strong> Public score = the exact calendar day the run died ("I made it to March 2034"); internals unchanged — lexicographic (days survived, doom-integral) per ADR-0002. Ladder texture Pip named: players overtake each other <em>by days</em> while decisions lock in <em>months</em> — coarse hands, fine scoreboard.</li>
+<li><strong>Strategic actions have durations.</strong> Nothing strategic resolves instantaneously; effects land mid-period or at the month review (fundraising is a campaign, hiring is a search -&gt; offer-interrupt -&gt; onboarding drag).</li>
+<li><strong>The badge is the date.</strong> Public score = the exact calendar day the run died ("I made it to March 2034"); internals unchanged -- lexicographic (days survived, doom-integral) per ADR-0002. Ladder texture Pip named: players overtake each other <em>by days</em> while decisions lock in <em>months</em> -- coarse hands, fine scoreboard.</li>
 </ol>
 <h2>Beacons served / violated</h2>
 <ul>
-<li><strong>Rams #10 (as little design as possible):</strong> one cadence ruling folds the loan-term absurdity, salary cadence, event pacing, and banking (deleted) — and the response menu reuses the ledger as its payment rail instead of adding a system.</li>
+<li><strong>Rams #10 (as little design as possible):</strong> one cadence ruling folds the loan-term absurdity, salary cadence, event pacing, and banking (deleted) -- and the response menu reuses the ledger as its payment rail instead of adding a system.</li>
 <li><strong>Rams #6 (honest):</strong> durations match fiction; a muted channel's events resolve honestly at list price; the insane 25%/turn loan becomes a <em>nameable</em> desperation tier at month denomination instead of a bug.</li>
-<li><strong>MaRo Interaction:</strong> the reserve gamble makes the plan and the event stream interlock. (Does <em>not</em> by itself fix the dominant-line finding — that's payoffs, beat 2.)</li>
+<li><strong>MaRo Interaction:</strong> the reserve gamble makes the plan and the event stream interlock. (Does <em>not</em> by itself fix the dominant-line finding -- that's payoffs, beat 2.)</li>
 </ul>
 <h2>Interaction contract</h2>
-<p>Reads/writes ≥2 existing systems: <strong>calendar/game_state</strong> (month boundary, day tick), <strong>Liability Ledger</strong> (DEFER intake — the flagship gains an intake valve every run hits), <strong>SA channels</strong> (window gating: SA buys response windows, ADR-0004 cashed out; muting a channel = auto-resolve without a window, priced), <strong>replay artifact</strong> (response records), <strong>exploit-finder</strong> (policies become plan-policy × response-policy), <strong>payroll/loans</strong> (re-denominated monthly).</p>
+<p>Reads/writes &gt;=2 existing systems: <strong>calendar/game_state</strong> (month boundary, day tick), <strong>Liability Ledger</strong> (DEFER intake -- the flagship gains an intake valve every run hits), <strong>SA channels</strong> (window gating: SA buys response windows, ADR-0004 cashed out; muting a channel = auto-resolve without a window, priced), <strong>replay artifact</strong> (response records), <strong>exploit-finder</strong> (policies become plan-policy x response-policy), <strong>payroll/loans</strong> (re-denominated monthly).</p>
 <h2>Rejected alternatives</h2>
 <ul>
-<li><strong>Week (the original intent):</strong> dead against the fiction window — ~500 turns to an early loss can't carry fast replays or badge legibility.</li>
-<li><strong>Quarter:</strong> strong candidate (evening-length runs; native quarterly-report/runway fiction; turn numbers matching the old badge intuitions). Lost to Pip's wall-clock preference (6–8 hr campaigns) and early-game texture. <strong>Revisit trigger:</strong> month-grain playtests showing decent runs well over ~8 hr, or empty/repetitive mid-run months.</li>
-<li><strong>Variable/coarsening cadence</strong> (month → quarter as the org scales): honest fit to the delegation fantasy (<em>"They can't go to all these weekly stand-ups, after all!"</em>) — parked until fixed grain demonstrably fails in playtest (Rams #10 discipline).</li>
-<li><strong>Soft reserve fallback</strong> (idle time does low-efficiency generic work): rejected v1 — crisp evaporation keeps the commitment-loss legible.</li>
+<li><strong>Week (the original intent):</strong> dead against the fiction window -- ~500 turns to an early loss can't carry fast replays or badge legibility.</li>
+<li><strong>Quarter:</strong> strong candidate (evening-length runs; native quarterly-report/runway fiction; turn numbers matching the old badge intuitions). Lost to Pip's wall-clock preference (6--8 hr campaigns) and early-game texture. <strong>Revisit trigger:</strong> month-grain playtests showing decent runs well over ~8 hr, or empty/repetitive mid-run months.</li>
+<li><strong>Variable/coarsening cadence</strong> (month -&gt; quarter as the org scales): honest fit to the delegation fantasy (<em>"They can't go to all these weekly stand-ups, after all!"</em>) -- parked until fixed grain demonstrably fails in playtest (Rams #10 discipline).</li>
+<li><strong>Soft reserve fallback</strong> (idle time does low-efficiency generic work): rejected v1 -- crisp evaporation keeps the commitment-loss legible.</li>
 </ul>
 <h2>Consequences / open questions</h2>
 <ul>
-<li><strong>Re-denomination pass:</strong> salaries → monthly payroll; loans → %/month with cost-of-debt as a function (org type / hype / reputation — merges with the DEFER pricing engine, agenda 3+4); event density per month; <code>review_period_weeks</code> conversion.</li>
+<li><strong>Re-denomination pass:</strong> salaries -&gt; monthly payroll; loans -&gt; %/month with cost-of-debt as a function (org type / hype / reputation -- merges with the DEFER pricing engine, agenda 3+4); event density per month; <code>review_period_weeks</code> conversion.</li>
 <li><strong>Replay schema bump:</strong> record <code>(event_id, window, choice, payment_source)</code> per response (ADR-0001/ADR-0006 artifact versioning; adjacent to DQ-6).</li>
-<li><strong>Exploit-finder rework:</strong> bots need plan-level and response-level policies — real work, and it upgrades the instrument (next sweep question: which <em>response</em> policy dominates?).</li>
+<li><strong>Exploit-finder rework:</strong> bots need plan-level and response-level policies -- real work, and it upgrades the instrument (next sweep question: which <em>response</em> policy dominates?).</li>
 <li><strong>UI:</strong> day-tick playback needs speed control + auto-pause-on-window; the month review screen is the natural home for world-state progression display (Pip's playtest note: progression feel is weak).</li>
-<li><strong>Risk (~40%):</strong> late-game dead air if interrupt density doesn't scale with era — expect a per-era density tuning pass.</li>
-<li><strong>Partially closes ADR-0008's deliberately-open wall-clock item:</strong> decent run 6–8 hr; consistent with its fixed constraints (deep-run tail "several hundred turns" ≈ 270 months to 2040; a noob death ~2 fiction-years ≈ 24 turns still costs well under an hour).</li>
-<li><strong>Save/fork/divergence:</strong> Pip is open ("I don't see strong reasons why we shouldn't"); legal under ADR-0006's verification law (a legal replay is a legal run however produced). Parked to backlog — it's ladder <em>norms</em>, not rules.</li>
+<li><strong>Risk (~40%):</strong> late-game dead air if interrupt density doesn't scale with era -- expect a per-era density tuning pass.</li>
+<li><strong>Partially closes ADR-0008's deliberately-open wall-clock item:</strong> decent run 6--8 hr; consistent with its fixed constraints (deep-run tail "several hundred turns" ~ 270 months to 2040; a noob death ~2 fiction-years ~ 24 turns still costs well under an hour).</li>
+<li><strong>Save/fork/divergence:</strong> Pip is open ("I don't see strong reasons why we shouldn't"); legal under ADR-0006's verification law (a legal replay is a legal run however produced). Parked to backlog -- it's ladder <em>norms</em>, not rules.</li>
 </ul>
 	</main>
 	<footer>

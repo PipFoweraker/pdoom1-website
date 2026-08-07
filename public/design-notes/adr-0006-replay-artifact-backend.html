@@ -3,11 +3,11 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ADR-0006 — The replay string is the canonical run artifact; backend wiring order | p(Doom)1 Design Notes</title>
+	<title>ADR-0006 -- The replay string is the canonical run artifact; backend wiring order | p(Doom)1 Design Notes</title>
 	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0006-replay-artifact-backend.html" />
-	<meta name="description" content="ADR-0006 — The replay string is the canonical run artifact; backend wiring order" />
-	<meta property="og:title" content="ADR-0006 — The replay string is the canonical run artifact; backend wiring order | p(Doom)1 Design Notes" />
-	<meta property="og:description" content="ADR-0006 — The replay string is the canonical run artifact; backend wiring order" />
+	<meta name="description" content="ADR-0006 -- The replay string is the canonical run artifact; backend wiring order" />
+	<meta property="og:title" content="ADR-0006 -- The replay string is the canonical run artifact; backend wiring order | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="ADR-0006 -- The replay string is the canonical run artifact; backend wiring order" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0006-replay-artifact-backend.html" />
 
@@ -96,18 +96,19 @@
 		</nav>
 	</header>
 	<main>
-		<h1>ADR-0006 — The replay string is the canonical run artifact; backend wiring order</h1>
+		<h1>ADR-0006 -- The replay string is the canonical run artifact; backend wiring order</h1>
 		<div class="meta"><strong>Status:</strong> ACCEPTED &middot; <strong>Decided:</strong> 2026-07-04</div>
 <div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
 <ul>
 <li><strong>Status:</strong> ACCEPTED</li>
 <li><strong>Date:</strong> 2026-07-04</li>
+<li><strong>Summary:</strong> The seeded-RNG + hash-chain replay backend (already ~80% built) is confirmed as the canonical run artifact, with a wiring order for the rest.</li>
 </ul>
 <h2>Context (what archaeology found)</h2>
-<p>The backend is ~80% built, not aspirational. Survived the Godot migration: seeded deterministic RNG through <code>godot/scripts/core/game_state.gd</code>; a fully implemented cumulative SHA-256 hash chain in <code>godot/autoload/verification_tracker.gd</code> (partially wired — <code>record_rng_outcome</code> live, <code>record_action</code> tests-only, final hash printed at game-over "for future leaderboard integration"); local per-seed JSON leaderboard (<code>godot/scripts/leaderboard.gd</code>); headless <code>baseline_simulator.gd</code>. In <code>pdoom1-website</code>: <code>api-server-v2.py</code> with <code>POST /api/scores/submit</code>, per-seed boards, JWT, Postgres migrations incl. verification-hash schema, plausibility checks — with static per-seed JSON boards on Netlify as the actually-deployed artifact. <code>pdoom1-webclient</code> has a TypeScript port of the tracker and an empty <code>src/api/</code>.</p>
-<p><strong>The correction:</strong> the "run any input string through a verifier" memory describes the full input-string replay design (<code>docs/REPLAY_VERIFICATION_SYSTEM.md</code>) — the one component never built in either era. A hash chain proves the client computed a self-consistent transcript; it does <strong>not</strong> prove the transcript describes a legal game. Only re-simulation from inputs verifies.</p>
+<p>The backend is ~80% built, not aspirational. Survived the Godot migration: seeded deterministic RNG through <code>godot/scripts/core/game_state.gd</code>; a fully implemented cumulative SHA-256 hash chain in <code>godot/autoload/verification_tracker.gd</code> (partially wired -- <code>record_rng_outcome</code> live, <code>record_action</code> tests-only, final hash printed at game-over "for future leaderboard integration"); local per-seed JSON leaderboard (<code>godot/scripts/leaderboard.gd</code>); headless <code>baseline_simulator.gd</code>. In <code>pdoom1-website</code>: <code>api-server-v2.py</code> with <code>POST /api/scores/submit</code>, per-seed boards, JWT, Postgres migrations incl. verification-hash schema, plausibility checks -- with static per-seed JSON boards on Netlify as the actually-deployed artifact. <code>pdoom1-webclient</code> has a TypeScript port of the tracker and an empty <code>src/api/</code>.</p>
+<p><strong>The correction:</strong> the "run any input string through a verifier" memory describes the full input-string replay design (<code>docs/REPLAY_VERIFICATION_SYSTEM.md</code>) -- the one component never built in either era. A hash chain proves the client computed a self-consistent transcript; it does <strong>not</strong> prove the transcript describes a legal game. Only re-simulation from inputs verifies.</p>
 <h2>Decision</h2>
-<p><strong>The input-string replay is the canonical run artifact — anti-cheat, share format, and bug-repro format in one object.</strong> Rationale beyond anti-cheat: the community philosophy (<em>"only the vastness of the design space will be what stops a determined player just brute-forcing their way to a high score… although I would laud the initiative!"</em>) makes verification the only law — coherent only if runs are replayable. And the "best loss" (inventing an opening the ladder adopts) requires openings to be <strong>shareable to be adoptable</strong>: the replay string is chess PGN — paste-able, forum-postable, verifiable text. The pygame-era compact command-string format (<code>docs/technical/ COMMAND_STRING_CONTROLLER.md</code>) is the starting point for serialization.</p>
+<p><strong>The input-string replay is the canonical run artifact -- anti-cheat, share format, and bug-repro format in one object.</strong> Rationale beyond anti-cheat: the community philosophy (<em>"only the vastness of the design space will be what stops a determined player just brute-forcing their way to a high score... although I would laud the initiative!"</em>) makes verification the only law -- coherent only if runs are replayable. And the "best loss" (inventing an opening the ladder adopts) requires openings to be <strong>shareable to be adoptable</strong>: the replay string is chess PGN -- paste-able, forum-postable, verifiable text. The pygame-era compact command-string format (<code>docs/technical/ COMMAND_STRING_CONTROLLER.md</code>) is the starting point for serialization.</p>
 <p><strong>Two-tier verification:</strong> hash chain stays as the cheap fingerprint for casual submission; headless re-simulation (Godot, as <code>baseline_simulator.gd</code> proves viable) backs disputed and top scores. For the ~30-nerd community, static-JSON boards plus a submit path are sufficient; <strong>the Postgres apparatus stays parked.</strong></p>
 <h2>Wiring order (implementation lane)</h2>
 <ol>
