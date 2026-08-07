@@ -41,6 +41,12 @@ travel.
 
 ## 1. The reframe: post the process, not the product
 
+> **RULED BY PIP, 2026-08-07 (~00:15 Hobart, 08-08): "I like pair plus verdict."**
+> The format below is decided, not proposed. The four slots in §3, the cadence in
+> §2 and the gates in §4 are still open for review. Recorded here at the moment of
+> the decision because a ruling that does not reach the moment of work gets
+> re-derived, usually worse (`coordination#15`).
+
 Pip's own summary of the batch, before the transcript was even read, was
 **"half are magnificent, half are terrible."** That sentence is a better post
 than any single image in it.
