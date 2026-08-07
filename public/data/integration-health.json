@@ -1,10 +1,10 @@
 {
-  "generated": "2026-08-06T07:00:00.610597+00:00",
+  "generated": "2026-08-07T06:28:39.711436+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 3,
-    "ok": 32
+    "warn": 2,
+    "ok": 33
   },
   "checks": [
     {
@@ -115,22 +115,22 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 6.7 days ago"
+      "detail": "generated 0.7 days ago"
     },
     {
       "name": "league:current_week",
       "status": "OK",
-      "detail": "week 2026_W32 current"
+      "detail": "week 2026_W33 current"
     },
     {
       "name": "league:version_drift",
-      "status": "WARN",
-      "detail": "weekly league game_version=v0.13.1 but deployed game=v0.13.2 -- a v0.13.2 client's scores cannot land on a v0.13.1 board"
+      "status": "OK",
+      "detail": "game_version v0.13.2 matches deployed"
     },
     {
       "name": "league:seed",
       "status": "OK",
-      "detail": "weekly seed weekly_2026_W32_5685561a"
+      "detail": "weekly seed weekly-2026-w31"
     },
     {
       "name": "league:integrity",
@@ -150,12 +150,12 @@
     {
       "name": "board:status_integrity",
       "status": "OK",
-      "detail": "data_status=live consistent with 5 entries"
+      "detail": "data_status=live consistent with 6 entries"
     },
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 6.2h ago"
+      "detail": "live API checked 5.0h ago"
     },
     {
       "name": "board:archived_anomaly",
@@ -165,12 +165,12 @@
     {
       "name": "board:liveness",
       "status": "OK",
-      "detail": "deployed board (weekly-2026-w31, L3) holds 5 entries"
+      "detail": "deployed board (weekly-2026-w31, L3) holds 6 entries"
     },
     {
       "name": "board:publish",
       "status": "OK",
-      "detail": "what we serve matches what the probe saw (5 entries on L3)"
+      "detail": "what we serve matches what the probe saw (6 entries on L3)"
     },
     {
       "name": "seed_leaderboards:parse",
