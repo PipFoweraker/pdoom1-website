@@ -397,11 +397,27 @@ def main():
     archive_absent = not archive
 
     # ---- verdict ------------------------------------------------------------
-    # SUPERSEDED FIRST, deliberately. When the published board is a whole epoch behind,
-    # every board on the current epoch looks orphaned, so the orphan branch would fire a
-    # loud, exit-1 alarm about a condition whose real cause is "the publisher has not run
-    # yet". Exit 2, like epoch-unknown: this is an admission, not an incident.
-    if superseded:
+    # UNREACHABLE FIRST. Every branch below reasons about boards; if not one probe
+    # succeeded we have observed nothing, and a verdict derived purely from local files
+    # would be a confident claim built without the thing it claims to be about -- the
+    # exact defect #293 exists to fix. In particular `superseded-publication` tells the
+    # reader to run the publisher, and the publisher cannot run when the API is down, so
+    # emitting it here would hand out advice that cannot work.
+    # `results and` matters: with an empty probe set, `errors == len(results)` is 0 == 0.
+    if results and errors == len(results):
+        verdict, exit_code = "unreachable", 2
+        print()
+        print("  UNKNOWN: every probe failed. NOT evidence that the board is empty --")
+        print("  evidence that we cannot tell.")
+        if superseded:
+            print("  (The published epoch and the current epoch also disagree. That is")
+            print("   true but unactionable right now -- the publisher needs the API too.)")
+    # SUPERSEDED NEXT, deliberately ahead of the orphan branch. When the published board
+    # is a whole epoch behind, every board on the current epoch looks orphaned, so the
+    # orphan branch would fire a loud, exit-1 alarm about a condition whose real cause is
+    # "the publisher has not run yet". Exit 2, like epoch-unknown: an admission, not an
+    # incident.
+    elif superseded:
         verdict, exit_code = "superseded-publication", 2
         print()
         print("  SUPERSEDED PUBLICATION. The board this site published is from an epoch")
@@ -466,11 +482,6 @@ def main():
         print()
         print("  OK: deployed board (%s, %s) holds %d entries."
               % (site_seed, site_epoch, deployed_board["entries"]))
-    elif errors == len(results):
-        verdict, exit_code = "unreachable", 2
-        print()
-        print("  UNKNOWN: every probe failed. NOT evidence that the board is empty --")
-        print("  evidence that we cannot tell.")
     else:
         verdict, exit_code = "genuinely-empty", 0
         print()

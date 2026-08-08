@@ -78,12 +78,16 @@ class Sandbox:
     exercise the legacy-file path rather than a synthesised approximation of it.
     """
 
-    def __init__(self, published, current_epoch, boards, seeds=None, versions=None):
+    def __init__(self, published, current_epoch, boards, seeds=None, versions=None,
+                 all_unreachable=False):
         self.published = published
         self.current_epoch = current_epoch
         self.boards = boards
         self.seeds = seeds
         self.versions = versions
+        # Forces every probe to fail, the way a real API outage does. Needed because a
+        # verdict derived only from local files must not outrank "we observed nothing".
+        self.all_unreachable = all_unreachable
 
     def __enter__(self):
         self.tmp = Path(tempfile.mkdtemp())
@@ -121,7 +125,13 @@ class Sandbox:
         versions = (self.versions if self.versions is not None
                     else sorted({v for _, v in boards}))
 
+        unreachable = self.all_unreachable
+
         def probe(seed, version):
+            if unreachable:
+                return {"seed": seed, "version": version,
+                        "key_shape": liveness.key_shape(version),
+                        "error": "stubbed outage", "entries": 0}
             rows = boards.get((seed, version)) or []
             return {"seed": seed, "version": version, "key_shape": liveness.key_shape(version),
                     "entries": len(rows), "players": len({r["player_name"] for r in rows}),
@@ -298,6 +308,26 @@ with Sandbox(published={"seed": "weekly-2026-w32"},  # no ladder_epoch key at al
           "the source string says the pair was composed and from which two files")
     check(d["verdict"] != "superseded-publication",
           "a missing field is not a disagreement, so it must not fire superseded")
+
+print("\n6. Every probe fails AND the epochs disagree -> unreachable wins over superseded")
+# Both statements are true, and the verdict must be the one derived from OBSERVATION.
+# `superseded-publication` tells the reader to run the publisher; the publisher needs the
+# same API that is down, so emitting it here hands out advice that cannot work. A verdict
+# built only from local files must never outrank "we saw nothing" -- that is #293's own
+# defect wearing different clothes.
+with Sandbox(published={"seed": "weekly-2026-w31", "ladder_epoch": "L3"},
+             current_epoch="L4",
+             boards={("weekly-2026-w32", "L4"): [ROW] * 9},
+             all_unreachable=True):
+    code, out = run()
+    d = record()
+    check(d["verdict"] == "unreachable",
+          f"verdict is unreachable, not superseded-publication (got {d['verdict']!r})")
+    check(code == 2, f"exit 2 -- an admission, not an incident (got {code})")
+    check("every probe failed" in out, "says plainly that nothing was observed")
+    check("disagree" in out, "still MENTIONS the epoch disagreement rather than hiding it")
+    check((d.get("new_orphans") or {}).get("entries_total", 0) == 0,
+          "no orphan claim is made from a run that observed nothing")
 
 print()
 if failures:
