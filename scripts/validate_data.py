@@ -333,10 +333,28 @@ def check_published_board():
             f"excluded by design)")
 
     # Self-consistency: an empty board must not advertise itself as live.
+    #
+    # The vocabulary is live | live-empty | pre-launch | legacy, shared with
+    # ingest_scores.py. "live-empty" was added 2026-08-08 for the state an epoch fork
+    # creates and the other three could not describe honestly: the board key IS the
+    # current one, the site IS publishing the board players submit to, and it genuinely
+    # holds no entries yet. Calling that "live" is the lie this FAIL exists to catch;
+    # calling it "pre-launch" is a different lie ("the board is not on yet" when it is).
+    # It is a narrow claim -- "current key, no rows" -- and so it is checked in BOTH
+    # directions, because a status that can never fail says nothing.
     if status == "live" and n_entries == 0:
         add("board:status_integrity", FAIL,
             "data_status='live' but the board holds 0 entries -- the page would present "
             "an empty ranking as real competitive results")
+    elif status == "live-empty" and n_entries > 0:
+        add("board:status_integrity", FAIL,
+            f"data_status='live-empty' but the board holds {n_entries} entries -- the page "
+            f"would tell a visitor nobody has scored while showing scores, and would hide "
+            f"the toolbar for a board that has rows to sort. Publish it as 'live'.")
+    elif status == "live-empty":
+        add("board:status_integrity", OK,
+            "data_status=live-empty: current board key, no entries yet (an epoch fork or a "
+            "seed roll opens a real board empty). Not presented as competitive results.")
     else:
         add("board:status_integrity", OK, f"data_status={status} consistent with {n_entries} entries")
 
