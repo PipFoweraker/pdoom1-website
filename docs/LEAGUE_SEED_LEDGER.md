@@ -122,6 +122,33 @@ it to players**: `public/leaderboard/index.html` only offers a seed whose record
 says `seed_provenance.blessed === true`, and the boundary test fails if the
 probable string is hardcoded anywhere in `scripts/` or `public/data/`.
 
+### L3 closed, L4 opened — recorded 2026-08-08 (NOT a blessing)
+
+**This section records a fact; it does not bless anything.** The L3 row above is still
+unfilled and only a human can fill it. Written here because the ladder moved while that
+row was open, and a ledger silent about a fork is worse than one with a gap in it.
+
+- pdoom1 **v0.14.0** forked the ladder **L3 → L4** on 2026-08-07. Authority is the
+  v0.14.0 **git tag message** — *"Ladder L4. Featured seed weekly-2026-w32. Board key
+  (weekly-2026-w32, L4)."* — corroborated by that release's `release_manifest.json`
+  carrying `"ladder_version": "4"`. Pip has blessed the key `(weekly-2026-w32, L4)`.
+- **Positively verified 2026-08-08** by a read-only `GET`: `(weekly-2026-w32, L4)` held
+  **9 entries** from clients stamped `v0.14.0` and `v0.14.1`. That is the positive check
+  this ledger demands — an `ok:true` alone proves nothing, since every wrong key returns
+  it. Nothing was POSTed to obtain this.
+- The **L3 board `(weekly-2026-w31, L3)` is closed history** and holds 6 real entries. It
+  is captured at `public/leaderboard/data/preserved/2026-08-08-l3-epoch-close/`, which is
+  what stops `check-board-liveness.py` reading it as a new orphan once the site publishes
+  L4. **Do not re-stamp those entries onto L4** — they were played under different rules.
+- `public/leaderboard/data/board-probe-targets.json` now declares `current_ladder_epoch:
+  "L4"` with that source, and pins `weekly-2026-w32` under `extra_seeds`.
+
+**Still owed by a human:** the L3 row above (seed `weekly-2026-w31`, blessed date, by),
+an L4 row, `regularised_from` / `seed_status` in `public/data/ladder-epochs.json`, and the
+Commissioner's ruling on the L3→L4 cut. Until those exist,
+`public/leaderboard/index.html` will still refuse to *offer* a seed to a player, because
+nothing sets `seed_provenance.blessed: true`.
+
 ## Blessings log
 
 The ceremony, for the record — including the one that missed, because the log is

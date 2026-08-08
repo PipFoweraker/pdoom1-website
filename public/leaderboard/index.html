@@ -853,6 +853,15 @@
       // Pre-launch the board is empty, so the search/sort/filter toolbar only offers
       // a visitor ways to filter nothing. Hide it and let the banner carry the whole
       // message; it comes back automatically once real scores publish.
+      //
+      // 'live-empty' reaches this line for exactly the same reason, and it is a
+      // DIFFERENT claim from the other three: the board key is the current one, this
+      // page IS publishing the board players submit to, and it holds no rows yet --
+      // which is what a ladder fork or a seed roll produces on day one. It is not
+      // 'live' (validate_data.py FAILS live+0 rows, because an empty ranking presented
+      // as live reads as real competitive results), and it is not 'pre-launch' (the
+      // board is on). Written only by publish-live-board.py, and only when the key it
+      // fetched differs from the key this page was already serving.
       if (controls) controls.style.display = 'none';
 
       // This base message still names no version -- applyBoardHonesty() below appends the
@@ -864,7 +873,9 @@
       // ships". That became false: submission HAS shipped and scores are being recorded.
       // What is missing is this page's ability to publish them, which is a different claim.
       banner.innerHTML =
-        (status === 'pre-launch')
+        (status === 'live-empty')
+          ? `&#9432; <strong>This board is open and has no scores on it yet.</strong> It is the board the current build submits to &mdash; a new ladder epoch or a new seed starts empty, so this is a board waiting for its first finished run, not a board that has been turned off. The first score published here will appear below.`
+        : (status === 'pre-launch')
           ? `&#9432; <strong>This page is not showing any scores.</strong> That does not by itself mean nobody has played &mdash; see the check below.`
         : (status === 'unknown')
           ? `&#9432; <strong>This board does not say whether it is live.</strong> It carries no status, so nothing on this page should be read as confirmed competitive results.`

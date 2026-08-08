@@ -5,13 +5,16 @@
 WHY THIS EXISTS
 ---------------
 publish-live-board.py was written and shipped on 2026-07-30 with ZERO tests, and it is
-what stands between players and a visible league board. Its docstring claims four safety
+what stands between players and a visible league board. Its docstring claims these safety
 properties:
 
   1. refuses and writes nothing when the ladder epoch is unknown
   2. refuses and writes nothing when the score API cannot be read
-  3. NEVER overwrites a good board with an empty one
+  3. never overwrites a board with an empty one on the SAME key -- but DOES publish an
+     empty board on a NEW key, because an epoch fork opens a real board with no rows
   4. never publishes a board from a different epoch
+  5. never guesses which empty board is real: with zero rows every wrong key looks
+     exactly like the right one, so an undecidable choice is refused, not made
 
 Those were assertions in prose. CLAUDE.md's testing discipline says a claimed safety
 property needs a FORCED failure, because a docstring is documentation and not evidence.
@@ -21,6 +24,14 @@ The property that matters most is (3). A crash is survivable and loud. Silently 
 a board that holds real player scores with an empty one -- on a transient network blip --
 destroys the record and looks exactly like "nobody is playing", which is the original bug
 this whole subsystem exists to prevent.
+
+**Property 3 changed shape on 2026-08-08 and this docstring changed with it.** It used to
+read "NEVER overwrites a good board with an empty one", full stop, and test 3 asserted
+exactly that. The L3 -> L4 ladder fork showed the blanket rule was itself a way to lie: the
+old board closes, the new board opens with nothing on it, and refusing to publish the empty
+new board leaves the site serving a CLOSED epoch's standings as if they were this week's.
+The distinction that carries the safety property is the KEY, not the row count -- so the
+one test became two, and the "same key" half is still the one that must never regress.
 
 HOW IT ISOLATES
 ---------------
@@ -78,9 +89,13 @@ GOOD_BOARD = {
 class Sandbox:
     """Redirect the module's writes into a temp dir and stub the network."""
 
-    def __init__(self, epoch="L3", boards=None, api_readable=True, seed_board=True):
+    def __init__(self, epoch="L3", boards=None, api_readable=True, seed_board=True,
+                 pinned=()):
         self.epoch, self.boards, self.api_readable = epoch, boards or {}, api_readable
         self.seed_board = seed_board
+        # Seeds pinned WITH a source in board-probe-targets.json. The module reads these
+        # only to narrow an otherwise undecidable choice between empty boards.
+        self.pinned = list(pinned)
 
     def __enter__(self):
         self.tmp = Path(tempfile.mkdtemp())
@@ -100,7 +115,8 @@ class Sandbox:
         pub.TARGETS_JSON.write_text(json.dumps({
             "current_ladder_epoch": (
                 {"value": self.epoch, "source": "test"} if self.epoch
-                else {"value": None, "source": None})
+                else {"value": None, "source": None}),
+            "extra_seeds": [{"value": s, "source": "test"} for s in self.pinned],
         }), encoding="utf-8")
 
         boards, readable = self.boards, self.api_readable
@@ -178,11 +194,57 @@ with Sandbox(boards={("weekly-2026-w30", "L3"): {"rows": ROWS, "last_entry": "x"
     check(board_on_disk() == GOOD_BOARD,
           "THE BIG ONE: a transient outage does not replace real scores with nothing")
 
-print("\n3. Epoch known but every board empty -> still does not publish an empty board")
-with Sandbox(boards={}):
+print("\n3a. Empty board on the SAME key -> REFUSES (this is the API losing rows)")
+# The published board is (weekly-2026-w30, L3) with 3 real entries. The epoch has not
+# moved and the API now says that exact key is empty. Nothing about the league changed,
+# so the only honest reading is that the data went missing -- publish it and the record
+# is gone. This is the half of old-test-3 that must never regress.
+with Sandbox(epoch="L3", boards={}):
+    code, out = run()
+    check(code == 1, f"exit 1, not 3 -- 'nothing publishable' is not 'cannot read' (got {code})")
+    check(board_on_disk() == GOOD_BOARD,
+          "THE OTHER BIG ONE: real scores are not replaced by an empty board on the same key")
+    check("SAME key" in out or "same key" in out.lower(), "names the same-key refusal")
+    check(not pub.PUBLISHED_JSON.exists(), "wrote no published-board.json")
+
+print("\n3b. Empty board on a NEW key -> PUBLISHES it, as live-empty")
+# The L3 -> L4 fork. The published board (weekly-2026-w30, L3) is now closed history; the
+# board players reach is on L4 and nobody has finished a run on it. Continuing to serve
+# the L3 standings would present a closed epoch's results as this week's league.
+with Sandbox(epoch="L4", boards={}):
+    code, out = run()
+    d = board_on_disk()
+    check(code == 0, f"exit 0 -- an empty board on a new key IS publishable (got {code})")
+    check(d["meta"]["board_key"]["ladder_epoch"] == "L4", "published the NEW epoch")
+    check(d["entries"] == [], "published board is empty, as observed")
+    check(d["data_status"] == "live-empty",
+          f"status is live-empty, never 'live' with 0 rows (got {d['data_status']!r})")
+    check(d["meta"]["total_entries"] == 0 and d["meta"]["total_players"] == 0,
+          "counts say zero rather than carrying the old board's numbers forward")
+    p = json.loads(pub.PUBLISHED_JSON.read_text(encoding="utf-8"))
+    check(p["entries_at_publish"] == 0 and p["ladder_epoch"] == "L4",
+          "published-board.json records the fork key and an honest zero")
+
+print("\n3c. Several empty boards on the new epoch -> refuses to GUESS which is real")
+# With zero rows the API is no evidence at all: every wrong key answers ok:true+empty.
+# Choosing between them would be a guess wearing an observation's clothes.
+FORK_EMPTIES = {("weekly-2026-w32", "L4"): {"rows": [], "last_entry": None},
+                ("weekly-2026-w33", "L4"): {"rows": [], "last_entry": None}}
+with Sandbox(epoch="L4", boards=FORK_EMPTIES):
+    code, out = run()
+    check(code == 1, f"refuses when nothing distinguishes the empty boards (got {code})")
+    check(board_on_disk() == GOOD_BOARD, "good board untouched while the choice is undecidable")
+    check("REFUSING" in out, "says plainly that it is refusing")
+    check("weekly-2026-w32" in out and "weekly-2026-w33" in out,
+          "names the candidates so a human can pin the right one")
+
+# ...and a seed DECLARED with a source in board-probe-targets.json resolves it. The pin is
+# the human channel; it narrows the choice and never widens it.
+with Sandbox(epoch="L4", boards=FORK_EMPTIES, pinned=["weekly-2026-w32"]):
     code, _ = run()
-    check(code != 0, f"non-zero when there is nothing to publish (got {code})")
-    check(board_on_disk() == GOOD_BOARD, "good board preserved, not zeroed")
+    d = board_on_disk()
+    check(code == 0 and d["seed"] == "weekly-2026-w32",
+          "a sourced pin picks the fork board; an unsourced one could not (see derive_targets)")
 
 print("\n4. Cross-epoch: a BUSIER old-epoch board must never be published")
 with Sandbox(epoch="L3", boards={
