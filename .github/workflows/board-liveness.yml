@@ -57,6 +57,7 @@ on:
       - 'scripts/check-board-liveness.py'
       - 'scripts/publish-live-board.py'
       - 'scripts/test-publish-live-board.py'
+      - 'scripts/test-board-liveness-verdicts.py'
       - 'scripts/test-board-escaping.js'
       - 'scripts/test-board-honesty.js'
       - 'public/leaderboard/index.html'
@@ -73,6 +74,7 @@ on:
     paths:
       - 'scripts/publish-live-board.py'
       - 'scripts/test-publish-live-board.py'
+      - 'scripts/test-board-liveness-verdicts.py'
       - 'scripts/test-board-escaping.js'
       - 'scripts/test-board-honesty.js'
       - 'scripts/check-board-liveness.py'
@@ -134,6 +136,13 @@ jobs:
       - name: The publisher refuses rather than guesses
         run: python scripts/test-publish-live-board.py
 
+      # The probe must never pair a seed from one file with an epoch from another and
+      # present the result as a board key (#293), and the orphan alarm must not be
+      # disarmed by the new state that stops it firing falsely. Forces every verdict
+      # boundary offline -- no HTTP request, so it cannot touch the live score API.
+      - name: The probe names a disagreement instead of composing a board key
+        run: python scripts/test-board-liveness-verdicts.py
+
   probe:
     name: Probe the live score API
     # Never on a PR: it issues ~108 GETs against the live API and the job writes back
@@ -157,6 +166,64 @@ jobs:
         with:
           python-version: '3.11'
 
+      # PUBLISH FIRST, PROBE SECOND. This order is load-bearing -- do not "tidy" it back.
+      #
+      # The probe reads published-board.json to decide which board the site publishes;
+      # this step REWRITES that file. With the probe first it was always reading the
+      # PREVIOUS run's answer, and then pairing that stale seed with the current epoch
+      # from board-probe-targets.json -- a composed key that has never existed. On
+      # 2026-08-08 (run 31276415053) that produced `(weekly-2026-w31, L4)` and reported
+      # nine real, correctly-saved scores as orphaned; re-running the identical workflow
+      # minutes later, with no code and no data change, said `live`. Issue #293.
+      #
+      # It also removes a red that healed itself inside its own run. Every step reported
+      # success and the JOB failed on a verdict that this step had already resolved by
+      # the time anyone could look -- and a red square that is always gone when you get
+      # there is how a team learns that red means nothing.
+      #
+      # Safe to move: publish-live-board.py imports helpers from check-board-liveness.py
+      # but never reads board-liveness.json, so it has no dependency on the probe having
+      # run. It derives its own targets from the score API, the preserved captures and
+      # the data files.
+      #
+      # Publishing stays in THIS workflow rather than a second one. The probe and the
+      # publisher must agree about the board key; two workflows re-deriving it from the
+      # same API minutes apart could reach different answers, which is precisely the
+      # split-brain the board key cannot afford.
+      #
+      # It runs even when the last run found orphans -- publishing is how an orphan STOPS
+      # being one. The failure gate below still fires on the probe's verdict, so a genuine
+      # loss is still red.
+      - name: Publish the live board
+        id: publish
+        run: |
+          set +e
+          python scripts/publish-live-board.py | tee publish.log
+          code=$?
+          set -e
+          echo "publish exit code: $code"
+          # 0 published / 1 nothing publishable / 2 epoch unknown / 3 fetch failed.
+          # None of these are failures HERE: 2 and 3 mean the script correctly refused to
+          # write rather than guessing, and it leaves the last known-good file untouched.
+          # A refusal to publish is the safe outcome, so it must not go red and train
+          # anyone to ignore this job.
+          {
+            echo "## Board publish"
+            echo ""
+            echo '```'
+            cat publish.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::No artifact says which ladder epoch is current, so the board was NOT published. Populate current_ladder_epoch in public/leaderboard/data/board-probe-targets.json."
+          elif [ "$code" -eq 3 ]; then
+            echo "::warning::The score API could not be read. The previously published board is untouched -- not overwritten with an empty one."
+          fi
+
+      # PROBE SECOND, so it observes the POST-publish state -- see the block above. The
+      # verdict this step emits is therefore about the board the site publishes right now,
+      # not the one it published six hours ago, and a condition the publisher has already
+      # resolved can no longer fail this job.
       - name: Probe boards
         id: probe
         run: |
@@ -186,40 +253,6 @@ jobs:
             cat probe.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-
-      # Publishing is deliberately part of THIS workflow rather than a second one. The
-      # probe already fetched and classified every board; a separate publisher would
-      # re-derive the same board key from the same API minutes later and could reach a
-      # different answer, which is precisely the split-brain the board key cannot afford.
-      #
-      # It runs even when the probe found new orphans -- publishing is how an orphan STOPS
-      # being one. The failure gate below still fires on the probe's verdict, so a genuine
-      # loss is still red; it just gets fixed in the same run that reports it.
-      - name: Publish the live board
-        id: publish
-        run: |
-          set +e
-          python scripts/publish-live-board.py | tee publish.log
-          code=$?
-          set -e
-          echo "publish exit code: $code"
-          # 0 published / 1 nothing publishable / 2 epoch unknown / 3 fetch failed.
-          # None of these are failures HERE: 2 and 3 mean the script correctly refused to
-          # write rather than guessing, and it leaves the last known-good file untouched.
-          # A refusal to publish is the safe outcome, so it must not go red and train
-          # anyone to ignore this job.
-          {
-            echo "## Board publish"
-            echo ""
-            echo '```'
-            cat publish.log
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
-          if [ "$code" -eq 2 ]; then
-            echo "::warning::No artifact says which ladder epoch is current, so the board was NOT published. Populate current_ladder_epoch in public/leaderboard/data/board-probe-targets.json."
-          elif [ "$code" -eq 3 ]; then
-            echo "::warning::The score API could not be read. The previously published board is untouched -- not overwritten with an empty one."
-          fi
 
       - name: Commit the observation and the published board
         run: |
@@ -286,6 +319,14 @@ jobs:
               exit 1 ;;
             epoch-unknown)
               echo "::warning::No artifact publishes the current ladder epoch, so this site cannot confirm it publishes the board players submit to. Unknown, not a mismatch."
+              ;;
+            superseded-publication)
+              # Not red. The published board is from an older epoch, which means no orphan
+              # claim can be made -- every board on the current epoch would score as one.
+              # It is an admission, like epoch-unknown, and the publisher (which now runs
+              # BEFORE this step) is what resolves it. If it persists across runs the
+              # publisher is refusing, and publish.log in this job's summary says why.
+              echo "::warning::The published board is from a superseded ladder epoch, and the publisher did not move it forward in this run. Read the 'Board publish' section of this job summary for the refusal reason."
               ;;
             unreachable|unreadable)
               echo "::warning::Score API state could not be read. Unknown, not empty." ;;

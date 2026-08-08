@@ -294,7 +294,12 @@ def check_published_board():
     # differ, so that check would have gone WARN forever on correct data. A guard that
     # always fires is a guard nobody reads.
     live = load_json_or_none(PUBLIC / "leaderboard" / "data" / "board-liveness.json")
-    epoch = ((live or {}).get("board_key") or {}).get("ladder_epoch")
+    # `current_ladder_epoch` is the ladder the GAME is on now; `ladder_epoch` is the epoch
+    # of the board the site PUBLISHED. Before #293 the record carried only the latter name
+    # holding the former value, so the fallback keeps an older board-liveness.json readable
+    # rather than silently reporting "no artifact tells this site which epoch is current".
+    _bk = (live or {}).get("board_key") or {}
+    epoch = _bk.get("current_ladder_epoch") or _bk.get("ladder_epoch")
     shape = board_key_shape(board_ver)
 
     if not epoch:
@@ -423,6 +428,14 @@ def check_board_liveness():
             f"{n_new} entries on orphan board(s), but the anomaly archive is missing so "
             f"known history cannot be told from a new incident. Restore "
             f"public/leaderboard/data/preserved/ and re-run.")
+    elif verdict == "superseded-publication":
+        add("board:liveness", WARN,
+            f"the published board ({key.get('seed')}, {key.get('published_ladder_epoch')}) "
+            f"is from a SUPERSEDED epoch -- the current ladder epoch is "
+            f"{key.get('current_ladder_epoch')}. No orphan claim can be made while the two "
+            f"disagree, because every board on the current epoch would score as an orphan. "
+            f"Reported as unresolved, deliberately NOT as scores being lost. "
+            f"Fix: run python scripts/publish-live-board.py. Do not re-stamp anything.")
     elif verdict == "epoch-unknown":
         add("board:liveness", WARN,
             "no artifact tells this site which ladder epoch is current, so it cannot "
@@ -476,14 +489,21 @@ def check_board_liveness():
                 add("board:publish", WARN,
                     f"{detail}, but the probe is {age_h/24:.1f} days old so the difference "
                     f"may just be stale observation. Re-run check-board-liveness.py first.")
-        elif served_key.get("ladder_epoch") and served_key.get("ladder_epoch") != key.get("ladder_epoch"):
-            add("board:publish", FAIL,
-                f"we serve epoch {served_key.get('ladder_epoch')} while the live epoch is "
-                f"{key.get('ladder_epoch')} -- scores are being set on a board we do not show.")
         else:
-            add("board:publish", OK,
-                f"what we serve matches what the probe saw ({served_n} entries on "
-                f"{key.get('ladder_epoch')})")
+            # Against the CURRENT epoch, not the published one. key['ladder_epoch'] is the
+            # epoch of the board the site published, and leaderboard.json is written by the
+            # same publisher in the same run -- so comparing those two can only ever agree,
+            # which would make this check vacuous (#293). The live epoch is the ladder the
+            # game is on; an older record carries it under the old name.
+            cur_epoch = key.get("current_ladder_epoch") or key.get("ladder_epoch")
+            if served_key.get("ladder_epoch") and cur_epoch and served_key.get("ladder_epoch") != cur_epoch:
+                add("board:publish", FAIL,
+                    f"we serve epoch {served_key.get('ladder_epoch')} while the live epoch is "
+                    f"{cur_epoch} -- scores are being set on a board we do not show.")
+            else:
+                add("board:publish", OK,
+                    f"what we serve matches what the probe saw ({served_n} entries on "
+                    f"{key.get('ladder_epoch')})")
 
 
 def check_seed_leaderboards():

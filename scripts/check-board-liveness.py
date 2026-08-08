@@ -53,10 +53,26 @@ pdoom1 PR #679 makes this repo a READ-ONLY consumer of ONE score API. GETs only.
 POSTs, never writes to the API, never re-stamps a version (that fabricates history). It
 writes one local file, board-liveness.json, which is an OBSERVATION, not a score store.
 
+NEVER COMPOSE A BOARD KEY FROM TWO FILES
+----------------------------------------
+The seed half comes from published-board.json (what the site actually served) and the
+epoch half used to come from board-probe-targets.json (what the ladder is on NOW). Those
+are two files of two different vintages, and pairing them asserts a key that may never
+have existed. On 2026-08-08 it produced `(weekly-2026-w31, L4)` -- an old seed from one
+file, a new epoch from the other -- and then correctly reported the 9 real scores on
+`(weekly-2026-w32, L4)` as orphaned. See issue #293.
+
+So the published epoch is read from published-board.json ALONGSIDE the seed, and the
+comparison is against that pair. When the two files disagree about the epoch the honest
+answer is a named state -- `superseded-publication` -- not a fabricated key. The ordinary
+weekly seed roll has the same defect with no tell: the composite resolves to LAST week's
+real board and nothing in the output looks invented (#229).
+
 EXIT CODES
   0  consistent, OR every orphaned board is already acknowledged in the anomaly archive
   1  a NEW, unacknowledged orphaned board holds entries -- scores are being lost NOW
-  2  the epoch is unknown, or the API could not be read (unknown, never "empty")
+  2  the epoch is unknown, the published board is from a superseded epoch, or the API
+     could not be read (all of these are "we cannot tell", never "empty")
 
 RUN
     python scripts/check-board-liveness.py
@@ -299,6 +315,21 @@ def main():
     published = load_json(PUBLISHED_JSON, {}) or {}
     site_seed = published.get("seed") or (load_json(WEEKLY_JSON, {}) or {}).get("seed")
     site_seed_source = "published-board.json" if published.get("seed") else "weekly/current.json"
+    # The epoch half of the SAME key, from the SAME file. Reading the seed here and the
+    # epoch from board-probe-targets.json is what composed a key that never existed
+    # (#293). When published-board.json predates the field, `site_epoch` falls back to
+    # the current epoch and the record says so -- `epoch_composed: true` -- rather than
+    # presenting the fallback pair as an observation.
+    published_epoch = published.get("ladder_epoch")
+    site_epoch = published_epoch or epoch
+    epoch_composed = published_epoch is None
+    site_epoch_source = ("published-board.json" if published_epoch
+                         else "COMPOSED: seed from %s, epoch from board-probe-targets.json "
+                              "(published-board.json records no ladder_epoch)" % site_seed_source)
+    # None, not False: the two files can only be compared when both name an epoch.
+    # Absence is unknown, never agreement.
+    epochs_agree = None if (published_epoch is None or epoch is None) else published_epoch == epoch
+    superseded = epochs_agree is False
     # Read only to REPORT. The build plays no part in any board comparison -- see the
     # module docstring on the build-vs-ladder split.
     build = ((load_json(VERSION_JSON, {}) or {}).get("latest_release") or {}).get("version")
@@ -309,6 +340,8 @@ def main():
     print("Board liveness probe -- %s" % now_iso())
     print("=" * 74)
     print("  site seed (published)   %s   [from %s]" % (site_seed or "UNKNOWN", site_seed_source))
+    print("  published ladder epoch  %s   [from %s]"
+          % (published_epoch or "not recorded", site_epoch_source))
     print("  current ladder epoch    %s" % (epoch or "UNKNOWN -- no artifact publishes it"))
     print("  deployed build          %s   (NOT part of the board key)" % (build or "unknown"))
     print("  anomaly archive         %d acknowledged board key(s)" % len(archive))
@@ -327,12 +360,24 @@ def main():
     populated = [r for r in results if (r.get("entries") or 0) > 0]
 
     def is_deployed(r):
-        return bool(epoch) and r["seed"] == site_seed and r["version"] == epoch
+        # Against the pair the SITE PUBLISHED -- (site_seed, site_epoch) -- not against a
+        # seed from one file paired with an epoch from another (#293).
+        return bool(site_epoch) and r["seed"] == site_seed and r["version"] == site_epoch
 
     deployed_board = next((r for r in results if is_deployed(r)), None)
     orphaned = [r for r in populated if not is_deployed(r)]
     known = [r for r in orphaned if (r["seed"], r["version"]) in archive]
     unknown = [r for r in orphaned if (r["seed"], r["version"]) not in archive]
+
+    # When publication is a whole epoch behind, EVERY board on the new epoch fails the
+    # is_deployed test -- including the board players are correctly scoring on. Calling
+    # those orphans is a false alarm about a real cause: the publisher has not run yet.
+    # They are set aside under `pending_publication` so the alarm keeps meaning what it
+    # says, and so the workflow's "N new orphaned entries" line does not report a number
+    # that is about to be zero.
+    pending_publication = []
+    if superseded:
+        pending_publication, unknown = unknown, []
 
     print("  probed %d board(s): %d seed(s) x %d version(s); %d unreadable"
           % (len(results), len(seeds), len(versions), errors))
@@ -352,7 +397,39 @@ def main():
     archive_absent = not archive
 
     # ---- verdict ------------------------------------------------------------
-    if unknown and not archive_absent:
+    # SUPERSEDED FIRST, deliberately. When the published board is a whole epoch behind,
+    # every board on the current epoch looks orphaned, so the orphan branch would fire a
+    # loud, exit-1 alarm about a condition whose real cause is "the publisher has not run
+    # yet". Exit 2, like epoch-unknown: this is an admission, not an incident.
+    if superseded:
+        verdict, exit_code = "superseded-publication", 2
+        print()
+        print("  SUPERSEDED PUBLICATION. The board this site published is from an epoch")
+        print("  that is no longer current, so no comparison here can say whether players")
+        print("  are being lost.")
+        print("    published board : (%s, %s)   [published-board.json]"
+              % (site_seed, published_epoch))
+        print("    current epoch   : %s   [board-probe-targets.json -> current_ladder_epoch]"
+              % epoch)
+        print("    epoch source    : %s" % (epoch_source or "unrecorded"))
+        print()
+        print("  These two halves come from two different files of two different vintages.")
+        print("  Pairing them would assert a board key that has never existed, so this run")
+        print("  does not: it names the disagreement instead (issue #293).")
+        if pending_publication:
+            print()
+            print("  %d populated board(s) on the current epoch are NOT being reported as"
+                  % len(pending_publication))
+            print("  orphans, because publication catching up is what resolves them:")
+            for r in pending_publication:
+                print("       - (%s, %s): %d entries, %d player(s)"
+                      % (r["seed"], r["version"], r["entries"], r["players"]))
+        print()
+        print("  FIX: run scripts/publish-live-board.py, which observes the live board and")
+        print("  rewrites published-board.json. Do NOT re-stamp published-board.json by")
+        print("  hand and do NOT edit the epoch to match -- either one fabricates a")
+        print("  publication that did not happen.")
+    elif unknown and not archive_absent:
         verdict, exit_code = "orphaned-scores", 1
         print()
         print("  !! NEW ORPHANED BOARD(S): %d entr%s on %d board(s) NOT in the anomaly"
@@ -388,7 +465,7 @@ def main():
         verdict, exit_code = "live", 0
         print()
         print("  OK: deployed board (%s, %s) holds %d entries."
-              % (site_seed, epoch, deployed_board["entries"]))
+              % (site_seed, site_epoch, deployed_board["entries"]))
     elif errors == len(results):
         verdict, exit_code = "unreachable", 2
         print()
@@ -398,7 +475,7 @@ def main():
         verdict, exit_code = "genuinely-empty", 0
         print()
         print("  Deployed board (%s, %s) holds 0 entries, and every other populated board"
-              % (site_seed, epoch))
+              % (site_seed, site_epoch))
         print("  is already acknowledged. Nobody has submitted to the current board yet.")
 
     if known:
@@ -420,13 +497,31 @@ def main():
         "checked_at": now_iso(),
         "api": SCORE_API,
         "verdict": verdict,
+        # THE BOARD KEY THE SITE PUBLISHED -- both halves from published-board.json, never
+        # one half from each of two files (#293). The current epoch is carried alongside as
+        # a separate, separately-sourced fact, and `epochs_agree` says whether they match.
         "board_key": {
             "seed": site_seed,
-            "ladder_epoch": epoch,
-            "ladder_epoch_source": epoch_source,
+            "seed_source": site_seed_source,
+            "ladder_epoch": site_epoch,
+            "ladder_epoch_source": site_epoch_source,
+            "published_ladder_epoch": published_epoch,
+            "current_ladder_epoch": epoch,
+            "current_ladder_epoch_source": epoch_source,
+            # true / false / null. null means one of the two is absent, which is UNKNOWN
+            # agreement -- never treat it as agreement.
+            "epochs_agree": epochs_agree,
+            # true means `ladder_epoch` above is NOT the epoch published-board.json
+            # recorded (it records none), so the pair is a fallback and not an observation.
+            "epoch_composed": epoch_composed,
             "epoch_known": bool(epoch),
             "note": "epoch_known=false means this site cannot confirm which board is "
-                    "current. It is NOT a mismatch finding.",
+                    "current. It is NOT a mismatch finding. epochs_agree=false means the "
+                    "published board is from a superseded epoch: the fix is to run "
+                    "scripts/publish-live-board.py, not to re-stamp anything. "
+                    "epoch_composed=true means ladder_epoch is a fallback to the current "
+                    "epoch because published-board.json predates the field -- the pair is "
+                    "composed, not observed.",
         },
         "deployed_build": build,
         "deployed_board": deployed_board,
@@ -440,7 +535,24 @@ def main():
             "note": "Pre-epoch anomaly archive. Permanent by Pip's ruling -- reported "
                     "every run, never a CI failure.",
         },
-        "new_orphans": {"boards": unknown, "entries_total": total_unknown},
+        "new_orphans": {
+            "boards": unknown,
+            "entries_total": total_unknown,
+            "note": ("Orphan classification is SUSPENDED this run: the published board is "
+                     "from a superseded epoch, so every board on the current epoch would "
+                     "score as an orphan. See pending_publication." if superseded else
+                     "Populated boards this site does not publish and the anomaly archive "
+                     "does not acknowledge."),
+        },
+        # Populated boards on the CURRENT epoch that publication has not caught up with.
+        # Named rather than counted as orphans, because running the publisher resolves
+        # them and an alarm that self-heals teaches people to ignore alarms.
+        "pending_publication": {
+            "boards": pending_publication,
+            "entries_total": sum(r["entries"] for r in pending_publication),
+            "note": "Not orphans. The publisher has not yet republished onto the current "
+                    "epoch; scripts/publish-live-board.py is the fix.",
+        },
         "boards": results,
     }
 
