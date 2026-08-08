@@ -4,9 +4,33 @@ name: Auto-Update Data
 # Updates version info and game stats without human approval
 
 on:
+  # BACKSTOP, not the mechanism (issue #285). A release published one minute
+  # after a scheduled run left pdoom1.com advertising the previous version for
+  # up to six hours -- green the whole time, because version.json held a
+  # complete and internally consistent record of the WRONG release. Shortening
+  # the cron narrows that window without closing it. The release event closing
+  # it is the `repository_dispatch` below; this cron stays as the safety net for
+  # when the dispatch does not arrive.
   schedule:
     # Run every 6 hours
     - cron: '0 */6 * * *'
+
+  # Fired by pdoom1's `sync-game-version.yml` at release-publish time. That
+  # workflow has POSTed `event_type: game_version_sync` at every release to
+  # date; this repository had no listener for it, so every one of those
+  # dispatches was accepted (the API returns 204 whether or not anything is
+  # subscribed) and discarded. Measured 2026-08-07: `gh api
+  # "repos/PipFoweraker/pdoom1-website/actions/runs?event=repository_dispatch"`
+  # returns an EMPTY list -- no repository_dispatch run has ever executed here.
+  #
+  # ORDERING HAZARD, measured on the v0.14.0 cut: scripts/update-version-info.py
+  # derives `latest_release.platforms` from the release's actual ASSET
+  # FILENAMES, and the download page offers exactly what version.json says. If
+  # the dispatch can arrive mid-upload, this job can publish a version with
+  # missing platforms. The sending side must fire only once assets are attached.
+  repository_dispatch:
+    types: [game_version_sync]
+
   workflow_dispatch:
     inputs:
       force:
