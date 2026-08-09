@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-08T20:14:27.598854+00:00",
+  "generated": "2026-08-09T06:19:14.011270+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 2.2 days ago"
+      "detail": "generated 2.6 days ago"
     },
     {
       "name": "league:current_week",
@@ -140,7 +140,7 @@
     {
       "name": "board:key",
       "status": "OK",
-      "detail": "published board key matches the current ladder epoch L3"
+      "detail": "published board key matches the current ladder epoch L4"
     },
     {
       "name": "board:exclusions",
@@ -150,27 +150,27 @@
     {
       "name": "board:status_integrity",
       "status": "OK",
-      "detail": "data_status=live consistent with 6 entries"
+      "detail": "data_status=live consistent with 9 entries"
     },
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 1.7h ago"
+      "detail": "live API checked 5.7h ago"
     },
     {
       "name": "board:archived_anomaly",
       "status": "WARN",
-      "detail": "30 score entries across 4 board(s) from 8 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, CogDerp, Cognitive Development, Division of Intelligent Agents, Hamthropic, Intelligent Agents Studies, Laboratory of Autonomous Systems). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
+      "detail": "36 score entries across 5 board(s) from 12 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, CogDerp, Cognitive Development, Cognitive Systems Studies, Cognitive Systems Studies II, Division of Intelligent Agents, Division of Machine Learning, Hamthropic, Intelligent Agents Studies, Laboratory of Autonomous Systems, Notkilleveryone Inc). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
     },
     {
       "name": "board:liveness",
       "status": "OK",
-      "detail": "deployed board (weekly-2026-w31, L3) holds 6 entries"
+      "detail": "deployed board (weekly-2026-w32, L4) holds 9 entries"
     },
     {
       "name": "board:publish",
       "status": "OK",
-      "detail": "what we serve matches what the probe saw (6 entries on L3)"
+      "detail": "what we serve matches what the probe saw (9 entries on L4)"
     },
     {
       "name": "seed_leaderboards:parse",
