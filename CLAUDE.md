@@ -628,15 +628,36 @@ platform that has no build.
   (`npm run update:version`, `weekly-deployment.yml`) the fiction won. It now carries
   forward whatever the calculator derived and omits the key when nothing has been
   derived. A scan in the test fails on any numeric literal re-added to that function.
-- **`version.json` has TWO writers, and one of them disarms the guard.**
-  `update-version-info.py` (via `auto-update-data.yml`) writes `latest_release.platforms`.
-  `update-game-data.yml` has its own inline Python that rebuilds `version.json` **from
-  scratch without that key**. Both run on ~6h crons, so the field blinks in and out —
-  `git log -S'"platforms"' -- public/data/version.json` shows the two alternating. While
-  it is absent, `check-platform-claims.py` prints `SKIP: version.json has no
-  latest_release.platforms` and **exits 0**, so the honesty guard is silently inert about
-  half the time. A page reading `latest_release.platforms` must therefore treat absence as
-  "unrecorded", never as "nothing shipped". (Found 2026-07-28; not yet fixed.)
+- **`version.json` had TWO writers, and one of them disarmed the guard. FIXED
+  2026-08-02 in #235 (`0a65e519`); this entry said "not yet fixed" until 2026-08-08.**
+  `update-game-data.yml` used to carry its own inline Python that rebuilt `version.json`
+  **from scratch without `latest_release.platforms`**. Both writers ran on the same ~6h
+  cron minute, so the field blinked in and out and `check-platform-claims.py` printed
+  `SKIP: version.json has no latest_release.platforms` and **exited 0** — the honesty
+  guard silently inert about half the time.
+  `update-version-info.py` (via `auto-update-data.yml`) is now the **sole writer**;
+  `update-game-data.yml:66` reads `# version.json is NOT written here any more.` and it
+  no longer stages the file either (staging would re-commit whatever the checkout held
+  and reintroduce the race by the back door).
+  **The standing rule survives the fix:** a page reading `latest_release.platforms` must
+  treat absence as "unrecorded", never as "nothing shipped". One writer today is not a
+  guarantee of one writer tomorrow, and the guard still exits 0 on a missing key.
+  - **Why this entry went stale for six days, because the mechanism matters more than
+    the fact.** #235 fixed the defect and touched exactly one file — the workflow. Its
+    reasoning went into the *commit message*, which is where it stayed. Nothing connects
+    a fix to the CLAUDE.md paragraph that records the defect, so an entry written at
+    discovery time has a finder and no closer. **#276 then edited CLAUDE.md four days
+    later under the title "delete the dead version.json writer" and still did not touch
+    this paragraph** — it was editing the test-suite list, a different section. Proximity
+    of topic is not proximity of text.
+    **This file is a cache of measurements asserted about the present**, which is exactly
+    what `coordination#20` forbids a seat from doing, applied to a document instead of a
+    session. The density of "CORRECTED <date>" notes above is the evidence that this
+    failure recurs — treat each one as a sample, not an anecdote.
+    **Practical rule: when you fix something this file describes as broken, the fix is
+    not done until the paragraph moves.** Grep CLAUDE.md for the symptom before closing
+    a PR, and prefer "FIXED <date> in #nn" over deleting the entry — the history of a
+    defect is why the guard exists.
 
 ## Changelog surfaces — there are FOUR (this said "three" until 2026-08-03)
 The count itself was the bug: `/dashboard/`'s development-log box is a release surface
