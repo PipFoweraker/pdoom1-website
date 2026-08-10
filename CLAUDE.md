@@ -434,6 +434,8 @@ node    scripts/test-board-escaping.js    # no API field reaches innerHTML   [bo
 node    scripts/test-board-honesty.js     # key mismatch stays visible       [board-liveness]
 python  scripts/test-publish-live-board.py # publisher refuses, never guesses [board-liveness]
 python  scripts/test-board-liveness-verdicts.py # probe names an epoch disagreement, never composes a key [board-liveness]
+python  scripts/check-epoch-drift.py      # declared board key vs the published one [epoch-drift]
+python  scripts/test-epoch-drift.py       # ...and drift is red, absence is UNKNOWN  [epoch-drift]
 
 node    scripts/test-escaping.js          # the SAME rule on the other 14 pages [escaping]
 node    scripts/test-roadmap-render.js    # roadmap markdown subset + escaping  [escaping]
