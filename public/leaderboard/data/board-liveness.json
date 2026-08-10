@@ -1,14 +1,20 @@
 {
   "_comment": "Read-only observation of the live score API. Not a score store. Written by scripts/check-board-liveness.py. The board key is (seed, ladder_epoch); the build version is NOT part of it.",
-  "checked_at": "2026-08-10T00:37:51+00:00",
+  "checked_at": "2026-08-10T04:41:22+00:00",
   "api": "https://api.pdoom1.com/score_api.php",
   "verdict": "live",
   "board_key": {
     "seed": "weekly-2026-w32",
+    "seed_source": "published-board.json",
     "ladder_epoch": "L4",
-    "ladder_epoch_source": "pdoom1 v0.14.0 git tag message: 'Ladder L4. Featured seed weekly-2026-w32. Board key (weekly-2026-w32, L4).' Corroborated by the release's release_manifest.json, \"ladder_version\": \"4\". Game-side authority unchanged: GameConfig.get_board_version() returns 'L' + LADDER_VERSION. Positively verified 2026-08-08 by a read-only GET: (weekly-2026-w32, L4) held 9 entries from clients stamped v0.14.0 and v0.14.1 -- a positive check, since every WRONG key also returns ok:true with an empty board.",
+    "ladder_epoch_source": "published-board.json",
+    "published_ladder_epoch": "L4",
+    "current_ladder_epoch": "L4",
+    "current_ladder_epoch_source": "pdoom1 v0.14.0 git tag message: 'Ladder L4. Featured seed weekly-2026-w32. Board key (weekly-2026-w32, L4).' Corroborated by the release's release_manifest.json, \"ladder_version\": \"4\". Game-side authority unchanged: GameConfig.get_board_version() returns 'L' + LADDER_VERSION. Positively verified 2026-08-08 by a read-only GET: (weekly-2026-w32, L4) held 9 entries from clients stamped v0.14.0 and v0.14.1 -- a positive check, since every WRONG key also returns ok:true with an empty board.",
+    "epochs_agree": true,
+    "epoch_composed": false,
     "epoch_known": true,
-    "note": "epoch_known=false means this site cannot confirm which board is current. It is NOT a mismatch finding."
+    "note": "epoch_known=false means this site cannot confirm which board is current. It is NOT a mismatch finding. epochs_agree=false means the published board is from a superseded epoch: the fix is to run scripts/publish-live-board.py, not to re-stamp anything. epoch_composed=true means ladder_epoch is a fallback to the current epoch because published-board.json predates the field -- the pair is composed, not observed."
   },
   "deployed_build": "v0.14.1",
   "deployed_board": {
@@ -207,13 +213,15 @@
       "L159",
       "L160",
       "L161",
-      "L162"
+      "L162",
+      "L163",
+      "L164"
     ],
-    "boards_probed": 1328,
+    "boards_probed": 1344,
     "unreachable": 0,
     "notes": [
       "11 board key(s) derived from the anomaly archive",
-      "epoch window L1..L162 (highest seen L160, +2 lookahead)"
+      "epoch window L1..L164 (highest seen L162, +2 lookahead)"
     ]
   },
   "archived_orphans": {
@@ -326,7 +334,13 @@
   },
   "new_orphans": {
     "boards": [],
-    "entries_total": 0
+    "entries_total": 0,
+    "note": "Populated boards this site does not publish and the anomaly archive does not acknowledge."
+  },
+  "pending_publication": {
+    "boards": [],
+    "entries_total": 0,
+    "note": "Not orphans. The publisher has not yet republished onto the current epoch; scripts/publish-live-board.py is the fix."
   },
   "boards": [
     {
@@ -2155,6 +2169,28 @@
     {
       "seed": "weekly-2026-w31",
       "version": "L162",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L163",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L164",
       "key_shape": "epoch",
       "entries": 0,
       "players": 0,
@@ -3998,6 +4034,28 @@
       "last_entry": null
     },
     {
+      "seed": "weekly-2026-w32",
+      "version": "L163",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "L164",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
       "seed": "league_2026-07_7d6ced29",
       "version": "L2",
       "key_shape": "epoch",
@@ -5815,6 +5873,28 @@
     {
       "seed": "league_2026-07_7d6ced29",
       "version": "L162",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L163",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L164",
       "key_shape": "epoch",
       "entries": 0,
       "players": 0,
@@ -7652,6 +7732,28 @@
     {
       "seed": "weekly-2026-w0",
       "version": "L162",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L163",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L164",
       "key_shape": "epoch",
       "entries": 0,
       "players": 0,
@@ -9500,6 +9602,28 @@
       "last_entry": null
     },
     {
+      "seed": "weekly-2026-w30",
+      "version": "L163",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "L164",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
       "seed": "weekly_2026_W30_18a08709",
       "version": "L2",
       "key_shape": "epoch",
@@ -11326,6 +11450,28 @@
       "last_entry": null
     },
     {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L163",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L164",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
       "seed": "weekly_2026_W32_5685561a",
       "version": "L2",
       "key_shape": "epoch",
@@ -13152,6 +13298,28 @@
       "last_entry": null
     },
     {
+      "seed": "weekly_2026_W32_5685561a",
+      "version": "L163",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W32_5685561a",
+      "version": "L164",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
       "seed": "weekly_2026_W31_f148a5b6",
       "version": "L2",
       "key_shape": "epoch",
@@ -14969,6 +15137,28 @@
     {
       "seed": "weekly_2026_W31_f148a5b6",
       "version": "L162",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W31_f148a5b6",
+      "version": "L163",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W31_f148a5b6",
+      "version": "L164",
       "key_shape": "epoch",
       "entries": 0,
       "players": 0,
