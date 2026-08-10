@@ -1,17 +1,5 @@
 [
   {
-    "job": "weekly-league-rollover",
-    "trigger": "schedule",
-    "timestamp": "2026-07-19T14:25:24.559010Z",
-    "status": "success",
-    "details": {
-      "archive-status": "success",
-      "new-week-status": "success",
-      "verify-status": "success",
-      "new-week-id": "2026_W29"
-    }
-  },
-  {
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2026-07-19T18:23:26.207392Z",
@@ -1021,6 +1009,16 @@
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2026-08-09T18:12:14.704439Z",
+    "status": "success",
+    "details": {
+      "version-status": "success",
+      "stats-status": "success"
+    }
+  },
+  {
+    "job": "auto-update-data",
+    "trigger": "schedule",
+    "timestamp": "2026-08-10T00:28:10.318782Z",
     "status": "success",
     "details": {
       "version-status": "success",
