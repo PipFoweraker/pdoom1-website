@@ -438,6 +438,7 @@ python  scripts/check-epoch-drift.py      # declared board key vs the published 
 python  scripts/test-epoch-drift.py       # ...and drift is red, absence is UNKNOWN  [epoch-drift]
 python  scripts/check-blessing-consistency.py # the four blessing artefacts agree [content-honesty ADVISORY]
 python  scripts/test-blessing-consistency.py  # ...and every disagreement shape is caught [content-honesty]
+python  scripts/check-token-drift.py      # token-named vars carry the token value [content-honesty ADVISORY]
 
 node    scripts/test-escaping.js          # the SAME rule on the other 14 pages [escaping]
 node    scripts/test-roadmap-render.js    # roadmap markdown subset + escaping  [escaping]
