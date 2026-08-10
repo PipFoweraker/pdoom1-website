@@ -409,6 +409,25 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           exit 0
 
+      - name: ADVISORY -- design token drift
+        continue-on-error: true
+        run: |
+          set +e
+          python scripts/check-token-drift.py | tee tokens.log
+          set -e
+          {
+            echo '## ADVISORY: design token drift'
+            echo ''
+            echo 'Pages defining a token-named CSS variable with a value that is not the'
+            echo 'token. Mechanical divergence, not a design decision. NEVER blocks --'
+            echo 'the sweep that clears it is Step 1 of the token plan and is Pip'"'"'s call.'
+            echo ''
+            echo '```'
+            cat tokens.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+
   alert:
     name: Alert on scheduled failure (de-duplicated)
     needs: [honesty]
@@ -459,3 +478,4 @@ jobs:
                 title, body, labels: [label, 'automation', 'priority:high'],
               });
             }
+
