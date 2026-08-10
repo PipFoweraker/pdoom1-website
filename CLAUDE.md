@@ -433,6 +433,7 @@ python  scripts/test-stamp-league-epoch.py      # defect texts claim only what t
 node    scripts/test-board-escaping.js    # no API field reaches innerHTML   [board-liveness]
 node    scripts/test-board-honesty.js     # key mismatch stays visible       [board-liveness]
 python  scripts/test-publish-live-board.py # publisher refuses, never guesses [board-liveness]
+python  scripts/test-board-liveness-verdicts.py # probe names an epoch disagreement, never composes a key [board-liveness]
 
 node    scripts/test-escaping.js          # the SAME rule on the other 14 pages [escaping]
 node    scripts/test-roadmap-render.js    # roadmap markdown subset + escaping  [escaping]
@@ -734,6 +735,23 @@ and nobody was counting it. Enumerate by grepping for consumers, not from this l
   from "nobody is playing", and **no error is shown to the player**. Proving a key
   needs a *positive* check (post a score, read it back). Suspect a key mismatch
   before suspecting analytics.
+- **`board-liveness.yml` PUBLISHES BEFORE IT PROBES, and that order is load-bearing**
+  (#293, fixed 2026-08-09). The probe reads `published-board.json`; the publisher rewrites
+  it. Probe-first meant the probe always read the PREVIOUS run's answer and paired that
+  stale seed with the CURRENT epoch from `board-probe-targets.json` — **a composed key
+  from two files of two different vintages, asserted as one fact.** On 2026-08-08 that
+  produced `(weekly-2026-w31, L4)`, a key that has never existed, and reported nine real
+  scores as `orphaned-scores`, exit 1. Re-running the identical workflow said `live`.
+  The epoch fork is only the loud version: an ordinary seed roll composes
+  `(last week's seed, same epoch)`, which resolves to a REAL board — last week's — and
+  nothing in the output looks invented (that is #229's symptom). `check-board-liveness.py`
+  now reads `ladder_epoch` from `published-board.json` alongside the seed, and reports
+  **`superseded-publication` (exit 2, an admission, not an incident)** when the two files
+  disagree — evaluated BEFORE the orphan branch, because when publication is an epoch
+  behind, every board on the new epoch scores as an orphan. `board_key` carries
+  `published_ladder_epoch`, `current_ladder_epoch`, `epochs_agree` (true/false/**null**
+  when either is absent) and `epoch_composed`. Consumers read the current epoch as
+  `current_ladder_epoch || ladder_epoch` so older records still parse.
 - **Never present an unblessed seed to a player.** The blessed value is
   `docs/LEAGUE_SEED_LEDGER.md` → mirrored into `public/data/ladder-epochs.json`;
   anything the website derives is a placeholder marked
