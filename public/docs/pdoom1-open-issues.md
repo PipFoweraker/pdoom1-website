@@ -1,12 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-10T00:33:58.535Z UTC
+Generated: 2026-08-10T06:43:57.980Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
 | 1193 | #1137's event retiming made a simulated run ~38% more expensive -- is that the intended event density? |  |  | 2026-08-09 01:19:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1193) |
-| 1181 | run_godot_tests.py: the 900s sim cap has no flag, and reports a timeout as '0 tests, 0 fail (FAIL)' |  |  | 2026-08-07 16:07:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/1181) |
-| 1178 | check_ladder_bump.py runs with '\|\| true' -- the guard on the board-key invariant cannot fail, and it already missed one for 31 hours |  |  | 2026-08-07 15:42:02 | [link](https://github.com/PipFoweraker/pdoom1/issues/1178) |
 | 1171 | Ladder eligibility must be visible BEFORE the run starts, not delivered at death (ruled by Pip 2026-08-07) |  |  | 2026-08-07 13:20:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1171) |
 | 1168 | Simulation tier cannot be run locally on Windows -- 15-min hardcoded timeout, and a timeout reports as '0 tests, 0 fail' |  |  | 2026-08-07 11:49:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/1168) |
 | 1163 | godot/data/historical_events.json carries two mojibake titles; the upstream repair cannot reach a hand-carried copy |  |  | 2026-08-07 07:12:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/1163) |
