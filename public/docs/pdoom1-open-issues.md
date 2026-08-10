@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-10T06:43:57.980Z UTC
+Generated: 2026-08-10T12:31:23.696Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1198 | Two text-leak scanners on main with near-identical names -- and the numbers they produced are already cited as evidence |  |  | 2026-08-10 10:04:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1198) |
 | 1193 | #1137's event retiming made a simulated run ~38% more expensive -- is that the intended event density? |  |  | 2026-08-09 01:19:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1193) |
 | 1171 | Ladder eligibility must be visible BEFORE the run starts, not delivered at death (ruled by Pip 2026-08-07) |  |  | 2026-08-07 13:20:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1171) |
 | 1168 | Simulation tier cannot be run locally on Windows -- 15-min hardcoded timeout, and a timeout reports as '0 tests, 0 fail' |  |  | 2026-08-07 11:49:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/1168) |
