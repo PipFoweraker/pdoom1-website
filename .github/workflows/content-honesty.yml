@@ -327,6 +327,17 @@ jobs:
       #                                remainder is content emoji inside frozen prose --
       #                                real drift, but not a lie to a visitor, and
       #                                blocking on it would freeze content work.
+      # check-blessing-consistency     ADVISORY ON PURPOSE AND ONLY FOR NOW. It reports
+      #                                7 real findings today, and every one of them is
+      #                                true. It is not blocking because the fix is two
+      #                                ledger rows that ONLY PIP MAY WRITE -- they record
+      #                                who blessed a seed and when, and a seat inferring
+      #                                that is the defect (#297). Blocking on a condition
+      #                                no seat is permitted to clear would be a permanent
+      #                                red, which CLAUDE.md forbids with double force.
+      #                                PROMOTE THIS TO BLOCKING once #297's L3 and L4 rows
+      #                                are filled. If it is still advisory in a month,
+      #                                that is the thing to question, not the finding.
       #
       # Each runs with continue-on-error so the job stays green. Green here means
       # "reported", NOT "clean" -- read the summary.
@@ -379,6 +390,25 @@ jobs:
   #
   # Single rolling issue, reused not duplicated -- the shape data-contract-validation.yml
   # already uses here. Only trusted GitHub contexts reach the script (CLAUDE.md trap #5).
+
+      - name: ADVISORY -- do the four blessing artefacts agree?
+        continue-on-error: true
+        run: |
+          set +e
+          python scripts/check-blessing-consistency.py | tee blessing.log
+          set -e
+          {
+            echo '## ADVISORY: blessing record consistency'
+            echo ''
+            echo 'Exit 0 agree / 1 disagree / 2 cannot tell. NEVER blocks -- the fix is'
+            echo 'two ledger rows only Pip may write. See #297.'
+            echo ''
+            echo '```'
+            cat blessing.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+
   alert:
     name: Alert on scheduled failure (de-duplicated)
     needs: [honesty]
