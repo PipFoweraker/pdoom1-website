@@ -112,13 +112,29 @@ def parse_ledger(path):
         epoch, rest = m.group(1), m.group(2)
         cells = [c.strip() for c in rest.split("|")]
         unfilled = bool(UNBLESSED_RE.search(rest))
-        ticked = BACKTICKED.findall(rest)
-        seed = None
-        for t in ticked:
-            # the seed cell is the first backticked value that is not a filename
-            if not t.endswith(".json"):
-                seed = t
-                break
+
+        # THE SEED COMES FROM ITS OWN CELL, and from nowhere else.
+        #
+        # This used to take "the first backticked value in the row that is not a
+        # filename", which reads sensibly and is wrong: a row whose seed cell is
+        # EMPTY adopts the first backtick anywhere in the row, including a
+        # documentation path in the notes column --
+        #
+        #   | L9 |  | L9 |  | - | - | see `docs/THING.md` for the seed |
+        #        -> seed == 'docs/THING.md'
+        #
+        # which would present a doc path as a blessed league seed. Found by
+        # attacking the parser (the 2026-08-11 sweep), not by reading it. It was
+        # harmless only because the live unfilled row is flagged separately and
+        # nulls the seed before this runs -- an accident, not a guard.
+        #
+        # Cell 0 is the seed column: ROW_RE has already consumed the epoch cell,
+        # so `rest` begins at the seed. Refuse rather than guess when it is empty.
+        seed_cell = cells[0] if cells else ""
+        ticked = BACKTICKED.findall(seed_cell)
+        seed = ticked[0] if ticked else (seed_cell or None)
+        if seed and (seed.endswith(".json") or UNBLESSED_RE.search(seed)):
+            seed = None
         date = None
         for c in cells:
             d = ISO_DATE.search(c)
@@ -188,6 +204,16 @@ def main():
         led_seed, led_blessed = row["seed"], row["blessed"]
         if row["unfilled"]:
             findings.append("LEDGER row for %s reads NOT YET BLESSED." % epoch)
+        elif not led_seed:
+            # Surfaced by the 2026-08-11 sweep's own regression test: a row that
+            # claims a blessing while naming no seed used to pass silently,
+            # because the old parser filled the gap from elsewhere in the row.
+            # With the seed read from its own cell the gap is now visible, and a
+            # blessing of nothing is exactly what this check exists to catch.
+            findings.append(
+                "LEDGER row for %s records a blessing but NAMES NO SEED. A blessing "
+                "is a sign-off on a specific string; without one there is nothing "
+                "for the other artefacts to agree with." % epoch)
         print("  ledger row                 seed=%s blessed=%s by=%s on=%s"
               % (led_seed, led_blessed, row["by"], row["blessed_utc"]))
 

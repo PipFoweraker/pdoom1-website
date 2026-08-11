@@ -1477,6 +1477,20 @@ def build():
     })
 
 
+
+def _diff_is_only_anchors(current, fresh):
+    """True when the ONLY differences are file:line anchors in citation links.
+
+    Citations render as ...blob/main/<path>#L<n>. When something is inserted above
+    a cited line every anchor below it shifts, and the page is 'stale' without a
+    single fact having changed. Normalising the anchors away tells the two
+    incidents apart; it is deliberately conservative -- anything else differing
+    means CONTENT, and the caller says so.
+    """
+    anchor = re.compile(r"#L\d+")
+    return anchor.sub("#L0", current) == anchor.sub("#L0", fresh)
+
+
 def main():
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -1497,11 +1511,29 @@ def main():
                   "scripts/generate-metabolism.py"
                   % OUT.relative_to(REPO_ROOT).as_posix())
             return 1
-        if OUT.read_text(encoding="utf-8") != page:
-            print("STALE: %s no longer matches what its sources produce.\n"
-                  "A cadence, a cron, a park notice or a cited line has moved. "
-                  "Regenerate:\n    python scripts/generate-metabolism.py"
-                  % OUT.relative_to(REPO_ROOT).as_posix())
+        current = OUT.read_text(encoding="utf-8")
+        if current != page:
+            # WHICH CLASS OF STALE? These are different incidents that printed the
+            # same words, and twice in four days someone (me) spent twenty minutes
+            # hunting a cadence change that had never happened. A citation is a
+            # file:line ANCHOR, so it moves whenever anything above it moves --
+            # the fact is identical and only its coordinates changed. Say so.
+            only_anchors = _diff_is_only_anchors(current, page)
+            if only_anchors:
+                print("STALE (COORDINATES ONLY): %s cites its sources by file:line, "
+                      "and a cited line has MOVED.\n"
+                      "  NO cadence, cron or park notice changed -- something was "
+                      "inserted above a citation.\n"
+                      "  This is expected after editing any cited file. Regenerate:\n"
+                      "    python scripts/generate-metabolism.py"
+                      % OUT.relative_to(REPO_ROOT).as_posix())
+            else:
+                print("STALE (CONTENT): %s no longer matches what its sources "
+                      "produce.\n"
+                      "  A cadence, a cron or a park notice has genuinely CHANGED -- "
+                      "read the diff before regenerating.\n"
+                      "  Regenerate:\n    python scripts/generate-metabolism.py"
+                      % OUT.relative_to(REPO_ROOT).as_posix())
             return 1
         print("OK: /metabolism/ is in step with its sources.")
         return 0
