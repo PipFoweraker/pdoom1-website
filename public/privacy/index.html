@@ -6,12 +6,12 @@
 	<title>Privacy & Analytics - p(Doom)1</title>
 	<link rel="canonical" href="https://pdoom1.com/privacy/" />
 	<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-	<meta name="description" content="Privacy policy and analytics opt-out for p(Doom)1 website. Learn about our privacy-preserving analytics and how to opt out." />
+	<meta name="description" content="Privacy policy for the p(Doom)1 website and the game client: what each one sends, what the game stores on your machine, and how to switch each off." />
 	<meta name="author" content="p(Doom)1" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="p(Doom)1" />
 	<meta property="og:title" content="Privacy & Analytics - p(Doom)1" />
-	<meta property="og:description" content="Privacy policy and analytics opt-out for the p(Doom)1 website." />
+	<meta property="og:description" content="What the p(Doom)1 website collects, what the game client sends, and how to switch each off." />
 	<meta property="og:url" content="https://pdoom1.com/privacy/" />
 	<meta property="og:image" content="https://pdoom1.com/assets/og-card.jpg" />
 	<meta name="twitter:card" content="summary_large_image" />
@@ -265,11 +265,35 @@
 	<main>
 		<div class="hero">
 			<h1>Privacy & Analytics</h1>
-			<p>What the analytics collect, and how to switch them off.</p>
+			<p>What this website collects, what the game sends, and how to switch each off.</p>
 		</div>
 
 		<section class="section">
-			<h2>Privacy-First Analytics</h2>
+			<h2>Two different things</h2>
+			<p>
+				<strong>This website</strong> and <strong>the game you download</strong> are separate
+				surfaces with separate behaviour, and until August 2026 this page described only the
+				first while implying it covered both. It does not any more. Read the half you care
+				about:
+			</p>
+			<ul>
+				<li><strong>The website</strong> &mdash; cookieless, anonymous page counts, and
+					whatever you type into a form. Nothing persistent identifies you.</li>
+				<li><strong>The game client</strong> &mdash; sends a <strong>persistent random
+					install ID</strong> to our analytics server on <em>every launch</em>, and this is
+					<strong>on by default</strong>. It can also submit your score and lab name to the
+					leaderboard, but only if you opt in. <a href="#game-client" style="color: var(--accent-primary);">The
+					full list is below</a>, with the switch for each one.</li>
+			</ul>
+			<p>
+				The earlier version of this page said we use no persistent identifiers. That was true
+				of the website and false of the game. Sorry &mdash; it is corrected below rather than
+				quietly deleted.
+			</p>
+		</section>
+
+		<section class="section">
+			<h2>The website: privacy-first analytics</h2>
 			<p>
 				We want to know whether pages get read &mdash; not who you are.
 				We use <strong>Plausible Analytics</strong>, a privacy-first analytics service that helps us improve
@@ -279,26 +303,26 @@
 			<div class="feature-list">
 				<div class="feature-item">
 					<h4>No Cookies</h4>
-					<p>We don't use cookies or persistent identifiers.</p>
+					<p>Browsing this website sets no cookies and no persistent identifier. (The game client is different &mdash; see below.)</p>
 				</div>
 				<div class="feature-item">
 					<h4>No Personal Data</h4>
-					<p>Our analytics never collect personally identifiable information.</p>
+					<p>Our website analytics never collect personally identifiable information.</p>
 				</div>
 				<div class="feature-item">
 					<h4>Privacy by Design</h4>
-					<p>No cookies and no personal data means no consent banner to click through &mdash; and nothing about you stored to misuse.</p>
+					<p>No cookies and no personal data means no consent banner to click through &mdash; and nothing about your visit stored to misuse.</p>
 				</div>
 				<div class="feature-item">
 					<h4>Respects DNT</h4>
-					<p>If your browser sends Do Not Track, we tell the tracker to ignore your visits. That check runs on our main pages, so a visit landing straight on an event page may be counted first.</p>
+					<p>If your browser sends Do Not Track, we tell the tracker to ignore your visits. That check runs on our main pages, so a visit landing straight on an event page may be counted first. Do Not Track is a browser signal, so it has no effect on the game.</p>
 				</div>
 			</div>
 		</section>
 
 		<section class="section">
-			<h2>What We Collect</h2>
-			<p>We collect only aggregate, anonymous information to understand website usage:</p>
+			<h2>The website: what we collect</h2>
+			<p>From your visits to this site we collect only aggregate, anonymous information:</p>
 			<ul>
 				<li><strong>Page views:</strong> Which pages are visited (no user identification)</li>
 				<li><strong>Referrers:</strong> Where visitors come from (e.g., search engines, social media)</li>
@@ -308,32 +332,158 @@
 			</ul>
 			
 			<h3>What We DON'T Collect</h3>
+			<p>From a visit to this website, in the browser:</p>
 			<ul class="exclusion-list">
 				<li>IP addresses (anonymized immediately)</li>
-				<li>Cookies or local storage (except for opt-out preference)</li>
+				<li>Cookies or browser local storage (except for your opt-out preference)</li>
 				<li>Personal information (names, emails, etc.)</li>
 				<li>Cross-site tracking data</li>
 				<li>Fingerprinting data</li>
 			</ul>
 			<p>
-				<strong>That covers analytics only.</strong> If you use one of our forms or email us, we receive
+				<strong>Those five lines are about the website only.</strong> They are not a claim about
+				the game client, which writes and sends a persistent install ID &mdash; see
+				<a href="#game-client" style="color: var(--accent-primary);">the game client</a> below.
+			</p>
+			<p>
+				<strong>And that covers analytics only.</strong> If you use the form on this site or email us, we receive
 				whatever you choose to send. We use each thing only for the reason you gave it to us:
 			</p>
 			<ul>
-				<li><strong>Your email</strong> (bug form) — used only to reply to you about that report. Kept with the report while it's open, then cleared. Never added to a mailing list, never published.</li>
-				<li><strong>Name for credit</strong> (bug form, optional) — used only to credit you, and <em>only</em> because you chose to fill it in. This one <strong>may appear publicly</strong> (release notes or a linked issue). Leave it blank to stay anonymous.</li>
+				<li><strong>Your email</strong> (the bug form on this site) — used only to reply to you about that report. Kept with the report while it's open, then cleared. Never added to a mailing list, never published.</li>
+				<li><strong>Name for credit</strong> (the bug form on this site, optional) — used only to credit you, and <em>only</em> because you chose to fill it in. This one <strong>may appear publicly</strong> (release notes or a linked issue). Leave it blank to stay anonymous.</li>
 				<li><strong>The report itself</strong> — goes privately to our team by email. If that send fails, the form offers to open a pre-filled <em>public</em> GitHub issue instead, so don't put anything in the description you wouldn't want published.</li>
 			</ul>
+			<p>
+				<strong>The bug reporter <em>inside the game</em> is a different thing and behaves
+				differently: it transmits nothing at all.</strong> It is described
+				<a href="#game-client" style="color: var(--accent-primary);">below</a>.
+			</p>
 			<p>
 				We don't sell or share any of it, and you can ask us to delete what we hold about you any time — <a href="mailto:team@pdoom1.com">team@pdoom1.com</a>.
 			</p>
 		</section>
 
-		<section class="section">
-			<h2>Opt-Out Controls</h2>
+		<section class="section" id="game-client">
+			<h2>The game client: everything it sends</h2>
 			<p>
-				You can opt out of analytics at any time. Your preference is stored locally and will persist
+				This is the complete list. The downloaded game can make five different network
+				requests, written in two files of its source, and they all go to us or to GitHub.
+				There is no third-party SDK in the build, no ad network, and no crash reporter.
+			</p>
+
+			<h3>1. The launch ping — a persistent install ID, on by default</h3>
+			<p>
+				Unless you turn it off, every time you start the game it sends one event to
+				<code>analytics.pdoom1.com/api/event</code> &mdash; the same Plausible server this
+				website uses. <strong>This is on by default.</strong> It carries exactly four things,
+				and nothing else:
+			</p>
+			<ul>
+				<li><strong>An install ID</strong> — a random UUID generated the first time you run
+					the game and saved to <code>install_id.txt</code> in the game's user folder. It is
+					<em>not</em> derived from your hardware, MAC address, username or anything about
+					your machine. But it is <strong>persistent</strong>: the same value is sent on
+					every launch, so launches from one installation can be joined up over time. That
+					makes it a persistent identifier, and it is stored with the event on our analytics
+					server. Deleting the file or reinstalling produces a new one.</li>
+				<li><strong>The game version</strong> you are running.</li>
+				<li><strong>Your operating system name</strong> — the word "Windows", "Linux" or
+					"macOS", not a machine name.</li>
+				<li><strong>Whether this is the first launch</strong> — true or false.</li>
+			</ul>
+			<p>
+				The request also sets a User-Agent of the form <code>pdoom1/&lt;version&gt; (&lt;OS&gt;)</code>,
+				and, like any network request, our server sees the IP address it came from.
+			</p>
+			<p>
+				<strong>To turn it off:</strong> in the game, open <strong>Settings</strong>, press
+				<strong>&gt;&gt; ALL PROTOCOLS</strong> to open the full board, and in the
+				<strong>DISCLOSURE</strong> column switch off <em>"Anonymous launch ping &mdash; counts
+				installs; no personal data"</em>. It saves immediately and is remembered. With it off,
+				no ping is sent and no request is made.
+			</p>
+
+			<h3>2. The leaderboard — off until you opt in</h3>
+			<p>
+				Submitting a score is <strong>opt-in</strong>. The first time a run reaches score
+				submission the game asks you once, explicitly; you can also set it in
+				<strong>Settings &rarr; ALL PROTOCOLS &rarr; DISCLOSURE</strong> under <em>"Submit
+				scores to the global leaderboard &mdash; shares player + lab name publicly. Opt-in."</em>
+				Until you say yes, nothing identifying leaves your machine. Declining changes nothing
+				about the game: local scores always save either way.
+			</p>
+			<p>
+				If you do opt in, each finished run that counts for the board &mdash; scenario runs
+				and runs using the in-game dev tools do not &mdash; is posted to
+				<code>api.pdoom1.com/score_api.php</code> carrying:
+			</p>
+			<ul>
+				<li><strong>The lab name you chose</strong> — this is the name that appears on the
+					public leaderboard on this site. If you type your real name into it, your real name
+					is published.</li>
+				<li>Your score (turns survived) and the doom-integral tiebreak</li>
+				<li>The final turn number, and how long the run took in seconds</li>
+				<li>The build version, the run's seed, and the leaderboard epoch the board is keyed on</li>
+				<li>A timestamp, a random per-entry ID, and two baseline comparison numbers</li>
+			</ul>
+			<p>
+				If a submission can't reach the server it is queued in a file in the game's user
+				folder and retried on the next launch, so a score can leave your machine some time
+				after the run that produced it. Turning the setting off stops future submissions;
+				it does not recall a score already on the board — email us to have one removed.
+			</p>
+			<p>
+				<strong>Viewing</strong> the leaderboard is a plain read. It sends nothing about you
+				and is not gated by the setting.
+			</p>
+
+			<h3>3. The update check — no identifiers, no switch</h3>
+			<p>
+				On launch the game fetches the release manifest from the project's GitHub releases
+				page, and if that fails, falls back once to <code>pdoom1.com/data/version.json</code>
+				on this site. Both are ordinary downloads of a public file. They carry no install ID
+				and nothing about you beyond the same
+				<code>pdoom1/&lt;version&gt; (&lt;OS&gt;)</code> User-Agent and the IP the request
+				comes from &mdash; GitHub sees that as it would for any download. There is no toggle
+				for this one, and it never auto-downloads anything: if a newer version exists you get
+				a dismissible notice and a link.
+			</p>
+
+			<h3>4. The in-game bug reporter — sends nothing</h3>
+			<p>
+				<strong>The bug reporter inside the game does not transmit your report anywhere.</strong>
+				It writes a <code>.json</code> file to your own machine, along with a screenshot and a
+				copy of your latest save if you ticked those boxes, then shows you the full path and
+				asks you to email that file to <a href="mailto:team@pdoom1.com">team@pdoom1.com</a>
+				yourself. If you don't, we never see it. This build has no automatic submission of any
+				kind.
+			</p>
+			<p>
+				The file records your operating system, the game and engine versions, a UTC timestamp,
+				and your name and contact details only if you ticked the attribution box. All of that
+				sits on your disk until you choose to send it.
+			</p>
+
+			<h3>What the game keeps on your machine</h3>
+			<p>
+				Stored locally, sent nowhere by itself: the install ID file, your settings (including
+				the two choices above), your local scores, the queue of score submissions still
+				waiting to go, and any bug report files you have saved. Deleting the game's user
+				folder removes all of it.
+			</p>
+		</section>
+
+		<section class="section">
+			<h2>Opt-Out Controls (website)</h2>
+			<p>
+				You can opt out of website analytics at any time. Your preference is stored locally and will persist
 				across visits. You can also opt back in if you change your mind.
+			</p>
+			<p>
+				<strong>This button does not reach the game.</strong> The game's two switches live in
+				the game's own Settings, in the DISCLOSURE column &mdash;
+				<a href="#game-client" style="color: var(--accent-primary);">see above</a>.
 			</p>
 
 			<div class="opt-out-box">
@@ -360,9 +510,24 @@
 			<h2>Data Retention</h2>
 			<p>
 				Analytics data is kept <strong>indefinitely</strong> — there is no automatic deletion after a
-				fixed period. We keep it so we can compare traffic across years. It holds no names, emails or
-				IP addresses, and the hash Plausible uses to count repeat visits is regenerated daily, so
-				visits can't be joined up across days into a user profile.
+				fixed period. We keep it so we can compare traffic across years.
+			</p>
+			<p>
+				For <strong>website</strong> visits that data holds no names, emails or IP addresses, and
+				the hash Plausible uses to count repeat visits is regenerated daily, so visits can't be
+				joined up across days into a user profile.
+			</p>
+			<p>
+				For <strong>game launches</strong> it is different, and the difference is the whole
+				reason this section is now two paragraphs: the install ID is stored alongside each
+				launch event and does <em>not</em> rotate, so launches from one installation can be
+				joined up across days and months for as long as we keep the data. That is what it is
+				for — counting how many installs there are, rather than how many launches. It is not
+				linked to a name, an email or an account, because we hold none of those.
+			</p>
+			<p>
+				Leaderboard entries are kept for as long as the board exists, and the lab name on them
+				is public by design.
 			</p>
 		</section>
 
@@ -372,7 +537,7 @@
 				We use <a href="https://plausible.io/" target="_blank" rel="noopener" style="color: var(--accent-primary);">Plausible Analytics</a>,
 				an open-source, privacy-focused analytics platform. We run our own copy of it on our own server
 				at <code>analytics.pdoom1.com</code>, so your data is never sent to Plausible's hosted service or
-				to any other analytics company. Plausible is:
+				to any other analytics company. The game's launch ping goes to that same server. Plausible is:
 			</p>
 			<ul>
 				<li>Open source and auditable</li>
@@ -381,6 +546,12 @@
 				<li>Does not use cookies or track users across sites</li>
 				<li>Built to satisfy GDPR, CCPA and PECR by collecting no personal data and setting no cookies</li>
 			</ul>
+			<p>
+				Those five points describe Plausible's <em>browser</em> tracking, which is what runs on
+				this website. They are not a description of the game's launch ping: that is our own
+				code posting our own event to the same server, and it carries the persistent install ID
+				described above.
+			</p>
 
 			<h3>Alternative Providers</h3>
 			<p>
@@ -404,17 +575,28 @@
 				mechanics than wave a compliance badge. Plainly:
 			</p>
 			<ul>
-				<li><strong>Legal basis:</strong> our analytics process <em>no personal data</em> &mdash; no
+				<li><strong>Website analytics:</strong> they process <em>no personal data</em> &mdash; no
 					names, emails, IP addresses or cross-session identifiers &mdash; so most of what GDPR
 					governs simply does not arise. For the aggregate counts we keep, the basis is our
 					legitimate interest in knowing whether the site works and is found.</li>
+				<li><strong>The game's launch ping is the exception, and we are not going to bury it:</strong>
+					it carries a persistent random install ID, it is on by default, and a persistent
+					identifier is a stronger thing than the anonymous counting above &mdash; that is
+					why it has its own labelled switch in the game rather than being folded into this
+					page's opt-out. It still carries no name, email or account, and nothing about your
+					machine.</li>
 				<li><strong>Where it lives:</strong> on our own server (a virtual machine currently hosted
 					in the United States), never with a third-party analytics company.</li>
 				<li><strong>No third parties:</strong> the analytics are self-hosted; nothing is shared
-					with, sold to, or processed by anyone else.</li>
+					with, sold to, or processed by anyone else. The downloaded game contains no
+					third-party analytics, ads or crash reporting.</li>
 				<li><strong>Your rights:</strong> access, correction and deletion of <em>personal</em> data
-					are trivial for us to honour &mdash; we hold none. You can stop even the anonymous
-					counting any time via Do Not Track or the opt-out above.</li>
+					are trivial for us to honour &mdash; we hold very little. You can stop the anonymous
+					web counting any time via Do Not Track or the opt-out above, and stop the game's
+					ping with its own switch. Ask us to delete a leaderboard entry and we will. For
+					pings already sent, be warned that the honest answer is the switch: we have built
+					no way to pick one install ID back out of the analytics store, so turning it off
+					stops new events rather than erasing old ones.</li>
 			</ul>
 			<p>
 				If there is something here we could do better, please tell us &mdash; genuinely.
