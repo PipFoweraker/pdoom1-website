@@ -345,11 +345,13 @@
 		<section class="section" id="submit-issue">
 			<h2>Submit Feedback</h2>
 			<p style="color: var(--text-secondary); margin-bottom: 2rem;">
-				Tell us what's wrong or what could be better. The quickest path is the
-				<a href="/bug-report/" style="color: var(--accent-primary);">direct bug reporter</a>,
-				which sends straight to the team &mdash; no email client, no GitHub account.
-				The form below is an alternative: it composes an email or a pre-filled GitHub
-				issue that <em>you</em> send. Nothing here is transmitted automatically.
+				Tell us what's wrong or what could be better. This form sends straight to the
+				team &mdash; no email client, no GitHub account, no waiting on you to finish the
+				job. If the send fails you get a pre-filled
+				<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" style="color: var(--accent-primary);">GitHub issue</a>
+				instead, so nothing you wrote is lost. Reporting a crash with a log or a
+				screenshot? The <a href="/bug-report/" style="color: var(--accent-primary);">bug reporter</a>
+				takes an attachment; this form does not.
 			</p>
 
 			<form id="issue-form" style="max-width: 700px; margin: 0 auto;">
@@ -391,14 +393,24 @@
 					</div>
 				</div>
 
+				<!-- Honeypot: off-screen and hidden from people, tempting to bots.
+				     Same field name (`hp`) the /bug-report/ form uses, because the
+				     same bug-submit.php reads it. A tripped honeypot only TAGS the
+				     report server-side; it is never silently dropped. -->
+				<div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
+					<label for="issue-hp">Do not fill this in</label>
+					<input type="text" id="issue-hp" name="hp" tabindex="-1" autocomplete="off">
+				</div>
+
 				<div style="background: var(--bg-tertiary); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--accent-primary); margin-bottom: 1.5rem;">
 					<h4 style="color: var(--accent-primary); margin-bottom: 0.5rem;">🔒 What happens to your feedback</h4>
 					<p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
-						This form doesn't transmit anything on its own. When you submit, it prepares
-						an email to the team &mdash; or a pre-filled GitHub issue &mdash; for you to send.
-						If you file it on GitHub, the issue text you wrote becomes public there; if you
-						email it, it stays private with the team. Any contact detail you add is used only
-						to reply, never posted publicly. You can submit anonymously.
+						Submitting sends this straight to the team's inbox &mdash; no account, no extra
+						step, nothing left for you to do. If that send fails we hand you a pre-filled
+						GitHub issue instead, so nothing you wrote is lost. Text filed on GitHub is
+						public; text that reaches the inbox stays private with the team. Any contact
+						detail you add is used only to reply, is never posted publicly, and is never
+						copied into the GitHub fallback. You can submit anonymously.
 					</p>
 				</div>
 
@@ -666,7 +678,21 @@
 			issuesLoader.renderIssues();
 		}
 
-		// Issue Form Submission
+		// Feedback form submission.
+		//
+		// WHAT THIS REPLACED, because the failure mode is the point (TECH_DEBT C5):
+		// this handler used to `await new Promise(r => setTimeout(r, 1000))` -- a
+		// FAKE network delay -- and then render a mailto: link under a success-
+		// coloured heading. It transmitted nothing. Anyone who filled the form in,
+		// read the confirmation and closed the tab had sent us precisely nothing,
+		// and we had no record that they had ever tried.
+		//
+		// It now POSTs to bug-submit.php, the same PHP mailer /bug-report/ uses
+		// (DreamHost shared hosting, PHP + mail(), recipient hardcoded server-side),
+		// and mirrors that page's GitHub fallback. The success state is shown ONLY
+		// for an ok response -- everything else says so and hands over a pre-filled
+		// GitHub issue, because "we lost it silently" is the one outcome that is
+		// worse than "this failed".
 		document.getElementById('issue-form').addEventListener('submit', async function(e) {
 			e.preventDefault();
 
@@ -674,67 +700,117 @@
 			const submitButton = e.target.querySelector('button[type="submit"]');
 			const originalButtonText = submitButton.textContent;
 
-			// Get form data
-			const formData = {
-				type: document.getElementById('issue-type').value,
-				title: document.getElementById('issue-title').value,
-				description: document.getElementById('issue-description').value,
-				version: document.getElementById('issue-version').value || 'Not specified',
-				contact: document.getElementById('contact-method').value || 'Anonymous'
+			const kind = document.getElementById('issue-type').value || 'feedback';
+			const title = document.getElementById('issue-title').value;
+			const description = document.getElementById('issue-description').value;
+			const version = document.getElementById('issue-version').value.trim();
+			const contact = document.getElementById('contact-method').value.trim();
+
+			// bug-submit.php runs the `email` key through FILTER_VALIDATE_EMAIL and
+			// blanks anything that is not an address. This field deliberately accepts
+			// any handle ("Email, or leave blank for anonymous" is what it says, and
+			// people put in a Discord name or a URL), so anything that is not an
+			// address goes in the BODY instead of being quietly discarded.
+			const looksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+
+			let body = description;
+			if (version) { body += '\n\nGame version: ' + version; }
+			if (contact && !looksLikeEmail) {
+				body += '\n\nContact given (not an email address): ' + contact;
+			}
+			body += '\n\nSubmitted via pdoom1.com/issues/';
+
+			const payload = {
+				title: title,
+				type: kind,
+				description: body,
+				email: looksLikeEmail ? contact : '',
+				hp: document.getElementById('issue-hp').value || '',
+				// Feeds the server's minimum-fill-time signal. It only TAGS a report,
+				// never drops it, so a fast typer still gets through.
+				elapsed_ms: Math.round(performance.now()),
+				source: 'web-issues'
 			};
 
-			// Disable form
+			// The fallback, prepared before the attempt so a failure is instant.
+			// Target the ISSUE FORM, not a blank issue: the game repo sets
+			// blank_issues_enabled:false, so /issues/new?title=&body= redirects to
+			// /issues/new/choose and DROPS the prefill. Keys must match
+			// .github/ISSUE_TEMPLATE/bug_report.yml in PipFoweraker/pdoom1.
+			// The reporter's contact detail is NOT included -- a GitHub issue is
+			// public, and the page promises that detail stays private.
+			const ghParams = new URLSearchParams({
+				template: 'bug_report.yml',
+				title: title || 'Feedback',
+				description: description + '\n\n_(filed via pdoom1.com/issues/; type: ' + kind + ')_'
+			});
+			const ghUrl = 'https://github.com/PipFoweraker/pdoom1/issues/new?' + ghParams.toString();
+
 			submitButton.disabled = true;
-			submitButton.textContent = 'Preparing...';
-			formStatus.textContent = 'Preparing your report...';
+			submitButton.textContent = 'Sending...';
+			formStatus.textContent = 'Sending your feedback...';
 			formStatus.style.color = 'var(--accent-primary)';
 
+			let res = null;
 			try {
-				// TODO: Replace with actual Netlify Function or backend endpoint
-				// For now, create a mailto link as fallback
-				const issueBody = `
-**Issue Type:** ${formData.type}
+				res = await fetch('/bug-submit.php', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(payload)
+				});
+			} catch (_) {
+				res = null;   // network failure -> the GitHub branch below
+			}
 
-**Description:**
-${formData.description}
-
-**Game Version:** ${formData.version}
-
-**Submitted via:** pdoom1.com/issues/
-${formData.contact !== 'Anonymous' ? `**Contact:** ${formData.contact}` : ''}
-				`.trim();
-
-				const subject = encodeURIComponent(`[${formData.type}] ${formData.title}`);
-				const body = encodeURIComponent(issueBody);
-
-				// Simulate submission delay
-				await new Promise(resolve => setTimeout(resolve, 1000));
-
-				formStatus.innerHTML = `
-					<div style="color: var(--accent-primary); margin-bottom: 1rem;">📝 Your report is ready &mdash; one step left to send it:</div>
-					<div style="font-size: 0.9rem; color: var(--text-secondary);">
-						<a href="mailto:team@pdoom1.com?subject=${subject}&body=${body}"
-						   style="color: var(--accent-primary); text-decoration: underline;">
-							Send it via email
-						</a>
-						<p style="margin-top: 0.5rem;">or file it on
-						<a href="https://github.com/PipFoweraker/pdoom1/issues/new/choose" target="_blank" style="color: var(--accent-primary);">GitHub</a>.
-						Prefer it to just go straight through? Use the
-						<a href="/bug-report/" style="color: var(--accent-primary);">direct bug reporter</a>.</p>
-					</div>
-				`;
-
-				// Reset form
+			if (res && res.ok) {
+				formStatus.textContent = 'Sent — it went straight to the team inbox. Nothing else for you to do.';
+				formStatus.style.color = 'var(--success-color)';
 				e.target.reset();
 				submitButton.textContent = originalButtonText;
 				submitButton.disabled = false;
+				return;
+			}
 
-			} catch (error) {
-				formStatus.textContent = '❌ Submission failed. Please try again or contact us directly.';
-				formStatus.style.color = 'var(--accent-danger)';
+			if (res && res.status === 429) {
+				// The server's per-IP throttle (one report per 30s). Deliberately NOT
+				// a GitHub hand-off: the reporter almost certainly just sent one, and
+				// the form still holds their text -- the honest instruction is "wait".
+				formStatus.textContent = 'The server accepts one report every 30 seconds. Your text is still here — press Submit again in a moment.';
+				formStatus.style.color = 'var(--accent-primary)';
 				submitButton.textContent = originalButtonText;
 				submitButton.disabled = false;
+				return;
 			}
+
+			// Anything else -- server down, mail() refused, validation rejected,
+			// network gone. Hand over a pre-filled GitHub issue rather than claim a
+			// success we did not get. Built as DOM nodes, not an innerHTML string,
+			// so the reporter's own text cannot reshape this page on its way out.
+			window.open(ghUrl, '_blank', 'noopener');
+			formStatus.textContent = '';
+			formStatus.style.color = 'var(--text-secondary)';
+
+			const headline = document.createElement('div');
+			headline.style.cssText = 'color: var(--accent-danger); margin-bottom: 0.6rem;';
+			headline.textContent = 'That did not send — so nothing has been lost, your report is opening as a pre-filled GitHub issue.';
+
+			const detail = document.createElement('div');
+			detail.style.cssText = 'font-size: 0.9rem; color: var(--text-secondary); font-weight: normal;';
+			const ghLink = document.createElement('a');
+			ghLink.href = ghUrl;
+			ghLink.target = '_blank';
+			ghLink.rel = 'noopener';
+			ghLink.style.cssText = 'color: var(--accent-primary); font-weight: bold;';
+			ghLink.textContent = 'Open the pre-filled GitHub issue →';
+			detail.appendChild(ghLink);
+			const tail = document.createElement('span');
+			tail.textContent = ' — press "Submit new issue" there to finish (a free GitHub account is needed), or email team@pdoom1.com directly.';
+			detail.appendChild(tail);
+
+			formStatus.appendChild(headline);
+			formStatus.appendChild(detail);
+			submitButton.textContent = originalButtonText;
+			submitButton.disabled = false;
 		});
 	</script>
 

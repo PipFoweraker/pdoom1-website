@@ -34,6 +34,14 @@
 				<li role="none" class="dropdown">
 					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
 					<ul class="dropdown-menu" role="menu">
+						<!-- /bug-report/ is the ONLY zero-account path on the site that
+						     actually delivers: it POSTs to bug-submit.php, which emails
+						     team@pdoom1.com. It was linked from nowhere in the nav until
+						     2026-08-11, so the one working contact route was unreachable
+						     unless you already knew the URL. Labelled for a general
+						     visitor, not "Report a Bug" -- most first-stranger contact is
+						     not a bug report, and a bug-only label turns them away. -->
+						<li role="none"><a href="/bug-report/" role="menuitem">Contact / Feedback</a></li>
 						<li role="none"><a href="/issues/" role="menuitem">Issues & Feedback</a></li>
 						<li role="none"><a href="/blog/" role="menuitem">Dev Blog</a></li>
 						<li role="none"><a href="/game-changelog/" role="menuitem">Updates</a></li>

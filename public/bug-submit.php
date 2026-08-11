@@ -28,7 +28,13 @@ const MAX_DESC    = 5000;
 const MAX_EMAIL   = 200;
 const MAX_CREDIT  = 80;                      // name the reporter wants crediting as
 const MAX_ATTACH_BYTES = 550 * 1024;         // decoded cap; client caps the file at 500 KB
-const TYPES       = ['bug', 'feature', 'documentation', 'performance'];
+// Allowlist for the `type` key. An unknown value falls back to 'bug' below, which
+// is safe but MISLABELS: /issues/ offers "General Feedback" and "Question", and
+// both would have arrived subject-lined "p(Doom)1 bug: ...". 'feedback' and
+// 'question' were added 2026-08-11 when that form was wired to this endpoint.
+// The value only ever reaches the subject line and the body, both after the
+// in_array() check, so widening the list adds no injection surface.
+const TYPES       = ['bug', 'feature', 'documentation', 'performance', 'feedback', 'question'];
 
 header('Content-Type: application/json; charset=utf-8');
 
