@@ -187,6 +187,32 @@ code, out = run(r)
 check(code == 2, "exit 2 (got %s)" % code)
 check("no current epoch" in out, "explains there is nothing to compare about")
 
+print("\n10. THE SWEEP BUG: an empty seed cell must not adopt a backtick from the notes")
+# 2026-08-11 sweep, probe 2. This row's seed cell is EMPTY and its NOTES carry a
+# backticked documentation path. The old parser took "the first backticked value in
+# the row that is not a filename" and would present docs/THING.md as a league seed.
+r = build(tmp / "j", "L9",
+          ["| L9 |  | L9 |  | - | - | see `docs/THING.md` for the seed |\n"],
+          ladder_of("L9", "weekly-2026-w99"),
+          weekly_of("L9", "weekly-2026-w99", True),
+          pub_of("L9", "weekly-2026-w99"))
+code, out = run(r)
+check("docs/THING.md" not in out,
+      "a documentation path from the NOTES column is never read as a seed")
+check(code == 1, "and the row still reports a disagreement rather than passing quietly")
+
+print("\n11. A pipe inside a later cell must not move the seed")
+# The row parser splits on '|', so a pipe in the notes shifts every later cell.
+# The seed must still come from its own cell rather than from a shifted position.
+r = build(tmp / "k", "L4",
+          ["| L4 | `weekly-2026-w32` | L4 | `b.json` | 2026-08-08 | Pip | uses `a|b` |\n"],
+          ladder_of("L4", "weekly-2026-w32"),
+          weekly_of("L4", "weekly-2026-w32", True),
+          pub_of("L4", "weekly-2026-w32"))
+code, out = run(r)
+check(code == 0,
+      "a pipe in a notes cell shifts later cells but must not move the seed (got %s)" % code)
+
 print("\n9. It never claims to be able to fix the ledger")
 r = build(tmp / "i", "L4", [unfilled_row("L4")],
           ladder_of("L4", "weekly-2026-w32"),
