@@ -91,6 +91,6 @@ was never built.
 
 ---
 
-*p(Doom)1 is free, open source and non-commercial. If something in this release
+*p(Doom)1 is free, source-available and non-commercial. If something in this release
 confused you, that is the most useful thing you can tell us — the bug tracker is
 the front door.*
