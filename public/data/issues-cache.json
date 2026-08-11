@@ -1,86 +1,6 @@
 {
   "issues": [
     {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1203",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1203/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1203/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1203/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/pull/1203",
-      "id": 5119764735,
-      "node_id": "PR_kwDOPVWa5879fPsM",
-      "number": 1203,
-      "title": "ci(guard): make class:guard and class:docs actually check something",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 11799845250,
-          "node_id": "LA_kwDOPVWa588AAAACv1NZgg",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/class:guard",
-          "name": "class:guard",
-          "color": "0E8A16",
-          "default": false,
-          "description": "Adds or repairs a check, gate or CI condition. Self-merge on green with a recorded RED run."
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2026-08-11T11:41:33Z",
-      "updated_at": "2026-08-11T11:43:14Z",
-      "closed_at": null,
-      "assignee": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "draft": false,
-      "pull_request": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/pulls/1203",
-        "html_url": "https://github.com/PipFoweraker/pdoom1/pull/1203",
-        "diff_url": "https://github.com/PipFoweraker/pdoom1/pull/1203.diff",
-        "patch_url": "https://github.com/PipFoweraker/pdoom1/pull/1203.patch",
-        "merged_at": null
-      },
-      "body": "## What this is\n\nRuling R1 (`RULED_2026-08-10_pr-self-merge-and-four-more.md`) lets a seat merge\nthe **guard** and **docs** classes without Pip, on green. The labels `class:guard`\nand `class:docs` were created in three repos on 2026-08-10 and, until this PR,\nthey **promised eligibility and nothing checked anything** -- the same defect that\nretired `ship:hotpatch-48h` on the same day. This PR is the mechanism.\n\nNew workflow `.github/workflows/self-merge-eligibility.yml` (pull_request:\nopened, labeled, unlabeled, synchronize, edited), backed by\n`tools/check_self_merge_eligibility.py` and 29 hermetic tests in\n`tests/test_check_self_merge_eligibility.py`.\n\n| situation | verdict |\n|---|---|\n| no class label | PASS, neutral -- never blocks a normal PR |\n| `class:docs` | PASS only if EVERY changed path is documentation |\n| `class:guard` | PASS only if the PR body records the RED run (Section 5g) |\n| `needs:pip` + a class label | FAIL -- a label cannot lift a hold |\n| both class labels | FAIL -- a PR is one class or neither |\n\nDesign, failure-message style and the \"declaration plus a mandatory substantive\nreason\" rule are adopted from `tools/check_ladder_bump.py`, not reinvented.\n\n**Documentation, for the docs class, means:** a path under `docs/`, or a file\nending `.md` / `.rst` / `.txt` -- **excluding** machine-read `.txt` files\n(`ladder_version.txt` is the leaderboard board key, `version.txt` is the version\nSSOT, `requirements*.txt` are pins, `godot/build_stamp.txt` and\n`godot/steam_appid.txt` are shipped engine data) and vendored `godot/addons/`.\nA suffix-only rule would have waved the board key through as prose.\n\n**One judgement call, flagged for overruling.** `needs:pip` **alone**, with no\nclass label, is neutral rather than red: a hold nobody is trying to skip is not\nthis gate's business, and a check that reddens every held PR is a check everyone\nlearns to ignore. It fails the moment a class label tries to lift the hold. One\nconstant, `BLOCKED_FAILS_ALONE`, flips it.\n\n## Section 5g: the RED run\n\nThis PR was opened carrying `class:guard` with **no declaration in the body**, on\npurpose, so the new gate would fail on this very PR for the exact rule it exists\nto enforce.\n\nRED-RUN: https://github.com/PipFoweraker/pdoom1/actions/runs/31487755114 -- opened with class:guard and no declaration in the body; the gate failed itself before it was believed\n\nThat run is red at `Check this PR against its class label`, printing the expected\nformat. The self-test step above it was green in the same run: the rule table\n(11 red/green cases) and the 29 unit tests ran before the gate judged this PR.\nThis line is what turns it green -- so the check's own green is downstream of its\nown red.\n\nDO NOT MERGE -- reporting back first.\n\nGenerated with [Claude Code](https://claude.com/claude-code)\n",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1203/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1203/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null
-    },
-    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/601",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/601/labels{/name}",
@@ -1363,8 +1283,101 @@
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
+    },
+    {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1090",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1090/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1090/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1090/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/1090",
+      "id": 5034412664,
+      "node_id": "I_kwDOPVWa588AAAABLBMKeA",
+      "number": 1090,
+      "title": "design(research): Research Quality (Rushed/Standard/Thorough) is still a global Plan-screen toggle -- the ruling moved it to research-project level",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [
+        {
+          "id": 9227753930,
+          "node_id": "LA_kwDOPVWa588AAAACJgRZyg",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/game-mechanics",
+          "name": "game-mechanics",
+          "color": "0e8a16",
+          "default": false,
+          "description": "Core game logic and mechanics"
+        },
+        {
+          "id": 9820300732,
+          "node_id": "LA_kwDOPVWa588AAAACSVXlvA",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/ux",
+          "name": "ux",
+          "color": "FBCA04",
+          "default": false,
+          "description": "What happens when you use it. If a fix needs new behaviour or words, it is ux."
+        }
+      ],
+      "state": "open",
+      "locked": false,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2026-08-01T00:43:11Z",
+      "updated_at": "2026-08-11T10:45:50Z",
+      "closed_at": null,
+      "assignee": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "body": "From the recorded playtest of v0.13.2, 2026-08-01 09:52 (`art_generated/audiodump/2026-08-01_09-52-08.transcript.md`, local-only; frames `f060_376s.jpg`, `f067_411s.jpg`).\n\n## Observation\n\n**[6:49]** \"Research quality, rushed, standard, thorough. This doesn't live in this UI, this lives somewhere else. So let's move it out of here. And I think we actually made a decision that this is going to be done at an idea or research project level, rather than as a global level. So let's figure out where this lives inside the more coherent, philosophically aligned version of the game, and then make a plan to move it there.\"\n\nFrames: the Rushed/Standard/Thorough selector sits at the very top-left of the Plan screen, directly under the attention bar, with its blurb line (\"2.0x speed. Erodes research integrity, widens capability overhang.\") occupying prime real estate on every planning turn -- for a setting most players will touch once.\n\n## The decision trail (Pip's memory checks out)\n\n- Origin: issue #500 -- built as an org-wide stance. Code: `godot/scripts/ui/research_quality_selector.gd` (\"Player picks the org-wide stance\"), mounted at `main_ui.gd:245-249` into the plan screen; state in `game_state.gd:234/728-749` (`research_quality_mode`, global multiplier + risk-pool feed).\n- `docs/game-design/WORKSHOP_2_BACKLOG.md:520`: \"Research Quality Rushed/Standard/Thorough (issue #500, top-left in game) uses literal doom deltas -- dies in the ADR-0015 event-intermediary content pass.\"\n- `docs/game-design/RESEARCH_IDEA_PAPER_PIPELINE_GAP.md` (section 1b): the global mode is called out as the ONLY research direction the player has -- \"global, not per-researcher and not per-idea\" -- precisely the gap the per-project model (ADR-0011 workstreams; ideas as first-class objects) is meant to fill.\n\nSo the ruling Pip remembers is real, recorded in two places, and this selector is the last visible artifact of the pre-ruling model.\n\n## Ask (a plan, not an immediate rip-out)\n\n1. Confirm the target home: quality as a property of a research project/idea (set when work is committed), per RESEARCH_IDEA_PAPER_PIPELINE_GAP + ADR-0011. If that substrate is not built yet, this issue BLOCKS ON it -- do not orphan the mechanic by deleting the only lever first.\n2. Interim (cheap, unblocks #1043's layout work): demote the selector out of the Plan screen's prime top-left -- it does not need per-turn prominence even while global.\n3. When the per-project model lands: migrate the multiplier + risk feed (`apply_research_quality_risk`) to per-project, delete the global mode, and update `test_research_quality.gd`.\n\n## Not claimed\n\n- Not claiming the mechanic's NUMBERS are wrong (2.0x/0.5x, integrity/overhang feeds) -- only its scope (global) and its screen position.\n\nRelated: #500 (origin), #1043 (Plan screen layout -- this selector is part of the clutter it inherits), #986 (ADR-0015 risk_events pass, where the literal-doom-delta content dies), #984 (mechanics deep-dive audit).\n",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1090/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1090/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null,
+      "pinned_comment": null
     }
   ],
   "count": 15,
-  "last_updated": "2026-08-11T12:12:47.717648"
+  "last_updated": "2026-08-11T18:14:37.866519"
 }
