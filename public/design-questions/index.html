@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Design questions -- p(Doom)1</title>
+<meta name="description" content="The 38 design questions p(Doom)1 has not settled yet, with their current status.">
+<link rel="stylesheet" href="/css/site.css">
+<style>
+:root{--bg-primary:#12100F;--bg-secondary:#1C1917;--bg-tertiary:#262220;
+--text-primary:#E9F2F2;--text-secondary:#CFC7BB;--text-muted:#A79E92;
+--accent-primary:#F6A800;--accent-secondary:#2FD4C2;--accent-danger:#E2524A;
+--border:#3A342E;--border-strong:#574E44;--success:#4FB37A;--warning:#E9752E}
+body{background:var(--bg-primary);color:var(--text-primary);
+font-family:'Courier New',monospace;line-height:1.55;margin:0}
+main{max-width:60rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{color:var(--accent-primary);margin:.2rem 0 .4rem;font-size:1.7rem}
+.lede{color:var(--text-secondary);max-width:46rem}
+.note{background:var(--bg-secondary);border-left:3px solid var(--accent-secondary);
+padding:.75rem 1rem;margin:1.5rem 0;color:var(--text-secondary)}
+table{width:100%;border-collapse:collapse;margin-top:1.5rem}
+th{text-align:left;color:var(--text-muted);font-weight:normal;
+border-bottom:1px solid var(--border-strong);padding:.5rem .6rem;font-size:.85rem}
+td{border-bottom:1px solid var(--border);padding:.7rem .6rem;vertical-align:top}
+.k{color:var(--accent-secondary);white-space:nowrap;font-size:.9rem}
+.d{color:var(--text-secondary);font-size:.92rem}
+.cav{color:var(--warning);font-size:.85rem;margin-top:.35rem}
+.pill{border:1px solid var(--border-strong);border-radius:1rem;
+padding:.1rem .55rem;font-size:.78rem;color:var(--text-muted);white-space:nowrap}
+footer{color:var(--text-muted);font-size:.85rem;margin-top:2.5rem;
+border-top:1px solid var(--border);padding-top:1rem}
+a{color:var(--accent-primary)}
+</style></head><body>
+<header></header>
+<main>
+<h1>Design questions</h1>
+<p class="lede">These are the things about p(Doom)1 that are <strong>not settled</strong>.
+Not a roadmap and not a promise &mdash; a list of questions the game is genuinely
+holding open, with where each currently stands.</p>
+
+<div class="note">Each line below is a one-sentence summary derived from the design
+backlog. <strong>The full text of each is being prepared.</strong> Nothing here is a
+commitment that a question will be answered a particular way, or at all &mdash; an open
+question is exactly that.</div>
+
+<table>
+<thead><tr><th>Ref</th><th>Question</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td class="k">DQ-1</td><td class="t"><b>Victory condition removal</b><br><span class="d">the doom≤0 victory branch is removed.</span></td><td class="s"><span class="pill">RESOLVED</span></td></tr>
+<tr><td class="k">DQ-2</td><td class="t"><b>Baseline yardstick</b><br><span class="d">is the no-action baseline still the right reference under turns-survived scoring?</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-3</td><td class="t"><b>Cross-version leaderboard UX</b><br><span class="d">(seed, game_version) boards show as separate seed (version) entries.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-4</td><td class="t"><b>Character-creation re-roll within a seed</b><br><span class="d">ruling applied: same seed → same starting staff.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-5</td><td class="t"><b>Empty-seed determinism contract</b><br><span class="d">only explicitly-seeded games are deterministic (empty falls back to Time).</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-6</td><td class="t"><b>Schedule provenance in the replay artifact</b><br><span class="d">replay accepts a schedule, but the exported artifact doesn&#x27;t yet carry it.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-7</td><td class="t"><b>Governance player-facing design</b><br><span class="d">governance added as an engine float (a ledger currency per ADR-0003), but its scale, starting value, how the player raises/spends it, and its UI are undesigned.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-8</td><td class="t"><b>Balance constants</b><br><span class="d">ledger escalation rates (DOOM_PER_UNPAID_1000, interest, loan multiple) and rival doom pressure are placeholders.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-9</td><td class="t"><b>Receivables / counterparty content</b><br><span class="d">the Entry model supports the receivable (favor/pledge) side, but content is unbuilt and overlaps ADR-0007 alliances (WS-3).</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-10</td><td class="t"><b>Inward-SA / ledger visibility</b><br><span class="d">how much of the player&#x27;s own ledger is visible is undecided; overlaps WS-2 SA and the inward-SA deferral (ADR-0008).</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-11</td><td class="t"><b>Save/fork/divergence mechanics</b><br><span class="d">Pip open to them; legal under ADR-0006&#x27;s verification law.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-12</td><td class="t"><b>Rival narrative presence</b><br><span class="d">playtest note: rival still &quot;narratively invisible&quot; despite mechanical doom pressure.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-13</td><td class="t"><b>Doom nudge strength</b><br><span class="d">playtest note: &quot;doom nudges overall probably a little strong.&quot; Folds into the DQ-8 balance pass, re-denominated at month grain.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-14</td><td class="t"><b>World-state progression display</b><br><span class="d">playtest note: &quot;sense of progression over time doesn&#x27;t feel very strong.&quot; Candidate home: month review screen (ADR-0009 consequence) + era-keyed visual/UI shifts.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-15</td><td class="t"><b>Researcher archetype roster</b><br><span class="d">Pip authored three (people-pleaser interp, authoritarian governance pessimist, moral-crusader agent foundations), Fable drafted two for veto (capabilities-curious optimist, burned-out ex-frontier senior).</span></td><td class="s"><span class="pill">SEEDED</span></td></tr>
+<tr><td class="k">DQ-15 ext</td><td class="t"><b>Portrait variant pools + seeded assignment</b><br><span class="d">each archetype carries a POOL of appearance variants (gender, ethnicity -- the representation rule made mechanical) with per-run random assignment and hot-swap capability; Pip kept both style-pole bests deliberately as pool stock (the CRT-dossier v2 set promoted as the current consistent face of the roster).</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-16</td><td class="t"><b>Conference-attendance subgame</b><br><span class="d">Pip&#x27;s flagged ambition (&quot;that&#x27;s how critical I think these are&quot;).</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-17</td><td class="t"><b>Achievement candidates register</b><br><span class="d">observer-only, never writes back to sim/score.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-17 ext</td><td class="t"><b>Achievements in-run visibility</b><br><span class="d">Pip wants them referenceable during a run, near a &quot;character sheet&quot; UI surface that doesn&#x27;t exist yet (himself unsure); also &quot;felt a little generic&quot; → content pass owed.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-18</td><td class="t"><b>Early game = scouting / the populating board</b><br><span class="d">DQ-18 — EXECUTED — the scouting beat ran as workshop #3&#x27;s lead.</span></td><td class="s"><span class="pill">EXECUTED</span></td></tr>
+<tr><td class="k">DQ-19</td><td class="t"><b>Character creation surface</b><br><span class="d">attached question (Pip: &quot;the right question&quot;): does founder background type the starting channels/connections — ex-academic → research-sight affinity, ex-finance → doors/VC access, ex-journalist → media-sight?</span></td><td class="s"><span class="pill">PRIORITISED</span></td></tr>
+<tr><td class="k">DQ-20</td><td class="t"><b>Risk pools</b><br><span class="d">Pip&#x27;s gloss, logged not designed: &quot;insurance/mutualisation - industry actors pooling exposure to AI incidents, and the pool itself becoming an actor with opinions about safety standards.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-21</td><td class="t"><b>Intermediary vocabulary v1</b><br><span class="d">Nine streams: general_capability (chronic floor), frontier_capability (per-actor map; player slice separately named for DQ-22 aggro), overhang (frontier − safety_absorption), global_compute (uncontrollable ocean, no direct doom term), dedicated_ai_compute (governable fleet), ambient_risk, global_panic (additive), global_alarm (small stream AND damper-gate), plus scheduled pulses (ramp/spike/tail envelope on ADR-0005 entries); political_pressure gates dampers, owns no stream.</span></td><td class="s"><span class="pill">RESOLVED</span></td></tr>
+<tr><td class="k">DQ-22</td><td class="t"><b>Aggro-threshold midgame</b><br><span class="d">rivals develop their own positions until the player&#x27;s visible impact threatens their interests, then active attacks begin (litigation, funding cuts, rep attacks, scathing reviews, psyops, aggressive hiring, leak seeking) — &quot;the sign we&#x27;re entering the midgame.&quot; XCOM:EU anti-grind / Factorio pollution-biters pattern.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-23</td><td class="t"><b>Damper economy</b><br><span class="d">minting systems, durations, stacking rules, per-stream caps.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-24</td><td class="t"><b>Attention-demand taxonomy + typed delegation</b><br><span class="d">enumerate the ~4–6 demand skill-categories (candidates: ops/bookkeeping, people/HR, technical-infra/security, research direction, external/comms) and the hire-archetype matching (&quot;can&#x27;t delegate bookkeeping to a security engineer&quot;); enumerate the process-step demand list (hiring pipeline steps, onboarding, research-strategy setting, progress check-ins); define aggregation rule (typed micro-demands roll up into manager-absorbed classes at scale — same object as the Celine&#x27;s-law report).</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-25</td><td class="t"><b>Desperation-lever revisit</b><br><span class="d">Pip wants the mechanic + flavor re-understood (ADR-0003&#x27;s catch-up machinery); solver-bot data now in (EE-9, PR #642, docs/balance/DESPERATION_SOLVER.md, calibrated pre-stream-migration constants).</span><div class="cav">Numbers to be re-confirmed against the current model.</div></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-26</td><td class="t"><b>VC/equity depth revisit</b><br><span class="d">the L5 instruments ship with equity dilution + board seats as inert standing terms (DQ-7 stubs).</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-27</td><td class="t"><b>Mortality guarantee -- where is it ratified?</b><br><span class="d">the guarantee (no immortal runs, ADR-0002) is currently emergent from ledger compounding interest, asserted across ADR-0002/0003/0013, pinned in no single ADR.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-28</td><td class="t"><b>Game &quot;phases&quot; as vocabulary + scenario-jump testing</b><br><span class="d">DQ-28 RESOLVED — the 5-phase spine (Startup → Incubator → Entity → Institution → Titan) is now in WORLD_AND_LORE (&quot;The five phases of a run&quot;); felt-not-announced (Factorio, not AoE).</span></td><td class="s"><span class="pill">RESOLVED</span></td></tr>
+<tr><td class="k">DQ-29</td><td class="t"><b>Cover-up debt</b><br><span class="d">a failure-response trichotomy: Transparency / Investigate / Cover-up, where covering up a technical failure mints a delayed-exposure hidden liability — a secret ledger entry that bites later via an exposure event.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-30</td><td class="t"><b>Economic cycles</b><br><span class="d">typed funding-source cycle-sensitivity (government counter-cyclical, seed/VC most cyclical) + named macro phases (bull/bear/winter).</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-31</td><td class="t"><b>Org/actor taxonomy -- tags, not enums</b><br><span class="d">the sim currently knows exactly two actor kinds: &quot;the player&quot; and RivalLab.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-32</td><td class="t"><b>News feedline + SA-priced information flow</b><br><span class="d">rival/world information should arrive on a News feedline: v0 is just a distinct colour on the Events tab (the #726 rivals channel, made filter-outable, is the seed), later possibly its own submenu on the action feed that lights up with unread items.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-33</td><td class="t"><b>Content-pool ladder (artefact promotion/relegation)</b><br><span class="d">as pdoom-data&#x27;s artefact pools grow (&quot;10,000 papers, 5,000 events&quot;), move to a fixed-size active pool with ranked entry: artefacts rated on impact measures, top N% make the game&#x27;s event pool; each month reports new entrants, rankings, pool shifts, and the new cut.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-34</td><td class="t"><b>Leaderboard disclosure tiers: score vs reconstructable play</b><br><span class="d">submitting a score must not automatically make a player&#x27;s ACTIONS reconstructable by others.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-35</td><td class="t"><b>Cosmetic progression + community insignia</b><br><span class="d">background theory of rewarding progress: one of the few things Pip likes in CoD is its appeasement of hardcore grinders via lots of little cosmetic tags and banners with distinct subthemes — pure cosmetics, no power.</span></td><td class="s"><span class="pill">open</span></td></tr>
+<tr><td class="k">DQ-35 ext</td><td class="t"><b>Scene/art unlocks + conditional event art</b><br><span class="d">concrete mechanisms for DQ-35: (a) event hero-art VARIANTS as unlockables (crisis V3 as achievement unlock; records_vault as unlocked leaderboard ground; records_trophy_terminal as a post-game achievements surface); (b) CONDITIONAL art selection -- e.g.</span></td><td class="s"><span class="pill">open</span></td></tr>
+</tbody></table>
+
+<footer>
+Mirrored from the p(Doom)1 design backlog on 2026-08-11. Identity and status come from the
+game repository's own generated index, so this table cannot disagree with it about
+which questions exist. Where a figure has a caveat, the caveat is shown rather than
+hidden.
+</footer>
+</main>
+<script src="/assets/js/navigation.js"></script>
+</body></html>
