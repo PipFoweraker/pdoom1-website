@@ -1,0 +1,86 @@
+name: Self-Merge Eligibility
+
+# Makes the class:guard / class:docs labels mean something.
+#
+# Ruling RULED_2026-08-10_pr-self-merge-and-four-more.md R1 lets a seat merge two
+# PR classes without Pip: guard (adds or repairs a check, gate, alarm or CI
+# condition) and docs (corrects documentation to match measured reality), both on
+# green. Anything changing a public claim, an entity boundary, a rule, or
+# anything irreversible stays with Pip.
+#
+# The labels were created in three repos on 2026-08-10 and, until this workflow
+# existed, they promised eligibility and checked nothing -- the same defect that
+# retired ship:hotpatch-48h the same day. This job is the mechanism.
+#
+# ON THIS REPO the docs class is narrower than the label suggests, and the
+# narrowing is the interesting part: everything under public/ is served to
+# visitors, so editing it is changing a PUBLIC CLAIM, which R1 keeps with Pip and
+# which the prime directive ("never lie to a visitor") makes the highest-stakes
+# edit available here. A published blog post is a .md file and still fails the
+# docs class. docs/copy-baseline/ is excluded for the same family of reason: it
+# is the frozen snapshot scripts/snapshot-copy.py --check diffs against, so
+# editing it is how a drift check is made to agree with drifted copy.
+#
+# It never blocks a PR that claims nothing: with no class label it passes with a
+# neutral message. It has an opinion only about PRs asking to skip Pip.
+#
+# No secrets, read-only, opens no issues. Stdlib Python only -- no pip install,
+# so it cannot break on dependency drift.
+
+on:
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  # Labelling and body edits fire this repeatedly; only the newest state matters.
+  group: self-merge-eligibility-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  eligibility:
+    name: Self-merge class eligibility
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The docs-class rule needs the real changed-path list, which needs the
+          # merge base with the target branch.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Prove the gate can still fail (self-test)
+        run: |
+          echo "Replaying the whole rule table hermetically -- no GitHub, no network."
+          echo "The gate must go RED on every unsupported claim (docs label over a served"
+          echo "page, over the frozen copy baseline, over deploy-excludes.txt; guard label"
+          echo "with no RED-RUN line; needs:pip over a class label; both class labels) and"
+          echo "GREEN on an unlabelled PR and the two supported claims."
+          python scripts/check-self-merge-eligibility.py --self-test
+
+      - name: The rules hold one at a time, not just as a table
+        run: python scripts/test-self-merge-eligibility.py
+
+      - name: Check this PR against its class label
+        env:
+          # Both are author-controlled text. Pass by environment, never inline
+          # into the shell.
+          PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          echo "class:docs  -> every changed path must be internal documentation."
+          echo "class:guard -> the PR body must record the RED run that proves the guard,"
+          echo "               per estate rule Section 5g:"
+          echo "               RED-RUN: <run-url-or-run-id> -- <what was broken to make it fail>"
+          echo "needs:pip over either class label -> fail; a class label cannot lift a hold."
+          echo "Both class labels -> fail; a PR is one class or neither."
+          echo "Neither class label -> pass, neutral. This check never blocks a normal PR."
+          git fetch --no-tags origin "$BASE_REF"
+          python scripts/check-self-merge-eligibility.py --base "origin/$BASE_REF"
