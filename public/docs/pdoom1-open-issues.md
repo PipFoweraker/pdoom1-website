@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-11T00:32:20.340Z UTC
+Generated: 2026-08-11T06:33:03.467Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1200 | The 6 unattributable packed assets: resolve or accept, forced by a guard not a document |  |  | 2026-08-11 03:59:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/1200) |
 | 1198 | Two text-leak scanners on main with near-identical names -- and the numbers they produced are already cited as evidence |  |  | 2026-08-10 10:04:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1198) |
 | 1193 | #1137's event retiming made a simulated run ~38% more expensive -- is that the intended event density? |  |  | 2026-08-09 01:19:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1193) |
 | 1171 | Ladder eligibility must be visible BEFORE the run starts, not delivered at death (ruled by Pip 2026-08-07) |  |  | 2026-08-07 13:20:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1171) |
