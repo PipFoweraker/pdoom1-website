@@ -3,11 +3,11 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ADR-0007 — Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight) | p(Doom)1 Design Notes</title>
+	<title>ADR-0007 -- Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight) | p(Doom)1 Design Notes</title>
 	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0007-alliances-third-client.html" />
-	<meta name="description" content="ADR-0007 — Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight)" />
-	<meta property="og:title" content="ADR-0007 — Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight) | p(Doom)1 Design Notes" />
-	<meta property="og:description" content="ADR-0007 — Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight)" />
+	<meta name="description" content="ADR-0007 -- Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight)" />
+	<meta property="og:title" content="ADR-0007 -- Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight) | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="ADR-0007 -- Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight)" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0007-alliances-third-client.html" />
 
@@ -96,27 +96,28 @@
 		</nav>
 	</header>
 	<main>
-		<h1>ADR-0007 — Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight)</h1>
+		<h1>ADR-0007 -- Alliances: the third client of Ledger + SA (treaty = shared liability + shared sight)</h1>
 		<div class="meta"><strong>Status:</strong> ACCEPTED as design; build <strong>third</strong>, strictly after ADR-0003 and ADR-0004 &middot; <strong>Decided:</strong> 2026-07-04</div>
 <div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
 <ul>
 <li><strong>Status:</strong> ACCEPTED as design; build <strong>third</strong>, strictly after ADR-0003 and ADR-0004</li>
 <li><strong>Date:</strong> 2026-07-04</li>
+<li><strong>Summary:</strong> Alliances are un-deferred and built as a third client of the Ledger and SA systems -- a treaty shares liability and sight between parties.</li>
 </ul>
-<h2>Context — why the original deferral was wrong in kind</h2>
-<p>The pre-workshop triage parked alliances/voting as a "big isolated system." Pip's own purpose statement convicts that: <em>"there isn't really consensus anywhere on the best approaches on how to deal with AI risk, other than try to coordinate pause / stop functions."</em> Coordination is the one lever the real-world model endorses — and the game's strategy space omitted it. For an artifact that teaches the way Civ teaches, a game with no coordination mechanic quietly argues coordination doesn't exist. That is a structural falsehood, not a missing feature. What was <em>right</em> in the deferral was sequencing: alliances need almost no new machinery <strong>because they are made of the other two systems' parts.</strong></p>
+<h2>Context -- why the original deferral was wrong in kind</h2>
+<p>The pre-workshop triage parked alliances/voting as a "big isolated system." Pip's own purpose statement convicts that: <em>"there isn't really consensus anywhere on the best approaches on how to deal with AI risk, other than try to coordinate pause / stop functions."</em> Coordination is the one lever the real-world model endorses -- and the game's strategy space omitted it. For an artifact that teaches the way Civ teaches, a game with no coordination mechanic quietly argues coordination doesn't exist. That is a structural falsehood, not a missing feature. What was <em>right</em> in the deferral was sequencing: alliances need almost no new machinery <strong>because they are made of the other two systems' parts.</strong></p>
 <h2>Decision</h2>
 <p><strong>A treaty is a shared liability plus shared sight</strong>: mutual ledger entries (obligations with fuses; defection = the exposure event running in reverse) plus a mutual SA channel (alliance-sight: slow, public, obligates you).</p>
 <p><strong>Votes are scheduled causes</strong> (ADR-0005): a treaty vote at turn X is visible terrain, with more lead time if you've bought it (ADR-0004).</p>
-<p><strong>The whip loop</strong> — from Pip's House of Cards image: <em>"there are critical votes coming up, and people are wavering. have you got them?"</em> Whipping a vote means spending money, reputation, and favors to acquire <strong>pledges</strong> — receivables in the two-sided ledger (ADR-0003). A pledge is not a vote until cast: receivables carry counterparty risk (a lab under financial pressure wavers; a rival counter-whips; a scandal flips a signatory). <strong>Wavering is computed from counterparty state, never scripted</strong> — author causes, never outcomes: the vote result is simmed. "Have you got them?" is a <em>sight</em> question about your own receivables, which gives alliance-sight a job only it can do and passes the decision-flip test trivially (knowing who wavers changes whether you shore up, buy a replacement vote, or write the treaty off).</p>
-<p><strong>Influence is not a resource</strong> (decided by Pip): no global influence stat — a fourth currency would be the parallel-economy trap, and less thematic (leverage is over <em>this</em> lab, <em>that</em> actor). Influence <em>is</em> the receivables column, per-actor. Reputation stays global and public. Fallback on record if playtests show per-actor favors overwhelm players: a global influence pool as the legibility compromise — build the honest version first.</p>
+<p><strong>The whip loop</strong> -- from Pip's House of Cards image: <em>"there are critical votes coming up, and people are wavering. have you got them?"</em> Whipping a vote means spending money, reputation, and favors to acquire <strong>pledges</strong> -- receivables in the two-sided ledger (ADR-0003). A pledge is not a vote until cast: receivables carry counterparty risk (a lab under financial pressure wavers; a rival counter-whips; a scandal flips a signatory). <strong>Wavering is computed from counterparty state, never scripted</strong> -- author causes, never outcomes: the vote result is simmed. "Have you got them?" is a <em>sight</em> question about your own receivables, which gives alliance-sight a job only it can do and passes the decision-flip test trivially (knowing who wavers changes whether you shore up, buy a replacement vote, or write the treaty off).</p>
+<p><strong>Influence is not a resource</strong> (decided by Pip): no global influence stat -- a fourth currency would be the parallel-economy trap, and less thematic (leverage is over <em>this</em> lab, <em>that</em> actor). Influence <em>is</em> the receivables column, per-actor. Reputation stays global and public. Fallback on record if playtests show per-actor favors overwhelm players: a global influence pool as the legibility compromise -- build the honest version first.</p>
 <h2>Sequencing discipline (binding)</h2>
-<p>Built third, after the Ledger and outward SA, because it is assembled from their parts. <strong>The vote screen must not be built early because it is dramatic</strong> — a vote UI without a working ledger underneath is theater.</p>
+<p>Built third, after the Ledger and outward SA, because it is assembled from their parts. <strong>The vote screen must not be built early because it is dramatic</strong> -- a vote UI without a working ledger underneath is theater.</p>
 <h2>Beacons</h2>
 <ul>
 <li>MaRo Interaction: reads money, reputation, SA; writes doom (treaty effects) and the ledger both ways. Surprise: the defection you didn't see. Inertia: a looming vote is a clock inside the clock.</li>
-<li>Rams #10: not one new system — one new <em>column</em> (already in ADR-0003) plus one event genre.</li>
-<li>Flavor/thesis: this is where the game's real-world subject — coordination under mistrust — actually lives.</li>
+<li>Rams #10: not one new system -- one new <em>column</em> (already in ADR-0003) plus one event genre.</li>
+<li>Flavor/thesis: this is where the game's real-world subject -- coordination under mistrust -- actually lives.</li>
 </ul>
 	</main>
 	<footer>

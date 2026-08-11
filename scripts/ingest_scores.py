@@ -14,7 +14,10 @@ seed_leaderboard_*.json -- validated against schemas/leaderboard-seed.schema.jso
      (which currently DOESN'T EXIST -> the page is broken),
   3. stamps `meta.game_version` from public/data/version.json (the REAL deployed version),
      fixing the v0.4.1 drift at publish time regardless of what a producer stamped,
-  4. sets an honest `data_status`: "live" | "pre-launch" | "legacy",
+  4. sets an honest `data_status` from the shared vocabulary
+     "live" | "live-empty" | "pre-launch" | "legacy" (this script emits three of the
+     four -- "live-empty" means "current board key, genuinely no rows yet", which only
+     the live publisher can establish, since this one reads files off disk),
   5. recomputes weekly/current.json statistics for internal consistency.
 
 Per the FROZEN v1 contract (pdoom1 PR #679), scores live in the PHP score API and the
@@ -197,7 +200,11 @@ def main():
             "invalid_entries_dropped": bad,
             "detail": excluded_ver,
         },
-        "data_status": status,               # live | pre-launch | legacy  (drives the honesty banner)
+        # Vocabulary: live | live-empty | pre-launch | legacy (drives the honesty banner).
+        # This script never emits "live-empty": no seed file on disk can tell it whether
+        # the CURRENT board key holds nothing, so its empty case stays "pre-launch".
+        # publish-live-board.py, which reads the live key, is the only writer of that value.
+        "data_status": status,
         "legacy": status != "live",
         "seed": (seeds_used[0] if len(seeds_used) == 1 else "aggregate") if merged else "—",
         "economic_model": "—",

@@ -853,6 +853,15 @@
       // Pre-launch the board is empty, so the search/sort/filter toolbar only offers
       // a visitor ways to filter nothing. Hide it and let the banner carry the whole
       // message; it comes back automatically once real scores publish.
+      //
+      // 'live-empty' reaches this line for exactly the same reason, and it is a
+      // DIFFERENT claim from the other three: the board key is the current one, this
+      // page IS publishing the board players submit to, and it holds no rows yet --
+      // which is what a ladder fork or a seed roll produces on day one. It is not
+      // 'live' (validate_data.py FAILS live+0 rows, because an empty ranking presented
+      // as live reads as real competitive results), and it is not 'pre-launch' (the
+      // board is on). Written only by publish-live-board.py, and only when the key it
+      // fetched differs from the key this page was already serving.
       if (controls) controls.style.display = 'none';
 
       // This base message still names no version -- applyBoardHonesty() below appends the
@@ -864,7 +873,9 @@
       // ships". That became false: submission HAS shipped and scores are being recorded.
       // What is missing is this page's ability to publish them, which is a different claim.
       banner.innerHTML =
-        (status === 'pre-launch')
+        (status === 'live-empty')
+          ? `&#9432; <strong>This board is open and has no scores on it yet.</strong> It is the board the current build submits to &mdash; a new ladder epoch or a new seed starts empty, so this is a board waiting for its first finished run, not a board that has been turned off. The first score published here will appear below.`
+        : (status === 'pre-launch')
           ? `&#9432; <strong>This page is not showing any scores.</strong> That does not by itself mean nobody has played &mdash; see the check below.`
         : (status === 'unknown')
           ? `&#9432; <strong>This board does not say whether it is live.</strong> It carries no status, so nothing on this page should be read as confirmed competitive results.`
@@ -978,7 +989,10 @@
 
       const boardVersion = data && data.meta && data.meta.game_version;
       const key = (liveness && liveness.board_key) || {};
-      const epoch = key.ladder_epoch;
+      // The LIVE season, which is a different fact from the season of the board this site
+      // published -- board_key.ladder_epoch is the latter. Before #293 the record carried
+      // only the one name, so an older board-liveness.json still reads correctly here.
+      const epoch = key.current_ladder_epoch || key.ladder_epoch;
       const notes = [];
 
       // 1. Is the board this page publishes the board players submit to?
@@ -994,6 +1008,18 @@
           `season (a "ladder epoch"), and nothing yet tells this site which season is live. ` +
           `So this page cannot promise that a run you finish today would show up here. ` +
           `It is not claiming a mismatch either &mdash; it genuinely does not know.`
+        );
+      } else if (key.epochs_agree === false) {
+        // Strictly ===false: the field is null when either half is absent, and undefined
+        // on a record written before #293. Neither of those is a disagreement, and
+        // treating "unknown" as "disagrees" would put a false claim in front of a visitor.
+        notes.push(
+          `<strong>This board is from a previous season.</strong> It is keyed ` +
+          `<code>${escapeHTML(String(key.published_ladder_epoch))}</code>, and the live ` +
+          `season is <code>${escapeHTML(String(key.current_ladder_epoch))}</code>. Runs ` +
+          `finished now are recorded against ` +
+          `<code>${escapeHTML(String(key.current_ladder_epoch))}</code> and will not appear ` +
+          `here until this page catches up. Those runs are saved &mdash; they are not lost.`
         );
       } else if (boardVersion && epoch && boardVersion !== epoch) {
         notes.push(
@@ -1063,6 +1089,14 @@
           notes.push(
             `Checked against the live score API at ${stamp}: nobody has submitted a score ` +
             `to the current board yet. This one really is empty rather than misrouted.`
+          );
+        } else if (liveness.verdict === 'superseded-publication') {
+          // The "previous season" case already spoke above; here we only date it, so the
+          // visitor can tell a current admission from a stale one.
+          notes.push(
+            `Checked against the live score API at ${stamp}: this page is still publishing ` +
+            `a previous season's board. Nothing on that board is wrong &mdash; it is simply ` +
+            `not the season a run finished today is recorded in.`
           );
         } else if (liveness.verdict === 'epoch-unknown') {
           // The "cannot confirm" case already spoke above; here we only date it, so the

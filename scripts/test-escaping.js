@@ -104,7 +104,12 @@ const GUARDED = [
     // issue.* is GitHub API data: anyone with a GitHub account can open an issue.
     roots: ['issue', 'label'],
     safeHelpers: [],
-    fetches: ['/data/issues-cache.json'],
+    // /bug-submit.php is a WRITE, not a read: the feedback form POSTs to it and
+    // reads only res.ok / res.status. No field of its response reaches the DOM,
+    // which is why it contributes no root. Declared because rule 3 requires every
+    // fetch target to be named, and a later change that DID render its body would
+    // then have to come back here and say where that body lands.
+    fetches: ['/data/issues-cache.json', '/bug-submit.php'],
   },
   {
     page: 'public/league/index.html',

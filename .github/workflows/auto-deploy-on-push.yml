@@ -1,5 +1,23 @@
 name: Auto-Deploy to DreamHost on Push
 
+# ALL FOUR PRODUCTION DEPLOYS SHARE THIS GROUP. Do not rename it in one file.
+# There are four workflows in this repo that run `rsync --delete` from public/ to
+# the DreamHost document root, and until 2026-08-10 none of them coordinated with
+# any other. On 2026-08-07 at 07:35Z two Auto-Deploy runs on different SHAs
+# overlapped by 13 seconds; their rsync STEPS missed each other by 10. Nothing
+# collided -- that was runner scheduling, not design.
+#
+# cancel-in-progress is FALSE on purpose and it is the important half: cancelling a
+# half-finished `rsync --delete` against a live document root is strictly worse than
+# queueing behind it. Same shape snapshot-analytics.yml and syndicate-content.yml
+# already use ("never interrupt a run that may be mid-post").
+#
+# A guard on three of four is not a guard: weekly-deployment.yml is dispatch-only
+# and reads as parked, but a dispatch still performs a real destructive deploy.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 on:
   push:
     branches:
@@ -35,21 +53,14 @@ on:
 permissions:
   contents: read
 
-# Every deploy below ends in `rsync --delete` against the live document root.
-# Two runs of THIS workflow on different SHAs overlapped by 13 seconds on
-# 2026-08-07 at 07:35Z; their delete phases missed each other by 10 seconds.
-# Nothing prevented that -- no deploy workflow in this repository declares a
-# concurrency group. Queue instead of cancel: cancelling mid-rsync is the one
-# outcome worse than waiting.
-#
-# INCOMPLETE ON PURPOSE, and the reviewer should decide this part. This only
-# serialises this workflow against itself, which is the case actually measured.
-# deploy-dreamhost.yml, version-aware-deploy.yml and weekly-deployment.yml need
-# the SAME group string to serialise against each other, and those are edits
-# this proposal deliberately does not make.
-concurrency:
-  group: deploy-production
-  cancel-in-progress: false
+# The concurrency group this branch proposed here is now the one at the TOP of
+# this file, and it is named `production-deploy`. #299 landed the same guard
+# across all four production deploys under that name while this branch was open,
+# which answers the question this PR's body left to the reviewer ("I do not know
+# which of them you consider live"): all four are live, and they share one group.
+# Keeping a second block named `deploy-production` would have been a duplicate
+# YAML key that silently WON -- this workflow would have serialised against
+# nothing while looking guarded. Do not reintroduce it.
 
 jobs:
   deploy:

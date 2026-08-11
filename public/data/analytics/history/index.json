@@ -2,8 +2,8 @@
   "schema": 1,
   "generated_by": "scripts/generate-analytics-index.py",
   "note": "Derived from every snapshot in this directory by scripts/generate-analytics-index.py. Snapshots overlap heavily -- each is a 30-day window ending the day before its snapshot_date -- so daily values are carried across, never summed. A date no snapshot reports is listed in gap_dates rather than written as a zero; a recorded zero and a missing day are different facts. Where snapshots disagree the date is listed in conflict_dates and its series values are null.",
-  "snapshot_count": 16,
-  "latest_snapshot": "2026-08-07",
+  "snapshot_count": 20,
+  "latest_snapshot": "2026-08-11",
   "unreadable_files": [],
   "snapshots": [
     {
@@ -390,11 +390,85 @@
         "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
       },
       "error_sections": []
+    },
+    {
+      "snapshot_date": "2026-08-08",
+      "file": "2026-08-08.json",
+      "snapshot_schema": 2,
+      "captured_at_utc": "2026-08-08T02:12:13+00:00",
+      "period": "30d",
+      "days_in_timeseries": 30,
+      "coverage": {
+        "days_returned": 30,
+        "first_date": "2026-07-09",
+        "last_date": "2026-08-07",
+        "missing_dates": [],
+        "zero_dates": [
+          "2026-07-11"
+        ],
+        "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
+      },
+      "error_sections": []
+    },
+    {
+      "snapshot_date": "2026-08-09",
+      "file": "2026-08-09.json",
+      "snapshot_schema": 2,
+      "captured_at_utc": "2026-08-09T02:13:09+00:00",
+      "period": "30d",
+      "days_in_timeseries": 30,
+      "coverage": {
+        "days_returned": 30,
+        "first_date": "2026-07-10",
+        "last_date": "2026-08-08",
+        "missing_dates": [],
+        "zero_dates": [
+          "2026-07-11"
+        ],
+        "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
+      },
+      "error_sections": []
+    },
+    {
+      "snapshot_date": "2026-08-10",
+      "file": "2026-08-10.json",
+      "snapshot_schema": 2,
+      "captured_at_utc": "2026-08-10T02:13:40+00:00",
+      "period": "30d",
+      "days_in_timeseries": 30,
+      "coverage": {
+        "days_returned": 30,
+        "first_date": "2026-07-11",
+        "last_date": "2026-08-09",
+        "missing_dates": [],
+        "zero_dates": [
+          "2026-07-11"
+        ],
+        "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
+      },
+      "error_sections": []
+    },
+    {
+      "snapshot_date": "2026-08-11",
+      "file": "2026-08-11.json",
+      "snapshot_schema": 2,
+      "captured_at_utc": "2026-08-11T02:13:30+00:00",
+      "period": "30d",
+      "days_in_timeseries": 30,
+      "coverage": {
+        "days_returned": 30,
+        "first_date": "2026-07-12",
+        "last_date": "2026-08-10",
+        "missing_dates": [],
+        "zero_dates": [],
+        "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
+      },
+      "error_sections": []
     }
   ],
   "series": {
     "first_date": "2026-03-01",
-    "last_date": "2026-08-05",
+    "last_date": "2026-08-10",
     "days": [
       {
         "date": "2026-03-01",
@@ -540,195 +614,230 @@
         "date": "2026-07-09",
         "pageviews": 1,
         "visitors": 1,
-        "snapshots": 15,
+        "snapshots": 16,
         "conflict": false
       },
       {
         "date": "2026-07-10",
         "pageviews": 5,
         "visitors": 4,
-        "snapshots": 15,
+        "snapshots": 17,
         "conflict": false
       },
       {
         "date": "2026-07-11",
         "pageviews": 0,
         "visitors": 0,
-        "snapshots": 15,
+        "snapshots": 18,
         "conflict": false
       },
       {
         "date": "2026-07-12",
         "pageviews": 4,
         "visitors": 4,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-13",
         "pageviews": 2,
         "visitors": 2,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-14",
         "pageviews": 2,
         "visitors": 2,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-15",
         "pageviews": 12,
         "visitors": 5,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-16",
         "pageviews": 3,
         "visitors": 3,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-17",
         "pageviews": 4,
         "visitors": 3,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-18",
         "pageviews": 5,
         "visitors": 4,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-19",
         "pageviews": 4,
         "visitors": 2,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-20",
         "pageviews": 9,
         "visitors": 9,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-21",
         "pageviews": 3,
         "visitors": 3,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-22",
         "pageviews": 6,
         "visitors": 7,
-        "snapshots": 15,
+        "snapshots": 19,
         "conflict": false
       },
       {
         "date": "2026-07-23",
         "pageviews": 5,
         "visitors": 5,
-        "snapshots": 14,
+        "snapshots": 18,
         "conflict": false
       },
       {
         "date": "2026-07-24",
         "pageviews": 3,
         "visitors": 3,
-        "snapshots": 13,
+        "snapshots": 17,
         "conflict": false
       },
       {
         "date": "2026-07-25",
         "pageviews": 1,
         "visitors": 1,
-        "snapshots": 12,
+        "snapshots": 16,
         "conflict": false
       },
       {
         "date": "2026-07-26",
         "pageviews": 12,
         "visitors": 7,
-        "snapshots": 11,
+        "snapshots": 15,
         "conflict": false
       },
       {
         "date": "2026-07-27",
         "pageviews": 8,
         "visitors": 6,
-        "snapshots": 10,
+        "snapshots": 14,
         "conflict": false
       },
       {
         "date": "2026-07-28",
         "pageviews": 11,
         "visitors": 9,
-        "snapshots": 9,
+        "snapshots": 13,
         "conflict": false
       },
       {
         "date": "2026-07-29",
         "pageviews": 20,
         "visitors": 21,
-        "snapshots": 8,
+        "snapshots": 12,
         "conflict": false
       },
       {
         "date": "2026-07-30",
         "pageviews": 5,
         "visitors": 8,
-        "snapshots": 7,
+        "snapshots": 11,
         "conflict": false
       },
       {
         "date": "2026-07-31",
         "pageviews": 13,
         "visitors": 10,
-        "snapshots": 6,
+        "snapshots": 10,
         "conflict": false
       },
       {
         "date": "2026-08-01",
         "pageviews": null,
         "visitors": null,
-        "snapshots": 6,
+        "snapshots": 10,
         "conflict": true
       },
       {
         "date": "2026-08-02",
         "pageviews": 18,
         "visitors": 11,
-        "snapshots": 4,
+        "snapshots": 8,
         "conflict": false
       },
       {
         "date": "2026-08-03",
         "pageviews": 9,
         "visitors": 11,
-        "snapshots": 3,
+        "snapshots": 7,
         "conflict": false
       },
       {
         "date": "2026-08-04",
         "pageviews": 7,
         "visitors": 4,
-        "snapshots": 2,
+        "snapshots": 6,
         "conflict": false
       },
       {
         "date": "2026-08-05",
         "pageviews": 2,
         "visitors": 4,
+        "snapshots": 5,
+        "conflict": false
+      },
+      {
+        "date": "2026-08-06",
+        "pageviews": 21,
+        "visitors": 22,
+        "snapshots": 4,
+        "conflict": false
+      },
+      {
+        "date": "2026-08-07",
+        "pageviews": 2,
+        "visitors": 3,
+        "snapshots": 4,
+        "conflict": false
+      },
+      {
+        "date": "2026-08-08",
+        "pageviews": 5,
+        "visitors": 7,
+        "snapshots": 3,
+        "conflict": false
+      },
+      {
+        "date": "2026-08-09",
+        "pageviews": 9,
+        "visitors": 7,
+        "snapshots": 2,
+        "conflict": false
+      },
+      {
+        "date": "2026-08-10",
+        "pageviews": 11,
+        "visitors": 11,
         "snapshots": 1,
         "conflict": false
       }
@@ -884,7 +993,11 @@
               "2026-08-03",
               "2026-08-04",
               "2026-08-05",
-              "2026-08-06"
+              "2026-08-06",
+              "2026-08-08",
+              "2026-08-09",
+              "2026-08-10",
+              "2026-08-11"
             ]
           },
           {

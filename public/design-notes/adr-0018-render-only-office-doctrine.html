@@ -102,6 +102,7 @@
 <ul>
 <li><strong>Status:</strong> DRAFT (formal confirm at 2026-07-27 R3a block; review-by 2027-07-27)</li>
 <li><strong>Date:</strong> 2026-07-27</li>
+<li><strong>Summary:</strong> The office floor renders state and never produces it -- no spatial fact (grid cell, occupancy, adjacency) may become a gameplay input, so the sim stays headless-testable and the view stays free to change.</li>
 </ul>
 <h2>Context</h2>
 <p>The office floor (<code>godot/scripts/ui/office_floor/office_sandbox.gd</code>) is a dev-tool sandbox for placing props and previewing worker sprites on a 32px snap grid (<code>GRID := 32.0</code>, <code>_snap_to_grid()</code>, <code>_cell_of()</code> at lines 52-58 and 874-893). It already computes pixel coordinates, grid cells, and occupancy keys. Two spatial build lanes were provisionally on Tuesday's plan: a first-class tile-grid implementation and a camera/real-estate application of it to shipped gameplay.</p>

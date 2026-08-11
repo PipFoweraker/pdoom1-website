@@ -1,10 +1,10 @@
 {
-  "generated": "2026-08-07T06:28:39.711436+00:00",
+  "generated": "2026-08-11T06:23:13.912211+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 2,
-    "ok": 33
+    "warn": 3,
+    "ok": 32
   },
   "checks": [
     {
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 0.7 days ago"
+      "detail": "generated 4.6 days ago"
     },
     {
       "name": "league:current_week",
@@ -124,8 +124,8 @@
     },
     {
       "name": "league:version_drift",
-      "status": "OK",
-      "detail": "game_version v0.13.2 matches deployed"
+      "status": "WARN",
+      "detail": "weekly league game_version=v0.13.2 but deployed game=v0.14.1 -- a v0.14.1 client's scores cannot land on a v0.13.2 board"
     },
     {
       "name": "league:seed",
@@ -140,7 +140,7 @@
     {
       "name": "board:key",
       "status": "OK",
-      "detail": "published board key matches the current ladder epoch L3"
+      "detail": "published board key matches the current ladder epoch L4"
     },
     {
       "name": "board:exclusions",
@@ -150,27 +150,27 @@
     {
       "name": "board:status_integrity",
       "status": "OK",
-      "detail": "data_status=live consistent with 6 entries"
+      "detail": "data_status=live consistent with 10 entries"
     },
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 5.0h ago"
+      "detail": "live API checked 5.8h ago"
     },
     {
       "name": "board:archived_anomaly",
       "status": "WARN",
-      "detail": "30 score entries across 4 board(s) from 8 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, CogDerp, Cognitive Development, Division of Intelligent Agents, Hamthropic, Intelligent Agents Studies, Laboratory of Autonomous Systems). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
+      "detail": "36 score entries across 5 board(s) from 12 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, CogDerp, Cognitive Development, Cognitive Systems Studies, Cognitive Systems Studies II, Division of Intelligent Agents, Division of Machine Learning, Hamthropic, Intelligent Agents Studies, Laboratory of Autonomous Systems, Notkilleveryone Inc). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
     },
     {
       "name": "board:liveness",
       "status": "OK",
-      "detail": "deployed board (weekly-2026-w31, L3) holds 6 entries"
+      "detail": "deployed board (weekly-2026-w32, L4) holds 10 entries"
     },
     {
       "name": "board:publish",
       "status": "OK",
-      "detail": "what we serve matches what the probe saw (6 entries on L3)"
+      "detail": "what we serve matches what the probe saw (10 entries on L4)"
     },
     {
       "name": "seed_leaderboards:parse",
@@ -180,7 +180,7 @@
     {
       "name": "seed_leaderboards:version_census",
       "status": "WARN",
-      "detail": "NO stored seed file is stamped with the deployed version v0.13.2, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
+      "detail": "NO stored seed file is stamped with the deployed version v0.14.1, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
     }
   ]
 }

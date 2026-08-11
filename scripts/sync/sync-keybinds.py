@@ -373,7 +373,20 @@ def check_no_hardcoded_keys(committed, problems, notes):
     actions = {b["action"] for b in committed.get("keybinds", [])}
     # A <kbd> may carry data-keybind="<known action>" and must be empty or hold
     # only the ellipsis placeholder that JS overwrites.
-    kbd_re = re.compile(r"<kbd\b(?P<attrs>[^>]*)>(?P<inner>.*?)</kbd>", re.DOTALL | re.IGNORECASE)
+    # The attribute run allows a quoted value to contain '>', because per the HTML
+    # spec a '>' inside a quoted attribute value does NOT close the tag. The naive
+    # [^>]* stops there and hands back a truncated action name --
+    #
+    #   <kbd data-keybind="move>right">X</kbd>
+    #      attrs -> ' data-keybind="move'   inner -> 'right">X'
+    #
+    # which would look up a key that does not exist and leave the placeholder
+    # standing, sending a player to a key that does nothing. That is the exact
+    # outcome this whole mirror exists to prevent, reached by a second route.
+    # Found by attacking the parser, 2026-08-11 sweep, probe 3.
+    kbd_re = re.compile(
+        r'<kbd\b(?P<attrs>(?:"[^"]*"|\'[^\']*\'|[^>"\'])*)>(?P<inner>.*?)</kbd>',
+        re.DOTALL | re.IGNORECASE)
     attr_re = re.compile(r'data-keybind\s*=\s*"(?P<action>[^"]+)"')
     # Only RENDERED markup counts. Style and script blocks legitimately mention
     # <kbd> in comments (this file's own convention is documented there), and

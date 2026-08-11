@@ -1,5 +1,23 @@
 name: Deploy to DreamHost (manual)
 
+# ALL FOUR PRODUCTION DEPLOYS SHARE THIS GROUP. Do not rename it in one file.
+# There are four workflows in this repo that run `rsync --delete` from public/ to
+# the DreamHost document root, and until 2026-08-10 none of them coordinated with
+# any other. On 2026-08-07 at 07:35Z two Auto-Deploy runs on different SHAs
+# overlapped by 13 seconds; their rsync STEPS missed each other by 10. Nothing
+# collided -- that was runner scheduling, not design.
+#
+# cancel-in-progress is FALSE on purpose and it is the important half: cancelling a
+# half-finished `rsync --delete` against a live document root is strictly worse than
+# queueing behind it. Same shape snapshot-analytics.yml and syndicate-content.yml
+# already use ("never interrupt a run that may be mid-post").
+#
+# A guard on three of four is not a guard: weekly-deployment.yml is dispatch-only
+# and reads as parked, but a dispatch still performs a real destructive deploy.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 on:
   workflow_dispatch:
     inputs:

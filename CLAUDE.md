@@ -433,6 +433,14 @@ python  scripts/test-stamp-league-epoch.py      # defect texts claim only what t
 node    scripts/test-board-escaping.js    # no API field reaches innerHTML   [board-liveness]
 node    scripts/test-board-honesty.js     # key mismatch stays visible       [board-liveness]
 python  scripts/test-publish-live-board.py # publisher refuses, never guesses [board-liveness]
+python  scripts/test-board-liveness-verdicts.py # probe names an epoch disagreement, never composes a key [board-liveness]
+python  scripts/check-epoch-drift.py      # declared board key vs the published one [epoch-drift]
+python  scripts/test-epoch-drift.py       # ...and drift is red, absence is UNKNOWN  [epoch-drift]
+python  scripts/check-blessing-consistency.py # the four blessing artefacts agree [content-honesty ADVISORY]
+python  scripts/test-blessing-consistency.py  # ...and every disagreement shape is caught [content-honesty]
+python  scripts/check-token-drift.py      # token-named vars carry the token value [content-honesty ADVISORY]
+python  scripts/test-design-questions.py  # DQ mirror: no row dropped, caveats publish [content-honesty]
+python  scripts/sync/sync-design-questions.py --check # /design-questions/ in step  [local only, needs ../pdoom1]
 
 node    scripts/test-escaping.js          # the SAME rule on the other 14 pages [escaping]
 node    scripts/test-roadmap-render.js    # roadmap markdown subset + escaping  [escaping]
@@ -627,15 +635,36 @@ platform that has no build.
   (`npm run update:version`, `weekly-deployment.yml`) the fiction won. It now carries
   forward whatever the calculator derived and omits the key when nothing has been
   derived. A scan in the test fails on any numeric literal re-added to that function.
-- **`version.json` has TWO writers, and one of them disarms the guard.**
-  `update-version-info.py` (via `auto-update-data.yml`) writes `latest_release.platforms`.
-  `update-game-data.yml` has its own inline Python that rebuilds `version.json` **from
-  scratch without that key**. Both run on ~6h crons, so the field blinks in and out —
-  `git log -S'"platforms"' -- public/data/version.json` shows the two alternating. While
-  it is absent, `check-platform-claims.py` prints `SKIP: version.json has no
-  latest_release.platforms` and **exits 0**, so the honesty guard is silently inert about
-  half the time. A page reading `latest_release.platforms` must therefore treat absence as
-  "unrecorded", never as "nothing shipped". (Found 2026-07-28; not yet fixed.)
+- **`version.json` had TWO writers, and one of them disarmed the guard. FIXED
+  2026-08-02 in #235 (`0a65e519`); this entry said "not yet fixed" until 2026-08-08.**
+  `update-game-data.yml` used to carry its own inline Python that rebuilt `version.json`
+  **from scratch without `latest_release.platforms`**. Both writers ran on the same ~6h
+  cron minute, so the field blinked in and out and `check-platform-claims.py` printed
+  `SKIP: version.json has no latest_release.platforms` and **exited 0** — the honesty
+  guard silently inert about half the time.
+  `update-version-info.py` (via `auto-update-data.yml`) is now the **sole writer**;
+  `update-game-data.yml:66` reads `# version.json is NOT written here any more.` and it
+  no longer stages the file either (staging would re-commit whatever the checkout held
+  and reintroduce the race by the back door).
+  **The standing rule survives the fix:** a page reading `latest_release.platforms` must
+  treat absence as "unrecorded", never as "nothing shipped". One writer today is not a
+  guarantee of one writer tomorrow, and the guard still exits 0 on a missing key.
+  - **Why this entry went stale for six days, because the mechanism matters more than
+    the fact.** #235 fixed the defect and touched exactly one file — the workflow. Its
+    reasoning went into the *commit message*, which is where it stayed. Nothing connects
+    a fix to the CLAUDE.md paragraph that records the defect, so an entry written at
+    discovery time has a finder and no closer. **#276 then edited CLAUDE.md four days
+    later under the title "delete the dead version.json writer" and still did not touch
+    this paragraph** — it was editing the test-suite list, a different section. Proximity
+    of topic is not proximity of text.
+    **This file is a cache of measurements asserted about the present**, which is exactly
+    what `coordination#20` forbids a seat from doing, applied to a document instead of a
+    session. The density of "CORRECTED <date>" notes above is the evidence that this
+    failure recurs — treat each one as a sample, not an anecdote.
+    **Practical rule: when you fix something this file describes as broken, the fix is
+    not done until the paragraph moves.** Grep CLAUDE.md for the symptom before closing
+    a PR, and prefer "FIXED <date> in #nn" over deleting the entry — the history of a
+    defect is why the guard exists.
 
 ## Changelog surfaces — there are FOUR (this said "three" until 2026-08-03)
 The count itself was the bug: `/dashboard/`'s development-log box is a release surface
@@ -734,6 +763,23 @@ and nobody was counting it. Enumerate by grepping for consumers, not from this l
   from "nobody is playing", and **no error is shown to the player**. Proving a key
   needs a *positive* check (post a score, read it back). Suspect a key mismatch
   before suspecting analytics.
+- **`board-liveness.yml` PUBLISHES BEFORE IT PROBES, and that order is load-bearing**
+  (#293, fixed 2026-08-09). The probe reads `published-board.json`; the publisher rewrites
+  it. Probe-first meant the probe always read the PREVIOUS run's answer and paired that
+  stale seed with the CURRENT epoch from `board-probe-targets.json` — **a composed key
+  from two files of two different vintages, asserted as one fact.** On 2026-08-08 that
+  produced `(weekly-2026-w31, L4)`, a key that has never existed, and reported nine real
+  scores as `orphaned-scores`, exit 1. Re-running the identical workflow said `live`.
+  The epoch fork is only the loud version: an ordinary seed roll composes
+  `(last week's seed, same epoch)`, which resolves to a REAL board — last week's — and
+  nothing in the output looks invented (that is #229's symptom). `check-board-liveness.py`
+  now reads `ladder_epoch` from `published-board.json` alongside the seed, and reports
+  **`superseded-publication` (exit 2, an admission, not an incident)** when the two files
+  disagree — evaluated BEFORE the orphan branch, because when publication is an epoch
+  behind, every board on the new epoch scores as an orphan. `board_key` carries
+  `published_ladder_epoch`, `current_ladder_epoch`, `epochs_agree` (true/false/**null**
+  when either is absent) and `epoch_composed`. Consumers read the current epoch as
+  `current_ladder_epoch || ladder_epoch` so older records still parse.
 - **Never present an unblessed seed to a player.** The blessed value is
   `docs/LEAGUE_SEED_LEDGER.md` → mirrored into `public/data/ladder-epochs.json`;
   anything the website derives is a placeholder marked

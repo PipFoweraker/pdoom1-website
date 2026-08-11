@@ -894,29 +894,73 @@ t	.hero {
 				</a>
 			</div>
 
-			<!-- Shown by resolveDownloads() only when a macOS build actually resolved.
-			     An unsigned/un-notarised Godot .app is refused by Gatekeeper on first
-			     open with "the developer cannot be verified", which reads as a broken
-			     download; most testers bounce silently rather than report it.
+			<!-- FIRST-RUN GUIDANCE. Wording is taken verbatim from the pdoom1 release
+			     body (v0.14.1, "Before you download: your OS will warn you"), which is
+			     the reviewed source for this text. Do not paraphrase it here; if it
+			     needs to change, change it in the release notes and copy it back.
 
-			     CORRECTED 2026-07-29. This note used to say "right-click and choose
-			     Open". Apple REMOVED that bypass in macOS Sequoia (15.x): on current
-			     macOS the context menu offers only Cancel / Move to Trash, so the old
-			     instruction failed in exactly the way it was written to prevent. It
-			     cost us a real playtest -- the first backer of the Manifund round
-			     followed it on 15.5, hit the dead end, and gave up. Verify against
-			     Apple's developer note before editing again; do not restore the
-			     Control-click wording as the primary path.
-			     The real fix is notarisation (Apple Developer Program), which is a
-			     budget line, not a copy change. -->
-			<p id="macos-gatekeeper-note" style="display: none; text-align: center; margin: 0 auto 0.6rem; max-width: 46rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
-				<strong>On macOS:</strong> the first launch is blocked because the build isn't
-				Apple-notarised yet. On macOS&nbsp;15 (Sequoia) and later, open
-				<strong>System&nbsp;Settings → Privacy&nbsp;&amp;&nbsp;Security</strong>, scroll to
-				<strong>Security</strong>, and choose <strong>Open&nbsp;Anyway</strong> — you may need your
-				admin password. On macOS&nbsp;14 and earlier, right-click (or Control-click) the app
-				and choose <strong>Open</strong>. Either way you only need to do it once.
-			</p>
+			     WHY IT IS ALWAYS VISIBLE (2026-08-10). This used to be a macOS-only
+			     paragraph shipping with `display: none`, unhidden by resolveDownloads()
+			     only after the GitHub API confirmed a macOS asset. Two failures came out
+			     of that: (a) resolveDownloads() rewrites every button's href to the
+			     direct .zip, so clicking downloads ~100 MB and NEVER lands on the release
+			     page where this guidance lives -- pdoom1.com was the only place a visitor
+			     could have read it, and it was hidden; (b) on a GitHub rate-limit the
+			     buttons keep working and the site's ONLY warning vanished. A safety note
+			     must not be conditional on an API call succeeding. It is static markup
+			     now and no script touches it.
+
+			     CORRECTED 2026-07-29, STILL LOAD-BEARING. This note used to say
+			     "right-click and choose Open" as the primary macOS path. Apple REMOVED
+			     that bypass in macOS Sequoia (15.x): on current macOS the context menu
+			     offers only Cancel / Move to Trash, so the old instruction failed in
+			     exactly the way it was written to prevent. It cost us a real playtest --
+			     the first backer of the Manifund round followed it on 15.5, hit the dead
+			     end, and gave up. Verify against Apple's developer note before editing
+			     again; do not restore the Control-click wording as the primary path.
+
+			     CORRECTED 2026-08-10. The Sequoia path was missing its FIRST step. "Open
+			     Anyway" does not exist in Privacy & Security until the app has been
+			     double-clicked once and refused -- macOS writes the entry in response to
+			     the refusal. A reader following the old text found an empty Security
+			     section and concluded the instructions were wrong.
+
+			     The real fix for macOS is notarisation (Apple Developer Program), which
+			     is a budget line, not a copy change. -->
+			<div id="first-run-note" style="text-align: left; margin: 0 auto 0.8rem; max-width: 46rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.55; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.8rem 1rem;">
+				<p style="margin: 0 0 0.5rem;">
+					<strong>Before you download: your OS will warn you, and that is expected.</strong>
+					These builds are <strong>unsigned</strong>. Signing means buying a code-signing
+					certificate (Windows) or an Apple Developer identity plus notarization (macOS).
+					p(Doom)1 is an alpha made by one person and has not bought either yet, so every
+					operating system reports that it cannot verify who made the program. The warnings
+					mean &ldquo;we cannot check the publisher&rdquo;, not &ldquo;this is malware&rdquo;.
+				</p>
+				<p style="margin: 0 0 0.5rem;">
+					<strong>Extract the whole zip to a folder before running the game.</strong>
+					Running it from inside the zip viewer hides <code>PDoom.pck</code>, and the game
+					will not start. That is the single most common problem people hit.
+				</p>
+				<p style="margin: 0 0 0.5rem;">
+					<strong>Windows &mdash; SmartScreen.</strong> You will see a blue
+					&ldquo;Windows protected your PC&rdquo; box, often naming an unknown / untrusted
+					publisher. Click <strong>More info</strong> (the small link under the message),
+					then <strong>Run anyway</strong>.
+				</p>
+				<p style="margin: 0 0 0.5rem;">
+					<strong>macOS &mdash; Gatekeeper.</strong> First launch is blocked. On
+					macOS&nbsp;15 (Sequoia) and later, <strong>double-click the app once and dismiss
+					the warning</strong> &mdash; that refusal is what puts the option there &mdash;
+					then go to <strong>System&nbsp;Settings → Privacy&nbsp;&amp;&nbsp;Security</strong>
+					and click <strong>Open&nbsp;Anyway</strong>. On macOS&nbsp;14 and earlier you can
+					right-click (or Control-click) the app and choose <strong>Open</strong>. Full steps
+					are in <code>HOW-TO-RUN.txt</code> inside the zip.
+				</p>
+				<p style="margin: 0;">
+					<strong>Linux.</strong> You may need to set the executable bit:
+					<code>chmod +x PDoom.x86_64</code>.
+				</p>
+			</div>
 
 			<div style="text-align: center; margin-bottom: 0.8rem;">
 				<a href="https://github.com/PipFoweraker/pdoom1" style="color: var(--accent-secondary); text-decoration: none; font-size: 0.9rem;">
@@ -1660,12 +1704,10 @@ t	.hero {
 					if (asset) markAvailable(el, asset.browser_download_url);
 					else markUnavailable(el);
 				}
-				// Show the macOS first-run note only when a macOS build actually resolved.
-				const macNote = document.getElementById('macos-gatekeeper-note');
-				if (macNote) {
-					const macEl = document.getElementById('download-macos');
-					macNote.style.display = (macEl && macEl.hasAttribute('href')) ? 'block' : 'none';
-				}
+				// DELIBERATELY does not touch #first-run-note. That note used to be
+				// unhidden here, which made the site's only unsigned-binary warning
+				// conditional on this fetch succeeding -- on a rate-limit the buttons
+				// still worked and the warning disappeared. It is static markup now.
 			} catch (_) { /* keep baseline */ }
 		}
 
@@ -1718,7 +1760,7 @@ t	.hero {
 			const TARGETS = [
 				{ id: 'download-windows', platform: 'Windows', file: 'PDoom-Windows.zip' },
 				{ id: 'download-macos',   platform: 'macOS',   file: 'PDoom.app.zip' },
-				{ id: 'download-linux',   platform: 'Linux',   file: 'PDoom.x86_64' }
+				{ id: 'download-linux',   platform: 'Linux',   file: 'PDoom-Linux.zip' }
 			];
 
 			TARGETS.forEach(function(target) {

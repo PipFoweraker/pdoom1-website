@@ -3,11 +3,11 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ADR-0005 — Emergent doom waves: author causes, never outcomes; seed = RNG + schedule | p(Doom)1 Design Notes</title>
+	<title>ADR-0005 -- Emergent doom waves: author causes, never outcomes; seed = RNG + schedule | p(Doom)1 Design Notes</title>
 	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0005-emergent-waves-seed-schedules.html" />
-	<meta name="description" content="Doom arrives in waves. The fork: authored waves (designed timings — pacing guaranteed, sim partly theater) vs emergent waves (arising from opponent behavio" />
-	<meta property="og:title" content="ADR-0005 — Emergent doom waves: author causes, never outcomes; seed = RNG + schedule | p(Doom)1 Design Notes" />
-	<meta property="og:description" content="Doom arrives in waves. The fork: authored waves (designed timings — pacing guaranteed, sim partly theater) vs emergent waves (arising from opponent behavio" />
+	<meta name="description" content="Doom arrives in waves. The fork: authored waves (designed timings -- pacing guaranteed, sim partly theater) vs emergent waves (arising from opponent behavi" />
+	<meta property="og:title" content="ADR-0005 -- Emergent doom waves: author causes, never outcomes; seed = RNG + schedule | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="Doom arrives in waves. The fork: authored waves (designed timings -- pacing guaranteed, sim partly theater) vs emergent waves (arising from opponent behavi" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0005-emergent-waves-seed-schedules.html" />
 
@@ -96,29 +96,30 @@
 		</nav>
 	</header>
 	<main>
-		<h1>ADR-0005 — Emergent doom waves: author causes, never outcomes; seed = RNG + schedule</h1>
+		<h1>ADR-0005 -- Emergent doom waves: author causes, never outcomes; seed = RNG + schedule</h1>
 		<div class="meta"><strong>Status:</strong> ACCEPTED &middot; <strong>Decided:</strong> 2026-07-04</div>
 <div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
 <ul>
 <li><strong>Status:</strong> ACCEPTED</li>
 <li><strong>Date:</strong> 2026-07-04</li>
+<li><strong>Summary:</strong> Doom waves emerge from opponent behavior and the player's ledger (not authored timings); designers author causes, seeded by RNG + schedule.</li>
 </ul>
 <h2>Context</h2>
-<p>Doom arrives in waves. The fork: <strong>authored</strong> waves (designed timings — pacing guaranteed, sim partly theater) vs <strong>emergent</strong> waves (arising from opponent behavior plus the player's accumulated ledger — pure, attributable, pacing at the mercy of the dynamics). Pip chose emergent, with a thumb on the scale: <em>"I think the doom's waves are emergent. We might lean our thumbs on the scale at certain points… For example, rival_lab could get a wave of funding at point X."</em></p>
+<p>Doom arrives in waves. The fork: <strong>authored</strong> waves (designed timings -- pacing guaranteed, sim partly theater) vs <strong>emergent</strong> waves (arising from opponent behavior plus the player's accumulated ledger -- pure, attributable, pacing at the mercy of the dynamics). Pip chose emergent, with a thumb on the scale: <em>"I think the doom's waves are emergent. We might lean our thumbs on the scale at certain points... For example, rival_lab could get a wave of funding at point X."</em></p>
 <h2>Decision</h2>
 <h3>Author causes, never outcomes</h3>
-<p>The designer's thumb may touch <strong>inputs to the sim</strong> — a funding wave hits rival_lab at turn 9, a regulation lapses, a key researcher defects — and the wave that reaches the player is whatever the sim does with that cause given opponent state and the player's ledger. The thumb never touches the doom variable directly. This one rule keeps three prior commitments intact:</p>
+<p>The designer's thumb may touch <strong>inputs to the sim</strong> -- a funding wave hits rival_lab at turn 9, a regulation lapses, a key researcher defects -- and the wave that reaches the player is whatever the sim does with that cause given opponent state and the player's ledger. The thumb never touches the doom variable directly. This one rule keeps three prior commitments intact:</p>
 <ul>
-<li>the sim never lies (every spike has a discoverable cause → scheduled events are SA content for free);</li>
+<li>the sim never lies (every spike has a discoverable cause -&gt; scheduled events are SA content for free);</li>
 <li>replay verification is unaffected (scheduled causes are deterministic given seed and version);</li>
-<li>repeatability: same seed, same causes, so players learn the terrain — "the turn-9 funding wave on this week's seed" becomes community vocabulary, and opening theory extends beyond your own moves into known weather.</li>
+<li>repeatability: same seed, same causes, so players learn the terrain -- "the turn-9 funding wave on this week's seed" becomes community vocabulary, and opening theory extends beyond your own moves into known weather.</li>
 </ul>
 <h3>A seed = RNG seed + event schedule</h3>
-<p>This redefinition is also the cheap implementation of <strong>seasons as scenarios</strong>: a "compute-overhang week" is a schedule dense with compute-cost causes — no engine changes. Patches rotate the meta by rotating world-model assumptions, which is more honest than nerfing numbers. Feedstock: the <code>pdoom-data</code> repo (1,194 curated real AI-timeline events, actively maintained) — real events, lightly fictionalized, as schedule entries. This closes Pip's "historical events affecting the game" patch ambition with existing infrastructure.</p>
+<p>This redefinition is also the cheap implementation of <strong>seasons as scenarios</strong>: a "compute-overhang week" is a schedule dense with compute-cost causes -- no engine changes. Patches rotate the meta by rotating world-model assumptions, which is more honest than nerfing numbers. Feedstock: the <code>pdoom-data</code> repo (1,194 curated real AI-timeline events, actively maintained) -- real events, lightly fictionalized, as schedule entries. This closes Pip's "historical events affecting the game" patch ambition with existing infrastructure.</p>
 <h3>Seed vetting replaces wave authoring</h3>
-<p>The cost of emergent, stated honestly: pacing guarantees weaken — the same cause produces different waves depending on state, so some seeds will be degenerate (dead by turn 3, or a snoozefest). <strong>Curation replaces authorship</strong>: run candidate seeds through <code>baseline_simulator.gd</code> headless (no-action baseline plus crude heuristic bots) and reject seeds whose doom trajectory falls outside a playability envelope before publishing. Pip is a seed <em>curator</em>, not a wave author — the SimCity thumb with quality control, built once.</p>
+<p>The cost of emergent, stated honestly: pacing guarantees weaken -- the same cause produces different waves depending on state, so some seeds will be degenerate (dead by turn 3, or a snoozefest). <strong>Curation replaces authorship</strong>: run candidate seeds through <code>baseline_simulator.gd</code> headless (no-action baseline plus crude heuristic bots) and reject seeds whose doom trajectory falls outside a playability envelope before publishing. Pip is a seed <em>curator</em>, not a wave author -- the SimCity thumb with quality control, built once.</p>
 <h3>Rejected: player-triggered disasters</h3>
-<p>Pip, explicitly: hardness is baked into game settings for the engine, never a player-facing disaster menu. (Player-<em>chosen</em> difficulty modifiers at run start are a separate parked item — ADR-0008.)</p>
+<p>Pip, explicitly: hardness is baked into game settings for the engine, never a player-facing disaster menu. (Player-<em>chosen</em> difficulty modifiers at run start are a separate parked item -- ADR-0008.)</p>
 <h2>Beacons</h2>
 <ul>
 <li>Rams #6: every spike has a real cause inside the sim.</li>

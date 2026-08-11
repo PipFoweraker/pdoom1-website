@@ -294,7 +294,12 @@ def check_published_board():
     # differ, so that check would have gone WARN forever on correct data. A guard that
     # always fires is a guard nobody reads.
     live = load_json_or_none(PUBLIC / "leaderboard" / "data" / "board-liveness.json")
-    epoch = ((live or {}).get("board_key") or {}).get("ladder_epoch")
+    # `current_ladder_epoch` is the ladder the GAME is on now; `ladder_epoch` is the epoch
+    # of the board the site PUBLISHED. Before #293 the record carried only the latter name
+    # holding the former value, so the fallback keeps an older board-liveness.json readable
+    # rather than silently reporting "no artifact tells this site which epoch is current".
+    _bk = (live or {}).get("board_key") or {}
+    epoch = _bk.get("current_ladder_epoch") or _bk.get("ladder_epoch")
     shape = board_key_shape(board_ver)
 
     if not epoch:
@@ -333,10 +338,28 @@ def check_published_board():
             f"excluded by design)")
 
     # Self-consistency: an empty board must not advertise itself as live.
+    #
+    # The vocabulary is live | live-empty | pre-launch | legacy, shared with
+    # ingest_scores.py. "live-empty" was added 2026-08-08 for the state an epoch fork
+    # creates and the other three could not describe honestly: the board key IS the
+    # current one, the site IS publishing the board players submit to, and it genuinely
+    # holds no entries yet. Calling that "live" is the lie this FAIL exists to catch;
+    # calling it "pre-launch" is a different lie ("the board is not on yet" when it is).
+    # It is a narrow claim -- "current key, no rows" -- and so it is checked in BOTH
+    # directions, because a status that can never fail says nothing.
     if status == "live" and n_entries == 0:
         add("board:status_integrity", FAIL,
             "data_status='live' but the board holds 0 entries -- the page would present "
             "an empty ranking as real competitive results")
+    elif status == "live-empty" and n_entries > 0:
+        add("board:status_integrity", FAIL,
+            f"data_status='live-empty' but the board holds {n_entries} entries -- the page "
+            f"would tell a visitor nobody has scored while showing scores, and would hide "
+            f"the toolbar for a board that has rows to sort. Publish it as 'live'.")
+    elif status == "live-empty":
+        add("board:status_integrity", OK,
+            "data_status=live-empty: current board key, no entries yet (an epoch fork or a "
+            "seed roll opens a real board empty). Not presented as competitive results.")
     else:
         add("board:status_integrity", OK, f"data_status={status} consistent with {n_entries} entries")
 
@@ -405,6 +428,14 @@ def check_board_liveness():
             f"{n_new} entries on orphan board(s), but the anomaly archive is missing so "
             f"known history cannot be told from a new incident. Restore "
             f"public/leaderboard/data/preserved/ and re-run.")
+    elif verdict == "superseded-publication":
+        add("board:liveness", WARN,
+            f"the published board ({key.get('seed')}, {key.get('published_ladder_epoch')}) "
+            f"is from a SUPERSEDED epoch -- the current ladder epoch is "
+            f"{key.get('current_ladder_epoch')}. No orphan claim can be made while the two "
+            f"disagree, because every board on the current epoch would score as an orphan. "
+            f"Reported as unresolved, deliberately NOT as scores being lost. "
+            f"Fix: run python scripts/publish-live-board.py. Do not re-stamp anything.")
     elif verdict == "epoch-unknown":
         add("board:liveness", WARN,
             "no artifact tells this site which ladder epoch is current, so it cannot "
@@ -458,14 +489,21 @@ def check_board_liveness():
                 add("board:publish", WARN,
                     f"{detail}, but the probe is {age_h/24:.1f} days old so the difference "
                     f"may just be stale observation. Re-run check-board-liveness.py first.")
-        elif served_key.get("ladder_epoch") and served_key.get("ladder_epoch") != key.get("ladder_epoch"):
-            add("board:publish", FAIL,
-                f"we serve epoch {served_key.get('ladder_epoch')} while the live epoch is "
-                f"{key.get('ladder_epoch')} -- scores are being set on a board we do not show.")
         else:
-            add("board:publish", OK,
-                f"what we serve matches what the probe saw ({served_n} entries on "
-                f"{key.get('ladder_epoch')})")
+            # Against the CURRENT epoch, not the published one. key['ladder_epoch'] is the
+            # epoch of the board the site published, and leaderboard.json is written by the
+            # same publisher in the same run -- so comparing those two can only ever agree,
+            # which would make this check vacuous (#293). The live epoch is the ladder the
+            # game is on; an older record carries it under the old name.
+            cur_epoch = key.get("current_ladder_epoch") or key.get("ladder_epoch")
+            if served_key.get("ladder_epoch") and cur_epoch and served_key.get("ladder_epoch") != cur_epoch:
+                add("board:publish", FAIL,
+                    f"we serve epoch {served_key.get('ladder_epoch')} while the live epoch is "
+                    f"{cur_epoch} -- scores are being set on a board we do not show.")
+            else:
+                add("board:publish", OK,
+                    f"what we serve matches what the probe saw ({served_n} entries on "
+                    f"{key.get('ladder_epoch')})")
 
 
 def check_seed_leaderboards():

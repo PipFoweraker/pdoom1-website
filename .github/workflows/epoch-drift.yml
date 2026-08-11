@@ -1,0 +1,163 @@
+name: Epoch drift (board key vs the published release)
+
+# WHY THIS EXISTS
+# ---------------
+# On 2026-08-07 pdoom1 published a FORKING release (L3 -> L4, seed rolled) and
+# pdoom1.com went on publishing the closed epoch's board for two days while 9 real
+# scores landed on the live one, invisible. Nothing alerted, because every check
+# was watching a value this repo had typed rather than the value the game
+# publishes. Workshop 2 (coordination#47) recorded that the detector, every time,
+# was a person holding two artefacts at once -- and that no machine in this estate
+# does that. This is the machine that holds two artefacts at once.
+#
+# READ-ONLY. One HTTPS GET of a public release asset. No secrets, no writes to
+# production, no POST, and it cannot deploy.
+#
+# WHY POLLING RATHER THAN pdoom1 TELLING US
+# -----------------------------------------
+# pdoom1 already POSTs `repository_dispatch: game_version_sync` at every release.
+# Nothing here listens, its curl carries no --fail, and it has gone green every
+# time (#290). `event=repository_dispatch` has a total_count of 0 on this repo --
+# that channel has never once fired. A pull fails on our side where we can see it.
+# When #289 lands, the dispatch becomes a latency optimisation on top of this, not
+# a replacement for it.
+
+on:
+  schedule:
+    # Every 3 hours. A fork is a rare event with a long tail of harm, so the cost
+    # of checking is one GET and the cost of missing it is measured in days.
+    - cron: '41 */3 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/check-epoch-drift.py'
+      - 'scripts/test-epoch-drift.py'
+      - 'public/leaderboard/data/board-probe-targets.json'
+      - '.github/workflows/epoch-drift.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/check-epoch-drift.py'
+      - 'scripts/test-epoch-drift.py'
+      - 'public/leaderboard/data/board-probe-targets.json'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: epoch-drift
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    name: The drift check can still fail (offline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      # Runs FIRST and offline. Workshop 2 R6: no guard counts as installed until
+      # a RED run of it has been observed. These fixtures force the red on demand
+      # rather than waiting for pdoom1 to fork the ladder again.
+      - name: Forced-state tests -- drift red, absence unknown, unreachable claims nothing
+        run: python scripts/test-epoch-drift.py
+
+  drift:
+    name: Compare the declared board key to the published one
+    runs-on: ubuntu-latest
+    needs: guard
+    # PRs get the offline guard only: a fork landing mid-PR would otherwise fail
+    # an unrelated contributor's branch for something they did not cause.
+    if: github.event_name != 'pull_request'
+    outputs:
+      verdict: ${{ steps.check.outputs.verdict }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check
+        id: check
+        run: |
+          set +e
+          python scripts/check-epoch-drift.py --json | tee drift.log
+          code=${PIPESTATUS[0]}
+          set -e
+          verdict=$(grep -oE '"verdict":[[:space:]]*"[a-z-]+"' drift.log | head -1 \
+                    | grep -oE '"[a-z-]+"$' | tr -d '"')
+          echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
+          echo "code=$code"       >> "$GITHUB_OUTPUT"
+          {
+            echo "## Epoch drift: \`${verdict:-unknown}\`"
+            echo ""
+            echo '```'
+            cat drift.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          # 0 in-step / 1 drift / 2 cannot tell.
+          # 2 is NOT a pass and NOT a failure of the board -- it means the source
+          # moved or could not be read, which needs a human but is not an incident.
+          # It is surfaced as a warning so a transient 404 cannot cry wolf, while
+          # the alert job below still opens an issue for it.
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::Cannot compare the board key -- see the log. Absence is not agreement."
+          fi
+          exit "$code"
+
+  alert:
+    name: Open an issue when the board key has drifted
+    runs-on: ubuntu-latest
+    needs: drift
+    if: failure() && github.event_name != 'pull_request'
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: File or update the rolling issue
+        uses: actions/github-script@v7
+        env:
+          VERDICT: ${{ needs.drift.outputs.verdict }}
+        with:
+          script: |
+            // Untrusted-ish context goes through env, never spliced into the
+            // script text -- CLAUDE.md workflow trap #5.
+            const verdict = process.env.VERDICT || 'unknown';
+            const title = 'Board key drift: the site and the shipped client disagree';
+            const marker = '<!-- epoch-drift-rolling -->';
+            const body = [
+              marker,
+              '**The epoch drift check reported `' + verdict + '`.**',
+              '',
+              'The board key this site declares no longer matches the one the shipped',
+              'client posts to, or could not be compared. On 2026-08-07 this exact',
+              'condition went unnoticed for two days while real scores landed on a',
+              'board nobody displayed.',
+              '',
+              'Run: ' + process.env.GITHUB_SERVER_URL + '/' + process.env.GITHUB_REPOSITORY +
+                '/actions/runs/' + process.env.GITHUB_RUN_ID,
+              '',
+              'Reproduce locally: `python scripts/check-epoch-drift.py`',
+              '',
+              '**A `cannot tell` verdict is not a false alarm.** It means a field this',
+              'check depends on has moved or the manifest could not be read, and the',
+              'field names are a cross-repo contract (coordination#48).',
+            ].join('\n');
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', per_page: 100,
+            });
+            const hit = existing.data.find(i => (i.body || '').includes(marker));
+            if (hit) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: hit.number, body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body,
+              });
+            }

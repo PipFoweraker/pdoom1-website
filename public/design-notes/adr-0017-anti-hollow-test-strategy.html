@@ -102,6 +102,7 @@
 <ul>
 <li><strong>Status:</strong> ACCEPTED</li>
 <li><strong>Date:</strong> 2026-07-17</li>
+<li><strong>Summary:</strong> Targets "hollow" tests that pass without exercising what they protect (zero-test CI, UI-parse-error-with-436-passing); adds load-time smoke and property-based invariants so a green suite means the code actually ran.</li>
 </ul>
 <h2>Context</h2>
 <p>Two real failures on 2026-07-17 share one root cause -- <strong>tests that pass without exercising the thing they claim to protect</strong> (call it a "hollow" test):</p>

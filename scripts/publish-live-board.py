@@ -29,6 +29,34 @@ WHAT IT WILL NOT DO
 - **Never publish across epochs.** Scores earned under different rules are not
   comparable -- that non-comparability is the entire reason the ladder epoch is half
   the board key. Boards on other epochs stay where they are, tagged legacy.
+- **Never replace a board with an empty one on the SAME key.** If the key has not
+  moved and the rows have vanished, the API is lying (or the network is), and
+  overwriting real scores with nothing is the exact damage this whole subsystem exists
+  to prevent.
+
+EMPTY BOARDS, AND THE ONE CASE WHERE PUBLISHING ONE IS HONEST
+-------------------------------------------------------------
+Added 2026-08-08, for the L3 -> L4 fork. An epoch fork (or a seed roll) opens a real
+board with **zero rows**, and that state is genuinely different from "the rows went
+missing":
+
+  same key + 0 rows  ->  the API is contradicting itself. REFUSE, keep the good board.
+  NEW key  + 0 rows  ->  a fork. The old board is closed history; the new board is the
+                         one players reach, and it is empty because nobody has finished
+                         a run yet. Publishing it as `data_status: "live-empty"` is the
+                         honest answer; continuing to publish the CLOSED board as if it
+                         were current is not.
+
+The published key is read from `leaderboard.json`'s own `meta.board_key`, so "new" means
+"different from what this site is serving right now", not "different from what some
+other file remembers".
+
+**A guessed seed is still refused.** With zero rows the API gives no evidence at all
+about which key is real -- every wrong key returns `ok:true` with an empty board -- so if
+several reachable boards on the epoch are empty, this REFUSES and names them rather than
+picking one. It narrows by DECLARATION where it can (a seed pinned in
+board-probe-targets.json carries a `source`; a derived one does not), and never widens.
+An empty board is published only when exactly one candidate survives.
 
 WHAT IT WRITES
 --------------
@@ -91,30 +119,87 @@ def load_json(path, default=None):
         return default
 
 
-def pick_live_board(epoch, verbose=True):
-    """The board on THIS epoch with the most recent activity.
+def published_key():
+    """The (seed, epoch) this site is serving RIGHT NOW, from the board it serves.
 
-    Returns (result_dict, entries_list) or (None, None). Only boards whose version half
-    equals the current epoch are eligible -- a busier board on an older epoch is history,
-    not the league, and publishing it would merge scores across rule sets.
+    Read from leaderboard.json rather than published-board.json on purpose: the question
+    being asked is "what would this write replace", and the answer is whatever the page
+    fetches. A missing or unreadable file yields (None, None), which compares unequal to
+    every real key -- so an absent board is treated as "nothing to protect", never as
+    "matches, refuse".
+    """
+    cur = load_json(BOARD_JSON, {}) or {}
+    k = ((cur.get("meta") or {}).get("board_key") or {})
+    return k.get("seed"), k.get("ladder_epoch")
+
+
+def pinned_seeds():
+    """Seeds a human declared in board-probe-targets.json, WITH a source.
+
+    Same rule check-board-liveness.py applies: a pinned value with no source is a
+    hardcoded literal wearing a costume, and is ignored. Used only to NARROW an
+    otherwise ambiguous empty-board choice, never to add a candidate.
+    """
+    targets = load_json(TARGETS_JSON, {}) or {}
+    out = set()
+    for item in (targets.get("extra_seeds") or []):
+        if isinstance(item, dict) and item.get("source") and item.get("value"):
+            out.add(item["value"])
+    return out
+
+
+def pick_live_board(epoch, verbose=True):
+    """The board on THIS epoch that the site should publish.
+
+    Returns (result_dict, entries_list, status) where status is one of:
+
+      "ok"          a board was chosen; entries_list holds its rows (possibly EMPTY,
+                    but only when the key differs from what is published today)
+      "unreadable"  every probe failed, or the winner's re-fetch failed. Evidence of
+                    nothing; the caller must not write.
+      "same-key"    the only thing on offer is an empty board on the key already
+                    published. The API is contradicting itself; refuse.
+      "ambiguous"   several reachable boards on this epoch are empty and none is
+                    distinguishable. Every wrong key answers ok:true+empty, so choosing
+                    would be guessing.
+      "none"        nothing reachable on this epoch at all.
+
+    Only boards whose version half equals the current epoch are eligible -- a busier
+    board on an older epoch is history, not the league, and publishing it would merge
+    scores across rule sets.
     """
     seeds, versions, notes = liveness.derive_targets([], [])
     if verbose:
         for n in notes:
             print("  note: %s" % n)
 
-    candidates = []
+    candidates, empties, errors, probed = [], [], 0, 0
     for s in seeds:
         r = liveness.probe_board(s, epoch)
+        probed += 1
         if r.get("error"):
+            errors += 1
             if verbose:
                 print("  unreachable: (%s, %s): %s" % (s, epoch, r["error"]))
             continue
         if (r.get("entries") or 0) > 0:
             candidates.append(r)
+        else:
+            empties.append(r)
+
+    # Every probe failed. NOT evidence that the boards are empty -- evidence that we
+    # cannot tell. This must stay distinguishable from "nothing to publish": conflating
+    # them is how a network blip would come to look like a fork.
+    if probed and errors == probed:
+        return None, None, "unreadable"
 
     if not candidates:
-        return None, None
+        winner, status = _pick_empty_fork(epoch, empties, verbose)
+        if winner is None:
+            return None, None, status
+        # No re-fetch: there are no rows to fetch, and probe_board already established
+        # that the key is reachable and answered ok:true.
+        return winner, [], "ok"
 
     # Most recently active wins. Ties are impossible in practice (timestamps are
     # per-entry), but sorting by seed keeps the choice deterministic if they happen.
@@ -134,8 +219,60 @@ def pick_live_board(epoch, verbose=True):
     q = urllib.parse.urlencode({"seed": winner["seed"], "version": epoch})
     data, err = liveness.get_json("%s?%s" % (liveness.SCORE_API, q))
     if err or not isinstance(data, dict) or not data.get("ok"):
-        return None, None
-    return winner, (data.get("entries") or [])
+        return None, None, "unreadable"
+    return winner, (data.get("entries") or []), "ok"
+
+
+def _pick_empty_fork(epoch, empties, verbose):
+    """Choose an empty board to publish, or explain why nothing may be chosen.
+
+    Returns (winner_or_None, status). See pick_live_board for the status vocabulary.
+    """
+    if not empties:
+        return None, "none"
+
+    cur_seed, cur_epoch = published_key()
+
+    # An empty board on the key already published is the API contradicting itself, not
+    # a fork. Refuse loudly rather than zeroing real scores.
+    if any(r["seed"] == cur_seed for r in empties) and epoch == cur_epoch:
+        if verbose:
+            print("  REFUSING: (%s, %s) is the board this site already publishes and it "
+                  "now reads EMPTY." % (cur_seed, cur_epoch))
+            print("  The key has not moved, so this is not a fork -- it is the API (or "
+                  "the network) losing rows.")
+        return None, "same-key"
+
+    fresh = [r for r in empties if (r["seed"], epoch) != (cur_seed, cur_epoch)]
+    if not fresh:
+        return None, "none"
+
+    # Narrow by DECLARATION, never widen: a seed pinned with a source is one a human
+    # vouched for. Derived seeds come from old captures and stale weekly files, and with
+    # zero rows the API cannot tell them apart from the real one.
+    declared = [r for r in fresh if r["seed"] in pinned_seeds()]
+    pool = declared or fresh
+
+    if len(pool) > 1:
+        if verbose:
+            print("  REFUSING: %d reachable boards on %s are empty and nothing "
+                  "distinguishes them:" % (len(pool), epoch))
+            for r in sorted(pool, key=lambda x: x["seed"]):
+                print("        (%s, %s)" % (r["seed"], epoch))
+            print("  Every WRONG key also answers ok:true with an empty board, so picking "
+                  "one would be a guess wearing an observation's clothes. Pin the real "
+                  "seed (with a source) in board-probe-targets.json, and remove any pin "
+                  "whose remove_when has been met.")
+        return None, "ambiguous"
+
+    winner = pool[0]
+    if verbose:
+        print("  FORK: (%s, %s) is a NEW board key -- the site currently publishes "
+              "(%s, %s)." % (winner["seed"], epoch, cur_seed, cur_epoch))
+        print("  It holds 0 entries. That is an open board nobody has scored on yet, not "
+              "a lost board: publishing it empty is honest, and continuing to publish a "
+              "closed board as current is not.")
+    return winner, "ok"
 
 
 def build_payload(board, entries, epoch):
@@ -159,8 +296,11 @@ def build_payload(board, entries, epoch):
             "source_api": liveness.SCORE_API,
         },
         # "live" is asserted only because rows were actually fetched. With zero rows the
-        # caller publishes nothing at all rather than an empty board labelled live.
-        "data_status": "live",
+        # claim shrinks to "live-empty": the key is current and holds nothing yet. That
+        # is a weaker statement than "live" on purpose -- validate_data.py FAILS on
+        # live+0, and the leaderboard page hides the sort/filter toolbar for a board
+        # that has nothing to sort.
+        "data_status": "live" if ranked else "live-empty",
         "legacy": False,
         "seed": board["seed"],
         "economic_model": "unknown",
@@ -210,13 +350,26 @@ def main():
     print("  current ladder epoch    %s" % epoch)
     print("  epoch source            %s" % epoch_source)
 
-    board, entries = pick_live_board(epoch, verbose=not args.check)
+    board, entries, status = pick_live_board(epoch, verbose=not args.check)
 
     if board is None:
-        print("  no board on %s holds any entry, or the API could not be read." % epoch)
-        print("  Leaving the published board untouched -- an empty file would erase")
-        print("  history on a transient network failure.")
-        return 3 if entries is None else 1
+        # Each refusal says which one it is. "Cannot read" and "nothing to publish" were
+        # once the same (None, None) return disambiguated by a sentinel, and that is the
+        # kind of collapsing that lets an outage be mistaken for an empty league.
+        if status == "unreadable":
+            print("  the score API could not be read on %s." % epoch)
+            print("  Leaving the published board untouched -- an empty file would erase")
+            print("  history on a transient network failure.")
+            return 3
+        if status == "same-key":
+            print("  the board this site publishes now reads EMPTY on the SAME key.")
+            print("  Refusing: that is the API losing rows, not a fork. Nothing written.")
+        elif status == "ambiguous":
+            print("  several empty boards on %s and no way to tell which is real." % epoch)
+            print("  Refusing rather than guessing a board key. Nothing written.")
+        else:
+            print("  no board on %s is reachable." % epoch)
+        return 1
 
     print("-" * 74)
     print("  publishing (%s, %s): %d entries from %d player(s)"

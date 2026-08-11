@@ -6,23 +6,23 @@
     "environment": "production"
   },
   "game": {
-    "status": "stable",
+    "status": "alpha",
     "repository": "https://github.com/PipFoweraker/pdoom1",
     "latestRelease": {
-      "version": "v0.14.0",
+      "version": "v0.14.1",
       "date": "2026-08-07",
       "downloadUrl": "https://github.com/PipFoweraker/pdoom1/releases/latest",
       "changelog": "See CHANGELOG.md for details"
     },
     "development": {
       "phase": "Ongoing feature development",
-      "progress": "v0.14.0 released",
+      "progress": "v0.14.1 released",
       "nextMilestone": "Public alpha readiness (the First Contact milestone)"
     },
-    "lastUpdated": "2026-08-07T14:01:26.770214"
+    "lastUpdated": "2026-08-11T06:23:59.906390"
   },
   "api": {
-    "bugReporting": "https://pdoom1-website-app.netlify.app/.netlify/functions/report-bug",
+    "bugReporting": "/bug-submit.php",
     "status": "active"
   }
 }
