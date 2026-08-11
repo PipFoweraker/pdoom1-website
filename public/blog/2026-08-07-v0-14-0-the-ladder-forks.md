@@ -1,3 +1,10 @@
+---
+title: "v0.14.0: the ladder forks, and your old scores stay where they are"
+date: "2026-08-07"
+tags: ["release", "league", "dev-notes"]
+summary: "v0.14.0 retimes the historical event deck to one turn per month, which changes which events fire on a seed - so the ladder epoch moves L3 to L4. L3 entries stay valid and visible under L3; new runs land on L4; the two are never merged. Also: what is in the release, and where the site is a step behind."
+commit: ""
+---
 # v0.14.0: the ladder forks, and your old scores stay where they are
 
 **2026-08-07**
