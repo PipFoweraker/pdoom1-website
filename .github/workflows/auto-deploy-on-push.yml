@@ -37,13 +37,30 @@ on:
   # and never reach pdoom1.com -- during a league, that means a board frozen at whatever a
   # human last pushed while players watch it not update. This closes that gap for the one
   # workflow that publishes reader-facing DATA on a schedule.
+  # "Auto-Update Data" added for issue #285. It writes public/data/version.json
+  # and pushes with the default GITHUB_TOKEN, so -- by the same loop-prevention
+  # rule stated above -- its push does NOT fire the `push` trigger. Verified on
+  # the v0.14.0 cut: the version.json commit landed at 14:01Z and the deploy
+  # that carried it to production was a `workflow_run` off Board liveness, not a
+  # `push`. Without this line a release-triggered version.json reaches the
+  # repository and then waits for an unrelated workflow to happen to deploy it,
+  # which is the second half of the up-to-six-hours window in #285.
   workflow_run:
-    workflows: ["Board liveness (score API)"]
+    workflows: ["Board liveness (score API)", "Auto-Update Data"]
     types: [completed]
     branches: [main]
 
 permissions:
   contents: read
+
+# The concurrency group this branch proposed here is now the one at the TOP of
+# this file, and it is named `production-deploy`. #299 landed the same guard
+# across all four production deploys under that name while this branch was open,
+# which answers the question this PR's body left to the reviewer ("I do not know
+# which of them you consider live"): all four are live, and they share one group.
+# Keeping a second block named `deploy-production` would have been a duplicate
+# YAML key that silently WON -- this workflow would have serialised against
+# nothing while looking guarded. Do not reintroduce it.
 
 jobs:
   deploy:
