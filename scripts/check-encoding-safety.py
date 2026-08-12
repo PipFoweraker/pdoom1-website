@@ -50,9 +50,14 @@ NOT a shared import. See PREAMBLE below and the note on why it is duplicated.
 
 import argparse
 import ast
+import datetime as dt
 import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from acknowledgements import (  # noqa: E402  (must follow the sys.path line)
+    AcknowledgementError, load_ledger)
 
 for _stream in (sys.stdout, sys.stderr):
     try:
@@ -99,11 +104,21 @@ SUBPROCESS_FUNCS = {"run", "check_output", "Popen", "call", "check_call"}
 # visible; delete the entry (and fix the file) as each branch merges. This list
 # is not a place to park anything else -- a new offender must be fixed, not
 # added here.
-KNOWN_UNFIXED = {
-    "scripts/ingest_scores.py": "held by the leaderboard branch (2026-07-29 sweep)",
-    "scripts/sync/sync-events.py": "held by the events-sync branch (2026-07-29 sweep)",
-    "scripts/weekly-league-manager.py": "held by the league branch (2026-07-29 sweep)",
-}
+# ...used to be a dict literal here. It is now data/acknowledgements.json, read
+# through scripts/acknowledgements.py, for two reasons.
+#
+# CLAUDE.md's rule, first: "pinned values go in a data file with a `source` note,
+# never a script literal."
+#
+# The one that actually bit, second. All three entries said "held by the <X>
+# branch (2026-07-29 sweep)". On 2026-08-09 no branch of two of those names
+# existed on the remote -- the reason had stopped being true, and this check went
+# on printing WAIVED and exiting 0, because a reason without a clock cannot
+# expire. That is "class 5, the knowing allowlist": the check was not fooled, the
+# reader was, by the exit code. Each acknowledgement now carries a review_by, and
+# this check goes RED when one lapses -- red on the EXPIRED ACCEPTANCE, never on
+# the underlying finding, so the red is always closeable by a human decision.
+ACK_CHECK_NAME = "check-encoding-safety"
 
 
 class Finding:
@@ -275,20 +290,44 @@ def main():
                     help="print the full audit table and exit 0")
     ap.add_argument("--self-test", action="store_true",
                     help="prove the checker still detects each violation")
+    ap.add_argument("--as-of", metavar="YYYY-MM-DD",
+                    help="evaluate acknowledgement expiry at this date instead of "
+                         "today -- shows what is about to come due, and lets the "
+                         "tests force the expired state rather than wait for it")
+    ap.add_argument("--ledger",
+                    help="path to an alternative acknowledgement ledger (tests)")
     args = ap.parse_args()
 
     if args.self_test:
         return self_test()
 
-    all_findings = []
-    waived = []
+    # Load BEFORE scanning. A malformed ledger must stop the run outright: if it
+    # were tolerated, every acknowledged file would report as a fresh finding and
+    # the reader would go hunting three encoding bugs that nobody introduced.
+    try:
+        ledger = load_ledger(ACK_CHECK_NAME, args.ledger)
+    except AcknowledgementError as exc:
+        print(f"REFUSED: the acknowledgement ledger cannot be trusted, so this "
+              f"check cannot say what it is tolerating.\n  {exc}", file=sys.stderr)
+        return 2
+
+    today = dt.date.fromisoformat(args.as_of) if args.as_of else dt.date.today()
+
+    scanned = {}
     rows = []
     for path, rel in python_files():
         source = path.read_text(encoding="utf-8", errors="replace")
         findings, prints, ok = scan_source(source, rel)
-        (waived if rel in KNOWN_UNFIXED else all_findings).extend(findings)
+        if findings:
+            scanned[rel] = findings
         rows.append((rel, prints, PREAMBLE_RE.search(source) is not None,
                      [f.code for f in findings]))
+
+    report = ledger.assess(fired_keys=scanned.keys(), today=today)
+    suppressed = report.acknowledged_keys
+    waived = [f for rel, fs in scanned.items() if rel in suppressed for f in fs]
+    all_findings = [f for rel, fs in scanned.items() if rel not in suppressed
+                    for f in fs]
 
     if args.list:
         print(f"{'file':<52} {'prints':<7} {'preamble':<9} findings")
@@ -298,14 +337,21 @@ def main():
                   f"{'yes' if pre else '-':<9} {','.join(codes) or '-'}")
         print(f"\n{len(rows)} modules scanned, "
               f"{len(all_findings)} findings, {len(waived)} waived")
+        report.print_to(sys.stdout)
         return 0
 
+    # Acknowledged findings are printed in full first -- the ledger prints the
+    # decision, this prints the thing decided about. Green with a number, never
+    # green with silence.
     if waived:
         print(f"WAIVED: {len(waived)} known finding(s) in "
-              f"{len(KNOWN_UNFIXED)} file(s) not fixed yet")
+              f"{len(suppressed & set(scanned))} file(s) not fixed yet")
         for f in sorted(waived, key=lambda f: (f.path, f.line)):
-            print(f"  {f}  <- {KNOWN_UNFIXED[f.path]}")
+            print(f"  {f}")
         print()
+
+    report.print_to(sys.stdout)
+    print()
 
     if all_findings:
         print(f"FAIL: {len(all_findings)} encoding-safety finding(s) "
@@ -318,9 +364,19 @@ def main():
               "errors='replace' only where mojibake is preferable to a crash.")
         return 1
 
-    clean = len(rows) - len(KNOWN_UNFIXED)
+    if report.blocking:
+        # NOT a finding failure. The scan is clean apart from things somebody
+        # chose to tolerate, and the choice ran out. This red closes by deciding,
+        # which is why it can never become the permanent red CLAUDE.md forbids.
+        print(f"FAIL: {len(report.expired)} acknowledgement(s) expired. Every "
+              f"encoding finding is either fixed or acknowledged -- what is red "
+              f"is the ACCEPTANCE, listed above with what to do about it.")
+        return 1
+
+    n_waived_files = len(suppressed & set(scanned))
+    clean = len(rows) - n_waived_files
     print(f"OK: {clean} of {len(rows)} Python modules are encoding-safe"
-          + (f" ({len(KNOWN_UNFIXED)} waived, listed above)" if waived else ""))
+          + (f" ({n_waived_files} acknowledged, listed above)" if waived else ""))
     return 0
 
 

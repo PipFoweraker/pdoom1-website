@@ -424,6 +424,8 @@ python  scripts/test-snapshot-plausible.py # analytics backup fails loudly   [co
 node    scripts/test-header-consistency.js # nav contract + emoji            [content-honesty ADVISORY]
 python  scripts/test-changelog-structure.py   # changelog files + data shape [encoding-safety]
 python  scripts/check-encoding-safety.py      # cp1252 preamble + encodings  [encoding-safety]
+python  scripts/test-acknowledgements.py      # the acknowledgement clock expires/refuses [encoding-safety]
+python  scripts/acknowledgements.py --audit   # every dated exemption, and when it lapses [report only]
 
 python  scripts/sync/sync-keybinds.py --check # FULL gate; needs ../pdoom1   [local only]
 python  scripts/sync/sync-keybinds.py --ci    # no-typed-keys half only      [content-honesty]
@@ -469,6 +471,36 @@ concrete reasons, not because they are unimportant:
 - `test-header-consistency.js` — 19/27 today. Real drift, but content emoji in
   frozen prose is not a lie to a visitor, and blocking on it would freeze content
   work.
+
+**There is now a THIRD state: acknowledged-and-clocked.** The two above are not
+enough, and the gap has a name — "class 5, the knowing allowlist"
+(`coordination#47`, 2026-08-09). A check that SEES a divergence, PRINTS it and
+exits 0 **by design** is not disarmed, not mis-aimed and not stale: it is telling
+the truth, and the reader is fooled anyway, by the exit code. This repo had four
+instances (`check-encoding-safety.py`'s `KNOWN_UNFIXED`, `check-platform-claims.py`'s
+`ALLOWLIST`, `check-stale-facts.py`'s `SKIP_FILES` and `LINE_ALLOWLIST`). Every one
+carried a **reason**; not one carried a **clock**, so a reason could stop being true
+and nothing would ever ask. All three `KNOWN_UNFIXED` entries said "held by the `<X>`
+branch"; on 2026-08-09 two of those branches did not exist, and the check had gone on
+printing `WAIVED` and exiting 0.
+
+**The rule: an acknowledgement is a state with a clock, and the thing that expires
+is the ACCEPTANCE, never the finding.** Before `review_by` the check is green and
+the item is printed *and counted in the summary line* — green carries a number,
+never silence. After `review_by` the check is red on *"this acceptance expired,
+re-accept or fix"*. That red is always closeable by a human decision, which is what
+stops it becoming the permanent red this section forbids; a red on the underlying
+finding would not be, because whoever hits it usually cannot fix it.
+
+Machinery: `scripts/acknowledgements.py` + `data/acknowledgements.json` (repo root,
+NOT under `public/` — it is CI metadata and `public/` is rsynced). Every entry needs
+what/why/accepted_by/accepted_on/review_by/on_expiry/source, all non-blank, and the
+loader **refuses the whole ledger** rather than skipping a bad entry — a skipped
+entry resurfaces as a fresh finding and sends someone hunting a bug nobody
+introduced. Wired into `check-encoding-safety.py` as the reference; rationale,
+porting checklist for `pdoom1`/`pdoom-data`, and five known weaknesses are in
+`docs/decisions/ACKNOWLEDGEMENT_CLOCK.md`. **Do not add a new in-script allowlist
+dict** — that is the shape this replaces.
 
 **Not wired, on purpose:**
 - `check-control-characters.py` — red (28 control chars across generated

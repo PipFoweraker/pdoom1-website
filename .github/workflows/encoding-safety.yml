@@ -46,7 +46,14 @@ jobs:
           python-version: '3.11'
       - name: The checker still detects each violation
         run: python scripts/check-encoding-safety.py --self-test
-      - name: Every Python module is encoding-safe
+      # Runs BEFORE the sweep, deliberately. It forces the states the live repo
+      # is not in -- expired acceptance, vanished finding, malformed ledger --
+      # so a green sweep below means "nothing is wrong", not "the acknowledgement
+      # machinery never fired". CLAUDE.md: run the test for a guard before the
+      # guard, or a broken guard reads as a clean repo.
+      - name: Acknowledgement clock still expires, refuses and surfaces
+        run: python scripts/test-acknowledgements.py
+      - name: Every Python module is encoding-safe (or acknowledged, unexpired)
         run: python scripts/check-encoding-safety.py --check
 
   windows-cp1252:
@@ -64,6 +71,12 @@ jobs:
           python-version: '3.11'
       - name: check-encoding-safety self-test
         run: python scripts/check-encoding-safety.py --self-test
+      # The acknowledgement report prints em dashes and arrows into stdout on
+      # every run, including the green one. Under a cp1252 console that is
+      # exactly the crash this workflow exists to catch, so it must be exercised
+      # here and not only on ubuntu.
+      - name: Acknowledgement clock under a cp1252 stdout
+        run: python scripts/test-acknowledgements.py
       - name: check-encoding-safety sweep
         run: python scripts/check-encoding-safety.py --check
       - name: test-changelog-structure (prints U+2713 on its first line)
