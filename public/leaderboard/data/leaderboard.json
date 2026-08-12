@@ -1,9 +1,9 @@
 {
   "meta": {
-    "generated": "2026-08-12T00:38:54+00:00",
+    "generated": "2026-08-12T06:45:38+00:00",
     "export_source": "website:publish-live-board.py",
     "total_players": 5,
-    "total_entries": 10,
+    "total_entries": 11,
     "board_key": {
       "seed": "weekly-2026-w32",
       "ladder_epoch": "L4"
@@ -61,6 +61,18 @@
       "game_mode": "v0.14.0",
       "duration_seconds": 3.453,
       "entry_uuid": "4599913513-09811-8013-10783-11130685108211",
+      "baseline_score": 0,
+      "baseline_doom_integral": 0
+    },
+    {
+      "score": 87,
+      "doom_integral": 7024,
+      "player_name": "Kaur, Chen & Lindqvist",
+      "date": "2026-08-12T14:36:57",
+      "level_reached": 87,
+      "game_mode": "v0.14.1",
+      "duration_seconds": 574.069,
+      "entry_uuid": "130914010110-4347-16128-12714-1410310123755312",
       "baseline_score": 0,
       "baseline_doom_integral": 0
     },
