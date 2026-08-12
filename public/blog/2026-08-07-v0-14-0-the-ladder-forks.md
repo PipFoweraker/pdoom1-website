@@ -2,7 +2,7 @@
 title: "v0.14.0: the ladder forks, and your old scores stay where they are"
 date: "2026-08-07"
 tags: ["release", "league", "dev-notes"]
-summary: "v0.14.0 retimes the historical event deck to one turn per month, which changes which events fire on a seed - so the ladder epoch moves L3 to L4. L3 entries stay valid and visible under L3; new runs land on L4; the two are never merged. Also: what is in the release, and where the site is a step behind."
+summary: "v0.14.0 retimes the historical event deck to one turn per month, which changes which events fire on a seed - so the ladder epoch moves L3 to L4. L3 entries stay valid and visible under L3; new runs land on L4; the two are never merged. Also: what is in the release, and where the site was a step behind."
 commit: ""
 ---
 # v0.14.0: the ladder forks, and your old scores stay where they are
@@ -45,16 +45,16 @@ Before that split, a version bump could quietly fork a leaderboard and strand
 everyone who had already played. That happened. It is the sort of thing you only
 fix once you have watched it happen to real people's scores.
 
-## The site is a step behind, and here is where
+## The site was a step behind, and here is where
 
 Being straight about this rather than letting you find it: pdoom1.com reads the
 board key from published game artifacts, and this release changed the key a few
 minutes after the site's last scheduled read. So for a window after publication,
-the league page will still be showing the L3 board while the game is posting to
-L4. That is being corrected, not ignored — and until it resolves, the board you
-see on the site may not be the board your run went to.
+the league page kept showing the L3 board while the game was already posting to
+L4. That has been corrected: the site reads L4, and the board you see is the
+board your run went to.
 
-Nothing is lost either way. Both boards exist; only the display is stale.
+Nothing was lost either way. Both boards exist; only the display was stale.
 
 ## What else is in it
 
