@@ -431,8 +431,17 @@
 			<p class="small">
 				Analytics is <a href="https://plausible.io/">Plausible</a>, self-hosted on
 				our own box at <code>analytics.pdoom1.com</code>. Not the hosted cloud, and
-				not Google. It sets no cookies, builds no cross-site profile, and stores no
-				identifier that can follow you between sessions.
+				not Google. In your browser it sets no cookies, builds no cross-site profile, and
+				stores no identifier that can follow you between sessions.
+			</p>
+			<p class="small">
+				<strong>Not everything here is browser traffic.</strong> The game client posts one
+				launch ping to that same Plausible site, so game launches land in these numbers too
+				&mdash; that is the <code>/launch</code> row in the pages table below, and it counts
+				towards the totals in the tiles. Unlike the browser tracking, that ping carries a
+				<strong>persistent install ID</strong>; it is on by default and has its own switch
+				inside the game. What it sends, and how to turn it off, is on the
+				<a href="/privacy/#game-client">privacy page</a>.
 			</p>
 			<p class="small">
 				We track it because a small project needs to know whether anything it makes
@@ -441,12 +450,13 @@
 				figure is a count of events, not a record of a person.
 			</p>
 			<ul class="plain small">
-				<li><strong>What is collected:</strong> page path, referrer source, country,
+				<li><strong>What is collected from your browser:</strong> page path, referrer source, country,
 					and whether a download or outbound link was clicked. Aggregated before it
 					is ever written down.</li>
-				<li><strong>What is not:</strong> no cookies, no IP addresses at rest, no
+				<li><strong>What is not, from your browser:</strong> no cookies, no IP addresses at rest, no
 					cross-site tracking, no individual profile, no session that survives the
-					day.</li>
+					day. The game's launch ping is the exception to the last two &mdash; its install
+					ID does not rotate, so one installation's launches can be joined up across days.</li>
 				<li><strong>Do Not Track is honoured</strong>, and you can opt out
 					explicitly from the <a href="/privacy/">privacy page</a>. That button
 					drives the one flag the tracker actually reads, and it persists.</li>
