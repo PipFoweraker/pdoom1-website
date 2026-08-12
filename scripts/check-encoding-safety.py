@@ -99,11 +99,20 @@ EXCLUDED = {
 
 SUBPROCESS_FUNCS = {"run", "check_output", "Popen", "call", "check_call"}
 
-# Files that DO need the fix but were held open by concurrent branches when the
-# repo-wide sweep landed. Reported loudly on every run so the waiver stays
-# visible; delete the entry (and fix the file) as each branch merges. This list
-# is not a place to park anything else -- a new offender must be fixed, not
+# Findings somebody has decided to tolerate for now. Reported loudly on every run
+# so the waiver stays visible; the entry is deleted when the file is fixed. This
+# list is not a place to park anything else -- a new offender must be fixed, not
 # added here.
+#
+# It currently holds NOTHING, and that is the intended resting state. The three
+# entries it carried were cleared on 2026-08-13: two of those files had in fact
+# been protected all along by a hand-rolled `io.TextIOWrapper` swap, which W1
+# cannot see, because PREAMBLE_RE matches ONE spelling of the fix rather than the
+# property "stdout will not die on a non-ASCII byte". Read a W1 as "this module
+# does not carry the canonical preamble", never as "this module is unprotected" --
+# and note the cost of the gap: a waiver sat on sync-events.py for eleven days
+# citing a crash risk it did not have.
+#
 # ...used to be a dict literal here. It is now data/acknowledgements.json, read
 # through scripts/acknowledgements.py, for two reasons.
 #

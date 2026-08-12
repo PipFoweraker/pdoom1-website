@@ -35,15 +35,15 @@ Run:  python scripts/ingest_scores.py            # publish from current seed fil
 
 import argparse
 import glob
-import io
 import json
 import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-if sys.platform.startswith("win"):
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+for _s in (sys.stdout, sys.stderr):
+    try: _s.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError): pass
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"

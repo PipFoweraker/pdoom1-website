@@ -309,9 +309,15 @@ with tempfile.TemporaryDirectory() as tmp:
 
 # ---------------------------------------------------------------------------
 print("\n9. THE REAL LEDGER loads, and every entry is honest about its clock")
+# Deliberately does NOT pin how many entries exist. The previous version asserted
+# `len(led.entries) == 3`, which quietly made the three waivers load-bearing: the
+# commit that FIXED all three findings turned this test red, so the test punished
+# exactly the outcome the ledger exists to produce. An allowlist whose size is
+# asserted is an allowlist nobody can empty. Assert the invariants that must hold
+# for whatever is on file -- including nothing.
 led = ack.load_ledger("check-encoding-safety")
-check("data/acknowledgements.json parses and validates", len(led.entries) == 3,
-      str(len(led.entries)))
+check("data/acknowledgements.json parses and validates",
+      isinstance(led.entries, list), str(type(led.entries)))
 today = dt.date.today()
 check("no entry in the real ledger is already expired (that would ship a red)",
       all(not e.is_expired(today) for e in led.entries),
@@ -321,16 +327,26 @@ check("real entries do not all share one review_by (no thundering herd)",
       str(sorted(str(e.review_by) for e in led.entries)))
 check("every real entry cites a source",
       all(len(e.source) > 20 for e in led.entries))
+print(f"     (the real ledger currently holds {len(led.entries)} entry(ies); "
+      f"zero is the goal state, not a broken fixture)")
 
 # ---------------------------------------------------------------------------
 print("\n10. The audit CLI reports, and never gates")
-r = subprocess.run([sys.executable, str(ROOT / "scripts" / "acknowledgements.py"),
-                    "--audit", "--as-of", "2030-01-01"],
-                   capture_output=True, text=True, encoding="utf-8")
-check("--audit exits 0 even with everything expired", r.returncode == 0,
+AUDIT = [sys.executable, str(ROOT / "scripts" / "acknowledgements.py"), "--audit"]
+r = subprocess.run(AUDIT, capture_output=True, text=True, encoding="utf-8")
+check("--audit over the REAL ledger exits 0", r.returncode == 0,
       f"rc={r.returncode} {r.stderr[-400:]}")
-check("--audit reports the expiries it found", "EXPIRED" in r.stdout,
-      r.stdout[-400:])
+# Forced against a synthetic ledger, not the real one: the real ledger may hold
+# nothing, and "nothing expired because nothing is on file" would prove the CLI
+# still reports expiries only by accident.
+with tempfile.TemporaryDirectory() as tmp:
+    p = write_ledger(tmp, ledger_doc([entry()]))
+    r = subprocess.run(AUDIT + ["--ledger", str(p), "--as-of", "2030-01-01"],
+                       capture_output=True, text=True, encoding="utf-8")
+    check("--audit exits 0 even with everything expired", r.returncode == 0,
+          f"rc={r.returncode} {r.stderr[-400:]}")
+    check("--audit reports the expiries it found", "EXPIRED" in r.stdout,
+          r.stdout[-400:])
 r = subprocess.run([sys.executable, str(ROOT / "scripts" / "acknowledgements.py"),
                     "--audit", "--check", "no-such-check"],
                    capture_output=True, text=True, encoding="utf-8")
@@ -347,17 +363,30 @@ GUARD = [sys.executable, str(ROOT / "scripts" / "check-encoding-safety.py")]
 r = subprocess.run(GUARD, capture_output=True, text=True, encoding="utf-8",
                    cwd=str(ROOT))
 check("today: the check is GREEN", r.returncode == 0, f"rc={r.returncode}")
-check("today: green PRINTS the acknowledged findings",
-      "WAIVED" in r.stdout and "ACKNOWLEDGED" in r.stdout, r.stdout[-600:])
-check("today: green carries a COUNT", "on file" in r.stdout, r.stdout[-600:])
+# Green must never be silent about the ledger, INCLUDING when the ledger is
+# empty -- "none on file" is a statement; printing nothing is not. This is the
+# one assertion here that reads the real ledger, and it holds either way.
+check("today: green says something about the acknowledgements, whatever they are",
+      "Acknowledgements for check-encoding-safety" in r.stdout, r.stdout[-600:])
 
-r = subprocess.run(GUARD + ["--as-of", "2027-01-01"], capture_output=True,
-                   text=True, encoding="utf-8", cwd=str(ROOT))
-check("future: the check is RED", r.returncode == 1, f"rc={r.returncode}")
-check("future: red names the EXPIRY, not the finding, as the cause",
-      "what is red is the ACCEPTANCE" in r.stdout, r.stdout[-800:])
-check("future: red tells the reader what to do",
-      "DO THIS" in r.stdout, r.stdout[-800:])
+# The expiry wiring is forced against a SYNTHETIC ledger. Driving it off the real
+# one only worked while the real one happened to hold entries; the moment the
+# findings were fixed, `--as-of 2027` had nothing to expire and this test would
+# have gone green for the wrong reason -- the worst outcome available to a guard.
+# An expired entry blocks whether or not its key still fires, which is what makes
+# it usable here.
+with tempfile.TemporaryDirectory() as tmp:
+    p = write_ledger(tmp, ledger_doc(
+        [entry(check="check-encoding-safety")],
+        checks={"check-encoding-safety": "synthetic, for the expiry wiring test"}))
+    r = subprocess.run(GUARD + ["--ledger", str(p), "--as-of", "2027-01-01"],
+                       capture_output=True, text=True, encoding="utf-8",
+                       cwd=str(ROOT))
+    check("future: the check is RED", r.returncode == 1, f"rc={r.returncode}")
+    check("future: red names the EXPIRY, not the finding, as the cause",
+          "what is red is the ACCEPTANCE" in r.stdout, r.stdout[-800:])
+    check("future: red tells the reader what to do",
+          "DO THIS" in r.stdout, r.stdout[-800:])
 
 # ---------------------------------------------------------------------------
 print("\n12. WIRING: a malformed ledger stops the check, and does NOT read as "
@@ -380,10 +409,15 @@ with tempfile.TemporaryDirectory() as tmp:
           "FAIL:" not in r.stdout, r.stdout[-400:])
 
 # ---------------------------------------------------------------------------
-print("\n13. WIRING: an EMPTY ledger makes the three real findings fail normally")
-# Proves the suppression is doing real work -- without it, these findings are
-# live and red. A guard whose allowlist could be emptied with no change in
-# behaviour is a guard that was never checking anything.
+print("\n13. WIRING: the repo is clean ON ITS OWN, not because of the ledger")
+# The inverse of what this slot used to assert. It used to prove suppression was
+# doing real work by emptying the ledger and watching the three waived findings
+# go red -- and in doing so it named those three files, so fixing them broke the
+# test. Now that they ARE fixed, the honest form of the same question is the
+# stronger one: run the check with NOTHING acknowledged, and it must still be
+# green. That separates "no findings" from "findings, quietly forgiven", which is
+# the whole of class 5, and it goes red the day somebody papers over a regression
+# with a new waiver instead of a fix.
 with tempfile.TemporaryDirectory() as tmp:
     p = Path(tmp) / "empty.json"
     p.write_text(json.dumps({
@@ -393,16 +427,16 @@ with tempfile.TemporaryDirectory() as tmp:
     }), encoding="utf-8")
     r = subprocess.run(GUARD + ["--ledger", str(p)], capture_output=True,
                        text=True, encoding="utf-8", cwd=str(ROOT))
-    check("with nothing acknowledged the check is RED on the findings",
-          r.returncode == 1, f"rc={r.returncode}")
-    check("and red on the FINDINGS this time, not on an expiry",
-          "encoding-safety finding(s)" in r.stdout
-          and "acknowledgement(s) expired" not in r.stdout, r.stdout[-500:])
-    check("the three real files are the ones named",
-          all(k in r.stdout for k in ("scripts/ingest_scores.py",
-                                      "scripts/sync/sync-events.py",
-                                      "scripts/weekly-league-manager.py")),
-          r.stdout[-600:])
+    check("with NOTHING acknowledged the check is still GREEN",
+          r.returncode == 0, f"rc={r.returncode} out={r.stdout[-800:]}")
+    check("no finding is being suppressed by the real ledger",
+          "encoding-safety finding(s)" not in r.stdout, r.stdout[-500:])
+    check("and it says so with a count, not with silence",
+          "Python modules are encoding-safe" in r.stdout, r.stdout[-500:])
+# That the SCANNER can still fail does not depend on the repo being dirty, and is
+# proved separately: --self-test strips the preamble and drops encoding= in memory
+# and asserts every violation is still detected (its own step in
+# encoding-safety.yml, and case 14 below).
 
 # ---------------------------------------------------------------------------
 print("\n14. WIRING: the check's own self-test and --list still work")

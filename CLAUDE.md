@@ -169,8 +169,16 @@ Pip's stated top priority. Practically:
   `python scripts/check-encoding-safety.py` (CI: `encoding-safety.yml`). The
   preamble is duplicated per-module on purpose, not imported from a helper —
   scripts run directly from many working directories, so an import that must
-  resolve is a new way for the thing-that-runs-first to fail. Three files were
-  held by concurrent branches and are listed in that script's `KNOWN_UNFIXED`.
+  resolve is a new way for the thing-that-runs-first to fail.
+  **CORRECTED 2026-08-13:** this said "Three files were held by concurrent
+  branches and are listed in that script's `KNOWN_UNFIXED`." Both halves were
+  stale. `KNOWN_UNFIXED` became `data/acknowledgements.json` on 2026-08-09
+  (#295), and the three files are now **fixed** — the ledger holds zero entries
+  and the sweep is green on all 73 modules with nothing acknowledged. Two of
+  the three were never unprotected: they carried a hand-rolled
+  `io.TextIOWrapper` swap that works but is not the idiom the checker's regex
+  looks for. Write the preamble above **verbatim**; an equivalent-but-different
+  spelling reads to the sweep as no preamble at all.
 - **The quiet half of the same bug: `open(path)` with no `encoding=`.** It
   decodes as cp1252 on Windows and utf-8 on Linux, so a UTF-8 file mojibakes
   *without raising*. On 2026-07-28 a diagnostic read a file this way, mistook a
