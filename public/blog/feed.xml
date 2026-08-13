@@ -5,8 +5,18 @@
     <link>https://pdoom1.com/blog/</link>
     <description>Development notes from p(Doom)1 - a satirical strategy game about managing an AI safety lab.</description>
     <language>en-AU</language>
-    <lastBuildDate>Thu, 30 Jul 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 07 Aug 2026 12:00:00 +0000</lastBuildDate>
     <atom:link href="https://pdoom1.com/blog/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>v0.14.0: the ladder forks, and your old scores stay where they are</title>
+      <link>https://pdoom1.com/blog/post.html?p=2026-08-07-v0-14-0-the-ladder-forks.md</link>
+      <guid isPermaLink="false">pdoom1-blog-2026-08-07-v0-14-0-the-ladder-forks.md</guid>
+      <pubDate>Fri, 07 Aug 2026 12:00:00 +0000</pubDate>
+      <description>v0.14.0 retimes the historical event deck to one turn per month, which changes which events fire on a seed - so the ladder epoch moves L3 to L4. L3 entries stay valid and visible under L3; new runs land on L4; the two are never merged. Also: what is in the release, and where the site was a step behind.</description>
+      <category>release</category>
+      <category>league</category>
+      <category>dev-notes</category>
+    </item>
     <item>
       <title>Issue #1 turns one</title>
       <link>https://pdoom1.com/blog/post.html?p=2026-07-30-issue-1-turns-one.md</link>
