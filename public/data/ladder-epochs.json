@@ -13,7 +13,10 @@
     "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z"
   },
   "regularised_from": {
-    "ladder_version": "L3",
+    "ladder_version": "L4",
+    "ladder_version_meaning": "THE FRONTIER -- the ladder epoch a NEW week opens on. Read by weekly-league-manager.start_new_week() to stamp meta.ladder_version and the board key, and by check-blessing-consistency.py as this file's claim about the current epoch. It MOVES at every ladder fork. It is NOT the epoch an archived week ran under: that is resolved per-week by ladder_version_for() from epochs[].boundary_local, so a restamp can never relabel a closed epoch's weeks. See boundary_ladder_version.",
+    "boundary_ladder_version": "L3",
+    "boundary_ladder_version_meaning": "HISTORICAL and fixed -- the ladder epoch in force at boundary_local, i.e. the epoch the regularisation cut itself was made on. Stamped into every weekly record as epoch.boundary_ladder_version; 44 archived records already carry 'L3'. This existed only implicitly until 2026-08-13, sharing the ladder_version field above, which meant moving the frontier L3 -> L4 would have silently rewritten all 44 of them.",
     "boundary_local": "2026-07-31T00:00:00+10:00",
     "boundary_tz": "Australia/Hobart",
     "boundary_rule": "A league week is anomalous iff it STARTS before boundary_local. The boundary is the Hobart-midnight anchor of the first L3 week, NOT board_opens_local -- see boundary_why.",
@@ -21,14 +24,11 @@
     "board_opens_local": "2026-07-31T17:00:00+10:00",
     "board_opens_confirmed": true,
     "board_opens_note": "Approximate, from pdoom1: 'Fri ~1700: board opens', with the seed blessed at a ceremony ~1645 AEST the same day. Treat as approximate until the game side confirms.",
-    "seed": "weekly-2026-w31",
-    "seed_status": "blessed",
-    "seed_note": "ROLLED, not blessed in place. The previous seed weekly-2026-w30 carried three Gate 4 proving runs; Pip ruled they must not open the league, and since the site does not filter a live board, the only honest exclusion was to open on a different seed. Those three runs are preserved as acknowledged history at public/leaderboard/data/preserved/2026-08-01-gate4-proving-runs/.",
+    "seed": null,
+    "seed_status": "unblessed",
+    "seed_note": "NO BLESSED SEED ON L4 YET, and this field must stay null until there is one. It was left reading weekly-2026-w31/blessed after the L3 -> L4 fork of 2026-08-07, which is a blessing of a CLOSED board (L3 closed with (weekly-2026-w31, L3); the capture is at public/leaderboard/data/preserved/2026-08-08-l3-epoch-close/). The seed the shipped client posts to is an OBSERVATION and lives in public/leaderboard/data/published-board.json, never here: this field is the machine mirror of a row in docs/LEAGUE_SEED_LEDGER.md, and the ledger has no L4 row. pdoom1 rolled the featured seed const to weekly-2026-w33 on 2026-08-13 (pdoom1#1214, e44660c4) ready for the Fri 2026-08-14 league, and that string is deliberately NOT copied here: scripts/test-weekly-league-boundary.py pins the invariant 'a seed is present IFF the status is blessed', because unblessed-with-a-seed is a value sitting where code reads it as canonical that nobody has blessed. FILLING THIS IS PIP'S, AFTER the Gate 5 ceremony and AFTER the ledger row -- a seat inferring a blessing is pdoom1-website#297.",
     "reason_pre": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
-    "reason_post": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L3), by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py.",
-    "seed_blessed_on": "2026-07-31",
-    "seed_blessed_by": "Pip",
-    "seed_evidence": "Confirmed at ARTIFACT level, not from memory or an issue comment: v0.13.2:godot/autoload/game_config.gd:462 pins const FEATURED_SEED_OVERRIDE: String = \"weekly-2026-w31\". Read from the released tag (published 2026-07-31T07:53Z), which is the standard the ceremony checklist requires -- artifact beats intention. Pip confirmed all gates blessed the same evening. Per coordination/WALKPACK_2026-08-02, the release manifest is now the seed publication surface with weekly-2026-w31 canonical."
+    "reason_post": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L<n>) where L<n> is this stamp's own ladder_version, by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py. This sentence used to name L3 outright; it was stamped unchanged onto weeks that ran on L4."
   },
   "epochs": [
     {
@@ -47,10 +47,26 @@
     },
     {
       "ladder_version": "L3",
-      "status": "opening",
-      "seed": null,
+      "status": "closed",
+      "seed": "weekly-2026-w31",
+      "boundary_local": "2026-07-31T00:00:00+10:00",
+      "blessed_utc": "2026-07-31",
+      "blessed_by": "Pip",
       "first_build": "v0.13.2",
-      "note": "Nothing has ever been published on L3. The current public build (v0.13.1) is L2."
+      "closed_by_build": "v0.14.0",
+      "closed_local": "2026-08-07T00:00:00+10:00",
+      "board_capture": "public/leaderboard/data/preserved/2026-08-08-l3-epoch-close/weekly-2026-w31__L3.json",
+      "seed_evidence": "Confirmed at ARTIFACT level, not from memory or an issue comment: v0.13.2:godot/autoload/game_config.gd:462 pins const FEATURED_SEED_OVERRIDE: String = \"weekly-2026-w31\". Read from the released tag (published 2026-07-31T07:53Z), which is the standard the ceremony checklist requires -- artifact beats intention. Pip confirmed all gates blessed the same evening. Per coordination/WALKPACK_2026-08-02, the release manifest is now the seed publication surface with weekly-2026-w31 canonical.",
+      "note": "UPDATED 2026-08-13. This entry read status 'opening', seed null, 'Nothing has ever been published on L3. The current public build (v0.13.1) is L2.' -- true when written on 2026-07-28 and false from the ceremony onwards. L3 did open, on weekly-2026-w31 at ~1700 AEST Fri 2026-07-31, took six real player scores, and closed when v0.14.0 forked the ladder on 2026-08-07. The correction is the record catching up with events that happened; no past entry's facts were altered. Preserved read-only; scores do not migrate forward. See docs/LEAGUE_SEED_LEDGER.md."
+    },
+    {
+      "ladder_version": "L4",
+      "status": "current",
+      "seed": null,
+      "boundary_local": "2026-08-07T00:00:00+10:00",
+      "first_build": "v0.14.0",
+      "seed_status": "unblessed",
+      "note": "Current epoch. seed is null because the LEDGER has no L4 row -- nothing here may claim a blessing docs/LEAGUE_SEED_LEDGER.md has not recorded (pdoom1-website#297). What the shipped client posts to is an observation, held in published-board.json: (weekly-2026-w32, L4) for the weeks of 2026-08-07 and 2026-08-14 as shipped, with pdoom1#1214 rolling the const to weekly-2026-w33 on 2026-08-13 for the Fri 2026-08-14 league. boundary_local is the Friday-midnight anchor of the first L4 week, following the same whole-week rule as the L3 cut (see regularised_from.boundary_why): v0.14.0 was tagged 2026-08-07T22:44+10:00, inside that week, and a week half under L3 rules and half under L4 is the cross-epoch blend the ladder key exists to prevent."
     }
   ],
   "sources": [
@@ -63,6 +79,21 @@
       "what": "The monthly 'Epoch = first Friday' cadence rule, and a calendar row reading 'Jul 31 | Fri | Weekly Seed | Seed | -- / L2'.",
       "where": "pdoom1/docs/RELEASE_NOMENCLATURE.md",
       "authority": "STALE FOR THIS CUT -- the cadence rule still describes the pattern, but the ladder forked mid-month, so that calendar row's '-- / L2' is wrong for 2026-07-31. Issue #151 wins."
+    },
+    {
+      "what": "The ladder forked 3 -> 4 with the Friday 2026-08-07 build; board key (weekly-2026-w32, L4); L3 scores stay valid and visible under L3. Reason for the bump: #1137 retimed the historical event deck against the one-turn-one-month ruling (#1125), changing which events fire on a given seed.",
+      "where": "pdoom1 git tag v0.14.0, tagged 2026-08-07T22:44:37+10:00; corroborated by pdoom1 ladder_version.txt = 4 and GameConfig.LADDER_VERSION = \"4\" (godot/autoload/game_config.gd:219)",
+      "authority": "AUTHORITATIVE"
+    },
+    {
+      "what": "L4 is the current epoch, positively verified rather than taken on the tag's word: a read-only GET on 2026-08-08 found entries on (weekly-2026-w32, L4) from clients stamped v0.14.0 and v0.14.1. This matters because the score API has no key validation -- every WRONG key also returns ok:true with an empty board.",
+      "where": "public/leaderboard/data/board-probe-targets.json -> current_ladder_epoch (declared 2026-08-08)",
+      "authority": "AUTHORITATIVE -- and the value this file's regularised_from.ladder_version is now pinned against by scripts/test-weekly-league-boundary.py, so the two declarations cannot drift apart again."
+    },
+    {
+      "what": "The featured seed rolled to weekly-2026-w33 for the Fri 2026-08-14 league, and the ladder does NOT move with it: 14 August is the second Friday, so it is a weekly Seed and not an Epoch, and ladder_version.txt stays 4.",
+      "where": "pdoom1 commit e44660c4, 'chore(league): roll the featured seed to weekly-2026-w33 (#1214)', 2026-08-13T15:52+10:00, authored by Pip",
+      "authority": "AUTHORITATIVE FOR THE CONST, NOT A BLESSING -- Gate 5 (the blessing ceremony) is Friday afternoon and the ledger row is Pip's to write. The string is deliberately NOT mirrored into regularised_from.seed until then; see seed_note."
     }
   ]
 }

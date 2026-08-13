@@ -370,7 +370,44 @@ _cut = _contract["regularised_from"]
 check("board key shape is (seed, L<n>)", _contract["board_key"]["shape"], "(seed, L<n>)")
 check("the shape explicitly excludes a build-version key",
       "v0.13.2" in _contract["board_key"]["is_not"], True)
-check("current ladder version", _cut["ladder_version"], "L3")
+# CORRECTED 2026-08-13. This read:
+#
+#     check("current ladder version", _cut["ladder_version"], "L3")
+#
+# which is the literal-against-a-moving-value defect the note twelve lines below
+# names, committed again in the same paragraph that names it -- and the ladder duly
+# moved to L4 on 2026-08-07 with nothing here objecting, because a pin only fires
+# when the OTHER side moves. It never went red; the contract simply stayed wrong and
+# this test kept agreeing with it. Worse than a stale assertion: this file is the
+# FIRST step of weekly-league-reset.yml, i.e. the last thing between a stale contract
+# and a published record, and it was pinning the stale value in place.
+#
+# The frontier is declared in two files by two hands. Assert that they AGREE rather
+# than what either says, so the next fork needs one edit and a disagreement is red.
+_declared_epoch = (json.loads(
+    (Path(__file__).parent.parent / "public" / "leaderboard" / "data"
+     / "board-probe-targets.json").read_text(encoding="utf-8")
+).get("current_ladder_epoch") or {}).get("value")
+check("the site declares a current ladder epoch at all", bool(_declared_epoch), True)
+check("the contract's frontier IS the declared current epoch",
+      _cut["ladder_version"], _declared_epoch)
+check("the boundary keeps its own ladder version, separate from the frontier",
+      _cut.get("boundary_ladder_version"), "L3")
+
+# A frontier bump must NOT relabel weeks that already ran. Both directions, because
+# the failure that prompted this was silent in the passing direction: bumping
+# ladder_version L3 -> L4 in the contract would have restamped 44 archived records
+# and the two regularised weeks, and nothing would have said so.
+check("the first regularised week keeps L3 after the ladder forked to L4",
+      wlm.ladder_version_for(datetime.fromisoformat("2026-07-31T00:00:00+10:00")), "L3")
+check("the last L3 week keeps L3",
+      wlm.ladder_version_for(datetime.fromisoformat("2026-08-06T00:00:00+10:00")), "L3")
+check("the first L4 week (Fri 2026-08-07) is L4",
+      wlm.ladder_version_for(datetime.fromisoformat("2026-08-07T00:00:00+10:00")), "L4")
+check("a week opening after the fork takes the current epoch, not the boundary's",
+      wlm.ladder_version_for(datetime.fromisoformat("2026-08-14T00:00:00+10:00")),
+      _declared_epoch)
+
 # CORRECTED 2026-08-02. These three assertions used to read:
 #
 #     check("the L3 seed is NOT set", _cut["seed"], None)
@@ -424,8 +461,12 @@ try:
     check("...and never the derived placeholder it was handed",
           "deadbeef" in str(_sb["seed"]), False)
     check("...and marks it blessed: true", _sb["seed_provenance"]["blessed"], True)
+    # The epoch half is read from the contract, not spelled "L3" here. Pinning it
+    # made this assertion go red at the L3 -> L4 fork while testing a rule ("the
+    # board key is (seed, frontier)") that had not changed at all.
     check("...and states the board key it implies",
-          _sb["seed_provenance"]["board_key"], "(weekly_2026_W99_blessed, L3)")
+          _sb["seed_provenance"]["board_key"],
+          "(weekly_2026_W99_blessed, %s)" % _cut["ladder_version"])
 finally:
     wlm._CONTRACT_CACHE[:] = _saved_seed
 
@@ -445,14 +486,30 @@ finally:
 #
 # This is the shape Pip ruled on 2026-08-02: a check must take at least one output from
 # inside the system it is checking. This one now does.
+#
+# CORRECTED 2026-08-13, and the correction is the same lesson a third time. The state
+# test read `regularised_from.seed_status`, which is a fact about the CURRENT epoch, and
+# used it to decide whether a seed belonging to a PAST one may be written down. Those
+# came apart at the L3 -> L4 fork: w31 was blessed, ran, took six real scores and closed,
+# and the moment regularised_from went back to `unblessed` for L4 this guard re-armed and
+# reported the ledger, the epoch record and a health report as leaks of an unblessed seed.
+# Every one of those files is *supposed* to name it -- it is history now.
+#
+# A blessing does not expire when its epoch does. So the question is no longer "is the
+# current epoch blessed" but "has THIS seed ever been blessed", answered from the record.
 _probable = "weekly-" + "2026-w31"      # assembled so this file does not contain it
 try:
     _epochs = json.loads(
         (Path(__file__).parent.parent / "public" / "data" / "ladder-epochs.json")
         .read_text(encoding="utf-8"))
-    _seed_status = (_epochs.get("regularised_from") or {}).get("seed_status")
+    _reg = _epochs.get("regularised_from") or {}
+    _blessed_ever = (_reg.get("seed") == _probable
+                     and _reg.get("seed_status") == "blessed")
+    for _e in (_epochs.get("epochs") or []):
+        if _e.get("seed") == _probable and _e.get("blessed_utc"):
+            _blessed_ever = True
 except (OSError, ValueError):
-    _seed_status = None      # unreadable -> assume unblessed, i.e. keep enforcing
+    _blessed_ever = False    # unreadable -> assume unblessed, i.e. keep enforcing
 
 _leaks = []
 for _p in list((Path(__file__).parent).glob("*.py")) + \
@@ -487,8 +544,8 @@ for _p in list((Path(__file__).parent).glob("*.py")) + \
             _leaks.append(_p.name)
     except (UnicodeDecodeError, OSError):
         pass
-if _seed_status == "blessed":
-    check("seed is BLESSED, so the no-hardcoding rule no longer applies "
+if _blessed_ever:
+    check("seed HAS BEEN BLESSED, so the no-hardcoding rule no longer applies "
           f"(found in {len(_leaks)} file(s), which is correct)", True, True)
 else:
     check("the UNBLESSED seed is hardcoded nowhere in scripts/ or public/data/",
