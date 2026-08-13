@@ -210,6 +210,52 @@ def board_opens() -> Optional[datetime]:
     except ValueError:
         return None
 
+
+def ladder_version_for(week_start: datetime) -> str:
+    """The ladder epoch a week beginning at `week_start` actually ran under.
+
+    NOT the frontier. `regularised_from.ladder_version` is the epoch a NEW week
+    opens on and it moves at every fork; a week that has already run keeps the
+    epoch it was played under, because that half of the board key is the whole
+    reason scores either side of a fork are not comparable.
+
+    Reading the frontier for every week is a live history-rewrite, not a
+    hypothetical one: stamp-league-epoch.py restamps all 45 weekly records from
+    this contract on every rollover, so bumping the frontier L3 -> L4 without
+    this function would have relabelled the closed L3 weeks as L4 -- the same
+    class as the composed key #293 published, and forbidden by TECH_DEBT section
+    E ("restamping the v0.4.1 records is forbidden").
+
+    Resolved from epochs[].boundary_local: the latest epoch whose boundary is at
+    or before the week's start. An epoch with no boundary_local (L1, L2 -- both
+    pre-regularisation, where no week is stamped with a ladder version anyway)
+    is skipped. Falls back to boundary_ladder_version, never to the frontier.
+    """
+    contract = ladder_contract()
+    ws = as_utc(week_start)
+    best: Optional[tuple] = None
+    for e in (contract.get("epochs") or []):
+        raw, lv = e.get("boundary_local"), e.get("ladder_version")
+        if not raw or not lv:
+            continue
+        try:
+            stated = datetime.fromisoformat(raw)
+        except ValueError:
+            raise RuntimeError(
+                f"{LADDER_CONTRACT_REL} -> epochs[] entry {lv} has a "
+                f"boundary_local that is not ISO-8601: {raw!r}")
+        if stated.tzinfo is None:
+            raise RuntimeError(
+                f"{LADDER_CONTRACT_REL} -> epochs[] entry {lv} boundary_local "
+                f"must carry its offset, got {raw!r}")
+        b = as_utc(stated)
+        if b <= ws and (best is None or b > best[0]):
+            best = (b, lv)
+    if best is not None:
+        return best[1]
+    cut = contract["regularised_from"]
+    return cut.get("boundary_ladder_version") or cut["ladder_version"]
+
 # The seed this script derives is NOT the competitive seed. docs/LEAGUE_SEED_LEDGER.md
 # is explicit: "The seed is not a free website-side choice" -- the canonical key is
 # whatever the shipped client POSTs, blessed by Pip in the ledger. This script's
@@ -356,8 +402,12 @@ def epoch_for(week_start: datetime) -> Dict[str, Any]:
         "anomalous": anomalous,
         # The ladder version IS the board key's second element. Recorded on both
         # sides of the fork so a reader never has to infer it from a date.
-        "ladder_version": None if anomalous else cut["ladder_version"],
-        "boundary_ladder_version": cut["ladder_version"],
+        #
+        # Resolved PER WEEK, not from the frontier: a closed L3 week must keep
+        # saying L3 after the ladder forks to L4. See ladder_version_for().
+        "ladder_version": None if anomalous else ladder_version_for(week_start),
+        "boundary_ladder_version": cut.get("boundary_ladder_version")
+                                   or cut["ladder_version"],
         "boundary_local": boundary.isoformat(),
         "boundary_tz": LEAGUE_TZ_NAME,
         "boundary_utc": as_utc(boundary).isoformat().replace("+00:00", "Z"),
@@ -572,7 +622,13 @@ class WeeklyLeagueManager:
         game_version = self.get_game_version()
 
         seed_block = seed_for_week(new_seed)
-        ladder = ladder_contract()["regularised_from"]["ladder_version"]
+        # Take the ladder version from the week's OWN epoch stamp rather than
+        # re-reading the contract, so meta.ladder_version, board_key and
+        # epoch.ladder_version are one value and cannot silently disagree inside
+        # a single record. Falls back to the frontier only for an anomalous week,
+        # which stamps no ladder version of its own.
+        ladder = (week_info['epoch'].get('ladder_version')
+                  or ladder_contract()["regularised_from"]["ladder_version"])
 
         print(f"NEW WEEK: Starting new weekly league for {week_info['week_id']}")
         print(f"SEED: {seed_block['seed']} "

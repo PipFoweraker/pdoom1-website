@@ -1430,7 +1430,7 @@
         "boundary_local": "2026-07-31T00:00:00+10:00",
         "boundary_tz": "Australia/Hobart",
         "boundary_utc": "2026-07-30T14:00:00Z",
-        "reason": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L3), by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py.",
+        "reason": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L<n>) where L<n> is this stamp's own ladder_version, by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py. This sentence used to name L3 outright; it was stamped unchanged onto weeks that ran on L4.",
         "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
         "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
         "board_opens_local": "2026-07-31T17:00:00+10:00",
@@ -1581,10 +1581,28 @@
       ],
       "first_entry": "2026-07-30T08:32:01",
       "last_entry": "2026-07-30T09:36:29"
+    },
+    {
+      "file": "2026-08-08-l3-epoch-close/weekly-2026-w31__L3.json",
+      "captured": "2026-08-08-l3-epoch-close",
+      "seed": "weekly-2026-w31",
+      "version": "L3",
+      "key_kind": "ladder",
+      "board_key": "(weekly-2026-w31, L3)",
+      "entry_count": 6,
+      "players": [
+        "AI Safety Lab",
+        "Cognitive Systems Studies",
+        "Cognitive Systems Studies II",
+        "Division of Machine Learning",
+        "Notkilleveryone Inc"
+      ],
+      "first_entry": "2026-07-31T10:35:08",
+      "last_entry": "2026-08-06T13:02:18"
     }
   ],
   "epochs": {
-    "ladder_version": "L3",
+    "ladder_version": "L4",
     "board_key": {
       "shape": "(seed, L<n>)",
       "example": "(weekly-2026-w30, L2)",
@@ -1611,8 +1629,8 @@
     "regularised": {
       "count": 1,
       "anomalous": false,
-      "reason": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L3), by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py."
+      "reason": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L<n>) where L<n> is this stamp's own ladder_version, by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py. This sentence used to name L3 outright; it was stamped unchanged onto weeks that ran on L4."
     }
   },
-  "last_updated": "2026-08-07T03:26:42.297633Z"
+  "last_updated": "2026-08-13T08:54:19.801290Z"
 }

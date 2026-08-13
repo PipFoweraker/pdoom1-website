@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-12T06:34:09.533586+00:00",
+  "generated": "2026-08-13T08:59:17.645974+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 5.7 days ago"
+      "detail": "generated 6.8 days ago"
     },
     {
       "name": "league:current_week",
@@ -130,7 +130,7 @@
     {
       "name": "league:seed",
       "status": "OK",
-      "detail": "weekly seed weekly-2026-w31"
+      "detail": "weekly seed weekly-2026-w32"
     },
     {
       "name": "league:integrity",
@@ -150,12 +150,12 @@
     {
       "name": "board:status_integrity",
       "status": "OK",
-      "detail": "data_status=live consistent with 10 entries"
+      "detail": "data_status=live consistent with 11 entries"
     },
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 5.8h ago"
+      "detail": "live API checked 8.2h ago"
     },
     {
       "name": "board:archived_anomaly",
@@ -165,12 +165,12 @@
     {
       "name": "board:liveness",
       "status": "OK",
-      "detail": "deployed board (weekly-2026-w32, L4) holds 10 entries"
+      "detail": "deployed board (weekly-2026-w32, L4) holds 11 entries"
     },
     {
       "name": "board:publish",
       "status": "OK",
-      "detail": "what we serve matches what the probe saw (10 entries on L4)"
+      "detail": "what we serve matches what the probe saw (11 entries on L4)"
     },
     {
       "name": "seed_leaderboards:parse",
