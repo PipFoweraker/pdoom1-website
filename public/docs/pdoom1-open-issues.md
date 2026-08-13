@@ -1,13 +1,12 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-13T00:39:04.729Z UTC
+Generated: 2026-08-13T06:45:46.302Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
 | 1210 | Half-day workshop: the first ten turns -- a first-timer could not tell what to do, and 44 -> 87 proves the surface is responsive, not that it is finished | game-mechanics, strategic, priority:high, ux |  | 2026-08-12 21:55:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1210) |
 | 1209 | Define 'league seed' and 'board key' for players -- both are printed on screen, neither is explained, and the guide states the key wrongly | documentation, priority:medium, ux |  | 2026-08-12 21:51:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/1209) |
 | 1208 | Player-facing doc: the four founder hour kinds (doors / approvals / audits / reserve) are unexplained -- and two of the four words already mean something else in the player guide | documentation, game-mechanics, priority:high, ux |  | 2026-08-12 21:50:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1208) |
-| 1206 | URGENT accuracy: merged PR #1176's body says the Operator name is never published -- its own second commit publishes it | documentation, priority:critical, class:docs |  | 2026-08-12 21:04:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1206) |
 | 1202 | Early-game legibility: five findings from a 2026-08-11 play session, and the one that is already measured |  |  | 2026-08-11 09:19:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1202) |
 | 1201 | The orb: a ponderable object, and the cult mechanic it opens later |  |  | 2026-08-11 09:18:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/1201) |
 | 1200 | The 6 unattributable packed assets: resolve or accept, forced by a guard not a document |  |  | 2026-08-11 03:59:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/1200) |
