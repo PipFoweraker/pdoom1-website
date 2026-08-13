@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "week_id": "2026_W33",
+    "season": "2025_Q4",
+    "generated": "2026-08-06T14:47:41.184092Z",
+    "game_version": "v0.13.2",
+    "game_version_note": "A RECORD STAMP: the build that produced this file on 2026-08-06, which is correct and is deliberately not bumped. It is not part of the board key and nothing may key off it. The deployed build is now v0.14.1; integration-health.json reports that gap separately, which is the right place for it.",
+    "ladder_version": "L4",
+    "ladder_version_corrected": "Was 'L3'. Week 2026_W33 ran Fri 2026-08-07 -> Thu 2026-08-13 Australia/Hobart, which is entirely inside the L4 epoch: pdoom1 forked L3 -> L4 with the Friday 2026-08-07 build (tag v0.14.0, ladder_version.txt = 4). This file was written on 2026-08-06 from a contract that still said L3 and nothing updated it at the fork. Corrected 2026-08-13 before the rollover archived it, because the record it was about to become was 'v0.14.1 on L3', a pairing that has never existed.",
+    "competition_type": "weekly_league",
+    "start_date": "2026-08-07T00:00:00+10:00",
+    "end_date": "2026-08-13T23:59:59+10:00",
+    "total_participants": 0,
+    "total_submissions": 0
+  },
+  "epoch": {
+    "id": "regularised",
+    "anomalous": false,
+    "ladder_version": "L4",
+    "boundary_ladder_version": "L3",
+    "boundary_local": "2026-07-31T00:00:00+10:00",
+    "boundary_tz": "Australia/Hobart",
+    "boundary_utc": "2026-07-30T14:00:00Z",
+    "reason": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L<n>) where L<n> is this stamp's own ladder_version, by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py. This sentence used to name L3 outright; it was stamped unchanged onto weeks that ran on L4.",
+    "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+    "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
+    "board_opens_local": "2026-07-31T17:00:00+10:00",
+    "board_opens_utc": "2026-07-31T07:00:00Z",
+    "board_opens_confirmed": true,
+    "observed_defects": {
+      "empty-shell": "this record's entries array is empty -- the record is a container, not a result. That is a fact about THIS FILE and not about how many people played: a week keyed to a blessed seed can be empty here while the live board under the same key holds real rows, because nothing imports them. For why no client could have posted, see unblessed-seed where it applies."
+    }
+  },
+  "seed": "weekly-2026-w32",
+  "seed_provenance": {
+    "blessed": false,
+    "ladder_version": "L4",
+    "board_key": "(weekly-2026-w32, L4)",
+    "derivation": "OBSERVED live on the score API, not blessed and not derived here. This is the board the shipped v0.14.x client posted to for the whole of week 2026_W33.",
+    "canonical_source": "public/leaderboard/data/published-board.json, written by publish-live-board.py from a read-only GET; corroborated by the pdoom1 v0.14.0 tag message 'Board key (weekly-2026-w32, L4).'",
+    "corrected": "Was seed 'weekly-2026-w31', ladder L3, blessed TRUE. Every part of that was wrong for this week and the blessed flag was the dangerous part: (weekly-2026-w31, L3) is the CLOSED L3 board (capture at public/leaderboard/data/preserved/2026-08-08-l3-epoch-close/), and four live pages read this file. blessed is now false and stays false: a blessing is a row in docs/LEAGUE_SEED_LEDGER.md, the ledger has no L4 row, and only Pip may write one (pdoom1-website#297). Observed-and-unblessed is the honest state, and it is the state public/leaderboard/index.html already knows not to offer to a player.",
+    "source": "pdoom1 git tag v0.14.0, 2026-08-07T22:44:37+10:00"
+  },
+  "board_key": {
+    "seed": "weekly-2026-w32",
+    "ladder_version": "L4",
+    "shape": "(seed, L<n>)",
+    "blessed": false
+  },
+  "economic_model": "unknown",
+  "week_info": {
+    "week_id": "2026_W33",
+    "year": 2026,
+    "week_number": 33,
+    "timezone": "Australia/Hobart",
+    "start_date": "2026-08-07",
+    "end_date": "2026-08-13",
+    "start_timestamp": "2026-08-07T00:00:00+10:00",
+    "end_timestamp": "2026-08-13T23:59:59+10:00",
+    "start_timestamp_utc": "2026-08-06T14:00:00Z",
+    "end_timestamp_utc": "2026-08-13T13:59:59Z",
+    "days_remaining": 6,
+    "hours_remaining": 23,
+    "is_current": false,
+    "status": "ended",
+    "season": "2025_Q4",
+    "epoch": {
+      "id": "regularised",
+      "anomalous": false,
+      "ladder_version": "L4",
+      "boundary_ladder_version": "L3",
+      "boundary_local": "2026-07-31T00:00:00+10:00",
+      "boundary_tz": "Australia/Hobart",
+      "boundary_utc": "2026-07-30T14:00:00Z",
+      "reason": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L<n>) where L<n> is this stamp's own ladder_version, by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py. This sentence used to name L3 outright; it was stamped unchanged onto weeks that ran on L4.",
+      "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+      "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
+      "board_opens_local": "2026-07-31T17:00:00+10:00",
+      "board_opens_utc": "2026-07-31T07:00:00Z",
+      "board_opens_confirmed": true
+    }
+  },
+  "entries": [],
+  "statistics": {
+    "highest_score": 0,
+    "average_score": 0.0,
+    "total_games": 0,
+    "unique_players": 0
+  },
+  "archived_at": "2026-08-13T14:27:59.976843Z",
+  "archive_status": "completed"
+}
