@@ -300,8 +300,7 @@ exit path. It prints success unconditionally.
 
 And the one that stings: **`test-board-escaping.js` — the guard I wrote today — could
 never run on Windows.** `core.autocrlf=true`, so a checkout writes CRLF, and the
-extractors anchor on `;
-`. Under CRLF the byte after `;` is ``, so extraction died
+extractors anchor on `;\n`. Under CRLF the byte after `;` is `\r`, so extraction died
 before a single assertion. It passed for me only because I had written the file from
 Python with LF preserved. It failed on the only platform CLAUDE.md tells you to run it on,
 while passing in a CI that does not run it either. *(Fixed in PR #208.)*

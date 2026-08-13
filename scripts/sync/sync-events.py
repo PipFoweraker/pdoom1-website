@@ -25,11 +25,14 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
-# Force UTF-8 for Windows console
-if sys.platform == 'win32':
-    import io
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+# Force UTF-8 for the console. Was a win32-only io.TextIOWrapper swap, which
+# protected this module but is not the idiom check-encoding-safety.py looks for,
+# so the sweep reported it as unprotected and it carried a waiver for eleven days
+# on a crash risk it did not have. Same effect, plus errors="replace"; see
+# CLAUDE.md "Environment / tooling".
+for _s in (sys.stdout, sys.stderr):
+    try: _s.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError): pass
 
 # Configuration
 SCRIPT_DIR = Path(__file__).parent

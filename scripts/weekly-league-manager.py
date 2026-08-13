@@ -24,6 +24,10 @@ from typing import Dict, Any, Optional
 import hashlib
 import random
 
+for _s in (sys.stdout, sys.stderr):
+    try: _s.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError): pass
+
 
 # --- League week geometry -------------------------------------------------
 #

@@ -9,39 +9,5 @@
   "checks": {
     "check-encoding-safety": "scripts/check-encoding-safety.py -- the cp1252 preamble and encoding= sweep. Keys are repo-relative module paths, matching Finding.path."
   },
-  "acknowledgements": [
-    {
-      "check": "check-encoding-safety",
-      "key": "scripts/ingest_scores.py",
-      "what": "W1: module prints but has no stdout/stderr reconfigure preamble (first non-ASCII print aborts the run on Windows)",
-      "why": "LAPSED JUSTIFICATION, recorded honestly rather than restated. The original waiver said 'held by the leaderboard branch (2026-07-29 sweep)'. As of 2026-08-09 no branch by that name exists on the remote, so that reason has not been true for some days and nobody noticed -- which is precisely the failure this ledger exists to make loud. The FINDING is still live and still real: the module prints and still has no preamble. This entry is a short bridge to a decision, not an argument that the finding is acceptable.",
-      "accepted_by": "Pip Foweraker -- accepted 2026-08-10. Originally migrated unattributed from the KNOWN_UNFIXED dict literal in scripts/check-encoding-safety.py (introduced by 6f69b65b, PR #198), where no accepter had been recorded. Pip accepted these three explicitly on 2026-08-10 when the clock was put to him, so the acceptance now has a name and a date rather than a gap.",
-      "accepted_on": "2026-07-29",
-      "review_by": "2026-08-30",
-      "on_expiry": "Add the five-line preamble from CLAUDE.md 'Environment / tooling' to scripts/ingest_scores.py and delete this entry. Only re-accept with a NEW named accepter and a why that is true on the day you write it.",
-      "source": "scripts/check-encoding-safety.py KNOWN_UNFIXED, commit 6f69b65b (PR #198); branch absence verified against origin on 2026-08-09."
-    },
-    {
-      "check": "check-encoding-safety",
-      "key": "scripts/sync/sync-events.py",
-      "what": "W1: module prints but has no stdout/stderr reconfigure preamble (first non-ASCII print aborts the run on Windows)",
-      "why": "LAPSED JUSTIFICATION. Original waiver: 'held by the events-sync branch (2026-07-29 sweep)'; no such branch exists on the remote as of 2026-08-09. Sharper than its two siblings: this module writes ~1,194 event pages a day from arXiv PDF text, which is where the repo's non-ASCII actually lives, so it is the one most likely to hit the crash on a Windows run.",
-      "accepted_by": "Pip Foweraker -- accepted 2026-08-10. Originally migrated unattributed from the KNOWN_UNFIXED dict literal in scripts/check-encoding-safety.py (introduced by 6f69b65b, PR #198), where no accepter had been recorded. Pip accepted these three explicitly on 2026-08-10 when the clock was put to him, so the acceptance now has a name and a date rather than a gap.",
-      "accepted_on": "2026-07-29",
-      "review_by": "2026-08-23",
-      "on_expiry": "Add the preamble to scripts/sync/sync-events.py and delete this entry. Earlier review_by than its siblings on purpose: this is the module whose input is other people's UTF-8.",
-      "source": "scripts/check-encoding-safety.py KNOWN_UNFIXED, commit 6f69b65b (PR #198); branch absence verified against origin on 2026-08-09."
-    },
-    {
-      "check": "check-encoding-safety",
-      "key": "scripts/weekly-league-manager.py",
-      "what": "W1: module prints but has no stdout/stderr reconfigure preamble (first non-ASCII print aborts the run on Windows)",
-      "why": "LAPSED JUSTIFICATION. Original waiver: 'held by the league branch (2026-07-29 sweep)'. origin/league/epoch-boundary still exists, so this is the one of the three whose stated reason might still hold -- but 'a branch with a similar name exists' is not the same claim, and nobody has checked whether that branch touches this file. Recorded as uncertain rather than assumed.",
-      "accepted_by": "Pip Foweraker -- accepted 2026-08-10. Originally migrated unattributed from the KNOWN_UNFIXED dict literal in scripts/check-encoding-safety.py (introduced by 6f69b65b, PR #198), where no accepter had been recorded. Pip accepted these three explicitly on 2026-08-10 when the clock was put to him, so the acceptance now has a name and a date rather than a gap.",
-      "accepted_on": "2026-07-29",
-      "review_by": "2026-09-06",
-      "on_expiry": "Check whether origin/league/epoch-boundary still holds scripts/weekly-league-manager.py. If not, add the preamble and delete this entry. If it does, re-accept with your name and the branch's actual state.",
-      "source": "scripts/check-encoding-safety.py KNOWN_UNFIXED, commit 6f69b65b (PR #198); branch listing verified against origin on 2026-08-09."
-    }
-  ]
+  "acknowledgements": []
 }
