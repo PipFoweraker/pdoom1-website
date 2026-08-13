@@ -1,10 +1,10 @@
 {
-  "generated": "2026-08-13T11:01:16.713216+00:00",
+  "generated": "2026-08-13T22:16:41.549620+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 3,
-    "ok": 32
+    "warn": 2,
+    "ok": 33
   },
   "checks": [
     {
@@ -115,22 +115,22 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 6.8 days ago"
+      "detail": "generated 0.3 days ago"
     },
     {
       "name": "league:current_week",
       "status": "OK",
-      "detail": "week 2026_W33 current"
+      "detail": "week 2026_W34 current"
     },
     {
       "name": "league:version_drift",
-      "status": "WARN",
-      "detail": "weekly league game_version=v0.13.2 but deployed game=v0.14.1 -- a v0.14.1 client's scores cannot land on a v0.13.2 board"
+      "status": "OK",
+      "detail": "game_version v0.14.1 matches deployed"
     },
     {
       "name": "league:seed",
       "status": "OK",
-      "detail": "weekly seed weekly-2026-w32"
+      "detail": "weekly seed weekly_2026_W34_8850f090"
     },
     {
       "name": "league:integrity",
@@ -155,7 +155,7 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 4.2h ago"
+      "detail": "live API checked 3.6h ago"
     },
     {
       "name": "board:archived_anomaly",
