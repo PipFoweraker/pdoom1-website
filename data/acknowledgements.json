@@ -7,7 +7,20 @@
     "source": "Chosen in PR ci/acknowledgement-clock (2026-08-09) as two working weeks -- long enough that the accepter sees EXPIRING SOON before the cliff and can act deliberately, short enough that the warning is not background noise. Not derived from measurement; revisit if warnings start being ignored."
   },
   "checks": {
-    "check-encoding-safety": "scripts/check-encoding-safety.py -- the cp1252 preamble and encoding= sweep. Keys are repo-relative module paths, matching Finding.path."
+    "check-encoding-safety": "scripts/check-encoding-safety.py -- the cp1252 preamble and encoding= sweep. Keys are repo-relative module paths, matching Finding.path.",
+    "check-campaign-facts": "scripts/check-campaign-facts.py -- the _facts_this_copy_must_not_break blocks in content/campaigns/. Keys are <campaign file>::<fact id> for entry-scoped findings, and <campaign file>::<finding name> for findings against the copy as a whole. NOTE: the `human` tier's review clock is NOT here -- it lives inline in the campaign file, next to the fact, because the person who acts on it reads that file and nothing else. This ledger holds only findings the check reports and somebody tolerates."
   },
-  "acknowledgements": []
+  "acknowledgements": [
+    {
+      "check": "check-campaign-facts",
+      "key": "content/campaigns/2026-07-24-alpha-launch.json::copy-defers-a-shipped-platform",
+      "what": "The alpha-launch draft copy says 'macOS and Linux within the week' / 'Mac + Linux this week' on all five platforms. Both shipped with v0.14.0 on 2026-08-07, so the copy now defers builds a reader could download today.",
+      "why": "The campaign is unposted (approved:false, every posted[*] null) so nothing false has reached a reader, and the fix is a rewrite of Pip's own marketing voice, which is not a seat's to make. The claim understates rather than over-promises -- it sends someone away from a build that exists, which is a smaller harm than promising one that does not, but it is still wrong.",
+      "accepted_by": "pdoom1-website seat, PR fix/rotless-campaign-facts. Not Pip's ruling -- he has not been asked yet; this entry is what asking looks like when the asker cannot wait.",
+      "accepted_on": "2026-08-14",
+      "review_by": "2026-09-15",
+      "on_expiry": "Pick one: post the campaign with the platform lines updated, rewrite them, or archive the campaign as superseded by ladder-fork-l4-2026-08. All three close this; none of them is a shrug.",
+      "source": "public/data/version.json -> latest_release.platforms (windows/macos/linux all true at v0.14.1); pdoom1/README.md:12-16. Found by scripts/check-campaign-facts.py on the run that introduced it."
+    }
+  ]
 }

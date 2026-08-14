@@ -53,6 +53,22 @@ Pip's stated top priority. Practically:
 - **Fallback literals are the dangerous ones.** A default value ships precisely
   when the real lookup failed. Prefer failing loudly, or preserving the last
   known-good value, over substituting a literal.
+- **`content/campaigns/*.json` fact-guards: write the CONSTRAINT, never the
+  value.** Each campaign's `_facts_this_copy_must_not_break` block is what social
+  copy is held to. It was an array of prose strings until 2026-08-14, and two
+  entries had silently become lies ("macOS and Linux are NOT yet released";
+  "remote submission is not live yet") while every check in this repo stayed
+  green, because nothing read them. A third — "open source" — was caught only
+  because a human looked (#284). **The defect was pinning a claim about a moving
+  world as immutable.** Entries are now objects that must declare `verify`:
+  `checked` (this repo has a source), `delegated` (another wired guard owns it),
+  `online` (needs the network — advisory only), `human` (nothing here can check
+  it, so it carries `why_not_machine` and a `human_verified` stamp that expires),
+  or `durable` (asserts nothing about the world, so it cannot rot — and must
+  carry no source). `scripts/check-campaign-facts.py` reads the sources;
+  `scripts/test-campaign-facts.py` forces the red. Format and rationale:
+  `content/campaigns/README.md` §2.1. **A verification date with no expiry is the
+  class-5 shape** — see the acknowledgement clock below.
 
 ## Cascade gotcha (cost a whole session once)
 - Any rule in `site.css` MUST use the dark palette. It once held light-theme
@@ -441,6 +457,8 @@ python  scripts/test_ingest_scores.py     # leaderboard read path            [da
 python  scripts/validate_data.py          # data contracts                   [data-contract]
 python  scripts/check-stale-facts.py      # hardcoded facts that rot         [content-honesty ADVISORY]
 python  scripts/check-stale-facts.py --min-severity HIGH  # the gate         [content-honesty]
+python  scripts/check-campaign-facts.py   # campaign fact-guards vs their sources [content-honesty]
+python  scripts/test-campaign-facts.py    # ...and that guard can still FAIL [content-honesty]
 python  scripts/check-platform-claims.py  # no page claims an unshipped OS   [content-honesty, encoding-safety]
 python  scripts/test-platform-claims.py   # ...and that guard can still FAIL [content-honesty]
 node    scripts/test-download-resolution.js # download buttons resolve/degrade [content-honesty]

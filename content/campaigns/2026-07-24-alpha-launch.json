@@ -5,11 +5,57 @@
   "url": "https://pdoom1.com/",
   "approved": false,
   "_facts_this_copy_must_not_break": [
-    "Windows build ships today (v0.13.0). macOS and Linux are NOT yet released -- say 'this week', do not imply Mac/Linux are downloadable now.",
-    "This is an early alpha. Promise rough edges, not polish.",
-    "Do NOT point anyone at the in-game F8 bug reporter: it does not transmit (pdoom1 #800).",
-    "Do NOT promise leaderboards or scores - remote submission is not live yet (pdoom1 #735).",
-    "The game is free and source-available, and non-commercial."
+    {
+      "id": "platforms-downloadable",
+      "constraint": "Do not promise a platform that is not downloadable. Name a platform only if the source below marks it shipped on the day you post; otherwise say 'coming soon' or leave it out.",
+      "verify": "checked",
+      "check": "platforms_shipped",
+      "source": "public/data/version.json -> latest_release.platforms. scripts/update-version-info.py derives it from the release's actual assets, so a build is either attached or it is not.",
+      "note": "REPLACED 2026-08-14 a pinned value: 'Windows build ships today (v0.13.0). macOS and Linux are NOT yet released -- say this week, do not imply Mac/Linux are downloadable now.' True on 2026-07-24, false from v0.14.0 on. All three ship as of v0.14.1. pdoom1/README.md:12-16 marks macOS and Linux 'Ships, boot-test not yet confirmed by us' -- downloadable is not the same as tested, so do not claim they are tested."
+    },
+    {
+      "id": "still-an-alpha",
+      "constraint": "This is an early alpha. Promise rough edges, not polish.",
+      "verify": "human",
+      "why_not_machine": "Maturity is a judgement, not a field. Neither this repo nor pdoom1 records a maturity level anywhere a script could read, so there is nothing to compare against and no honest way to go green on it.",
+      "source": "Pip's call. Nearest evidence: the v0.14.1 release notes and pdoom1/README.md.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR fix/rotless-campaign-facts",
+        "on": "2026-08-14",
+        "review_by": "2026-11-14",
+        "note": "Still true: no 1.0, builds are not code-signed (pdoom1#917), macOS and Linux ship without a boot test."
+      }
+    },
+    {
+      "id": "bug-reporter-does-not-transmit",
+      "constraint": "Do not point anyone at the in-game F8 bug reporter while it still fails to transmit. Send them to https://pdoom1.com/bug-report/ or a plain reply instead.",
+      "verify": "online",
+      "check": "issue_state",
+      "issue": "PipFoweraker/pdoom1#800",
+      "expect": "open",
+      "source": "pdoom1#800. public/data/issues-cache.json cannot answer this -- it mirrors only the ~15 most recent OPEN issues, so absence there proves nothing. Verified OPEN 2026-08-14 with `gh issue view 800 --repo PipFoweraker/pdoom1`."
+    },
+    {
+      "id": "leaderboard-live",
+      "constraint": "Do not promise a feature that is not live. Remote score submission IS live now -- but read today's board key from the source below rather than typing one into copy, and never send anyone to a board with no scores on it.",
+      "verify": "checked",
+      "check": "board_live",
+      "source": "public/leaderboard/data/published-board.json (the key) and public/leaderboard/data/board-liveness.json (a read-only observation of https://api.pdoom1.com/score_api.php, refreshed 4x/day by board-liveness.yml).",
+      "note": "REPLACED 2026-08-14 a pinned value: 'Do NOT promise leaderboards or scores - remote submission is not live yet (pdoom1 #735).' pdoom1#735 closed 2026-07-31. A read-only GET of (weekly-2026-w32, L4) on 2026-08-14 returned 11 entries from 5 players on builds v0.14.0 and v0.14.1, newest 2026-08-12. The key is deliberately not repeated here -- it moves, the check prints it."
+    },
+    {
+      "id": "licence-free-source-available-non-commercial",
+      "constraint": "The game is free, source-available and non-commercial. Never write 'open source' -- the interim licence grants no redistribution.",
+      "verify": "human",
+      "why_not_machine": "The licence lives in another repo (pdoom1/LICENSE) and this repo holds no copy, so nothing here can read it. Checking it against another page of our own prose would be checking a claim against a claim.",
+      "source": "pdoom1/LICENSE:1-7 ('No license is granted to redistribute, sell, or make commercial use'). Corrected in #284 (3aa1b0699); the same claim was removed from /press/ in #310; public/index.html says 'Open source: not yet, and it would be wrong to say otherwise'.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR fix/rotless-campaign-facts",
+        "on": "2026-08-14",
+        "review_by": "2026-10-31",
+        "note": "Read pdoom1/LICENSE at ../pdoom1. Interim pre-1.0 licence, all rights reserved, source provided for reference/evaluation/contribution only."
+      }
+    }
   ],
   "copy": {
     "linkedin": "I've been building a game about AI safety on my own, and it's now playable — a lower bar than \"good\", but I'm claiming it anyway.\n\np(Doom)1 puts you in charge of an AI safety lab. You hire researchers, chase funding, wrangle compute, and try to lower the odds of catastrophe — mostly via meetings, budgets and paperwork. The bureaucracy is the game.\n\nIt's an early alpha, built solo, and rough in the places you'd expect. That's the point of putting it out now: I want to know where it's confusing, where it drags, and where it's accidentally fun.\n\nWindows today — macOS and Linux within the week.\n\nFree, source-available, non-commercial.\n\nhttps://pdoom1.com/?utm_source=linkedin&utm_medium=social&utm_campaign=alpha-launch-2026-07-24",
