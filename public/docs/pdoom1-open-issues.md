@@ -1,9 +1,13 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-14T00:38:49.282Z UTC
+Generated: 2026-08-14T06:44:42.316Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1221 | Convention: a refusal must say whether it is a rule or a stub |  |  | 2026-08-14 05:54:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/1221) |
+| 1219 | Submenu-driven actions fail silently: the is_submenu early return skips every rejection report (hiring is entirely on that path) | bug, priority-high, action-system, ux |  | 2026-08-14 05:47:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1219) |
+| 1218 | Attention spent without saying so: the 4 surfaces PR #1217 could not fix display-only, + the cat has no art SLOT (not a missing asset) | ui-ux, technical-debt, ux |  | 2026-08-14 05:36:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/1218) |
+| 1215 | Stale generated per-checkout artefact: a cache Godot needs, git cannot ship, and CI cannot see | testing, technical-debt, ship:next-release, class:guard |  | 2026-08-14 03:52:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/1215) |
 | 1210 | Half-day workshop: the first ten turns -- a first-timer could not tell what to do, and 44 -> 87 proves the surface is responsive, not that it is finished | game-mechanics, strategic, priority:high, ux |  | 2026-08-12 21:55:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1210) |
 | 1209 | Define 'league seed' and 'board key' for players -- both are printed on screen, neither is explained, and the guide states the key wrongly | documentation, priority:medium, ux |  | 2026-08-12 21:51:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/1209) |
 | 1208 | Player-facing doc: the four founder hour kinds (doors / approvals / audits / reserve) are unexplained -- and two of the four words already mean something else in the player guide | documentation, game-mechanics, priority:high, ux |  | 2026-08-12 21:50:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1208) |
