@@ -4,8 +4,19 @@
   <link href="https://pdoom1.com/blog/" />
   <link href="https://pdoom1.com/blog/atom.xml" rel="self" />
   <id>urn:pdoom1:blog</id>
-  <updated>2026-08-07T12:00:00Z</updated>
+  <updated>2026-08-15T12:00:00Z</updated>
   <subtitle>Development notes from p(Doom)1 - a satirical strategy game about managing an AI safety lab.</subtitle>
+  <entry>
+    <title>1,313 tests passed and the game had no buttons</title>
+    <link href="https://pdoom1.com/blog/post.html?p=2026-08-15-1313-tests-passed-and-the-game-had-no-buttons.md" />
+    <id>urn:pdoom1:blog:2026-08-15-1313-tests-passed-and-the-game-had-no-buttons.md</id>
+    <updated>2026-08-15T12:00:00Z</updated>
+    <summary>On Thursday a first-time player sat down, the game drew its art and a doom percentage, and offered nothing to click. 1,313 tests were green. The cause is a per-checkout cache that CI can never see go stale, because CI always starts clean. The guard shipped Friday afternoon; the identical failure shape was back within hours - and this time it was caught.</summary>
+    <category term="playtest" />
+    <category term="testing" />
+    <category term="process" />
+    <category term="dev-notes" />
+  </entry>
   <entry>
     <title>v0.14.0: the ladder forks, and your old scores stay where they are</title>
     <link href="https://pdoom1.com/blog/post.html?p=2026-08-07-v0-14-0-the-ladder-forks.md" />
