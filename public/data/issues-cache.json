@@ -1,95 +1,6 @@
 {
   "issues": [
     {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1207",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1207/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1207/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1207/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/pull/1207",
-      "id": 5135588140,
-      "node_id": "PR_kwDOPVWa587-Sb_z",
-      "number": 1207,
-      "title": "docs(privacy): PRIVACY_POSTURE.md now says HOW both names reach the public board (and why the doc was not the thing that was wrong)",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 9028221046,
-          "node_id": "LA_kwDOPVWa588AAAACGh-4dg",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/documentation",
-          "name": "documentation",
-          "color": "0075ca",
-          "default": true,
-          "description": "Improvements or additions to documentation"
-        },
-        {
-          "id": 11799822392,
-          "node_id": "LA_kwDOPVWa588AAAACv1MAOA",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/class:docs",
-          "name": "class:docs",
-          "color": "1D76DB",
-          "default": false,
-          "description": "Corrects documentation to match measured reality. Self-merge on green (R1)."
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2026-08-12T21:47:50Z",
-      "updated_at": "2026-08-12T22:06:25Z",
-      "closed_at": null,
-      "assignee": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "draft": false,
-      "pull_request": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/pulls/1207",
-        "html_url": "https://github.com/PipFoweraker/pdoom1/pull/1207",
-        "diff_url": "https://github.com/PipFoweraker/pdoom1/pull/1207.diff",
-        "patch_url": "https://github.com/PipFoweraker/pdoom1/pull/1207.patch",
-        "merged_at": null
-      },
-      "body": "Documentation only. No `.gd`, no behaviour, no test change.\n\n## Read this part first -- the brief I was given was stale, and I did not act on it\n\nI was asked to fix `docs/PRIVACY_POSTURE.md` on the premise that it over-claims:\nit says the leaderboard shares *\"player name + lab name\"* while the code sends\n**one** name (`lab_name`, in a field called `player_name`).\n\n**That premise was true until 2026-08-10 and is not true now.** I checked the\ncode before editing, and the finding is the reverse of the brief:\n\n- `godot/scripts/leaderboard.gd:196`, inside `ScoreEntry.to_wire_dict()`:\n  ```gdscript\n  body[\"player_name\"] = Leaderboard.compose_board_name(lab_name, operator_name)\n  ```\n- `Leaderboard.compose_board_name` (`godot/scripts/leaderboard.gd:32`) emits\n  `LAB -- OPERATOR`.\n\nSo **both** names go to the public board. `PRIVACY_POSTURE.md:23` is correct in\nsubstance, and \"fixing\" it to say one name would have made a privacy SSOT wrong\nin the one direction a privacy statement must never be wrong in -- understating\nwhat is published. **I did not make that edit.** The code is right; the doc was\nnot wrong, it was *incomplete*.\n\nThe thing that landed this is PR #1176's second commit,\n[`18180379`](https://github.com/PipFoweraker/pdoom1/commit/18180379f6288c746bfe720eb3355567f74e5c30).\nThe stale account survives in three other places on `main` -- #1176's own merged\nbody and two comments in `game_over_screen.gd` -- and that is filed separately\nand urgently as **#1206**. This PR does not touch those.\n\n## What this PR actually changes\n\n`PRIVACY_POSTURE.md` opens by declaring itself the canonical statement of *\"what\nthe shipped game sends, under what consent, and why\"*, with an explicit\nanti-policy-rot instruction (Pip, 2026-07-26) to keep it current. Measured\nagainst that bar, Tier 1 has two gaps:\n\n**1. It says the two names are shared, and stops.** It never says they are not\ntwo fields. They are composed into ONE public string in the frozen wire key\n`player_name`, because the server has no operator field -- an unknown extra key\nis accepted with HTTP 200 and then dropped by `$ALLOWED_FIELDS` (measured\n2026-08-10 against the deployed API). Three consequences a privacy reader needs\nand could not previously get from this file:\n\n- the Operator name is rendered publicly, verbatim, beside the lab -- it is\n  **not** a local-only value;\n- the composed string is fitted **client-side** to a measured 40-byte budget and\n  marked `...` when cut, so a long name is published truncated;\n- a run with no Operator name submits the lab alone, byte-identical to the\n  pre-#1176 shape, and legacy rows are never back-filled.\n\n**2. The Tier 1 \"Code:\" list omitted the one file that decides the wire shape.**\nIt named `leaderboard_sync.gd`, `game_over_screen.gd`, `settings_menu.gd` and\n`game_config.gd` -- consent and plumbing -- but not `godot/scripts/leaderboard.gd`,\nwhich is where `to_wire_dict` and `compose_board_name` live. An SSOT whose code\npointers skip the file that composes the published string cannot be checked\nagainst reality by the next reader. Added, with a note that a change there is a\nchange to this posture.\n\n## Verify\n\n```\nsed -n '20,45p' docs/PRIVACY_POSTURE.md\nsed -n '183,199p' godot/scripts/leaderboard.gd\n```\n\n## Checks\n\nFull pre-commit suite green (ASCII/no-emoji enforcement, line endings, standards\ngate). No test run: nothing under `godot/` is touched.\n\n---\n\nGenerated with [Claude Code](https://claude.com/claude-code)\n\n---\n\nLadder-Impact: none -- documentation only, no file under `godot/` touched.\n",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1207/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1207/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null
-    },
-    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1210",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1210/labels{/name}",
@@ -1408,8 +1319,101 @@
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
+    },
+    {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1086",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1086/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1086/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1086/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/1086",
+      "id": 5034409125,
+      "node_id": "I_kwDOPVWa588AAAABLBL8pQ",
+      "number": 1086,
+      "title": "ux(hiring): onboard-now window -- tooltip omits the Attention cost (costs dict has money only), prints raw 'money: 3000.0', and Q/W read as the same option",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [
+        {
+          "id": 9028221041,
+          "node_id": "LA_kwDOPVWa588AAAACGh-4cQ",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/bug",
+          "name": "bug",
+          "color": "d73a4a",
+          "default": true,
+          "description": "Something isn't working"
+        },
+        {
+          "id": 9820300732,
+          "node_id": "LA_kwDOPVWa588AAAACSVXlvA",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/ux",
+          "name": "ux",
+          "color": "FBCA04",
+          "default": false,
+          "description": "What happens when you use it. If a fix needs new behaviour or words, it is ux."
+        }
+      ],
+      "state": "open",
+      "locked": false,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2026-08-01T00:42:25Z",
+      "updated_at": "2026-08-11T10:45:56Z",
+      "closed_at": null,
+      "assignee": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "body": "From the recorded playtest of v0.13.2, 2026-08-01 09:52 (`art_generated/audiodump/2026-08-01_09-52-08.transcript.md`, local-only; frames in `frames_2026-08-01_09-52-08/`, see `f014_133s.jpg`, `f015_142s.jpg`, `f018_168s.jpg`).\n\nThe \"Owen Rodriguez said yes\" onboarding window (the new hiring-stitch accept prompt) works as a mechanic -- but four presentation defects landed together in one 35-second stretch:\n\n## 1. The tooltip omits the Attention cost and prints a raw float\n\n**[2:11]** \"first bug ... this says 3 attention reserved and says it costs 3 money, this is not a really good layout\"\n\nFrame `f015_142s.jpg`: hovering `[Q] Set them up now (3 Att from reserve) ($3,000)` shows a tooltip reading `Costs: money: 3000.0`. Mechanism, verified in code: `godot/scripts/core/hiring_pipeline.gd:597` builds the option as `\"costs\": {\"money\": money}` -- the Attention cost lives only in the label TEXT, not in the structured costs dict, so whatever renders the costs tooltip can only ever show money. The tooltip also renders the internal key and float verbatim (`money: 3000.0`) instead of `$3,000`.\n\nThe tooltip additionally OCCLUDES the [W] option's label while hovering [Q] (visible in the frame), hiding exactly the text that distinguishes the two options.\n\n## 2. Q and W read as the same option\n\n**[2:20]** \"the Q option is not a good layout, the W option is not a good layout\"\n\nThe two labels are `[Q] Set them up now (3 Att from reserve) ($3,000)` and `[W] Set them up now (3 Att, pull from planned work) ($3,000)` -- identical first four words, identical price, the load-bearing difference buried mid-parenthesis. The reserve-vs-cannibalize choice is the crisp teaching moment of the window system (per `hiring_pipeline.gd:550` comment) and the layout hides it.\n\n## 3. An unpayable option is offered, then errors after the click\n\n**[2:34]** \"Can I pull from planned work ... I can't pull from planned work, whatever\"\n\nFrame `f018_168s.jpg`: after choosing [W], an error line appears under the options: `[!] Insufficient capacity to handle by cannibalizing -- pick another option.` The message source is `godot/scripts/core/window_resolver.gd:91`; the option existed but could not be paid (`month_controller.gd:298` documents exactly this state). The window should know at render time that cannibalize cannot be paid (no free capacity, no WIP at turn 3) and show the option disabled with the reason, instead of letting the player pick it and bounce.\n\n## 4. \"Cannibalizing\" is internal vocabulary leaking to the player\n\n**[2:46]** \"Insufficient capacity to handle by cannibalizing, okay\"\n\n`handle_reserve` / `handle_cannibalize` are the ENGINE's verb names (`window_resolver.gd:6`). \"Cannibalizing\" in a player-facing error, with no prior introduction of the term, reads as jargon. The player-facing copy should say what it means: \"not enough unplanned capacity -- you would have to cancel planned work, and there is none to cancel\".\n\n## Ask\n\n- Put the Attention cost into the costs dict (or teach the tooltip renderer to read both), and format money as money.\n- Restructure the two set-up-now options so the SOURCE is the visible difference (e.g. one action, source picker).\n- Disable-with-reason unpayable options at render time.\n- Copy pass on the cannibalize failure text.\n\n## Not claimed\n\n- Not claiming the mechanic is wrong -- reserve-vs-cannibalize as an explicit choice is working as designed and Pip used it. This is presentation.\n\nRelated: #789 (the hiring stitch that built this window), #1041 (previous playtest hiring findings), #830 (hiring statefulness), #855 (Attention readout in event-dialog corner).\n",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1086/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1086/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null,
+      "pinned_comment": null
     }
   ],
   "count": 15,
-  "last_updated": "2026-08-13T18:14:59.465086"
+  "last_updated": "2026-08-14T00:12:24.890358"
 }
