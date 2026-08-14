@@ -50,6 +50,14 @@ on:
       - 'scripts/test-platform-claims.py'
       - 'scripts/check-published-emails.py'
       - 'scripts/check-stale-facts.py'
+      # The fact-guards social copy is written against. They used to be prose
+      # strings with no source; two of them had rotted into lies before anyone
+      # looked. content/ is not deployed, so this is the ONLY trigger that sees
+      # them -- every other path here is under public/.
+      - 'content/campaigns/**'
+      - 'scripts/check-campaign-facts.py'
+      - 'scripts/test-campaign-facts.py'
+      - 'data/acknowledgements.json'
       # The three committing generators and the tests that force their refusals.
       # sync-events.py owns EMAIL_PATTERN and REDACTION_MARKER, which both
       # check-published-emails.py and update-game-data.yml import.
@@ -102,6 +110,14 @@ on:
       - 'scripts/test-platform-claims.py'
       - 'scripts/check-published-emails.py'
       - 'scripts/check-stale-facts.py'
+      # The fact-guards social copy is written against. They used to be prose
+      # strings with no source; two of them had rotted into lies before anyone
+      # looked. content/ is not deployed, so this is the ONLY trigger that sees
+      # them -- every other path here is under public/.
+      - 'content/campaigns/**'
+      - 'scripts/check-campaign-facts.py'
+      - 'scripts/test-campaign-facts.py'
+      - 'data/acknowledgements.json'
       # The three committing generators and the tests that force their refusals.
       - 'scripts/sync/sync-events.py'
       - 'scripts/test-sync-events.py'
@@ -286,6 +302,31 @@ jobs:
       - name: No stale fact is presented as current (HIGH severity)
         run: python scripts/check-stale-facts.py --min-severity HIGH
 
+      # The same failure one layer upstream of the site: the fact-guards that
+      # social copy is written against. Until 2026-08-14 they were prose strings
+      # with no source and no date, and two of them had become false --
+      # "macOS and Linux are NOT yet released" and "remote submission is not live
+      # yet" -- while every check in this file stayed green, because nothing read
+      # them. A third, the "open source" licence claim, was caught only because a
+      # human happened to look (#284).
+      #
+      # The fix is not the two corrections; it is that each entry now declares HOW
+      # IT IS KNOWN (checked / delegated / online / human / durable) and, where it
+      # is a claim about the world, WHAT SOURCE ANSWERS IT. This step reads those
+      # sources.
+      #
+      # Forced-failure test FIRST, for the reason test-platform-claims.py runs
+      # first: platforms_shipped is green vacuously today -- there is no unshipped
+      # platform to find -- so its passing run carries no information on its own.
+      - name: The campaign fact-guards can still fail (forced-failure test)
+        run: python scripts/test-campaign-facts.py
+
+      # Offline. `online` entries (a pdoom1 issue's state) are deliberately NOT
+      # resolved here and print as NOT CHECKED: a bug being fixed in another repo
+      # must not turn an unrelated content PR red. The advisory job resolves them.
+      - name: No campaign fact-guard has rotted
+        run: python scripts/check-campaign-facts.py
+
       # The analytics-to-git backup must keep failing LOUDLY. Its script only ever runs
       # for real in CI where the API key lives, so its failure paths are unreachable by
       # hand -- this stubs the API and asserts every exit code, plus the workflow
@@ -339,6 +380,12 @@ jobs:
       #                                remainder is content emoji inside frozen prose --
       #                                real drift, but not a lie to a visitor, and
       #                                blocking on it would freeze content work.
+      # check-campaign-facts --online  Resolves a pdoom1 ISSUE's state. The subject is
+      #                                in another repository, so a red here is not
+      #                                closeable by anything in this one -- same
+      #                                reasoning epoch-drift.yml uses to skip its
+      #                                online half on pull_request. The OFFLINE half
+      #                                of the same script IS blocking.
       # check-blessing-consistency     ADVISORY ON PURPOSE AND ONLY FOR NOW. It reports
       #                                7 real findings today, and every one of them is
       #                                true. It is not blocking because the fix is two
@@ -381,6 +428,37 @@ jobs:
             python scripts/check-stale-facts.py 2>&1 | tail -n 120 || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # The ONLINE half of the campaign fact-guards. The blocking job runs the same
+      # script offline and prints these as NOT CHECKED; this resolves them.
+      #
+      # Advisory rather than blocking on purpose, and the reason is the one
+      # epoch-drift.yml already uses for its PR path: the thing being checked lives
+      # in ANOTHER repository. pdoom1#800 closing is good news, and it must not
+      # arrive as a red square on an unrelated content PR that nobody here can
+      # clear. What it means is that a fact-guard now says the opposite of the
+      # truth -- "do not mention the bug reporter, it does not transmit" -- which
+      # is a copy decision for a human, on their own schedule.
+      - name: Campaign fact-guards -- the online tier
+        continue-on-error: true
+        run: |
+          set +e
+          python scripts/check-campaign-facts.py --online | tee campaign-facts.log
+          set -e
+          {
+            echo '## ADVISORY: campaign fact-guards, online tier'
+            echo ''
+            echo 'Resolves the `online` entries the blocking job printed as NOT CHECKED --'
+            echo 'today, whether pdoom1#800 (the F8 reporter that does not transmit) is'
+            echo 'still open. A finding here means a fact-guard has inverted: it is now'
+            echo 'telling a copywriter to avoid something that has since been fixed.'
+            echo 'NEVER blocks -- the subject lives in another repo.'
+            echo ''
+            echo '```'
+            cat campaign-facts.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
 
       - name: Header / nav contract drift
         continue-on-error: true
@@ -469,6 +547,7 @@ jobs:
               '- `python scripts/test-sync-events-pii.py`',
               '- `python scripts/check-platform-claims.py`',
               '- `python scripts/check-stale-facts.py --min-severity HIGH`',
+              '- `python scripts/check-campaign-facts.py`',
               '',
               '_This is a single rolling issue -- it is reused, not duplicated, per run._'
             ].join('\n');

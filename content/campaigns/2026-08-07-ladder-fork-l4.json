@@ -7,16 +7,104 @@
   "_drafted": "2026-08-07T13:40Z, rewritten 2026-08-08T02:20Z by the pdoom1-website seat.",
   "_why_the_slug_has_no_version_in_it": "First draft was campaign 'v0-14-0-2026-08-07' and every line opened 'p(Doom)1 v0.14.0 is out'. A patch shipping the same night would have made that copy announce a superseded build before it was ever posted. The DURABLE event is the ladder fork L3->L4, which no patch can touch: GameConfig.get_board_version() returns 'L' + LADDER_VERSION, so the build version is not part of the board key by construction. Renamed before anything went out, which is free; a utm_campaign value is stable forever once posted.",
   "_facts_this_copy_must_not_break": [
-    "Lead with the FORK, not a version number. A patch (v0.14.x) does not move the ladder, so copy keyed to the fork survives the week and copy keyed to '0.14.0' does not.",
-    "L3 entries are NOT deleted and NOT re-stamped. They stay valid and visible under L3. Never imply anyone lost a score.",
-    "New runs land on L4, on featured seed weekly-2026-w32. The two epochs are never merged. Source: the v0.14.0 git tag message, which states the board key outright.",
-    "The site's league page may still be showing the L3 board. Until that is corrected, do NOT drive people to /leaderboard/ with a claim that it shows the current board.",
-    "Do NOT name platforms in copy unless verified against public/data/version.json -> latest_release.platforms on the day of posting. Link the download page and let it resolve. (Verified all three true as of 2026-08-08T02:15Z, for v0.14.0.)",
-    "Do NOT name a specific patch version in the copy at all. 'The latest build' ages correctly; 'v0.14.0' does not.",
-    "This is still an alpha. Promise rough edges, not polish.",
-    "Do NOT reference the in-game bug reporter without re-checking pdoom1#800 - it did not transmit as of 2026-07.",
-    "Do NOT imply unshipped features. Every claim below maps to a line in the v0.14.0 release notes.",
-    "The game is free, source-available and non-commercial."
+    {
+      "id": "lead-with-the-fork",
+      "constraint": "Lead with the FORK, not a version number. A patch does not move the ladder, so copy keyed to the fork survives the week and copy keyed to a build number does not.",
+      "verify": "durable",
+      "why_durable": "An editorial rule about emphasis. It asserts nothing about the world, so there is nothing in it that can become false. The half that DOES assert something -- 'no build number appears in the copy' -- is the separate no-version-in-copy entry below, and that one is machine-checked."
+    },
+    {
+      "id": "l3-entries-stay-valid",
+      "constraint": "L3 entries are NOT deleted and NOT re-stamped. They stay valid and visible under L3. Never imply anyone lost a score.",
+      "verify": "human",
+      "why_not_machine": "A claim about what the game and the score API do to old boards. The website is a read-only consumer of that API (pdoom1#679) and holds no artefact recording the retention rule, so nothing here can check it. Probing L3 for entries would show what is there today, not what the rule is.",
+      "source": "pdoom1 v0.14.0 git tag message and its release_manifest.json; GameConfig.get_board_version() returns 'L' + LADDER_VERSION, which is why a board key is per-epoch by construction.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR fix/rotless-campaign-facts",
+        "on": "2026-08-14",
+        "review_by": "2026-09-30",
+        "note": "board-liveness.json still records populated L3-era boards under archived_orphans, i.e. nothing was deleted. Short clock: the next fork is the event that would falsify this."
+      }
+    },
+    {
+      "id": "new-runs-on-the-current-epoch",
+      "constraint": "New runs land on the CURRENT epoch and seed, and the two epochs are never merged. Do not type the epoch or the seed into copy -- read today's values from the source below, or link the board and let it resolve.",
+      "verify": "checked",
+      "check": "board_live",
+      "source": "public/leaderboard/data/published-board.json (the key) and public/leaderboard/data/board-liveness.json (a read-only observation of https://api.pdoom1.com/score_api.php, refreshed 4x/day by board-liveness.yml).",
+      "note": "REPLACED 2026-08-14 a pinned value: 'New runs land on L4, on featured seed weekly-2026-w32.' Both were true when written and both move on the next fork or seed roll. The check prints the current key on every run, so the value is available without being frozen here."
+    },
+    {
+      "id": "league-page-in-step",
+      "constraint": "Do not tell anyone the league page shows the current board unless the key this site publishes matches the key the shipped client posts to. If they disagree, say so or say nothing.",
+      "verify": "delegated",
+      "check": "scripts/check-epoch-drift.py",
+      "source": "scripts/check-epoch-drift.py, wired by .github/workflows/epoch-drift.yml (every 3h). It compares public/leaderboard/data/board-probe-targets.json against pdoom1's published release_manifest.json and reports in-step / drift / unknown / unreachable.",
+      "note": "REPLACED 2026-08-14 a pinned value: 'The site's league page may still be showing the L3 board.' That lag was real on 2026-08-07 and is resolved -- check-epoch-drift.py reported verdict 'in-step' on 2026-08-14 (site declares L4, pins weekly-2026-w32; the v0.14.1 client posts to (weekly-2026-w32, L4)). The condition is now watched by a guard rather than remembered by a sentence."
+    },
+    {
+      "id": "platforms-downloadable",
+      "constraint": "Do not promise a platform that is not downloadable. Name a platform only if the source below marks it shipped on the day you post; otherwise link the download page and let it resolve.",
+      "verify": "checked",
+      "check": "platforms_shipped",
+      "source": "public/data/version.json -> latest_release.platforms. scripts/update-version-info.py derives it from the release's actual assets, so a build is either attached or it is not.",
+      "note": "The parenthetical '(Verified all three true as of 2026-08-08T02:15Z, for v0.14.0)' is gone on purpose: a verification stamp on a value that moves is the rot. The check re-reads the source every run."
+    },
+    {
+      "id": "no-version-in-copy",
+      "constraint": "Do not name a specific build version in the copy at all. 'The latest build' ages correctly; a version number does not.",
+      "verify": "checked",
+      "check": "no_version_literal_in_copy",
+      "source": "This campaign's own copy strings. The check scans them for an x.y.z literal."
+    },
+    {
+      "id": "still-an-alpha",
+      "constraint": "This is still an alpha. Promise rough edges, not polish.",
+      "verify": "human",
+      "why_not_machine": "Maturity is a judgement, not a field. Neither this repo nor pdoom1 records a maturity level anywhere a script could read.",
+      "source": "Pip's call. Nearest evidence: the v0.14.1 release notes and pdoom1/README.md.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR fix/rotless-campaign-facts",
+        "on": "2026-08-14",
+        "review_by": "2026-11-21",
+        "note": "Still true: no 1.0, builds are not code-signed (pdoom1#917), macOS and Linux ship without a boot test."
+      }
+    },
+    {
+      "id": "bug-reporter-does-not-transmit",
+      "constraint": "Do not reference the in-game bug reporter while it still fails to transmit. Re-check before writing about it; do not rely on this line being current.",
+      "verify": "online",
+      "check": "issue_state",
+      "issue": "PipFoweraker/pdoom1#800",
+      "expect": "open",
+      "source": "pdoom1#800. public/data/issues-cache.json cannot answer this -- it mirrors only the ~15 most recent OPEN issues, so absence there proves nothing. Verified OPEN 2026-08-14 with `gh issue view 800 --repo PipFoweraker/pdoom1`."
+    },
+    {
+      "id": "no-unshipped-features",
+      "constraint": "Do not imply an unshipped feature. Every product claim in the copy must map to a line in the release notes for the build that is live when you post.",
+      "verify": "human",
+      "why_not_machine": "Mapping a sentence of marketing prose to a release-note line is a reading task. A machine could check that the release notes exist; it cannot check that a claim is one of them, and a check that only proved the file was present would be a green that means nothing.",
+      "source": "public/data/version.json -> latest_release.body (the v0.14.1 notes), and the pdoom1 releases API for anything older.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR fix/rotless-campaign-facts",
+        "on": "2026-08-14",
+        "review_by": "2026-09-19",
+        "note": "Checked against v0.14.1's notes: the fork, the claim-a-name prompt, the visible-failure leaderboard fetch, music selection and the office cat all appear. Short clock, because this is anchored to one release and the copy is unposted."
+      }
+    },
+    {
+      "id": "licence-free-source-available-non-commercial",
+      "constraint": "The game is free, source-available and non-commercial. Never write 'open source' -- the interim licence grants no redistribution.",
+      "verify": "human",
+      "why_not_machine": "The licence lives in another repo (pdoom1/LICENSE) and this repo holds no copy, so nothing here can read it. Checking it against another page of our own prose would be checking a claim against a claim.",
+      "source": "pdoom1/LICENSE:1-7 ('No license is granted to redistribute, sell, or make commercial use'). Corrected in #284 (3aa1b0699); the same claim was removed from /press/ in #310.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR fix/rotless-campaign-facts",
+        "on": "2026-08-14",
+        "review_by": "2026-11-07",
+        "note": "Read pdoom1/LICENSE at ../pdoom1. Interim pre-1.0 licence, all rights reserved, source provided for reference/evaluation/contribution only."
+      }
+    }
   ],
   "copy": {
     "bluesky": "p(Doom)1's ladder just forked.\n\nTime now runs a month per turn, which changes which events fire on a given seed. So a run from last week and a run from tomorrow aren't measuring the same game - and rather than quietly add them together, the board splits.\n\nOld scores stay valid, on the old board. New runs go to a new one. Nobody lost anything; you finished a chapter.\n\nhttps://pdoom1.com/?utm_source=bluesky&utm_medium=social&utm_campaign=ladder-fork-l4-2026-08",

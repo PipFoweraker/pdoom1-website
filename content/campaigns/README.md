@@ -73,6 +73,91 @@ rework:
 `approved: false` and `posted: null` are the safety interlocks. Fill `posted`
 in as you go — it is your checklist *and* the record.
 
+### 2.1 `_facts_this_copy_must_not_break` — write the CONSTRAINT, not the value
+
+This block is the list of things your copy must not contradict. It is checked by
+`python scripts/check-campaign-facts.py`, wired **blocking** into
+`content-honesty.yml`.
+
+**Until 2026-08-14 it was an array of prose strings, and two of them had become
+lies:**
+
+```json
+"Windows build ships today (v0.13.0). macOS and Linux are NOT yet released...",
+"Do NOT promise leaderboards or scores - remote submission is not live yet..."
+```
+
+Both were true when written. All three platforms now ship and the board holds
+real scores. A third entry claimed the game was "open source", which it never
+was; it was found by a person, by luck (#284).
+
+**The defect was not the wrong sentences. It was pinning a claim about a moving
+world as if it were immutable.** What is actually immutable is the constraint:
+
+| the value (rots) | the constraint (does not) |
+|---|---|
+| "macOS and Linux are NOT yet released" | "do not promise a platform that is not downloadable" |
+| "do NOT promise leaderboards, submission is not live" | "do not promise a feature that is not live" |
+
+A constraint written that way can be **asked of a source** on every run. So each
+entry is now an object, and it must declare **how it is known**:
+
+```jsonc
+{
+  "id": "platforms-downloadable",              // stable slug; the key it reports under
+  "constraint": "Do not promise a platform that is not downloadable...",
+  "verify": "checked",                          // one of the five below
+  "check": "platforms_shipped",                 // which verifier
+  "source": "public/data/version.json -> latest_release.platforms ..."
+}
+```
+
+| `verify` | means | what it needs | blocks? |
+|---|---|---|---|
+| `checked` | the script verifies it offline against an in-repo source | `check` + `source` | yes |
+| `delegated` | another wired guard already owns it | `check` (script path) + `source` | yes — if that guard has been deleted or unwired |
+| `online` | only checkable over the network (a GitHub issue's state) | `check`, `issue`, `expect`, `source` | no — advisory job only; the blocking job prints **NOT CHECKED**, never a pass |
+| `human` | no machine here can check it — and it says so | `why_not_machine`, `source`, `human_verified` | only when the verification **expires** |
+| `durable` | asserts nothing about the world, so it cannot rot | `why_durable`, and **no** source/check/clock | n/a |
+
+Verifiers available to `checked`: `platforms_shipped`, `board_live`,
+`no_version_literal_in_copy`. `online` has `issue_state`.
+
+**`human` is the honest answer, not the escape hatch.** Some things genuinely
+cannot be machine-checked here — whether the game is still "an alpha", what
+another repo's licence says. Saying so explicitly beats a false green. It costs
+a dated stamp:
+
+```jsonc
+"human_verified": {
+  "by": "who actually looked",
+  "on": "2026-08-14",
+  "review_by": "2026-11-14",       // the check goes RED here
+  "note": "what you saw"
+}
+```
+
+Past `review_by` the check is red on **"this verification expired"** — never on
+the claim itself. That red always closes by a person deciding something: re-read
+the source and re-stamp it, or fix the constraint. Same rule as
+`scripts/acknowledgements.py`, and the warn window is read from that ledger.
+
+**Two things the check will not do.** It will not fail a campaign that has
+already been **posted** — that copy is a historical record and editing it to
+clear a check would be falsifying it, so findings there print as HISTORY. And it
+will not rewrite your words: where the copy itself has drifted, the finding goes
+to `data/acknowledgements.json` with a date, and the decision stays yours.
+
+Useful:
+
+```
+python scripts/check-campaign-facts.py            # the gate
+python scripts/check-campaign-facts.py --list     # every guard and its tier
+python scripts/check-campaign-facts.py --online   # + resolve issue states
+python scripts/check-campaign-facts.py --as-of 2027-01-01   # what expires when
+python scripts/test-campaign-facts.py             # prove the gate can still fail
+```
+
 ---
 
 ## 3. Running a campaign
