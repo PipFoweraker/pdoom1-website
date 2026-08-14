@@ -239,6 +239,100 @@ def count_obfuscated_contacts(value: Any) -> int:
 
 
 # ---------------------------------------------------------------------------
+# Truncation-severed addresses -- ADVISORY ONLY, never blocks.
+#
+# MODE (d). EMAIL_PATTERN requires a TLD, so an address whose domain was CUT OFF
+# mid-string is invisible to it by construction: "leimeister@un" has no dot and
+# no TLD, and every scanner on both sides of this sync reported the corpus clean
+# the whole time it was being served.
+#
+# It reached this repo TWICE, by two different routes, from one upstream defect:
+#
+#   1. pdoom-data's importer caps `description` at 1,000 characters
+#      (`description[:997] + '...'`) and exactly one cap landed inside a contact
+#      line. That shipped to public/data/events.json and to one page under
+#      public/events/. Fixed at source in pdoom-data#81 (2026-08-13), which
+#      extended that repo's redact_emails.py with a mode-(d) rule of its own.
+#
+#   2. THEN THE REMEDIATION REPUBLISHED IT. pdoom1#1212 -- the PR that closed
+#      the original exposure -- quoted the severed fragment verbatim in its body
+#      to explain the defect, and update-game-data.yml harvests OPEN issue and
+#      PR bodies into public/data/issues-cache.json, which is served from
+#      pdoom1.com. redact_pii() ran on that harvest and could not see it. The
+#      fix and the leak were the same sentence.
+#
+# WHY THIS IS ADVISORY AND NOT A REDACTION, which is the whole design question.
+# pdoom-data's SEVERED rule is safe because it is anchored to the END OF THE
+# STRING: in a `description` field the cut is necessarily the last thing in the
+# value, and that one bound excludes the entirety of prose. Issue and PR bodies
+# have no such anchor -- the #1212 fragment sat mid-body on a line ending in a
+# quote character -- so transplanting that rule here means scanning free-form
+# markdown for `token@token...`, and that fires on ordinary prose and on exactly
+# the metric notation this corpus is full of (pass@k appears in it routinely).
+# A rewriting check on that basis is the noisy advisory that
+# OBFUSCATED_CONTACT_PATTERN's own note argues against, one section up, and a
+# noisy advisory is one everybody learns to ignore.
+#
+# So this removes the SILENCE, which is the cheap half and the half that was
+# actually missing: nothing anywhere could report that something address-shaped
+# had got through. Same posture and same reasoning as the obfuscated-contact
+# advisory above.
+#
+# The bounds on the local part are pdoom-data's, reused rather than reinvented
+# so the two repos agree on what "looks like a person" means, minus its
+# line-start refinement -- that keys off extracted-PDF contact lines, which
+# markdown does not have, so the stricter uniform bound is used instead.
+#
+# COUNTS ONLY, NEVER THE MATCHED TEXT. events-sync-summary.json is served from
+# pdoom1.com, so printing a match would republish the exact string the redaction
+# exists to remove -- #1212's mistake a second time, in the log instead of the
+# body.
+_TRUNCATION_MARKER = r"(?:\.\.\.|…)"
+SEVERED_CONTACT_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9._%+\-@])"                      # a whole token, not a tail
+    r"(?P<local>[A-Za-z0-9._%+\-]{3,})"             # local part...
+    r"@"                                            # ...bound to '@', no space
+    r"(?P<domain>[A-Za-z0-9][A-Za-z0-9.\-]{0,23})?" # domain fragment, may be cut
+    + _TRUNCATION_MARKER
+)
+
+
+def _severed_local_ok(local: str) -> bool:
+    """Does this local part look like a person, or like inline notation?
+
+    Short bare tokens are what metric and LaTeX notation is made of -- pass(4),
+    Acc(3), lx(2), math(4), ACDC(4) -- and every one of those appears to the
+    LEFT of an '@' in this corpus. A separator, or real length, is what
+    distinguishes a name from a token.
+    """
+    if not re.search(r"[A-Za-z]", local):
+        return False
+    if len(local) >= 4 and re.search(r"[._%+\-]", local):
+        return True
+    return len(local) >= 5
+
+
+def count_severed_contacts(value: Any) -> int:
+    """Count truncation-severed address shapes EMAIL_PATTERN cannot see."""
+    if isinstance(value, str):
+        n = 0
+        for m in SEVERED_CONTACT_PATTERN.finditer(value):
+            if REDACTION_MARKER in m.group(0):
+                continue
+            # A complete address is mode (a) and redact_pii() already took it.
+            if EMAIL_PATTERN.fullmatch(m.group("local") + "@" + (m.group("domain") or "")):
+                continue
+            if _severed_local_ok(m.group("local")):
+                n += 1
+        return n
+    if isinstance(value, list):
+        return sum(count_severed_contacts(v) for v in value)
+    if isinstance(value, dict):
+        return sum(count_severed_contacts(v) for v in value.values())
+    return 0
+
+
+# ---------------------------------------------------------------------------
 # Pre-write verification
 #
 # WHY THIS EXISTS AT ALL, given redact_pii() runs first.

@@ -140,6 +140,39 @@ jobs:
               issues_data = _sync_events.redact_pii(issues_data)
               print(f"Redacted {_found} email address(es) from the issues mirror")
 
+              # ADVISORY: truncation-severed addresses, which redact_pii() cannot see.
+              #
+              # This is not hypothetical and it is not about a third party's typo.
+              # On 2026-08-13 this file served "leimeister@un" -- a real address cut
+              # mid-domain by pdoom-data's 1,000-character description cap, so it has
+              # no TLD and EMAIL_PATTERN cannot match it. The line above printed
+              # "Redacted 0 email address(es)" and was telling the truth about what it
+              # matched while the address was live on pdoom1.com.
+              #
+              # It got here because pdoom1#1212 -- the PR that CLOSED the original
+              # exposure -- quoted the fragment verbatim to explain the defect, and
+              # this job harvests open issue and PR bodies verbatim. The remediation
+              # republished the thing it was remediating. It left the published cache
+              # only because #1212 merged and dropped out of the state=open window
+              # below, which is luck, not a control.
+              #
+              # ADVISORY RATHER THAN A REDACTION, deliberately: the safe form of this
+              # rule (pdoom-data's) is anchored to end-of-string, which a `description`
+              # field guarantees and free-form markdown does not. Rewriting on a
+              # weaker anchor would fire on prose and on the metric notation these
+              # bodies are full of. See the long note in sync-events.py.
+              #
+              # COUNTS ONLY, never the matched text: this log is public, and printing
+              # the match would republish the address a third time.
+              _severed = _sync_events.count_severed_contacts(issues_data)
+              if _severed:
+                  print(f"::warning::{_severed} truncation-severed address shape(s) "
+                        "in the issues mirror -- redact_pii() cannot see these. "
+                        "Redact the quoting issue/PR body at the source; the next run "
+                        "of this job reinstates whatever is still there.")
+              else:
+                  print("No truncation-severed address shapes in the issues mirror")
+
               issues_cache = {
                   "issues": issues_data,
                   "count": len(issues_data),
