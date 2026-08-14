@@ -1,13 +1,19 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-14T06:44:42.316Z UTC
+Generated: 2026-08-14T12:29:13.016Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1232 | ADR-0015: runtime pdoom-data event options write literal doom -- an unbounded -6 doom/turn sink |  |  | 2026-08-14 08:45:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/1232) |
+| 1229 | Design thread (explicitly not now): office simulation direction -- most of it already ships, it is top-down not isometric, and ADR-0018 is the live constraint | ui-ux, strategic, someday |  | 2026-08-14 07:12:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1229) |
+| 1228 | Events: 25 authored, 19 of them the same three-option shape, and the taxonomy built to vary them is used by zero of them | game-mechanics, strategic, event-system |  | 2026-08-14 07:12:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1228) |
+| 1227 | Design: the ledger and research progress both stop at the edge of the roster -- one missing object (a paper with contributors) blocks both | game-mechanics, strategic |  | 2026-08-14 07:11:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1227) |
+| 1226 | Firing exists -- on a screen the player never reaches, and it is the one departure that costs nothing but cash | bug, game-mechanics, ux |  | 2026-08-14 07:11:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1226) |
+| 1225 | Hiring pipeline: five things the sim knows and the panel never says -- five faces for six candidates, free offer retries, an invisible ad campaign, empty counter-offers, and the onboarding bill you only see after you commit | game-mechanics, ui-ux, priority-medium, ux |  | 2026-08-14 07:10:44 | [link](https://github.com/PipFoweraker/pdoom1/issues/1225) |
+| 1224 | Legibility: the hotkey badges lose to modulate, 'press 1-9' is wrong at 13 tiles, and there is no font-size SSOT to turn (378 sites) | ui-ux, priority-medium, ux, ui |  | 2026-08-14 07:10:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1224) |
+| 1223 | The Action Queue and the Attention header contradict each other in one frame -- three widgets, three data sources, one column (and 'ticks' is a word we never defined) | bug, ui-ux, priority-high, action-system, ux |  | 2026-08-14 07:09:46 | [link](https://github.com/PipFoweraker/pdoom1/issues/1223) |
 | 1221 | Convention: a refusal must say whether it is a rule or a stub |  |  | 2026-08-14 05:54:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/1221) |
-| 1219 | Submenu-driven actions fail silently: the is_submenu early return skips every rejection report (hiring is entirely on that path) | bug, priority-high, action-system, ux |  | 2026-08-14 05:47:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1219) |
 | 1218 | Attention spent without saying so: the 4 surfaces PR #1217 could not fix display-only, + the cat has no art SLOT (not a missing asset) | ui-ux, technical-debt, ux |  | 2026-08-14 05:36:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/1218) |
-| 1215 | Stale generated per-checkout artefact: a cache Godot needs, git cannot ship, and CI cannot see | testing, technical-debt, ship:next-release, class:guard |  | 2026-08-14 03:52:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/1215) |
 | 1210 | Half-day workshop: the first ten turns -- a first-timer could not tell what to do, and 44 -> 87 proves the surface is responsive, not that it is finished | game-mechanics, strategic, priority:high, ux |  | 2026-08-12 21:55:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1210) |
 | 1209 | Define 'league seed' and 'board key' for players -- both are printed on screen, neither is explained, and the guide states the key wrongly | documentation, priority:medium, ux |  | 2026-08-12 21:51:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/1209) |
 | 1208 | Player-facing doc: the four founder hour kinds (doors / approvals / audits / reserve) are unexplained -- and two of the four words already mean something else in the player guide | documentation, game-mechanics, priority:high, ux |  | 2026-08-12 21:50:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1208) |
@@ -26,7 +32,7 @@ Generated: 2026-08-14T06:44:42.316Z UTC
 | 1148 | core: pending_events is an unguarded public queue -- give it one validated entry point (class fix behind #1134) |  |  | 2026-08-06 07:11:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/1148) |
 | 1147 | release: add a BEHAVIOURAL build-identity check to the release checklist (a feature the old build cannot have) |  |  | 2026-08-06 07:11:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1147) |
 | 1142 | Goal: Chinese localisation of the game before end of year -- scope undecided, worth an early estimate |  |  | 2026-08-06 04:30:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1142) |
-| 1141 | Playthrough of this afternoon's build: music works, save looks better -- but settings traps you into quitting, F3 will not close, and the cold open never fired |  |  | 2026-08-06 04:17:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/1141) |
+| 1141 | Playthrough of this afternoon's build: music works, save looks better -- but settings traps you into quitting, F3 will not close, and the cold open never fired |  |  | 2026-08-14 07:28:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1141) |
 | 1140 | Pip's full response to the Fresh Eyes Teardown (26 min, from memory) -- meta dev cycle, month review becomes an expandable action log, winning does not exist |  |  | 2026-08-06 04:17:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1140) |
 | 1138 | take-loan duplicate is a symptom: the mechanic wants discrete options, not a slider. Plus: build clickable grouping mock-ups, and a question back on tech-debt cadence |  |  | 2026-08-06 03:54:35 | [link](https://github.com/PipFoweraker/pdoom1/issues/1138) |
 | 1135 | Lab-name generator: future-epoch content pass -- more shapes, more pool, backfilled bacronyms | ship:next-release |  | 2026-08-05 22:54:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1135) |
@@ -146,7 +152,7 @@ Generated: 2026-08-14T06:44:42.316Z UTC
 | 848 | feat(dev): in-game live A/B icon rotation (dev-mode asset swapper) | ship:next-release |  | 2026-07-26 01:38:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/848) |
 | 833 | design: 'people & money' cohesion spine -- recruitment epic -> roles/salary/manager -> payroll -> finance/roster |  | First Contact | 2026-07-24 23:32:23 | [link](https://github.com/PipFoweraker/pdoom1/issues/833) |
 | 830 | ux(hiring): statefulness -- ask WHO, per-candidate interviews, interview popup w/ card+info fade-in, portraits, embedded employee panel |  | First Contact | 2026-07-24 23:32:30 | [link](https://github.com/PipFoweraker/pdoom1/issues/830) |
-| 828 | observe/design(ux): hiring actions don't appear in the action queue (top bar + hiring submenu only) |  | First Contact | 2026-07-24 23:32:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/828) |
+| 828 | observe/design(ux): hiring actions don't appear in the action queue (top bar + hiring submenu only) |  | First Contact | 2026-08-14 07:26:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/828) |
 | 826 | docs: rendered HTML architecture + nomenclature map (turn/game systems, with diagrams) |  | Technical Debt Cleanup | 2026-07-24 23:32:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/826) |
 | 825 | design(events): OUTS sweep -- every event response offers a resource trade-off (no dead-ends) |  | First Contact | 2026-07-24 23:32:42 | [link](https://github.com/PipFoweraker/pdoom1/issues/825) |
 | 824 | feat(ux): MTG-style pass-priority / F6 -- accept defaults, skip to end-turn summary |  | First Contact | 2026-07-24 23:32:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/824) |
