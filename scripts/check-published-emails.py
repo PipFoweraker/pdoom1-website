@@ -63,17 +63,31 @@ ALLOWED = re.compile(
 
 
 def load_generator_pattern():
-    """Import EMAIL_PATTERN / REDACTION_MARKER from sync-events.py.
+    """Import EMAIL_PATTERN / REDACTION_MARKER / residue_scan from sync-events.py.
 
     The module name has a hyphen, so a plain import is impossible; importlib
-    is the supported way. Reusing it is the point -- a second copy of the
-    regex would drift from the one that actually protects the generated pages.
+    is the supported way. Reusing EMAIL_PATTERN is the point -- a second copy of
+    the regex would drift from the one that actually protects the generated
+    pages.
+
+    BUT REUSING IT IS ALSO THIS SCRIPT'S BLIND SPOT, and it is worth being
+    explicit about which half is which. Sharing the pattern means this check
+    cannot disagree with the generator about a KNOWN shape, which is what we
+    want. It also means that if the pattern is WRONG, this check confirms the
+    generator's own mistake and reports PASS -- which is exactly what happened
+    between 2026-08-09 and 2026-08-15, when the brace-group mode was
+    unmatchable here and upstream had already fixed it.
+
+    So residue_scan() is imported alongside it: same module, DIFFERENT
+    PRINCIPLE. It walks '@' characters rather than matching an address shape,
+    so it is not blind in the same places, and a count it can see that
+    EMAIL_PATTERN cannot is reported as a DISAGREEMENT below.
     """
     path = REPO_ROOT / "scripts" / "sync" / "sync-events.py"
     spec = importlib.util.spec_from_file_location("sync_events", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.EMAIL_PATTERN, module.REDACTION_MARKER
+    return module.EMAIL_PATTERN, module.REDACTION_MARKER, module.unexplained_residue
 
 
 def is_allowed(match: str) -> bool:
@@ -106,6 +120,33 @@ def scan(pattern):
     return findings
 
 
+def scan_residue(unexplained_residue):
+    """Return {relative_path: unexplained_count} where the independent scanner
+    sees address-shaped text EMAIL_PATTERN cannot account for.
+
+    This is a DISAGREEMENT check, not a second detector: everything
+    EMAIL_PATTERN can see is already handled by scan() above, so what matters is
+    the remainder. A positive remainder means the shared pattern has a hole,
+    which is the one failure that cannot be seen from inside the pattern.
+
+    The comparison is POSITIONAL, done in sync-events.py. Comparing totals
+    instead does not work -- the footer's allowed addresses are counted by
+    EMAIL_PATTERN and ignored by the independent scanner, so on any ordinary
+    page the subtraction goes negative and hides a real leak.
+    """
+    findings = {}
+    for path in sorted(PUBLIC_DIR.rglob("*")):
+        if not path.is_file() or path.suffix.lower() not in SCAN_SUFFIXES:
+            continue
+        text = read(path)
+        if "@" not in text:
+            continue
+        unexplained = unexplained_residue(text)
+        if unexplained > 0:
+            findings[path.relative_to(REPO_ROOT).as_posix()] = unexplained
+    return findings
+
+
 def fix(pattern, marker, findings):
     """Replace disallowed addresses in place, leaving allowed ones alone."""
     for rel in findings:
@@ -125,23 +166,62 @@ def main():
                         help="rewrite offending files in place")
     args = parser.parse_args()
 
-    pattern, marker = load_generator_pattern()
+    pattern, marker, unexplained_residue = load_generator_pattern()
     findings = scan(pattern)
+    residue = scan_residue(unexplained_residue)
 
-    if not findings:
-        print("PASS: no third-party email addresses published under public/")
+    if not findings and not residue:
+        print("PASS: no third-party email addresses published under public/ "
+              "(and the independent scanner agrees)")
         return 0
 
-    distinct = {a for hits in findings.values() for a in hits}
-    total = sum(len(h) for h in findings.values())
-    print(f"Found {len(distinct)} distinct third-party addresses, "
-          f"{total} occurrences, across {len(findings)} files:")
-    for rel, hits in findings.items():
-        print(f"  {rel}: {', '.join(sorted(set(hits)))}")
+    if findings:
+        distinct = {a for hits in findings.values() for a in hits}
+        total = sum(len(h) for h in findings.values())
+        # COUNTS AND PATHS ONLY, NEVER THE ADDRESS TEXT.
+        #
+        # This script runs in content-honesty.yml on a PUBLIC repository, so its
+        # stdout is a published artefact. Printing the matches would republish
+        # every address the run just found -- to a wider audience than the page
+        # it was found on, and permanently, because Actions logs outlive the
+        # commit that triggered them.
+        #
+        # That is not hypothetical: pdoom1#1212, the PR that CLOSED the original
+        # exposure, quoted a severed address verbatim in its body to explain the
+        # defect, and update-game-data.yml then harvested that body into
+        # public/data/issues-cache.json and served it. The fix and the leak were
+        # the same sentence. sync-events.py already prints counts only for this
+        # reason; this script did not, and it is the one wired into CI.
+        #
+        # A maintainer who needs the text has the path and the line count, and
+        # can look at the file locally where the disclosure stops.
+        print(f"FOUND {len(distinct)} distinct third-party address(es), "
+              f"{total} occurrence(s), across {len(findings)} file(s):")
+        for rel in sorted(findings):
+            print(f"  {rel}: {len(findings[rel])} occurrence(s)")
+        print("\nAddresses are deliberately NOT printed: this log is public.")
+
+    if residue:
+        total_r = sum(residue.values())
+        print(f"\nDISAGREEMENT: the independent scanner found {total_r} "
+              f"address-shaped item(s) across {len(residue)} file(s) that "
+              f"EMAIL_PATTERN cannot account for:")
+        for rel in sorted(residue):
+            print(f"  {rel}: {residue[rel]} unexplained")
+        print("\nThis means the shared pattern has a hole in it. Widen "
+              "EMAIL_PATTERN in scripts/sync/sync-events.py to cover the mode, "
+              "or characterise the new false-positive family STRUCTURALLY in "
+              "residue_scan() -- never by adding a name to an allowlist.")
 
     if not args.fix:
         print("\nFAIL. Fix at the generator where one owns the page; "
               "re-run with --fix only for pages no generator owns.")
+        return 1
+
+    if residue:
+        print("\nFAIL: --fix cannot clear a DISAGREEMENT. It rewrites what "
+              "EMAIL_PATTERN matches, and by definition the pattern cannot see "
+              "these. Fix the pattern first.")
         return 1
 
     print()
