@@ -299,6 +299,31 @@ Pip's stated top priority. Practically:
     served from pdoom1.com, so naming the events would republish a pointer to the
     thing that was redacted). Deliberately narrow: a `\s+at\s+` alternative fires
     on prose like "aimed at arxiv.org", and a noisy advisory gets ignored.
+  - **A SECOND form that fails open: the truncation-severed address, "mode (d)"**
+    (2026-08-13). pdoom-data's importer caps `description` at 1,000 chars
+    (`description[:997] + '...'`) and one cap landed mid-address, leaving
+    `leimeister@un` — **no dot, no TLD**, so `EMAIL_PATTERN` cannot match it and
+    `residue_scan()` upstream could not either. Both scanners reported the corpus
+    clean while the address was live. Fixed at source in **pdoom-data#81**, whose
+    `SEVERED` rule is anchored to **end-of-string** — safe in a `description`
+    field, where the cut is necessarily last.
+    **That anchor does not exist in free-form markdown**, which is why this repo
+    carries `SEVERED_CONTACT_PATTERN` + `count_severed_contacts()` as an
+    **advisory** (same posture as the obfuscated one above) rather than a
+    redaction: rewriting on a weaker anchor eats `pass@k`. Forced-failure test is
+    `scripts/test-severed-contacts.py`; it pins all ten measured false-positive
+    families, each tested bare **and** hard-cut with the marker appended.
+  - **The remediation republished the leak, and that is the transferable lesson.**
+    `pdoom1#1212` — the PR that *closed* the original exposure — quoted the severed
+    fragment verbatim to explain the defect, and `update-game-data.yml` harvests
+    open issue and PR bodies into `issues-cache.json`. The address was served from
+    pdoom1.com again for ~12 hours, out of the fix's own prose. It left the
+    published cache only because #1212 merged and dropped out of that job's
+    `state=open&per_page=15` window — **luck, not a control**; a still-open issue
+    quoting an address stays published indefinitely.
+    **When writing up a disclosure, redact the literal in the write-up too.** Any
+    repo that publishes issue or PR text is a mirror, and a postmortem is input to
+    it.
 - **The event page template escapes nothing by itself** — it is one 500-line
   f-string, so the data decides where the markup ends, and arXiv descriptions are
   raw PDF text uploaded by anyone. `escape_event_for_html()` walks the whole
@@ -424,6 +449,7 @@ node    scripts/test-dashboard-devlog.js  # /dashboard/ derives + freshness  [co
 
 python  scripts/check-published-emails.py # no third party's address served  [content-honesty, sync-events]
 python  scripts/test-sync-events-pii.py   # ...and the sync REFUSES to write [content-honesty, sync-events]
+python  scripts/test-severed-contacts.py  # truncation-severed addresses (mode d) [content-honesty]
 python  scripts/snapshot-copy.py --check  # reader-facing prose drift        [content-honesty ADVISORY]
 python  scripts/generate-feeds.py --check # feeds in step with the blog      [generate-feeds]
 node    scripts/test-blog-render.js       # blog markdown -> the right tags  [generate-feeds]

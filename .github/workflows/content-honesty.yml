@@ -56,6 +56,7 @@ on:
       - 'scripts/sync/sync-events.py'
       - 'scripts/test-sync-events.py'
       - 'scripts/test-sync-events-pii.py'
+      - 'scripts/test-severed-contacts.py'
       - 'scripts/update-version-info.py'
       - 'scripts/test-update-version-info.py'
       - 'scripts/health-check.py'
@@ -105,6 +106,7 @@ on:
       - 'scripts/sync/sync-events.py'
       - 'scripts/test-sync-events.py'
       - 'scripts/test-sync-events-pii.py'
+      - 'scripts/test-severed-contacts.py'
       - 'scripts/update-version-info.py'
       - 'scripts/test-update-version-info.py'
       - 'scripts/health-check.py'
@@ -241,6 +243,16 @@ jobs:
       # against a fixture corpus and asserts the generator refuses to write.
       - name: The events-sync PII gate can still refuse (forced-failure test)
         run: python scripts/test-sync-events-pii.py
+
+      # The mode-(d) advisory: an address whose domain was CUT OFF has no TLD,
+      # so EMAIL_PATTERN cannot match it and every scanner here reported clean
+      # while issues-cache.json served one for ~12 hours on 2026-08-13. This
+      # test forces the advisory to fire on the exact text that leaked, and
+      # asserts silence on all ten measured false-positive families -- each
+      # tested bare AND hard-cut with the truncation marker appended, because
+      # the marker is the only thing the rule anchors on.
+      - name: The truncation-severed advisory fires, and stays quiet on notation
+        run: python scripts/test-severed-contacts.py
 
       - name: No third party's email address is published
         run: python scripts/check-published-emails.py
