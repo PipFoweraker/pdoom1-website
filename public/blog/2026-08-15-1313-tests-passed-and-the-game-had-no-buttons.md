@@ -39,10 +39,11 @@ gitignored, and belongs to one checkout. A refactor earlier in the week added
 a new class, `Capacity`. The agent that wrote it worked in a separate
 worktree, which built its own fresh cache and saw all 1,313 tests pass —
 honestly. The shared checkout only *pulled*, so its cache predated the new
-file, and every script that referenced `Capacity` failed to compile: 30 parse
-errors, 17 dependent-script failures, cascading through the autoloads that
-build the UI and start the game. The windowed run swallowed all of it; the
-errors only surfaced in a headless run.
+file, and every script that referenced `Capacity` failed to compile,
+cascading through the autoloads that build the UI and start the game.
+Reconstructing that exact cache afterwards on a scratch copy: 30 parse
+errors, 17 dependent-script failures. The windowed run swallowed all of it;
+the errors only surfaced in a headless run.
 
 The fix is one command and takes seconds. Diagnosis took the evening. The
 full symptom record is
@@ -95,9 +96,10 @@ minutes of play (a legible first screen, and rejections that actually reach
 the player instead of a hidden feed). Honest caveats: a lab name is typed,
 not an identity, so this is not established to be the same person, and it is
 not a controlled comparison. It is evidence of headroom, and I will take it.
-Monday's 44 has a distinction the number does not show: it was the first
-score submitted to the global board by someone who is not me, which is worth
-more than any check I can run against my own API.
+Monday's 44 has a distinction the number does not show: a run submitted by
+someone who is not me, accepted by the live board — the first external
+evidence the whole pipeline works end to end, which is worth more than any
+check I can run against my own API.
 
 **Every refusal in the game got audited.** 144 distinct player-facing refusal
 strings, each traced to the code behind it: 106 are real rules, correctly
