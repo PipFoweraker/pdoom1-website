@@ -20,7 +20,22 @@
 
 // ---- config -------------------------------------------------------------
 const RECIPIENT   = 'team@pdoom1.com';      // hardcoded on purpose (see above)
-const FROM        = 'team@pdoom1.com';      // same domain -> passes SPF on DreamHost
+// CORRECTED 2026-08-16. This line used to read "same domain -> passes SPF on
+// DreamHost". That is false, and it was the load-bearing assumption of this whole
+// intake path. SPF authorises SENDING IPs for a domain, not matching domain names;
+// with no SPF record published for pdoom1.com the result is `none`, never `pass`.
+// Measured against ns1.dreamhost.com on 2026-08-15: pdoom1.com publishes no SPF,
+// no DKIM and no DMARC, while MX points at Google. So this mail leaves a DreamHost
+// shared IP claiming to be from a domain Google itself hosts, entirely
+// unauthenticated -- the exact shape of a spoofing attempt.
+//
+// Two separate fixes are outstanding and neither is in this file:
+//   1. publish SPF + DMARC (DreamHost panel) and DKIM (Google Admin). See
+//      docs/decisions/FEEDBACK_INTAKE_CONTRACT.md section 5.
+//   2. pass an aligned envelope sender as mail()'s 5th parameter. Without it,
+//      DMARC alignment fails even once SPF exists, which is why
+//      scripts/check-mail-auth.py currently pins the policy at p=none.
+const FROM        = 'team@pdoom1.com';
 const MIN_FILL_MS = 3000;                    // faster than this = a bot
 const THROTTLE_S  = 30;                      // seconds between reports per IP
 const MAX_TITLE   = 200;

@@ -169,6 +169,29 @@ jobs:
         with:
           node-version: '20'
 
+      # PHP is PINNED, not inherited from the runner image.
+      #
+      # Once public/ingest.php exists, scripts/fixtures/ingest_harness.py RAISES
+      # if no `php` is on PATH -- it refuses to fall back to the stub, because a
+      # fallback would report the stub's behaviour under the endpoint's name.
+      # That refusal is loud, so a missing PHP is a red rather than a silent skip.
+      #
+      # But this job is the ONLY place rows F1-F6 and F9-F15 can ever run: there
+      # is no php binary on the Windows dev box, so they cannot be run locally
+      # once the endpoint lands. Leaning on ubuntu-latest happening to ship PHP
+      # would make thirteen destructive tests depend on an undeclared property of
+      # a runner image that GitHub can change without telling us.
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: PHP is actually present (the harness depends on it)
+        run: |
+          set -euo pipefail
+          php --version
+          php -r 'exit(function_exists("http_response_code") ? 0 : 1);' \
+            || { echo "http_response_code() missing under this SAPI -- contract 11.5"; exit 1; }
+
       # These three are named in FEEDBACK_INTAKE_CONTRACT.md section 6 and are
       # written BEFORE the implementation. A missing one fails this step rather
       # than being skipped: a workflow that silently steps over an absent test is
