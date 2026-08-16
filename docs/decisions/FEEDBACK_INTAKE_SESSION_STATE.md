@@ -51,19 +51,37 @@ TXT  google._domainkey   <generated in Google Admin, NOT the DreamHost panel>
 | suite | real exit | meaning |
 |---|---|---|
 | `node scripts/test-feedback-outbox.js` | **1** | F7, F8, F16, F17 all fail against the stub |
-| `python scripts/test-ingest-destructive.py` | **not measured** — run exceeded 120s and was stopped at shutdown | A3 reports 13 rows failing; **unverified by me** |
+| `python scripts/test-ingest-destructive.py` | **1** — reverified 2026-08-16, full run | 12 of 13 fail; subject line confirms `STUB`, not a half-written endpoint |
 | `python scripts/test-check-mail-auth.py` | **0** | every mail-auth check forced into its failing state and observed |
 | `python scripts/check-mail-auth.py` | **0** | 3 passing, 4 acknowledged, **`DMARC ceiling p=none`** — M5 interlock live |
 | `python scripts/check-encoding-safety.py` | **0** | 83/83 modules, new files included |
 
-A3's headline was 16 FAIL / 1 PASS. **I verified the 4 JS rows and the exit
-code; I did not verify the 13 Python rows** — the suite was still running when
-shutdown was called. Treat A3's Python numbers as a report, not a measurement.
+A3's headline was 16 FAIL / 1 PASS. **Reverified 2026-08-16: it is exactly
+right.** Python rows F1, F2, F3, F5, F6, F9-F15 fail; F4 passes. JS rows F7, F8,
+F16, F17 fail against the stub and pass against A2's real module.
 
 **A3 flagged F4 (concurrent append) as too weak**, and it is right: its lock
 probe is POSIX-only and skips on Windows, so the local PASS means "nothing
 collided on this run", not "a lock exists". It runs for real on the Linux CI
 runner.
+
+### 3.1 Where the suite can and cannot run — a constraint, not a bug
+
+Once `public/ingest.php` exists, `test-ingest-destructive.py` **cannot run on a
+Windows box at all**: there is no `php` binary, and the harness RAISES rather
+than falling back to the stub, because a fallback would report the stub's
+behaviour under the endpoint's name. That is the correct design and it means
+**CI is the only place those 13 rows will ever execute.**
+
+Three consequences, none yet closed:
+- `.github/workflows/feedback-intake.yml` has **no explicit `setup-php` step**.
+  `ubuntu-latest` ships PHP, so it should work by default — but that is an
+  implicit dependency on a runner image. Pin it. Failure mode is loud (the
+  harness raises), so this is robustness, not correctness.
+- **CI has never run on this branch.** The workflow triggers on `pull_request`
+  and `push: main`; no PR exists. Every green recorded here is local-only.
+- The POSIX-only halves — F2's torn write, F4's lock probe, F13's rsync dry-run
+  — have therefore **never executed anywhere**.
 
 ---
 
