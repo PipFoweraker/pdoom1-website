@@ -503,9 +503,26 @@ try:
     files, calls = cma.scan_mailers(ROOT)
     check(len(calls) >= 1, f"the scanner finds a real mail() call in the repo "
                            f"({files} PHP files, {len(calls)} calls)")
-    check(all(not c.alignment(live["domain"])[0] for c in calls),
-          "every real mailer is currently UNALIGNED -- if this flips, the ceiling "
-          "may lift and this assertion is the place to record that it did")
+    # 2026-08-17: this asserted the OPPOSITE -- "every real mailer is currently
+    # UNALIGNED" -- and it went red the moment bug-submit.php gained its 5th
+    # parameter. That red was the assertion doing its job: it is a state snapshot
+    # whose whole purpose is to fail when the state moves, so that a human has to
+    # come and say which way it moved and why. Recorded here rather than deleted,
+    # because the direction matters.
+    #
+    # What flipped it, in order: SPF and DMARC were published for pdoom1.com on
+    # 2026-08-17; a real message through the live form then came back
+    # `spf=pass ... dmarc=fail`, proving the alignment gap at a real receiver; the
+    # mailer gained `-f team@pdoom1.com`. Both mailers are now aligned and the
+    # ceiling stands at p=reject. The regression this now catches is somebody
+    # dropping the 5th parameter back out -- which would silently return the
+    # site's own feedback mail to a Gmail warning banner.
+    unaligned = [f"{c.path}:{c.line}" for c in calls
+                 if not c.alignment(live["domain"])[0]]
+    check(not unaligned,
+          f"every real mailer passes an aligned envelope sender (unaligned: "
+          f"{unaligned or 'none'}) -- if this flips, the DMARC ceiling drops back "
+          f"to p=none and this assertion is the place that records it did")
 except cma.SpecError as exc:
     check(False, f"the live spec does not load: {exc}")
 

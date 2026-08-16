@@ -190,7 +190,20 @@ if ($hasAttachment) {
     $body = $textBody;
 }
 
-$sent = @mail(RECIPIENT, $subject, $body, $headers);
+// The 5th parameter is the whole reason this mail can pass DMARC. Without it the
+// envelope sender is whatever the host picks -- measured 2026-08-17 on a real
+// delivered message, that is pdoom1_dot_com_shell@iad1-shared-b8-18.dreamhost.com.
+// SPF then passes for DREAMHOST's domain, which does not align with the pdoom1.com
+// From: header above, so DMARC fails and Gmail shows the recipient a warning
+// banner on the site's own feedback mail (observed, Message-Id 4hNWYX273Bz13YTW).
+// With `-f team@pdoom1.com` the envelope domain is pdoom1.com, SPF is evaluated
+// against OUR record -- which carries include:netblocks.dreamhost.com, covering
+// the relay 208.113.156.243 -- and the pass is aligned.
+// This only works because the SPF record exists; it was published 2026-08-17.
+// Safe on this host: the MTA is Postfix (`Received: ... (Postfix, from userid
+// 6835806)`), whose sendmail wrapper honours -f without the X-Authentication-Warning
+// header that a real sendmail adds for an untrusted user.
+$sent = @mail(RECIPIENT, $subject, $body, $headers, '-f ' . FROM);
 
 if ($sent) {
     done(200, ['ok' => true]);
