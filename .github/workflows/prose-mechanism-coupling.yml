@@ -1,0 +1,62 @@
+# Reader-facing prose and the mechanism it describes must ship together.
+#
+# WHY THERE IS NO `paths:` FILTER
+# ------------------------------
+# This coupling can break from EITHER side, and the two sides live in different
+# trees:
+#   - someone edits the privacy page to promise a deletion clock  (public/)
+#   - someone deletes the cron that enforces it                   (.github/)
+#   - someone renames or removes the script behind it             (scripts/)
+#   - someone unmounts the widget from the last page carrying it  (public/)
+#
+# A path filter tuned to one side would go quiet exactly when the other side
+# moved. This repo already has that scar in a sharper form: content-honesty's
+# email guard triggered on `push` to `public/**/*.html`, while the sync that
+# writes 1,194 of those pages commits with the CI-suppression marker -- so the
+# guard ran on human pushes and NEVER ONCE on the output it existed to check
+# (#240). A check must take at least one input from inside the system it checks.
+#
+# So: every pull request, plus a daily backstop.
+#
+# THE DAILY SCHEDULE IS NOT DECORATION. `auto-deploy-on-push.yml` fires ~4x/day
+# on a workflow_run trigger with no conclusion filter, and the deploy job runs no
+# tests. So prose reaches production on a clock, unattended, whether or not any
+# human opened a PR. A guard that only runs on PRs cannot see that path.
+
+name: Prose/mechanism coupling
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # 02:20 UTC daily. Offset off the hour on purpose: the shared runner pool is
+    # busiest at :00, and this repo already has several jobs on the hour.
+    - cron: '20 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coupling:
+    name: BLOCKING -- no promise without a mechanism
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # The forced-failure suite runs FIRST and is not optional.
+      #
+      # This guard is a regex over prose plus three predicates -- which is to say
+      # it is easy to render silently inert by loosening a pattern, and the
+      # tempting way to "fix" a finding is to do exactly that. The suite pins the
+      # cases where the guard must fire AND the cases where it must stay quiet, so
+      # a loosened pattern fails here rather than passing everywhere.
+      - name: The guard can still fail
+        run: python scripts/test-check-prose-mechanism-coupling.py
+
+      - name: Every live claim is backed by a mechanism that runs
+        run: python scripts/check-prose-mechanism-coupling.py

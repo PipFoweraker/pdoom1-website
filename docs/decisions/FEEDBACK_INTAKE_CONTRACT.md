@@ -286,6 +286,40 @@ exact axis the prime directive protects.
 `python scripts/snapshot-copy.py --check` will flag the prose change. That is the
 mechanism working, not an obstacle.
 
+### 7.1 The coupling is BIDIRECTIONAL — found 2026-08-16 by agent B1
+
+This section originally said only that the privacy page must not lag the widget.
+**The corollary was never written down: it must not LEAD it either.**
+
+B1 rewrote the page to be true of a system that does not yet run, and in doing so
+created a fresh falsehood pointing the other way — the page now says *"Some pages
+carry a feedback widget"* when `grep -rln "feedback.js" public/ --include=*.html`
+returns nothing, and describes 90/180/30-day clocks that only
+`scripts/purge-feedback.py` makes real, which no workflow schedules. Both verified
+independently, 2026-08-16.
+
+A promise about a mechanism that does not run is the same class of lie as a
+mechanism that runs unpromised. "We delete your contact details after 90 days" is
+**false** until something deletes them, and it is more damaging than silence
+because a visitor may hand over an address on the strength of it.
+
+> **RULE: reader-facing prose and the mechanism it describes ship in the SAME
+> deploy, in BOTH directions.** Neither may lead. The prose is a claim about the
+> present tense, and `auto-deploy-on-push.yml` fires ~4x/day gated on nothing, so
+> "it will be true by the time anyone reads it" is not available as a defence.
+
+**Merge preconditions for the privacy prose** — all three, or the corresponding
+sentences come back out:
+
+1. at least one page mounts the widget;
+2. `purge-feedback.py` is on a schedule, or the 90/180/30 sentences are removed;
+3. `generate-feedback-stats.py` output is published, or the public-tally
+   paragraph is removed.
+
+This is the same failure the repo already records for `game-changes.json` —
+someone migrated one consumer, verified that one page, and generalised. Here the
+generalisation ran ahead of the code instead of behind it. **Same defect, mirrored.**
+
 ---
 
 ## 8. Decisions — SETTLED 2026-08-15 (Pip)

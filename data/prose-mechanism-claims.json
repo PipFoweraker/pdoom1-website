@@ -1,0 +1,82 @@
+{
+  "_README": [
+    "Reader-facing prose that DESCRIBES A MECHANISM is a claim about the present",
+    "tense. This file pins each such claim to the thing that makes it true, so the",
+    "two cannot drift apart in either direction.",
+    "",
+    "WHY THIS EXISTS. On 2026-08-16 the privacy page was rewritten to be true of a",
+    "feedback system that had been built but not yet wired: the page said 'Some",
+    "pages carry a feedback widget' when no page loaded feedback.js, and promised",
+    "90/180/30-day deletion clocks that only purge-feedback.py enforces, which no",
+    "workflow scheduled. The contract had recorded that the privacy page must not",
+    "LAG the widget. Nobody had written down that it must not LEAD it either.",
+    "",
+    "A promise about a mechanism that does not run is the same class of lie as a",
+    "mechanism that runs unpromised -- and it is worse, because a visitor may hand",
+    "over an address on the strength of it. 'We delete your contact details after",
+    "90 days' is FALSE until something deletes them.",
+    "",
+    "auto-deploy-on-push.yml fires ~4x/day gated on nothing, so 'it will be true by",
+    "the time anyone reads it' is not available as a defence.",
+    "",
+    "HOW TO ADD AN ENTRY. Write the CONSTRAINT, never the value -- the same rule",
+    "content/campaigns/README.md 2.1 learned the hard way. 'requires' names a",
+    "condition this repo can evaluate today; if nothing here can check it, the claim",
+    "does not belong in reader-facing prose yet.",
+    "",
+    "PREDICATE KINDS:",
+    "  page_loads_script   some HTML under public/ references this path",
+    "  workflow_schedules  some workflow has a cron AND invokes this script",
+    "  path_exists         this path exists in the repo",
+    "",
+    "The checker FAILS CLOSED: an unknown predicate kind, a missing claim_file, or a",
+    "malformed entry rejects the WHOLE registry rather than skipping the entry. A",
+    "skipped entry resurfaces later as a fresh finding and sends someone hunting a",
+    "bug nobody introduced."
+  ],
+
+  "schema": 1,
+
+  "claims": [
+    {
+      "id": "privacy-names-a-feedback-widget",
+      "claim_file": "public/privacy/index.html",
+      "claim_pattern": "feedback widget",
+      "requires": {
+        "kind": "page_loads_script",
+        "value": "assets/js/feedback.js"
+      },
+      "why": "The page tells visitors a widget exists and describes what it stores. If no page mounts it, the description is of a thing that is not there, and every retention promise attached to it is unanchored."
+    },
+    {
+      "id": "privacy-promises-a-contact-deletion-clock",
+      "claim_file": "public/privacy/index.html",
+      "claim_pattern": "90 days",
+      "requires": {
+        "kind": "workflow_schedules",
+        "value": "scripts/purge-feedback.py"
+      },
+      "why": "A retention policy without a cron job is prose -- the contract says so in section 10 and then the privacy page shipped the prose first anyway. Nothing deletes a contact field unless purge-feedback.py runs on a schedule."
+    },
+    {
+      "id": "privacy-promises-a-public-tally",
+      "claim_file": "public/privacy/index.html",
+      "claim_pattern": "public (?:tally|count)",
+      "requires": {
+        "kind": "workflow_schedules",
+        "value": "scripts/generate-feedback-stats.py"
+      },
+      "why": "The page tells visitors their feedback may be counted in a public tally, and that only counts are published. If nothing generates that file the promise describes nothing, and the k=5 suppression rule it also promises protects nobody."
+    },
+    {
+      "id": "privacy-offers-erasure-by-receipt",
+      "claim_file": "public/privacy/index.html",
+      "claim_pattern": "receipt",
+      "requires": {
+        "kind": "path_exists",
+        "value": "scripts/purge-feedback.py"
+      },
+      "why": "We store no identity, so the receipt is the ONLY key by which a person can ask to be erased. Offering that route with no tool behind it makes an unkeepable promise to the one visitor who most wants it kept."
+    }
+  ]
+}
