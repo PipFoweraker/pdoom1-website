@@ -397,3 +397,77 @@ Privacy-page wording this obliges us to (B1's input, must be true when published
 > *Free-text feedback is kept indefinitely. Anything you type into the contact
 > field is deleted within 90 days. We never store your IP address — only a hash
 > that is re-salted daily.*
+
+---
+
+## 11. Adjudications (2026-08-16, after A3's Gate 2 run)
+
+A3 wrote the suite from §1–§10 and hit nine under-specifications. These are the
+rulings. They are binding on A1/A2.
+
+### 11.1 Mail observability seam — ACCEPTED
+
+`PDOOM_MAIL_SINK` (path; endpoint appends one JSON line per notification,
+`{rid, ok, ...}`, instead of calling `mail()`) and `PDOOM_MAIL_FAIL=1` (forces
+`ok:false`). Test-only, inert when unset. **A1 must honour both**, or F1/F5 are
+untestable — which is not the same as passing.
+
+Positive control required: a happy-path submission must produce a sink line, or
+F1/F5 report *unobservable-FAIL* rather than passing on an absence. This is the
+`count_emails()` trap from CLAUDE.md — a check that reports what it matched will
+happily print success on a run where nothing happened.
+
+### 11.2 Client API — ACCEPTED
+
+```js
+createFeedbackClient({storage, fetch, uuid, now, render, endpoint})
+  -> {submit, replay, outbox}
+```
+
+CommonJS-exported like `escape.js`. `render(html)` receives the exact string the
+widget would assign to `innerHTML` — that is F17's sink. Outbox key
+`pdoom_feedback_outbox`. **A2 must export this or an adapter.**
+
+### 11.3 Throttle rates — NAMED (the contract was silent; this is the fix)
+
+The binding directive and "low friction" resolve together here, because the
+outbox makes throttling a **pacing device, not a rejection device**: a 429 is
+`retryable`, the entry stays in the outbox, and it goes out later. Throttling
+therefore **delays a message, never drops one**.
+
+| kind | per IP | burst |
+|---|---|---|
+| `thumb` | 120 / hour | 20 |
+| prose (`comment`, `bug`, `feature`, `question`, `feedback`) | 10 / hour | 5 |
+
+The existing `bug-submit.php` value — one per 30s across everything — is hostile
+to the thumbs case (three pages in a minute trips it) and is **not** carried
+forward. `PDOOM_THROTTLE_BURST` overrides for tests.
+
+### 11.4 A 413 must name the offending field — ACCEPTED
+
+`error` identifies which cap was exceeded. The visitor cannot fix it otherwise,
+and an unfixable rejection is a loss with extra steps. Silent
+truncate-and-store is forbidden: it stores something the visitor did not say.
+
+### 11.5 `http_response_code()` under PHP CLI SAPI — A1'S FIRST TASK
+
+Assumed to work as getter/setter; **unverified, no `php` binary on the dev box**.
+If it does not, every status assertion in the Python suite is wrong and the suite
+moves to `php -S`. **Verify before writing anything else.**
+
+### 11.6 Readers that A3's tests require to exist
+
+F3 (read-time dedup) and F6 (mail divergence) inject their fault correctly and
+then find nothing that can observe it — which is the silent-loss condition
+itself, so they FAIL rather than skip. A1 owns:
+
+- `scripts/read-feedback.py` — collapses duplicate `rid`, earliest `server_ts` wins
+- `scripts/reconcile-feedback.py --store --mail-log --json` — reports divergence
+  between what was stored and what was notified
+
+### 11.7 Still unverified, and A1 must fail loudly on it
+
+`store_root` writability on DreamHost shared hosting (§3). If
+`dirname(docroot)` is not writable by the PHP user, the endpoint returns 507 and
+**never** falls back to a path inside the docroot (INV-1c, F14).
