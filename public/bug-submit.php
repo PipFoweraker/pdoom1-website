@@ -20,16 +20,36 @@
 
 // ---- config -------------------------------------------------------------
 const RECIPIENT   = 'team@pdoom1.com';      // hardcoded on purpose (see above)
-// FROM is the same domain as RECIPIENT. The comment that used to sit here said
-// "same domain -> passes SPF on DreamHost", which asserted a DNS fact that has
-// NEVER been true: pdoom1.com has never published a v=spf1 record, so no pass is
-// possible and the best obtainable result is `none`. Re-verified against
-// 8.8.8.8 on 2026-08-14, 2026-08-15 and 2026-08-17 -- still absent each time.
-// Google hosts the MX, so mail claiming to be from this domain arriving over
-// SMTP from a DreamHost IP with no SPF and no DMARC is the textbook inbound
-// spoof signature, which is why mail() succeeds and nothing is delivered.
-// Tracked as pdoom1-website#321. Do not restore the old comment; if the SPF
-// record lands, say so here WITH the date it was verified.
+// FROM is the same domain as RECIPIENT.
+//
+// UPDATED 2026-08-17 ~08:53 AEST -- the SPF record LANDED, which this comment
+// asked to be recorded here with its verification date. Published in the
+// DreamHost panel and confirmed against all three DreamHost nameservers plus
+// 8.8.8.8, 1.1.1.1 and 9.9.9.9:
+//
+//   pdoom1.com          TXT  v=spf1 include:_spf.google.com include:netblocks.dreamhost.com ~all
+//   _dmarc.pdoom1.com   TXT  v=DMARC1; p=none; rua=mailto:team@pdoom1.com
+//
+// Do NOT read that as "the domain now passes". Two corrections to what this
+// comment said before, both from the headers of a real delivered message
+// (Message-Id 4hNWYX273Bz13YTW, 2026-08-17 08:56 AEST):
+//
+// 1. "same domain -> passes SPF" was and remains WRONG, and publishing a record
+//    does not make it right. SPF authorises the sending IP for the ENVELOPE
+//    domain. With no 5th parameter on mail() the envelope sender is
+//    pdoom1_dot_com_shell@iad1-shared-b8-18.dreamhost.com, so Google returned
+//    `spf=pass` -- for DreamHost -- and `dmarc=fail`, because that domain does
+//    not align with the pdoom1.com From: header built below. The fix is the -f
+//    parameter at the mail() call, not the DNS record alone.
+//
+// 2. "mail() succeeds and nothing is delivered" is too strong. Two test
+//    messages on 2026-08-17 were DELIVERED to the inbox, each carrying Gmail's
+//    yellow "appears to be sent from your account but Gmail couldn't verify
+//    this" banner. Delivered-with-a-spoof-warning is a different failure from
+//    silently-dropped, and it is the one that is actually observed. What
+//    happened to submissions before that date is not established here.
+//
+// Tracked as pdoom1-website#321. Do not restore the pre-#321 comment.
 const FROM        = 'team@pdoom1.com';
 const MIN_FILL_MS = 3000;                    // faster than this = a bot
 const THROTTLE_S  = 30;                      // seconds between reports per IP
@@ -242,7 +262,22 @@ submission_log([
     'ua'        => mb_substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 200),
 ]);
 
-$sent = @mail(RECIPIENT, $subject, $body, $headers);
+// The 5th parameter is what makes this mail capable of passing DMARC, and it
+// only became useful once the SPF record above existed. Measured on a real
+// delivered message 2026-08-17: without it the envelope sender is
+// pdoom1_dot_com_shell@iad1-shared-b8-18.dreamhost.com, so Google reports
+// `spf=pass ... dmarc=fail (p=NONE dis=NONE) header.from=pdoom1.com` and shows
+// the recipient a spoof warning on the site's own feedback mail.
+//
+// `-f team@pdoom1.com` puts the envelope domain on pdoom1.com, so SPF is
+// evaluated against OUR record -- which carries include:netblocks.dreamhost.com,
+// covering the relay 208.113.156.243 that Google actually authenticated -- and
+// the pass then aligns with the From: header.
+//
+// Safe on this host: the MTA is Postfix (`Received: ... (Postfix, from userid
+// 6835806)`), whose sendmail wrapper honours -f without adding the
+// X-Authentication-Warning header a real sendmail adds for an untrusted user.
+$sent = @mail(RECIPIENT, $subject, $body, $headers, '-f ' . FROM);
 
 submission_log([
     'id'    => $submissionId,
