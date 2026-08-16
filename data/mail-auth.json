@@ -1,0 +1,60 @@
+{
+  "note": "What pdoom1.com's mail authentication is SUPPOSED to be, what it was last MEASURED to be, and which senders have to be covered. Read by scripts/check-mail-auth.py. This file lives at the repo root and NOT under public/, because public/ is rsynced to production on every deploy and this is CI metadata. CLAUDE.md: 'pinned values go in a data file with a `source` note, never a script literal.'",
+  "schema": "pdoom-mail-auth/v1",
+  "domain": "pdoom1.com",
+
+  "why_this_file_is_a_MIRROR_and_not_the_truth": "DNS is the truth. This file records an OBSERVATION of DNS made on a date by a named resolver, exactly like public/data/keybinds.json mirrors the game's keybind_manager.gd. A mirror rots, so the observation carries observed_on and this file carries max_observation_age_days; check P1 goes red when the observation is older than that, and the fix is `python scripts/check-mail-auth.py --live --update`. The blocking check is deliberately OFFLINE: a gate that resolves DNS on every PR is a gate that goes red when a runner's resolver hiccups, and CLAUDE.md is explicit that a flaky red teaches everyone to ignore red.",
+
+  "max_observation_age_days": 30,
+  "max_observation_age_source": "Judgement call, not a measurement. DNS here changes only when a human edits the DreamHost panel or Google Admin, which is a rare deliberate act; 30 days is short enough that a change cannot sit unnoticed for a quarter and long enough that it does not nag. Revisit if it fires without anything having changed.",
+
+  "senders": [
+    {
+      "id": "google-workspace",
+      "what": "Google Workspace, which holds the mailboxes for @pdoom1.com.",
+      "ip": null,
+      "spf_mechanism": "include:_spf.google.com",
+      "runs_php": false,
+      "source": "MX for pdoom1.com is SMTP.GOOGLE.com, measured 2026-08-15 against ns1.dreamhost.com (authoritative)."
+    },
+    {
+      "id": "dreamhost-shared",
+      "what": "DreamHost shared hosting, the box that executes public/*.php and therefore originates every mail() the intake path sends.",
+      "ip": "173.236.253.218",
+      "spf_mechanism": "include:netblocks.dreamhost.com",
+      "covering_netblock": "173.236.128.0/17",
+      "runs_php": true,
+      "source": "CLAUDE.md 'Server access': pdoom1.com static site = DreamHost shared hosting 173.236.253.218. PTR measured 2026-08-15 = apache2-pat.iad1-shared-b8-18.dreamhost.com; the address falls inside netblocks.dreamhost.com's ip4:173.236.128.0/17."
+    }
+  ],
+
+  "intended": {
+    "spf": "v=spf1 include:_spf.google.com include:netblocks.dreamhost.com ~all",
+    "dmarc": "v=DMARC1; p=none; rua=mailto:team@pdoom1.com",
+    "dkim_selector": "google._domainkey",
+    "source": "docs/decisions/FEEDBACK_INTAKE_CONTRACT.md section 5, 'Records to publish'. p=none is NOT a placeholder to be tidied up later -- check M5 pins it there for as long as any PHP mailer would fail DMARC alignment, and raising it early silently kills the site's only inbound-feedback path."
+  },
+
+  "php_mailers_expected": [
+    "public/bug-submit.php"
+  ],
+  "php_mailers_expected_source": "The one PHP mailer in the repo as of 2026-08-15. This list is the anti-vacuous-green control for M5: if the scanner finds no mail() call in a file named here, M5 has nothing to constrain and would pass trivially, so the scan itself is reported as BROKEN instead. Same shape as check-platform-claims.py's REACHABLE list, which exists so a renamed page cannot silently shrink a guard's coverage to nothing. Add a path here when a new mailer lands; do NOT remove one to make the check green.",
+
+  "observation": {
+    "observed_on": "2026-08-15",
+    "resolver": "ns1.dreamhost.com",
+    "method": "Authoritative TXT queries against the domain's own nameserver, so the answers are not a cache's opinion.",
+    "observed_by": "pdoom1-website seat, branch feedback/intake-contract",
+    "records": {
+      "spf": [],
+      "dmarc": [],
+      "dkim": {
+        "google._domainkey": []
+      }
+    },
+    "mx": [
+      "SMTP.GOOGLE.com"
+    ],
+    "source": "Measured 2026-08-15 in the session that wrote docs/decisions/FEEDBACK_INTAKE_CONTRACT.md section 5. An empty array means QUERIED AND NOTHING WAS THERE; null would mean NOT QUERIED, and the checker refuses a null it is not told about rather than treating the two as the same. google._domainkey.pdoom1.com was NXDOMAIN."
+  }
+}

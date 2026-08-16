@@ -8,7 +8,8 @@
   },
   "checks": {
     "check-encoding-safety": "scripts/check-encoding-safety.py -- the cp1252 preamble and encoding= sweep. Keys are repo-relative module paths, matching Finding.path.",
-    "check-campaign-facts": "scripts/check-campaign-facts.py -- the _facts_this_copy_must_not_break blocks in content/campaigns/. Keys are <campaign file>::<fact id> for entry-scoped findings, and <campaign file>::<finding name> for findings against the copy as a whole. NOTE: the `human` tier's review clock is NOT here -- it lives inline in the campaign file, next to the fact, because the person who acts on it reads that file and nothing else. This ledger holds only findings the check reports and somebody tolerates."
+    "check-campaign-facts": "scripts/check-campaign-facts.py -- the _facts_this_copy_must_not_break blocks in content/campaigns/. Keys are <campaign file>::<fact id> for entry-scoped findings, and <campaign file>::<finding name> for findings against the copy as a whole. NOTE: the `human` tier's review clock is NOT here -- it lives inline in the campaign file, next to the fact, because the person who acts on it reads that file and nothing else. This ledger holds only findings the check reports and somebody tolerates.",
+    "check-mail-auth": "scripts/check-mail-auth.py -- SPF/DKIM/DMARC for the domain that carries feedback mail, plus the M5 interlock that pins the DMARC policy while any PHP mailer would fail alignment. Keys are <domain>/<check id>/<state slug>, e.g. pdoom1.com/M1/absent. The STATE is part of the key on purpose: an acceptance of 'SPF is absent' must not silently forgive 'SPF is present and wrong'. When the state changes the entry goes STALE, which is visible, rather than pre-forgiving a different finding."
   },
   "acknowledgements": [
     {
@@ -21,6 +22,50 @@
       "review_by": "2026-09-15",
       "on_expiry": "Pick one: post the campaign with the platform lines updated, rewrite them, or archive the campaign as superseded by ladder-fork-l4-2026-08. All three close this; none of them is a shrug.",
       "source": "public/data/version.json -> latest_release.platforms (windows/macos/linux all true at v0.14.1); pdoom1/README.md:12-16. Found by scripts/check-campaign-facts.py on the run that introduced it."
+    },
+    {
+      "check": "check-mail-auth",
+      "key": "pdoom1.com/M1/absent",
+      "what": "pdoom1.com publishes no SPF record. Queried 2026-08-15 against ns1.dreamhost.com (authoritative): TXT pdoom1.com has no v=spf1 answer, so every receiver evaluates SPF as `none` for everything the site and the Workspace send.",
+      "why": "The fix is not in this repository and no seat can make it. It is one TXT record typed into the DreamHost panel (Manage Domains -> DNS), which only Pip can reach. Blocking on it would be a red that whoever hits it cannot close, which is the permanent red CLAUDE.md forbids with double force. The exposure while it stands is deliverability, not loss of a stored message: mail is a notification derived from a write (INV-1a), and no PHP mailer is being made stricter while this is open -- M5 pins the DMARC policy at p=none precisely so that nothing tightens underneath it.",
+      "accepted_by": "pdoom1-website seat, branch feedback/intake-contract. Not Pip's ruling -- this entry is what asking looks like when the asker cannot type the record himself.",
+      "accepted_on": "2026-08-15",
+      "review_by": "2026-08-22",
+      "on_expiry": "Ask Pip whether the SPF record went in. If it did: run `python scripts/check-mail-auth.py --live --update` and delete this entry (it will report STALE until you do). If it did not: find out what is blocking it and re-accept with that as the `why`, or escalate -- a week of nothing means the panel is not the obstacle.",
+      "source": "docs/decisions/FEEDBACK_INTAKE_CONTRACT.md section 5; measurement recorded in data/mail-auth.json -> observation (ns1.dreamhost.com, 2026-08-15)."
+    },
+    {
+      "check": "check-mail-auth",
+      "key": "pdoom1.com/M2/unevaluable-no-spf",
+      "what": "M2 asks whether the SPF record covers both senders (Google Workspace, and the DreamHost shared box 173.236.253.218 that executes the PHP mailer). With no record at all there is nothing to read, so the question is unanswerable rather than answered.",
+      "why": "Entailed by M1 and cleared by the same single act. It is carried as its own entry, not folded into M1, because folding it in would let the check go green on M1's acknowledgement while M2 quietly went unevaluated -- 'a true statement nobody reads', which is the exact class-5 shape this ledger exists to abolish. When the record appears this entry goes STALE (visible) and M2 starts answering for real.",
+      "accepted_by": "pdoom1-website seat, branch feedback/intake-contract, same acceptance as pdoom1.com/M1/absent.",
+      "accepted_on": "2026-08-15",
+      "review_by": "2026-08-22",
+      "on_expiry": "Same action as pdoom1.com/M1/absent -- these two close together or not at all. If SPF is published but M2 now reports `uncovered-sender`, that is a DIFFERENT finding with a different key and this entry must not be edited to cover it; fix the record instead.",
+      "source": "docs/decisions/FEEDBACK_INTAKE_CONTRACT.md section 5, table row M2; senders listed in data/mail-auth.json."
+    },
+    {
+      "check": "check-mail-auth",
+      "key": "pdoom1.com/M3/absent",
+      "what": "pdoom1.com publishes no DMARC record. Queried 2026-08-15 against ns1.dreamhost.com: TXT _dmarc.pdoom1.com has no v=DMARC1 answer. No policy, and no rua=, so nobody is reporting who is failing on our behalf.",
+      "why": "Same panel, same person, same single visit as the SPF record. The missing rua= is the part that actually costs us something today: without it we are blind to spoofing and to our own alignment failures, which is how the interlock in M5 would otherwise be discovered the hard way. The record to publish is `v=DMARC1; p=none; rua=mailto:team@pdoom1.com` -- p=none deliberately, and M5 will go red if anyone raises it while the mailer is unaligned.",
+      "accepted_by": "pdoom1-website seat, branch feedback/intake-contract. Not Pip's ruling.",
+      "accepted_on": "2026-08-15",
+      "review_by": "2026-08-22",
+      "on_expiry": "Ask Pip whether the DMARC record went in, then `--live --update` and delete this entry. Do NOT close it by raising the policy: p=none is the correct value until M5's ceiling lifts, and M5 will fail the build if it is raised early.",
+      "source": "docs/decisions/FEEDBACK_INTAKE_CONTRACT.md section 5; measurement in data/mail-auth.json -> observation."
+    },
+    {
+      "check": "check-mail-auth",
+      "key": "pdoom1.com/M4/absent",
+      "what": "google._domainkey.pdoom1.com is NXDOMAIN, measured 2026-08-15 against ns1.dreamhost.com. Nothing the domain sends is DKIM-signed.",
+      "why": "A DIFFERENT console from the other three: the key is generated in Google Admin (Apps -> Google Workspace -> Gmail -> Authenticate email) and only then pasted into DreamHost DNS, so it is a second act on a second day and it gets its own date rather than joining a herd of expiries that would be answered by one bulk re-accept. Note what DKIM does NOT fix here: mail leaving the DreamHost box never passes through Google, so it can never be signed by this key. DKIM helps the Workspace half only; the intake mailer's sole route to a DMARC pass remains SPF alignment, which is M2 plus M5.",
+      "accepted_by": "pdoom1-website seat, branch feedback/intake-contract. Not Pip's ruling.",
+      "accepted_on": "2026-08-15",
+      "review_by": "2026-08-29",
+      "on_expiry": "Ask Pip whether the Google Admin DKIM key was generated and published. If yes, `--live --update` and delete this entry. If the answer is 'we are not using Workspace for this after all', that is a spec change: edit data/mail-auth.json's senders and intended.dkim_selector, and say so in the diff.",
+      "source": "docs/decisions/FEEDBACK_INTAKE_CONTRACT.md section 5, 'TXT google._domainkey <generated in Google Admin, not the DreamHost panel>'; measurement in data/mail-auth.json -> observation."
     }
   ]
 }

@@ -1,0 +1,258 @@
+name: Feedback Intake Contract
+
+# The CI for docs/decisions/FEEDBACK_INTAKE_CONTRACT.md.
+#
+# Binding directive (Pip, 2026-08-15): "If I ever lose a message silently, that's
+# now the worst thing my website can do and it would be better the entire website
+# doesn't exist." Everything in this workflow exists to make a silent loss into a
+# loud one.
+#
+# TWO JOBS, and the split is diagnostic, not cosmetic:
+#
+#   mail-auth (BLOCKING)   SPF/DKIM/DMARC for the domain that carries feedback
+#                          mail, plus M5 -- the interlock that refuses to let the
+#                          DMARC policy rise above p=none while any PHP mailer
+#                          would fail alignment. Offline: it reads the recorded
+#                          observation in data/mail-auth.json and touches no
+#                          network, so it cannot go red because a runner's
+#                          resolver hiccupped.
+#   intake-tests (BLOCKING) The failure-taxonomy tests the contract's section 6
+#                          names. These are written against the contract, before
+#                          the implementation exists, and are expected to be RED
+#                          first. That is Gate 2: "a test that has never failed
+#                          has not been shown to be a test."
+#
+#   live-dns (ADVISORY)    Re-resolves DNS and reports drift against the recorded
+#                          observation. NEVER blocks -- it needs the network, and
+#                          the only fix for a real finding is a record only Pip
+#                          can publish. The blocking clock on that mirror is
+#                          check P1 inside check-mail-auth.py, which goes red when
+#                          the observation is older than max_observation_age_days.
+#
+# WHY M1-M4 ARE RED-BUT-GREEN TODAY. pdoom1.com publishes no SPF, no DKIM and no
+# DMARC (measured 2026-08-15 against ns1.dreamhost.com, authoritative). Those are
+# real findings and nothing in this repository can fix them: they are records
+# typed into the DreamHost panel and Google Admin. Blocking on them would be a red
+# nobody who hits it can close, which CLAUDE.md forbids. They are carried in
+# data/acknowledgements.json instead -- printed and counted on every run, green
+# until review_by (2026-08-22 / 2026-08-29), then red on "this acceptance expired,
+# re-accept or fix". See docs/decisions/ACKNOWLEDGEMENT_CLOCK.md.
+#
+# No secrets. Read-only. Opens no issues: every trigger below is human-driven, so
+# a red mark is already in front of the person who caused it.
+#
+# CLAUDE.md trap check for anyone editing this file:
+#   #2  no `github.event.inputs` guard anywhere -- it is EMPTY on a schedule, and
+#       this workflow has no schedule and no inputs at all.
+#   #5  no `${{ }}` interpolation of author-controlled context into any `run:`.
+#       The only shell values here are literals written in this file.
+#   #6  nothing this workflow guards is written by a bot commit that suppresses
+#       CI, so the `push` trigger genuinely sees the paths it lists. Re-check that
+#       claim if a generator ever starts writing public/*.php or data/mail-auth.json.
+
+on:
+  pull_request:
+    paths:
+      - 'public/**/*.php'
+      - 'data/mail-auth.json'
+      - 'data/acknowledgements.json'
+      - 'scripts/check-mail-auth.py'
+      - 'scripts/test-check-mail-auth.py'
+      - 'scripts/acknowledgements.py'
+      - 'scripts/test-ingest-destructive.py'
+      - 'scripts/test-feedback-outbox.js'
+      - 'scripts/test-mail-auth-interlock.py'
+      - 'public/assets/js/feedback*.js'
+      - 'docs/decisions/FEEDBACK_INTAKE_CONTRACT.md'
+      - '.github/workflows/feedback-intake.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'public/**/*.php'
+      - 'data/mail-auth.json'
+      - 'data/acknowledgements.json'
+      - 'scripts/check-mail-auth.py'
+      - 'scripts/test-check-mail-auth.py'
+      - 'scripts/acknowledgements.py'
+      - 'scripts/test-ingest-destructive.py'
+      - 'scripts/test-feedback-outbox.js'
+      - 'scripts/test-mail-auth-interlock.py'
+      - 'public/assets/js/feedback*.js'
+      - 'docs/decisions/FEEDBACK_INTAKE_CONTRACT.md'
+      - '.github/workflows/feedback-intake.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mail-auth:
+    name: BLOCKING -- mail authentication and the M5 interlock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # The guard's own files. Named explicitly so a rename cannot turn this job
+      # into a no-op that still reports success -- the exact shape CLAUDE.md
+      # records for sync-pdoom1-docs.yml, which "succeeded" 4x/day for months
+      # while committing nothing.
+      - name: Every file this job runs is present
+        run: |
+          set -euo pipefail
+          missing=0
+          for f in \
+            "scripts/check-mail-auth.py" \
+            "scripts/test-check-mail-auth.py" \
+            "data/mail-auth.json" \
+            "data/acknowledgements.json"
+          do
+            if [ -f "$f" ]; then
+              echo "present  $f"
+            else
+              echo "MISSING  $f"
+              missing=$((missing + 1))
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo ""
+            echo "$missing file(s) this job depends on are absent. A missing file"
+            echo "must fail loudly here: skipping it would leave the job green"
+            echo "while checking nothing, which is worse than having no job."
+            exit 1
+          fi
+
+      # FIRST, and this order is load-bearing. On the live repo M5 PASSES -- the
+      # intended policy is p=none, which is at the ceiling -- so a passing M5
+      # carries no information on its own about whether the interlock works. This
+      # test forces p=quarantine and p=reject against an unaligned mailer and
+      # observes the refusal, plus every ABSENT / WRONG / UNMEASURED /
+      # UNEVALUABLE state, the ledger refusals, and the PHP parser's fail-closed
+      # behaviour. Same reasoning content-honesty.yml uses to run
+      # test-platform-claims.py before check-platform-claims.py.
+      - name: The mail-auth guard can still fail (forced-failure test)
+        run: python scripts/test-check-mail-auth.py
+
+      - name: SPF/DKIM/DMARC and the DMARC-vs-alignment interlock
+        run: python scripts/check-mail-auth.py --check
+
+      # The findings this run tolerated, and when the tolerance dies, into the job
+      # summary -- so "green" here is legible as "four known gaps, accepted until
+      # 2026-08-22" rather than as "nothing to see".
+      - name: Report what is acknowledged, and when it expires
+        if: always()
+        run: |
+          set -euo pipefail
+          {
+            echo '## Mail auth: what this green is tolerating'
+            echo ''
+            echo 'pdoom1.com publishes no SPF, no DKIM and no DMARC. Those are real'
+            echo 'findings, acknowledged with a clock because only Pip can publish the'
+            echo 'records. After review_by this job goes RED on the expired acceptance.'
+            echo ''
+            echo '```'
+            python scripts/acknowledgements.py --audit --check check-mail-auth
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  intake-tests:
+    name: BLOCKING -- the failure taxonomy (contract section 6)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # These three are named in FEEDBACK_INTAKE_CONTRACT.md section 6 and are
+      # written BEFORE the implementation. A missing one fails this step rather
+      # than being skipped: a workflow that silently steps over an absent test is
+      # a workflow reporting success for work nobody did, and this repo has the
+      # scar (sync-pdoom1-docs.yml, CLAUDE.md "Workflow authoring traps" #1).
+      - name: Every test the contract names exists
+        run: |
+          set -euo pipefail
+          missing=0
+          for f in \
+            "scripts/test-ingest-destructive.py" \
+            "scripts/test-feedback-outbox.js" \
+            "scripts/test-mail-auth-interlock.py"
+          do
+            if [ -f "$f" ]; then
+              echo "present  $f"
+            else
+              echo "MISSING  $f"
+              missing=$((missing + 1))
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo ""
+            echo "$missing test file(s) named in section 6 of"
+            echo "docs/decisions/FEEDBACK_INTAKE_CONTRACT.md are absent."
+            echo ""
+            echo "If they have not been written yet, this red IS the correct state"
+            echo "and it closes when they land. Do NOT make this step tolerant:"
+            echo "a tolerated absence is indistinguishable from a passing test."
+            exit 1
+          fi
+
+      # F1-F6, F9-F15: store unwritable, disk full mid-append, fatal after write,
+      # concurrent POSTs, mail() returning false, throttle, honeypot, malformed
+      # JSON, oversize payload, rsync --delete reachability, store_root inside the
+      # docroot, and UTF-8 round-tripping under a cp1252 console.
+      - name: Destructive tests against the ingest endpoint
+        run: python scripts/test-ingest-destructive.py
+
+      # F7, F8, F16: POST never leaves the client, response lost after the server
+      # wrote, localStorage quota exhausted. INV-1b lives here -- an outbox entry
+      # leaves ONLY on a 200 carrying a matching rid.
+      - name: The client outbox never shows success it has not earned
+        run: node scripts/test-feedback-outbox.js
+
+      # M5 forced red, written from the contract by a different author than the
+      # guard. Two independent tests of one interlock is deliberate: the guard's
+      # own test can only be as right as the guard author's reading of section 5.
+      - name: The M5 interlock refuses a DMARC tightening (independent test)
+        run: python scripts/test-mail-auth-interlock.py
+
+  live-dns:
+    name: ADVISORY -- live DNS vs the recorded observation
+    runs-on: ubuntu-latest
+    # Never gates a merge. It needs the network, and a real finding here is fixed
+    # in the DreamHost panel, not in this repository. The BLOCKING clock on the
+    # same mirror is check P1, which reds when the observation goes stale.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Resolve for real and report drift
+        continue-on-error: true
+        run: |
+          set +e
+          python scripts/check-mail-auth.py --live > live.log 2>&1
+          code=$?
+          set -e
+          {
+            echo '## ADVISORY: live DNS for pdoom1.com'
+            echo ''
+            echo 'Exit 0 = clean or acknowledged, 1 = finding, 2 = refused,'
+            echo '3 = the resolver failed (which is NOT an empty answer).'
+            echo "This run exited $code. NEVER blocks."
+            echo ''
+            echo 'A DRIFT line means DNS has changed since data/mail-auth.json was'
+            echo 'written. Record it with:'
+            echo '  python scripts/check-mail-auth.py --live --update'
+            echo 'and then delete any acknowledgement that has gone STALE.'
+            echo ''
+            echo '```'
+            cat live.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
