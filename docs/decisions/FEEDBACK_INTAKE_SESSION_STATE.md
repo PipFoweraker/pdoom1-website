@@ -1,5 +1,68 @@
 # Feedback intake — session state at shutdown
 
+> ## SUPERSEDED IN PART — stamped 2026-08-16T23:35Z = 2026-08-17 09:35 AEST
+>
+> **Mail auth is DONE and DEPLOYED.** Sections 1 and 2 below described a world
+> where SPF, DKIM and DMARC were all absent. Two of those changed on 2026-08-17.
+> Read this box before believing anything below it.
+>
+> **What Pip published** (DreamHost panel, ~08:53 AEST, verified on all three
+> DreamHost nameservers plus 8.8.8.8, 1.1.1.1 and 9.9.9.9):
+>
+> ```
+> pdoom1.com          TXT  v=spf1 include:_spf.google.com include:netblocks.dreamhost.com ~all
+> _dmarc.pdoom1.com   TXT  v=DMARC1; p=none; rua=mailto:team@pdoom1.com
+> ```
+>
+> **What that changed**
+>
+> | | before | now |
+> |---|---|---|
+> | M1 / M2 / M3 | ABSENT / UNEVALUABLE / ABSENT | **PASS** — the three 08-22 acknowledgements are DELETED, not expired |
+> | M4 (DKIM) | ABSENT | still ABSENT, acknowledgement stands, `review_by 2026-08-29` |
+> | DMARC ceiling | `p=none` | **`p=reject` permitted**; published policy deliberately still `p=none` |
+> | form mail | `dmarc=fail`, Gmail spoof banner | **`dmarc=pass`**, no banner |
+>
+> **Merged to main and live: `06416bf2`** — `bug-submit.php`'s `mail()` gained
+> `-f team@pdoom1.com` (PR #325). Verified end-to-end by sending through the live
+> form and reading the received headers: `Return-Path: <team@pdoom1.com>`,
+> `spf=pass ... designates 208.113.156.243`, `dmarc=pass`.
+>
+> **Three claims this repo held that real headers disproved:**
+> 1. `data/mail-auth.json` named `173.236.253.218` as the sender. That is the WEB
+>    IP and sends nothing. PHP runs on `173.236.245.76`; the SMTP client Google
+>    authenticates is the relay `208.113.156.243`. Corrected in `01893664`.
+> 2. The M4 acknowledgement said "nothing the domain sends is DKIM-signed".
+>    Workspace mail IS signed — `d=pdoom1-com.20251104.gappssmtp.com` — but that
+>    does not ALIGN, so DMARC can't use it. Workspace `dmarc=pass` rests on SPF
+>    alone, and SPF alignment is what forwarding breaks. That is the real argument
+>    for doing M4. Corrected in `01893664`.
+> 3. `bug-submit.php`'s own comment (`b2a6d422`, written 08:25) asserted with
+>    today's date that no SPF record existed. True when written, false 28 minutes
+>    later. Corrected in `06416bf2`.
+>
+> **Open, in priority order:**
+> - **`bug-submit.php` WILL CONFLICT** when this branch merges: `main` has
+>   `b2a6d422` + `06416bf2`, this branch has `72cb1b3c` + `01893664`, both editing
+>   the same region. Reconcile before merging.
+> - Revert the mailto mitigation `50227fc0` — safe now, the form's mail
+>   authenticates.
+> - **Do NOT raise the DMARC policy** past `p=none` until the `rua` reports have
+>   been watched for ~2 weeks. Permission is not a reason.
+> - Check whether `rua` reports actually arrive within 48h. If nothing lands, the
+>   tag is decoration.
+> - DKIM (M4) in Google Admin — a different console. Clock: 2026-08-29.
+> - **Unresolved: were pre-fix submissions lost?** Google Admin's Email Log Search
+>   showed nothing. That is NOT evidence of loss — it caps at ~30 days, the
+>   server-side `submission_log()` only exists from `b2a6d422` onward, and Email
+>   Log Search can only show what reached Google at all. Pip's hypothesis is that
+>   Postfix never handed them off; checking DreamHost's own mail logs is the next
+>   step and was deferred. Note that "nobody used the form" is an equally good
+>   explanation of the same null and has not been ruled out.
+> - `scripts/check-mail-auth.py --live` resolves against `ns1.dreamhost.com`,
+>   which is **Cloudflare anycast** — it can record a stale PoP's answer as a
+>   measurement. Unfixed. Require agreement across all three nameservers.
+
 **Stamped 2026-08-16T07:53Z** (2026-08-16 17:53 Australia/Hobart, UTC+10).
 Session ran 2026-08-15 into 2026-08-16. Branch `feedback/intake-contract`,
 forked from `main` at `04004298`. **Nothing merged, nothing deployed.**
