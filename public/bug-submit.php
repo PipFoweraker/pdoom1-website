@@ -20,7 +20,17 @@
 
 // ---- config -------------------------------------------------------------
 const RECIPIENT   = 'team@pdoom1.com';      // hardcoded on purpose (see above)
-const FROM        = 'team@pdoom1.com';      // same domain -> passes SPF on DreamHost
+// FROM is the same domain as RECIPIENT. The comment that used to sit here said
+// "same domain -> passes SPF on DreamHost", which asserted a DNS fact that has
+// NEVER been true: pdoom1.com has never published a v=spf1 record, so no pass is
+// possible and the best obtainable result is `none`. Re-verified against
+// 8.8.8.8 on 2026-08-14, 2026-08-15 and 2026-08-17 -- still absent each time.
+// Google hosts the MX, so mail claiming to be from this domain arriving over
+// SMTP from a DreamHost IP with no SPF and no DMARC is the textbook inbound
+// spoof signature, which is why mail() succeeds and nothing is delivered.
+// Tracked as pdoom1-website#321. Do not restore the old comment; if the SPF
+// record lands, say so here WITH the date it was verified.
+const FROM        = 'team@pdoom1.com';
 const MIN_FILL_MS = 3000;                    // faster than this = a bot
 const THROTTLE_S  = 30;                      // seconds between reports per IP
 const MAX_TITLE   = 200;
@@ -37,6 +47,43 @@ const MAX_ATTACH_BYTES = 550 * 1024;         // decoded cap; client caps the fil
 const TYPES       = ['bug', 'feature', 'documentation', 'performance', 'feedback', 'question'];
 
 header('Content-Type: application/json; charset=utf-8');
+
+/**
+ * Append-only record of every submission this endpoint ACCEPTS.
+ *
+ * WHY. `mail()` returning true is a handoff receipt from the local MTA, not a
+ * delivery confirmation -- delivery to Google happens afterwards and can fail
+ * silently, which is exactly what has been happening since at least
+ * 2026-07-24. Without this log a lost report is not merely undelivered, it is
+ * unrecoverable and invisible: we never learn the sender existed.
+ *
+ * WHERE. Deliberately OUTSIDE the document root. `public/` IS the docroot on
+ * DreamHost and is deployed with `rsync --delete`, so anything written inside
+ * it would be both world-readable and erased by the next deploy. The parent
+ * directory is neither served nor rsynced.
+ *
+ * This is a recovery log, not a mailbox. It holds what the reporter typed,
+ * including their email if they gave one, so it is created 0700 and carries a
+ * deny-all .htaccess in case it is ever relocated somewhere that is served.
+ * NOTE: nothing here rotates or expires it. That is a deliberate omission --
+ * silent deletion is the failure this file exists to prevent -- but it means
+ * retention is an open question, not a solved one.
+ */
+function submission_log(array $record): void {
+    $dir = dirname(__DIR__) . '/feedback-log';
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0700, true);
+        @file_put_contents($dir . '/.htaccess', "Require all denied\n");
+    }
+    $line = json_encode($record, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    if ($line === false) {
+        $line = json_encode(['id' => $record['id'] ?? '?',
+                             'error' => 'record was not JSON-encodable']);
+    }
+    // LOCK_EX so two concurrent submissions cannot interleave a half-line.
+    @file_put_contents($dir . '/' . gmdate('Y-m') . '.jsonl',
+                       $line . "\n", FILE_APPEND | LOCK_EX);
+}
 
 function done(int $code, array $payload): void {
     http_response_code($code);
@@ -175,7 +222,35 @@ if ($hasAttachment) {
     $body = $textBody;
 }
 
+// Record BEFORE sending. If mail() throws, dies, or the process is killed, the
+// submission still survives on disk -- which is the entire point. The outcome
+// is appended as a second line keyed by the same id, so the pair is
+// append-only and neither write depends on the other succeeding.
+$submissionId = bin2hex(random_bytes(8));
+submission_log([
+    'id'        => $submissionId,
+    'at'        => gmdate('c'),
+    'event'     => 'accepted',
+    'type'      => $type,
+    'title'     => $title,
+    'body'      => $desc,
+    'email'     => $email,
+    'credit'    => $credit,
+    'flags'     => $flags,
+    'attach'    => $attName,
+    'ip_hash'   => hash('sha256', $ip),   // hashed: enough to correlate, not to identify
+    'ua'        => mb_substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 200),
+]);
+
 $sent = @mail(RECIPIENT, $subject, $body, $headers);
+
+submission_log([
+    'id'    => $submissionId,
+    'at'    => gmdate('c'),
+    'event' => 'handoff',
+    // NOT "delivered". mail() only reports that the local MTA accepted it.
+    'mail_accepted_by_local_mta' => (bool)$sent,
+]);
 
 if ($sent) {
     done(200, ['ok' => true]);
