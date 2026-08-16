@@ -1,0 +1,87 @@
+# Refuse a PR whose merge message would silently suppress every workflow.
+#
+# THE MECHANISM BEING GUARDED
+# ---------------------------
+# `gh pr merge --squash` and the UI's squash button compose the merge commit
+# message from the PR TITLE plus the PR BODY. GitHub matches a CI-suppression
+# token anywhere in a commit message -- including inside backticks and code
+# fences -- and then runs nothing at all: no queued run, no skipped run, no entry
+# in `gh run list`. It reads exactly like an Actions outage.
+#
+# pdoom1-website#244 discussed a sync workflow's own suppression marker three
+# times in its body. Merge commit d3556d1e ran ONE check run where its neighbours
+# ran 8, 9 and 15. The PR's own CI had been fully green -- the suppression happens
+# at merge, after every gate anyone was watching.
+#
+# The damage is a missed DEPLOY, not a missed test. #244 changed three files under
+# public/, Auto-Deploy never fired, and pdoom1.com served stale bytes for hours.
+#
+# WHY THIS EXISTS RATHER THAN A CONVENTION
+# ----------------------------------------
+# CLAUDE.md has said "name it, never write it" since 2026-08-02, and #244 happened
+# anyway -- because the rule has to be remembered at the exact moment someone is
+# explaining the thing the rule is about. That is the worst possible moment.
+#
+# TRAP THIS WORKFLOW MUST NOT FALL INTO ITSELF
+# --------------------------------------------
+# A PR title and body are AUTHOR-CONTROLLED CONTEXT. GitHub substitutes ${{ }}
+# into the shell text BEFORE it runs, so templating the body inline would let a PR
+# description execute commands on the runner -- CLAUDE.md "Workflow authoring
+# traps" #5, which already cost this repo a failed production deploy when a commit
+# message containing "macOS & Linux" ran `macOS` as a command.
+#
+# So the body goes into `env:` and is read as an environment variable. It is NEVER
+# interpolated into `run:`.
+
+name: Merge message guard
+
+on:
+  pull_request:
+    # `edited` matters as much as `opened`: the body can be rewritten at any time
+    # before the merge button is pressed, and it is the body at merge time that
+    # becomes the commit message.
+    types: [opened, edited, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  merge-message:
+    name: BLOCKING -- the squash message must not suppress CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Needed for the commit-message half: a rebase or merge-commit merge
+          # keeps individual commit messages, so the squash message is not the
+          # only surface.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # The guard's own forced-failure suite runs FIRST. A guard whose test has
+      # not been observed passing on this runner is a guard nobody has shown to
+      # work here -- and this one is easy to render inert by "tidying" a regex.
+      - name: The guard can still fail
+        run: python scripts/test-check-merge-message.py
+
+      - name: The PR title and body must not carry a suppression token
+        env:
+          # Untrusted, author-controlled. Read as an env var by the script.
+          # Never spliced into the shell text above.
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: python scripts/check-merge-message.py --from-env
+
+      - name: No commit message on this branch carries one either
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          # %B is the raw commit body. Piped straight into the checker on stdin;
+          # it never reaches the shell as a word.
+          git log --format=%B "$BASE_SHA".."$HEAD_SHA" \
+            | python scripts/check-merge-message.py --commits-from -
