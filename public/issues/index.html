@@ -331,25 +331,6 @@
 				Help us improve p(Doom)1 by reporting bugs, requesting features, or providing feedback
 			</p>
 		</section>
-		<!-- TEMPORARY 2026-08-15, pdoom1-website#321. The form on this page POSTs
-		     to bug-submit.php, which uses PHP mail() on DreamHost. pdoom1.com
-		     publishes no SPF record and its MX is Google, so Google will not
-		     deliver mail claiming to be from its own hosted domain arriving from
-		     a DreamHost IP. mail() returns true anyway and the success message is
-		     shown before delivery is attempted. Email is unaffected: a visitor's
-		     own client never touches DreamHost.
-		     REMOVE once SPF is live AND a probe is confirmed IN THE INBOX. -->
-		<div style="border-left: 4px solid #c98a00; background: rgba(201,138,0,0.09);
-		            padding: 0.9rem 1.1rem; margin: 0 0 1.4rem 0; border-radius: 4px;">
-			<strong>Email us directly &mdash; it is the reliable route right now.</strong>
-			<p style="margin: 0.5rem 0 0 0;">
-				We are fixing a mail-delivery fault that can stop this form reaching us.
-				Until it is confirmed fixed, please write to
-				<a href="mailto:team@pdoom1.com?subject=p(Doom)1%20feedback"><strong>team@pdoom1.com</strong></a>
-				instead. Your own email will arrive normally &mdash; the fault is on our
-				sending side, not yours.
-			</p>
-		</div>
 
 		<!-- Quick Actions -->
 		<div style="text-align: center; margin-bottom: 2rem;">
@@ -782,7 +763,14 @@
 			}
 
 			if (res && res.ok) {
-				formStatus.textContent = 'Sent — it went straight to the team inbox. Nothing else for you to do.';
+				// SOFTENED 2026-08-17. This said "it went straight to the team inbox.
+				// Nothing else for you to do." Both halves claimed more than a 200 can
+				// support: res.ok means bug-submit.php's mail() returned true, which is
+				// the LOCAL MTA accepting a handoff, not delivery -- and bug-submit.php
+				// writes no submission log, so if it never arrives there is no record
+				// anywhere that the sender existed. /bug-report/ already says this in
+				// its own prose; this page was promising the opposite two screens away.
+				formStatus.textContent = 'Sent to the team inbox. We cannot confirm delivery from our side, so if you do not hear back, the GitHub route below leaves a record we can both see.';
 				formStatus.style.color = 'var(--success-color)';
 				e.target.reset();
 				submitButton.textContent = originalButtonText;
