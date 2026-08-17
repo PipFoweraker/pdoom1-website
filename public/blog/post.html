@@ -82,6 +82,47 @@
         .authorship-unattributed, .authorship-unresolved { font-style: italic; }
         .colophon { max-width: 820px; margin: 1.6rem auto 0; padding: 0 1.5rem;
             font-size: 0.85rem; color: var(--text-muted); line-height: 1.55; }
+
+        /* --- the feedback widget -----------------------------------------
+           Class names belong to /assets/js/feedback.js, which builds its own chrome
+           with createElement; styling is all this page contributes. Dark palette
+           only -- see CLAUDE.md's cascade note. */
+        .feedback-block { max-width: 820px; margin: 2.4rem auto 0; padding: 1.6rem 1.5rem 0;
+            border-top: 1px solid var(--border-color); }
+        .feedback-block h2 { font-size: 1.1rem; color: var(--text-primary); margin: 0 0 0.4rem; }
+        .feedback-block .fb-intro { font-size: 0.9rem; color: var(--text-muted);
+            margin: 0 0 1rem; line-height: 1.55; }
+        .fb-thumbs { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .fb-thumb { background: var(--bg-tertiary); color: var(--text-primary);
+            border: 1px solid var(--border-color); border-radius: var(--radius-md);
+            padding: 0.45rem 1rem; font-family: inherit; font-size: 0.9rem; cursor: pointer; }
+        .fb-thumb:hover, .fb-thumb:focus-visible { border-color: var(--accent-primary); }
+        .fb-form { display: flex; flex-direction: column; gap: 0.7rem; }
+        .fb-text { width: 100%; min-height: 5rem; padding: 0.7rem; background: var(--bg-primary);
+            color: var(--text-primary); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem;
+            resize: vertical; }
+        .fb-text:focus { outline: none; border-color: var(--accent-primary); }
+        .fb-form button { align-self: flex-start; background: var(--accent-primary);
+            color: #12100f; border: none; border-radius: var(--radius-md);
+            padding: 0.5rem 1.2rem; font-family: inherit; font-size: 0.95rem;
+            font-weight: bold; cursor: pointer; }
+        .fb-status { margin-top: 1rem; padding: 0.8rem 0.9rem; background: var(--bg-tertiary);
+            border: 1px solid var(--border-color); border-left: 3px solid var(--text-muted);
+            border-radius: var(--radius-md); }
+        /* Only `acked` gets the success colour. `retrying` deliberately does not --
+           contract 4.3: no success affordance for a message that has not arrived. */
+        .fb-status.fb-acked { border-left-color: var(--accent-secondary); }
+        .fb-status.fb-refused, .fb-status.fb-rejected { border-left-color: #ff4444; }
+        .fb-status.fb-retrying, .fb-status.fb-sending, .fb-status.fb-queued {
+            border-left-color: var(--accent-primary); }
+        .fb-headline { font-weight: bold; color: var(--text-primary); margin: 0;
+            font-size: 0.95rem; }
+        .fb-note, .fb-detail, .fb-echo, .fb-who, .fb-meta, .fb-fallback {
+            margin: 0.35rem 0 0; color: var(--text-secondary); font-size: 0.88rem; }
+        .fb-meta { color: var(--text-muted); font-size: 0.8rem; }
+        .fb-echo { color: var(--text-muted); font-style: italic; }
+        .fb-link { color: var(--accent-primary); }
     </style>
 	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
 	     PLAIN blocking script: the inline renderers below call it, so it has to be
@@ -90,6 +131,15 @@
 	<!-- Author identity resolution (returns plain strings; this page escapes them).
 	     Same blocking rule, same reason. -->
 	<script src="/assets/js/authorship.js"></script>
+	<!-- The durable-write feedback widget (docs/decisions/FEEDBACK_INTAKE_CONTRACT.md).
+	     AFTER escape.js and blocking, for both halves of the reason: feedback.js looks
+	     the shared escaper up at paint() time and FAILS CLOSED without it (it renders
+	     nothing rather than rendering visitor text raw), and the mount block at the end
+	     of <body> calls window.mountFeedbackWidget, which has to exist by then.
+	     Mounted here and on /issues/ because /privacy/ tells visitors "some pages carry
+	     a feedback widget" and describes what it stores -- prose and mechanism ship in
+	     the same deploy, in BOTH directions (contract 7.1). -->
+	<script src="/assets/js/feedback.js"></script>
 </head>
 <body>
     <div class="container">
@@ -100,9 +150,70 @@
          never varies, so a field repeating it on every item would always hold the same
          value. The identical sentence is the "colophon" key of /data/authors.json, and
          scripts/test-blog-render.js fails if the two ever differ by a character. -->
+    <!-- QUICK FEEDBACK on the post above. The widget is mounted only when a post
+         actually rendered -- see the mount block at the end of this file -- because
+         "was this useful?" under a "Post not found" message is a question about
+         nothing. -->
+    <section class="feedback-block" id="feedback-block" hidden>
+        <h2>Was this useful?</h2>
+        <p class="fb-intro">
+            One click, or a sentence. No name, no email. Your message is written to our own
+            server before anything here says it arrived, so this box will not say
+            &ldquo;thanks&rdquo; until that write has finished; if it cannot reach us it waits
+            in your browser&rsquo;s own storage and keeps retrying. You get a receipt code you
+            can quote to have it erased. What we keep, and for how long, is on the
+            <a href="/privacy/#what-you-send">privacy page</a>.
+        </p>
+        <div class="fb-thumbs">
+            <button type="button" class="fb-thumb" id="fb-thumb-up">Useful</button>
+            <button type="button" class="fb-thumb" id="fb-thumb-down">Not useful</button>
+        </div>
+        <div id="feedback-widget"></div>
+    </section>
     <footer class="colophon">
         Everything published here ships with Pip Foweraker's approval, and the mistakes are his — including the mistakes of things working under his direction.
     </footer>
+    <script>
+        // MOUNT the durable-write feedback widget (docs/decisions/FEEDBACK_INTAKE_CONTRACT.md).
+        //
+        // Declared in a script tag BEFORE the renderer, not after it. The renderer is an
+        // async IIFE: it starts running the moment it parses and then awaits a fetch, and
+        // a microtask can resume it before the parser has reached a later inline script.
+        // Defining this afterwards would make the mount depend on that race.
+        //
+        // This block builds NO markup. mountFeedbackWidget() constructs its own chrome
+        // with createElement/textContent and owns the one innerHTML sink in the feature --
+        // its status region, fed only by paint(), which routes every visitor and server
+        // string through the shared escaper and renders NOTHING if that escaper is absent.
+        // Composing markup here would add a second sink that scripts/test-feedback-outbox.js
+        // row F17 cannot see, which is how this site once acquired five escapers.
+        function mountPostFeedback() {
+            var block = document.getElementById('feedback-block');
+            var box = document.getElementById('feedback-widget');
+            if (!block || !box || typeof window.mountFeedbackWidget !== 'function') { return; }
+            var client = window.mountFeedbackWidget(box, {
+                kind: 'comment',
+                label: 'Send'
+            });
+            if (!client) { return; }
+            block.hidden = false;
+            function thumb(v) {
+                return function () {
+                    // A thumb is one bit plus the page. location.search carries ?p=<file>,
+                    // which is what makes the count attributable to THIS post.
+                    client.submit({
+                        kind: 'thumb',
+                        value: v,
+                        page: location.pathname + location.search
+                    });
+                };
+            }
+            var up = document.getElementById('fb-thumb-up');
+            var down = document.getElementById('fb-thumb-down');
+            if (up) { up.addEventListener('click', thumb(1)); }
+            if (down) { down.addEventListener('click', thumb(-1)); }
+        }
+    </script>
     <script>
         // Minimal, dependency-free Markdown renderer. Covers the subset used by
         // p(Doom)1 dev-blog posts: headings, bold/italic, links, images, inline
@@ -277,6 +388,9 @@
                     renderMarkdown(md), authorshipBlockHTML(authorship));
                 const h1 = el.querySelector('h1');
                 if (h1) document.title = h1.textContent + ' - p(Doom)1 Dev Blog';
+                // Only once a post has actually rendered. Neither error branch below
+                // calls this, so "was this useful?" never appears under "Post not found".
+                mountPostFeedback();
             } catch (e) {
                 el.innerHTML = '<p class="post-error">Could not load this post. <a href="/blog/">Back to the blog &rarr;</a></p>';
             }

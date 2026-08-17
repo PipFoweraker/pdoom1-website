@@ -278,7 +278,9 @@
 			</p>
 			<ul>
 				<li><strong>The website</strong> &mdash; cookieless, anonymous page counts, and
-					whatever you type into a form. Nothing persistent identifies you.</li>
+					whatever you type into a form or the feedback widget, which we keep and which may
+					include an address you give us to reply to. We set no cookie and assign you no
+					identifier.</li>
 				<li><strong>The game client</strong> &mdash; sends a <strong>persistent random
 					install ID</strong> to our analytics server on <em>every launch</em>, and this is
 					<strong>on by default</strong>. It can also submit your score and lab name to the
@@ -311,7 +313,7 @@
 				</div>
 				<div class="feature-item">
 					<h4>Privacy by Design</h4>
-					<p>No cookies and no personal data means no consent banner to click through &mdash; and nothing about your visit stored to misuse.</p>
+					<p>No cookies and no personal data in our analytics means no consent banner to click through &mdash; and nothing stored from your reading of the site that could be misused. What you send us on purpose is listed below.</p>
 				</div>
 				<div class="feature-item">
 					<h4>Respects DNT</h4>
@@ -322,7 +324,7 @@
 
 		<section class="section">
 			<h2>The website: what we collect</h2>
-			<p>From your visits to this site we collect only aggregate, anonymous information:</p>
+			<p>From your visits to this site &mdash; that is, from reading pages, without sending us anything &mdash; we collect only aggregate, anonymous information:</p>
 			<ul>
 				<li><strong>Page views:</strong> Which pages are visited (no user identification)</li>
 				<li><strong>Referrers:</strong> Where visitors come from (e.g., search engines, social media)</li>
@@ -332,10 +334,10 @@
 			</ul>
 			
 			<h3>What We DON'T Collect</h3>
-			<p>From a visit to this website, in the browser:</p>
+			<p>From reading pages on this website, in the browser:</p>
 			<ul class="exclusion-list">
 				<li>IP addresses (anonymized immediately)</li>
-				<li>Cookies or browser local storage (except for your opt-out preference)</li>
+				<li>Cookies or browser local storage (two exceptions, both kept on your own device: your analytics opt-out preference, and a feedback message you have written that has not reached us yet)</li>
 				<li>Personal information (names, emails, etc.)</li>
 				<li>Cross-site tracking data</li>
 				<li>Fingerprinting data</li>
@@ -346,7 +348,7 @@
 				<a href="#game-client" style="color: var(--accent-primary);">the game client</a> below.
 			</p>
 			<p>
-				<strong>And that covers analytics only.</strong> If you use the form on this site or email us, we receive
+				<strong>And that covers analytics only.</strong> If you use a form on this site or email us, we receive
 				whatever you choose to send. We use each thing only for the reason you gave it to us:
 			</p>
 			<ul>
@@ -358,6 +360,53 @@
 				<strong>The bug reporter <em>inside the game</em> is a different thing and behaves
 				differently: it transmits nothing at all.</strong> It is described
 				<a href="#game-client" style="color: var(--accent-primary);">below</a>.
+			</p>
+			<h3 id="what-you-send">If you send us feedback</h3>
+			<p>
+				Some pages carry a feedback widget &mdash; a thumbs up or down, and a box you can type in.
+				Like the bug form above, it sends us something we then store, so here is the whole of it,
+				field by field, with how long we keep each one:
+			</p>
+			<ul>
+				<li><strong>What you wrote, and which page you were on</strong> &mdash; kept
+					<strong>indefinitely</strong>, because a bug is worth having until it is fixed and a
+					design note is worth having for years. It is stored privately, on our server but outside
+					anything this website can serve, and read by our team. If it cannot reach us, the widget
+					offers to open a pre-filled <em>public</em> GitHub issue instead, so don't type anything
+					you wouldn't want published.</li>
+				<li><strong>Contact details</strong> (optional; it can be an email address or any other way
+					of reaching you) &mdash; used only to reply to you about what you sent. Deleted within
+					90 days of our last reply. Never added to a mailing list, never published.</li>
+				<li><strong>Name for credit</strong> (optional) &mdash; kept for as long as we credit you,
+					and <strong>may appear publicly</strong>, because that is what you asked for by filling
+					it in. Leave it blank to stay anonymous.</li>
+				<li><strong>Your browser and operating system string</strong> &mdash; the same line your
+					browser sends to every website. Kept 180 days, to help reproduce a bug, then deleted.</li>
+				<li><strong>Not your IP address.</strong> We store a hash of it, made with a salt we change
+					every day, so submissions cannot be joined up across days. It is there to slow down
+					floods, and it is dropped after 30 days.</li>
+			</ul>
+			<p>
+				When it goes through you get a receipt code that looks like <code>F-XXXXXX</code>.
+				<strong>Keep it.</strong> We store no account and no name or address you didn't type in, so
+				that code is the only way we can find your submission again &mdash; to answer it, or to
+				erase it if you email <a href="mailto:team@pdoom1.com">team@pdoom1.com</a> and ask.
+			</p>
+			<p>
+				If your message can't reach us straight away it waits in your browser's storage, on your own
+				machine, and the page keeps retrying; it is cleared only once we have confirmed we have it.
+				That is also why the widget won't say "thanks" until we do.
+			</p>
+			<p>
+				We publish a running <strong>tally</strong> of what comes in &mdash; how many comments, how
+				many thumbs, how many were abusive or attempted attacks, and how many we haven't read yet.
+				It is <strong>counts only</strong>: it never quotes you. No automated classifier puts you in
+				one of those categories &mdash; a person confirms each one, or it stays in the unread count.
+				Any category of feedback with fewer than five entries is withheld rather than published,
+				because a count of one on a single page can identify whoever wrote it &mdash; and we
+				publish how many categories we withheld, so nothing disappears from the tally quietly.
+				The unread count is the one number never withheld: it is there to hold us to reading what
+				you send.
 			</p>
 			<p>
 				We don't sell or share any of it, and you can ask us to delete what we hold about you any time — <a href="mailto:team@pdoom1.com">team@pdoom1.com</a>.
@@ -506,7 +555,7 @@
 			</p>
 		</section>
 
-		<section class="section">
+		<section class="section" id="retention">
 			<h2>Data Retention</h2>
 			<p>
 				Analytics data is kept <strong>indefinitely</strong> — there is no automatic deletion after a
@@ -529,6 +578,16 @@
 				Leaderboard entries are kept for as long as the board exists, and the lab name on them
 				is public by design.
 			</p>
+			<p>
+				<strong>Feedback sent through the widget</strong> has a clock <em>per field</em>, because the
+				fields are for different things: what you wrote is kept indefinitely, contact details are deleted
+				within 90 days of our last reply, the browser string after 180 days, and the daily-salted
+				hash of your IP after 30. Ask us sooner and we will: quote your <code>F-XXXXXX</code> receipt
+				to <a href="mailto:team@pdoom1.com">team@pdoom1.com</a> and we empty every field that holds
+				what you wrote, how to reach you, what to credit you as, and what browser you used. What is
+				left is the receipt, the timestamp and the bare fact that a submission arrived, so that the
+				public tally cannot quietly disagree with what actually came in.
+			</p>
 		</section>
 
 		<section class="section">
@@ -550,7 +609,10 @@
 				Those five points describe Plausible's <em>browser</em> tracking, which is what runs on
 				this website. They are not a description of the game's launch ping: that is our own
 				code posting our own event to the same server, and it carries the persistent install ID
-				described above.
+				described above. They are not a description of the bug and feedback forms either &mdash;
+				those are our own code, storing what you typed into them, and
+				<a href="#what-you-send" style="color: var(--accent-primary);">what they keep is listed
+				above</a>.
 			</p>
 
 			<h3>Alternative Providers</h3>
@@ -579,7 +641,13 @@
 					names, emails, IP addresses or cross-session identifiers &mdash; so most of what GDPR
 					governs simply does not arise. For the aggregate counts we keep, the basis is our
 					legitimate interest in knowing whether the site works and is found.</li>
-				<li><strong>The game's launch ping is the exception, and we are not going to bury it:</strong>
+				<li><strong>What you send us on purpose is a different thing entirely:</strong> a bug
+					report or a feedback comment can carry an email address and a name, because you typed
+					them in. That is personal data. We hold it for the reason you gave it to us and for
+					nothing else; every field of a feedback submission has a deletion clock, and you can
+					have yours erased by quoting your receipt code &mdash;
+					<a href="#retention" style="color: var(--accent-primary);">the clocks are here</a>.</li>
+				<li><strong>The game's launch ping is the other exception, and we are not going to bury it:</strong>
 					it carries a persistent random install ID, it is on by default, and a persistent
 					identifier is a stronger thing than the anonymous counting above &mdash; that is
 					why it has its own labelled switch in the game rather than being folded into this

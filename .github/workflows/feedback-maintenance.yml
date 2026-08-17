@@ -1,0 +1,579 @@
+name: Feedback maintenance (retention and the public tally)
+
+# PARKED -- there is no `cron:` in this file yet, and the missing line is the
+# honest part of it. Read this whole header before adding one.
+#
+# WHAT THIS WORKFLOW IS FOR
+# -------------------------
+# docs/decisions/FEEDBACK_INTAKE_CONTRACT.md 10: "A retention policy without a
+# cron job is prose." public/privacy/index.html now tells visitors that contact
+# details are deleted within 90 days, the browser string after 180, the salted IP
+# hash after 30, and that we publish a running counts-only tally. Two scripts make
+# those sentences true -- scripts/purge-feedback.py and
+# scripts/generate-feedback-stats.py -- and this is the thing that runs them.
+#
+# WHY IT IS PARKED RATHER THAN SCHEDULED
+# --------------------------------------
+# The feedback store does NOT live on a GitHub runner. It lives above the docroot
+# on DreamHost shared hosting, because contract INV-1c forbids a store anywhere
+# `rsync --delete` can reach and because the records carry reporter PII. A cron on
+# `ubuntu-latest` would therefore find no store, purge nothing, certify nothing,
+# and exit 2 -- while satisfying scripts/check-prose-mechanism-coupling.py's
+# `workflow_schedules` predicate, which only asks whether some workflow has a cron
+# and names the script.
+#
+# That combination -- a guard going green over a job that deletes nothing -- is
+# strictly worse than the red it replaces. The privacy page would promise a
+# deletion clock, CI would agree, and no byte would ever be deleted. So the cron
+# is deliberately absent until the reach is PROVEN, and the coupling check stays
+# red in the meantime. A red somebody can close is better than a green nobody can
+# trust (CLAUDE.md, "Severity model").
+#
+# HOW TO UN-PARK IT -- three steps, in this order
+# -----------------------------------------------
+#  1. Set the repository variable FEEDBACK_STORE_PATH (Settings > Secrets and
+#     variables > Actions > Variables) to the ABSOLUTE path of the store on the
+#     DreamHost box -- the directory public/ingest.php resolves as
+#     `dirname(docroot)/feedback-store`, or whatever PDOOM_FEEDBACK_STORE is set
+#     to there. Confirm it by hand first:
+#         ssh $DH_USER@$DH_HOST 'ls -la <path>'
+#     There is deliberately NO derived default here. This workflow will not guess
+#     the path, for the same reason purge-feedback.py will not: a wrong guess
+#     either purges nothing while reporting success, or reaches a directory
+#     nobody meant it to reach. `dirname($DH_PATH)/feedback-store` looks like a
+#     safe derivation and is not -- DH_PATH is an unread secret that may carry a
+#     tilde, a trailing slash, or a docroot that is not one level below the home
+#     directory.
+#  2. Run this workflow by hand: Actions > this workflow > Run workflow, leaving
+#     dry_run = true. That is the verification. A green dry run means the SSH key
+#     reaches the host, python3 >= 3.7 exists on it, and the store is where the
+#     variable says. Nothing is written by a dry run.
+#  3. Only then uncomment the schedule below, and say in the commit message that
+#     step 2 went green and on which run.
+#
+#     on:
+#       schedule:
+#   #     41 15 * * *  -- 15:41 UTC daily.
+#   #     Daily because every clock in contract 10 is measured in days, so a
+#   #     finer cadence buys no accuracy and only adds unattended SSH sessions
+#   #     against production. 15:41 UTC is 01:41 in Australia/Hobart, the
+#   #     project's stated reference timezone and the site's quietest local
+#   #     window: the purge rewrites the JSONL and calls os.replace(), so a POST
+#   #     that ingest.php is appending at that instant holds a file descriptor on
+#   #     the old inode. That race is inherent to rewriting an append-only log
+#   #     and cannot be scheduled away, only made unlikely. The odd minute keeps
+#   #     it off the :00 queue spike, off board-liveness.yml's `17 */6 * * *`,
+#   #     and off weekly-league-reset.yml's `0 14 * * 4`.
+#         - cron: '41 15 * * *'
+#
+# CLAUDE.md "Workflow authoring traps" -- how each one is handled here
+# -------------------------------------------------------------------
+#  #1  `git diff` cannot see untracked files. The tally job `git add`s the file
+#      FIRST and then tests `git diff --cached --quiet`. On the first ever run
+#      public/data/feedback-stats.json does not exist, which is precisely the
+#      case the untracked bug swallows -- sync-pdoom1-docs.yml reported SUCCESS
+#      4x/day for months while committing nothing.
+#  #2  `github.event.inputs` is EMPTY on a schedule trigger. Nothing here reads
+#      it. The dry-run guard tests `github.event_name` explicitly and treats
+#      anything that is not a workflow_dispatch as a real run, so the dangerous
+#      direction of the ambiguity is the one that fails safe.
+#  #3  The alert job carries `permissions: issues: write`. Without it the handler
+#      403s and a scheduled failure is invisible -- which is the same silence the
+#      binding directive exists to abolish, one layer up.
+#  #4  This file is PARKED with the reason above rather than deleted or reduced
+#      to a bare dispatch with no explanation.
+#  #5  No author-controlled context is spliced into any `run:`. The store path is
+#      a repository variable, and it still crosses to the remote shell base64-
+#      encoded, so no metacharacter in it can ever be parsed as shell.
+#  #6  Nothing here is guarded by a `push` trigger, so the `[skip ci]` blindness
+#      class does not apply. The output it commits (feedback-stats.json) is
+#      itself under public/, so it reaches production on the next deploy.
+#
+# WHAT NEVER LEAVES THE HOST
+# --------------------------
+# Both scripts run ON the DreamHost box, over SSH. No record, no free text, no
+# contact field and no IP hash is ever copied to a GitHub runner. The only thing
+# that comes back over the wire is generate-feedback-stats.py's counts-only
+# document, and the runner re-checks it with that script's own
+# assert_counts_only() before writing it into public/ -- the same function that
+# already refused to write it on the far side. Two independent chances to catch
+# a document carrying content instead of counts, on two machines.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Report what would happen and write nothing (default true).'
+        type: boolean
+        default: true
+
+concurrency:
+  # Never two of these at once. The purge rewrites the store with os.replace();
+  # two rewrites racing is how an append-only log loses a message. Same shape and
+  # same reason as auto-deploy-on-push.yml's `production-deploy`: cancelling a
+  # run that may be mid-rewrite is strictly worse than queueing behind it.
+  group: feedback-maintenance
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  retention:
+    name: Apply the per-field retention clocks (contract section 10)
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      # A missing script must fail here rather than be stepped over. A workflow
+      # that skips an absent file reports success for work nobody did.
+      - name: The script this job exists to run is present
+        run: |
+          set -euo pipefail
+          if [ ! -f scripts/purge-feedback.py ]; then
+            echo "MISSING scripts/purge-feedback.py"
+            echo "This job has nothing to run. That is a red, not a skip: a"
+            echo "tolerated absence is indistinguishable from a passing run, and"
+            echo "the privacy page's deletion clocks depend on this file."
+            exit 1
+          fi
+          echo "present  scripts/purge-feedback.py"
+
+      - name: Preconditions -- secrets, and the declared store path
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+          STORE_PATH: ${{ vars.FEEDBACK_STORE_PATH }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for v in DH_HOST DH_USER DH_SSH_KEY; do
+            if [ -z "${!v}" ]; then echo "MISSING secret: $v"; missing=1; fi
+          done
+          if [ -z "$STORE_PATH" ]; then
+            echo "MISSING repository variable: FEEDBACK_STORE_PATH"
+            echo ""
+            echo "This is not derived and will not be guessed. purge-feedback.py"
+            echo "refuses a derived default for the same reason (see its"
+            echo "resolve_store docstring): a wrong store path either purges"
+            echo "nothing while looking successful, or writes somewhere nobody"
+            echo "intended. Set it to the absolute path you have confirmed by"
+            echo "hand on the DreamHost box."
+            missing=1
+          fi
+          case "$STORE_PATH" in
+            /tmp/*)
+              echo "REFUSED: FEEDBACK_STORE_PATH is under /tmp."
+              echo "This job stages the scripts in /tmp on the remote host, and"
+              echo "purge-feedback.py refuses any store inside its own directory"
+              echo "tree. A store under /tmp would also not survive a reboot."
+              missing=1 ;;
+          esac
+          [ "$missing" = "0" ] || exit 1
+          echo "preconditions OK"
+
+      - name: Setup SSH
+        env:
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          echo "$DH_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      - name: Purge on the host, then certify the result
+        id: purge
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+          STORE_PATH: ${{ vars.FEEDBACK_STORE_PATH }}
+          EVENT: ${{ github.event_name }}
+          DRY_RUN_INPUT: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          PORT="${DH_PORT:-22}"
+          TARGET="${DH_USER}@${DH_HOST}"
+          # GITHUB_RUN_ID is numeric and GitHub-controlled, so this name carries
+          # nothing an attacker chose. mktemp's output would be remote-controlled
+          # text flowing back into a command string; this avoids that entirely.
+          REMOTE_TMP="/tmp/pdoom-feedback-maint-${GITHUB_RUN_ID}"
+
+          # Trap #2, handled by testing the event name rather than an input that
+          # is empty on a schedule. Anything that is not a hand-pressed dispatch
+          # is a real run.
+          if [ "$EVENT" = "workflow_dispatch" ] && [ "$DRY_RUN_INPUT" = "true" ]; then
+            MODE="--dry-run"
+            echo "DRY RUN -- nothing will be written."
+          else
+            MODE=""
+            echo "REAL RUN -- the clocks will be applied."
+          fi
+
+          # The store path crosses as base64. The alphabet is [A-Za-z0-9+/=], so
+          # whatever is in the variable, the remote shell sees no metacharacter.
+          STORE_B64="$(printf '%s' "$STORE_PATH" | base64 | tr -d '\n')"
+
+          ssh -p "$PORT" "$TARGET" "mkdir -p '${REMOTE_TMP}'"
+          scp -P "$PORT" scripts/purge-feedback.py "${TARGET}:${REMOTE_TMP}/"
+
+          set +e
+          ssh -p "$PORT" "$TARGET" "
+            set -eu
+            TMP='${REMOTE_TMP}'
+            STORE=\$(printf %s '${STORE_B64}' | base64 -d)
+
+            PY=\$(command -v python3 || true)
+            if [ -z \"\$PY\" ]; then echo 'NO_PYTHON3'; exit 90; fi
+            \"\$PY\" -c 'import sys; sys.exit(0 if sys.version_info >= (3,7) else 1)' \
+              || { echo 'PYTHON_TOO_OLD'; \"\$PY\" --version; exit 91; }
+
+            if [ ! -d \"\$STORE\" ]; then echo 'STORE_ABSENT'; exit 80; fi
+
+            echo \"store: \$STORE\"
+            \"\$PY\" \"\$TMP/purge-feedback.py\" --store \"\$STORE\" ${MODE}
+            # The gate, run AFTER the purge: is anything still past its clock?
+            # --check writes nothing, so it is safe after a dry run too.
+            \"\$PY\" \"\$TMP/purge-feedback.py\" --store \"\$STORE\" --check
+          "
+          code=$?
+          set -e
+
+          ssh -p "$PORT" "$TARGET" "rm -rf '${REMOTE_TMP}'" || true
+
+          case "$code" in
+            0)
+              echo "OK: the clocks were applied and nothing is retained past one."
+              echo "state=purged" >> "$GITHUB_OUTPUT" ;;
+            80)
+              # We LOOKED and the directory is not there. That is a positive
+              # observation, not an absence of information: ingest.php creates
+              # the store on its first write, so no store means no record exists,
+              # which means no field can be over-retained. Green with a number.
+              echo "OK: store absent -- 0 records exist, so no clock has anything"
+              echo "to enforce. Verified by looking, not assumed."
+              echo "state=store-absent" >> "$GITHUB_OUTPUT" ;;
+            90|91)
+              echo "RED: no usable python3 on the host, so the retention clocks"
+              echo "cannot be applied at all. The privacy page promises them."
+              exit 1 ;;
+            1)
+              echo "RED: --check found a field retained past its clock even after"
+              echo "the purge ran. Something is over-retained right now."
+              exit 1 ;;
+            2)
+              echo "RED: UNKNOWN. The store was reached but could not be fully"
+              echo "certified -- unparseable lines, a record with no usable"
+              echo "server_ts, or an unreadable triage.log (which makes '90 days"
+              echo "from the last reply' uncomputable, so contact was left"
+              echo "alone). Nothing here is certified; do not read it as clean."
+              exit 1 ;;
+            3)
+              echo "RED: REFUSED. The store path resolved somewhere it must never"
+              echo "be, or the arguments were contradictory. Nothing was written."
+              exit 1 ;;
+            *)
+              echo "RED: unexpected exit $code from the remote purge."
+              exit 1 ;;
+          esac
+
+      - name: Summary
+        if: always()
+        env:
+          STATE: ${{ steps.purge.outputs.state }}
+        run: |
+          {
+            echo '## Retention clocks (contract section 10)'
+            echo ''
+            echo "Outcome: ${STATE:-failed}"
+            echo ''
+            echo 'What the privacy page promises, and what this job enforces:'
+            echo ''
+            echo '| field | clock |'
+            echo '|---|---|'
+            echo '| `contact` | 90 days from the last reply |'
+            echo '| `ua` | 180 days |'
+            echo '| `ip_hash` | 30 days |'
+            echo ''
+            echo 'A `store-absent` outcome is green because the directory was'
+            echo 'checked and is not there -- ingest.php creates it on first'
+            echo 'write, so zero records exist. It is NOT green because nothing'
+            echo 'was looked at.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  tally:
+    name: Publish the counts-only public tally (contract section 9)
+    needs: retention
+    # Runs after the purge whatever the purge did, but never alongside it: the
+    # two touch the same files. `!cancelled()` rather than `always()` so a
+    # cancelled run does not carry on reading a store mid-rewrite.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Every script this job runs is present
+        run: |
+          set -euo pipefail
+          missing=0
+          for f in scripts/generate-feedback-stats.py \
+                   scripts/read-feedback.py \
+                   scripts/purge-feedback.py; do
+            if [ -f "$f" ]; then echo "present  $f"; else echo "MISSING  $f"; missing=1; fi
+          done
+          # All three, because generate-feedback-stats.py imports the other two
+          # rather than reimplementing read-time dedup or the store-location
+          # refusal. It REFUSES if either is absent; copying only one of them to
+          # the host would turn that refusal into a remote failure nobody can
+          # read from here.
+          [ "$missing" = "0" ] || exit 1
+
+      - name: Preconditions -- secrets, and the declared store path
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+          STORE_PATH: ${{ vars.FEEDBACK_STORE_PATH }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for v in DH_HOST DH_USER DH_SSH_KEY; do
+            if [ -z "${!v}" ]; then echo "MISSING secret: $v"; missing=1; fi
+          done
+          if [ -z "$STORE_PATH" ]; then
+            echo "MISSING repository variable: FEEDBACK_STORE_PATH -- see this"
+            echo "workflow's header. Not derived, not guessed."
+            missing=1
+          fi
+          [ "$missing" = "0" ] || exit 1
+
+      - name: Setup SSH
+        env:
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          echo "$DH_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      - name: Generate the tally on the host and bring back counts only
+        id: generate
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+          STORE_PATH: ${{ vars.FEEDBACK_STORE_PATH }}
+        run: |
+          set -euo pipefail
+          PORT="${DH_PORT:-22}"
+          TARGET="${DH_USER}@${DH_HOST}"
+          REMOTE_TMP="/tmp/pdoom-feedback-tally-${GITHUB_RUN_ID}"
+          STORE_B64="$(printf '%s' "$STORE_PATH" | base64 | tr -d '\n')"
+
+          ssh -p "$PORT" "$TARGET" "mkdir -p '${REMOTE_TMP}'"
+          scp -P "$PORT" \
+            scripts/generate-feedback-stats.py \
+            scripts/read-feedback.py \
+            scripts/purge-feedback.py \
+            "${TARGET}:${REMOTE_TMP}/"
+
+          set +e
+          ssh -p "$PORT" "$TARGET" "
+            set -eu
+            TMP='${REMOTE_TMP}'
+            STORE=\$(printf %s '${STORE_B64}' | base64 -d)
+            PY=\$(command -v python3 || true)
+            if [ -z \"\$PY\" ]; then echo 'NO_PYTHON3'; exit 90; fi
+            if [ ! -d \"\$STORE\" ]; then echo 'STORE_ABSENT'; exit 80; fi
+            # --out into the REMOTE TEMP DIR, never into the docroot. A file
+            # written under public/ on the server is deleted by the next
+            # rsync --delete (four of those run daily), so a server-side
+            # generator writing straight into the docroot publishes something
+            # that vanishes within hours. The runner commits it instead, which
+            # is also what puts it under review and in the history.
+            \"\$PY\" \"\$TMP/generate-feedback-stats.py\" --store \"\$STORE\" \
+              --out \"\$TMP/feedback-stats.json\"
+          "
+          code=$?
+          set -e
+
+          if [ "$code" = "0" ]; then
+            scp -P "$PORT" "${TARGET}:${REMOTE_TMP}/feedback-stats.json" ./fetched-stats.json
+          fi
+          ssh -p "$PORT" "$TARGET" "rm -rf '${REMOTE_TMP}'" || true
+
+          case "$code" in
+            0)  echo "state=generated" >> "$GITHUB_OUTPUT" ;;
+            80)
+              # Nothing to count. generate-feedback-stats.py refuses to write a
+              # zeroed file for exactly this reason -- "publishing a zeroed file
+              # would be a claim that nobody has written to us" -- so this job
+              # publishes nothing either, and whatever is already committed
+              # stands untouched.
+              echo "OK: store absent. No tally written; any existing one stands."
+              echo "state=store-absent" >> "$GITHUB_OUTPUT" ;;
+            2)
+              echo "RED: UNKNOWN -- the store was reached but a triage.log line"
+              echo "could not be read, so every category derived from it is"
+              echo "uncertain. Nothing was written."
+              exit 1 ;;
+            3)
+              echo "RED: REFUSED -- the reader is missing or misbehaving, triage"
+              echo "claimed human provenance with nobody named, or the document"
+              echo "failed the counts-only assertion. Nothing was written."
+              exit 1 ;;
+            90) echo "RED: no python3 on the host."; exit 1 ;;
+            *)  echo "RED: unexpected exit $code."; exit 1 ;;
+          esac
+
+      # The counts-only promise is re-checked on THIS machine, against the bytes
+      # that actually arrived, using the generator's own assert_counts_only().
+      # Imported, never reimplemented: a second opinion about what "counts only"
+      # means is how two definitions of a rule get into one codebase.
+      - name: Re-assert counts-only on the document that arrived
+        if: steps.generate.outputs.state == 'generated'
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import importlib.util, json, pathlib, sys
+          spec = importlib.util.spec_from_file_location(
+              "gfs", "scripts/generate-feedback-stats.py")
+          gfs = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(gfs)
+          doc = json.loads(pathlib.Path("fetched-stats.json").read_text(encoding="utf-8"))
+          try:
+              gfs.assert_counts_only(doc)
+          except gfs.Refused as exc:
+              print("REFUSED on arrival: %s" % exc)
+              print("The host produced a document this repo will not publish.")
+              print("Nothing written; the committed tally stands.")
+              sys.exit(1)
+          print("counts-only OK: %d categor(ies), untriaged=%s"
+                % (len(doc.get("counts", {})), doc.get("untriaged")))
+          PY
+
+      - name: Commit the tally
+        if: steps.generate.outputs.state == 'generated'
+        env:
+          EVENT: ${{ github.event_name }}
+          DRY_RUN_INPUT: ${{ inputs.dry_run }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "workflow_dispatch" ] && [ "$DRY_RUN_INPUT" = "true" ]; then
+            echo "DRY RUN -- the document that would be published:"
+            cat fetched-stats.json
+            exit 0
+          fi
+          if [ "$REF_NAME" != "main" ]; then
+            echo "Not on main ($REF_NAME); not committing."
+            cat fetched-stats.json
+            exit 0
+          fi
+
+          mkdir -p public/data
+          mv fetched-stats.json public/data/feedback-stats.json
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Trap #1: `git add` FIRST, then test the INDEX. On the first ever run
+          # this file is untracked, and `git diff --quiet <path>` reports "no
+          # changes" for an untracked file -- which is how a workflow commits
+          # nothing while reporting success.
+          git add public/data/feedback-stats.json
+          if git diff --cached --quiet -- public/data/feedback-stats.json; then
+            echo "No change to the published tally."
+            exit 0
+          fi
+          # The subject deliberately contains no CI-suppression token. This repo
+          # has a scar from one appearing in a merge body: the commit ran zero
+          # Actions and the production deploy it needed never happened.
+          git commit -m "chore(feedback): refresh the public feedback tally"
+          git push
+          echo "Committed. It reaches pdoom1.com on the next deploy."
+
+      - name: Summary
+        if: always()
+        env:
+          STATE: ${{ steps.generate.outputs.state }}
+        run: |
+          {
+            echo '## Public tally (contract section 9)'
+            echo ''
+            echo "Outcome: ${STATE:-failed}"
+            echo ''
+            echo 'Counts only, human-confirmed tags only, k=5 withholding, and'
+            echo '`untriaged` published at any size because it is the number that'
+            echo 'holds us to reading what people send.'
+            echo ''
+            echo 'Nothing but that counts-only document crosses from the host to'
+            echo 'this runner. No free text, no contact field, no IP hash.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  alert:
+    name: Alert on scheduled failure (de-duplicated)
+    needs: [retention, tally]
+    # Only on a schedule. A dispatch failure is already in front of the person
+    # who pressed the button; an unattended failure has nobody watching it, and
+    # a retention promise failing in silence is the binding directive's own
+    # failure mode wearing an operations hat.
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the single feedback-maintenance issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Feedback maintenance failing (scheduled run)';
+            const label = 'feedback-maintenance';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              'The scheduled feedback maintenance run went red with no human behind it.',
+              '',
+              `Run: ${runUrl}`,
+              '',
+              'While this is red, public/privacy/index.html is making promises that',
+              'nothing is currently keeping: contact details deleted within 90 days,',
+              'the browser string after 180, the salted IP hash after 30, and a',
+              'published counts-only tally.',
+              '',
+              'Check, in order:',
+              '- can the SSH key still reach the host, and is `FEEDBACK_STORE_PATH` still right?',
+              '- `python scripts/purge-feedback.py --store <path> --check` on the host',
+              '- an unreadable line in `<store>/triage.log` makes the 90-day contact',
+              '  clock uncomputable, so `contact` is left alone and both jobs go UNKNOWN',
+              '',
+              'If this cannot be fixed quickly, the honest remedy is the other one',
+              'contract 7.1 allows: take the affected sentences out of the privacy',
+              'page until the mechanism runs again.',
+              '',
+              '_This is a single rolling issue -- it is reused, not duplicated, per run._'
+            ].join('\n');
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 10,
+            });
+            const found = existing.data.find(i => i.title === title);
+            if (found) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: found.number,
+                body: `Still failing as of ${new Date().toUTCString()}.\n\nRun: ${runUrl}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label, 'automation', 'priority:high'],
+              });
+            }

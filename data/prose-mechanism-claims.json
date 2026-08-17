@@ -32,7 +32,22 @@
     "The checker FAILS CLOSED: an unknown predicate kind, a missing claim_file, or a",
     "malformed entry rejects the WHOLE registry rather than skipping the entry. A",
     "skipped entry resurfaces later as a fresh finding and sends someone hunting a",
-    "bug nobody introduced."
+    "bug nobody introduced.",
+    "",
+    "KNOWN WEAKNESS OF workflow_schedules -- read before trusting its green.",
+    "It proves a script is INVOKED BY a workflow that carries a cron. It does NOT",
+    "prove the run can reach the data it is supposed to act on.",
+    "",
+    "That gap is live right now, not theoretical. The feedback store is on DreamHost",
+    "shared hosting; a GitHub runner has no store, so `purge-feedback.py --check`",
+    "exits 2 (UNKNOWN) there by design. A cron on ubuntu-latest would therefore",
+    "delete nothing, check nothing, and still satisfy this predicate -- turning the",
+    "guard into the very thing it was written to catch, one level up. The predicate",
+    "is a necessary condition, never a sufficient one.",
+    "",
+    "Until a predicate can assert reachability, the retention claim below is only as",
+    "good as the human who wired the workflow. Do not read its green as 'contact",
+    "fields are being deleted'. Read it as 'something is scheduled, go look at what'."
   ],
 
   "schema": 1,

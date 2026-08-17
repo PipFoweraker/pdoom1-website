@@ -313,11 +313,70 @@
 				padding: 1px 4px !important;
 			}
 		}
+
+		/* --- the feedback widget -----------------------------------------
+		   Class names are feedback.js's, not this page's: the module builds its own
+		   chrome with createElement, so styling it is all this page contributes.
+		   Dark palette only -- see CLAUDE.md's cascade note. */
+		.fb-thumbs { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+		.fb-thumb {
+			background: var(--bg-tertiary); color: var(--text-primary);
+			border: var(--border-width) solid var(--border-color);
+			border-radius: var(--radius-md); padding: 0.5rem 1.1rem;
+			font-family: inherit; font-size: 0.95rem; cursor: pointer;
+			transition: border-color var(--duration-fast) var(--easing);
+		}
+		.fb-thumb:hover, .fb-thumb:focus-visible { border-color: var(--accent-primary); }
+		.fb-form { display: flex; flex-direction: column; gap: 0.7rem; max-width: 700px; }
+		.fb-text {
+			width: 100%; min-height: 6rem; padding: 0.7rem;
+			background: var(--bg-primary); color: var(--text-primary);
+			border: var(--border-width) solid var(--border-color);
+			border-radius: var(--radius-md); font-family: inherit; font-size: 1rem;
+			resize: vertical;
+		}
+		.fb-text:focus { outline: none; border-color: var(--accent-primary); }
+		.fb-form button {
+			align-self: flex-start; background: var(--accent-primary); color: #12100f;
+			border: none; border-radius: var(--radius-md); padding: 0.6rem 1.4rem;
+			font-family: inherit; font-size: 1rem; font-weight: bold; cursor: pointer;
+		}
+		.fb-status-region { max-width: 700px; }
+		.fb-status {
+			margin-top: 1rem; padding: 0.9rem 1rem;
+			background: var(--bg-tertiary);
+			border: var(--border-width) solid var(--border-color);
+			border-left: 3px solid var(--text-muted);
+			border-radius: var(--radius-md);
+		}
+		/* Only `acked` gets the success colour. `retrying` deliberately does NOT --
+		   contract 4.3: the retrying state renders no success affordance, because the
+		   message has not reached us yet. */
+		.fb-status.fb-acked { border-left-color: var(--success-color); }
+		.fb-status.fb-refused, .fb-status.fb-rejected { border-left-color: var(--accent-danger); }
+		.fb-status.fb-retrying, .fb-status.fb-sending, .fb-status.fb-queued { border-left-color: var(--accent-primary); }
+		.fb-headline { font-weight: bold; color: var(--text-primary); margin: 0; }
+		.fb-note, .fb-detail, .fb-echo, .fb-who, .fb-meta, .fb-fallback {
+			margin: 0.4rem 0 0; color: var(--text-secondary); font-size: 0.92rem;
+		}
+		.fb-meta { color: var(--text-muted); font-size: 0.82rem; }
+		.fb-echo { color: var(--text-muted); font-style: italic; }
+		.fb-link { color: var(--accent-primary); }
 	</style>
 	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
 	     PLAIN blocking script: the inline renderers below call it, so it has to be
 	     defined before they run. Not defer, not async. -->
 	<script src="/assets/js/escape.js"></script>
+	<!-- The durable-write feedback widget (docs/decisions/FEEDBACK_INTAKE_CONTRACT.md).
+	     Loaded AFTER escape.js and blocking, for both halves of the reason:
+	     feedback.js looks the shared escaper up at paint() time and FAILS CLOSED if it
+	     is absent (it renders nothing rather than rendering visitor text raw), and the
+	     inline mount block at the end of <body> calls window.mountFeedbackWidget, which
+	     has to exist by then. Not defer, not async.
+	     Mounted here and on /blog/post.html because /privacy/ tells visitors "some pages
+	     carry a feedback widget" and describes what it stores -- prose and mechanism ship
+	     together, in both directions (contract 7.1). -->
+	<script src="/assets/js/feedback.js"></script>
 </head>
 <body>
 	<header>
@@ -510,6 +569,32 @@
 					</div>
 				</div>
 			</div>
+		</section>
+
+		<!-- QUICK FEEDBACK -- the durable-write widget (contract INV-1).
+		     Deliberately alongside the form above rather than replacing it: that form
+		     collects a title, a type and a version, which this widget does not, and
+		     removing a working route to reach us to install a newer one is a loss
+		     channel of its own. -->
+		<section class="section" id="quick-feedback">
+			<h2>Quick feedback</h2>
+			<p style="color: var(--text-secondary); max-width: 700px;">
+				One click, or a sentence &mdash; no name, no email, no form to fill in. This is a
+				different route from the form above: your message is written to our own server
+				before anything on this page tells you it arrived, so nothing here says
+				&ldquo;thanks&rdquo; until that write has actually finished.
+			</p>
+			<div class="fb-thumbs">
+				<button type="button" class="fb-thumb" id="fb-thumb-up">This page was useful</button>
+				<button type="button" class="fb-thumb" id="fb-thumb-down">This page was not useful</button>
+			</div>
+			<div id="feedback-widget"></div>
+			<p style="color: var(--text-muted); font-size: 0.9rem; max-width: 700px; margin-top: 1rem;">
+				If it cannot reach us it waits in your browser&rsquo;s own storage and the page keeps
+				retrying; it clears only once we confirm we have it, and you get a receipt code you
+				can quote to have it erased. What we keep, and for how long, is set out on the
+				<a href="/privacy/#what-you-send" style="color: var(--accent-primary);">privacy page</a>.
+			</p>
 		</section>
 	</main>
 
@@ -812,6 +897,45 @@
 			submitButton.textContent = originalButtonText;
 			submitButton.disabled = false;
 		});
+	</script>
+
+	<script>
+		// MOUNT the durable-write feedback widget (docs/decisions/FEEDBACK_INTAKE_CONTRACT.md).
+		//
+		// This block deliberately builds NO markup. mountFeedbackWidget() constructs its
+		// own chrome with createElement/textContent, and the module owns the single
+		// innerHTML sink in the whole feature -- its status region, fed only by paint(),
+		// which runs every visitor and server string through the shared escaper and
+		// renders NOTHING if that escaper failed to load. Composing the markup here
+		// instead would create a second sink that scripts/test-feedback-outbox.js row
+		// F17 could not see, which is how this site once ended up with five escapers.
+		//
+		// The thumbs use createFeedbackClient's documented submit() (contract 11.2) on
+		// the SAME client instance as the text box, so a thumb and a comment share one
+		// outbox, one replay loop and one status region.
+		(function () {
+			var box = document.getElementById('feedback-widget');
+			if (!box || typeof window.mountFeedbackWidget !== 'function') { return; }
+			var client = window.mountFeedbackWidget(box, {
+				kind: 'feedback',
+				label: 'Send feedback'
+			});
+			if (!client) { return; }
+			function thumb(v) {
+				return function () {
+					// No text, no contact, no credit: a thumb is one bit plus the page.
+					client.submit({
+						kind: 'thumb',
+						value: v,
+						page: location.pathname + location.search
+					});
+				};
+			}
+			var up = document.getElementById('fb-thumb-up');
+			var down = document.getElementById('fb-thumb-down');
+			if (up) { up.addEventListener('click', thumb(1)); }
+			if (down) { down.addEventListener('click', thumb(-1)); }
+		})();
 	</script>
 
 	<!-- Standard Navigation -->
