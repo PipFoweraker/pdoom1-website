@@ -1,4 +1,4 @@
-name: Feedback maintenance (retention and the public tally)
+name: Feedback maintenance (retention, reconciliation and the public tally)
 
 # PARKED -- there is no `cron:` in this file yet, and the missing line is the
 # honest part of it. Read this whole header before adding one.
@@ -11,6 +11,15 @@ name: Feedback maintenance (retention and the public tally)
 # hash after 30, and that we publish a running counts-only tally. Two scripts make
 # those sentences true -- scripts/purge-feedback.py and
 # scripts/generate-feedback-stats.py -- and this is the thing that runs them.
+#
+# A THIRD script runs here for a different reason. scripts/reconcile-feedback.py
+# is the only mechanism in the whole system that implements contract 6 row F6 --
+# "MTA accepts then discards" -- and 9c, "received-and-never-read is silent loss
+# wearing a different hat". It compares what the store HOLDS against what the
+# notification log says was SENT. Until 2026-08-17 no workflow invoked it, and
+# ingest.php writes that log to <store>/notifications/YYYY-MM.log on the
+# DreamHost box, where no runner ever looked. A written mechanism with no clock
+# is the same class of nothing as a retention policy with no cron.
 #
 # WHY IT IS PARKED RATHER THAN SCHEDULED
 # --------------------------------------
@@ -51,6 +60,63 @@ name: Feedback maintenance (retention and the public tally)
 #  3. Only then uncomment the schedule below, and say in the commit message that
 #     step 2 went green and on which run.
 #
+# WHAT MUST BE TRUE BEFORE A HUMAN TURNS THE SCHEDULE ON  (recommendation,
+# 2026-08-17 -- deliberately NOT acted on; adding the cron is Pip's call)
+# -----------------------------------------------------------------------
+# This becomes an unattended job that DELETES production data. weekly-deployment.yml
+# already did an unattended `rsync --delete` to production every Friday behind a
+# guard that read as safe, so the bar here is a demonstration, not an argument.
+# All six, and the first three are the ones that cannot be skipped:
+#
+#  P1  A dispatched dry run is GREEN and its log shows `state=purged` -- not
+#      `state=store-absent`. A green store-absent dry run proves the SSH key and
+#      python3, and proves nothing about the purge, because the purge never ran.
+#      This is the whole point of the exit-80 rework above.
+#  P2  A dispatched REAL run is green, and `--check` in the same run agrees.
+#      Deleting for the first time with nobody watching is the version of this
+#      that gets discovered later.
+#  P3  The store holds real records at P2 time. A purge over an empty store
+#      exercises no code path that can lose anything.
+#  P4  `alert` has been seen to open its issue. Trap #3 -- a 403 on the handler
+#      is invisible, and an unattended job whose failure handler is broken is
+#      exactly the silence the binding directive exists to abolish. Force it once
+#      by dispatching with a deliberately wrong FEEDBACK_STORE_PATH.
+#      NOTE: `alert` is gated on `github.event_name == 'schedule'`, so this can
+#      only be observed AFTER the cron exists. Turn the schedule on, break the
+#      variable, watch the issue appear, fix the variable. That ordering is the
+#      honest one -- do not "verify" P4 by reading the YAML.
+#  P5  scripts/test-purge-feedback.py is green in CI, not just locally. It is now
+#      a blocking step in feedback-intake.yml (2026-08-17); before that it was
+#      wired to no workflow at all.
+#  P6  A recovery is written down: how to restore the store if a purge nulls a
+#      field it should not have. purge-feedback.py keeps tombstones, so a wrong
+#      purge is not recoverable from the store itself. If the answer is "there is
+#      no backup", say so in the commit that turns the cron on, because that is a
+#      decision and it should be a stated one.
+#
+# THE DRY-RUN GUARD, and why the one below cannot repeat trap #2
+# --------------------------------------------------------------
+# `github.event.inputs.dry_run` is EMPTY on a schedule trigger, so the natural
+# spelling --
+#     if: github.event.inputs.dry_run != 'true'
+# -- is always TRUE on a cron run, which is how a Friday `rsync --delete` ran
+# unattended behind a guard that read as safe. The guard in the purge step tests
+# the EVENT instead:
+#     if [ "$EVENT" = "workflow_dispatch" ] && [ "$DRY_RUN_INPUT" = "true" ]
+# Both halves matter, and the failure direction is the point:
+#   - a schedule never satisfies the first half, so a cron run is ALWAYS a real
+#     run and is labelled one in the log. There is no state in which a scheduled
+#     run silently believes it is dry;
+#   - an empty, absent or mistyped `dry_run` fails the second half, so the only
+#     way to get a dry run is to explicitly ask for one on a dispatch. The
+#     ambiguous case resolves toward doing the visible thing, not the invisible
+#     one;
+#   - both values arrive through `env:`, never `${{ }}` inline in the shell text
+#     (trap #5).
+# If you ever want a scheduled DRY run -- a reasonable thing to want while
+# building confidence -- add a SECOND cron and a separate job, or gate on the ref;
+# do NOT reintroduce an input read on a schedule.
+#
 #     on:
 #       schedule:
 #   #     41 15 * * *  -- 15:41 UTC daily.
@@ -66,38 +132,110 @@ name: Feedback maintenance (retention and the public tally)
 #   #     and off weekly-league-reset.yml's `0 14 * * 4`.
 #         - cron: '41 15 * * *'
 #
+# "STORE ABSENT" IS A CLAIM, AND IT HAS TO BE PROVEN  (fixed 2026-08-17)
+# ----------------------------------------------------------------------
+# This workflow used to treat remote exit 80 -- the store directory is not there
+# -- as GREEN, reasoning that ingest.php creates the store on its first write, so
+# no directory means no records, so no clock has anything to enforce.
+#
+# What that actually verified is only that THIS PATH has no directory. It is not
+# the same claim. FEEDBACK_STORE_PATH is typed by a human and deliberately never
+# derived (see step 1 above), so `feedback_store` for `feedback-store`, or a
+# docroot one level off, yields exit 80 on every run forever: a green job, a
+# privacy page promising a deletion clock, and records piling up unpurged in a
+# directory nothing is looking at. The failure mode of a guard that cannot tell
+# "there is nothing here" from "I am looking in the wrong place" is that it
+# reports the safest of the two.
+#
+# Exit 80 is now only reachable after a positive proof, and the probe splits into
+# three outcomes instead of one:
+#
+#   80  STORE_ABSENT_PROVEN     the store is not there, the PARENT directory was
+#                               listed successfully, and no `.probe` canary
+#                               exists anywhere under it. ingest.php writes
+#                               <store>/.probe on every request (ingest.php:271),
+#                               so no canary under the parent is evidence that no
+#                               store exists under any name there. GREEN.
+#   81  STORE_PARENT_UNLISTABLE dirname(store) could not be entered or read. The
+#                               path is unverifiable, so nothing can be said about
+#                               it. RED. This is the typo signature for any
+#                               component above the last one, and the permissions
+#                               signature for all of them.
+#   82  STORE_ELSEWHERE         the declared path holds no store, but a `.probe`
+#                               canary sits under a SIBLING of it. Something IS
+#                               ingesting feedback and this workflow is pointed at
+#                               the wrong directory. RED, and it prints the
+#                               canary paths RELATIVE to the parent so the fix is
+#                               obvious without putting the deploy user's home
+#                               path into a public Actions log.
+#
+# Only the `retention` job runs the full probe. `tally` and `reconcile` are gated
+# on `needs.retention.result == 'success'`, so by the time either of them sees a
+# bare exit 80 the path has already been proven this run -- and if the store has
+# VANISHED between the two jobs, they compare against retention's own state and
+# go red rather than green. One opinion about one directory, held in one place.
+#
 # CLAUDE.md "Workflow authoring traps" -- how each one is handled here
 # -------------------------------------------------------------------
 #  #1  `git diff` cannot see untracked files. The tally job `git add`s the file
 #      FIRST and then tests `git diff --cached --quiet`. On the first ever run
 #      public/data/feedback-stats.json does not exist, which is precisely the
 #      case the untracked bug swallows -- sync-pdoom1-docs.yml reported SUCCESS
-#      4x/day for months while committing nothing.
+#      4x/day for months while committing nothing. The reconcile job commits
+#      nothing at all, so the trap cannot apply to it; if it ever starts writing
+#      a file, it inherits this rule.
 #  #2  `github.event.inputs` is EMPTY on a schedule trigger. Nothing here reads
 #      it. The dry-run guard tests `github.event_name` explicitly and treats
 #      anything that is not a workflow_dispatch as a real run, so the dangerous
 #      direction of the ambiguity is the one that fails safe.
 #  #3  The alert job carries `permissions: issues: write`. Without it the handler
 #      403s and a scheduled failure is invisible -- which is the same silence the
-#      binding directive exists to abolish, one layer up.
+#      binding directive exists to abolish, one layer up. It `needs:` ALL THREE
+#      jobs -- a job missing from that list is a job whose unattended failure
+#      opens no issue, which is the trap in its quietest form.
 #  #4  This file is PARKED with the reason above rather than deleted or reduced
 #      to a bare dispatch with no explanation.
 #  #5  No author-controlled context is spliced into any `run:`. The store path is
 #      a repository variable, and it still crosses to the remote shell base64-
-#      encoded, so no metacharacter in it can ever be parsed as shell.
+#      encoded, so no metacharacter in it can ever be parsed as shell. The one
+#      value that flows BETWEEN jobs -- `needs.retention.outputs.state` -- is a
+#      literal this file writes, and it is still put in `env:` and read as a
+#      quoted "$RETENTION_STATE" rather than interpolated, because the rule is
+#      about the shape of the mistake, not about who happens to control the
+#      value today.
 #  #6  Nothing here is guarded by a `push` trigger, so the `[skip ci]` blindness
 #      class does not apply. The output it commits (feedback-stats.json) is
 #      itself under public/, so it reaches production on the next deploy.
 #
 # WHAT NEVER LEAVES THE HOST
 # --------------------------
-# Both scripts run ON the DreamHost box, over SSH. No record, no free text, no
-# contact field and no IP hash is ever copied to a GitHub runner. The only thing
-# that comes back over the wire is generate-feedback-stats.py's counts-only
-# document, and the runner re-checks it with that script's own
-# assert_counts_only() before writing it into public/ -- the same function that
-# already refused to write it on the far side. Two independent chances to catch
-# a document carrying content instead of counts, on two machines.
+# All three scripts run ON the DreamHost box, over SSH. No record, no free text,
+# no contact field and no IP hash is ever copied to a GitHub runner.
+#
+# Two documents come back over the wire, and they are not equally safe:
+#
+#   feedback-stats.json  counts only. The runner re-checks it with
+#                        generate-feedback-stats.py's own assert_counts_only()
+#                        before writing it into public/ -- the same function that
+#                        already refused to write it on the far side. Two
+#                        independent chances to catch a document carrying content
+#                        instead of counts, on two machines. This one is
+#                        COMMITTED and published.
+#   reconcile.json       counts PLUS the rid of every divergent record. It is
+#                        read on the runner and NEVER committed, never echoed,
+#                        and never summarised beyond len(). A rid is the preimage
+#                        of the visitor's receipt (contract section 1), and
+#                        section 10 accepts a receipt as authority to erase that
+#                        message -- so a rid in a public Actions log is a key to
+#                        deleting a stranger's words. It exists only in the run's
+#                        ephemeral workspace. Do NOT add it to any artifact
+#                        upload, and do NOT print it "just for debugging".
+#
+# UPDATED 2026-08-17: this section used to say "the only thing that comes back
+# over the wire is ... counts-only". That stopped being true the moment the
+# reconcile job landed, and a header that describes a workflow one job ago is the
+# CLAUDE.md failure this repo keeps re-recording. If you add a fourth job that
+# copies anything back, this paragraph moves in the same commit.
 
 on:
   workflow_dispatch:
@@ -123,6 +261,11 @@ jobs:
     name: Apply the per-field retention clocks (contract section 10)
     runs-on: ubuntu-latest
     environment: production
+    # Published so `tally` and `reconcile` can tell "this run proved the store is
+    # absent" apart from "the store went missing since". Neither re-runs the
+    # parent-directory probe; both are gated on this job having succeeded.
+    outputs:
+      state: ${{ steps.purge.outputs.state }}
     steps:
       - uses: actions/checkout@v4
 
@@ -231,7 +374,29 @@ jobs:
             \"\$PY\" -c 'import sys; sys.exit(0 if sys.version_info >= (3,7) else 1)' \
               || { echo 'PYTHON_TOO_OLD'; \"\$PY\" --version; exit 91; }
 
-            if [ ! -d \"\$STORE\" ]; then echo 'STORE_ABSENT'; exit 80; fi
+            # ---- the store-absence probe (see this file's header) ------------
+            # A missing directory at the declared path proves nothing on its own.
+            # Green requires: the parent can be listed, AND no ingest.php canary
+            # (<dir>/.probe) exists anywhere under it. Anything else is red.
+            if [ ! -d \"\$STORE\" ]; then
+              PARENT=\$(dirname \"\$STORE\")
+              if ! cd \"\$PARENT\" 2>/dev/null; then
+                echo 'STORE_PARENT_UNLISTABLE'; exit 81
+              fi
+              if ! ls -a . >/dev/null 2>&1; then
+                echo 'STORE_PARENT_UNLISTABLE'; exit 81
+              fi
+              # Relative to the parent on purpose: an absolute path here would
+              # carry the deploy user's home directory into a public log.
+              FOUND=\$(find . -maxdepth 2 -name .probe -print 2>/dev/null | head -n 5)
+              if [ -n \"\$FOUND\" ]; then
+                echo 'STORE_ELSEWHERE'
+                echo \"\$FOUND\"
+                exit 82
+              fi
+              echo 'STORE_ABSENT_PROVEN'
+              exit 80
+            fi
 
             echo \"store: \$STORE\"
             \"\$PY\" \"\$TMP/purge-feedback.py\" --store \"\$STORE\" ${MODE}
@@ -249,13 +414,46 @@ jobs:
               echo "OK: the clocks were applied and nothing is retained past one."
               echo "state=purged" >> "$GITHUB_OUTPUT" ;;
             80)
-              # We LOOKED and the directory is not there. That is a positive
-              # observation, not an absence of information: ingest.php creates
-              # the store on its first write, so no store means no record exists,
-              # which means no field can be over-retained. Green with a number.
-              echo "OK: store absent -- 0 records exist, so no clock has anything"
-              echo "to enforce. Verified by looking, not assumed."
+              # PROVEN absent, not merely not-found: the parent directory was
+              # listed and carries no ingest.php `.probe` canary anywhere under
+              # it. ingest.php writes that canary on every request, so its
+              # absence under the parent is evidence that no store exists there
+              # under any spelling -- which is the part the old exit-80 branch
+              # asserted without checking. Green with a reason.
+              echo "OK: store absent, and proven absent."
+              echo "  - the parent directory was listed successfully"
+              echo "  - no <dir>/.probe canary exists anywhere beneath it"
+              echo "ingest.php creates the store and the canary on its first"
+              echo "write, so 0 records exist and no clock has anything to"
+              echo "enforce. Verified by looking, not assumed."
               echo "state=store-absent" >> "$GITHUB_OUTPUT" ;;
+            81)
+              echo "RED: the PARENT of FEEDBACK_STORE_PATH could not be entered"
+              echo "or listed on the host, so nothing can be said about the store"
+              echo "path at all. This is what a mistyped path component above the"
+              echo "last one looks like, and what a permissions change looks like."
+              echo ""
+              echo "It is NOT 'no records exist'. Do not read it as green: while"
+              echo "this is unverifiable, public/privacy/index.html is promising a"
+              echo "deletion clock that may be running over nothing."
+              echo ""
+              echo "Fix: ssh to the host and run 'ls -la <parent>' by hand, then"
+              echo "correct the FEEDBACK_STORE_PATH repository variable."
+              exit 1 ;;
+            82)
+              echo "RED: no store at the declared FEEDBACK_STORE_PATH, but an"
+              echo "ingest.php .probe canary exists under a sibling directory"
+              echo "(paths printed above, relative to the parent)."
+              echo ""
+              echo "Something IS ingesting feedback and this workflow is pointed"
+              echo "somewhere else. Every clock the privacy page promises is"
+              echo "currently enforced over an empty path while real records"
+              echo "accumulate. Correct FEEDBACK_STORE_PATH."
+              echo ""
+              echo "If instead a canary turned up INSIDE the docroot, that is a"
+              echo "contract INV-1c violation -- rsync --delete reaches it and it"
+              echo "is publicly fetchable -- and it is the more urgent finding."
+              exit 1 ;;
             90|91)
               echo "RED: no usable python3 on the host, so the retention clocks"
               echo "cannot be applied at all. The privacy page promises them."
@@ -298,19 +496,32 @@ jobs:
             echo '| `ua` | 180 days |'
             echo '| `ip_hash` | 30 days |'
             echo ''
-            echo 'A `store-absent` outcome is green because the directory was'
-            echo 'checked and is not there -- ingest.php creates it on first'
-            echo 'write, so zero records exist. It is NOT green because nothing'
-            echo 'was looked at.'
+            echo 'A `store-absent` outcome is green only when the absence was'
+            echo 'PROVEN: the parent directory listed successfully and carries no'
+            echo '`.probe` canary anywhere beneath it. ingest.php writes that'
+            echo 'canary on every request, so its absence is evidence that no'
+            echo 'store exists there under any spelling.'
+            echo ''
+            echo 'An unlistable parent, or a canary under a sibling directory, is'
+            echo 'RED -- those are what a mistyped `FEEDBACK_STORE_PATH` looks'
+            echo 'like, and a typo reported as green would leave the privacy'
+            echo 'page promising a deletion clock that deletes nothing.'
           } >> "$GITHUB_STEP_SUMMARY"
 
   tally:
     name: Publish the counts-only public tally (contract section 9)
     needs: retention
-    # Runs after the purge whatever the purge did, but never alongside it: the
-    # two touch the same files. `!cancelled()` rather than `always()` so a
-    # cancelled run does not carry on reading a store mid-rewrite.
-    if: ${{ !cancelled() }}
+    # Runs after the purge, never alongside it: the two touch the same files.
+    #
+    # CHANGED 2026-08-17 from `!cancelled()` to requiring retention to have
+    # SUCCEEDED. The store-absence proof (this file's header) lives in the
+    # retention job, and this job's own `exit 80` branch is green. Running this
+    # job after a retention that went red on STORE_PARENT_UNLISTABLE or
+    # STORE_ELSEWHERE would let the unproven half of the pair publish a tally --
+    # or, worse, report `store-absent` as an outcome on a path nobody has
+    # verified. A cancelled run must also not carry on reading a store
+    # mid-rewrite, which `== 'success'` covers too.
+    if: ${{ needs.retention.result == 'success' }}
     runs-on: ubuntu-latest
     environment: production
     permissions:
@@ -370,6 +581,7 @@ jobs:
           DH_USER: ${{ secrets.DH_USER }}
           DH_PORT: ${{ secrets.DH_PORT }}
           STORE_PATH: ${{ vars.FEEDBACK_STORE_PATH }}
+          RETENTION_STATE: ${{ needs.retention.outputs.state }}
         run: |
           set -euo pipefail
           PORT="${DH_PORT:-22}"
@@ -412,12 +624,26 @@ jobs:
           case "$code" in
             0)  echo "state=generated" >> "$GITHUB_OUTPUT" ;;
             80)
+              # This job does not re-run the parent-directory probe -- it does
+              # not need to. It only runs at all when `retention` succeeded, and
+              # `retention` is where the absence was proven this run. What is
+              # left to catch is the store DISAPPEARING between the two jobs,
+              # which is a real event and not a green one.
+              if [ "${RETENTION_STATE:-}" = "purged" ]; then
+                echo "RED: the retention job found this store and purged it"
+                echo "minutes ago, and it is gone now. A store that vanishes"
+                echo "between two jobs of one run is either a deletion nobody"
+                echo "ordered or a path that is not stable. Do not publish a"
+                echo "tally derived from either."
+                exit 1
+              fi
               # Nothing to count. generate-feedback-stats.py refuses to write a
               # zeroed file for exactly this reason -- "publishing a zeroed file
               # would be a claim that nobody has written to us" -- so this job
               # publishes nothing either, and whatever is already committed
               # stands untouched.
-              echo "OK: store absent. No tally written; any existing one stands."
+              echo "OK: store absent (proven so by the retention job this run)."
+              echo "No tally written; any existing one stands."
               echo "state=store-absent" >> "$GITHUB_OUTPUT" ;;
             2)
               echo "RED: UNKNOWN -- the store was reached but a triage.log line"
@@ -518,9 +744,248 @@ jobs:
             echo 'this runner. No free text, no contact field, no IP hash.'
           } >> "$GITHUB_STEP_SUMMARY"
 
+  reconcile:
+    name: Did anything get stored and never notified? (contract F6 / 9c)
+    needs: [retention, tally]
+    # After both, for the same reason tally is after retention: purge-feedback.py
+    # rewrites the store with os.replace(), and reading a store mid-rewrite is how
+    # a reconciler invents a divergence that is really just a rename in flight.
+    # Gated on retention having SUCCEEDED so the `exit 80` green below stands on
+    # a proof made this run, not on an unverified path (see this file's header).
+    if: ${{ needs.retention.result == 'success' }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Every script this job runs is present
+        run: |
+          set -euo pipefail
+          missing=0
+          for f in scripts/reconcile-feedback.py \
+                   scripts/read-feedback.py; do
+            if [ -f "$f" ]; then echo "present  $f"; else echo "MISSING  $f"; missing=1; fi
+          done
+          # Both, because reconcile-feedback.py loads read-feedback.py rather
+          # than reimplementing the rid-collapse rule -- two collapse rules would
+          # disagree and the disagreement would read as data loss. It raises if
+          # the reader is absent, so copying only one to the host would turn a
+          # legible refusal here into an opaque remote failure there.
+          [ "$missing" = "0" ] || exit 1
+
+      - name: Preconditions -- secrets, and the declared store path
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+          STORE_PATH: ${{ vars.FEEDBACK_STORE_PATH }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for v in DH_HOST DH_USER DH_SSH_KEY; do
+            if [ -z "${!v}" ]; then echo "MISSING secret: $v"; missing=1; fi
+          done
+          if [ -z "$STORE_PATH" ]; then
+            echo "MISSING repository variable: FEEDBACK_STORE_PATH -- see this"
+            echo "workflow's header. Not derived, not guessed."
+            missing=1
+          fi
+          [ "$missing" = "0" ] || exit 1
+
+      - name: Setup SSH
+        env:
+          DH_SSH_KEY: ${{ secrets.DH_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          echo "$DH_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      # This job READS. It writes nothing to the store and nothing to the repo,
+      # so `dry_run` does not change what it does -- and it must not, because a
+      # dry run that declines to look is a dry run that cannot tell you the thing
+      # you pressed the button to find out.
+      - name: Reconcile the store against the notification log, on the host
+        id: reconcile
+        env:
+          DH_HOST: ${{ secrets.DH_HOST }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PORT: ${{ secrets.DH_PORT }}
+          STORE_PATH: ${{ vars.FEEDBACK_STORE_PATH }}
+          RETENTION_STATE: ${{ needs.retention.outputs.state }}
+        run: |
+          set -euo pipefail
+          PORT="${DH_PORT:-22}"
+          TARGET="${DH_USER}@${DH_HOST}"
+          REMOTE_TMP="/tmp/pdoom-feedback-reconcile-${GITHUB_RUN_ID}"
+          STORE_B64="$(printf '%s' "$STORE_PATH" | base64 | tr -d '\n')"
+
+          ssh -p "$PORT" "$TARGET" "mkdir -p '${REMOTE_TMP}'"
+          scp -P "$PORT" \
+            scripts/reconcile-feedback.py \
+            scripts/read-feedback.py \
+            "${TARGET}:${REMOTE_TMP}/"
+
+          set +e
+          ssh -p "$PORT" "$TARGET" "
+            set -eu
+            TMP='${REMOTE_TMP}'
+            STORE=\$(printf %s '${STORE_B64}' | base64 -d)
+            PY=\$(command -v python3 || true)
+            if [ -z \"\$PY\" ]; then echo 'NO_PYTHON3'; exit 90; fi
+            if [ ! -d \"\$STORE\" ]; then echo 'STORE_ABSENT'; exit 80; fi
+
+            # Zero record files is a real, green state and is NOT the same as a
+            # missing notification log. Distinguishing them here is what stops
+            # the reconciler's own 'a missing log means every record diverged'
+            # rule -- which is correct and must not be softened -- from being
+            # permanently red on a store nobody has written to yet.
+            RECORDS=\$(find \"\$STORE\" -type f -name '*.jsonl' 2>/dev/null | head -n 1)
+            if [ -z \"\$RECORDS\" ]; then echo 'NO_RECORDS'; exit 83; fi
+
+            # ingest.php rotates the notification log monthly
+            # (<store>/notifications/YYYY-MM.log, ingest.php:567-578) while
+            # read-feedback.py globs **/*.jsonl across ALL months. Handing the
+            # reconciler one month's log against an all-time store would report
+            # every older record as divergent -- a fabricated incident. So every
+            # monthly log is concatenated into one file first. Concatenation is
+            # safe: the format is one independent JSON object per line.
+            NOTIF=\"\$STORE/notifications\"
+            if [ -d \"\$NOTIF\" ]; then
+              ALL=\"\$TMP/notifications.all.log\"
+              : > \"\$ALL\"
+              find \"\$NOTIF\" -type f -name '*.log' -exec cat {} + >> \"\$ALL\"
+            else
+              # Deliberately a path that does not exist. Records exist and no
+              # notification directory does, so the reconciler must see MISSING
+              # and treat every record as unaccounted for. Handing it an empty
+              # file instead would report 'present, 0 entries' -- true, and a
+              # quieter shade of the same red.
+              ALL=\"\$NOTIF/absent.log\"
+            fi
+
+            # --json, and redirected to a file, on purpose: the human output
+            # names every divergent rid. A rid is the receipt's preimage
+            # (contract section 1), and Actions logs on a public repository are
+            # public, so printing rids would hand a stranger the key that
+            # contract section 10 accepts as authority to ERASE that message.
+            # Counts come back instead. Same discipline as the tally.
+            \"\$PY\" \"\$TMP/reconcile-feedback.py\" --store \"\$STORE\" \
+              --mail-log \"\$ALL\" --json > \"\$TMP/reconcile.json\"
+          "
+          code=$?
+          set -e
+
+          if [ "$code" = "0" ] || [ "$code" = "1" ]; then
+            scp -P "$PORT" "${TARGET}:${REMOTE_TMP}/reconcile.json" ./reconcile.json || true
+          fi
+          ssh -p "$PORT" "$TARGET" "rm -rf '${REMOTE_TMP}'" || true
+
+          case "$code" in
+            0)
+              echo "state=reconciled" >> "$GITHUB_OUTPUT" ;;
+            1)
+              echo "state=divergent" >> "$GITHUB_OUTPUT"
+              echo "RED: at least one record is stored and was never successfully"
+              echo "notified, or a notification exists for a record that is not"
+              echo "stored. Contract section 6 row F6, and section 9c: the words"
+              echo "are safe -- the store is the record -- but nobody has been"
+              echo "told they arrived, and received-and-never-read is silent loss"
+              echo "wearing a different hat."
+              echo ""
+              echo "The rids are NOT printed here (a rid is the receipt's"
+              echo "preimage and this log is public). Read them on the host:"
+              echo "  python3 reconcile-feedback.py --store <path> \\"
+              echo "    --mail-log <path>/notifications/<YYYY-MM>.log"
+              exit 1 ;;
+            2)
+              echo "RED: UNKNOWN -- the store or the notification log could not be"
+              echo "read. Nothing was reconciled; do not read this as clean."
+              exit 1 ;;
+            80)
+              if [ "${RETENTION_STATE:-}" = "purged" ]; then
+                echo "RED: the retention job purged this store minutes ago and it"
+                echo "is gone now. See the tally job's identical branch."
+                exit 1
+              fi
+              echo "OK: store absent (proven so by the retention job this run)."
+              echo "Nothing has been ingested, so nothing can have gone"
+              echo "unnotified."
+              echo "state=store-absent" >> "$GITHUB_OUTPUT" ;;
+            83)
+              echo "OK: the store exists and holds zero record files, so there is"
+              echo "nothing that could have been stored-and-not-notified. This is"
+              echo "a positive observation -- the directory was listed."
+              echo "state=no-records" >> "$GITHUB_OUTPUT" ;;
+            90) echo "RED: no python3 on the host."; exit 1 ;;
+            *)  echo "RED: unexpected exit $code from the remote reconcile."; exit 1 ;;
+          esac
+
+      # Counts only, from the JSON, on this machine. The rid lists in that file
+      # are read and deliberately not printed.
+      - name: Summary
+        if: always()
+        env:
+          STATE: ${{ steps.reconcile.outputs.state }}
+        run: |
+          set -euo pipefail
+          {
+            echo '## Stored vs notified (contract section 6 row F6, section 9c)'
+            echo ''
+            echo "Outcome: ${STATE:-failed}"
+            echo ''
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -f reconcile.json ]; then
+            python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, pathlib, sys
+
+          for _s in (sys.stdout, sys.stderr):
+              try: _s.reconfigure(encoding="utf-8", errors="replace")
+              except (AttributeError, ValueError): pass
+
+          doc = json.loads(pathlib.Path("reconcile.json").read_text(encoding="utf-8"))
+          # COUNTS ONLY. doc["divergent"] and doc["notified_not_stored"] are lists
+          # of rids; a rid is the preimage of the visitor's receipt, and this
+          # summary is public. Print len(), never the list.
+          print("| measure | count |")
+          print("|---|---|")
+          for label, value in (
+              ("records in the store (duplicates collapsed)", doc["stored"]),
+              ("duplicate writes collapsed", doc["duplicates_collapsed"]),
+              ("notification log entries", doc["notified"]),
+              ("notified OK", doc["ok"]),
+              ("deferred to the thumbs digest", len(doc["deferred"])),
+              ("DIVERGENT (stored, never notified)", len(doc["divergent"])),
+              ("NOTIFIED BUT NOT STORED", len(doc["notified_not_stored"])),
+              ("unusable notification lines", doc["notifications_unusable"]),
+              ("unparseable store lines", doc["unparseable_store_lines"]),
+          ):
+              print("| %s | %s |" % (label, value))
+          print("")
+          if not doc["mail_log_present"]:
+              print("The notification log was MISSING. Every stored record is "
+                    "therefore unaccounted for -- that is not the same as "
+                    "'nothing to do', and it is why this is red.")
+          print("")
+          print("Rids are withheld on purpose: a rid is the receipt's preimage "
+                "(contract section 1) and section 10 accepts a receipt as "
+                "authority to erase a message. Read them on the host.")
+          PY
+          else
+            {
+              echo 'No reconciliation document was produced. Either the store is'
+              echo 'absent, it holds no records, or the run failed before the'
+              echo 'reconciler ran. None of those are "no divergence found".'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   alert:
     name: Alert on scheduled failure (de-duplicated)
-    needs: [retention, tally]
+    needs: [retention, tally, reconcile]
     # Only on a schedule. A dispatch failure is already in front of the person
     # who pressed the button; an unattended failure has nobody watching it, and
     # a retention promise failing in silence is the binding directive's own
@@ -549,9 +1014,16 @@ jobs:
               '',
               'Check, in order:',
               '- can the SSH key still reach the host, and is `FEEDBACK_STORE_PATH` still right?',
+              '- a `STORE_PARENT_UNLISTABLE` or `STORE_ELSEWHERE` red means the path',
+              '  itself is wrong or unverifiable -- fix that FIRST, because every',
+              '  other result this run is about the wrong directory',
               '- `python scripts/purge-feedback.py --store <path> --check` on the host',
               '- an unreadable line in `<store>/triage.log` makes the 90-day contact',
               '  clock uncomputable, so `contact` is left alone and both jobs go UNKNOWN',
+              '- a red `reconcile` job is DIFFERENT in kind: nothing is lost (the store',
+              '  is the record) but messages have arrived that no notification carried,',
+              '  so nobody has been told. Contract section 6 row F6 and section 9c.',
+              '  The rids are on the host, not in the run log -- deliberately.',
               '',
               'If this cannot be fixed quickly, the honest remedy is the other one',
               'contract 7.1 allows: take the affected sentences out of the privacy',
