@@ -34,32 +34,14 @@
 				<li role="none" class="dropdown">
 					<a href="#" role="menuitem" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">Community ▾</a>
 					<ul class="dropdown-menu" role="menu">
-						<!-- TEMPORARY, 2026-08-15. This pointed at /bug-report/, and the
-						     comment here said that was "the ONLY zero-account path on the
-						     site that actually delivers". That became false and nobody
-						     noticed, which is why it is being written down rather than
-						     quietly edited.
-
-						     /bug-report/ POSTs to bug-submit.php, which calls PHP mail()
-						     on DreamHost. pdoom1.com has NEVER published an SPF record and
-						     its MX is Google, so Google sees its own hosted domain arriving
-						     unauthorised from a DreamHost IP and does not deliver. mail()
-						     returns true regardless, and the 200 the visitor sees is
-						     generated before delivery is even attempted -- so the form
-						     shows "Report Submitted!" and the message is gone. Measured
-						     2026-08-14: a probe returned {"ok":true} and had not arrived
-						     34 minutes later. pdoom1-website#321.
-
-						     mailto: is UNAFFECTED. A visitor's own mail client sends from
-						     their provider to Google's MX and never touches DreamHost. So
-						     the nav points at the address, which works, instead of the
-						     form, which does not.
-
-						     REVERT THIS once the SPF record is live AND a probe has been
-						     confirmed arriving in the inbox -- not merely once the DNS has
-						     been edited. Handover:
-						     coordination/HANDOVER_2026-08-15_pdoom1-mail-transmission.md -->
-						<li role="none"><a href="mailto:team@pdoom1.com?subject=p(Doom)1%20feedback" role="menuitem">Contact / Feedback</a></li>
+						<!-- /bug-report/ is the ONLY zero-account path on the site that
+						     actually delivers: it POSTs to bug-submit.php, which emails
+						     team@pdoom1.com. It was linked from nowhere in the nav until
+						     2026-08-11, so the one working contact route was unreachable
+						     unless you already knew the URL. Labelled for a general
+						     visitor, not "Report a Bug" -- most first-stranger contact is
+						     not a bug report, and a bug-only label turns them away. -->
+						<li role="none"><a href="/bug-report/" role="menuitem">Contact / Feedback</a></li>
 						<li role="none"><a href="/issues/" role="menuitem">Issues & Feedback</a></li>
 						<li role="none"><a href="/blog/" role="menuitem">Dev Blog</a></li>
 						<li role="none"><a href="/game-changelog/" role="menuitem">Updates</a></li>
