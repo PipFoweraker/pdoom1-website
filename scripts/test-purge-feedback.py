@@ -29,12 +29,30 @@ Each block below injects the fault rather than asserting about it:
   T14 purge and read-feedback agree on what a record file is
   T15 §10's other half -- a salt that stopped rotating is RED, and a salt this
       script cannot find is UNVERIFIED out loud rather than silently fine
+  T16 A1: contention on <store>/.write-lock -- the lock is HELD by this process
+      and the purge must wait and then refuse, never replace
+  T17 A1, the defect itself: a record appended DURING a purge, under the lock,
+      exactly as ingest.php appends it. It must survive the os.replace()
+  T18 A2: a store inside a docroot that carries none of the heuristic's names --
+      the real DreamHost layout, which the old guard waved through
+  T19 A3: the salts and throttle buckets the purge never touched, and the
+      linkage a retained salt keeps alive
 
 Nothing here touches the repository tree: every store is built in a fresh temp
 directory outside it, which is also the only place purge-feedback will consent
 to operate.
+
+WHY EVERY RUN GETS A DOCROOT (changed 2026-08-17)
+------------------------------------------------
+purge-feedback.py now REFUSES without --docroot / PDOOM_DOCROOT, so run() below
+injects a throwaway one that contains no store. T18 is the block that takes it
+away again and observes the refusal -- if the default were silently absent here,
+every other block would be exercising the refusal path instead of the thing it
+means to test, and would still look green.
 """
 
+import datetime as dt
+import hashlib
 import importlib.util
 import json
 import os
@@ -42,6 +60,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 for _stream in (sys.stdout, sys.stderr):
@@ -72,16 +91,47 @@ def check(label, condition, detail=""):
         FAILURES.append(label)
 
 
-def run(*args, env_extra=None, cwd=None):
+# A docroot that exists and contains none of the stores below, so the INV-1c
+# containment test has something real to compare against without ever matching.
+# Created once; the interpreter's temp dir is cleaned by the OS.
+DEFAULT_DOCROOT = tempfile.mkdtemp(prefix="pdoom-test-docroot-")
+
+
+def _env(env_extra=None):
     env = dict(os.environ)
     env.pop("PDOOM_FEEDBACK_STORE", None)
     env.pop("PDOOM_PURGE_CRASH_AFTER", None)
+    env.pop("PDOOM_DOCROOT", None)
+    env.pop("PDOOM_PURGE_LOCK_TIMEOUT", None)
+    # Short by default so a genuinely stuck lock fails the suite in seconds
+    # instead of hanging it; T16 sets its own.
+    env["PDOOM_PURGE_LOCK_TIMEOUT"] = "5"
+    env["PDOOM_DOCROOT"] = DEFAULT_DOCROOT
+    # env_extra wins, INCLUDING an empty string -- that is how T18 takes the
+    # docroot away and observes the refusal.
     env.update(env_extra or {})
+    return env
+
+
+def run(*args, env_extra=None, cwd=None):
     proc = subprocess.run(
         [sys.executable, str(PURGE)] + [str(a) for a in args],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
-        env=env, cwd=str(cwd or REPO_ROOT))
+        env=_env(env_extra), cwd=str(cwd or REPO_ROOT))
     return proc.returncode, proc.stdout, proc.stderr
+
+
+def spawn(*args, env_extra=None):
+    """Same invocation as run(), but the caller drives the process.
+
+    T17 needs the purge to be RUNNING and blocked while this process holds the
+    lock and appends a record. subprocess.run() cannot express that.
+    """
+    return subprocess.Popen(
+        [sys.executable, str(PURGE)] + [str(a) for a in args],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        encoding="utf-8", errors="replace",
+        env=_env(env_extra), cwd=str(REPO_ROOT))
 
 
 def record(rid, **over):
@@ -527,14 +577,310 @@ def t15_salt_rotation():
         check("stale salt: the message says why it matters",
               "linkable" in out, out)
 
-        # Fresh: green again, and still counted rather than passed over silently.
+        # A fresh salt clears the ROTATION finding -- and must NOT clear the
+        # RETENTION one, which is A3's whole point: the salt is rotating and
+        # every historical salt is still on disk, so a 30-day-old ip_hash is
+        # still reversible. Two different findings about the same directory.
         fresh = salt / "today"
         fresh.write_text("x", encoding="utf-8")
         code, out, _err = run("--store", root, "--check")
-        check("fresh salt: --check is green", code == 0,
+        check("fresh salt + a retained old one: still RED", code == 1,
+              "exit %s\n%s" % (code, out))
+        check("...and now for RETENTION, not rotation",
+              "salt rotation OK" in out and "ip-derived file" in out, out)
+
+        # Green only once the old salt is actually gone.
+        old.unlink()
+        code, out, _err = run("--store", root, "--check")
+        check("fresh salt, no retained salt: --check is green", code == 0,
               "exit %s\n%s" % (code, out))
         check("fresh salt: green still carries the number",
               "salt rotation OK" in out, out)
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+
+def t16_write_lock_is_observed():
+    print("\nT16 A1: hold <store>/.write-lock and watch the purge refuse to replace")
+    purge = _import(PURGE, "purge_lock_probe")
+    root = store_with([record("held", server_ts=NOW - 400 * DAY)])
+    try:
+        before = raw_bytes(root)
+
+        # The fault: a real exclusive lock, taken by THIS process on the very
+        # file ingest.php locks. Not a stub, not a flag -- the same primitive.
+        with purge.store_write_lock(root, 5.0) as lock_path:
+            check("the lockfile is not a record file",
+                  lock_path.name == ".write-lock"
+                  and not lock_path.name.endswith(".jsonl"),
+                  str(lock_path))
+            started = time.monotonic()
+            code, _out, err = run("--store", root, "--now", NOW,
+                                  "--lock-timeout", "1")
+            waited = time.monotonic() - started
+            check("a purge that cannot take the lock REFUSES (3)", code == 3,
+                  "exit %s\n%s" % (code, err))
+            check("...and it WAITED for the lock rather than skipping it",
+                  waited >= 0.9, "returned after %.2fs" % waited)
+            check("...and the store is byte-identical", raw_bytes(root) == before)
+            check("...and the refusal names the lockfile",
+                  ".write-lock" in err, err)
+
+            # --check has a different right answer: it wrote nothing either way,
+            # so the honest report is "certified nothing", not "refused".
+            code, _out, err = run("--store", root, "--check", "--now", NOW,
+                                  "--lock-timeout", "1")
+            check("--check under contention is UNKNOWN (2), never a green",
+                  code == 2, "exit %s\n%s" % (code, err))
+            check("...and says why silence is not success",
+                  "certified nothing" in err, err)
+
+        # POSITIVE CONTROL. Without this, every assertion above is equally
+        # consistent with a purge that is simply broken -- CLAUDE.md's
+        # count_emails() trap, which reports success on a run where nothing
+        # happened.
+        code, out, _err = run("--store", root, "--now", NOW, "--lock-timeout", "1")
+        check("positive control: the same run succeeds once the lock is free",
+              code == 0, "exit %s\n%s" % (code, out))
+        check("positive control: it really did rewrite the store",
+              raw_bytes(root) != before)
+        check("positive control: the record survived the rewrite",
+              read_records(root)[0]["text"] == "the visitor said something")
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+
+def t17_a_submission_during_a_purge_survives():
+    print("\nT17 A1, the defect itself: a POST that lands mid-purge must survive")
+    # This is the failing sequence from the review, executed rather than
+    # described: purge starts, ingest.php appends and answers 200, purge calls
+    # os.replace(). Before the shared lock the appended record ended up in an
+    # orphaned inode and NOTHING recorded the loss.
+    # The two processes are real and so is the contention. PDOOM_PURGE_STALL_MS
+    # only widens the read -> os.replace() window from sub-millisecond to
+    # seconds; it does not change who holds what. Without it the race is real
+    # but unobservable, and an unobservable property is one a test can only
+    # assert about.
+    purge = _import(PURGE, "purge_race_probe")
+    root = store_with([record("old-%d" % i, server_ts=NOW - 400 * DAY)
+                       for i in range(3)])
+    proc = None
+    holder = None
+    try:
+        proc = spawn("--store", root, "--now", NOW, "--lock-timeout", "60",
+                     env_extra={"PDOOM_PURGE_STALL_MS": "3000"})
+        time.sleep(1.0)
+        check("the purge is mid-run (it has read the store, not yet replaced it)",
+              proc.poll() is None, "it exited %s already" % proc.poll())
+
+        # Now do exactly what public/ingest.php does on a POST: take the store
+        # write lock, append one line, fsync, release. The 200 with the
+        # visitor's receipt goes out at the instant of that fsync.
+        started = time.monotonic()
+        holder = purge.store_write_lock(root, 30.0)
+        holder.__enter__()
+        waited = time.monotonic() - started
+        check("the appender BLOCKED on the lock the purge is holding",
+              waited >= 1.0,
+              "acquired in %.2fs -- the purge is not holding the lock across "
+              "its read, so a record written now is in an inode about to be "
+              "replaced" % waited)
+
+        late = record("late-arrival", server_ts=NOW)
+        with open(root / "2026-08.jsonl", "a", encoding="utf-8",
+                  newline="") as fh:
+            fh.write(json.dumps(late, ensure_ascii=False,
+                                separators=(",", ":")) + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+        holder.__exit__(None, None, None)
+        holder = None
+
+        out, err = proc.communicate(timeout=60)
+        check("the purge completed", proc.returncode == 0,
+              "exit %s\n%s%s" % (proc.returncode, out, err))
+
+        recs = read_records(root)
+        rids = [r["rid"] for r in recs if r]
+        check("THE ONE THAT MATTERS: the record appended mid-purge survived",
+              "late-arrival" in rids,
+              "the visitor holds a receipt for a message that is gone; rids=%s"
+              % rids)
+        check("...and no earlier record was lost", len(recs) == 4,
+              "got %d record(s): %s" % (len(recs), rids))
+        check("...and the purge still did its job on the old records",
+              all(r["ip_hash"] is None for r in recs if r["rid"] != "late-arrival"),
+              json.dumps(recs))
+        # Indexed defensively: when the record HAS been swallowed this list is
+        # empty, and a raised IndexError would take the summary line with it.
+        survivors = [r for r in recs if r["rid"] == "late-arrival"]
+        check("...and the fresh record was left alone",
+              bool(survivors) and survivors[0]["ip_hash"] == "a" * 64,
+              "no surviving late-arrival to inspect" if not survivors
+              else repr(survivors[0]["ip_hash"]))
+    finally:
+        if holder is not None:
+            holder.__exit__(None, None, None)
+        if proc is not None and proc.poll() is None:
+            proc.kill()
+        shutil.rmtree(root, ignore_errors=True)
+
+
+def t18_a_store_inside_the_real_docroot_is_refused():
+    print("\nT18 A2: the DreamHost layout -- a docroot with no `public` in its name")
+    purge = _import(PURGE, "purge_docroot_probe")
+    home = Path(tempfile.mkdtemp(prefix="pdoom-home-"))
+    docroot = home / "pdoom1.com"          # DreamHost's actual docroot shape
+    store = docroot / "feedback-store"
+    store.mkdir(parents=True)
+    (store / "2026-08.jsonl").write_text(
+        json.dumps(record("in-docroot"), ensure_ascii=False,
+                   separators=(",", ":")) + "\n", encoding="utf-8")
+    try:
+        # First: prove the OLD guard would have passed this. Without this the
+        # block only shows the new check firing, and says nothing about whether
+        # it was needed.
+        parts = Path(os.path.realpath(str(store))).parts
+        hits = [p for p in parts if p.lower() in purge.DOCROOT_PARTS]
+        check("the name heuristic ALONE does not see this path (the defect)",
+              hits == [], "heuristic matched %s" % hits)
+
+        code, _out, err = run("--store", store, "--check", "--now", NOW,
+                              env_extra={"PDOOM_DOCROOT": str(docroot)})
+        check("containment against the declared docroot refuses it", code == 3,
+              "exit %s\n%s" % (code, err))
+        check("the refusal cites INV-1c and names the docroot",
+              "INV-1c" in err and "pdoom1.com" in err, err)
+        check("the refusal points at ingest.php's matching guard",
+              "ingest.php" in err, err)
+
+        # A refusal that only applied to --check would leave the dangerous mode
+        # unguarded, which is the shape of every early-return defect in this repo.
+        code, _out, err = run("--store", store, "--now", NOW,
+                              env_extra={"PDOOM_DOCROOT": str(docroot)})
+        check("a real purge is refused too, not only --check", code == 3,
+              "exit %s\n%s" % (code, err))
+        check("the refused run created no lockfile inside the docroot store",
+              not (store / ".write-lock").exists())
+
+        # The --docroot FLAG must work, not just the env var.
+        code, _out, err = run("--store", store, "--check", "--now", NOW,
+                              "--docroot", str(docroot),
+                              env_extra={"PDOOM_DOCROOT": ""})
+        check("--docroot as a flag refuses it as well", code == 3,
+              "exit %s\n%s" % (code, err))
+
+        # The sibling that merely LOOKS contained must NOT be refused, or an
+        # operator learns to reach for a bypass.
+        sibling = home / "pdoom1.com-feedback-store"
+        sibling.mkdir()
+        (sibling / "2026-08.jsonl").write_text(
+            json.dumps(record("outside"), ensure_ascii=False,
+                       separators=(",", ":")) + "\n", encoding="utf-8")
+        code, out, err = run("--store", sibling, "--check", "--now", NOW,
+                             env_extra={"PDOOM_DOCROOT": str(docroot)})
+        check("a sibling sharing the docroot's PREFIX is not refused",
+              code != 3, "exit %s\n%s%s" % (code, out, err))
+
+        # No docroot at all: REFUSE, never fall back to the heuristic.
+        code, _out, err = run("--store", sibling, "--check", "--now", NOW,
+                              env_extra={"PDOOM_DOCROOT": ""})
+        check("with no docroot supplied it REFUSES rather than falling back",
+              code == 3, "exit %s\n%s" % (code, err))
+        check("...and says exactly what to pass",
+              "--docroot" in err and "PDOOM_DOCROOT" in err, err)
+        check("...and explains why there is no default",
+              "DreamHost" in err or "no fallback" in err.lower(), err)
+    finally:
+        shutil.rmtree(home, ignore_errors=True)
+
+
+def t19_salts_and_throttle_buckets_are_swept():
+    print("\nT19 A3: the ip_hash clock is not only a field")
+    day = dt.datetime.fromtimestamp(NOW, dt.timezone.utc)
+    today = day.strftime("%Y-%m-%d")
+    ten_days_ago = (day - dt.timedelta(days=10)).strftime("%Y-%m-%d")
+
+    ip = "203.0.113.7"
+    old_salt_value = "s" * 64
+    linkable = hashlib.sha256((ip + old_salt_value).encode("utf-8")).hexdigest()
+
+    # A record whose ip_hash is still INSIDE its 30-day window, so the field is
+    # legitimately retained. The finding is entirely about the files.
+    root = store_with([record("recent", server_ts=NOW - 5 * DAY,
+                              contact=None, ua=None, ip_hash=linkable)])
+    try:
+        salt = root / ".salt"
+        salt.mkdir()
+        throttle = root / ".throttle"
+        throttle.mkdir()
+
+        fresh_salt = salt / today
+        fresh_salt.write_text("f" * 64, encoding="utf-8")
+        old_salt = salt / ten_days_ago
+        old_salt.write_text(old_salt_value, encoding="utf-8")
+        # ingest.php's lost-rename leftover, which carries salt material and
+        # which nothing in this system has ever removed.
+        stray = salt / "legacy-salt-no-date"
+        stray.write_text("l" * 64, encoding="utf-8")
+        # mtimes are set against the INJECTED clock so salt_state() reports
+        # rotation as healthy -- otherwise the run goes red for staleness and
+        # this block would be observing the wrong finding.
+        for path, when in ((fresh_salt, NOW - 3600),
+                           (old_salt, NOW - 10 * DAY),
+                           (stray, NOW - 400 * DAY)):
+            os.utime(path, (when, when))
+
+        fresh_bucket = throttle / ("a" * 32 + ".json")
+        fresh_bucket.write_text('{"prose":{"tokens":4}}', encoding="utf-8")
+        old_bucket = throttle / (linkable[:32] + ".json")
+        old_bucket.write_text('{"prose":{"tokens":5}}', encoding="utf-8")
+        os.utime(fresh_bucket, (NOW - DAY, NOW - DAY))
+        os.utime(old_bucket, (NOW - 40 * DAY, NOW - 40 * DAY))
+
+        # The linkage is real, not rhetorical: with the retained salt in hand,
+        # the stored ip_hash resolves back to an address.
+        check("a retained salt makes a stored ip_hash reversible (the harm)",
+              hashlib.sha256(
+                  (ip + old_salt.read_text(encoding="utf-8")).encode("utf-8")
+              ).hexdigest() == linkable)
+        check("the throttle bucket is NAMED after that same ip_hash",
+              old_bucket.stem == linkable[:32])
+
+        code, out, _err = run("--store", root, "--check", "--now", NOW)
+        check("--check goes RED on retained ip-derived files", code == 1,
+              "exit %s\n%s" % (code, out))
+        check("--check counts them", "ip_derived_files_over_clock" in out, out)
+        check("--check names the salt and the bucket",
+              ten_days_ago in out and old_bucket.name in out, out)
+        check("--check is red for RETENTION, not rotation",
+              "salt rotation OK" in out, out)
+        check("--check deleted nothing", old_salt.exists() and old_bucket.exists())
+
+        code, out, _err = run("--store", root, "--now", NOW)
+        check("the purge succeeded", code == 0, "exit %s\n%s" % (code, out))
+        check("the over-age salt is GONE", not old_salt.exists())
+        check("the undated leftover is gone too (mtime fallback)",
+              not stray.exists())
+        check("the over-age throttle bucket is GONE", not old_bucket.exists())
+        check("today's salt survived -- sweeping it would re-hash every visitor",
+              fresh_salt.exists())
+        check("the in-window throttle bucket survived", fresh_bucket.exists())
+        check("the purge reported what it swept", "swept" in out, out)
+        check("the visitor's record was not touched by any of this",
+              read_records(root)[0]["text"] == "the visitor said something")
+        check("...and its in-window ip_hash is still there",
+              read_records(root)[0]["ip_hash"] == linkable)
+
+        code, out, _err = run("--store", root, "--check", "--now", NOW)
+        check("--check is green after the sweep", code == 0,
+              "exit %s\n%s" % (code, out))
+
+        # "Never counted as a record" is a claim; this is the observation.
+        purge = _import(PURGE, "purge_glob_probe")
+        names = [str(p) for p in purge.record_files(root)]
+        check("no salt, bucket or lockfile is read as a record file",
+              names == [str(root / "2026-08.jsonl")], str(names))
     finally:
         shutil.rmtree(root, ignore_errors=True)
 
@@ -558,7 +904,11 @@ def main():
                t8_bad_store_locations_refused, t9_unparseable_line_preserved,
                t10_no_store_is_unknown_not_green, t11_second_run_rewrites_nothing,
                t12_u2028_does_not_tear_a_record, t13_utf8_under_cp1252,
-               t14_record_glob_agrees_with_the_reader, t15_salt_rotation):
+               t14_record_glob_agrees_with_the_reader, t15_salt_rotation,
+               t16_write_lock_is_observed,
+               t17_a_submission_during_a_purge_survives,
+               t18_a_store_inside_the_real_docroot_is_refused,
+               t19_salts_and_throttle_buckets_are_swept):
         # A block that dies takes its own findings with it AND every block after
         # it, which turns a precise report into "something went wrong". Observed
         # while mutation-testing this file: the crash-mid-rewrite defect failed

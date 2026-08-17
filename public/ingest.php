@@ -97,6 +97,15 @@ const RECIPIENT = 'team@pdoom1.com';   // hardcoded on purpose (see above)
 const FROM      = 'team@pdoom1.com';   // envelope sender; see mail()'s 5th param
 const SCHEMA    = 1;
 
+// The ONE file every writer to this store locks. See append_record() for why it
+// cannot be the month file. scripts/purge-feedback.py takes the same lock, on
+// the same path, and holds it across its read -> os.replace().
+//
+// NOT *.jsonl on purpose: `<store>/*.jsonl` means "visitor records" to every
+// reader in this system, and a lockfile counted as a record is a message nobody
+// sent.
+const STORE_LOCK = '.write-lock';
+
 // A whole-body cap, checked on bytes before anything is parsed. The per-field
 // caps below are the ones a visitor can act on; this one only exists so a
 // multi-megabyte body cannot be decoded into memory.
@@ -268,7 +277,53 @@ function ensure_store(string $root): bool
     if (!is_dir($root)) {
         return false;
     }
+    // Create the shared write lock here so it exists from the first request of a
+    // new deploy, rather than being created by whichever writer happens to run
+    // first. 'c' creates without truncating; the contents are never read.
+    $lock = @fopen(store_lock_path($root), 'cb');
+    if ($lock) {
+        @fclose($lock);
+    }
     return @file_put_contents($root . '/.probe', gmdate('c') . "\n") !== false;
+}
+
+function store_lock_path(string $root): string
+{
+    return $root . '/' . STORE_LOCK;
+}
+
+/**
+ * Take the store-wide write lock, or false.
+ *
+ * Returns the open handle -- the lock lives as long as the handle does, so the
+ * caller MUST pass it to release_store_lock() on every path out.
+ */
+function acquire_store_lock(string $root)
+{
+    // 'c': create if absent, do NOT truncate, do NOT move the pointer. The file
+    // is never unlinked and never written: unlinking it is how two processes end
+    // up locking two different inodes while both believe they are serialised,
+    // which is the very defect this lock exists to fix.
+    $fh = @fopen(store_lock_path($root), 'cb');
+    if (!$fh) {
+        return false;
+    }
+    // BLOCKING on purpose (no LOCK_NB). A busy lock means the purge is rewriting
+    // the store, which takes well under a second; waiting costs the visitor a
+    // moment, while giving up would cost them the message.
+    if (!@flock($fh, LOCK_EX)) {
+        @fclose($fh);
+        return false;
+    }
+    return $fh;
+}
+
+function release_store_lock($fh): void
+{
+    if ($fh) {
+        @flock($fh, LOCK_UN);
+        @fclose($fh);
+    }
 }
 
 // ---- identity ------------------------------------------------------------
@@ -446,8 +501,48 @@ function throttle_check(string $root, string $ipHash, string $class): array
  *   or fsync fails, the bytes already on disk are a partial line, and a partial
  *   line is a corrupt store forever. Rolling back is what makes "no partial
  *   line" true rather than hoped for.
+ *
+ * THE OUTER LOCK IS A DIFFERENT FILE, AND THAT IS THE WHOLE POINT (fixed
+ * 2026-08-17)
+ * ---------------------------------------------------------------------------
+ * flock() locks an INODE. scripts/purge-feedback.py rewrites the month file by
+ * rendering a temp file and calling os.replace(), which SWAPS THAT INODE OUT.
+ * So the flock() below -- taken on the month file, and correct against another
+ * ingest.php -- was invisible to the purge, and the purge was invisible to it:
+ *
+ *   purge reads 2026-08.jsonl
+ *   visitor POSTs; this function appends, fsyncs, and a 200 with a receipt goes
+ *     back out
+ *   purge calls os.replace()
+ *   -> the record is now in an orphaned inode, the visitor holds a receipt for
+ *      a message that no longer exists, and NOTHING anywhere records the loss
+ *
+ * That is the binding directive's worst case, reached with no bug in either
+ * program. The fix is a lock on a file whose inode never changes:
+ * <store>/.write-lock. The purge holds it across read -> os.replace(); this
+ * takes it around the append. The per-file flock() stays, unchanged: it costs
+ * nothing and it still serialises two concurrent POSTs (contract F4) even if a
+ * future writer forgets the outer lock.
  */
 function append_record(string $root, array $rec): array
+{
+    $lock = acquire_store_lock($root);
+    if ($lock === false) {
+        // The directory was already proven writable by ensure_store(), so this
+        // is a genuine anomaly. Refuse: appending unlocked is how a purge
+        // silently swallows a record we are about to answer 200 for, and a 507
+        // costs a duplicate on retry while a wrong 200 costs the message.
+        return ['ok' => false, 'why' => 'store write lock could not be taken'];
+    }
+    try {
+        return append_record_locked($root, $rec);
+    } finally {
+        release_store_lock($lock);
+    }
+}
+
+/** The append itself. Callers MUST hold the store write lock. */
+function append_record_locked(string $root, array $rec): array
 {
     $line = json_encode($rec, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if ($line === false) {

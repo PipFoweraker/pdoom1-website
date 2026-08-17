@@ -2,10 +2,14 @@
 # -*- coding: utf-8 -*-
 """Per-field retention for the feedback store, and erasure on request.
 
-    python scripts/purge-feedback.py --store <dir> --check      # the CI gate
-    python scripts/purge-feedback.py --store <dir>              # apply the clocks
-    python scripts/purge-feedback.py --store <dir> --receipt F-ABC123
-    python scripts/purge-feedback.py --store <dir> --rid <uuid>
+    python scripts/purge-feedback.py --store <dir> --docroot <dir> --check
+    python scripts/purge-feedback.py --store <dir> --docroot <dir>
+    python scripts/purge-feedback.py --store <dir> --docroot <dir> --receipt F-ABC123
+    python scripts/purge-feedback.py --store <dir> --docroot <dir> --rid <uuid>
+
+--docroot (or PDOOM_DOCROOT) is REQUIRED and has no default. See "THE DOCROOT
+IS AN INPUT" below: guessing it is how a store inside the docroot got waved
+through.
 
 WHY THIS FILE EXISTS
 --------------------
@@ -38,6 +42,73 @@ kind, page, value, flags and timestamps standing, so the public aggregate
 counter (scripts/generate-feedback-stats.py) cannot silently disagree with
 history. An erased submission is still one submission.
 
+THE DOCROOT IS AN INPUT, NOT A GUESS (INV-1c) -- FIXED 2026-08-17
+-----------------------------------------------------------------
+This script used to enforce INV-1c with a NAME heuristic alone: refuse any store
+whose path contained a component called public/public_html/httpdocs. On
+DreamHost shared hosting the docroot is /home/<user>/<domain>, so a store at
+/home/pdoom1/pdoom1.com/feedback-store -- inside the docroot, publicly
+fetchable, and inside `rsync --delete`'s destination -- carried none of those
+names and PASSED. public/ingest.php refused the identical path, because it
+compares against DOCUMENT_ROOT. Two guards, one invariant, opposite answers.
+
+So the docroot is now an explicit input (--docroot, or PDOOM_DOCROOT, the same
+variable ingest.php reads) and the containment test is the one ingest.php does:
+realpath both, then "is the store the docroot or under it". The name heuristic
+survives as an ADDITIONAL refusal, never as the only one.
+
+If no docroot is supplied this script REFUSES. It does not fall back to the
+heuristic, because a fallback ships exactly when the real check is unavailable
+(CLAUDE.md: "Fallback literals are the dangerous ones"), and the thing it would
+be protecting is somebody's email address.
+
+The guard is deliberately TWO functions, and the split is a known gap, not a
+tidy-up. scripts/generate-feedback-stats.py:484 calls
+refuse_bad_store_location() by name and has no --docroot to pass, so:
+
+    refuse_bad_store_location()   repo containment + the name heuristic
+    refuse_store_inside_docroot() the ingest.php comparison; REFUSES with no
+                                  docroot
+
+main() here calls both. generate-feedback-stats.py calls only the first, so it
+still carries the weaker guard.
+
+WHY THAT IS TOLERABLE TODAY, STATED SO NOBODY HAS TO REDISCOVER IT: the tally
+job in .github/workflows/feedback-maintenance.yml declares `needs: retention`,
+and retention runs this script against the SAME store path. A store inside the
+docroot therefore fails the retention job and the tally never runs. The gap is
+real on any path that runs the generator ALONE.
+**Closing it needs a --docroot flag on generate-feedback-stats.py**, which is
+outside this file. Do not close it by giving refuse_bad_store_location() a
+default docroot: a default here is the exact fallback the paragraph above
+forbids.
+
+THE STORE WRITE LOCK -- WHY IT IS A SEPARATE FILE (A1) -- FIXED 2026-08-17
+--------------------------------------------------------------------------
+os.replace() is atomic with respect to a CRASH. It is not atomic with respect to
+a CONCURRENT WRITER, and ingest.php is one.
+
+ingest.php took flock(LOCK_EX) on the month file, which locks an INODE.
+os.replace() swaps that inode out. So: this script reads 2026-08.jsonl, a
+visitor POSTs 0.4s later, ingest appends and fsyncs and answers 200 with a
+receipt, then os.replace() lands and that record is in an orphaned inode nobody
+will ever open. The visitor holds a receipt for a message that no longer exists
+and nothing anywhere records the loss -- precisely the binding directive's worst
+case.
+
+The fix is a lock on a file whose inode NEVER changes: <store>/.write-lock.
+ingest.php takes flock(LOCK_EX) on it around its append; this script holds it
+across read -> os.replace() for the WHOLE run. The lockfile is created if
+absent, never unlinked (unlinking it is how two processes end up locking two
+different inodes and both believing they hold the lock), and never counted as a
+record by anything -- it is not *.jsonl.
+
+Contention is not an error. A busy lock means a visitor is mid-POST, and the
+right answer is to wait: --lock-timeout (default 30s, PDOOM_PURGE_LOCK_TIMEOUT).
+On timeout this script writes NOTHING -- REFUSED (3) in a write mode, UNKNOWN
+(2) under --check, because a check that never read the store has certified
+nothing.
+
 THE REWRITE IS ATOMIC, AND THAT IS THE POINT
 --------------------------------------------
 This is the one script in the feedback system that WRITES to the store, so it is
@@ -56,6 +127,33 @@ onward not. No file is ever half-written, no record is ever lost, and the next
 run finishes the job -- the operation is idempotent, so re-running is always the
 correct response to an interrupted one.
 
+THE ip_hash CLOCK IS NOT ONLY A FIELD (A3) -- FIXED 2026-08-17
+--------------------------------------------------------------
+§10 nulls ip_hash at 30 days and says the daily salt makes the row "unlinkable
+after 24h". Both sentences were false in the same way: this script assessed
+record FIELDS only, while ingest.php writes two ip-derived things it never
+deleted.
+
+  <store>/.salt/<YYYY-MM-DD>     every day's salt, kept forever
+  <store>/.throttle/<hash>.json  a FILENAME derived from ip_hash, kept forever
+
+Keeping every historical salt makes any ip_hash still inside its 30-day window
+reversible: the IPv4 space is 2^32, so an attacker with the salt enumerates it
+in minutes. "Rotation makes it unlinkable" is only true if the OLD SALT IS
+DESTROYED. And a throttle bucket named after an ip_hash outlives the field it
+was derived from, so nulling the field deleted the copy nobody was looking at.
+
+So the purge now sweeps both, and --check counts them and goes RED on them:
+
+  .salt/*         kept 2 days   (SALT_KEEP_DAYS; nothing reads a salt older
+                                 than today, so 2 is already generous)
+  .throttle/*     kept 30 days  (IP_HASH_DAYS -- the same clock as the field,
+                                 because it is the same personal datum)
+
+Neither directory is ever read as records: RECORD_GLOB is *.jsonl and a salt has
+no extension while a throttle bucket is *.json. scripts/test-purge-feedback.py
+asserts that rather than trusting it.
+
 Lines this script cannot parse are PRESERVED BYTE-FOR-BYTE and counted. An
 unparseable line is a candidate lost message; a purge is not a licence to tidy.
 Records that need no change are re-emitted as their ORIGINAL line text, never
@@ -63,22 +161,36 @@ re-serialised, so a run that purges three fields cannot perturb 900 other rows.
 
 EXIT CODES
     0  clean (--check), or the purge applied
-    1  --check found a field retained past its clock, or a demonstrably stale
-       ip_hash salt (§10's other half)  <- the gate
-    2  UNKNOWN: no store configured/present, unparseable lines, or a sidecar
-       that makes a clock uncomputable. Never reported as 0: a check that
-       cannot see the store has not certified it.
-    3  REFUSED: ambiguous or unmatched receipt, or a store path that resolves
-       somewhere it must never be (contract INV-1c).
+    1  --check found a field retained past its clock, a salt or throttle bucket
+       retained past its clock, or a demonstrably stale ip_hash salt (§10's
+       other half)  <- the gate
+    2  UNKNOWN: no store configured/present, unparseable lines, a sidecar
+       that makes a clock uncomputable, or a --check that could not take the
+       store write lock. Never reported as 0: a check that cannot see the store
+       has not certified it.
+    3  REFUSED: ambiguous or unmatched receipt, no docroot supplied, a store
+       path that resolves somewhere it must never be (contract INV-1c), or a
+       write mode that could not take the store write lock.
 """
 
 import argparse
+import contextlib
 import datetime as dt
 import json
 import os
 import re
 import sys
+import time
 from pathlib import Path
+
+try:
+    import fcntl as _fcntl
+except ImportError:                                   # not POSIX
+    _fcntl = None
+try:
+    import msvcrt as _msvcrt
+except ImportError:                                   # not Windows
+    _msvcrt = None
 
 for _stream in (sys.stdout, sys.stderr):
     try:
@@ -128,7 +240,46 @@ TRIAGE_NAME = "triage.log"
 # store may never live where rsync --delete can reach it, and the payload carries
 # reporter PII, so a store under the docroot is publicly fetchable. Either reason
 # alone is sufficient to refuse.
+#
+# THIS IS THE SECOND LINE OF DEFENCE, NOT THE FIRST. It was the only one until
+# 2026-08-17, and it missed the production layout: DreamHost's docroot is
+# /home/<user>/<domain>, which carries none of these names. The first line is
+# now containment against an EXPLICIT --docroot, the same comparison
+# public/ingest.php:693 makes against DOCUMENT_ROOT.
 DOCROOT_PARTS = {"public", "public_html", "httpdocs"}
+
+# The one file every writer to this store locks (A1). Its inode must never
+# change, which is why it is a dedicated file and not one of the record files:
+# os.replace() below swaps a record file's inode out from under any flock held
+# on it, so ingest.php's per-file lock and this script's rewrite were locking
+# two different objects and could not see each other.
+#
+# Deliberately NOT *.jsonl: RECORD_GLOB means "visitor records" to every reader
+# in this system, and a lockfile counted as a record is a message nobody sent.
+LOCK_NAME = ".write-lock"
+
+# Seconds to wait for the write lock. A busy lock means a visitor is mid-POST,
+# and waiting is the correct answer -- ingest.php holds it for one append.
+DEFAULT_LOCK_TIMEOUT = 30.0
+
+# The endpoint's throttle bucket directory. The FILENAME is derived from
+# ip_hash, so the file is personal data with or without the field inside it.
+THROTTLE_DIR = ".throttle"
+
+# Salts are kept for two days, measured from the START of the UTC day the salt
+# is named for. ingest.php only ever reads gmdate('Y-m-d'), i.e. TODAY's salt,
+# so anything older is dead weight that keeps a 30-day-old ip_hash reversible
+# over a 2^32 address space. Two rather than one so that a clock skew, a late
+# cron or a run straddling UTC midnight can never delete a live salt: losing
+# today's salt would not lose a message, but it would re-hash every visitor and
+# reset the throttle, and cheap safety here costs one extra day of exposure.
+SALT_KEEP_DAYS = 2
+
+# Throttle buckets carry the SAME clock as the ip_hash field they are named
+# after, because they are the same personal datum in a different place. A
+# different number here would mean the record said one thing and the filesystem
+# another.
+THROTTLE_KEEP_DAYS = IP_HASH_DAYS
 
 ISO_Z = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -149,6 +300,128 @@ SALT_STALE_HOURS = 48
 
 class Refused(Exception):
     """The run must stop and say why. Never caught to continue."""
+
+
+class LockBusy(Exception):
+    """Somebody else holds the store write lock and the wait ran out.
+
+    Separate from Refused because the CORRECT exit code differs by mode: a write
+    mode that could not take the lock has refused to act (3), while a --check
+    that could not take it has certified nothing (2). Collapsing the two would
+    report a transient visitor POST as a configuration error, or a
+    configuration error as a transient.
+    """
+
+
+def _try_lock(fd):
+    """One NON-BLOCKING attempt at an exclusive lock on fd. True on success.
+
+    Both branches are the same primitive the other writer uses:
+      POSIX   fcntl.flock == flock(2), which is what PHP's flock() calls on
+              Linux, so ingest.php and this script contend on the same object.
+              Production is Linux; this is the branch that matters.
+      Windows msvcrt.locking == LockFile, which is what PHP's flock() calls on
+              Windows. Present so the forced-failure test can observe real
+              contention on the dev box rather than a simulation of it.
+
+    Polled rather than blocking so that ONE code path carries the timeout on
+    both platforms -- msvcrt has no bounded blocking mode (LK_LOCK retries for a
+    fixed ten seconds and then raises), so a blocking call would silently mean
+    something different on each OS.
+    """
+    if _fcntl is not None:
+        try:
+            _fcntl.flock(fd, _fcntl.LOCK_EX | _fcntl.LOCK_NB)
+            return True
+        except OSError:
+            return False
+    if _msvcrt is not None:
+        try:
+            os.lseek(fd, 0, os.SEEK_SET)
+            _msvcrt.locking(fd, _msvcrt.LK_NBLCK, 1)
+            return True
+        except OSError:
+            return False
+    raise Refused(
+        "this Python has neither fcntl nor msvcrt, so the store write lock "
+        "cannot be taken. Refusing: an unlocked rewrite can silently swallow a "
+        "submission ingest.php has already answered 200 for.")
+
+
+def _unlock(fd):
+    if _fcntl is not None:
+        try:
+            _fcntl.flock(fd, _fcntl.LOCK_UN)
+        except OSError:
+            pass
+        return
+    if _msvcrt is not None:
+        try:
+            os.lseek(fd, 0, os.SEEK_SET)
+            _msvcrt.locking(fd, _msvcrt.LK_UNLCK, 1)
+        except OSError:
+            pass
+
+
+def lock_path_for(store):
+    """<store>/.write-lock -- or beside it when --store names a single file.
+
+    record_files() accepts a lone .jsonl path, and `<file>/.write-lock` is not a
+    path; the sibling is. It is still the same object every writer in that
+    directory takes, which is the only property that matters.
+    """
+    store = Path(store)
+    return (store.parent if store.is_file() else store) / LOCK_NAME
+
+
+@contextlib.contextmanager
+def store_write_lock(store, timeout):
+    """Hold <store>/.write-lock exclusively, or raise LockBusy having waited.
+
+    Created if absent, NEVER unlinked. An unlinked lockfile is how two processes
+    come to hold locks on two different inodes while both believe they are
+    serialised -- the same class of defect this lock exists to fix.
+    """
+    path = lock_path_for(store)
+    try:
+        fd = os.open(str(path), os.O_RDWR | os.O_CREAT, 0o600)
+    except OSError as exc:
+        raise Refused(
+            "cannot open the store write lock %s (%s). Refusing rather than "
+            "rewriting the store unlocked: an unlocked rewrite can drop a "
+            "record ingest.php has already answered 200 for." % (path, exc))
+    try:
+        # msvcrt.locking() locks a byte range from the current offset. A region
+        # past end-of-file is lockable on Windows, but a one-byte file makes the
+        # behaviour identical on both platforms and costs nothing. Two racing
+        # processes both writing this byte is harmless: nothing reads it.
+        if _fcntl is None and _msvcrt is not None:
+            try:
+                if os.fstat(fd).st_size == 0:
+                    os.write(fd, b"L")
+            except OSError:
+                pass
+        deadline = time.monotonic() + max(0.0, float(timeout))
+        held = False
+        while True:
+            if _try_lock(fd):
+                held = True
+                break
+            if time.monotonic() >= deadline:
+                break
+            time.sleep(0.05)
+        if not held:
+            raise LockBusy(
+                "another process has held %s for more than %.1fs. Nothing was "
+                "read and nothing was written. That is almost always ingest.php "
+                "appending a submission; re-run, or raise --lock-timeout."
+                % (path, float(timeout)))
+        try:
+            yield path
+        finally:
+            _unlock(fd)
+    finally:
+        os.close(fd)
 
 
 def now_from(value):
@@ -197,9 +470,69 @@ def resolve_store(explicit):
     return Path(str(value).strip()).expanduser()
 
 
+def resolve_docroot(explicit):
+    """--docroot, else PDOOM_DOCROOT. Returns None when neither is set.
+
+    PDOOM_DOCROOT is not a name invented here: public/ingest.php:235 reads the
+    same variable as its own fallback for DOCUMENT_ROOT. One name, so an
+    operator cannot configure the endpoint and the purge to disagree about where
+    the web root is -- which is the disagreement this whole guard exists to
+    stop.
+    """
+    value = explicit or os.environ.get("PDOOM_DOCROOT")
+    if not value or not str(value).strip():
+        return None
+    return str(value).strip()
+
+
+def norm_path(path):
+    """The Python half of ingest.php's norm_path(): realpath, non-strict.
+
+    os.path.realpath resolves symlinks as far as the path exists and leaves the
+    rest lexically normalised, which is exactly what ingest.php's
+    deepest-existing-ancestor loop does. Containment has to work BEFORE the store
+    directory exists, or the very first run is the one that skips the check.
+    """
+    return os.path.realpath(str(path))
+
+
+def path_inside(child, parent):
+    """True when child IS parent or lives under it. ingest.php:212, in Python.
+
+    The trailing separator matters and is the reason this is not a startswith:
+    without it a docroot /home/u/pdoom1.com would swallow the sibling store
+    /home/u/pdoom1.com-feedback, and refusing a safe path teaches an operator to
+    reach for a bypass.
+    """
+    if not child or not parent:
+        return False
+    c = norm_path(child).rstrip("/\\")
+    p = norm_path(parent).rstrip("/\\")
+    if os.name == "nt":
+        c, p = c.lower(), p.lower()
+    if c == p:
+        return True
+    return c.startswith(p + os.sep) or c.startswith(p + "/")
+
+
 def refuse_bad_store_location(store):
-    """INV-1c, enforced before anything is opened, created or read."""
-    resolved = Path(os.path.abspath(str(store)))
+    """The two refusals that need NO docroot. INV-1c, first pass.
+
+      1. inside this git checkout -- the store carries reporter PII, a path in
+         the repo gets committed, and anything under public/ is rsynced
+      2. a docroot-shaped NAME    -- public / public_html / httpdocs
+
+    THIS IS NOT SUFFICIENT ON ITS OWN and was the entire guard until 2026-08-17.
+    refuse_store_inside_docroot() below is the half that catches the real
+    DreamHost layout; main() calls both.
+
+    KEPT AS A SEPARATE ENTRY POINT ON PURPOSE. scripts/generate-feedback-stats.py
+    calls this function by name and has no --docroot to pass, so folding the
+    containment test into this signature would break that script's import with a
+    TypeError rather than a stated refusal. See the hand-off note in the module
+    docstring: that script currently gets only this weaker half.
+    """
+    resolved = Path(norm_path(store))
     try:
         resolved.relative_to(REPO_ROOT)
     except ValueError:
@@ -211,6 +544,7 @@ def refuse_bad_store_location(store):
             "public/ is rsynced to production (contract INV-1c). Point "
             "--store / PDOOM_FEEDBACK_STORE somewhere outside the repository."
             % (resolved, REPO_ROOT))
+
     hits = [p for p in resolved.parts if p.lower() in DOCROOT_PARTS]
     if hits:
         raise Refused(
@@ -218,6 +552,36 @@ def refuse_bad_store_location(store):
             "every host this project uses. Contract INV-1c: the store may never "
             "live where rsync --delete can reach it, and PII under a docroot is "
             "publicly fetchable." % (resolved, hits[0]))
+
+
+def refuse_store_inside_docroot(store, docroot):
+    """INV-1c, the half that needs a docroot -- and refuses without one.
+
+    This is the comparison public/ingest.php:693 makes against DOCUMENT_ROOT,
+    and it is the one that catches /home/<user>/<domain>/feedback-store.
+    """
+    if docroot is None:
+        raise Refused(
+            "no docroot was supplied, so INV-1c cannot be enforced. Pass "
+            "--docroot <path> or set PDOOM_DOCROOT to the SAME directory "
+            "public/ingest.php sees as DOCUMENT_ROOT.\n"
+            "  There is deliberately no fallback. The name heuristic that used "
+            "to stand alone here (%s) does not match DreamHost's docroot, which "
+            "is /home/<user>/<domain> -- so a store at "
+            "/home/<user>/<domain>/feedback-store passed this guard while "
+            "ingest.php refused the identical path. A guard that runs when the "
+            "real check is unavailable is a guard that ships exactly when it is "
+            "wrong." % ", ".join(sorted(DOCROOT_PARTS)))
+
+    resolved = Path(norm_path(store))
+    if path_inside(resolved, docroot):
+        raise Refused(
+            "store %s is inside the docroot %s. Contract INV-1c: the store may "
+            "never live where rsync --delete can reach it (it runs ~4x/day from "
+            "public/), and reporter PII under a docroot is publicly fetchable. "
+            "Either reason alone is sufficient. public/ingest.php:693 refuses "
+            "this same path with a 507; this is the other half of that guard."
+            % (resolved, Path(norm_path(docroot))))
 
 
 def record_files(store):
@@ -361,6 +725,95 @@ def salt_state(store, now):
                 "a salt, so the 30-day clock is not the only thing that matters."
                 % (SALT_DIR, hours, SALT_STALE_HOURS))
     return ("fresh", "salt rotation OK: newest salt is %.0f hours old" % hours)
+
+
+class Expired:
+    """One ip-derived FILE past its clock. The other half of the ip_hash row."""
+
+    def __init__(self, path, kind, age_days, limit_days):
+        self.path = path
+        self.kind = kind
+        self.age_days = age_days
+        self.limit_days = limit_days
+
+    def __str__(self):
+        return ("%s/%s retained %d day(s), clock is %d"
+                % (self.path.parent.name, self.path.name,
+                   int(self.age_days), self.limit_days))
+
+
+def salt_age_days(path, now):
+    """Age of one salt file, from its NAME first and its mtime only as a fallback.
+
+    ingest.php names a salt for the UTC day it belongs to, so the name is the
+    authoritative statement of what the file is for; mtime is not, because a
+    backup restore, an rsync or a `touch` rewrites it and would silently
+    resurrect a salt that ought to be gone. Age runs from the START of the named
+    day, which is the literal reading of "older than N days".
+
+    The mtime fallback is what catches ingest.php's lost-rename leftovers --
+    `<day>.<hex>.tmp`, written by daily_salt() when two processes race. Those
+    contain salt material and no date this can parse, and nothing else in the
+    system would ever remove them.
+    """
+    match = re.match(r"^(\d{4})-(\d{2})-(\d{2})", path.name)
+    if match:
+        try:
+            day = dt.datetime(int(match.group(1)), int(match.group(2)),
+                              int(match.group(3)), tzinfo=dt.timezone.utc)
+            return (now - day.timestamp()) / DAY
+        except ValueError:
+            pass
+    try:
+        return (now - path.stat().st_mtime) / DAY
+    except OSError:
+        return None
+
+
+def expired_sidecars(store, now):
+    """[Expired, ...] -- the salts and throttle buckets past their clock.
+
+    Pure: it decides, never unlinks. --check calls this and reports; the purge
+    calls it and then removes exactly what it named.
+    """
+    out = []
+    for dirname, limit, ager in (
+            (SALT_DIR, SALT_KEEP_DAYS, salt_age_days),
+            (THROTTLE_DIR, THROTTLE_KEEP_DAYS,
+             lambda p, n: ((n - p.stat().st_mtime) / DAY))):
+        path = Path(store) / dirname
+        if not path.is_dir():
+            continue
+        for entry in sorted(path.iterdir()):
+            if not entry.is_file():
+                continue
+            try:
+                age = ager(entry, now)
+            except OSError:
+                age = None
+            if age is None or age <= limit:
+                continue
+            out.append(Expired(entry, dirname, age, limit))
+    return out
+
+
+def sweep_sidecars(expired):
+    """Unlink what expired_sidecars() named. Returns (counts, failures).
+
+    An unlink that fails is REPORTED, never swallowed: the file is still there,
+    the privacy promise is still false, and a run that said nothing about it
+    would be the silent version of the same defect.
+    """
+    counts = {}
+    failures = []
+    for item in expired:
+        try:
+            item.path.unlink()
+        except OSError as exc:
+            failures.append("%s: %s" % (item.path, exc))
+            continue
+        counts[item.kind] = counts.get(item.kind, 0) + 1
+    return counts, failures
 
 
 def is_present(value):
@@ -599,6 +1052,15 @@ def report(counts, as_json, out=sys.stdout):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--store", help="feedback store root (or PDOOM_FEEDBACK_STORE)")
+    ap.add_argument("--docroot",
+                    help="the web docroot, i.e. what public/ingest.php sees as "
+                         "DOCUMENT_ROOT (or PDOOM_DOCROOT). REQUIRED: the store "
+                         "must not be inside it (INV-1c), and this script will "
+                         "not guess where it is")
+    ap.add_argument("--lock-timeout", type=float, default=None,
+                    help="seconds to wait for <store>/%s before giving up "
+                         "(default %.0f, or PDOOM_PURGE_LOCK_TIMEOUT)"
+                         % (LOCK_NAME, DEFAULT_LOCK_TIMEOUT))
     ap.add_argument("--check", action="store_true",
                     help="report fields retained past their clock and exit 1; "
                          "writes nothing")
@@ -637,13 +1099,63 @@ def main(argv=None):
             return EXIT_UNKNOWN
 
         refuse_bad_store_location(store)
+        refuse_store_inside_docroot(store, resolve_docroot(args.docroot))
 
         if not store.exists():
             print("UNKNOWN: store %s does not exist. Nothing certified."
                   % store, file=sys.stderr)
             return EXIT_UNKNOWN
 
+        timeout = args.lock_timeout
+        if timeout is None:
+            env_timeout = os.environ.get("PDOOM_PURGE_LOCK_TIMEOUT", "")
+            try:
+                timeout = float(env_timeout) if env_timeout.strip() else None
+            except ValueError:
+                raise Refused("PDOOM_PURGE_LOCK_TIMEOUT=%r is not a number"
+                              % env_timeout)
+        if timeout is None:
+            timeout = DEFAULT_LOCK_TIMEOUT
+
+        # EVERYTHING that reads or writes the store happens inside this lock,
+        # read included. A lock taken only around os.replace() would still lose
+        # any record ingest.php appended between the read and the swap -- which
+        # is the exact defect (A1), not a smaller version of it.
+        try:
+            with store_write_lock(store, timeout):
+                return run_locked(args, store, now)
+        except LockBusy as exc:
+            if args.check or args.dry_run:
+                print("UNKNOWN: %s\n  A check that never read the store has "
+                      "certified nothing, so this is not a green." % exc,
+                      file=sys.stderr)
+                return EXIT_UNKNOWN
+            print("REFUSED: %s" % exc, file=sys.stderr)
+            return EXIT_REFUSED
+
+    except Refused as exc:
+        print("REFUSED: %s" % exc, file=sys.stderr)
+        return EXIT_REFUSED
+
+
+def run_locked(args, store, now):
+    """The body of a run, with <store>/.write-lock held. Split out only so the
+    lock's scope is visible in one place rather than inferred from indentation.
+    """
+    try:
         files = read_store(store)
+
+        # Test-only seam, inert when unset -- the same shape and the same
+        # justification as PDOOM_PURGE_CRASH_AFTER above. The window this widens
+        # is the one between the read and the os.replace(), which is exactly
+        # where a concurrent append used to be swallowed. Without it the race is
+        # sub-millisecond and a test could only assert about it; with it,
+        # scripts/test-purge-feedback.py T17 makes a real appender contend with
+        # a real purge and OBSERVES which of them wins.
+        stall = os.environ.get("PDOOM_PURGE_STALL_MS", "")
+        if stall.strip():
+            time.sleep(int(stall) / 1000.0)
+
         replies, sidecar_damage = load_reply_times(store)
         contact_known = sidecar_damage == 0
 
@@ -684,15 +1196,25 @@ def main(argv=None):
         for over in overruns:
             by_field[over.field] = by_field.get(over.field, 0) + 1
 
+        # A3: the ip_hash clock is not only a field. These are counted in every
+        # mode, so a green --check carries the number rather than silence.
+        expired = expired_sidecars(store, now)
+        by_sidecar = {}
+        for item in expired:
+            by_sidecar[item.kind] = by_sidecar.get(item.kind, 0) + 1
+
         counts = {
             "records": len(records),
             "files": len(files),
             "unparseable_lines": len(unparseable),
             "sidecar_unreadable_lines": sidecar_damage,
             "over_clock": by_field,
+            "ip_derived_files_over_clock": by_sidecar,
             "as_of": iso(now),
         }
 
+        # Computed BEFORE any sweep below, so the message describes the state
+        # this run found rather than the state it left behind.
         salt_status, salt_message = salt_state(store, now)
         counts["salt_rotation"] = salt_status
 
@@ -702,6 +1224,8 @@ def main(argv=None):
             print("  %s" % salt_message)
             for over in sorted(overruns, key=lambda o: (o.field, o.lineno))[:50]:
                 print("  RETAINED %s" % over)
+            for item in expired[:50]:
+                print("  RETAINED %s" % item)
             for line in unknowns[:20]:
                 print("  UNKNOWN  %s" % line)
             if salt_status == "stale":
@@ -710,6 +1234,14 @@ def main(argv=None):
             if overruns:
                 print("\nFAIL: %d field(s) retained past the clock in contract "
                       "§10. Run without --check to purge." % len(overruns))
+                return EXIT_RETAINED
+            if expired:
+                print("\nFAIL: %d ip-derived file(s) retained past their clock. "
+                      "A salt kept past its day makes every ip_hash still inside "
+                      "the 30-day window reversible over a 2^32 address space, "
+                      "and a throttle bucket is NAMED after an ip_hash -- so "
+                      "nulling the field deleted the copy nobody was looking at. "
+                      "Run without --check to sweep them." % len(expired))
                 return EXIT_RETAINED
             if unparseable or unknowns or sidecar_damage:
                 print("\nUNKNOWN: %d unparseable line(s), %d record(s) with no "
@@ -736,11 +1268,21 @@ def main(argv=None):
             for name, n in fields.items():
                 purged[name] = purged.get(name, 0) + n
 
+        swept, sweep_failures = sweep_sidecars(expired)
+
         counts["records_rewritten"] = total_changed
         counts["purged"] = purged
+        counts["swept"] = swept
         print("purge-feedback on %s" % store)
         report(counts, args.json)
         print("  %s" % salt_message)
+        if sweep_failures:
+            print("\nUNKNOWN: %d ip-derived file(s) could not be unlinked. They "
+                  "are still on disk, so the ip_hash clock is still not true for "
+                  "them:" % len(sweep_failures))
+            for line in sweep_failures[:20]:
+                print("    %s" % line)
+            return EXIT_UNKNOWN
         if not contact_known:
             print("\nUNKNOWN: the triage sidecar has %d unreadable line(s), so "
                   "'90 days from the last reply' is not computable. contact was "
