@@ -17,10 +17,33 @@ name: Feedback Intake Contract
 #                          network, so it cannot go red because a runner's
 #                          resolver hiccupped.
 #   intake-tests (BLOCKING) The failure-taxonomy tests the contract's section 6
-#                          names. These are written against the contract, before
-#                          the implementation exists, and are expected to be RED
+#                          names, PLUS the forced-failure suites for the two
+#                          scripts that touch the store off-request. These are
+#                          written against the contract, before the
+#                          implementation exists, and are expected to be RED
 #                          first. That is Gate 2: "a test that has never failed
 #                          has not been shown to be a test."
+#
+# THE TRIGGER PATHS ARE PART OF THE TEST  (fixed 2026-08-17)
+# ----------------------------------------------------------
+# Until 2026-08-17 this workflow listed only the three section-6 test files and
+# the mail-auth guard. `grep -rn "test-purge-feedback\|test-feedback-stats"
+# .github/workflows/` returned NOTHING, and none of read-feedback.py,
+# purge-feedback.py, reconcile-feedback.py, generate-feedback-stats.py or
+# scripts/fixtures/** appeared in either path list. Editing the reader's dedup
+# rule, or the ingest harness every destructive test runs through, therefore
+# triggered ZERO CI.
+#
+# That is CLAUDE.md's "'It is in the pre-PR suite' is not 'it runs'", recurring
+# one commit after it was written down. A test file that no `paths:` entry names
+# is a test that runs when a human remembers, and the entire point of these
+# suites is the days nobody does.
+#
+# RULE for anyone adding to this system: a new script under scripts/ that reads
+# or writes the feedback store goes in BOTH path lists in the same commit as the
+# script, and its forced-failure suite goes in the intake-tests job as a step,
+# not in a document. Both lists, because `pull_request` gates the merge and
+# `push` catches whatever reached main another way.
 #
 #   live-dns (ADVISORY)    Re-resolves DNS and reports drift against the recorded
 #                          observation. NEVER blocks -- it needs the network, and
@@ -62,6 +85,17 @@ on:
       - 'scripts/test-ingest-destructive.py'
       - 'scripts/test-feedback-outbox.js'
       - 'scripts/test-mail-auth-interlock.py'
+      # The store-side scripts. Every one of them can lose or mis-report a
+      # visitor's message, and none of them was named here until 2026-08-17.
+      - 'scripts/read-feedback.py'
+      - 'scripts/purge-feedback.py'
+      - 'scripts/reconcile-feedback.py'
+      - 'scripts/generate-feedback-stats.py'
+      - 'scripts/test-purge-feedback.py'
+      - 'scripts/test-feedback-stats.py'
+      # The harness the destructive suite runs THROUGH. A change here can turn
+      # thirteen tests green without touching a line of the endpoint.
+      - 'scripts/fixtures/**'
       - 'public/assets/js/feedback*.js'
       - 'docs/decisions/FEEDBACK_INTAKE_CONTRACT.md'
       - '.github/workflows/feedback-intake.yml'
@@ -77,6 +111,16 @@ on:
       - 'scripts/test-ingest-destructive.py'
       - 'scripts/test-feedback-outbox.js'
       - 'scripts/test-mail-auth-interlock.py'
+      # Keep this list byte-identical to the pull_request one above. They have
+      # drifted apart in other workflows here, and a path present in only one of
+      # them is a guard that gates the merge but not main, or the reverse.
+      - 'scripts/read-feedback.py'
+      - 'scripts/purge-feedback.py'
+      - 'scripts/reconcile-feedback.py'
+      - 'scripts/generate-feedback-stats.py'
+      - 'scripts/test-purge-feedback.py'
+      - 'scripts/test-feedback-stats.py'
+      - 'scripts/fixtures/**'
       - 'public/assets/js/feedback*.js'
       - 'docs/decisions/FEEDBACK_INTAKE_CONTRACT.md'
       - '.github/workflows/feedback-intake.yml'
@@ -192,19 +236,31 @@ jobs:
           php -r 'exit(function_exists("http_response_code") ? 0 : 1);' \
             || { echo "http_response_code() missing under this SAPI -- contract 11.5"; exit 1; }
 
-      # These three are named in FEEDBACK_INTAKE_CONTRACT.md section 6 and are
-      # written BEFORE the implementation. A missing one fails this step rather
-      # than being skipped: a workflow that silently steps over an absent test is
-      # a workflow reporting success for work nobody did, and this repo has the
-      # scar (sync-pdoom1-docs.yml, CLAUDE.md "Workflow authoring traps" #1).
-      - name: Every test the contract names exists
+      # The first three are named in FEEDBACK_INTAKE_CONTRACT.md section 6 and
+      # are written BEFORE the implementation. The rest are the store-side
+      # scripts and their forced-failure suites, added 2026-08-17 when it turned
+      # out no workflow ran either suite.
+      #
+      # A missing one fails this step rather than being skipped: a workflow that
+      # silently steps over an absent test is a workflow reporting success for
+      # work nobody did, and this repo has the scar (sync-pdoom1-docs.yml,
+      # CLAUDE.md "Workflow authoring traps" #1). The three non-test scripts are
+      # listed because their suites import them by path -- an absent one would
+      # otherwise surface as a traceback several steps later, and a traceback is
+      # a worse diagnosis than a name.
+      - name: Every test the contract names exists, and every script it exercises
         run: |
           set -euo pipefail
           missing=0
           for f in \
             "scripts/test-ingest-destructive.py" \
             "scripts/test-feedback-outbox.js" \
-            "scripts/test-mail-auth-interlock.py"
+            "scripts/test-mail-auth-interlock.py" \
+            "scripts/test-purge-feedback.py" \
+            "scripts/test-feedback-stats.py" \
+            "scripts/purge-feedback.py" \
+            "scripts/read-feedback.py" \
+            "scripts/generate-feedback-stats.py"
           do
             if [ -f "$f" ]; then
               echo "present  $f"
@@ -215,8 +271,10 @@ jobs:
           done
           if [ "$missing" -ne 0 ]; then
             echo ""
-            echo "$missing test file(s) named in section 6 of"
-            echo "docs/decisions/FEEDBACK_INTAKE_CONTRACT.md are absent."
+            echo "$missing file(s) this job depends on are absent -- either a"
+            echo "test named in section 6 of"
+            echo "docs/decisions/FEEDBACK_INTAKE_CONTRACT.md, or a store-side"
+            echo "script one of the suites below loads by path."
             echo ""
             echo "If they have not been written yet, this red IS the correct state"
             echo "and it closes when they land. Do NOT make this step tolerant:"
@@ -242,6 +300,29 @@ jobs:
       # own test can only be as right as the guard author's reading of section 5.
       - name: The M5 interlock refuses a DMARC tightening (independent test)
         run: python scripts/test-mail-auth-interlock.py
+
+      # WIRED 2026-08-17. Both suites existed and both were run by nothing.
+      #
+      # purge-feedback.py is the only script in this system that WRITES to the
+      # store, so every property it claims is a claim about not destroying a
+      # visitor's message: it hard-kills the process mid-rewrite and requires the
+      # original file to survive byte-for-byte, forces both sides of every
+      # retention clock in contract section 10, and forces the refusals on a
+      # colliding receipt and an unmatched one. Blocking, not advisory: the whole
+      # suite is green today (96 checks), so there is no red-but-tolerated state
+      # to create.
+      - name: The purge can be killed mid-rewrite and lose nothing (forced failure)
+        run: python scripts/test-purge-feedback.py
+
+      # generate-feedback-stats.py writes the ONE file in this system that
+      # reaches pdoom1.com. This suite forces every hazard section 9 names --
+      # k=5 withholding on both sides of the threshold, a machine-derived tag
+      # given no route into a public category, a triage entry claiming human
+      # provenance with nobody named, and the conservation law that a reader
+      # losing a record must REFUSE rather than publish a smaller number.
+      # 84 checks, green today.
+      - name: No visitor's words and no machine's guess reach the public tally
+        run: python scripts/test-feedback-stats.py
 
   live-dns:
     name: ADVISORY -- live DNS vs the recorded observation
