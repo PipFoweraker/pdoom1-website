@@ -204,7 +204,7 @@ jobs:
           for f in \
             "scripts/test-ingest-destructive.py" \
             "scripts/test-feedback-outbox.js" \
-            "scripts/test-mail-auth-interlock.py"
+            "scripts/test-check-mail-auth.py"
           do
             if [ -f "$f" ]; then
               echo "present  $f"
