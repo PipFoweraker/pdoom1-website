@@ -1,7 +1,26 @@
 // Destructive suite for the feedback widget's client outbox -- rows F7, F8, F16 and
-// F17 of docs/decisions/FEEDBACK_INTAKE_CONTRACT.md §6.
+// F17 of docs/decisions/FEEDBACK_INTAKE_CONTRACT.md §6, plus C1 and C2.
 //
 //   node scripts/test-feedback-outbox.js          (exit 0 = every row green)
+//   PDOOM_FEEDBACK_CLIENT=<path> node scripts/test-feedback-outbox.js
+//                                                 (point it at another build)
+//
+// C1 AND C2 ARE NOT CONTRACT ROWS. They are two defects found by review on
+// 2026-08-17 and fixed the same day; each is kept as a row because the fix asserts
+// a safety property, and a claimed safety property needs a test that FORCES the
+// failing condition rather than watching the fixed path pass.
+//
+//   C1  escape.js does not load       -> the visitor must still be told something
+//                                        TRUE, in constants, rather than shown a
+//                                        blank region after a durable write
+//   C2  the endpoint is unreachable   -> §4.6's prefilled GitHub fallback must be
+//                                        rendered on `retrying`, the exact state
+//                                        §4.6 was written for
+//
+// Both were observed RED against the pre-fix client (git show
+// feedback/intake-contract:public/assets/js/feedback.js) with F7/F8/F16/F17 still
+// green -- which is what says they are aimed at these two defects and nothing else.
+// PDOOM_FEEDBACK_CLIENT is how to reproduce that.
 //
 // WHICH WORKFLOW SHOULD RUN THIS (agent A4 owns the wiring; this file must not)
 // ----------------------------------------------------------------------------
@@ -40,7 +59,9 @@
 // with feedback.js, the contract is the tiebreaker.
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 // ---------------------------------------------------------------------------
 // Subject resolution -- printed, never inferred silently.
@@ -481,12 +502,399 @@ row('F17', 'hostile payload in every field',
         + 'make a URL safe, it needs safeUrl()/isSafeUrl() from escape.js');
     });
 
+// ===========================================================================
+// C1 -- escape.js fails to load
+// ===========================================================================
+// Not a contract row: a defect found by review on 2026-08-17 and fixed in the
+// same PR as C2. Recorded here as a row because the fix asserts a SAFETY property
+// ("the visitor is always told something true"), and this repo's rule is that a
+// claimed safety property needs a test that FORCES the failing condition and
+// observes the outcome.
+//
+// The defect: paint() read `if (!E) { return; }`. Failing closed on the ESCAPING
+// question is right and stays. Failing closed on the whole message is not -- the
+// durable write had already happened, so the visitor saw an empty region, which is
+// indistinguishable from a button that did nothing. That invites a resubmit and
+// invites the conclusion that the message was dropped. Under the binding directive
+// a message that WAS saved but LOOKS lost is the same harm as a lost one.
+//
+// HOW THE FAULT IS INJECTED, and why it needs a child process
+// -----------------------------------------------------------
+// getEscapers() looks at window/globalThis first and only then at
+// require('./escape.js'). escape.js:152-159 assigns its five names onto globalThis
+// whenever there is no window -- which is every Node run -- so the moment this file
+// requires the real widget, `globalThis.escapeHTML` is set for the life of the
+// process and no in-process trick can un-set it honestly. So: copy the REAL widget
+// bytes into a temp dir beside a STUB escape.js that exports nothing, and drive it
+// from a fresh `node` with a clean global. The subject is the real file, unedited;
+// only its neighbour is broken. Nothing committed is touched.
+
+const C1_HOSTILE_TEXT = '<img src=x onerror=alert(1)> "quoted" \' apostrophe';
+const C1_PAGE = '/blog/post.html?p=<script>';
+const C1_CONTACT = 'a"b@example.com';
+const C1_CREDIT = "</p><div class='fb-ok'>Thanks";
+
+// The driver runs INSIDE the temp dir. It reports what reached render(), plus
+// whether an escaper was reachable at all -- because a run in which escape.js was
+// somehow still present would be green for the wrong reason, and "the fault did not
+// inject" must never read as "the property holds".
+const C1_DRIVER = `
+'use strict';
+const FB = require('./feedback.js');
+let stubEscaper = null;
+try { stubEscaper = require('./escape.js'); } catch (e) { stubEscaper = 'threw'; }
+const escaperPresent =
+  (typeof globalThis.escapeHTML === 'function') ||
+  (typeof window !== 'undefined' && window && typeof window.escapeHTML === 'function') ||
+  !!(stubEscaper && typeof stubEscaper.escapeHTML === 'function');
+
+function mkStore() {
+  const m = new Map();
+  return {
+    getItem: (k) => (m.has(k) ? m.get(k) : null),
+    setItem: (k, v) => { m.set(k, String(v)); },
+    removeItem: (k) => { m.delete(k); }
+  };
+}
+const INPUT = ${JSON.stringify({
+  kind: 'bug', page: C1_PAGE, text: C1_HOSTILE_TEXT,
+  contact: C1_CONTACT, credit: C1_CREDIT
+})};
+
+function client(painted, fetchImpl) {
+  return FB.createFeedbackClient({
+    storage: mkStore(),
+    fetch: fetchImpl,
+    uuid: () => 'ffffffff-dead-4bee-8fff-000000000001',
+    now: () => 1755230000000,
+    render: (h) => { painted.push(String(h)); }
+  });
+}
+
+(async function () {
+  const offlinePainted = [];
+  const offlineResult = await client(offlinePainted,
+    () => Promise.reject(new TypeError('Failed to fetch'))).submit(INPUT);
+
+  const ackedPainted = [];
+  await client(ackedPainted, (u, i) => {
+    const body = JSON.parse(i.body);
+    return Promise.resolve({
+      ok: true, status: 200,
+      json: () => Promise.resolve({ ok: true, rid: body.rid, receipt: 'F-ZZZZZZ' })
+    });
+  }).submit(INPUT);
+
+  process.stdout.write(JSON.stringify({
+    escaperPresent: escaperPresent,
+    offlinePainted: offlinePainted,
+    offlineState: offlineResult && offlineResult.state,
+    ackedPainted: ackedPainted
+  }));
+})().catch((e) => {
+  process.stdout.write(JSON.stringify({ driverError: e.name + ': ' + e.message }));
+});
+`;
+
+function runWithoutEscaper() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pdoom-fb-noescape-'));
+  try {
+    fs.copyFileSync(SUBJECT.file, path.join(dir, 'feedback.js'));
+    // The stub: present, requireable, and useless. This is what a CDN 404, a CSP
+    // block or a typo'd <script src> looks like from inside the widget.
+    fs.writeFileSync(path.join(dir, 'escape.js'),
+      '// deliberately empty: escape.js did not load\nmodule.exports = {};\n', 'utf8');
+    fs.writeFileSync(path.join(dir, 'drive.js'), C1_DRIVER, 'utf8');
+    const p = spawnSync(process.execPath, [path.join(dir, 'drive.js')],
+      { encoding: 'utf8', timeout: 30000 });
+    if (p.status !== 0) {
+      return { spawnFailed: 'exit ' + p.status + ' :: ' + String(p.stderr).slice(0, 400) };
+    }
+    try { return JSON.parse(p.stdout); }
+    catch (e) { return { spawnFailed: 'unparseable stdout: ' + String(p.stdout).slice(0, 400) }; }
+  } finally {
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) { /* temp dir */ }
+  }
+}
+
+row('C1', 'escape.js fails to load',
+    'the widget is run beside a STUB escape.js that exports nothing, in a fresh '
+    + 'node process so no earlier require can have leaked the real escaper onto globalThis',
+    'INV-1, §4.3, §4.6, binding directive (never lose a message)',
+    async (t) => {
+      const out = runWithoutEscaper();
+      if (out.spawnFailed || out.driverError) {
+        t.check(false, 'INV-1',
+          'the fault could not be injected, which is NOT the same as the property '
+          + 'holding: ' + (out.spawnFailed || out.driverError));
+        return;
+      }
+
+      // Without this the whole row is vacuous -- green would mean "escaping worked",
+      // not "the degraded path worked".
+      t.check(out.escaperPresent === false, 'INV-1',
+        'the fault must actually be injected: no escaper may be reachable in the '
+        + 'child process, got escaperPresent=' + out.escaperPresent);
+
+      const painted = (out.offlinePainted || []).join('\n');
+      t.note('painted with no escaper: ' + JSON.stringify(painted.slice(0, 240)));
+
+      // THE DEFECT. Before the fix this array was empty and this check is the one
+      // that fails.
+      t.check((out.offlinePainted || []).length > 0, 'INV-1',
+        'with escape.js missing the widget rendered NOTHING at all -- the write was '
+        + 'durable and the visitor saw a blank region, which reads as "the button did '
+        + 'nothing" and invites a resubmit. Painted ' + (out.offlinePainted || []).length
+        + ' time(s)');
+      t.check(painted.trim().length > 0, 'INV-1',
+        'the render must carry actual words, not an empty shell');
+      t.check(HONEST_PENDING.test(painted), '§4.3',
+        'the visitor must still be told their message is held on this device and not '
+        + 'yet sent; rendered ' + JSON.stringify(painted.slice(0, 240)));
+      t.check(!SUCCESS_AFFORDANCE.test(painted), '§4.3',
+        'the degraded render must not claim success either; rendered '
+        + JSON.stringify(painted.slice(0, 240)));
+      t.check(/github|e-?mail|issue/i.test(painted), '§4.6',
+        'the fallback must survive the degraded path -- an unreachable endpoint plus '
+        + 'a missing escaper is exactly when a visitor needs somewhere else to go');
+
+      // The point of the fix: CONSTANTS ONLY. Not "escaped correctly" -- there is no
+      // escaper here, so any interpolation at all is raw, and raw is the XSS the
+      // early return was avoiding.
+      const both = painted + '\n' + (out.ackedPainted || []).join('\n');
+      const leaks = [
+        ['text', C1_HOSTILE_TEXT], ['page', C1_PAGE],
+        ['contact', C1_CONTACT], ['credit', C1_CREDIT]
+      ].filter(([, v]) => both.indexOf(v) !== -1).map(([k]) => k);
+      t.check(leaks.length === 0, 'escaping',
+        'NO visitor value may be interpolated on the no-escaper path (it would be '
+        + 'raw). Leaked: ' + JSON.stringify(leaks));
+      t.check(inert(both), 'escaping',
+        'the degraded render must still be structurally inert; got '
+        + JSON.stringify(both.slice(0, 240)));
+
+      // A receipt cannot be shown without an escaper, and pretending otherwise is
+      // the class of lie this repo forbids: the receipt is the visitor's only handle
+      // for a later erasure request (§10).
+      const acked = (out.ackedPainted || []).join('\n');
+      t.check(acked.trim().length > 0, 'INV-1',
+        'an ACKNOWLEDGED message must also render something -- a 200 that paints '
+        + 'nothing is the same blank region');
+      t.check(!/F-[A-Z2-7]{6}/.test(acked), 'escaping',
+        'no receipt code may be composed into the degraded string; got '
+        + JSON.stringify(acked.slice(0, 240)));
+      t.check(/receipt/i.test(acked), '§10',
+        'and the visitor must be TOLD the receipt cannot be shown, rather than left '
+        + 'to notice its absence; got ' + JSON.stringify(acked.slice(0, 240)));
+    });
+
+// ===========================================================================
+// C2 -- §4.6's fallback on the state it was written for
+// ===========================================================================
+// Also a 2026-08-17 review defect, not a contract row. §4.6 says: "If the endpoint
+// is unreachable entirely, the fallback is a prefilled GitHub issue -- offered
+// AFTER telling the truth about what happened, never instead of it." The widget
+// emitted the fallback only for `refused` and `rejected`. `retrying` -- which is
+// precisely where an unreachable endpoint lands, via settleRetry() -- rendered no
+// fallback at all, so the one state §4.6 names was the one state without it.
+//
+// Two halves, because "a fallback is present" and "the fallback is prefilled" are
+// different claims:
+//   (a) with no element factory, the constant-url line must appear in the string;
+//   (b) with one, an anchor NODE must appear carrying the visitor's own words, and
+//       that url must never appear in the html string -- a url built out of hostile
+//       text has no business in an attribute.
+
+/** A minimal element, faithful on the two things that matter: assignment is to a
+ *  PROPERTY (no HTML parsing anywhere) and children are appended, not serialised. */
+function makeElementFactory() {
+  const created = [];
+  function fn(tag) {
+    const el = {
+      tagName: String(tag).toLowerCase(),
+      children: [],
+      appendChild(n) { this.children.push(n); return n; }
+    };
+    created.push(el);
+    return el;
+  }
+  return { fn, created };
+}
+
+function allText(node) {
+  if (!node) return '';
+  let s = typeof node.textContent === 'string' ? node.textContent : '';
+  for (const c of (node.children || [])) s += allText(c);
+  return s;
+}
+
+function anchorsIn(nodeLists) {
+  const out = [];
+  const walk = (n) => {
+    if (!n) return;
+    if (n.tagName === 'a') out.push(n);
+    for (const c of (n.children || [])) walk(c);
+  };
+  for (const list of nodeLists) for (const n of (list || [])) walk(n);
+  return out;
+}
+
+function makeRender2() {
+  const painted = [];
+  const nodes = [];
+  return {
+    fn: (html, ns) => { painted.push(String(html)); nodes.push(ns || []); },
+    painted, nodes
+  };
+}
+
+const GH_BASE = 'https://github.com/PipFoweraker/pdoom1/issues/new';
+
+row('C2', 'the endpoint is unreachable entirely -- §4.6 fallback in `retrying`',
+    'fetch rejects, so settleRetry() runs and the entry sits in `retrying`; the '
+    + 'render is inspected for the fallback that §4.6 asks for on exactly that state',
+    '§4.6, §4.3',
+    async (t) => {
+      const TEXT = "the linux build 404s & it's \"broken\" <script>alert(1)</script>";
+
+      // -- (a) no element factory: the string channel must still carry the offer ---
+      const storageA = makeStorage();
+      const renderA = makeRender2();
+      const netA = makeFetch(storageA, [offline]);
+      const clientA = MODULE.createFeedbackClient({
+        storage: storageA, fetch: netA.fn, uuid, now: () => 1755230000000,
+        render: renderA.fn
+      });
+      const rA = await clientA.submit({ kind: 'bug', page: '/download/', text: TEXT });
+
+      t.check(rA.state === 'retrying', '§4',
+        'the row must actually reach `retrying`, or it is testing nothing; got '
+        + JSON.stringify(rA.state));
+      const lastA = renderA.painted[renderA.painted.length - 1] || '';
+      t.note('retrying render: ' + JSON.stringify(lastA.slice(0, 200)));
+
+      // THE DEFECT. Before the fix this is the check that fails.
+      t.check(/github|e-?mail|issue/i.test(lastA), '§4.6',
+        'an unreachable endpoint is the exact case §4.6 was written for, and the '
+        + '`retrying` render offered NO fallback. Rendered: '
+        + JSON.stringify(lastA.slice(0, 240)));
+      t.check(lastA.indexOf(GH_BASE) !== -1, '§4.6',
+        'the offer must be a usable link, not a mention; rendered '
+        + JSON.stringify(lastA.slice(0, 240)));
+
+      // Rule 3 is absolute and the fix must not have bent it while adding an
+      // affordance to this state.
+      t.check(!SUCCESS_AFFORDANCE.test(renderA.painted.join('\n')), '§4.3',
+        'a `retrying` render carrying a fallback still MUST NOT carry a success '
+        + 'affordance; rendered ' + JSON.stringify(lastA.slice(0, 240)));
+      t.check(HONEST_PENDING.test(lastA), '§4.6',
+        'the fallback is offered AFTER the truth, never instead of it -- the same '
+        + 'render must still say the message is unsent and held here');
+      t.check(inert(renderA.painted.join('\n')), 'escaping',
+        'adding a link to this state must not add an escaping hole');
+
+      // Negative control. Without it, "fallback in retrying" is indistinguishable
+      // from "fallback pasted into every state", which would put an escape hatch on
+      // a render that is going fine and read as an apology for a success.
+      const queuedA = renderA.painted[0] || '';
+      t.check(queuedA.indexOf(GH_BASE) === -1, '§4.6',
+        'the queued/sending render must NOT offer the fallback -- nothing has gone '
+        + 'wrong yet; rendered ' + JSON.stringify(queuedA.slice(0, 200)));
+
+      // -- (b) with an element factory: a PREFILLED anchor, built as a node --------
+      const storageB = makeStorage();
+      const renderB = makeRender2();
+      const el = makeElementFactory();
+      const netB = makeFetch(storageB, [offline]);
+      const clientB = MODULE.createFeedbackClient({
+        storage: storageB, fetch: netB.fn, uuid, now: () => 1755230000000,
+        render: renderB.fn, createElement: el.fn
+      });
+      await clientB.submit({
+        kind: 'bug', page: '/download/', text: TEXT,
+        contact: 'someone@example.com', credit: 'Pat'
+      });
+
+      const anchors = anchorsIn(renderB.nodes);
+      t.check(anchors.length >= 1, '§4.6',
+        'with an element factory available the fallback must be built as DOM nodes; '
+        + 'found ' + anchors.length + ' anchor(s) across '
+        + renderB.nodes.length + ' render call(s)');
+      if (!anchors.length) { return; }
+      const a = anchors[anchors.length - 1];
+      t.note('anchor href: ' + JSON.stringify(String(a.href).slice(0, 220)));
+
+      t.check(String(a.href).indexOf(GH_BASE + '?') === 0, '§4.6',
+        'the link must be the PREFILLED issue form, not a bare new-issue url -- §4.6 '
+        + 'says prefilled and the widget shipped a constant for a year; got '
+        + JSON.stringify(String(a.href).slice(0, 160)));
+      t.check(/[?&]template=bug_report\.yml(&|$)/.test(String(a.href)), '§4.6',
+        'pdoom1 disables blank issues, so a prefill that does not name the form is '
+        + 'dropped on the redirect to /issues/new/choose and the link silently lies '
+        + 'about being pre-filled; got ' + JSON.stringify(String(a.href).slice(0, 160)));
+      t.check(String(a.href).indexOf(encodeURIComponent('the linux build 404s')
+        .replace(/%20/g, '+')) !== -1, '§4.6',
+        'the visitor\'s own words must actually be in the prefill; got '
+        + JSON.stringify(String(a.href).slice(0, 220)));
+      t.check(allText(a).trim().length > 0, '§4.6',
+        'the link must have visible text -- an anchor with no text is not an offer');
+
+      // A url built out of hostile text is exactly why this is a node and not a
+      // string. x-www-form-urlencoded cannot emit any of these; assert it rather
+      // than trust it, because the whole safety argument rests on that alphabet.
+      t.check(!/["'<>\s]/.test(String(a.href)), 'escaping',
+        'the prefilled url must contain no quote, angle bracket or space -- those are '
+        + 'what break out of an attribute; got ' + JSON.stringify(String(a.href)));
+
+      // ...and it must never have been a string in the first place. This is the
+      // check that stops a later refactor from "simplifying" the node channel away.
+      const htmlB = renderB.painted.join('\n');
+      t.check(htmlB.indexOf(String(a.href)) === -1, 'escaping',
+        'the prefilled url must NEVER appear in the html string -- it is built from '
+        + 'the visitor\'s words and belongs on a property, not in an attribute');
+      t.check(inert(htmlB), 'escaping',
+        'the html channel stays inert with the node channel in play');
+      t.check(!SUCCESS_AFFORDANCE.test(htmlB + '\n' + allText(a)), '§4.3',
+        'neither channel may carry a success affordance in `retrying`');
+
+      // A GitHub issue is public. Neither field was given to us for publication --
+      // the same call public/issues/index.html:825-826 already made.
+      t.check(String(a.href).indexOf('someone') === -1
+           && String(a.href).indexOf('%40example.com') === -1, '§7',
+        'the reporter\'s contact must not be pushed into a PUBLIC issue prefill; got '
+        + JSON.stringify(String(a.href).slice(0, 220)));
+
+      // -- (c) the hostile corpus through the prefill ------------------------------
+      for (const h of HOSTILE) {
+        const storageC = makeStorage();
+        const renderC = makeRender2();
+        const elC = makeElementFactory();
+        const netC = makeFetch(storageC, [offline]);
+        const clientC = MODULE.createFeedbackClient({
+          storage: storageC, fetch: netC.fn, uuid, now: () => 1755230000000,
+          render: renderC.fn, createElement: elC.fn
+        });
+        await clientC.submit({ kind: h, page: h, text: h, contact: h, credit: h });
+        const hostileAnchors = anchorsIn(renderC.nodes);
+        const hrefs = hostileAnchors.map((n) => String(n.href)).join(' ');
+        t.check(!/["'<>\s]/.test(hrefs), 'escaping',
+          'prefill url stays free of attribute-breaking characters for payload '
+          + h.slice(0, 30) + ' -- got ' + JSON.stringify(hrefs.slice(0, 200)));
+        t.check(hrefs.indexOf(GH_BASE) === 0 || hrefs === '', 'escaping',
+          'the prefill must stay on the GitHub origin for payload ' + h.slice(0, 30)
+          + ' -- got ' + JSON.stringify(hrefs.slice(0, 120)));
+        t.check(inert(renderC.painted.join('\n')), 'escaping',
+          'html channel inert with a hostile prefill in play: ' + h.slice(0, 30));
+      }
+    });
+
 // ---------------------------------------------------------------------------
 // Runner
 // ---------------------------------------------------------------------------
 (async function main() {
   console.log('='.repeat(78));
-  console.log('FEEDBACK OUTBOX -- DESTRUCTIVE SUITE (contract §6, rows F7, F8, F16, F17)');
+  console.log('FEEDBACK OUTBOX -- DESTRUCTIVE SUITE (contract §6 rows F7, F8, F16, F17'
+            + ' + review defects C1, C2)');
   console.log('subject under test: ' + SUBJECT.label);
   console.log('node: ' + process.version);
   console.log('='.repeat(78));
