@@ -20,21 +20,36 @@
 
 // ---- config -------------------------------------------------------------
 const RECIPIENT   = 'team@pdoom1.com';      // hardcoded on purpose (see above)
-// CORRECTED 2026-08-16. This line used to read "same domain -> passes SPF on
-// DreamHost". That is false, and it was the load-bearing assumption of this whole
-// intake path. SPF authorises SENDING IPs for a domain, not matching domain names;
-// with no SPF record published for pdoom1.com the result is `none`, never `pass`.
-// Measured against ns1.dreamhost.com on 2026-08-15: pdoom1.com publishes no SPF,
-// no DKIM and no DMARC, while MX points at Google. So this mail leaves a DreamHost
-// shared IP claiming to be from a domain Google itself hosts, entirely
-// unauthenticated -- the exact shape of a spoofing attempt.
+// FROM is the same domain as RECIPIENT.
 //
-// Two separate fixes are outstanding and neither is in this file:
-//   1. publish SPF + DMARC (DreamHost panel) and DKIM (Google Admin). See
-//      docs/decisions/FEEDBACK_INTAKE_CONTRACT.md section 5.
-//   2. pass an aligned envelope sender as mail()'s 5th parameter. Without it,
-//      DMARC alignment fails even once SPF exists, which is why
-//      scripts/check-mail-auth.py currently pins the policy at p=none.
+// UPDATED 2026-08-17 ~08:53 AEST -- the SPF record LANDED, which this comment
+// asked to be recorded here with its verification date. Published in the
+// DreamHost panel and confirmed against all three DreamHost nameservers plus
+// 8.8.8.8, 1.1.1.1 and 9.9.9.9:
+//
+//   pdoom1.com          TXT  v=spf1 include:_spf.google.com include:netblocks.dreamhost.com ~all
+//   _dmarc.pdoom1.com   TXT  v=DMARC1; p=none; rua=mailto:team@pdoom1.com
+//
+// Do NOT read that as "the domain now passes". Two corrections to what this
+// comment said before, both from the headers of a real delivered message
+// (Message-Id 4hNWYX273Bz13YTW, 2026-08-17 08:56 AEST):
+//
+// 1. "same domain -> passes SPF" was and remains WRONG, and publishing a record
+//    does not make it right. SPF authorises the sending IP for the ENVELOPE
+//    domain. With no 5th parameter on mail() the envelope sender is
+//    pdoom1_dot_com_shell@iad1-shared-b8-18.dreamhost.com, so Google returned
+//    `spf=pass` -- for DreamHost -- and `dmarc=fail`, because that domain does
+//    not align with the pdoom1.com From: header built below. The fix is the -f
+//    parameter at the mail() call, not the DNS record alone.
+//
+// 2. "mail() succeeds and nothing is delivered" is too strong. Two test
+//    messages on 2026-08-17 were DELIVERED to the inbox, each carrying Gmail's
+//    yellow "appears to be sent from your account but Gmail couldn't verify
+//    this" banner. Delivered-with-a-spoof-warning is a different failure from
+//    silently-dropped, and it is the one that is actually observed. What
+//    happened to submissions before that date is not established here.
+//
+// Tracked as pdoom1-website#321. Do not restore the pre-#321 comment.
 const FROM        = 'team@pdoom1.com';
 const MIN_FILL_MS = 3000;                    // faster than this = a bot
 const THROTTLE_S  = 30;                      // seconds between reports per IP
@@ -52,6 +67,43 @@ const MAX_ATTACH_BYTES = 550 * 1024;         // decoded cap; client caps the fil
 const TYPES       = ['bug', 'feature', 'documentation', 'performance', 'feedback', 'question'];
 
 header('Content-Type: application/json; charset=utf-8');
+
+/**
+ * Append-only record of every submission this endpoint ACCEPTS.
+ *
+ * WHY. `mail()` returning true is a handoff receipt from the local MTA, not a
+ * delivery confirmation -- delivery to Google happens afterwards and can fail
+ * silently, which is exactly what has been happening since at least
+ * 2026-07-24. Without this log a lost report is not merely undelivered, it is
+ * unrecoverable and invisible: we never learn the sender existed.
+ *
+ * WHERE. Deliberately OUTSIDE the document root. `public/` IS the docroot on
+ * DreamHost and is deployed with `rsync --delete`, so anything written inside
+ * it would be both world-readable and erased by the next deploy. The parent
+ * directory is neither served nor rsynced.
+ *
+ * This is a recovery log, not a mailbox. It holds what the reporter typed,
+ * including their email if they gave one, so it is created 0700 and carries a
+ * deny-all .htaccess in case it is ever relocated somewhere that is served.
+ * NOTE: nothing here rotates or expires it. That is a deliberate omission --
+ * silent deletion is the failure this file exists to prevent -- but it means
+ * retention is an open question, not a solved one.
+ */
+function submission_log(array $record): void {
+    $dir = dirname(__DIR__) . '/feedback-log';
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0700, true);
+        @file_put_contents($dir . '/.htaccess', "Require all denied\n");
+    }
+    $line = json_encode($record, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    if ($line === false) {
+        $line = json_encode(['id' => $record['id'] ?? '?',
+                             'error' => 'record was not JSON-encodable']);
+    }
+    // LOCK_EX so two concurrent submissions cannot interleave a half-line.
+    @file_put_contents($dir . '/' . gmdate('Y-m') . '.jsonl',
+                       $line . "\n", FILE_APPEND | LOCK_EX);
+}
 
 function done(int $code, array $payload): void {
     http_response_code($code);
@@ -190,20 +242,50 @@ if ($hasAttachment) {
     $body = $textBody;
 }
 
-// The 5th parameter is the whole reason this mail can pass DMARC. Without it the
-// envelope sender is whatever the host picks -- measured 2026-08-17 on a real
-// delivered message, that is pdoom1_dot_com_shell@iad1-shared-b8-18.dreamhost.com.
-// SPF then passes for DREAMHOST's domain, which does not align with the pdoom1.com
-// From: header above, so DMARC fails and Gmail shows the recipient a warning
-// banner on the site's own feedback mail (observed, Message-Id 4hNWYX273Bz13YTW).
-// With `-f team@pdoom1.com` the envelope domain is pdoom1.com, SPF is evaluated
-// against OUR record -- which carries include:netblocks.dreamhost.com, covering
-// the relay 208.113.156.243 -- and the pass is aligned.
-// This only works because the SPF record exists; it was published 2026-08-17.
+// Record BEFORE sending. If mail() throws, dies, or the process is killed, the
+// submission still survives on disk -- which is the entire point. The outcome
+// is appended as a second line keyed by the same id, so the pair is
+// append-only and neither write depends on the other succeeding.
+$submissionId = bin2hex(random_bytes(8));
+submission_log([
+    'id'        => $submissionId,
+    'at'        => gmdate('c'),
+    'event'     => 'accepted',
+    'type'      => $type,
+    'title'     => $title,
+    'body'      => $desc,
+    'email'     => $email,
+    'credit'    => $credit,
+    'flags'     => $flags,
+    'attach'    => $attName,
+    'ip_hash'   => hash('sha256', $ip),   // hashed: enough to correlate, not to identify
+    'ua'        => mb_substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 200),
+]);
+
+// The 5th parameter is what makes this mail capable of passing DMARC, and it
+// only became useful once the SPF record above existed. Measured on a real
+// delivered message 2026-08-17: without it the envelope sender is
+// pdoom1_dot_com_shell@iad1-shared-b8-18.dreamhost.com, so Google reports
+// `spf=pass ... dmarc=fail (p=NONE dis=NONE) header.from=pdoom1.com` and shows
+// the recipient a spoof warning on the site's own feedback mail.
+//
+// `-f team@pdoom1.com` puts the envelope domain on pdoom1.com, so SPF is
+// evaluated against OUR record -- which carries include:netblocks.dreamhost.com,
+// covering the relay 208.113.156.243 that Google actually authenticated -- and
+// the pass then aligns with the From: header.
+//
 // Safe on this host: the MTA is Postfix (`Received: ... (Postfix, from userid
-// 6835806)`), whose sendmail wrapper honours -f without the X-Authentication-Warning
-// header that a real sendmail adds for an untrusted user.
+// 6835806)`), whose sendmail wrapper honours -f without adding the
+// X-Authentication-Warning header a real sendmail adds for an untrusted user.
 $sent = @mail(RECIPIENT, $subject, $body, $headers, '-f ' . FROM);
+
+submission_log([
+    'id'    => $submissionId,
+    'at'    => gmdate('c'),
+    'event' => 'handoff',
+    // NOT "delivered". mail() only reports that the local MTA accepted it.
+    'mail_accepted_by_local_mta' => (bool)$sent,
+]);
 
 if ($sent) {
     done(200, ['ok' => true]);

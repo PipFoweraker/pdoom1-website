@@ -1,0 +1,125 @@
+{
+  "_README": "DRAFT COPY - rewrite freely, it should sound like you, not like a tool. Nothing is posted by any automation from this file; you post by hand. Set posted[platform] to an ISO timestamp as each goes out, then commit. Check every link keeps its own platform's utm_source before posting. Every example in this copy is a real failure in this estate; re-verify the SPF one before posting, because it is the one being fixed on 17 August.",
+  "campaign": "the-working-2026-08",
+  "title": "A system reporting on itself",
+  "url": "https://pdoom1.com/",
+  "approved": false,
+  "_drafted": "2026-08-15 by the pdoom-data seat.",
+  "_why_this_campaign_exists": "Every post about p(Doom)1 so far has been about p(Doom)1. This one is about the working: three failures from the last fortnight, all of which are the same failure. In each case a system was asked whether it had succeeded and said yes, and the answer was believed because it came back green. That is not a lesson anyone needs delivered as a lesson; it is three short stories that land on their own if they are told accurately and then left alone. The reason it is worth publishing is that it is the most credible thing this project can say about itself - not that we are careful, but that we found these, wrote them down with numbers, and changed the checks.",
+  "_facts_this_copy_must_not_break": [
+    {
+      "id": "the-rule-is-quoted-not-paraphrased",
+      "constraint": "The rule is: a check must take at least one INPUT FROM OUTSIDE the system it is checking, and must not derive what to look for from that same system. Quote it, do not reword it. In particular NEVER write it as 'output from inside' -- that inverted form was written into pdoom-data's CLAUDE.md on 2026-08-02 and propagated into three repos and two printed sheets before it was caught, and it passes the exact failure the rule exists to catch.",
+      "verify": "human",
+      "why_not_machine": "The canonical wording lives in a GitHub issue body in another repo (pdoom1#1075). Nothing in this repo holds it, and checking our prose against our own restatement of it would be checking a claim against a claim -- which is the defect the rule itself describes.",
+      "source": "pdoom1#1075, the canonical wording, restored by coordination#5. Quoted in coordination PROTOCOL_UPDATES_2026-08-02.md:57 and 63, coordination LESSON_2026-08-15_look-at-the-thing.md:58, coordination HANDOVER_2026-08-15_pdoom1-mail-transmission.md:134, and pdoom-data CLAUDE.md, which also records the inversion and its blast radius.",
+      "human_verified": {
+        "by": "pdoom-data seat, drafting this campaign",
+        "on": "2026-08-15",
+        "review_by": "2026-11-15",
+        "note": "Read the wording in four coordination files at drafting; all four agree, all four say OUTSIDE. Long clock: this is a settled rule with a written history of being restored after corruption, so the risk is a drafting error here, not the rule moving."
+      }
+    },
+    {
+      "id": "spf-is-still-unpublished",
+      "constraint": "The copy says, in the present tense, that pdoom1.com has never published an SPF record and that the feedback form therefore loses submissions. That is scheduled to be fixed. If pdoom1-website#321 is closed, the present tense is a lie and the paragraph must be rewritten into the past tense before posting -- and the same-day check is not that the DNS was edited, it is that a probe message arrived in the inbox.",
+      "verify": "online",
+      "check": "issue_state",
+      "issue": "PipFoweraker/pdoom1-website#321",
+      "expect": "open",
+      "source": "pdoom1-website#321, 'Website feedback form silently loses every submission: pdoom1.com publishes no SPF record, MX is Google, mail() sends from DreamHost'. Verified OPEN 2026-08-15 with `gh issue view 321 --repo PipFoweraker/pdoom1-website`. The offending comment is public/bug-submit.php:23. The corrective note and the revert conditions are in public/assets/js/navigation.js:38-62. Handover: coordination HANDOVER_2026-08-15_pdoom1-mail-transmission.md.",
+      "note": "The fix is scheduled for Monday 17 August, so this guard is expected to fire soon and that is the point of it. Closing the issue must trigger a rewrite of one paragraph, not a quiet mismatch."
+    },
+    {
+      "id": "spf-comment-is-quoted-verbatim",
+      "constraint": "The comment quoted in the copy is 'same domain -> passes SPF on DreamHost'. It is verbatim from source and must stay verbatim; do not tidy it, and do not describe it as documentation or a docstring. It is an end-of-line comment beside a constant.",
+      "verify": "human",
+      "why_not_machine": "The string is in this repo and could in principle be grepped, but the constraint is about faithful quotation of a line that is about to be deleted by the fix; once bug-submit.php is corrected there is nothing left here to check the quote against, and a check that goes green by deleting its own referent is worse than none.",
+      "source": "public/bug-submit.php:23 -- `const FROM = 'team@pdoom1.com'; // same domain -> passes SPF on DreamHost`.",
+      "human_verified": {
+        "by": "pdoom-data seat, drafting this campaign",
+        "on": "2026-08-15",
+        "review_by": "2026-09-19",
+        "note": "Read at bug-submit.php:23 on 2026-08-15, character for character. The measurement that contradicts it: a probe on 2026-08-14 returned {\"ok\":true} and had not arrived 34 minutes later, recorded in the navigation.js note and in pdoom1-website#321."
+      }
+    },
+    {
+      "id": "print-numbers-are-six-and-five",
+      "constraint": "Six jobs reported as printed; five of them had been cancelled at the device. Not 'most'. Not 'nearly all'. Do not round, and do not say the queue lied -- the queue reported its own intake accurately, which is precisely the problem.",
+      "verify": "human",
+      "why_not_machine": "The incident and its counts live in coordination, a repo this site does not read. There is no artefact here to check against, and vendoring one makes a variant (coordination#15).",
+      "source": "coordination HANDOVER_2026-08-15_pdoom1-mail-transmission.md:129-131 and coordination DEFECT_2026-08-14_print-pipeline-and-stack-collection.md:235-241, quoting safe_print.py's docstring: 'A job cancelled at the device leaves the queue exactly as a printed job does. The queue is the printing system reporting on its own intake, which is a proxy, not an observation of the outcome.' Carried by coordination#82.",
+      "human_verified": {
+        "by": "pdoom-data seat, drafting this campaign",
+        "on": "2026-08-15",
+        "review_by": "2026-10-15",
+        "note": "Read both coordination files at drafting; the counts agree. The replacement tool validates the artefact with a different program than made it, reads the job's terminal state rather than the queue's emptiness, and exits non-zero on failure; it printed successfully as job 27 on 2026-08-14. It is also honest that it still cannot see whether paper is in the tray, which is the limit worth keeping in the copy if there is room."
+      }
+    },
+    {
+      "id": "redaction-count-is-ten-in-the-public-zone",
+      "constraint": "Ten records in the public zone were still carrying live addresses while the tombstone said the file was clean. Do not quote the earlier figure of four without saying it was superseded, and do not claim the verifier and the redactor were 'the same code' -- they shared a broken PATTERN, which is the distinction the whole example turns on.",
+      "verify": "human",
+      "why_not_machine": "The dataset, the redactor, the scanner and the incident record are all in pdoom-data. This site holds none of them.",
+      "source": "pdoom-data docs/DECISIONS_2026-08-10_pdoom-data.md:52-56 (pdoom-data#72: ten records in the public zone plus 306 occurrences in data/transformed/, a tracked zone no redaction run had ever listed; the scan now runs in CI gating on an independently written scanner rather than on the redaction pattern, and has been observed going red on run 31342812917). Pattern at scripts/privacy/redact_emails.py:73-74. Earlier, smaller measurement: docs/CORPUS_PROPOSAL_2026-08-09.md:275-277, four records and six addresses.",
+      "human_verified": {
+        "by": "pdoom-data seat, drafting this campaign",
+        "on": "2026-08-15",
+        "review_by": "2026-10-15",
+        "note": "Read both pdoom-data documents at drafting. The four-then-ten sequence is itself the point and the copy uses the later number: the first count came from reading the file, the second from running a scanner nobody had written yet. The cause is the same damage twice over -- PDF extraction inserted a space inside the domain ('uni -tuebingen.de', 'louisville. edu', 'cbs .dk'), so the redactor's pattern, which requires a dot immediately after the domain's first token, matched nothing and the verifier built on that pattern saw nothing to report."
+      }
+    },
+    {
+      "id": "dont-moralise",
+      "constraint": "Tell the three stories, state the rule once, stop. No 'and the lesson here is', no invitation to reflect, no claim that this project is unusually rigorous. The pattern lands because the examples are specific; a moral at the end takes that away from the reader.",
+      "verify": "durable",
+      "why_durable": "A rule about tone and structure in our own prose. It asserts nothing about the world, so there is nothing in it that can become false."
+    },
+    {
+      "id": "these-are-our-failures-not-anyone-elses",
+      "constraint": "Every example must be one of ours. Do not reach for an industry anecdote or someone else's outage to pad the pattern; the credibility of this post is entirely that the failures are in repositories with our name on them.",
+      "verify": "durable",
+      "why_durable": "An editorial rule about sourcing our own examples. It constrains what we write, not what is true."
+    },
+    {
+      "id": "no-promise-of-human-artists-yet",
+      "constraint": "Do NOT say human artists have been hired, commissioned, or engaged. Funding is not secured. The correct tense is that this is what the money would pay for.",
+      "verify": "human",
+      "why_not_machine": "A claim about a commercial arrangement that does not exist. Absence of a contract is not recorded anywhere, and no machine can check that a thing has not happened.",
+      "source": "https://manifund.org/projects/fund-development-of-pdoom1 -- funding-use section lists human artists as an intended use; the round has not closed and the minimum has not been met.",
+      "human_verified": {
+        "by": "pdoom-data seat",
+        "on": "2026-08-15",
+        "review_by": "2026-09-16",
+        "note": "Carried over from the art-cull campaign's guard of the same id, and kept here because this copy mentions the funding round. Review date is a week after the 2026-09-09 close, the event that makes this guard either obsolete or permanent."
+      }
+    },
+    {
+      "id": "manifund-figures-move",
+      "constraint": "Do not type the raised total or the days remaining into copy. Both move daily and a stale number is worse than none. Link the page and let it resolve, or say 'the minimum' without a figure.",
+      "verify": "durable",
+      "why_durable": "An editorial rule about what not to write. It asserts nothing about the world.",
+      "note": "The deadline 2026-09-09 and the $14,500 minimum are stable and MAY be typed. The raised figure and the day count may not."
+    },
+    {
+      "id": "no-version-in-copy",
+      "constraint": "Do not name a specific build version in the copy. 'The latest build' ages correctly; a version number does not.",
+      "verify": "checked",
+      "check": "no_version_literal_in_copy",
+      "source": "This campaign's own copy strings. The check scans them for an x.y.z literal."
+    }
+  ],
+  "copy": {
+    "bluesky": "Three things broke here this fortnight and they were all the same thing.\n\nThe feedback form said \"Report Submitted!\" and delivered nothing; the send function returned true before delivery was attempted.\n\nSix print jobs reported as printed; five had been cancelled at the printer.\n\nA redaction tool's verifier reported the file clean while ten records were still publishing people's email addresses.\n\nEach time, the system was asked whether it had worked, and it said yes.\n\nhttps://pdoom1.com/?utm_source=bluesky&utm_medium=social&utm_campaign=the-working-2026-08",
+    "twitter": "Three failures here in a fortnight, one shape.\n\nA comment in our own source said \"same domain -> passes SPF on DreamHost\". The domain has never published an SPF record. A claim about DNS, sitting in a file for months, never once checked against DNS.\n\nSix print jobs reported printed; five had been cancelled at the device, because a queue empties the same way either way.\n\nA redaction verifier reported clean while ten records still carried live addresses; a separately written scanner disagreed, which is the only reason anyone found out.\n\nEvery time, the system reported on itself and was believed.\n\nhttps://pdoom1.com/?utm_source=twitter&utm_medium=social&utm_campaign=the-working-2026-08",
+    "linkedin": "Three things went wrong here in the last fortnight, and it took the third one to notice they were the same thing.\n\nThe first is the website's feedback form. It showed every visitor \"Report Submitted!\" and delivered nothing. The send call returned true, and the success page was generated before delivery was even attempted; a probe on 14 August came back {\"ok\":true} and had still not arrived thirty-four minutes later. The cause is that the domain has never published an SPF record while its mail is hosted elsewhere, so the receiving side saw its own hosted domain arriving unauthorised from a shared-hosting IP and quietly dropped it. What makes it worth writing down is not the misconfiguration; it is the comment sitting beside the sender address in our own source, which reads \"same domain -> passes SPF on DreamHost\". A claim about DNS, in a file, never once checked against DNS.\n\nThe second is printing. Six jobs were reported as printed and five of them had been cancelled at the device. The check polled the print queue and saw it empty, which it was; a queue empties identically whether a job printed or was killed at the panel. The queue was reporting the printing system's own intake, accurately, and intake is not outcome.\n\nThe third is a redaction tool. It strips email addresses out of a public dataset, and it carried a verifier that reported the file clean while ten records were still publishing live addresses. The extraction that produced the text had inserted a space inside each domain; the redactor's pattern required a dot immediately after the domain's first token, so it matched nothing, and the verifier - built on that same pattern - saw nothing to report. What caught it was a separately written scanner giving a different answer.\n\nThe obvious fix on that last one is to make detection and verification share a single function, and that is exactly wrong: a defect in the shared function then becomes invisible to both. So the rule we work to now, and I am quoting it rather than rewording it, is that a check must take at least one input from OUTSIDE the system it is checking, and must not derive what to look for from that same system. Two clauses, because each one of these failures passes a single-clause version.\n\nThe form has been rerouted to a plain email address until the DNS is fixed and a test message has been seen arriving in an inbox - not merely until the DNS is edited. The printer tool now validates the file with a different program than the one that made it and reads the job's terminal state; it is also honest that it still cannot tell whether there is paper in the tray, because only a person can see that. The redaction scan runs on every push, gated on the independent scanner rather than on the redactor's pattern, and it has been observed going red, which is the only evidence that a green means anything.\n\nI build p(Doom)1, a game about the people trying to stop AI going badly wrong. You cannot win; you can only buy time. The funding round closes 9 September.\n\nhttps://pdoom1.com/?utm_source=linkedin&utm_medium=social&utm_campaign=the-working-2026-08",
+    "devlog": "# A system reporting on itself\n\nThis one is not about the game. It is about the working, and about three failures from the last fortnight that turned out to be one failure wearing different clothes.\n\n## The form that always succeeded\n\nThe site has a feedback form. It POSTs to a small PHP handler, which calls the platform's mail function, which returns true. The success page - \"Report Submitted!\" - is generated before delivery is attempted, and the mail function returns true whether or not anything is ever delivered. On 14 August a probe went through it, came back `{\"ok\":true}`, and had not arrived thirty-four minutes later.\n\nThe reason nothing arrives is dull: the domain has never published an SPF record, its MX is Google, and the mail leaves from a DreamHost IP, so Google sees its own hosted domain arriving unauthorised from somewhere it has no reason to trust and does not deliver it. That is a fifteen-minute DNS change, and it is booked for Monday.\n\nThe part I keep re-reading is line 23 of the handler. Beside the constant that sets the sender address there is a comment:\n\n> `// same domain -> passes SPF on DreamHost`\n\nA claim about DNS, written into a source file, sitting there for months, and never once checked against DNS. Nobody lied; somebody reasoned about what should follow from the configuration and then wrote the conclusion down in a place where it reads like an observation. `pdoom1-website#321`\n\nThe fix in the meantime is to point the navigation at a plain mailto address, which works because the visitor's own mail client sends from their own provider and never touches ours. The revert condition is written into the markup: put the form back once the SPF record is live AND a probe has been confirmed arriving in the inbox. Not once the DNS has been edited. The edit is not the outcome either.\n\n## Six printed, five cancelled\n\nSame week, different subsystem. Six print jobs were reported as printed. Five of them had been cancelled at the device.\n\nThe check polled the print queue and found it empty. It was empty. A job cancelled at the panel leaves the queue in exactly the state a printed job leaves it in; the queue is the printing system reporting on its own intake, and intake is not outcome. Six greens, one real print.\n\nThe replacement does three things differently. It validates the artefact with a different program than the one that generated it, on the principle that a generator cannot certify its own output. It reads the job's terminal state rather than the queue's emptiness. And it exits non-zero when it fails, which sounds too obvious to state until you notice how many checks in a codebase discard the exit code of the thing they invoke.\n\nIt is also candid about where it stops: it still cannot see whether there is paper in the tray. Nothing in the software can. Only a person standing next to the machine can close that loop, and saying so is better than a check that implies otherwise.\n\n## The verifier that agreed with itself\n\nThe third one is the oldest and the one I find hardest to look at directly.\n\nA dataset here is built from extracted PDF text, and academic PDF front matter is contact details, so there is a tool that strips email addresses before anything is published. It has a verifier. The verifier reported the file clean. Ten records in the public zone were still carrying live addresses, and a tracked intermediate zone that no redaction run had ever listed held another three hundred and six occurrences.\n\nThe cause is one piece of damage doing two jobs. The PDF extraction had inserted a space inside each domain - `uni -tuebingen.de`, `louisville. edu`, `cbs .dk` - and the redactor's pattern requires a dot immediately after the domain's first token, so it matched nothing. The verifier was built on that same pattern. The damage that made the addresses hard to read is the damage that made them invisible to the scanner, and the scanner reported that as cleanliness.\n\nThere was an earlier count of four records. It came from reading the file. The count of ten came from running a scanner that had not existed when the first count was made.\n\nThe tempting fix is to have detection and verification share one function so they can never disagree. That is the wrong direction: a defect in the shared function is then invisible to both, which is what had already happened. What actually found this was a separately written scanner giving a different answer. The scan now runs in CI, gated on that independent scanner, and it has been observed going red - which is the only thing that makes its green worth anything.\n\n## The rule\n\nQuoted, not reworded, because this one was written down backwards once and the inverted version propagated through three repositories and two printed sheets before anybody noticed:\n\n> A check must take at least one input from **outside** the system it is checking, and must not derive what to look for from that same system.\n\nTwo clauses, and each of the three failures above defeats a version with only one. The mail function observed the wrong thing. The queue observed the right object's wrong property. The verifier observed correctly and looked for the wrong thing, because what to look for came out of the system under test.\n\nA sentence I have stopped being able to un-see: nearly every green in an estate this size is a system being asked whether it worked.\n\n---\n\np(Doom)1 is a game about the people trying to stop AI going badly wrong. You cannot win; you can only buy time. The funding round has a $14,500 minimum and closes 9 September.\n\n[Play it](https://pdoom1.com/?utm_source=devlog&utm_medium=owned&utm_campaign=the-working-2026-08) - [back it](https://manifund.org/projects/fund-development-of-pdoom1)\n"
+  },
+  "posted": {
+    "bluesky": null,
+    "twitter": null,
+    "linkedin": null,
+    "devlog": null
+  },
+  "_source_of_truth": "Each example traces to a dated artefact named in its guard above: pdoom1-website#321 and public/bug-submit.php:23 for the SPF failure; coordination HANDOVER_2026-08-15_pdoom1-mail-transmission.md and DEFECT_2026-08-14_print-pipeline-and-stack-collection.md for the print jobs; pdoom-data docs/DECISIONS_2026-08-10_pdoom-data.md and docs/CORPUS_PROPOSAL_2026-08-09.md for the redaction verifier; pdoom1#1075 for the rule. Two further examples were verified and left out for length, and are here if a variant needs them: an ssh cleanup trusted on its exit code, which returns 0 on an SFTP-only host having executed nothing (pdoom-data CLAUDE.md, clause 1 of the rule), and commit recency as a health signal - eight repositories read as dormant by last-commit date while carrying 41 open issues between them (coordination METRICS_2026-08-15_week.md:54-55)."
+}
