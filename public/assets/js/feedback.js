@@ -31,20 +31,28 @@
  * ESCAPING
  * --------
  * There is exactly ONE escaper on this site and it is public/assets/js/escape.js.
- * This file defines none of its own; it looks the shared one up and FAILS CLOSED --
- * if escape.js did not load, paint() renders nothing rather than rendering visitor
- * text raw. The durable write still happens: a missing render is a UI failure, a
- * raw render is an XSS, and a dropped message is the one thing the directive
- * forbids outright. Sinks used, and why each one:
+ * This file defines none of its own; it looks the shared one up and FAILS CLOSED on
+ * the ESCAPING question -- if escape.js did not load, no visitor or server string is
+ * interpolated into markup. Sinks used, and why each one:
  *
  *   escapeHTML   every visitor/server string that becomes element TEXT
  *   isSafeUrl    a bare predicate: may this URL be SHOWN at all? `javascript:`
  *                contains no HTML metacharacter, so escaping cannot make it safe
  *                and only a scheme check can decide.
  *
- * No visitor-supplied value is ever placed in an href. The only href this widget
- * emits is a compile-time constant (the GitHub fallback). See "Fallback link" below
- * for why it is not prefilled.
+ * FAILING CLOSED ON ESCAPING IS NOT FAILING CLOSED ON THE WHOLE MESSAGE (fixed
+ * 2026-08-17, defect C1). paint() used to `return` outright when escape.js was
+ * missing, so the durable write happened and the visitor saw an empty region --
+ * indistinguishable from a button that did nothing, which invites a resubmit and
+ * invites the conclusion that the message was lost. A message that WAS saved but
+ * LOOKS lost is the same harm as a lost message from where the visitor is standing.
+ * paintDegraded() therefore renders a CONSTANT-ONLY string: every fragment is a
+ * compile-time literal out of COPY, there is not one interpolation on that path, so
+ * the escaping question never arises rather than being answered badly. Nothing
+ * visitor-supplied and nothing server-supplied may EVER be added to it.
+ *
+ * No visitor-supplied value is ever placed in an href *inside an HTML string*. The
+ * one prefilled href this widget emits is built as a DOM node (see fallbackNodes).
  *
  * WHAT THIS FILE IS NOT
  * ---------------------
@@ -64,13 +72,41 @@
   // page load and an `online` event both call.
   var BACKOFF_MS = [0, 5000, 30000, 300000];
 
-  // Offered on refusal and on a server rejection (§4.6). CONSTANT, never prefilled
-  // with the visitor's text: encodeURIComponent leaves ' ( ) * ! unescaped, so a
-  // prefilled body would put an apostrophe inside a quoted href, and no amount of
-  // escaping fixes a URL that is being built out of hostile text. The visitor's
-  // words stay visible in the form so they can be copied.
+  // §4.6's fallback. Offered on refusal, on a server rejection, and -- since the
+  // 2026-08-17 fix for defect C2 -- on `retrying`, which is the state §4.6 was
+  // actually written for: "if the endpoint is unreachable entirely". It is offered
+  // AFTER the truth about what happened, never instead of it (§4.6), so every state
+  // that carries it renders its honest headline first.
+  //
+  // CORRECTED 2026-08-17. This constant used to carry a comment arguing a prefill
+  // could not be built safely, because "encodeURIComponent leaves ' ( ) * ! unescaped
+  // so a prefilled body would put an apostrophe inside a quoted href". The premise
+  // was wrong on both halves:
+  //   1. The encoder named is not the one to use. URLSearchParams serialises
+  //      application/x-www-form-urlencoded, whose output alphabet is A-Z a-z 0-9
+  //      * - . _ plus + for space and %XX for everything else. It cannot emit a
+  //      quote, an apostrophe or an angle bracket at all. prefillQuery() asserts
+  //      that alphabet rather than trusting it, and returns null if it ever fails.
+  //   2. "Inside a quoted href" assumes an HTML string. public/issues/index.html
+  //      :878-896 already builds a prefilled GitHub link in this same repo with
+  //      createElement + property assignment, where no attribute exists to break
+  //      out of. fallbackNodes() does the same.
+  // The constant-URL line survives as the degradation for any context with no
+  // element factory (see fallbackLine): the offer is never simply absent.
   var FALLBACK_URL = 'https://github.com/PipFoweraker/pdoom1/issues/new';
   var FALLBACK_LABEL = 'github.com/PipFoweraker/pdoom1/issues/new';
+  var FALLBACK_PREFILL_LABEL = 'Open a pre-filled GitHub issue';
+
+  // pdoom1 sets blank_issues_enabled:false, so /issues/new?title=&body= redirects to
+  // /issues/new/choose and DROPS the prefill. The form must be named, and the keys
+  // must match .github/ISSUE_TEMPLATE/bug_report.yml in PipFoweraker/pdoom1 --
+  // measured via public/issues/index.html:827-832, which files against the same form.
+  var FALLBACK_TEMPLATE = 'bug_report.yml';
+
+  // The states that offer the fallback, as data rather than as a chain of ifs, so
+  // "which states offer it" is one greppable line instead of three call sites --
+  // C2 was exactly a missing call site.
+  var OFFERS_FALLBACK = { refused: true, rejected: true, retrying: true };
 
   // ------------------------------------------------------------------------
   // The shared escaper, looked up late and never reimplemented.
@@ -137,7 +173,23 @@
              + 'still waiting.',
     keep:      'Keep this code. It is the only way to ask us to delete this '
              + 'message later.',
-    fallback:  'You can open a GitHub issue instead: '
+    fallback:  'You can open a GitHub issue instead: ',
+    // The tail of the PREFILLED offer. Rendered as element text on a DOM node, so
+    // it never meets an HTML parser; kept here anyway because all visitor-facing
+    // wording belongs in one table.
+    prefill_tail: ' — your own words are already filled in there. Nothing is sent '
+             + 'until you press Submit new issue.',
+
+    // ---- the escape.js-missing path (defect C1). CONSTANTS ONLY. -------------
+    // Anything added below must be a compile-time literal. The whole reason this
+    // path is safe is that it interpolates nothing, so there is no escaping
+    // question to get wrong. A single template hole here reopens the XSS that
+    // paint()'s early return was avoiding.
+    degraded:  'Part of this page did not load, so your message is not being shown '
+             + 'back to you here. Nothing has been lost.',
+    degraded_acked:
+               'Saved. Your message reached us, but this page cannot display your '
+             + 'receipt code right now.'
   };
 
   function createFeedbackClient(deps) {
@@ -149,8 +201,19 @@
           ? function (u, i) { return window.fetch(u, i); } : null);
     var mkuuid = deps.uuid || defaultUuid;
     var now = deps.now || Date.now;
+    // render(html, nodes): `html` is the status string that goes to innerHTML;
+    // `nodes` is an array of already-built DOM nodes to APPEND after it. The node
+    // channel exists so the prefilled fallback link never becomes markup -- see
+    // fallbackNodes(). A consumer that ignores the second argument still gets a
+    // complete, honest render, because paint() emits the constant-URL line whenever
+    // it could not build nodes.
     var render = deps.render || function () {};
     var endpoint = deps.endpoint || DEFAULT_ENDPOINT;
+    // The element factory, injectable for the same reason storage and fetch are:
+    // otherwise the node path is only exercised in a browser nobody is testing.
+    var mkel = deps.createElement
+      || (typeof document !== 'undefined' && document.createElement
+          ? function (t) { return document.createElement(t); } : null);
     // Scheduling is a browser concern. In a test sandbox there is no page and no
     // visitor, so an un-injected timer would only leave the event loop alive and
     // fire a fetch nobody is watching.
@@ -219,12 +282,16 @@
 
     /**
      * Build the exact string the widget assigns to innerHTML and hand it to
-     * render(). Every interpolation is element TEXT and goes through escapeHTML;
-     * the one href is a constant. Fails closed when escape.js is absent.
+     * render(). Every interpolation is element TEXT and goes through escapeHTML.
+     * When escape.js is absent this delegates to paintDegraded, which interpolates
+     * NOTHING -- see the ESCAPING note at the top of this file.
      */
     function paint(entry, state, detail) {
       var E = getEscapers();
-      if (!E) { return; }               // fail closed: nothing, rather than raw
+      var offer = OFFERS_FALLBACK[state] === true;
+      // Fail closed on ESCAPING, not on the whole message (defect C1). The visitor
+      // is still told, in constants, that their words are held.
+      if (!E) { return paintDegraded(entry, state, offer); }
       var p = payloadOf(entry);
       var html = '<div class="fb-status fb-' + state + '">';
 
@@ -235,11 +302,9 @@
       } else if (state === 'refused') {
         html += '<p class="fb-headline">' + COPY.refused + '</p>';
         html += '<p class="fb-note">' + COPY.kept + '</p>';
-        html += fallbackLine();
       } else {
         html += '<p class="fb-headline">' + (COPY[state] || COPY.retrying) + '</p>';
         if (detail) { html += '<p class="fb-detail">' + E.escapeHTML(detail) + '</p>'; }
-        if (state === 'rejected') { html += fallbackLine(); }
       }
 
       // Echo of what is being held. Element text in every case.
@@ -256,14 +321,136 @@
       if (p.page && E.isSafeUrl(p.page)) { meta.push(E.escapeHTML(p.page)); }
       if (meta.length) { html += '<p class="fb-meta">' + meta.join(' · ') + '</p>'; }
 
+      // §4.6, and it comes LAST on purpose: the offer follows the truth about what
+      // happened rather than standing in for it.
+      var nodes = [];
+      if (offer) {
+        var node = fallbackNodes(entry);
+        if (node) { nodes.push(node); } else { html += fallbackLine(); }
+      }
+
       html += '</div>';
-      render(html);
+      render(html, nodes);
     }
 
+    // A state name is internal today, but "internal today" is how several of this
+    // repo's escaping holes began. On the degraded path the class comes out of a
+    // literal table, so no value from anywhere else can reach the string.
+    var DEGRADED_CLASS = {
+      queued: 'fb-queued', sending: 'fb-sending', retrying: 'fb-retrying',
+      rejected: 'fb-rejected', refused: 'fb-refused', acked: 'fb-acked'
+    };
+
+    /**
+     * The escape.js-is-missing render (defect C1). CONSTANTS ONLY -- no visitor
+     * value, no server value, no receipt, no detail string, not even the state name
+     * except through the literal table above. Because nothing is interpolated there
+     * is no escaping question on this path at all, which is why it is safe to render
+     * it with no escaper: not "we escaped carefully", but "there is nothing to
+     * escape". Do not add a hole here. If you need to show a value, the fix is to
+     * make escape.js load, not to interpolate without it.
+     */
+    function paintDegraded(entry, state, offer) {
+      var cls = DEGRADED_CLASS[state] || DEGRADED_CLASS.retrying;
+      var headline = (state === 'acked')
+        ? COPY.degraded_acked
+        : (COPY[state] || COPY.retrying);
+      var html = '<div class="fb-status fb-degraded ' + cls + '">'
+               + '<p class="fb-headline">' + headline + '</p>'
+               + '<p class="fb-note">' + COPY.degraded + '</p>';
+      if (state === 'refused') { html += '<p class="fb-note">' + COPY.kept + '</p>'; }
+      if (state === 'acked') { html += '<p class="fb-note">' + COPY.keep + '</p>'; }
+      // The CONSTANT url, never the prefill: the prefill is built out of the
+      // visitor's words, and this path exists precisely because we are refusing to
+      // handle their words at all right now.
+      if (offer) { html += fallbackLine(); }
+      html += '</div>';
+      render(html, []);
+      return;
+    }
+
+    /** The un-prefilled offer, as an HTML string. Every character is a compile-time
+     *  literal, so it needs no escaper and carries no visitor value. */
     function fallbackLine() {
       return '<p class="fb-fallback">' + COPY.fallback
            + '<a class="fb-link" href="' + FALLBACK_URL + '">' + FALLBACK_LABEL
            + '</a></p>';
+    }
+
+    /**
+     * The PREFILLED offer (§4.6), as DOM nodes. There is no HTML string on this
+     * path: the url reaches the anchor by property assignment and every visible
+     * string by textContent, so there is no attribute for a quote to close and no
+     * parser for an angle bracket to reach. That is the same construction
+     * public/issues/index.html:878-896 uses for the same link.
+     *
+     * Returns null when there is no element factory (a non-browser host, or a
+     * consumer that injected none); paint() then emits fallbackLine() instead, so
+     * the visitor is never left with no fallback at all.
+     */
+    function fallbackNodes(entry) {
+      if (!mkel) { return null; }
+      var wrap, lead, link, tail;
+      try {
+        wrap = mkel('p'); lead = mkel('span'); link = mkel('a'); tail = mkel('span');
+      } catch (e) { return null; }
+      if (!wrap || !link || typeof wrap.appendChild !== 'function') { return null; }
+      var url = prefillUrl(entry);
+      wrap.className = 'fb-fallback';
+      lead.textContent = COPY.fallback;
+      link.className = 'fb-link';
+      link.href = url;                       // property, not markup
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = (url === FALLBACK_URL) ? FALLBACK_LABEL : FALLBACK_PREFILL_LABEL;
+      tail.textContent = (url === FALLBACK_URL) ? '' : COPY.prefill_tail;
+      wrap.appendChild(lead);
+      wrap.appendChild(link);
+      wrap.appendChild(tail);
+      return wrap;
+    }
+
+    /**
+     * The prefilled issue URL, or the bare constant if it cannot be built safely.
+     * Never throws and never guesses: an encoder that surprises us degrades to the
+     * un-prefilled link rather than emitting whatever it produced.
+     *
+     * The reporter's `contact` and `credit` are DELIBERATELY absent. A GitHub issue
+     * is public and neither was given to us for publication -- the same call
+     * public/issues/index.html:825-826 already made.
+     */
+    function prefillUrl(entry) {
+      var USP = (typeof URLSearchParams === 'function') ? URLSearchParams
+              : (typeof window !== 'undefined' && window.URLSearchParams)
+                ? window.URLSearchParams : null;
+      if (typeof USP !== 'function') { return FALLBACK_URL; }
+      var p = payloadOf(entry);
+      var text = (typeof p.text === 'string') ? p.text : '';
+      var kind = (typeof p.kind === 'string') ? p.kind : '';
+      var page = (typeof p.page === 'string') ? p.page : '';
+      if (!text) { return FALLBACK_URL; }
+      var title = text.split('\n')[0].slice(0, 70) || 'Feedback from pdoom1.com';
+      var body = text + '\n\n---\n'
+               + 'Filed from pdoom1.com because the site could not accept it directly.\n'
+               + (kind ? 'type: ' + kind + '\n' : '')
+               + (page ? 'page: ' + page + '\n' : '');
+      var qs;
+      try {
+        qs = new USP({
+          template: FALLBACK_TEMPLATE, title: title, description: body
+        }).toString();
+      } catch (e) { return FALLBACK_URL; }
+      // ASSERT the serialiser's alphabet rather than trusting the docs for it. The
+      // whole safety argument for building a url out of hostile text is that
+      // x-www-form-urlencoded cannot emit " ' < > or a space; if that is ever false
+      // in some host, the honest move is the un-prefilled link, not this string.
+      if (typeof qs !== 'string' || !qs || /[^A-Za-z0-9*\-._+%=&]/.test(qs)) {
+        return FALLBACK_URL;
+      }
+      // GitHub caps the URL it will accept; past ~8k the form silently drops the
+      // prefill, which would be a link that lies about being pre-filled.
+      if (qs.length > 6000) { return FALLBACK_URL; }
+      return FALLBACK_URL + '?' + qs;
     }
 
     // -- wire --------------------------------------------------------------
@@ -500,7 +687,9 @@
   //
   // The form chrome is built with createElement/textContent, so it has no HTML
   // string and therefore no escaping question at all. The ONE innerHTML sink in
-  // this file is the status node, and everything reaching it came out of paint().
+  // this file is the status node, and everything reaching it came out of paint()'s
+  // string channel -- which is escaped, or (when escape.js is missing) constant.
+  // The fallback link takes the node channel and never becomes a string.
   // ------------------------------------------------------------------------
   function mountFeedbackWidget(container, options) {
     if (!container || typeof document === 'undefined') { return null; }
@@ -536,7 +725,22 @@
 
     var client = createFeedbackClient({
       endpoint: options.endpoint,
-      render: function (html) { status.innerHTML = html; }
+      // Two channels on purpose. `html` is paint()'s escaped string and is the only
+      // innerHTML sink in this file. `nodes` are already-built elements -- the
+      // prefilled GitHub link, whose url came out of the visitor's own words and
+      // therefore must never be serialised into markup. They are APPENDED, never
+      // merged into the string, because merging them would mean serialising them.
+      // Target is the .fb-status box paint() just wrote, so a node lands exactly
+      // where fallbackLine() would have -- the pages style .fb-fallback, and a
+      // fallback that fell outside the box would be styled half-right.
+      render: function (html, nodes) {
+        status.innerHTML = html;
+        if (!nodes || !nodes.length) { return; }
+        var host = status.firstElementChild || status;
+        for (var i = 0; i < nodes.length; i++) {
+          if (nodes[i]) { host.appendChild(nodes[i]); }
+        }
+      }
     });
 
     var opened = Date.now();
