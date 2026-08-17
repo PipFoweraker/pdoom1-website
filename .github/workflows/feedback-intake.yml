@@ -254,6 +254,7 @@ jobs:
             "scripts/test-ingest-destructive.py" \
             "scripts/test-feedback-outbox.js" \
             "scripts/test-check-mail-auth.py" \
+            "scripts/test-mail-auth-interlock.py" \
             "scripts/test-purge-feedback.py" \
             "scripts/test-feedback-stats.py" \
             "scripts/purge-feedback.py" \

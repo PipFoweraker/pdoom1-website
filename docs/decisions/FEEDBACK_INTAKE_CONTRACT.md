@@ -263,18 +263,44 @@ Test files (Wave 1, agent A3, written before implementation exists):
 
 ```
 scripts/test-ingest-destructive.py     # F1-F6, F9-F15
-scripts/test-feedback-outbox.js        # F7, F8, F16, F17
-scripts/test-check-mail-auth.py        # M5 forced red
+scripts/test-feedback-outbox.js        # F7, F8, F16, F17, C1, C2
+scripts/test-check-mail-auth.py        # M5 forced red -- the guard author's reading
+scripts/test-mail-auth-interlock.py    # M5 forced red -- an INDEPENDENT reading
 ```
 
-**CORRECTED 2026-08-17.** The third line named
-`scripts/test-mail-auth-interlock.py`, which was never written. The M5 forced-red
-test was consolidated into `scripts/test-check-mail-auth.py` instead — its
-section 4 is titled "M5 -- THE INTERLOCK, forced red (the reason this file
-exists)" and it forces `intended p=quarantine` against an unaligned mailer,
-asserts the state is WRONG, asserts the key is `pdoom1.com/M5/policy-above-ceiling`
-and asserts the output names the file:line holding the ceiling down. So the
-requirement is met; only the filename was wrong.
+**CORRECTED 2026-08-17, then corrected again the same day.** The first correction
+said `scripts/test-mail-auth-interlock.py` "was never written" and that the M5
+test had been "consolidated" into `scripts/test-check-mail-auth.py`. The first
+half was true; the second was a rationalisation of an absence.
+
+**Consolidating those two files was never the design.** `feedback-intake.yml`
+says so at its own call site: *"M5 forced red, written from the contract by a
+different author than the guard. Two independent tests of one interlock is
+deliberate: the guard's own test can only be as right as the guard author's
+reading of section 5."* Pointing that step at `test-check-mail-auth.py` would
+have turned the build green by collapsing two readings into one — and if that one
+reading is wrong, both tests are wrong together and both stay green. The tempting
+fix would have destroyed the property it appeared to restore.
+
+So the missing file was written instead, on 2026-08-17, derived from this section
+and explicitly barred from copying expectations out of the guard: it asserts no
+finding key, no internal constant and no state name, and its only hard observable
+is the exit code, because this section's own words are "fails the build". 20
+assertions, including the couplings a single reading might miss — that M5 is
+coupled to M2 (an aligned `-f` still fails if SPF does not authorise the box that
+runs the PHP), that an *observed* published policy above the ceiling fails just as
+an intended one does, that an unresolvable 5th parameter counts as unaligned, and
+that "every PHP mailer" is a universal quantifier over a mixed set.
+
+**The two readings agreed on all 20 points.** That agreement is the evidence the
+consolidation would have thrown away: it is now known rather than assumed.
+
+One thing the independent reading surfaced that the guard's own does not say:
+**over an empty tree the M5 row reads PASS**, because "every PHP mailer is
+aligned" is vacuously true of an empty set. The build still fails — the refusal
+comes from the mailer-scan integrity control — so no tightening can ship on an
+absence. But a reader of the M5 row alone would draw the wrong conclusion. The
+test prints that as a NOTE rather than letting a green swallow it.
 
 That mattered more than a stale name usually does. `feedback-intake.yml`'s
 "Every test the contract names exists" step is a **blocking precondition** that
