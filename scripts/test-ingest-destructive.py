@@ -140,13 +140,54 @@ class Workspace(object):
         self.mail = self.root / "mail-sink.jsonl"
 
     def cleanup(self):
-        def _force(func, path, _exc):
+        # Teardown only. Nothing here is an observation, and nothing here may
+        # raise: a throwaway temp dir that resists deletion must not be able to
+        # score a row that has already finished asserting.
+        #
+        # The obvious spelling of this is wrong, and cost F1 its whole verdict on
+        # the suite's first-ever run (2026-08-17). It was:
+        #
+        #     def _force(func, path, _exc):
+        #         try:
+        #             os.chmod(path, stat.S_IWRITE | stat.S_IREAD)
+        #             func(path)          # <-- retry "the operation that failed"
+        #         except OSError:
+        #             pass
+        #
+        # `func` is whatever rmtree was calling, and on POSIX -- where
+        # shutil._use_fd_functions is true -- rmtree walks with directory file
+        # descriptors, so on a 0-mode directory it fails inside
+        #     os.open(path, os.O_RDONLY | os.O_NONBLOCK, dir_fd=...)
+        # and reports it as `onerror(os.open, path, exc)` (Lib/shutil.py:748).
+        # Re-calling that as `func(path)` is `os.open(path)` with no `flags`:
+        # TypeError, which `except OSError` does not catch. It escaped cleanup,
+        # escaped f1()'s `finally`, and the runner scored the row FAIL -- after
+        # all ten of its checks had already passed. _f1_chmod_000 is the only
+        # injection that makes a directory unopenable, which is why F1 was the
+        # only row to hit it, and why Windows never saw it (_use_fd_functions is
+        # false there, and mode bits on a directory are a no-op anyway).
+        #
+        # So: restore the modes FIRST, top-down, and never re-invoke `func`.
+        # os.walk is top-down and scandirs each directory only when it reaches
+        # it, so chmodding a subdirectory here happens before the walk descends
+        # into it.
+        for dirpath, dirnames, filenames in os.walk(self.root):
+            for name in dirnames + filenames:
+                try:
+                    os.chmod(os.path.join(dirpath, name), stat.S_IRWXU)
+                except OSError:
+                    pass
+
+        def _relax(_func, path, _exc):
+            # Last resort for anything the walk could not reach. Chmod and
+            # return: rmtree retries the entry itself, and a leaked temp dir is
+            # a smaller harm than a teardown that can fail a row.
             try:
-                os.chmod(path, stat.S_IWRITE | stat.S_IREAD)
-                func(path)
+                os.chmod(path, stat.S_IRWXU)
             except OSError:
                 pass
-        shutil.rmtree(self.root, onerror=_force)
+
+        shutil.rmtree(self.root, onerror=_relax)
 
     def env(self, **over):
         base = dict(store=self.store, docroot=self.docroot, mail_sink=self.mail)
@@ -566,6 +607,15 @@ def _f4_lock_probe(r, ws):
         waited = time.time() - started
     finally:
         released.cancel()
+        # JOIN before touching fh. cancel() only wins if the timer has not woken
+        # yet; if it has, its lambda is calling fh.fileno() on another thread
+        # while this one is about to close fh. That is the same closed-file
+        # lifetime bug that took F3 and F4 out on the first CI run, one thread
+        # over -- it would raise inside the Timer thread, where it cannot fail
+        # the row and can only print a traceback next to an unrelated verdict.
+        # Unlike that one it has never been observed; this is prevention.
+        # join() on a cancelled Timer returns immediately.
+        released.join()
         try:
             fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
         except OSError:

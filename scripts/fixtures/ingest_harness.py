@@ -228,19 +228,57 @@ def post(payload=None, *, raw_body=None, timeout=30, preexec=None, **envkw):
 
 def spawn(payload, **envkw):
     """Start a request WITHOUT waiting -- used to race requests (F4) and to kill
-    the endpoint mid-flight (F3). Returns the Popen; feed it yourself."""
+    the endpoint mid-flight (F3). Returns the Popen; collect() it later.
+
+    The body is written and stdin is CLOSED here, deliberately: the child must see
+    EOF and get on with the request while the caller does something else (sleep,
+    kill, or start fifteen more). That closure is what made this function unusable
+    on Linux until 2026-08-17 -- see the note on the `proc.stdin = None` below."""
     _, argv, _label = subject()
     proc = subprocess.Popen(
         argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         env=build_env(**envkw), cwd=str(REPO_ROOT),
     )
-    proc.stdin.write(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
-    proc.stdin.flush()
-    proc.stdin.close()
+    try:
+        proc.stdin.write(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
+        proc.stdin.flush()
+    except (BrokenPipeError, OSError):
+        # The child died before it read its body. Not an error to raise on: it is
+        # an OUTCOME, and the row observes it as the response collect() returns
+        # (a crashed=True 500, or a non-200). post() already behaves this way --
+        # subprocess swallows BrokenPipeError inside communicate() -- so this only
+        # brings spawn() into line with the path every other row uses. It does not
+        # suppress an assertion; nothing is asserted here.
+        pass
+    try:
+        proc.stdin.close()
+    except (BrokenPipeError, OSError):
+        pass
+    # DETACH the closed pipe from the Popen, or collect() cannot run at all.
+    #
+    # Popen.communicate() -> _communicate() begins with `if self.stdin:` and a
+    # CLOSED file object is still truthy. On POSIX (Lib/subprocess.py:2063-2069)
+    # the next statement is `self.stdin.flush()`, guarded only by
+    # `except BrokenPipeError` -- so a closed stdin raises
+    #     ValueError: flush of closed file
+    # straight out of collect(). On Windows the same prologue is
+    # `_stdin_write(None)` (Lib/subprocess.py:1621, 1140-1163), which with falsy
+    # input only calls close(), and closing a closed file is a no-op -- so this
+    # bug is INVISIBLE on Windows and fires on every Linux runner. It took out F3
+    # and F4 on the suite's first CI run, before either row asserted anything.
+    #
+    # Setting the attribute to None is what subprocess itself does once a pipe is
+    # spent; the fd is already closed, so the child still sees EOF.
+    proc.stdin = None
     return proc
 
 
 def collect(proc, timeout=30):
+    # Defensive twin of spawn()'s detach, for any Popen that reached here with a
+    # closed-but-attached stdin (a caller writing its own body, say). Same reason:
+    # communicate() would flush it and raise on POSIX.
+    if proc.stdin is not None and proc.stdin.closed:
+        proc.stdin = None
     try:
         out, err = proc.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
