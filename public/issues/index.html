@@ -763,7 +763,14 @@
 			}
 
 			if (res && res.ok) {
-				formStatus.textContent = 'Sent — it went straight to the team inbox. Nothing else for you to do.';
+				// SOFTENED 2026-08-17. This said "it went straight to the team inbox.
+				// Nothing else for you to do." Both halves claimed more than a 200 can
+				// support: res.ok means bug-submit.php's mail() returned true, which is
+				// the LOCAL MTA accepting a handoff, not delivery -- and bug-submit.php
+				// writes no submission log, so if it never arrives there is no record
+				// anywhere that the sender existed. /bug-report/ already says this in
+				// its own prose; this page was promising the opposite two screens away.
+				formStatus.textContent = 'Sent to the team inbox. We cannot confirm delivery from our side, so if you do not hear back, the GitHub route below leaves a record we can both see.';
 				formStatus.style.color = 'var(--success-color)';
 				e.target.reset();
 				submitButton.textContent = originalButtonText;
