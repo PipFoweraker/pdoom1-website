@@ -42,6 +42,22 @@ PRINTED at the top of every run. With no endpoint present it is the deliberately
 naive stub, and most rows below are expected to be RED. That is the deliverable,
 not a defect.
 
+ONE FAULT PER ROW -- AND §11.3 IS F9'S FAULT, NOBODY ELSE'S (2026-08-17)
+------------------------------------------------------------------------
+The first CI run against the real endpoint had F3 and F4 red, and neither had
+found a defect. §11.3 throttles PER IP (prose: burst 5, refill 10/hour) and every
+request the harness sends carries the same REMOTE_ADDR by default, so any row
+issuing more than five prose submissions in a second was answered 429 from step 7
+-- upstream of the store, the lock, and the dedup rule those rows exist to test.
+F4 read `expected 16, found 5` as a broken flock(); F3 read `429 then 429` as a
+write-time dedup index. Both were reading F9.
+
+So: a row that is not about the throttle sends each request from its own client
+address (see client_ip()), which is also the honest model of the fault -- sixteen
+simultaneous appends are sixteen visitors. F9 keeps sending from one address,
+because that is its fault, and it passes. Rule to keep: when a row goes red,
+check which step of the endpoint answered it before believing what it says.
+
 WHAT A ROW CANNOT DO IS PASS QUIETLY
 ------------------------------------
 Verdicts are PASS / FAIL / SKIP / UNINJECTABLE, and only PASS is green. A SKIP
@@ -51,6 +67,8 @@ evidence that the invariant holds.
 """
 
 import argparse
+import importlib.util
+import itertools
 import json
 import os
 import shutil
@@ -72,7 +90,69 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "fixtures"))
 import ingest_harness as H  # noqa: E402  (must follow the sys.path line)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+PURGE = REPO_ROOT / "scripts" / "purge-feedback.py"
 IS_WINDOWS = os.name == "nt"
+
+# ---------------------------------------------------------------------------
+# One client address per request, where the row is not about the client
+# ---------------------------------------------------------------------------
+#
+# WHY THIS EXISTS (measured 2026-08-17, the suite's first CI run against the real
+# public/ingest.php under PHP 8.2)
+# --------------------------------------------------------------------------
+# §11.3 throttles PER IP: prose (comment/bug/feature/question/feedback) gets a
+# burst of 5 and a refill of 10/hour, i.e. 0.0028 tokens per second. Every
+# request the harness sends carries the SAME REMOTE_ADDR by default
+# (ingest_harness.build_env's `remote_addr="203.0.113.7"`), so a row that issues
+# more than five prose submissions in a second is one client emptying one bucket,
+# and everything after the fifth is a 429 that never reaches the code the row is
+# about.
+#
+# That is exactly what happened. F4 issues 16 prose POSTs: 5 x 200, 11 x 429,
+# five records on disk, and its `expected 16, found 5` read as a broken append.
+# F3 issues 3 baselines + 13 crash attempts + 2 retries: the first five wrote and
+# the rest were paced, so its INV-1e retry pair came back `429 then 429` and its
+# read-time-dedup check collapsed nothing because there was nothing to collapse.
+# Neither row had found a defect. Both had found F9.
+#
+# The throttle is not the thing under test in either row -- F9 is the row that
+# tests the throttle, it PASSES, and it must keep sending from one address. So
+# the rows that are about the STORE send from distinct addresses, which is also
+# the honest model of the fault they inject: sixteen simultaneous appends are
+# sixteen visitors, and one visitor firing sixteen prose submissions in a second
+# is F9's scenario by definition.
+#
+# No test seam was added to the endpoint for this. REMOTE_ADDR is not a seam: it
+# is a real request property that a web SAPI sets and that
+# scripts/fixtures/php_cli_shim.php already maps from PDOOM_REMOTE_ADDR, declared
+# in the harness docstring since before the endpoint existed. Nothing here can be
+# reached from a request.
+#
+# 198.51.100.0/24 is TEST-NET-2 (RFC 5737), reserved for documentation and
+# guaranteed never to be a real client. It is a DIFFERENT block from the
+# harness's own default (203.0.113.7, TEST-NET-3), so a row using this allocator
+# can never collide with a row that deliberately does not.
+
+_IP_SEQ = itertools.count(1)
+
+
+def client_ip():
+    """A fresh, never-reused client address.
+
+    Raises rather than wrapping. A wrapped counter would silently hand two
+    requests the same throttle bucket again, which is the confound this function
+    exists to remove -- and it would do it invisibly, months later, when somebody
+    added a row.
+    """
+    n = next(_IP_SEQ)
+    if n > 254:
+        raise RuntimeError(
+            "the destructive suite has asked for more than 254 distinct client "
+            "addresses in one run. 198.51.100.0/24 is exhausted. Widen the block "
+            "here -- do NOT wrap, because a reused address silently reintroduces "
+            "the per-IP throttle into a row that is not about the throttle.")
+    return "198.51.100.%d" % n
+
 
 # ---------------------------------------------------------------------------
 # Row plumbing
@@ -412,9 +492,17 @@ def f3(r):
         # death. The injection was failing silently and the row's other checks
         # were reading a store that nothing had crashed. Keep the two measurements
         # separate.
+        #
+        # Every request below comes from its OWN client address (see client_ip()).
+        # This row injects a crash campaign, not a burst: 16 prose submissions
+        # from one address is F9's fault, and before 2026-08-17 it was silently
+        # this row's fault too -- the campaign emptied the §11.3 prose bucket by
+        # its fifth request and the rest were 429ed before append_record() was
+        # ever reached.
         spans = []
         for _ in range(3):
-            p = H.spawn(payload(text="baseline timing probe"), **ws.env())
+            p = H.spawn(payload(text="baseline timing probe"),
+                        remote_addr=client_ip(), **ws.env())
             t0 = time.time()
             b = H.collect(p)
             spans.append(time.time() - t0)
@@ -430,7 +518,8 @@ def f3(r):
         # the response.
         for frac in (0.02, 0.05, 0.1, 0.2, 0.35, 0.5, 0.7, 0.9, 1.1):
             attempts += 1
-            p = H.spawn(payload(text="crash campaign at %.2f x span" % frac), **ws.env())
+            p = H.spawn(payload(text="crash campaign at %.2f x span" % frac),
+                        remote_addr=client_ip(), **ws.env())
             time.sleep(span * frac)
             if p.poll() is None:
                 p.kill()
@@ -440,7 +529,7 @@ def f3(r):
             attempts += 1
             before = _store_size(ws.store)
             p = H.spawn(payload(text="crash campaign, kill on first byte written"),
-                        **ws.env())
+                        remote_addr=client_ip(), **ws.env())
             deadline = time.time() + max(span * 4, 1.0)
             while time.time() < deadline:
                 if _store_size(ws.store) > before and p.poll() is None:
@@ -470,9 +559,37 @@ def f3(r):
         # The client's response to this fault is to retry the SAME rid. The writer
         # must accept it -- rejecting a write to prevent a duplicate is the one
         # thing INV-1e forbids outright.
+        #
+        # BOTH halves of the retry come from ONE address, and that address is a
+        # FRESH one. Both halves matter and for opposite reasons:
+        #
+        #   same address -- a real retry comes from the client that sent the
+        #   original. Sending the two halves from two addresses would still
+        #   detect a write-time dedup index (the defect INV-1e names), but it
+        #   would test a request pair no visitor ever makes.
+        #
+        #   fresh address -- the crash campaign above has just spent this row's
+        #   requests. Reusing its address would put the pair behind whatever the
+        #   campaign left in the §11.3 bucket, and a 429 here says nothing about
+        #   dedup. §11.3's prose burst is 5, so a full bucket covers a pair with
+        #   room to spare.
+        #
+        # WHAT THIS DELIBERATELY DOES NOT TEST, because the contract has not
+        # decided it: a retry that arrives while the client's own bucket is
+        # EMPTY. INV-1e ("rejecting a write to prevent a duplicate is not
+        # acceptable") and §11.3 ("a per-IP throttle returns 429") both apply to
+        # that request and the contract does not say which wins. A 429 is
+        # retryable and the outbox holds the message, so it is arguably not a
+        # rejection at all -- but that is a reading, not a ruling, and this file
+        # is not the place to make one. Written up for Pip in the report
+        # accompanying branch fix/intake-throttle-vs-f3f4. Do not resolve it by
+        # editing the assertion below.
+        retry_ip = client_ip()
         rid = str(uuid.uuid4())
-        a = H.post(payload(rid=rid, text="retry after a lost response", attempt=1), **ws.env())
-        b = H.post(payload(rid=rid, text="retry after a lost response", attempt=2), **ws.env())
+        a = H.post(payload(rid=rid, text="retry after a lost response", attempt=1),
+                   remote_addr=retry_ip, **ws.env())
+        b = H.post(payload(rid=rid, text="retry after a lost response", attempt=2),
+                   remote_addr=retry_ip, **ws.env())
         r.check(a.status == 200 and b.status == 200, "INV-1e",
                 "[INV-1e] a repeated rid must be accepted, never rejected to prevent a "
                 "duplicate; got %s then %s" % (a.status, b.status))
@@ -519,7 +636,8 @@ def f3(r):
 # ---------------------------------------------------------------------------
 
 @row("F4", "concurrent POSTs",
-     "16 requests are started simultaneously, then flock(LOCK_EX) is held by the test",
+     "16 requests from 16 clients are started simultaneously, then each of the two "
+     "locks the endpoint must take is held by the test in turn",
      "§3 append discipline")
 def f4(r):
     ws = Workspace("F4")
@@ -529,7 +647,17 @@ def f4(r):
         # Near the §2 cap, so each record is thousands of bytes: a big record is
         # what turns an unlocked multi-write append into an interleaved one. Under
         # the cap on purpose -- this row is about locking, not about 413.
-        procs = [H.spawn(payload(rid=rid, text=("row-%d " % i) + ("x" * 4800)), **ws.env())
+        #
+        # SIXTEEN VISITORS, NOT ONE VISITOR SIXTEEN TIMES (fixed 2026-08-17).
+        # Every POST here used to carry the harness's single default REMOTE_ADDR,
+        # so §11.3's prose bucket (burst 5, refill 10/hour) admitted exactly five
+        # and 429ed eleven -- and this row read `expected 16, found 5` as a
+        # failure of flock(). It was not: the eleven never reached the append at
+        # all. Concurrency on a public endpoint is many clients at once; one
+        # client at sixteen-per-second is F9's fault, F9 injects it, and F9
+        # passes. See client_ip().
+        procs = [H.spawn(payload(rid=rid, text=("row-%d " % i) + ("x" * 4800)),
+                         remote_addr=client_ip(), **ws.env())
                  for i, rid in enumerate(rids)]
         responses = [H.collect(p) for p in procs]
 
@@ -564,13 +692,54 @@ def f4(r):
         # is evidence that nothing collided on this run, NOT evidence that a lock
         # exists -- the same shape as "a guard seen only in its passing state".
         #
-        # The deterministic half: §3 prescribes flock(fh, LOCK_EX). Hold LOCK_EX
-        # on the store file from here and a compliant endpoint MUST wait for it.
-        # A lock-free one sails past and answers immediately, which is directly
-        # observable as a duration.
+        # The deterministic half: hold each lock the endpoint is supposed to take
+        # and watch whether it waits. A lock-free writer sails past and answers
+        # immediately, which is directly observable as a duration.
         _f4_lock_probe(r, ws)
     finally:
         ws.cleanup()
+
+
+# ---------------------------------------------------------------------------
+# The lock probe. Rewritten 2026-08-17 -- the previous version could not observe
+# the thing it named.
+#
+# WHAT IT USED TO CONCLUDE, AND WHY THAT WAS LIBEL
+# ------------------------------------------------
+# It held flock(LOCK_EX) on the month file, POSTed, and on a short duration
+# printed "so it is not taking the exclusive lock §3 prescribes". Its POST came
+# from the same address as the sixteen above, which had already emptied §11.3's
+# prose bucket -- so the endpoint answered 429 in 47 ms from step 7, roughly a
+# hundred lines of PHP BEFORE append_record() and its lock exist. The probe was
+# not measuring a lock-free append. It was measuring a request that never
+# attempted an append, and it reported that as proof of a missing lock. A verdict
+# reached before the code under test runs cannot distinguish a compliant endpoint
+# from a broken one, and it read as the second.
+#
+# THERE ARE TWO LOCKS NOW, AND THE PROBE TAKES BOTH
+# -------------------------------------------------
+#   A) <store>/.write-lock, the store-wide lock. Its whole purpose is that its
+#      inode never changes, so a purge holding it across read -> os.replace() and
+#      an ingest holding it across an append can see each other. A probe that
+#      only ever locks the month file cannot observe it AT ALL: the purge swaps
+#      that inode out, which is the defect the lock was added to fix.
+#      This half deliberately takes the lock by calling
+#      scripts/purge-feedback.py's own store_write_lock() rather than by opening
+#      a path spelled out here. The property under test is that the two writers
+#      agree on one object; asserting that against a literal typed into this file
+#      would let both of them move and still pass.
+#   B) the month file, which §3 literally prescribes (flock($fh, LOCK_EX)) and
+#      which still serialises two concurrent POSTs on its own.
+#
+# AND IT CARRIES ITS OWN CONTROL
+# ------------------------------
+# "The endpoint took 1.5 s" only means "it waited" if an uncontended request does
+# not. So an uncontended POST is timed first and the hold is scaled from it. If
+# the box is slow enough that the two cannot be told apart, the probe says so
+# rather than returning a green nobody can read.
+# ---------------------------------------------------------------------------
+
+LOCK_PROBE_MAX_HOLD = 10.0
 
 
 def _f4_lock_probe(r, ws):
@@ -589,45 +758,185 @@ def _f4_lock_probe(r, ws):
         r.check(False, "§3",
                 "[§3] lock probe could not run: no store file exists to lock")
         return
-    import threading
 
-    target = files[0]
-    hold = 1.5
-    fh = open(target, "ab")
-    fcntl.flock(fh.fileno(), fcntl.LOCK_EX)
-    # Released from a timer, not after the POST returns: a COMPLIANT endpoint
-    # blocks on the lock, so releasing afterwards would deadlock the test into a
-    # timeout and score correct behaviour as a hang.
-    released = threading.Timer(hold, lambda: fcntl.flock(fh.fileno(), fcntl.LOCK_UN))
-    released.start()
+    # The control. A fresh address, nothing held, so this measures the endpoint's
+    # own cost -- process start, parse, validate, append, fsync.
+    control = H.post(payload(text="lock probe control: no lock is held"),
+                     remote_addr=client_ip(), timeout=30, **ws.env())
+    r.check(control.status == 200, "§3",
+            "[§3] lock probe control: an UNCONTENDED append must be a 200, got %s. "
+            "Without a working control the timings below discriminate nothing."
+            % control.status)
+    uncontended = control.duration
+    hold = max(1.5, uncontended * 6.0)
+    r.note("lock probe control: an uncontended append took %.0f ms, so each lock "
+           "is held for %.0f ms and anything under %.0f ms counts as 'did not wait'"
+           % (uncontended * 1000, hold * 1000, hold * 500))
+    if hold > LOCK_PROBE_MAX_HOLD:
+        # Not a lock failure and not something to paper over: on this box a
+        # normal request is slow enough that "waited" and "did not wait" are the
+        # same measurement, so the probe cannot answer. Say that out loud.
+        r.check(False, "§3",
+                "[§3] the lock probe cannot discriminate on this machine: an "
+                "UNCONTENDED append took %.0f ms, so a hold long enough to be "
+                "unmistakable would exceed the %.0fs ceiling. This is a statement "
+                "about the runner, not about the endpoint -- do not read it as "
+                "either a passing or a failing lock."
+                % (uncontended * 1000, LOCK_PROBE_MAX_HOLD))
+        return
+
+    purge = _load_purge()
+    if purge is None:
+        r.check(False, "§3",
+                "[§3] the store-wide write lock cannot be probed: %s is missing or "
+                "will not import, so nothing in this suite can hold the lock the "
+                "OTHER writer takes. <store>/.write-lock exists precisely so the "
+                "purge and the endpoint serialise against each other, and that "
+                "property is currently unobserved." % PURGE.name)
+    else:
+        _hold_and_post(
+            r, ws,
+            label="<store>/%s, taken via purge-feedback.store_write_lock()"
+                  % purge.LOCK_NAME,
+            cm=purge.store_write_lock(ws.store, 15.0),
+            hold=hold, uncontended=uncontended,
+            consequence="the purge rewrites the store while a visitor is mid-append, "
+                        "and a record the endpoint has already answered 200 for is "
+                        "dropped by os.replace() with nothing anywhere recording the "
+                        "loss")
+
+    _hold_and_post(
+        r, ws,
+        label="the month file %s, flock(LOCK_EX) as §3 prescribes" % files[0].name,
+        cm=_flock_held(fcntl, files[0]),
+        hold=hold, uncontended=uncontended,
+        consequence="two simultaneous POSTs on shared hosting interleave and one "
+                    "visitor's record is written through the middle of another's")
+
+
+def _load_purge():
+    """scripts/purge-feedback.py as a module, or None.
+
+    Imported for ONE symbol -- the lock helper -- so that this suite takes the
+    store-wide lock the same way the only other writer to the store does. None,
+    never a substitute: a probe that quietly locked some other path would report
+    a serialisation that does not exist.
+    """
+    if not PURGE.exists():
+        return None
     try:
-        started = time.time()
-        resp = H.post(payload(text="this append must queue behind the held lock"),
-                      timeout=20, **ws.env())
-        waited = time.time() - started
-    finally:
-        released.cancel()
-        # JOIN before touching fh. cancel() only wins if the timer has not woken
-        # yet; if it has, its lambda is calling fh.fileno() on another thread
-        # while this one is about to close fh. That is the same closed-file
-        # lifetime bug that took F3 and F4 out on the first CI run, one thread
-        # over -- it would raise inside the Timer thread, where it cannot fail
-        # the row and can only print a traceback next to an unrelated verdict.
-        # Unlike that one it has never been observed; this is prevention.
-        # join() on a cancelled Timer returns immediately.
-        released.join()
+        spec = importlib.util.spec_from_file_location("purge_for_lock_probe", PURGE)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+    except Exception:
+        return None
+    if not hasattr(module, "store_write_lock") or not hasattr(module, "LOCK_NAME"):
+        return None
+    return module
+
+
+class _flock_held(object):
+    """Context manager: flock(LOCK_EX) on one path, released on exit."""
+
+    def __init__(self, fcntl_mod, path):
+        self._fcntl = fcntl_mod
+        self._path = path
+        self._fh = None
+
+    def __enter__(self):
+        self._fh = open(self._path, "ab")
+        self._fcntl.flock(self._fh.fileno(), self._fcntl.LOCK_EX)
+        return self._path
+
+    def __exit__(self, *_exc):
         try:
-            fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
+            self._fcntl.flock(self._fh.fileno(), self._fcntl.LOCK_UN)
         except OSError:
             pass
-        fh.close()
-    r.check(waited >= hold * 0.5 or resp.status == 507, "§3",
-            "[§3] the endpoint appended while a test process held flock(LOCK_EX) on "
-            "the store file: it returned %s after %.0f ms without waiting, so it is "
-            "not taking the exclusive lock §3 prescribes and two simultaneous POSTs "
-            "on shared hosting will interleave" % (resp.status, waited * 1000))
-    r.note("lock-hold probe: endpoint took %.0f ms while LOCK_EX was held elsewhere"
-           % (waited * 1000))
+        self._fh.close()
+        return False
+
+
+def _hold_and_post(r, ws, label, cm, hold, uncontended, consequence):
+    """Hold one lock on a background thread, POST, and measure the wait.
+
+    The lock is released BY THE HOLDER after `hold` seconds, not after the POST
+    returns. That order is the whole reason this is a thread and not a `with`
+    block around the POST: a COMPLIANT endpoint blocks, so releasing afterwards
+    would deadlock the test and score correct behaviour as a hang.
+    """
+    import threading
+
+    ready = threading.Event()
+    release = threading.Event()
+    holder_error = {}
+
+    def _holder():
+        try:
+            with cm:
+                ready.set()
+                release.wait(hold)
+        except Exception as exc:            # noqa: BLE001 -- reported, not swallowed
+            holder_error["exc"] = exc
+            ready.set()
+
+    thread = threading.Thread(target=_holder, name="lock-holder", daemon=True)
+    thread.start()
+    try:
+        if not ready.wait(30.0):
+            r.check(False, "§3",
+                    "[§3] the probe could not take %s within 30s, so nothing below "
+                    "was measured. Something else is holding it." % label)
+            return
+        if "exc" in holder_error:
+            r.check(False, "§3",
+                    "[§3] the probe could not take %s: %r. The endpoint was not "
+                    "tested against it." % (label, holder_error["exc"]))
+            return
+
+        rid = str(uuid.uuid4())
+        started = time.time()
+        # A fresh client address. This request must reach append_record(); a 429
+        # from §11.3 would be answered before the lock is ever touched, and that
+        # is exactly how this probe came to report a working lock as a missing
+        # one on 2026-08-17.
+        resp = H.post(payload(rid=rid,
+                              text="this append must queue behind %s" % label),
+                      remote_addr=client_ip(),
+                      timeout=max(60.0, hold * 6),
+                      **ws.env())
+        waited = time.time() - started
+    finally:
+        release.set()
+        thread.join(30.0)
+
+    r.note("lock-hold probe [%s]: endpoint answered %s after %.0f ms (control %.0f ms, "
+           "lock held %.0f ms)" % (label, resp.status, waited * 1000,
+                                   uncontended * 1000, hold * 1000))
+
+    # 429 is called out separately because it is the ONE status that means the
+    # measurement is void rather than bad: the request was refused upstream of
+    # the append, so it says nothing about any lock. It must not be able to hide
+    # inside a generic "did not wait".
+    r.check(resp.status != 429, "§3",
+            "[§3] the probe request was throttled (429) while %s was held, so it "
+            "never reached the append and this row measured nothing about the "
+            "lock. Every probe request must come from a fresh client address."
+            % label)
+    r.check(resp.status == 429 or waited >= hold * 0.5 or resp.status == 507, "§3",
+            "[§3] the endpoint did NOT wait for %s: it answered %s after %.0f ms "
+            "while the lock was held for %.0f ms, against an uncontended control of "
+            "%.0f ms. It is therefore appending without taking that lock, and %s"
+            % (label, resp.status, waited * 1000, hold * 1000, uncontended * 1000,
+               consequence))
+    if resp.status == 200:
+        # Waiting is only half of it. An endpoint that blocks correctly and then
+        # loses the record has still lost the record.
+        stored = {x.get("rid") for x in H.store_records(ws.store)}
+        r.check(rid in stored, "INV-1",
+                "[INV-1] the endpoint waited for %s, answered 200, and the record is "
+                "NOT on disk. A 200 without a durable write is the one thing INV-1 "
+                "forbids." % label)
 
 
 # ---------------------------------------------------------------------------
