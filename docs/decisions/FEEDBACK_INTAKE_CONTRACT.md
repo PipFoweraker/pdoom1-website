@@ -263,9 +263,32 @@ Test files (Wave 1, agent A3, written before implementation exists):
 
 ```
 scripts/test-ingest-destructive.py     # F1-F6, F9-F15
-scripts/test-feedback-outbox.js        # F7, F8, F16
-scripts/test-mail-auth-interlock.py    # M5 forced red
+scripts/test-feedback-outbox.js        # F7, F8, F16, F17
+scripts/test-check-mail-auth.py        # M5 forced red
 ```
+
+**CORRECTED 2026-08-17.** The third line named
+`scripts/test-mail-auth-interlock.py`, which was never written. The M5 forced-red
+test was consolidated into `scripts/test-check-mail-auth.py` instead — its
+section 4 is titled "M5 -- THE INTERLOCK, forced red (the reason this file
+exists)" and it forces `intended p=quarantine` against an unaligned mailer,
+asserts the state is WRONG, asserts the key is `pdoom1.com/M5/policy-above-ceiling`
+and asserts the output names the file:line holding the ceiling down. So the
+requirement is met; only the filename was wrong.
+
+That mattered more than a stale name usually does. `feedback-intake.yml`'s
+"Every test the contract names exists" step is a **blocking precondition** that
+runs BEFORE the taxonomy suite, and it is correct to be intolerant — its own
+message says "a tolerated absence is indistinguishable from a passing test." But
+because it named a file that never existed, it exited 1 every time and
+`scripts/test-ingest-destructive.py` was **never reached**. Combined with the
+workflow triggering on `push` to `main` only, and with no PR open, the result was
+that thirteen forced-failure tests for `public/ingest.php` had never executed
+anywhere at all.
+
+The second line also said `F7, F8, F16`; the suite has always run `F17` too, and
+gained `C1`/`C2` on 2026-08-17 (blank render when `escape.js` is absent, and
+§4.6's fallback missing from `retrying`).
 
 **Gate 2:** these run against a stub and are observed **RED** before A1/A2 write
 a line. A test that has never failed has not been shown to be a test.
