@@ -1,15 +1,5 @@
 [
   {
-    "job": "auto-update-data",
-    "trigger": "schedule",
-    "timestamp": "2026-07-26T12:29:49.936089Z",
-    "status": "success",
-    "details": {
-      "version-status": "success",
-      "stats-status": "success"
-    }
-  },
-  {
     "job": "weekly-league-rollover",
     "trigger": "schedule",
     "timestamp": "2026-07-26T14:28:04.586873Z",
@@ -1007,6 +997,16 @@
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2026-08-18T06:12:57.046703Z",
+    "status": "success",
+    "details": {
+      "version-status": "success",
+      "stats-status": "success"
+    }
+  },
+  {
+    "job": "auto-update-data",
+    "trigger": "schedule",
+    "timestamp": "2026-08-18T12:11:47.446445Z",
     "status": "success",
     "details": {
       "version-status": "success",
