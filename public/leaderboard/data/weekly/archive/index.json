@@ -1471,9 +1471,40 @@
           "empty-shell": "this record's entries array is empty -- the record is a container, not a result. That is a fact about THIS FILE and not about how many people played: a week keyed to a blessed seed can be empty here while the live board under the same key holds real rows, because nothing imports them. For why no client could have posted, see unblessed-seed where it applies."
         }
       }
+    },
+    {
+      "week_id": "2026_W34",
+      "season": "2025_Q4",
+      "year": 2026,
+      "week_number": 34,
+      "start_date": "2026-08-14",
+      "end_date": "2026-08-20",
+      "file": "2026_W34_league.json",
+      "archived_at": "2026-08-20T14:13:43.691942Z",
+      "game_version": "v0.14.1",
+      "entry_count": 0,
+      "epoch": {
+        "id": "regularised",
+        "anomalous": false,
+        "ladder_version": "L4",
+        "boundary_ladder_version": "L3",
+        "boundary_local": "2026-07-31T00:00:00+10:00",
+        "boundary_tz": "Australia/Hobart",
+        "boundary_utc": "2026-07-30T14:00:00Z",
+        "reason": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L<n>) where L<n> is this stamp's own ladder_version, by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py. This sentence used to name L3 outright; it was stamped unchanged onto weeks that ran on L4.",
+        "see": "docs/LEAGUE_EPOCH_ANOMALY.md",
+        "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z",
+        "board_opens_local": "2026-07-31T17:00:00+10:00",
+        "board_opens_utc": "2026-07-31T07:00:00Z",
+        "board_opens_confirmed": true,
+        "observed_defects": {
+          "empty-shell": "this record's entries array is empty -- the record is a container, not a result. That is a fact about THIS FILE and not about how many people played: a week keyed to a blessed seed can be empty here while the live board under the same key holds real rows, because nothing imports them. For why no client could have posted, see unblessed-seed where it applies.",
+          "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it."
+        }
+      }
     }
   ],
-  "total_archives": 45,
+  "total_archives": 46,
   "seasons": [
     "2025_Q4"
   ],
@@ -1657,10 +1688,10 @@
       "reason": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result."
     },
     "regularised": {
-      "count": 2,
+      "count": 3,
       "anomalous": false,
       "reason": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L<n>) where L<n> is this stamp's own ladder_version, by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py. This sentence used to name L3 outright; it was stamped unchanged onto weeks that ran on L4."
     }
   },
-  "last_updated": "2026-08-13T14:28:00.166244Z"
+  "last_updated": "2026-08-20T14:13:44.304458Z"
 }

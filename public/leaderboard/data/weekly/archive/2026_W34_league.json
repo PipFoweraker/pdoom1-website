@@ -1,13 +1,13 @@
 {
   "meta": {
-    "week_id": "2026_W35",
+    "week_id": "2026_W34",
     "season": "2025_Q4",
-    "generated": "2026-08-20T14:13:44.191787Z",
+    "generated": "2026-08-13T14:28:00.072682Z",
     "game_version": "v0.14.1",
     "ladder_version": "L4",
     "competition_type": "weekly_league",
-    "start_date": "2026-08-21T00:00:00+10:00",
-    "end_date": "2026-08-27T23:59:59+10:00",
+    "start_date": "2026-08-14T00:00:00+10:00",
+    "end_date": "2026-08-20T23:59:59+10:00",
     "total_participants": 0,
     "total_submissions": 0
   },
@@ -26,10 +26,11 @@
     "board_opens_utc": "2026-07-31T07:00:00Z",
     "board_opens_confirmed": true,
     "observed_defects": {
+      "empty-shell": "this record's entries array is empty -- the record is a container, not a result. That is a fact about THIS FILE and not about how many people played: a week keyed to a blessed seed can be empty here while the live board under the same key holds real rows, because nothing imports them. For why no client could have posted, see unblessed-seed where it applies.",
       "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it."
     }
   },
-  "seed": "weekly_2026_W35_a97e68ae",
+  "seed": "weekly_2026_W34_8850f090",
   "seed_provenance": {
     "blessed": false,
     "derivation": "sha256('pdoom1_weekly_<week_id>_<season>')[:8], website-side",
@@ -40,27 +41,27 @@
     "board_key_shape": "(seed, L<n>)"
   },
   "board_key": {
-    "seed": "weekly_2026_W35_a97e68ae",
+    "seed": "weekly_2026_W34_8850f090",
     "ladder_version": "L4",
     "shape": "(seed, L<n>)",
     "blessed": false
   },
   "economic_model": "unknown",
   "week_info": {
-    "week_id": "2026_W35",
+    "week_id": "2026_W34",
     "year": 2026,
-    "week_number": 35,
+    "week_number": 34,
     "timezone": "Australia/Hobart",
-    "start_date": "2026-08-21",
-    "end_date": "2026-08-27",
-    "start_timestamp": "2026-08-21T00:00:00+10:00",
-    "end_timestamp": "2026-08-27T23:59:59+10:00",
-    "start_timestamp_utc": "2026-08-20T14:00:00Z",
-    "end_timestamp_utc": "2026-08-27T13:59:59Z",
+    "start_date": "2026-08-14",
+    "end_date": "2026-08-20",
+    "start_timestamp": "2026-08-14T00:00:00+10:00",
+    "end_timestamp": "2026-08-20T23:59:59+10:00",
+    "start_timestamp_utc": "2026-08-13T14:00:00Z",
+    "end_timestamp_utc": "2026-08-20T13:59:59Z",
     "days_remaining": 6,
     "hours_remaining": 23,
-    "is_current": true,
-    "status": "running",
+    "is_current": false,
+    "status": "ended",
     "season": "2025_Q4",
     "epoch": {
       "id": "regularised",
@@ -84,5 +85,7 @@
     "average_score": 0.0,
     "total_games": 0,
     "unique_players": 0
-  }
+  },
+  "archived_at": "2026-08-20T14:13:43.691942Z",
+  "archive_status": "completed"
 }
