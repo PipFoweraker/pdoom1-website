@@ -6,6 +6,12 @@
       "channel": "direct",
       "note": "friends and family alpha links sent",
       "url": null
+    },
+    {
+      "date": "2026-07-29T00:51:44+00:00",
+      "channel": "manifund",
+      "note": "Manifund funding page went live. Timestamp recovered from commit cd789c77's message on 2026-08-21; the annotation it described was never actually committed.",
+      "url": "https://manifund.org/projects/fund-development-of-pdoom1"
     }
   ]
 }
