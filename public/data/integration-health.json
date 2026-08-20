@@ -1,10 +1,10 @@
 {
-  "generated": "2026-08-17T06:15:29.897231+00:00",
+  "generated": "2026-08-20T06:12:51.288544+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 2,
-    "ok": 33
+    "warn": 3,
+    "ok": 32
   },
   "checks": [
     {
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 3.7 days ago"
+      "detail": "generated 6.7 days ago"
     },
     {
       "name": "league:current_week",
@@ -154,8 +154,8 @@
     },
     {
       "name": "board:liveness_freshness",
-      "status": "OK",
-      "detail": "live API checked 5.7h ago"
+      "status": "WARN",
+      "detail": "last live API check was 2.7 days ago -- the verdict below may be stale"
     },
     {
       "name": "board:archived_anomaly",
