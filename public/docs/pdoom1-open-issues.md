@@ -1,10 +1,9 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-20T00:26:25.827Z UTC
+Generated: 2026-08-20T06:25:55.261Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
-| 1232 | ADR-0015: runtime pdoom-data event options write literal doom -- an unbounded -6 doom/turn sink |  |  | 2026-08-14 08:45:26 | [link](https://github.com/PipFoweraker/pdoom1/issues/1232) |
 | 1229 | Design thread (explicitly not now): office simulation direction -- most of it already ships, it is top-down not isometric, and ADR-0018 is the live constraint | ui-ux, strategic, someday |  | 2026-08-14 07:12:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1229) |
 | 1228 | Events: 25 authored, 19 of them the same three-option shape, and the taxonomy built to vary them is used by zero of them | game-mechanics, strategic, event-system |  | 2026-08-14 07:12:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1228) |
 | 1227 | Design: the ledger and research progress both stop at the edge of the roster -- one missing object (a paper with contributors) blocks both | game-mechanics, strategic |  | 2026-08-14 07:11:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1227) |
@@ -15,8 +14,6 @@ Generated: 2026-08-20T00:26:25.827Z UTC
 | 1221 | Convention: a refusal must say whether it is a rule or a stub |  |  | 2026-08-14 05:54:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/1221) |
 | 1218 | Attention spent without saying so: the 4 surfaces PR #1217 could not fix display-only, + the cat has no art SLOT (not a missing asset) | ui-ux, technical-debt, ux |  | 2026-08-14 05:36:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/1218) |
 | 1210 | Half-day workshop: the first ten turns -- a first-timer could not tell what to do, and 44 -> 87 proves the surface is responsive, not that it is finished | game-mechanics, strategic, priority:high, ux |  | 2026-08-12 21:55:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1210) |
-| 1209 | Define 'league seed' and 'board key' for players -- both are printed on screen, neither is explained, and the guide states the key wrongly | documentation, priority:medium, ux |  | 2026-08-12 21:51:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/1209) |
-| 1208 | Player-facing doc: the four founder hour kinds (doors / approvals / audits / reserve) are unexplained -- and two of the four words already mean something else in the player guide | documentation, game-mechanics, priority:high, ux |  | 2026-08-12 21:50:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1208) |
 | 1202 | Early-game legibility: five findings from a 2026-08-11 play session, and the one that is already measured |  |  | 2026-08-11 09:19:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1202) |
 | 1201 | The orb: a ponderable object, and the cult mechanic it opens later |  |  | 2026-08-11 09:18:16 | [link](https://github.com/PipFoweraker/pdoom1/issues/1201) |
 | 1200 | The 6 unattributable packed assets: resolve or accept, forced by a guard not a document |  |  | 2026-08-11 03:59:45 | [link](https://github.com/PipFoweraker/pdoom1/issues/1200) |
