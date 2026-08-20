@@ -1,6 +1,86 @@
 {
   "issues": [
     {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1244",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1244/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1244/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1244/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/pull/1244",
+      "id": 5202686717,
+      "node_id": "PR_kwDOPVWa588AAAABAZ-ITg",
+      "number": 1244,
+      "title": "chore(gitignore): per-reviewer store backups were not ignored",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [
+        {
+          "id": 11799822392,
+          "node_id": "LA_kwDOPVWa588AAAACv1MAOA",
+          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/class:docs",
+          "name": "class:docs",
+          "color": "1D76DB",
+          "default": false,
+          "description": "Corrects documentation to match measured reality. Self-merge on green (R1)."
+        }
+      ],
+      "state": "open",
+      "locked": false,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2026-08-20T11:05:29Z",
+      "updated_at": "2026-08-20T11:05:31Z",
+      "closed_at": null,
+      "assignee": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "draft": false,
+      "pull_request": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/pulls/1244",
+        "html_url": "https://github.com/PipFoweraker/pdoom1/pull/1244",
+        "diff_url": "https://github.com/PipFoweraker/pdoom1/pull/1244.diff",
+        "patch_url": "https://github.com/PipFoweraker/pdoom1/pull/1244.patch",
+        "merged_at": null
+      },
+      "body": "`e01a9a0f` gave each named reviewer their own `review_state.<name>.json`. The backup glob was still `tools/art_review/review_state.json.bak-*`, which matches only the unsuffixed store.\n\nSo when `collapse_px_keys` backed up Wanasai's store tonight, the file landed **untracked and unignored** -- one careless `git add -A` from being committed. Her store is 197 verdicts with her name on it, which is exactly the class of file this repo should not acquire by accident.\n\nWidened to `review_state*.json.bak-*`, plus `review_log*.jsonl.bak-*` for the same reason. Verified both spellings are now ignored.\n\nA small instance of the pattern this week keeps producing: a convention that was correct when there was one of a thing, left unadjusted when there were two.\n\nGenerated with [Claude Code](https://claude.com/claude-code)",
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1244/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1244/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null
+    },
+    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1141",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1141/labels{/name}",
@@ -1407,101 +1487,8 @@
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
-    },
-    {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1029",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1029/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1029/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1029/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/1029",
-      "id": 5014402355,
-      "node_id": "I_kwDOPVWa588AAAABKuG1Mw",
-      "number": 1029,
-      "title": "dev+ux: no way to replay the cold-open intro -- add a reset for last_seen_intro_version",
-      "user": {
-        "login": "PipFoweraker",
-        "id": 77564415,
-        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
-        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/PipFoweraker",
-        "html_url": "https://github.com/PipFoweraker",
-        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
-        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
-        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
-        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
-        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 9028221058,
-          "node_id": "LA_kwDOPVWa588AAAACGh-4gg",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/enhancement",
-          "name": "enhancement",
-          "color": "a2eeef",
-          "default": true,
-          "description": "New feature or request"
-        },
-        {
-          "id": 9820300732,
-          "node_id": "LA_kwDOPVWa588AAAACSVXlvA",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/ux",
-          "name": "ux",
-          "color": "FBCA04",
-          "default": false,
-          "description": "What happens when you use it. If a fix needs new behaviour or words, it is ux."
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2026-07-29T23:21:23Z",
-      "updated_at": "2026-08-11T10:46:19Z",
-      "closed_at": null,
-      "assignee": null,
-      "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "body": "Pip needs to replay the cold-open repeatedly while playtesting. Today there is no\nin-game way to do that -- once seen, it is seen forever.\n\n## Evidence (CONFIRMED)\n\n- `godot/autoload/game_config.gd:110` -- `var last_seen_intro_version: String = \"\"`\n  (`\"\" = never seen the cold-open`), persisted in the config `game` section.\n- `godot/autoload/game_config.gd:151` -- `const INTRO_VERSION: String = \"1\"`,\n  deliberately independent of `CURRENT_VERSION` so ordinary patches do not\n  re-trigger the intro.\n- `godot/autoload/game_config.gd:535-544` -- the whole gate:\n  ```\n  func should_show_intro() -> bool:\n      if not play_intros:\n          return false\n      return last_seen_intro_version != INTRO_VERSION\n  ```\n\nSo a reset is: set `last_seen_intro_version = \"\"` and `save_config()`. That is\nthe entire change. Nothing else reads the field. No migration, no versioning\nconcern, no ladder impact (this is presentation state, not run state).\n\nNote the gate is already deliberately clean -- the comment at `:530-533` records\nthat it is gated PURELY on `last_seen_intro_version` and NOT on `games_played`,\nspecifically to be immune to the `increment_games_played()` ordering in\n`config_confirmation.gd`. Whoever wrote #801 left this easy on purpose.\n\n## Manual workaround for today (no code change)\n\nEdit the persisted config and blank the value, then relaunch:\n\n- Windows user config path is Godot's `user://` --\n  `%APPDATA%/Godot/app_userdata/<project name>/` (the project name comes from\n  `godot/project.godot`). Find the config file written by\n  `GameConfig.save_config()`, locate the `game` section's\n  `last_seen_intro_version`, set it to an empty string, save.\n\nSetting it to any string other than `\"1\"` also works -- the gate is an\ninequality, not an emptiness test. `play_intros` must also be true.\n\n## Where should the control live? (options, not a mandate)\n\n**A. Dev overlay button.** `godot/scripts/debug/dev_mode_overlay.gd` already\nhosts a column of dev \"pokes\". A `Replay Intro` button there is the smallest,\nlowest-risk change, ships in dev builds only, and directly serves the stated need\n(Pip replaying it while playtesting). Downside: does nothing for players, and it\ninherits the pause-interaction problem filed separately in the ESC/dev-overlay\nissue.\n\n**B. Settings menu entry.** `godot/scenes/settings_menu.tscn` +\n`settings_menu.gd`, next to the existing `play_intros` toggle. Player-visible\n(\"Replay intro\"), which is a genuinely nice thing to have -- players who skipped\nthe cold-open on first run currently cannot ever see it. Downside: player-facing\nUI change during a release freeze, needs a string and a layout slot.\n\n**C. Both.** B for players, A for the tight playtest loop.\n\nRecommendation: **A now** (dev-only, zero player-build risk, unblocks Pip's loop\nthis week), **B queued for after the Friday cut** as a small UX win. Do not do B\nbefore the freeze lifts.\n\nEither way, implement it as a single named function on GameConfig\n(`reset_intro_seen()`) so both call sites share it and the field is not poked\nfrom UI code.\n\n## Size\n\nGenuinely tiny -- one function on GameConfig plus one button. Filing it because\nit is easy to lose, not because it is hard.\n\nRelated: #801 (the cold-open intro gate this reverses), #1028 (the pause/dev-overlay interaction referenced above).\n",
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1029/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1029/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null,
-      "pinned_comment": null
     }
   ],
   "count": 15,
-  "last_updated": "2026-08-20T06:04:42.630748"
+  "last_updated": "2026-08-20T12:04:50.933110"
 }
