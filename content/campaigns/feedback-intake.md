@@ -44,7 +44,21 @@ launch-day fix.
 
 | date | who | channel | what they said | action |
 |---|---|---|---|---|
-| 2026-08-19 | working artist, first contact (anonymous by ruling) | direct | Opened the 193 MB review gallery and identified the assets as AI-generated **within minutes**, unprompted. The tell they named was visible mistakes in the images, not style. Warm about the project and the theme; offered to keep working on it. | campaign `97-percent-2026-08-19` drafted the same evening |
+| 2026-08-19 | working artist, first contact (anonymous by ruling) | web-form | Opened the 193 MB review gallery and identified the assets as AI-generated **within minutes**, unprompted. The tell they named was visible mistakes in the images, not style. Warm about the project and the theme; offered to keep working on it. | campaign `97-percent-2026-08-19` drafted the same evening |
+
+**CHANNEL CORRECTED 2026-08-21: it was `web-form`, not `direct`.** It was logged
+as `direct` on the assumption it arrived by email relay. The submission actually
+came through `pdoom1.com/issues/` on 2026-08-19 01:33:08 -0700 and was delivered
+to `team@pdoom1.com` in **one second**, `spf=pass`, `dmarc=pass` -- confirmed both
+in the message headers and independently in Google's DMARC aggregate report for
+that day (one message from `208.113.156.243`). It sat unread in the inbox for two
+days, which is a different failure from the one #321 was about and a much smaller
+one.
+
+**Two things follow.** The web-form channel is PROVEN to work end to end, by a real
+submission rather than a smoke test. And the reporter set the form's credit field
+to *anonymous -- do NOT name this reporter publicly* at submission time, which is
+her own instruction and predates the ruling below rather than depending on it.
 
 **Anonymous by ruling (Pip, 2026-08-19): "just anonymous feedback for our own
 corpus and the value of my response."** So their words are not recorded here and
