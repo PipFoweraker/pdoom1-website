@@ -40,6 +40,38 @@ launch-day fix.
 
 ---
 
+## 2026-08-19 — first outside eyes on the art pack
+
+| date | who | channel | what they said | action |
+|---|---|---|---|---|
+| 2026-08-19 | working artist, first contact (anonymous by ruling) | direct | Opened the 193 MB review gallery and identified the assets as AI-generated **within minutes**, unprompted. The tell they named was visible mistakes in the images, not style. Warm about the project and the theme; offered to keep working on it. | campaign `97-percent-2026-08-19` drafted the same evening |
+
+**Anonymous by ruling (Pip, 2026-08-19): "just anonymous feedback for our own
+corpus and the value of my response."** So their words are not recorded here and
+their name is not either. That is not only politeness — **this repo is PUBLIC**.
+`content/` never deploys to pdoom1.com, which makes it feel internal, and it is
+not: it is world-readable on GitHub. A verbatim quote from a private email would
+be published by the act of filing it, and a distinctive enough sentence is
+attributable even without a name. Record the signal, never the voice, unless the
+person has said yes.
+
+### Why this one is worth a campaign and not just a row
+
+The speed is the finding. This was **minutes, not an audit** — the same
+judgement Austin Chen reached on the Manifund page, reached independently, by
+someone who was predisposed to like the project and had just been handed a gift.
+Two independent observers converging that fast means the read is not a matter of
+taste, it is the default first impression, and it will keep arriving.
+
+What it does NOT license: treating one artist's first impression as a mandate
+about art direction. It is one data point about legibility, from someone who had
+seen the pack and not the game.
+
+The response drafted from it deliberately publishes **a measured number rather
+than a promise** — 97.0% of packed art is model-generated, and the only part that
+is not is contributed cat photos. See `2026-08-19-97-percent.json`, including the
+guard forbidding any copy from naming, quoting or characterising the reviewer.
+
 ## Patterns worth watching for
 
 Not every report is what it says it is. A few known confusions for this launch:
@@ -53,6 +85,11 @@ Not every report is what it says it is. A few known confusions for this launch:
 - **"My score didn't show up"** → expected; remote score submission is not live
   (pdoom1 #735). Not a bug on their end, and worth saying so quickly so they
   don't think they broke something.
+- **"It smells of AI" / "there are mistakes in the images"** → expected, and now
+  measured rather than argued with: 97.0% of packed art IS model-generated
+  (`godot/data/asset_provenance.json` in pdoom1). Do not get defensive and do not
+  over-apologise. Give the number, name what the 3% is, and say the soundtrack is
+  0% generated. Recount before quoting the figure — it moves.
 - **Silence from a whole platform** → check the link you posted actually
   carried its UTM and resolves. A dead or unattributed link looks exactly like
   disinterest.

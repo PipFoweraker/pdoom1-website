@@ -1,0 +1,114 @@
+{
+  "_README": "DRAFT COPY - rewrite freely, it should sound like you, not like a tool. Nothing is posted by any automation from this file; you post by hand. Set posted[platform] to an ISO timestamp as each goes out, then commit. Check every link keeps its own platform's utm_source before posting.",
+  "campaign": "97-percent-2026-08-19",
+  "title": "97% of the art is machine-generated, and the 3% that isn't is cats",
+  "url": "https://pdoom1.com/",
+  "approved": false,
+  "_drafted": "2026-08-19 by the pdoom1-website seat, from Pip's own email the same evening. His reasoning is preserved verbatim below because the copy is downstream of it.",
+  "_why_this_campaign_exists": "The standing criticism of p(Doom)1 is that the art looks AI-generated. It does, and on 2026-08-19 a working artist confirmed it within minutes of opening the asset pack. Pip's answer has always been a promise ('the funding is for human artists'). This campaign replaces the promise with a MEASURED NUMBER that a script re-derives: 97.0% of packed art is model-generated, and the only part that is not is contributed cat photos. Publishing the baseline is what makes any future movement legible, and it is strictly harder to fake than a promise.",
+  "_pips_reasoning_verbatim": [
+    "Game is complex engine and mechanics",
+    "If I make game look good with poo mechanics, game fails",
+    "therefore I want to make barely playable game and mostly focus on mechanics",
+    "turns out humans want good art and UI and UX, they've gotten greedy, the bastards",
+    "Spending 200 hours making up some concept art and placeholder images is much bad use of my time compared to 200 dev hours",
+    "People need to be able to get at least the theme and gist of what I am talking about",
+    "the nature of the game still is open to a lot of artistic choices, eg how detailed, what camera angles, how isometric, what button styles, what icon styles, what ui elements change over time",
+    "This needs us to cohere on some artistic themes, but I don't want to lock in too early",
+    "Obviously badly made AI art is bad, and steals from artists",
+    "Paying you to make 200 sample images or little sprites for the office if I then go change the camera angle is silly, and I don't have any money (yet)",
+    "Paying you to make high quality art of things we are highly likely to keep, i.e. stills of poster images, key animations, hero animations, etc, seems useful because that's where highest quality lies",
+    "Paying for tokens to do some things seems like a reasonable intermediate step, especially as this game is about the dangers of ratcheting capabilities",
+    "I'd rather get image generation done from e.g. some model that has been ethically trained on things that people opt into, rather than functionally stolen art",
+    "I would rather not get slowed down too much by the above point, we only have so many days before AGI"
+  ],
+  "_facts_this_copy_must_not_break": [
+    {
+      "id": "the-97-percent-is-measured-not-rhetorical",
+      "constraint": "97.0% is 488 of 503 PACKED ART files with origin generated_model, measured 2026-08-19. If you publish a number, publish the denominator with it or link to how it is derived. Do not round to 'about 95' or 'nearly all', and do not reuse this figure after the pack changes -- RECOUNT.",
+      "verify": "human",
+      "source": "pdoom1 godot/data/asset_provenance.json. Recount over the assets map, ART extensions only (.png .jpg .jpeg .webp .svg .gif .bmp), counting origin == generated_model.",
+      "note": "The guard owns manifest/pack agreement and the pinned unknown set; it does not itself publish a percentage. That is why this entry is delegated and not checked: this repo holds no copy of the manifest and must not vendor one.",
+      "why_not_machine": "The manifest lives in pdoom1 (godot/data/asset_provenance.json) and this repo holds no copy. `delegated` means a guard IN THIS REPO owns the claim, and none does; vendoring a copy here to enable a check would create the variant that goes stale the moment pdoom1 rewrites the manifest (coordination#15, and the same reasoning the august-watch campaign records for pdoom-data's atoms). The guard that genuinely owns this is pdoom1's tools/assets/check_provenance.py, wired to quality-checks.yml and pre-commit on 2026-08-19 -- but it is not reachable from here, so this entry says `human` and names it as evidence rather than pretending a check runs.",
+      "human_verified": {
+        "by": "pdoom1-website seat, drafting this campaign",
+        "on": "2026-08-19",
+        "review_by": "2026-09-19",
+        "note": "SHORT CLOCK on purpose: the number moves whenever the pack changes. Measured 2026-08-19 from godot/data/asset_provenance.json at pdoom1 main + the in-flight 511-entry manifest: 488 of 503 packed ART files are generated_model = 97.0%. Recount before any repost; do not carry the figure forward."
+      }
+    },
+    {
+      "id": "the-three-percent-is-cats",
+      "constraint": "The non-generated art is 8 contributor cat PHOTOS and 5 hand-written cat SVGs. Nothing else. Do not imply any commissioned or hand-drawn game art exists yet -- none does.",
+      "verify": "human",
+      "source": "pdoom1 godot/data/asset_provenance.json: photo x8, authored_code x5, all under cats/. Excluding cats, packed art is 99.6% generated_model.",
+      "note": "This is the entry that will go false FIRST, and by design -- it goes false on the day the first commissioned asset ships, which is the milestone the funding is for.",
+      "why_not_machine": "The manifest lives in pdoom1 (godot/data/asset_provenance.json) and this repo holds no copy. `delegated` means a guard IN THIS REPO owns the claim, and none does; vendoring a copy here to enable a check would create the variant that goes stale the moment pdoom1 rewrites the manifest (coordination#15, and the same reasoning the august-watch campaign records for pdoom-data's atoms). The guard that genuinely owns this is pdoom1's tools/assets/check_provenance.py, wired to quality-checks.yml and pre-commit on 2026-08-19 -- but it is not reachable from here, so this entry says `human` and names it as evidence rather than pretending a check runs.",
+      "human_verified": {
+        "by": "pdoom1-website seat, drafting this campaign",
+        "on": "2026-08-19",
+        "review_by": "2026-09-19",
+        "note": "Read at drafting: photo x8 and authored_code x5, every one under cats/. Excluding cats/simple/ and cats/default/, packed art is 99.6% generated_model with 2 pinned unknowns. This is designed to go false the day the first commissioned asset ships."
+      }
+    },
+    {
+      "id": "the-soundtrack-is-not-generated",
+      "constraint": "All 8 audio files are procedural_render -- captures of hand-authored WebAudio patches, composed under Pip's direction with an LLM as the live-coding instrument. Never call the music AI-generated, and never call it unassisted either.",
+      "verify": "human",
+      "source": "pdoom1 godot/data/asset_provenance.json (8/8 procedural_render) and pdoom1 CREDITS.md:59-62.",
+      "note": "The scope doc records why a naive human/AI split was rejected: these are 'neither generated nor human in the naive sense'.",
+      "why_not_machine": "The manifest lives in pdoom1 (godot/data/asset_provenance.json) and this repo holds no copy. `delegated` means a guard IN THIS REPO owns the claim, and none does; vendoring a copy here to enable a check would create the variant that goes stale the moment pdoom1 rewrites the manifest (coordination#15, and the same reasoning the august-watch campaign records for pdoom-data's atoms). The guard that genuinely owns this is pdoom1's tools/assets/check_provenance.py, wired to quality-checks.yml and pre-commit on 2026-08-19 -- but it is not reachable from here, so this entry says `human` and names it as evidence rather than pretending a check runs.",
+      "human_verified": {
+        "by": "pdoom1-website seat, drafting this campaign",
+        "on": "2026-08-19",
+        "review_by": "2026-11-19",
+        "note": "Read at drafting: 8 of 8 audio files recorded procedural_render. Longer clock than its siblings because the soundtrack is not currently being added to."
+      }
+    },
+    {
+      "id": "no-trajectory-is-promised",
+      "constraint": "Publish the baseline as a dated measurement, never as a rate. Do not write 'we will move it 1% a week' or imply the number moves without money. It only moves when someone is paid.",
+      "verify": "durable",
+      "note": "Asserts nothing about the world, so it cannot rot. This is the guard against the campaign's own best line becoming a promise.",
+      "why_durable": "It is an instruction about how to write, not a claim about the world. It says 'publish a dated measurement, never a rate'. No fact outside this file can falsify it, so there is nothing for it to fall out of step with. The number it governs rots fast, which is exactly why the rule about it must not."
+    },
+    {
+      "id": "the-reviewer-has-not-consented-to-being-quoted",
+      "constraint": "Do NOT name, quote, paraphrase or characterise the artist who reviewed the pack on 2026-08-19. They gave private feedback in an email, not a testimonial. Even 'an artist spotted it in minutes' is their words repackaged -- ask first, and if they agree, let them choose how they are described.",
+      "verify": "human",
+      "why_not_machine": "Consent is a fact about a person's wishes. No file in any repo records it and no check could.",
+      "source": "Pip's email thread, 2026-08-19. The reviewer prefers to be called Emma.",
+      "human_verified": {
+        "by": "pdoom1-website seat, drafting this campaign",
+        "on": "2026-08-19",
+        "review_by": "2026-09-19",
+        "note": "NOT ASKED AS AT DRAFTING. Every copy variant below is written to be true without them, which is why none mentions a reviewer at all."
+      }
+    },
+    {
+      "id": "licence-free-source-available-non-commercial",
+      "constraint": "Never write 'open source' -- the interim licence grants no redistribution.",
+      "verify": "human",
+      "why_not_machine": "The licence lives in pdoom1 and this repo holds no copy.",
+      "source": "pdoom1/LICENSE:1-7.",
+      "human_verified": {
+        "by": "pdoom1-website seat",
+        "on": "2026-08-19",
+        "review_by": "2026-10-31",
+        "note": "Carried forward from the alpha-launch campaign, unchanged."
+      }
+    }
+  ],
+  "copy": {
+    "bluesky": "97% of p(Doom)1's art is machine-generated. I counted: 488 of 503 files.\n\nThe 3% that isn't is cats. Real photos, sent in by their people.\n\nThe soundtrack is 0% generated.\n\nIt moves when someone gets paid.\n\nhttps://pdoom1.com/?utm_source=bluesky&utm_medium=social&utm_campaign=97-percent-2026-08",
+    "twitter": "97% of p(Doom)1's art is machine-generated. 488 of 503 files. I counted.\n\nThe 3% that isn't is cats.\n\nThe soundtrack is 0% generated.\n\nhttps://pdoom1.com/?utm_source=twitter&utm_medium=social&utm_campaign=97-percent-2026-08",
+    "manifund_update": "**Where the art actually stands, as a number rather than a promise**\n\nThe honest criticism of this project is that the art looks AI-generated. It does. So rather than promise to fix it, here is the measurement, taken today and reproducible from the repo:\n\n- **97.0%** of packed art is model-generated (488 of 503 files)\n- **2.6%** is not: eight photographs of contributors' cats, and five hand-written SVGs of the same cats\n- **0.4%** is unattributable, and is recorded as `unknown` rather than guessed\n- **0%** of the soundtrack is generated -- all eight tracks are captures of hand-authored patches, judged by ear\n\nThat 97% is not an estimate. Every packed asset now carries a provenance record naming what produced it and what evidence says so, and a guard refuses the commit if the manifest and the shipped assets disagree, or if a new unattributable asset appears. Six files were unattributable when this started; four were resolved by reading signed credentials embedded in the files themselves, and two remain, pinned by content hash so they cannot be quietly forgotten.\n\nThe grant commitment is \"human artists to replace current AI-generated assets\". Until today that was a sentence. It is now a number with a denominator, and the mechanism that notices the first time it moves is already running: the moment one non-cat, non-generated art asset ships, the check announces it in the build output.\n\n**Why the art is generated in the first place**, stated plainly: the hard part of this game is the simulation, and 200 hours spent drawing placeholders is 200 hours not spent on mechanics. The art direction is also genuinely unsettled -- camera angle, detail level, how isometric it should be, which UI elements change as doom rises -- and commissioning hundreds of sprites before those are decided would waste an artist's time and money I do not yet have. Generated art is a fast way to find out what I actually want, and the finding-out happens by throwing most of it away: on 14 August I judged 470 assets in 23 minutes and discarded 274 of them.\n\nWhere paid work goes first, when there is money: the things most likely to survive a change of direction -- poster stills, key animations, hero frames. Highest quality where quality lasts longest.\n\nOne preference stated without over-claiming: where generation is used, I would rather use models trained on opted-in work than on scraped work, and I am not going to pretend the current pack meets that bar.\n\nThe number is 97%. It moves when someone gets paid.",
+    "devlog_long": "# 97%\n\nI counted. It is 97.0% -- 488 of 503 packed art files are machine-generated.\n\nI had guessed that number in an email this morning, before anything measured it. That is either good instincts or the kind of coincidence that should make a person go and check the arithmetic. The arithmetic checks.\n\n## The 3% is cats\n\nEight photographs of contributors' cats, and five hand-drawn SVGs of the same cats. That is the entire non-generated portion of the art. Take the cats out and packed art is 99.6% generated.\n\nThe cats are there because people sent them, with permission, and the game picks one at random per run so every one of them reaches players. The only part of the visual layer a person made on purpose is a cat.\n\n## The soundtrack is 0%\n\nAll eight audio files are recorded as `procedural_render`: captures of hand-authored patches, composed by ear over the workshop sessions with an LLM as the live-coding instrument. A naive human-or-AI field was rejected during design precisely because these are neither, in the naive sense. I have not been saying this out loud, and I should have been.\n\n## Why a number and not a promise\n\nThe standing answer to \"your art looks AI-generated\" has been \"the funding is for human artists\". That is a promise, and promises are unfalsifiable right up until they are broken.\n\nSo every packed asset now carries a provenance record: what produced it, and what evidence establishes that. Six were genuinely unattributable when the pass started. Four were resolved by reading signed credentials that were inside the files the whole time. Two remain, recorded as `unknown` and pinned by content hash -- pinned, because a mechanism that forces the question later is worth more than a document that asks nicely.\n\nA guard now refuses the commit if the manifest and the shipped pack disagree, if an asset arrives with no record, or if the unknown set changes in either direction. It shipped on 11 August wired to nothing, which is how an asset slipped in on the 12th with no record at all and went unnoticed for a week. That is fixed too, and the fix is the more useful half of the story: a mechanism nobody runs is a document.\n\n## What the number is for\n\nIt is a baseline. It moves when someone is paid to move it, and not otherwise. When it moves I will say by how much, from what to what, and what the money bought.\n\np(Doom)1 is a game about the people trying to stop AI going badly wrong. You cannot win; you can only buy time.\n\n[Play it](https://pdoom1.com/?utm_source=devlog&utm_medium=owned&utm_campaign=97-percent-2026-08) - [back it](https://manifund.org/projects/fund-development-of-pdoom1)\n"
+  },
+  "posted": {
+    "bluesky": null,
+    "twitter": null,
+    "manifund_update": null,
+    "devlog_long": null
+  }
+}
