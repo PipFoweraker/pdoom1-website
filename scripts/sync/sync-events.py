@@ -150,12 +150,73 @@ def filter_events(events: Dict[str, Any]) -> Dict[str, Any]:
 # to rewrite the visible text on every page that carries one.
 REDACTION_MARKER = "[email address redacted]"
 
+# WIDENED 2026-08-15, inheriting pdoom-data 12c0455 (2026-08-09).
+#
+# MODES (e), (f), (g). The pattern above was correct about ordinary addresses
+# and blind to three further modes, all of them consequences of the same fact
+# the notes above already turn on: this text is EXTRACTED FROM PDFs, not typed.
+# pdoom-data hit exactly these and fixed them at source; this repo never
+# inherited that fix, so the three modes were invisible on this side of the sync
+# for six days, and the only reason nothing was serving is that the daily sync
+# happened to pull an upstream corpus that had already been cleaned.
+#
+#   (e) BRACE-GROUP NOTATION, the highest-volume mode upstream. Papers print
+#       several authors in ONE address: "{aaa,bbb,ccc}@institution.edu" is three
+#       data subjects in a single match. The old local part is
+#       [A-Za-z0-9._%+\-]+, which contains neither '{' nor ',', so no substring
+#       of that string could reach the '@'. The match failed SILENTLY and the
+#       address shipped -- and because count_emails() shares this pattern, the
+#       sync log confidently reported zero.
+#   (f) WHITESPACE INSIDE THE DOMAIN, inserted by the extractor when it breaks a
+#       token across a column or line: "institution. edu", "uni -example.de",
+#       "cbs .dk".
+#   (g) WHITESPACE BEFORE THE '@': "{aaa, bbb} @institution.edu".
+#
+# PORTED, NOT COPIED, and the difference is load-bearing.
+#
+# pdoom-data's domain rule ends in [A-Za-z]{2,24}. Transplanting that here is
+# WRONG, for the reason the note above already records: a case-insensitive TLD
+# eats the capitalised given name the extractor glued on, and silently deletes a
+# person's name from the page. The lowercase-TLD rule stays.
+#
+# It also turns out to be what makes mode (f) SAFE, which was not obvious and is
+# the reason this is split into two alternatives instead of one permissive one.
+# Once a space is allowed around the dot, "team@pdoom1.com. It usually replies"
+# -- an ordinary sentence break in this site's own footer copy -- matches with a
+# domain of "pdoom1.com. It", which the anchored allowlist in
+# check-published-emails.py then rejects, so the guard fires on our own contact
+# address and no page can ever be written again. Requiring the TLD to be
+# ENTIRELY lowercase once whitespace is involved stops the match at the capital
+# that begins the next sentence, exactly as the original rule stops it at the
+# capital that begins the next author's name. Same discipline, second use.
+#
+# So: the no-whitespace form keeps today's rule EXACTLY, byte for byte, so no
+# address that is redacted today can stop being redacted. The broken form is
+# strictly additional reach, and pays for it with the stricter TLD.
+_LABEL = r"[A-Za-z0-9\-]+"
+
+# Today's domain rule, unchanged. Tried first, so ordinary addresses match
+# ordinary addresses and nothing about the existing corpus shifts.
+_DOMAIN_TIGHT = _LABEL + r"(?:\.[A-Za-z0-9\-]+)*" + r"\.[A-Za-z][a-z]{1,23}"
+
+# Extractor-broken domains. AT MOST ONE whitespace character at each break: a
+# real extraction artefact is one severed token, never a clause, and unbounded
+# whitespace lets a match run out of the address and into the surrounding prose.
+_DOMAIN_BROKEN = (
+    _LABEL + r"(?:\s?[.\-]\s?" + _LABEL + r")*" + r"\s?\.\s?[a-z]{2,24}"
+)
+
+# A brace group is bounded by the closing brace immediately before the '@' and
+# by 200 characters, so it cannot run away. It admits NEWLINES on purpose: the
+# extractor line-wraps long author groups mid-list, and excluding newlines was
+# the first bug pdoom-data's own widening shipped.
+_LOCAL = r"(?:\{[^{}@]{1,200}\}|[A-Za-z0-9._%+\-]+)"
+
 EMAIL_PATTERN = re.compile(
     r"(?:mailto:)?"                            # swallow a mailto: prefix too
-    r"[A-Za-z0-9._%+\-]+"                      # local part
-    r"@"
-    r"[A-Za-z0-9\-]+(?:\.[A-Za-z0-9\-]+)*"     # domain labels
-    r"\.[A-Za-z][a-z]{1,23}"                   # TLD (see note above)
+    + _LOCAL +                                 # local part, or a whole group
+    r"\s?@\s?"                                 # at most one space either side
+    + r"(?:" + _DOMAIN_TIGHT + r"|" + _DOMAIN_BROKEN + r")"
 )
 
 
@@ -390,6 +451,145 @@ def load_allowlist():
     return module.is_allowed
 
 
+# ---------------------------------------------------------------------------
+# THE INDEPENDENT SCANNER -- and its independence is the entire point of it.
+#
+# This is the STRUCTURAL half of pdoom-data 12c0455, and it matters more than
+# the widened regex above. Until now this repo had exactly ONE definition of
+# "what an email address looks like": redact_pii() removes what EMAIL_PATTERN
+# matches, find_published_emails() then verifies the rendered pages with
+# EMAIL_PATTERN, and check-published-emails.py imports EMAIL_PATTERN from this
+# module ON PURPOSE so there would be exactly one copy.
+#
+# Half of that reasoning is right and half is exactly backwards, and CLAUDE.md
+# already states the rule it violates: A CHECK MUST TAKE AT LEAST ONE INPUT FROM
+# OUTSIDE THE SYSTEM IT IS CHECKING. One shared pattern guarantees detection and
+# verification CANNOT DISAGREE -- which is worth having only if the pattern is
+# right, and is a guarantee that they will be wrong together if it is not.
+#
+# That is not hypothetical; it is the recorded history of this file. The
+# brace-group mode was unmatchable, so redact_pii() left those addresses in,
+# find_published_emails() then agreed the pages were clean, check-published-
+# emails.py agreed a third time because it imports the same object, and
+# count_emails() logged zero for the same reason. FOUR independent-looking green
+# results, one blind spot, and the upstream fix is the only reason it did not
+# ship again.
+#
+# So this is built on a DIFFERENT PRINCIPLE, not a different regex of the same
+# shape. It does not try to recognise an address. It walks every '@' CHARACTER
+# in the text and asks what sits on each side of it, which means a mode nobody
+# has thought of yet still gets looked at -- the '@' is the one thing an address
+# cannot be spelled without.
+#
+# Disagreement REFUSES THE WRITE. A false alarm costs a human thirty seconds.
+# The alternative already happened: 75 academics' addresses on a public site.
+#
+# The false-positive families are bounded by the SHAPE OF THE DAMAGE, not by an
+# allowlist of things to ignore, because an allowlist is a place for the next
+# blind spot to hide. Measured against this repo's own 2,204 published pages,
+# the families that put a real '@' in the tree are: BibTeX entry types
+# (@article{...}), metric notation (pass@k, Acc@100), hardware strings
+# (@ 2.20GHz), CSS at-rules (@media, @keyframes) and bare social handles. Every
+# one of those is excluded STRUCTURALLY -- by having no person-shaped local part
+# to the left, or no domain to the right -- never by name.
+_RESIDUE_BIBTEX = re.compile(
+    r"@(?:article|inproceedings|incollection|misc|book|booklet|conference"
+    r"|inbook|manual|mastersthesis|phdthesis|proceedings|techreport"
+    r"|unpublished)\s*\{",
+    re.IGNORECASE,
+)
+_RESIDUE_CSS_AT_RULE = re.compile(
+    r"@(?:media|import|supports|keyframes|font-face|charset|namespace|page"
+    r"|layer|container|property)\b",
+    re.IGNORECASE,
+)
+# A domain to the RIGHT of the '@'. Deliberately looser than EMAIL_PATTERN's
+# domain rule -- it has to be able to see what EMAIL_PATTERN cannot.
+_RESIDUE_DOMAIN = re.compile(
+    r"^\s{0,2}[A-Za-z0-9][A-Za-z0-9\-]{0,40}"
+    r"(?:\s{0,2}[.\-]\s{0,2}[A-Za-z0-9\-]{1,40}){0,6}"
+    r"\s{0,2}\.\s{0,2}[A-Za-z]{2,24}"
+)
+# A person-shaped local part to the LEFT. Same bound as _severed_local_ok():
+# a name carries a separator or real length; pass, Acc, lx, P do not.
+_RESIDUE_LOCAL = re.compile(r"(\{[^{}@]{1,200}\}|[A-Za-z0-9._%+\-]{1,64})\s{0,2}$")
+
+
+def _residue_local_is_person_shaped(local: str) -> bool:
+    """Does the text left of an '@' look like a person, or like notation?"""
+    local = local.split("mailto:", 1)[-1].strip()
+    if not re.search(r"[A-Za-z]", local):
+        return False
+    if "{" in local:
+        # A brace group is a LIST OF PEOPLE. It is never notation, and it was
+        # the mode that actually shipped, so it is admitted unconditionally.
+        return True
+    if len(local) >= 4 and re.search(r"[._%+\-]", local):
+        return True
+    return len(local) >= 5
+
+
+def residue_positions(text: str) -> set:
+    """The INDEX of every '@' that looks like a real person's address.
+
+    Returns POSITIONS, not text and not a bare count.
+
+    Positions rather than a count, because the comparison against EMAIL_PATTERN
+    has to be positional to mean anything. The first version of this subtracted
+    one total from the other, and that is silently broken: this scanner
+    deliberately ignores short locals like the "team@" in the site footer, while
+    EMAIL_PATTERN counts every one of them. On a page carrying two footer
+    addresses and one real leak the arithmetic reads 1 - 2 = -1, and the leak is
+    reported as no disagreement at all. A guard that is muted by the presence of
+    ALLOWED addresses is worse than no guard, and it took a planted brace group
+    that the guard failed to flag to notice.
+
+    Never the matched text: every caller either logs to
+    events-sync-summary.json or prints to CI, and both are public. Reproducing
+    the string is how pdoom1#1212 leaked the address it was fixing.
+    """
+    found = set()
+    for m in re.finditer("@", text):
+        i = m.start()
+        rest = text[i:]
+        if _RESIDUE_BIBTEX.match(rest) or _RESIDUE_CSS_AT_RULE.match(rest):
+            continue
+        if not _RESIDUE_DOMAIN.match(text[i + 1:i + 120]):
+            continue
+        left = _RESIDUE_LOCAL.search(text[max(0, i - 240):i])
+        if not left:
+            continue
+        if not _residue_local_is_person_shaped(left.group(1)):
+            continue
+        found.add(i)
+    return found
+
+
+def explained_positions(text: str) -> set:
+    """The index of every '@' that falls inside an EMAIL_PATTERN match.
+
+    This is what "the shared definition can see" means, expressed in the same
+    coordinates as residue_positions() so the two can actually be compared.
+    """
+    covered = set()
+    for m in EMAIL_PATTERN.finditer(text):
+        for k in range(m.start(), m.end()):
+            if text[k] == "@":
+                covered.add(k)
+    return covered
+
+
+def residue_scan(text: str) -> int:
+    """Count of address-shaped residue. Thin wrapper; positions are the truth."""
+    return len(residue_positions(text))
+
+
+def unexplained_residue(text: str) -> int:
+    """How many person-shaped '@' the independent route sees and EMAIL_PATTERN
+    does NOT cover. Zero means the two agree about this text."""
+    return len(residue_positions(text) - explained_positions(text))
+
+
 def find_published_emails(rendered: Dict[str, str], is_allowed) -> Dict[str, List[str]]:
     """{artefact_name: [address, ...]} for disallowed addresses in rendered output."""
     findings: Dict[str, List[str]] = {}
@@ -397,6 +597,25 @@ def find_published_emails(rendered: Dict[str, str], is_allowed) -> Dict[str, Lis
         hits = [m for m in EMAIL_PATTERN.findall(text) if not is_allowed(m)]
         if hits:
             findings[name] = hits
+    return findings
+
+
+def find_residue_disagreements(rendered: Dict[str, str], is_allowed) -> Dict[str, int]:
+    """{artefact_name: unexplained_count} where the independent scanner sees
+    more address-shaped text than EMAIL_PATTERN can account for.
+
+    The subtraction is what makes this a DISAGREEMENT check rather than a second
+    detector. Everything EMAIL_PATTERN found is either already redacted or
+    already reported by find_published_emails(); what is interesting is the
+    REMAINDER, because a positive remainder means the independent route can see
+    something the shared definition cannot -- which is precisely the failure
+    that shipped 75 addresses and could not be seen from inside.
+    """
+    findings: Dict[str, int] = {}
+    for name, text in rendered.items():
+        unexplained = unexplained_residue(text)
+        if unexplained > 0:
+            findings[name] = unexplained
     return findings
 
 
@@ -1559,7 +1778,47 @@ def main():
             "are public.", "ERROR")
         log("=" * 60, "ERROR")
         sys.exit(1)
-    log(f"Verified {len(rendered)} rendered artefacts: no disallowed addresses")
+
+    # THE SECOND OPINION, and it is allowed to disagree with the first.
+    #
+    # find_published_emails() above cannot fail in the one way that has actually
+    # cost us: it shares EMAIL_PATTERN with the redactor, so if the pattern is
+    # blind to a mode, the redaction misses it AND this verification confirms
+    # the miss. residue_scan() reaches the same question from the '@' character
+    # instead of from a shape, so it is not blind in the same places -- and a
+    # count it cannot explain is exactly the signature of a mode nobody has
+    # written a rule for yet.
+    #
+    # This BLOCKS. An unexplained residue means the shared definition has a hole
+    # in it, and the entire history of this file says that a hole in the shared
+    # definition is how addresses reach production.
+    disagreements = find_residue_disagreements(rendered, is_allowed)
+    if disagreements:
+        total = sum(disagreements.values())
+        log("=" * 60, "ERROR")
+        log(
+            f"REFUSING TO WRITE: the independent scanner found {total} "
+            f"address-shaped item(s) across {len(disagreements)} artefact(s) "
+            f"that EMAIL_PATTERN cannot account for.",
+            "ERROR",
+        )
+        for name in sorted(disagreements)[:20]:
+            log(f"  {name}: {disagreements[name]} unexplained", "ERROR")
+        if len(disagreements) > 20:
+            log(f"  ... and {len(disagreements) - 20} more artefact(s)", "ERROR")
+        log("", "ERROR")
+        log("This is a DISAGREEMENT, not a second detection. The two checks are "
+            "built on different principles precisely so they can disagree; when "
+            "they do, the shared definition is the thing to suspect.", "ERROR")
+        log("Widen EMAIL_PATTERN to cover the mode, or characterise the new "
+            "false-positive family STRUCTURALLY in residue_scan() -- never by "
+            "adding a name to an allowlist.", "ERROR")
+        log("NOTHING WAS WRITTEN. Counts only; CI logs are public.", "ERROR")
+        log("=" * 60, "ERROR")
+        sys.exit(1)
+
+    log(f"Verified {len(rendered)} rendered artefacts: no disallowed addresses, "
+        f"and the independent scanner agrees")
 
     # Verification passed. Only now does anything reach disk.
     for name, html_content in rendered.items():
