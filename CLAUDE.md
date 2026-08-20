@@ -94,7 +94,20 @@ Pip's stated top priority. Practically:
   nginx logs from the VPS, but pdoom1.com is on *shared hosting*. Those logs
   structurally cannot contain the site's pageviews. The workflow is parked.
 - `forum.pdoom1.com` has **no DNS record** despite NodeBB being live on port 80
-  of that box; `api.pdoom1.com` resolves there with **no valid TLS cert**.
+  of that box (re-verified 2026-08-16: still NXDOMAIN).
+  **CORRECTED 2026-08-16:** this line used to continue "`api.pdoom1.com` resolves
+  there with **no valid TLS cert**". That is false and had been for some time.
+  Measured against the live host: `api.pdoom1.com` serves a valid Let's Encrypt
+  cert (`CN=api.pdoom1.com`, expires 2026-10-06), and `analytics.pdoom1.com`
+  serves its own (expires 2026-10-08). Certbot works on that box.
+  `docs/TECH_DEBT.md` §A2 had already recorded the correction on 2026-08-06 —
+  and noted the contrast explicitly, that the sibling host now resolves and
+  serves a valid cert — **but nothing moved this paragraph**, so the two
+  documents disagreed for ten days and the stale one is the file every session
+  reads first. This is the failure mode already documented under the
+  `version.json` entry below, recurring: *proximity of topic is not proximity of
+  text.* Grep CLAUDE.md for the symptom when you fix something, not just the
+  section you happen to be editing.
 - The CVTas VPS is a different machine (`208.113.128.121`) — similar key names,
   different IPs.
 - Pip's cross-repo server index: `coordination/SERVER_ACCESS_REFERENCE.md` in the
