@@ -1,9 +1,14 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-21T00:26:40.874Z UTC
+Generated: 2026-08-21T06:26:02.753Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1252 | Release Checklist: v0.14.2 | release, checklist |  | 2026-08-21 06:09:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1252) |
+| 1250 | Month-end report clips could drift subtly over a run (PARKED -- Pip, 2026-08-21) | ui-ux, someday |  | 2026-08-21 05:19:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1250) |
+| 1249 | Music picker: no feedback for ~2s, and a pick made during a crossfade is dropped silently -- 'nudging the conductor....' | bug, ui-ux |  | 2026-08-21 05:19:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1249) |
+| 1248 | Game-over screen prints historical watermarks as CAUSE OF DEATH, including a crisis the player recovered from | bug, ux |  | 2026-08-21 05:13:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1248) |
+| 1247 | Acquired startup staff half-exist: they consume stationery and move doom, but occupy no desks and cannot be managed | bug, game-mechanics |  | 2026-08-21 05:10:49 | [link](https://github.com/PipFoweraker/pdoom1/issues/1247) |
 | 1229 | Design thread (explicitly not now): office simulation direction -- most of it already ships, it is top-down not isometric, and ADR-0018 is the live constraint | ui-ux, strategic, someday |  | 2026-08-14 07:12:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1229) |
 | 1228 | Events: 25 authored, 19 of them the same three-option shape, and the taxonomy built to vary them is used by zero of them | game-mechanics, strategic, event-system |  | 2026-08-14 07:12:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1228) |
 | 1227 | Design: the ledger and research progress both stop at the edge of the roster -- one missing object (a paper with contributors) blocks both | game-mechanics, strategic |  | 2026-08-14 07:11:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1227) |
