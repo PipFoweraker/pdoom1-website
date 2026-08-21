@@ -18,7 +18,9 @@ picked here.
 | epoch | seed | ladder | board file | blessed (UTC) | by | notes |
 |---|---|---|---|---|---|---|
 | L2 | `weekly-2026-w30` | L2 | `board_weekly-2026-w30__L2.json` | 2026-07-25 | Pip | **First epoch cut.** Client sends `version="L2"`, seed `weekly-2026-w30` (pdoom1 #151, gate-green; echoed in `public/data/version.json` release notes). Legacy L1 board preserved as `board_weekly-2026-w0__L1.json`. |
-| **L3** | ⏳ **NOT YET BLESSED** | L3 | `board_<seed>__L3.json` | — | — | **PENDING — a human must fill this row.** See below. |
+| L3 | `weekly-2026-w31` | L3 | `board_weekly-2026-w31__L3.json` | 2026-08-21 | Pip | **Regularised retrospectively on 2026-08-21**, not blessed on the night. Verified FROM THE ARTIFACT per this ledger's own rule, never by POST: the v0.13.2 client's `FEATURED_SEED_OVERRIDE`, corroborated by the 6 real entries preserved at `public/leaderboard/data/preserved/2026-08-08-l3-epoch-close/`. **Closed history** — do not re-stamp these onto a later epoch; they were played under different rules. |
+| L4 | `weekly-2026-w32` | L4 | `board_weekly-2026-w32__L4.json` | 2026-08-21 | Pip | **Regularised retrospectively on 2026-08-21.** The ladder forked 2026-08-07 with pdoom1 v0.14.0 and no ceremony completed; the factual record below (recorded 2026-08-08, explicitly NOT a blessing) stands and this row now blesses it. Artifact: the v0.14.0 tag message plus that release's `release_manifest.json` carrying `"ladder_version": "4"`. Positively verified 2026-08-08 by read-only GET — 11 entries from 5 players on clients stamped v0.14.0/v0.14.1. |
+| **L5** | `weekly-2026-w33` | L5 | `board_weekly-2026-w33__L5.json` | 2026-08-21 | Pip | **Blessed at [Gate 5] on the night.** pdoom1 **v0.14.2** forked L4 -> L5; the seed is HELD, not rolled, because the epoch half moved and forking twice buys nothing. Verified FROM THE ARTIFACT: v0.14.2 `release_manifest.json` carries `"ladder_version": "5"`, `"league_seed": "weekly-2026-w33"`, `"commit_hash": "38528c22..."` — the tagged commit. Gate 5 checks 1-6 and 8 all passed (difficulty locked to Standard; scenarios and Alpha Tools routed through `is_ranked_run()`). **Check 7 UNAVAILABLE and [Gate 6] HELD by the Commissioner: `api.pdoom1.com` is unreachable** — ICMP, :22, :80 and :443 all TIME OUT rather than refuse, so the host is down; not a token, which would require a server to read it and say no. The board is not open. |
 
 ### ⏳ L3 — pending blessing (do not fill this in from memory)
 
@@ -148,6 +150,37 @@ an L4 row, `regularised_from` / `seed_status` in `public/data/ladder-epochs.json
 Commissioner's ruling on the L3→L4 cut. Until those exist,
 `public/leaderboard/index.html` will still refuse to *offer* a seed to a player, because
 nothing sets `seed_provenance.blessed: true`.
+
+### L4 -> L5 fork, and why the seed was held -- 2026-08-21
+
+**The Commissioner's ruling on the L3 -> L4 cut, owed since 2026-08-08, is also
+given here: both cuts stand.**
+
+pdoom1 v0.14.2 forked the ladder because two merged changes alter what a score
+MEANS on a given seed:
+
+- `6b65338b` (pdoom1 #1233) routed runtime pdoom-data event options through the
+  doom streams, closing a sink of up to **-6 doom per turn**. Identical seeds now
+  produce different trajectories.
+- `56d46c40` (pdoom1 #1230) added **28 events**, filling every risk-pool and
+  severity cell, changing which events fire on a given seed.
+
+Both are BUMP triggers under `BUILD_VS_LADDER_VERSION_SPLIT.md` Section 3.1.
+
+**The seed was HELD at `weekly-2026-w33`, deliberately.** The 2026-07-31 "roll,
+not bless-in-place" ruling exists for when the RULES did not change and the seed
+is the only half that can move. Here the epoch half moved, which forks the board
+key on its own; rolling as well would move two things at once for no gain.
+`gate_5_seed_blessing.md`: blessing the seed the const actually names "costs
+nothing and is usually right".
+
+**`weekly-2026-w33` had never shipped.** It was rolled on 2026-08-13 (pdoom1
+`e44660c4`, #1214) for a league that never opened. v0.14.2 is the first build to
+carry it.
+
+**Gate 6 is HELD.** The board key is blessed and the board is not open. That is
+recorded here rather than left as a gap, per the 2026-08-08 precedent: a ledger
+silent about the state of a board is worse than one that says the board is down.
 
 ## Blessings log
 
