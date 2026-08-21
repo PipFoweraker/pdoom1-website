@@ -1,6 +1,6 @@
 {
   "_comment": "Read-only observation of the live score API. Not a score store. Written by scripts/check-board-liveness.py. The board key is (seed, ladder_epoch); the build version is NOT part of it.",
-  "checked_at": "2026-08-21T06:31:27+00:00",
+  "checked_at": "2026-08-21T12:21:26+00:00",
   "api": "https://api.pdoom1.com/score_api.php",
   "verdict": "unreachable",
   "board_key": {
@@ -9,9 +9,9 @@
     "ladder_epoch": "L4",
     "ladder_epoch_source": "published-board.json",
     "published_ladder_epoch": "L4",
-    "current_ladder_epoch": "L4",
-    "current_ladder_epoch_source": "pdoom1 v0.14.0 git tag message: 'Ladder L4. Featured seed weekly-2026-w32. Board key (weekly-2026-w32, L4).' Corroborated by the release's release_manifest.json, \"ladder_version\": \"4\". Game-side authority unchanged: GameConfig.get_board_version() returns 'L' + LADDER_VERSION. Positively verified 2026-08-08 by a read-only GET: (weekly-2026-w32, L4) held 9 entries from clients stamped v0.14.0 and v0.14.1 -- a positive check, since every WRONG key also returns ok:true with an empty board.",
-    "epochs_agree": true,
+    "current_ladder_epoch": "L5",
+    "current_ladder_epoch_source": "pdoom1 v0.14.2 release_manifest.json (a published release asset) carries \"ladder_version\": \"5\" and \"league_seed\": \"weekly-2026-w33\", commit_hash 38528c22cd7b3d282dc825fa03e941d43a7c87fe. Corroborated by the v0.14.2 git tag message and blessed by Pip at [Gate 5] on 2026-08-21 (docs/LEAGUE_SEED_LEDGER.md L5 row). NOT a value typed from a GitHub comment.",
+    "epochs_agree": false,
     "epoch_composed": false,
     "epoch_known": true,
     "note": "epoch_known=false means this site cannot confirm which board is current. It is NOT a mismatch finding. epochs_agree=false means the published board is from a superseded epoch: the fix is to run scripts/publish-live-board.py, not to re-stamp anything. epoch_composed=true means ladder_epoch is a fallback to the current epoch because published-board.json predates the field -- the pair is composed, not observed."
@@ -26,7 +26,8 @@
       "weekly-2026-w0",
       "weekly-2026-w30",
       "weekly_2026_W30_18a08709",
-      "weekly-2026-w31"
+      "weekly-2026-w31",
+      "weekly-2026-w33"
     ],
     "versions": [
       "L2",
@@ -45,7 +46,7 @@
     "notes": [
       "11 board key(s) derived from the anomaly archive",
       "epoch window L1..L6 (highest seen L4, +2 lookahead)",
-      "PROBE INCOMPLETE (unreachable): asked 8 of 70 board(s) in 161s. The score API looks unreachable -- check the VPS before reading anything below."
+      "PROBE INCOMPLETE (unreachable): asked 8 of 80 board(s) in 161s. The score API looks unreachable -- check the VPS before reading anything below."
     ]
   },
   "archived_orphans": {
@@ -58,7 +59,7 @@
   "new_orphans": {
     "boards": [],
     "entries_total": 0,
-    "note": "Populated boards this site does not publish and the anomaly archive does not acknowledge."
+    "note": "Orphan classification is SUSPENDED this run: the published board is from a superseded epoch, so every board on the current epoch would score as an orphan. See pending_publication."
   },
   "pending_publication": {
     "boards": [],
