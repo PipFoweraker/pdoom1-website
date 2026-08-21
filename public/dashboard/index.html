@@ -28,7 +28,6 @@
     overflow:hidden;
   }
 
-  canvas {position:absolute;top:0;left:0;z-index:1;}
   #container {position:relative;z-index:10;width:100vw;height:100vh;}
 
   /* Subtle scanline effect for retro terminal feel */
@@ -711,7 +710,6 @@
   <!-- Navigation loaded by navigation.js -->
 </header>
 
-<canvas id="shader"></canvas>
 
 <div id="container">
   <div id="header">
@@ -1008,155 +1006,16 @@
 </div>
 
 <script>
-/* ========== Shader ========== */
-const shaderCanvas = document.getElementById('shader');
-const gl = shaderCanvas.getContext('webgl');
-
-function resizeShader() {
-  shaderCanvas.width = window.innerWidth;
-  shaderCanvas.height = window.innerHeight;
-  if(gl) gl.viewport(0, 0, shaderCanvas.width, shaderCanvas.height);
-}
-window.addEventListener('resize', resizeShader);
-resizeShader();
-
-const vsSource = `attribute vec2 pos; void main() {gl_Position = vec4(pos, 0.0, 1.0);}`;
-const fsSource = `
-precision highp float;
-uniform vec2 resolution;
-uniform float time;
-uniform float pdoomLevel;
-
-float hash(vec2 p) {
-  p = fract(p * vec2(123.45, 678.90));
-  p += dot(p, p + 34.56);
-  return fract(p.x * p.y);
-}
-
-vec2 voronoi(vec2 p, float speed) {
-  vec2 n = floor(p), f = fract(p);
-  float minDist = 10.0;
-  for(int j = -1; j <= 1; j++) {
-    for(int i = -1; i <= 1; i++) {
-      vec2 neighbor = vec2(float(i), float(j));
-      vec2 point = hash(n + neighbor) * vec2(sin(time * speed), cos(time * speed + 3.14)) * 0.4;
-      float dist = length(neighbor + point - f);
-      minDist = min(minDist, dist);
-    }
-  }
-  return vec2(minDist, 0);
-}
-
-float neuralConnections(vec2 p, float t, float chaos) {
-  float speed = 0.5 + chaos * 2.0;
-  vec2 vor = voronoi(p * (3.5 + chaos), speed);
-  float neuron = smoothstep(0.18, 0.12, vor.x) * (0.3 + 0.3 * sin(t * (4.0 + chaos * 6.0)));
-  vec2 grid = fract(p * (6.0 + chaos * 3.0)) - 0.5;
-  float axonH = smoothstep(0.008, 0.0, abs(grid.y + sin(p.x * 3.0 + t * (1.0 + chaos * 2.0)) * 0.3)) * (0.25 + chaos * 0.3);
-  float axonV = smoothstep(0.008, 0.0, abs(grid.x + sin(p.y * 3.0 + t * (1.0 + chaos * 2.0)) * 0.3)) * (0.25 + chaos * 0.3);
-  return neuron * (1.2 + chaos * 0.5) + axonH + axonV;
-}
-
-void main() {
-  vec2 uv = gl_FragCoord.xy / resolution;
-  vec2 p = uv * 2.0 - 1.0;
-  p.x *= resolution.x / resolution.y;
-  float chaos = pdoomLevel * 2.0;
-  float t = time * (0.5 + chaos * 0.5);
-  float neural = neuralConnections(p, t, chaos);
-
-  vec3 safeColor = vec3(0.0, 1.0, 0.25);
-  vec3 warnColor = vec3(1.0, 0.42, 0.21);
-  vec3 criticalColor = vec3(1.0, 0.0, 0.0);
-  vec3 baseColor = pdoomLevel < 0.3 ? mix(safeColor, warnColor, pdoomLevel / 0.3) : mix(warnColor, criticalColor, (pdoomLevel - 0.3) / 0.7);
-
-  vec3 color = mix(baseColor * 0.10, baseColor * 0.4, neural * 0.6);
-  color = mix(color, baseColor, neural * neural * 0.4);
-  color *= neural * (0.3 + pdoomLevel * 0.2);
-  color *= smoothstep(1.5, 0.3, length(p));
-  color *= 0.45;  // Reduced for calmer appearance
-
-  if(pdoomLevel > 0.5) {
-    float pulse = 0.5 + 0.5 * sin(t * (5.0 + chaos * 3.0));
-    color += criticalColor * pulse * (pdoomLevel - 0.5) * 0.15;
-  }
-
-  gl_FragColor = vec4(color, 1.0);
-}
-`;
-
-function compileShader(source, type) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  // A shader that fails to compile used to fail SILENTLY to a black canvas.
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.warn('[dashboard] shader did not compile:', gl.getShaderInfoLog(shader));
-    return null;
-  }
-  return shader;
-}
-
-// GUARD: everything below is BACKGROUND DECORATION, and it used to be able to kill the
-// whole page. `gl` is null whenever WebGL is unavailable -- a phone with it disabled,
-// iOS Safari shedding contexts under memory pressure, a locked-down browser, a headless
-// checker. `gl.createProgram()` on null throws a TypeError, and because the sliders, the
-// Plotly chart, the Manifold fetch and the clock all live in this SAME inline <script>,
-// that exception aborted every one of them. The visible result was not "no background"
-// but a dead page: frozen sliders, empty chart, "Loading markets..." forever.
+/* ========== Background ========== */
+// The animated WebGL shader that used to live here was REMOVED 2026-08-22 on Pip's
+// instruction ("I hate those... the dots or whatever just slow everything down").
+// It was a full-viewport fragment shader repainting every frame via
+// requestAnimationFrame, forever, on a page whose job is to be read.
 //
-// Decoration must never be able to take the content with it. If WebGL is missing we skip
-// the shader entirely and the page runs; the canvas simply stays the CSS background.
-// These two stay OUTSIDE the guard: currentPdoomLevel is assigned by updateAll() further
-// down, so it must exist whether or not the shader initialised.
-let startTime = Date.now();
+// currentPdoomLevel survives because updateAll() assigns it further down; it is now
+// write-only and can go with the next real edit to this page. Left in place rather
+// than removed so this patch cannot touch the data path.
 let currentPdoomLevel = 0.121;
-
-let shaderReady = false;
-let resolutionLoc = null, timeLoc = null, pdoomLevelLoc = null;
-
-if (gl) {
-  const vs = compileShader(vsSource, gl.VERTEX_SHADER);
-  const fs = compileShader(fsSource, gl.FRAGMENT_SHADER);
-  if (vs && fs) {
-    const program = gl.createProgram();
-    gl.attachShader(program, vs);
-    gl.attachShader(program, fs);
-    gl.linkProgram(program);
-    if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      gl.useProgram(program);
-
-      const positions = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
-      const buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-
-      const posLoc = gl.getAttribLocation(program, 'pos');
-      gl.enableVertexAttribArray(posLoc);
-      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-      resolutionLoc = gl.getUniformLocation(program, 'resolution');
-      timeLoc = gl.getUniformLocation(program, 'time');
-      pdoomLevelLoc = gl.getUniformLocation(program, 'pdoomLevel');
-      shaderReady = true;
-    } else {
-      console.warn('[dashboard] shader program did not link:', gl.getProgramInfoLog(program));
-    }
-  }
-} else {
-  console.info('[dashboard] WebGL unavailable — background shader skipped. Page is fine.');
-}
-
-function animateShader() {
-  if (!shaderReady) { return; }
-  const time = (Date.now() - startTime) * 0.001;
-  gl.uniform2f(resolutionLoc, shaderCanvas.width, shaderCanvas.height);
-  gl.uniform1f(timeLoc, time);
-  gl.uniform1f(pdoomLevelLoc, currentPdoomLevel);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  requestAnimationFrame(animateShader);
-}
-if (shaderReady) { animateShader(); }
 
 /* ========== Data & Functions ========== */
 function pdoomFunc(year) {
