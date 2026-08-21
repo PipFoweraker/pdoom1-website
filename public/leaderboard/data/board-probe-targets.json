@@ -30,20 +30,6 @@
   },
   "extra_seeds": [
     {
-      "value": "weekly-2026-w31",
-      "source": "OBSERVED live on the score API 2026-07-31T17:15 AEST, immediately after the Gate 5 seed roll: the shipped v0.13.2 client is POSTing here. Not a guess and not pre-populated -- the ceremony had already happened and real entries existed before this line was written.",
-      "why_needed": "The probe DERIVES seeds from files that have already seen them (preserved captures, weekly/current.json, leaderboard.json, published-board.json). A brand-new seed is therefore invisible to it: on the first probe after the roll it checked 108 boards, never asked about w31, and reported 'OK: deployed board (weekly-2026-w30, L3)' -- a confident answer about the wrong board while two real players' scores sat unpublished. Epochs get a +2 lookahead; seeds get nothing equivalent because a seed is a drawn string, not a counter.",
-      "remove_when": "The publisher writes it into published-board.json, from which the probe derives it on subsequent runs. Safe to delete after the next successful publish -- but see the follow-up issue on making seed discovery not depend on a human noticing.",
-      "added": "2026-07-31"
-    },
-    {
-      "value": "weekly-2026-w32",
-      "source": "pdoom1 v0.14.0 git tag message: 'Ladder L4. Featured seed weekly-2026-w32. Board key (weekly-2026-w32, L4).' CONFIRMED by observation, not taken on the tag's word alone: a read-only GET on 2026-08-08 found 9 entries on (weekly-2026-w32, L4) from clients stamped v0.14.0 and v0.14.1, so this is the key the shipped client is demonstrably POSTing to.",
-      "why_needed": "Same blind spot the w31 entry above records, hit a second time by the L3 -> L4 fork. The probe DERIVES seeds from files that have already seen them (preserved captures, weekly/current.json, leaderboard.json, published-board.json); a brand-new seed drawn for a new epoch is invisible to it until a publish writes it down. Epochs get a +2 lookahead; seeds get nothing equivalent, because a seed is a drawn string and not a counter. Without this line the probe would keep confidently reporting the closed (weekly-2026-w31, L3) board while nine real scores sat unpublished on w32.",
-      "remove_when": "The publisher writes it into published-board.json, from which the probe derives it on subsequent runs. Safe to delete after the next successful publish -- but note this is now the SECOND fork to need a manual line here, which is evidence for automating seed discovery rather than for repeating this edit.",
-      "added": "2026-08-08"
-    },
-    {
       "value": "weekly-2026-w33",
       "source": "BLESSED by Pip at [Gate 5] 2026-08-21 and recorded in docs/LEAGUE_SEED_LEDGER.md (L5 row). Read from the published v0.14.2 release_manifest.json (\"league_seed\": \"weekly-2026-w33\"), not guessed and not pre-populated -- the ceremony had already happened when this line was written. The v0.14.2 client POSTs to (weekly-2026-w33, L5). NOT YET OBSERVED live: api.pdoom1.com is unreachable, so no GET has confirmed the board exists. Pinned so check-board-liveness.py can probe it the moment the host returns."
     }
