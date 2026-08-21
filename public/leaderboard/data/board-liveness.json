@@ -1,6 +1,6 @@
 {
   "_comment": "Read-only observation of the live score API. Not a score store. Written by scripts/check-board-liveness.py. The board key is (seed, ladder_epoch); the build version is NOT part of it.",
-  "checked_at": "2026-08-21T12:21:26+00:00",
+  "checked_at": "2026-08-21T12:31:30+00:00",
   "api": "https://api.pdoom1.com/score_api.php",
   "verdict": "unreachable",
   "board_key": {
