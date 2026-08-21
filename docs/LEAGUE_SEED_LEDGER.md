@@ -192,7 +192,25 @@ history, not a tidy final answer.
 |---|---|---|---|---|
 | 1 | 2026-07-24 ~08:00 | `league_2026-07_7d6ced29` | *waves doom staff* | **Superseded.** Blessed in good faith, but conflicted with the already-shipped client key. Corrected same day. |
 | 2 | 2026-07-25 ~09:20 | `weekly-2026-w30` | *waves doom staff* | **Canonical.** Matches the shipped v0.13 client. This is the seed the L2 board uses. |
-| 3 | 2026-07-31 ~16:45 | ⏳ *to be drawn* | *waves doom staff* | **PENDING.** Roll ruled 2026-07-31 so the Gate 4 proving runs do not open the board. Fill from pdoom1's confirmed string, not from memory. |
+| 3 | 2026-07-31 ~16:45 | `weekly-2026-w31` | *unrecorded* | **LOST TO THE RECORD.** Ruled by Pip 2026-08-22: the ceremony was skipped or said in a hurry, late in the evening, not at the appointed time -- and nobody wrote down which. The seed is certain (v0.13.2 pins it; 6 real scores were played on it); the rite is not. Regularised in the table above on 2026-08-21. **This row stays as it is.** A log that quietly acquires a ceremony nobody remembers is worth less than one with an honest hole in it. |
+| 4 | 2026-08-07 ~-- | `weekly-2026-w32` | *unrecorded* | **LOST TO THE RECORD**, same cause. L4 forked with v0.14.0 and no ceremony was recorded; 11 real scores were played on it regardless. Regularised 2026-08-21. |
+| 5 | 2026-08-21 ~16:45 | `weekly-2026-w33` | *waves doom staff* | **BLESSED.** The first completed [Gate 5] since L2 on 2026-07-25 -- four weeks and three epochs. Checks 1-6 and 8 passed; check 7 (a named human attesting the live board) was UNAVAILABLE because api.pdoom1.com was down, and was recorded as such rather than skipped. [Gate 6] was HELD that night and the board opened 2026-08-22 once the host returned. |
+
+### On the two lost blessings -- ruled 2026-08-22
+
+L3 and L4 both ran their whole lives without a recorded ceremony. The seeds were
+right, the boards were right, the scores were real, and the rite either did not
+happen or happened in a hurry late at night with nobody writing it down.
+
+That is recorded here as a hole rather than patched over, for a reason that is
+not sentimental. This ledger's entire job is to distinguish **what a machine can
+derive** from **what a human decided**. The seed is derivable -- it is pinned in
+a released binary and anybody can read it back out. The blessing is not: it
+exists only if somebody performed it and said so. Writing a plausible date into
+that column would make the ledger indistinguishable from a file that just reads
+the client's constants, which is the one thing it must never be.
+
+So: two epochs, no ceremony, honestly logged. The league ran anyway.
 
 ## Correction note (2026-07-24)
 
