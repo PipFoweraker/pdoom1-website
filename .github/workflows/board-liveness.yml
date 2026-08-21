@@ -142,7 +142,13 @@ jobs:
       # boundary offline -- no HTTP request, so it cannot touch the live score API.
       - name: The probe names a disagreement instead of composing a board key
         run: python scripts/test-board-liveness-verdicts.py
-        python scripts/test-board-probe-budget.py
+
+      # A per-request timeout does not bound a run: 2,070 candidate boards x 20s is
+      # 11.5 hours. On 2026-08-20 an unreachable VPS made this workflow run for 13.9
+      # hours, hold its own concurrency group, cancel the next eight scheduled runs,
+      # and take production's 4x/day deploy with it (#337).
+      - name: The probe is bounded in wall clock, not just per request
+        run: python scripts/test-board-probe-budget.py
 
   probe:
     name: Probe the live score API
