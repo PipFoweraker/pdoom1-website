@@ -51,14 +51,15 @@
       "status": "closed",
       "seed": "weekly-2026-w31",
       "boundary_local": "2026-07-31T00:00:00+10:00",
-      "blessed_utc": "2026-07-31",
-      "blessed_by": "Pip",
+      "blessed_utc": "2026-08-21",
+      "blessed_by": "Pip (retrospective; the original ceremony is unrecorded)",
       "first_build": "v0.13.2",
       "closed_by_build": "v0.14.0",
       "closed_local": "2026-08-07T00:00:00+10:00",
       "board_capture": "public/leaderboard/data/preserved/2026-08-08-l3-epoch-close/weekly-2026-w31__L3.json",
       "seed_evidence": "Confirmed at ARTIFACT level, not from memory or an issue comment: v0.13.2:godot/autoload/game_config.gd:462 pins const FEATURED_SEED_OVERRIDE: String = \"weekly-2026-w31\". Read from the released tag (published 2026-07-31T07:53Z), which is the standard the ceremony checklist requires -- artifact beats intention. Pip confirmed all gates blessed the same evening. Per coordination/WALKPACK_2026-08-02, the release manifest is now the seed publication surface with weekly-2026-w31 canonical.",
-      "note": "UPDATED 2026-08-13. This entry read status 'opening', seed null, 'Nothing has ever been published on L3. The current public build (v0.13.1) is L2.' -- true when written on 2026-07-28 and false from the ceremony onwards. L3 did open, on weekly-2026-w31 at ~1700 AEST Fri 2026-07-31, took six real player scores, and closed when v0.14.0 forked the ladder on 2026-08-07. The correction is the record catching up with events that happened; no past entry's facts were altered. Preserved read-only; scores do not migrate forward. See docs/LEAGUE_SEED_LEDGER.md."
+      "note": "UPDATED 2026-08-13. This entry read status 'opening', seed null, 'Nothing has ever been published on L3. The current public build (v0.13.1) is L2.' -- true when written on 2026-07-28 and false from the ceremony onwards. L3 did open, on weekly-2026-w31 at ~1700 AEST Fri 2026-07-31, took six real player scores, and closed when v0.14.0 forked the ladder on 2026-08-07. The correction is the record catching up with events that happened; no past entry's facts were altered. Preserved read-only; scores do not migrate forward. See docs/LEAGUE_SEED_LEDGER.md.",
+      "blessing_note": "THE CEREMONY IS UNRECORDED. Ruled by Pip 2026-08-22: \"we kind of skipped ceremonies due to timing or i said it in a hurry and quite late in the evening? not at the correct time. from memory. we can honestly say this one is lost to poor records from a chaotic time.\" This entry previously asserted blessed_utc 2026-07-31 / blessed_by Pip as FACT; it was an inference from artifact evidence, which is exactly the move pdoom1-website#297 exists to prevent. The SEED is not in doubt -- v0.13.2 pins weekly-2026-w31 and 6 real entries were played on it. What is lost is whether the rite was performed, and when. blessed_utc now names the day the row was WRITTEN (2026-08-21), not a ceremony anybody can attest."
     },
     {
       "ladder_version": "L4",
