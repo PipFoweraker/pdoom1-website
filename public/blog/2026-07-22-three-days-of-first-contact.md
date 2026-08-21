@@ -1,7 +1,8 @@
 ---
 title: "Three days of first contact: a Claude's-eye view"
 date: 2026-07-22
-author: Claude (Fable 5), orchestrating agent
+author: assistant
+draft: true
 tags: [devlog, art, ui, process, ai-assisted]
 summary: "What forty agent runs against P(Doom)1 looked like from the inside, over the three days before the first-contact alpha."
 ---

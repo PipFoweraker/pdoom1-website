@@ -1,71 +1,261 @@
 {
-  "entries": [
+  "posts": [
     {
-      "filename": "2026-07-22-three-days-of-first-contact.md",
-      "slug": "2026-07-22-three-days-of-first-contact",
-      "path": "entries/2026-07-22-three-days-of-first-contact.md",
-      "frontmatter": {
-        "title": "Three days of first contact: a Claude's-eye view",
-        "date": "2026-07-22",
-        "author": "Claude (Fable 5), orchestrating agent",
-        "tags": [
-          "devlog",
-          "art",
-          "ui",
-          "process",
-          "ai-assisted"
-        ],
-        "summary": "What forty agent runs against P(Doom)1 looked like from the inside, over the three days before the first-contact alpha."
-      },
-      "word_count": 654,
-      "file_size": 4361,
-      "modified_at": "2026-08-21T20:20:24.238356"
-    }
-  ],
-  "config": {
-    "blog": {
-      "title": "P(Doom) Development Blog",
-      "description": "Development notes for P(Doom)1, the Godot AI-safety strategy game. Entries from the retired pygame era are archived under dev-blog/archive/.",
-      "base_url": "/dev-blog",
-      "author": "P(Doom) Development Team",
-      "language": "en"
-    },
-    "build": {
-      "auto_generate_index": true,
-      "sort_by": "date",
-      "sort_order": "desc",
-      "entries_per_page": 10
-    },
-    "content_policy": {
-      "ascii_only": true,
-      "max_title_length": 60,
-      "required_frontmatter": [
-        "title",
-        "date",
-        "tags",
-        "summary"
-      ]
-    },
-    "tags": {
-      "allowed": [
-        "infrastructure",
-        "type-annotations",
-        "refactoring",
-        "ui-improvements",
+      "filename": "2026-08-15-1313-tests-passed-and-the-game-had-no-buttons.md",
+      "title": "1,313 tests passed and the game had no buttons",
+      "date": "2026-08-15",
+      "tags": [
+        "playtest",
         "testing",
-        "performance",
-        "bugfixes",
+        "process",
+        "dev-notes"
+      ],
+      "summary": "On Thursday a first-time player sat down, the game drew its art and a doom percentage, and offered nothing to click. 1,313 tests were green. The cause is a per-checkout cache that CI can never see go stale, because CI always starts clean. The guard shipped Friday afternoon; the identical failure shape was back within hours - and this time it was caught.",
+      "commit": "",
+      "featured": false
+    },
+    {
+      "filename": "2026-08-07-v0-14-0-the-ladder-forks.md",
+      "title": "v0.14.0: the ladder forks, and your old scores stay where they are",
+      "date": "2026-08-07",
+      "tags": [
+        "release",
+        "league",
+        "dev-notes"
+      ],
+      "summary": "v0.14.0 retimes the historical event deck to one turn per month, which changes which events fire on a seed - so the ladder epoch moves L3 to L4. L3 entries stay valid and visible under L3; new runs land on L4; the two are never merged. Also: what is in the release, and where the site was a step behind.",
+      "commit": "",
+      "featured": false
+    },
+    {
+      "filename": "2026-07-30-issue-1-turns-one.md",
+      "title": "Issue #1 turns one",
+      "date": "2026-07-30",
+      "tags": [
+        "anniversary",
         "milestone",
+        "process",
+        "dev-notes"
+      ],
+      "summary": "The first issue ever filed on p(Doom)1 - 'Text overflows UI elements on several screens', 2025-07-30 - turns one. A year measured in the bug tracker rather than the trophy cabinet, ending with an audit of every promise the game's code makes.",
+      "commit": "",
+      "featured": false
+    },
+    {
+      "filename": "2026-07-28-this-post-has-a-shelf-life.md",
+      "title": "This post has a shelf life",
+      "date": "2026-07-28",
+      "tags": [
+        "process",
+        "honesty",
+        "dev-notes"
+      ],
+      "summary": "This week's development cadence, reported as a dated decision (2026-07-27) rather than a forward promise - and where to check for yourself whether it held.",
+      "commit": "",
+      "featured": false
+    },
+    {
+      "filename": "2026-07-15-ui-before-snapshot.md",
+      "title": "Where the site stands, before the refresh",
+      "date": "2026-07-15",
+      "tags": [
+        "website",
+        "ui",
+        "design",
+        "dev-notes"
+      ],
+      "summary": "A deliberate 'before' snapshot of pdoom1.com at the start of a UI refresh - what's working (the Risk Dashboard), what reads as dated (blanket monospace, no shared layout spine), and the correctness bugs fixed the same day.",
+      "commit": "426e7b6",
+      "featured": false
+    },
+    {
+      "filename": "2025-10-09-website-development-sprint-complete-v0-2-0.md",
+      "title": "Website Development Sprint Complete: v0.2.0 Major Enhancement",
+      "date": "2025-10-09",
+      "tags": [
+        "website",
+        "milestone",
+        "ui",
+        "infrastructure"
+      ],
+      "summary": "Completed comprehensive 6-hour development sprint delivering major website enhancements across three phases: game asset integration, blog system overhaul, and UI polish. Transformed the website from a basic landing page into a professional developer showcase.",
+      "commit": "f675ac2",
+      "featured": true
+    },
+    {
+      "filename": "2025-10-09-architecture-revolution-monolith-to-modular.md",
+      "title": "Architecture Revolution: From Monolith to Modular Excellence",
+      "date": "2025-10-09",
+      "tags": [
+        "milestone",
+        "architecture",
+        "refactoring",
+        "type-annotation",
+        "engineering"
+      ],
+      "summary": "A comprehensive look at our systematic approach to breaking down 4,235+ line monoliths into clean, maintainable modules - featuring real metrics and engineering insights from the trenches",
+      "commit": "beae890",
+      "featured": true
+    },
+    {
+      "filename": "2025-09-15-ui-monolith-breakdown-complete.md",
+      "title": "UI Monolith Breakdown Complete - Architecture Transformation",
+      "date": "2025-09-15",
+      "tags": [
+        "milestone",
+        "architecture",
+        "ui",
+        "refactoring",
+        "v0.7.0"
+      ],
+      "summary": "Completed systematic breakdown of 4,235-line UI monolith into 8 specialized modules, achieving 37.1% reduction with zero functionality regression",
+      "commit": "4c615f3",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-15-multi-repository-integration-complete.md",
+      "title": "Multi-Repository Integration System Complete",
+      "date": "2025-09-15",
+      "tags": [
         "automation",
+        "versioning",
+        "documentation",
+        "architecture",
+        "github-actions"
+      ],
+      "summary": "Completed comprehensive multi-repository integration system establishing professional automation and documentation management across pdoom1, pdoom1-website, and pdoom-data repositories with zero-manual-overhead release process.",
+      "commit": "",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-15-monolith-breakdown-tutorial-extraction.md",
+      "title": "Monolith Breakdown: Tutorial Extraction & Legacy Cleanup",
+      "date": "2025-09-15",
+      "tags": [
+        "refactoring",
+        "monolith-breakdown",
+        "ui",
+        "cleanup",
+        "modular-architecture"
+      ],
+      "summary": "Extracted 486 lines of tutorial functions, removed 151 lines of legacy code, and fixed critical hover tooltips bug",
+      "commit": "139ef35",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-14-deterministic-rng-complete.md",
+      "title": "Complete Deterministic RNG System v0.6.0",
+      "date": "2025-09-14",
+      "tags": [
+        "milestone",
+        "deterministic",
+        "competitive",
+        "rng",
+        "v0.6.0"
+      ],
+      "summary": "MAJOR MILESTONE: Transform P(Doom) into fully deterministic competitive gaming platform with perfect reproducibility",
+      "commit": "9956d94",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-14-deployment-infrastructure-complete.md",
+      "title": "p(Doom)1 Website Release - Deployment Infrastructure Complete",
+      "date": "2025-09-14",
+      "tags": [
+        "milestone",
+        "infrastructure",
+        "deployment"
+      ],
+      "summary": "Successfully implemented and documented the complete deployment pipeline for the p(Doom)1 website with GitHub Actions workflow",
+      "commit": "",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-13-enhanced-leaderboard-system-v0-4-1.md",
+      "title": "Enhanced Leaderboard System v0.4.1: Seed Competition",
+      "date": "2025-09-13",
+      "tags": [
+        "milestone",
+        "leaderboard",
+        "bootstrap-economics",
+        "ui",
+        "competition"
+      ],
+      "summary": "Major competitive gaming milestone: seed-specific leaderboards, lab name integration, bootstrap economic model, and comprehensive session tracking",
+      "commit": "2dd48ac",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-11-v0-3-0-consolidated-release.md",
+      "title": "P(Doom) v0.3.0: Consolidated Feature Release",
+      "date": "2025-09-11",
+      "tags": [
+        "milestone",
+        "release",
+        "longtermist",
+        "accessibility",
+        "alpha",
+        "consolidation"
+      ],
+      "summary": "Major consolidated release featuring longtermist 5-digit year dates, accessibility framework, comprehensive bug sweep plan, and systematic branch merge for alpha readiness",
+      "commit": "76de59c",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-11-debug-console-system.md",
+      "title": "Debug Console System",
+      "date": "2025-09-11",
+      "tags": [
+        "debug",
+        "ui",
+        "development"
+      ],
+      "summary": "Added real-time debug console with backtick toggle for game state monitoring",
+      "commit": "7aa2673",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-10-version-0-2-12-release.md",
+      "title": "P(Doom) v0.2.12: Development Infrastructure",
+      "date": "2025-09-10",
+      "tags": [
+        "release",
+        "milestone",
+        "type-annotations",
+        "infrastructure",
+        "quality"
+      ],
+      "summary": "Major version release featuring comprehensive type annotations and development tooling infrastructure",
+      "commit": "fedc543",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-10-type-annotation-sprint.md",
+      "title": "Type Annotation Sprint: game_state.py Near Completion",
+      "date": "2025-09-10",
+      "tags": [
+        "type-annotations",
+        "pylance",
+        "code-quality",
+        "monoliths"
+      ],
+      "summary": "Completed 85-90% of game_state.py type annotations with 25+ methods annotated across core systems",
+      "commit": "08180d1",
+      "featured": false
+    },
+    {
+      "filename": "2025-09-10-major-type-annotation-milestone.md",
+      "title": "Major Type Annotation Milestone: UI and GameState Complete",
+      "date": "2025-09-10",
+      "tags": [
+        "milestone",
+        "type-annotations",
+        "infrastructure",
         "code-quality"
-      ]
+      ],
+      "summary": "Completed comprehensive type annotations for ui.py and 60% of game_state.py, resolving 1,100-1,600 pylance issues",
+      "commit": "867127d",
+      "featured": false
     }
-  },
-  "errors": [],
-  "stats": {
-    "total_entries": 1,
-    "total_errors": 0,
-    "latest_entry": "2026-07-22"
-  },
-  "generated_at": "2026-08-21T20:20:25.159474"
+  ]
 }
