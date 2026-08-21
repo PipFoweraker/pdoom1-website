@@ -142,6 +142,7 @@ jobs:
       # boundary offline -- no HTTP request, so it cannot touch the live score API.
       - name: The probe names a disagreement instead of composing a board key
         run: python scripts/test-board-liveness-verdicts.py
+        python scripts/test-board-probe-budget.py
 
   probe:
     name: Probe the live score API

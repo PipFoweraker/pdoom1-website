@@ -85,6 +85,7 @@ import io
 import json
 import re
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -138,6 +139,11 @@ def load_json(path, default=None):
         return json.loads(Path(path).read_text(encoding="utf-8"))
     except Exception:
         return default
+
+
+# A per-request timeout bounds one GET, not a run. See the budget block in main().
+PROBE_BUDGET_S = 600          # 10 minutes for the whole probe loop
+UNREACHABLE_STREAK = 8        # consecutive connection-level failures = the host is down
 
 
 def get_json(url, headers=None, timeout=20):
@@ -349,13 +355,61 @@ def main():
         print("  note: %s" % n)
     print()
 
+    # ---------------------------------------------------------------- budget
+    # A per-request timeout does not bound a run. get_json() caps each GET at 20s,
+    # but the candidate set grows with history -- 9 seeds x 230 versions = 2,070
+    # boards as of 2026-08-21 -- so an unreachable API costs 2070 x 20s = 11.5
+    # hours. On 2026-08-20 the DreamCompute VPS went unreachable and this loop ran
+    # for 13.9 hours before it was cancelled by hand. Because the workflow declares
+    # `concurrency: {group: board-liveness, cancel-in-progress: false}`, the hung
+    # run held the group and the next EIGHT scheduled runs were cancelled while
+    # queued -- and because auto-deploy-on-push.yml triggers on this workflow
+    # COMPLETING, production lost its 4x/day deploy for four days too.
+    #
+    # Two bounds, because they answer different failures:
+    #   PROBE_BUDGET_S  -- the whole loop, however it is slow.
+    #   UNREACHABLE_STREAK -- the host is down; asking 2,070 times learns nothing
+    #                         the first few already told us.
     results, errors = [], 0
+    budget_hit = False
+    unreachable_streak = 0
+    started = time.monotonic()
+
     for s in seeds:
         for v in versions:
+            if time.monotonic() - started > PROBE_BUDGET_S:
+                budget_hit = "budget"
+                break
+            if unreachable_streak >= UNREACHABLE_STREAK:
+                budget_hit = "unreachable"
+                break
             r = probe_board(s, v)
-            if r.get("error"):
+            err = r.get("error") or ""
+            if err:
                 errors += 1
+                # Connection-level failures mean the host, not the board. An HTTP
+                # status is a real answer and must NOT trip the breaker.
+                unreachable_streak = (unreachable_streak + 1
+                                      if not err.startswith("HTTP ") else 0)
+            else:
+                unreachable_streak = 0
             results.append(r)
+        if budget_hit:
+            break
+
+    if budget_hit:
+        # Partial data is reported as partial. A short probe that says so is
+        # honest; a short probe that reports "live" because it never asked is the
+        # failure this whole subsystem exists to prevent.
+        notes.append(
+            "PROBE INCOMPLETE (%s): asked %d of %d board(s) in %.0fs. %s"
+            % (budget_hit, len(results), len(seeds) * len(versions),
+               time.monotonic() - started,
+               "The score API looks unreachable -- check the VPS before reading anything below."
+               if budget_hit == "unreachable" else
+               "Ran out of wall-clock budget; the remaining boards were not asked about.")
+        )
+        print("  " + notes[-1])
 
     populated = [r for r in results if (r.get("entries") or 0) > 0]
 
