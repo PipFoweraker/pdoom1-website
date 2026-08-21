@@ -1,10 +1,10 @@
 {
-  "generated": "2026-08-20T06:12:51.288544+00:00",
+  "generated": "2026-08-21T06:13:11.914782+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 3,
-    "ok": 32
+    "warn": 2,
+    "ok": 31
   },
   "checks": [
     {
@@ -115,12 +115,12 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 6.7 days ago"
+      "detail": "generated 0.7 days ago"
     },
     {
       "name": "league:current_week",
       "status": "OK",
-      "detail": "week 2026_W34 current"
+      "detail": "week 2026_W35 current"
     },
     {
       "name": "league:version_drift",
@@ -130,7 +130,7 @@
     {
       "name": "league:seed",
       "status": "OK",
-      "detail": "weekly seed weekly_2026_W34_8850f090"
+      "detail": "weekly seed weekly_2026_W35_a97e68ae"
     },
     {
       "name": "league:integrity",
@@ -154,23 +154,13 @@
     },
     {
       "name": "board:liveness_freshness",
-      "status": "WARN",
-      "detail": "last live API check was 2.7 days ago -- the verdict below may be stale"
-    },
-    {
-      "name": "board:archived_anomaly",
-      "status": "WARN",
-      "detail": "36 score entries across 5 board(s) from 12 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, CogDerp, Cognitive Development, Cognitive Systems Studies, Cognitive Systems Studies II, Division of Intelligent Agents, Division of Machine Learning, Hamthropic, Intelligent Agents Studies, Laboratory of Autonomous Systems, Notkilleveryone Inc). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
+      "status": "OK",
+      "detail": "live API checked 0.8h ago"
     },
     {
       "name": "board:liveness",
-      "status": "OK",
-      "detail": "deployed board (weekly-2026-w32, L4) holds 11 entries"
-    },
-    {
-      "name": "board:publish",
-      "status": "OK",
-      "detail": "what we serve matches what the probe saw (11 entries on L4)"
+      "status": "WARN",
+      "detail": "the score API could not be reached at the last check -- board state is UNKNOWN, not empty"
     },
     {
       "name": "seed_leaderboards:parse",
