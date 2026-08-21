@@ -12,6 +12,12 @@
       "channel": "manifund",
       "note": "Manifund funding page went live. Timestamp recovered from commit cd789c77's message on 2026-08-21; the annotation it described was never actually committed.",
       "url": "https://manifund.org/projects/fund-development-of-pdoom1"
+    },
+    {
+      "date": "2026-08-17T16:00:00+00:00",
+      "channel": "outage",
+      "note": "DreamCompute instance pdoom-website STOPPED (panel Action Log: Stop, Aug 17 2026 4pm, User ID blank -- not a panel action by Pip). Plausible, the score API and NodeBB were all down until 2026-08-21T22:22Z. 2026-08-19 and 2026-08-20 are recorded as TRUE ZEROS in the snapshots: the tracker could not receive events, so they are an instrument outage, NOT a collapse in traffic. Do not read them as a trend. ClickHouse survived -- the 30d aggregate was unchanged across the gap (228 -> 227 visitors, consistent with the window rolling).",
+      "url": "https://github.com/PipFoweraker/pdoom1-website/issues/337"
     }
   ]
 }
