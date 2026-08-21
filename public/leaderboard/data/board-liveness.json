@@ -1,33 +1,43 @@
 {
   "_comment": "Read-only observation of the live score API. Not a score store. Written by scripts/check-board-liveness.py. The board key is (seed, ladder_epoch); the build version is NOT part of it.",
-  "checked_at": "2026-08-21T18:31:05+00:00",
+  "checked_at": "2026-08-21T22:42:22+00:00",
   "api": "https://api.pdoom1.com/score_api.php",
-  "verdict": "unreachable",
+  "verdict": "orphaned-scores",
   "board_key": {
-    "seed": "weekly-2026-w32",
+    "seed": "weekly-2026-w33",
     "seed_source": "published-board.json",
-    "ladder_epoch": "L4",
+    "ladder_epoch": "L5",
     "ladder_epoch_source": "published-board.json",
-    "published_ladder_epoch": "L4",
+    "published_ladder_epoch": "L5",
     "current_ladder_epoch": "L5",
     "current_ladder_epoch_source": "pdoom1 v0.14.2 release_manifest.json (a published release asset) carries \"ladder_version\": \"5\" and \"league_seed\": \"weekly-2026-w33\", commit_hash 38528c22cd7b3d282dc825fa03e941d43a7c87fe. Corroborated by the v0.14.2 git tag message and blessed by Pip at [Gate 5] on 2026-08-21 (docs/LEAGUE_SEED_LEDGER.md L5 row). NOT a value typed from a GitHub comment.",
-    "epochs_agree": false,
+    "epochs_agree": true,
     "epoch_composed": false,
     "epoch_known": true,
     "note": "epoch_known=false means this site cannot confirm which board is current. It is NOT a mismatch finding. epochs_agree=false means the published board is from a superseded epoch: the fix is to run scripts/publish-live-board.py, not to re-stamp anything. epoch_composed=true means ladder_epoch is a fallback to the current epoch because published-board.json predates the field -- the pair is composed, not observed."
   },
   "deployed_build": "v0.14.2",
-  "deployed_board": null,
+  "deployed_board": {
+    "seed": "weekly-2026-w33",
+    "version": "L5",
+    "key_shape": "epoch",
+    "entries": 0,
+    "players": 0,
+    "player_names": [],
+    "builds_seen": [],
+    "first_entry": null,
+    "last_entry": null
+  },
   "probe": {
     "seeds": [
       "weekly_2026_W35_a97e68ae",
-      "weekly-2026-w32",
+      "weekly-2026-w33",
       "league_2026-07_7d6ced29",
       "weekly-2026-w0",
       "weekly-2026-w30",
       "weekly_2026_W30_18a08709",
       "weekly-2026-w31",
-      "weekly-2026-w33"
+      "weekly-2026-w32"
     ],
     "versions": [
       "L2",
@@ -36,30 +46,173 @@
       "v0.13.0",
       "v0.13.1",
       "L3",
-      "L1",
       "L4",
+      "L1",
       "L5",
-      "L6"
+      "L6",
+      "L7",
+      "L8"
     ],
-    "boards_probed": 8,
-    "unreachable": 8,
+    "boards_probed": 96,
+    "unreachable": 0,
     "notes": [
-      "11 board key(s) derived from the anomaly archive",
-      "epoch window L1..L6 (highest seen L4, +2 lookahead)",
-      "PROBE INCOMPLETE (unreachable): asked 8 of 80 board(s) in 161s. The score API looks unreachable -- check the VPS before reading anything below."
+      "12 board key(s) derived from the anomaly archive",
+      "epoch window L1..L8 (highest seen L6, +2 lookahead)"
     ]
   },
   "archived_orphans": {
     "acknowledged": true,
-    "boards": [],
-    "entries_total": 0,
-    "player_names": [],
+    "boards": [
+      {
+        "seed": "weekly-2026-w0",
+        "version": "v0.11.0",
+        "key_shape": "build",
+        "entries": 20,
+        "players": 3,
+        "player_names": [
+          "CogDerp",
+          "Cognitive Development",
+          "Laboratory of Autonomous Systems"
+        ],
+        "builds_seen": [
+          "v0.11.0"
+        ],
+        "first_entry": "2026-07-19T19:40:08",
+        "last_entry": "2026-07-22T15:56:46"
+      },
+      {
+        "seed": "weekly-2026-w0",
+        "version": "v0.12.0",
+        "key_shape": "build",
+        "entries": 3,
+        "players": 2,
+        "player_names": [
+          "AI Safety Lab",
+          "Laboratory of Autonomous Systems"
+        ],
+        "builds_seen": [
+          "v0.12.0"
+        ],
+        "first_entry": "2026-07-22T21:03:57",
+        "last_entry": "2026-07-22T23:36:37"
+      },
+      {
+        "seed": "weekly-2026-w30",
+        "version": "L2",
+        "key_shape": "epoch",
+        "entries": 4,
+        "players": 3,
+        "player_names": [
+          "AI Safety Lab",
+          "Division of Intelligent Agents",
+          "Hamthropic"
+        ],
+        "builds_seen": [
+          "v0.13.0",
+          "v0.13.1"
+        ],
+        "first_entry": "2026-07-24T11:02:52",
+        "last_entry": "2026-07-26T18:30:47"
+      },
+      {
+        "seed": "weekly-2026-w30",
+        "version": "L3",
+        "key_shape": "epoch",
+        "entries": 3,
+        "players": 2,
+        "player_names": [
+          "Applied AI Safety",
+          "Intelligent Agents Studies"
+        ],
+        "builds_seen": [
+          "v0.13.1",
+          "v0.13.2"
+        ],
+        "first_entry": "2026-07-30T08:32:01",
+        "last_entry": "2026-07-30T09:36:29"
+      },
+      {
+        "seed": "weekly-2026-w31",
+        "version": "L3",
+        "key_shape": "epoch",
+        "entries": 6,
+        "players": 5,
+        "player_names": [
+          "AI Safety Lab",
+          "Cognitive Systems Studies",
+          "Cognitive Systems Studies II",
+          "Division of Machine Learning",
+          "Notkilleveryone Inc"
+        ],
+        "builds_seen": [
+          "v0.13.2"
+        ],
+        "first_entry": "2026-07-31T10:35:08",
+        "last_entry": "2026-08-06T13:02:18"
+      },
+      {
+        "seed": "weekly-2026-w32",
+        "version": "L4",
+        "key_shape": "epoch",
+        "entries": 11,
+        "players": 5,
+        "player_names": [
+          "GRIM",
+          "GRIM (Global Risk Intervention Mechanism",
+          "Kaur, Chen & Lindqvist",
+          "gronklabs",
+          "gronklabs the better"
+        ],
+        "builds_seen": [
+          "v0.14.0",
+          "v0.14.1"
+        ],
+        "first_entry": "2026-08-07T23:21:45",
+        "last_entry": "2026-08-12T14:36:57"
+      }
+    ],
+    "entries_total": 47,
+    "player_names": [
+      "AI Safety Lab",
+      "Applied AI Safety",
+      "CogDerp",
+      "Cognitive Development",
+      "Cognitive Systems Studies",
+      "Cognitive Systems Studies II",
+      "Division of Intelligent Agents",
+      "Division of Machine Learning",
+      "GRIM",
+      "GRIM (Global Risk Intervention Mechanism",
+      "Hamthropic",
+      "Intelligent Agents Studies",
+      "Kaur, Chen & Lindqvist",
+      "Laboratory of Autonomous Systems",
+      "Notkilleveryone Inc",
+      "gronklabs",
+      "gronklabs the better"
+    ],
     "note": "Pre-epoch anomaly archive. Permanent by Pip's ruling -- reported every run, never a CI failure."
   },
   "new_orphans": {
-    "boards": [],
-    "entries_total": 0,
-    "note": "Orphan classification is SUSPENDED this run: the published board is from a superseded epoch, so every board on the current epoch would score as an orphan. See pending_publication."
+    "boards": [
+      {
+        "seed": "weekly-2026-w33",
+        "version": "L4",
+        "key_shape": "epoch",
+        "entries": 1,
+        "players": 1,
+        "player_names": [
+          "Bureau of Catastrophe... -- Pip"
+        ],
+        "builds_seen": [
+          "v0.14.1"
+        ],
+        "first_entry": "2026-08-14T16:51:13",
+        "last_entry": "2026-08-14T16:51:13"
+      }
+    ],
+    "entries_total": 1,
+    "note": "Populated boards this site does not publish and the anomaly archive does not acknowledge."
   },
   "pending_publication": {
     "boards": [],
@@ -71,57 +224,1102 @@
       "seed": "weekly_2026_W35_a97e68ae",
       "version": "L2",
       "key_shape": "epoch",
-      "error": "URLError: <urlopen error timed out>",
-      "entries": null
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
     },
     {
       "seed": "weekly_2026_W35_a97e68ae",
       "version": "v0.11.0",
       "key_shape": "build",
-      "error": "URLError: <urlopen error timed out>",
-      "entries": null
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
     },
     {
       "seed": "weekly_2026_W35_a97e68ae",
       "version": "v0.12.0",
       "key_shape": "build",
-      "error": "URLError: <urlopen error timed out>",
-      "entries": null
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
     },
     {
       "seed": "weekly_2026_W35_a97e68ae",
       "version": "v0.13.0",
       "key_shape": "build",
-      "error": "URLError: <urlopen error timed out>",
-      "entries": null
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
     },
     {
       "seed": "weekly_2026_W35_a97e68ae",
       "version": "v0.13.1",
       "key_shape": "build",
-      "error": "URLError: <urlopen error timed out>",
-      "entries": null
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
     },
     {
       "seed": "weekly_2026_W35_a97e68ae",
       "version": "L3",
       "key_shape": "epoch",
-      "error": "URLError: <urlopen error timed out>",
-      "entries": null
-    },
-    {
-      "seed": "weekly_2026_W35_a97e68ae",
-      "version": "L1",
-      "key_shape": "epoch",
-      "error": "URLError: <urlopen error timed out>",
-      "entries": null
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
     },
     {
       "seed": "weekly_2026_W35_a97e68ae",
       "version": "L4",
       "key_shape": "epoch",
-      "error": "URLError: <urlopen error timed out>",
-      "entries": null
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W35_a97e68ae",
+      "version": "L1",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W35_a97e68ae",
+      "version": "L5",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W35_a97e68ae",
+      "version": "L6",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W35_a97e68ae",
+      "version": "L7",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W35_a97e68ae",
+      "version": "L8",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "L2",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "v0.11.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "v0.12.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "v0.13.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "v0.13.1",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "L3",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "L4",
+      "key_shape": "epoch",
+      "entries": 1,
+      "players": 1,
+      "player_names": [
+        "Bureau of Catastrophe... -- Pip"
+      ],
+      "builds_seen": [
+        "v0.14.1"
+      ],
+      "first_entry": "2026-08-14T16:51:13",
+      "last_entry": "2026-08-14T16:51:13"
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "L1",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "L5",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "L6",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "L7",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "L8",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L2",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "v0.11.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "v0.12.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "v0.13.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "v0.13.1",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L3",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L4",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L1",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L5",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L6",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L7",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L8",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L2",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.11.0",
+      "key_shape": "build",
+      "entries": 20,
+      "players": 3,
+      "player_names": [
+        "CogDerp",
+        "Cognitive Development",
+        "Laboratory of Autonomous Systems"
+      ],
+      "builds_seen": [
+        "v0.11.0"
+      ],
+      "first_entry": "2026-07-19T19:40:08",
+      "last_entry": "2026-07-22T15:56:46"
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.12.0",
+      "key_shape": "build",
+      "entries": 3,
+      "players": 2,
+      "player_names": [
+        "AI Safety Lab",
+        "Laboratory of Autonomous Systems"
+      ],
+      "builds_seen": [
+        "v0.12.0"
+      ],
+      "first_entry": "2026-07-22T21:03:57",
+      "last_entry": "2026-07-22T23:36:37"
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.13.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "v0.13.1",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L3",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L4",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L1",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L5",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L6",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L7",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L8",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "L2",
+      "key_shape": "epoch",
+      "entries": 4,
+      "players": 3,
+      "player_names": [
+        "AI Safety Lab",
+        "Division of Intelligent Agents",
+        "Hamthropic"
+      ],
+      "builds_seen": [
+        "v0.13.0",
+        "v0.13.1"
+      ],
+      "first_entry": "2026-07-24T11:02:52",
+      "last_entry": "2026-07-26T18:30:47"
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "v0.11.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "v0.12.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "v0.13.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "v0.13.1",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "L3",
+      "key_shape": "epoch",
+      "entries": 3,
+      "players": 2,
+      "player_names": [
+        "Applied AI Safety",
+        "Intelligent Agents Studies"
+      ],
+      "builds_seen": [
+        "v0.13.1",
+        "v0.13.2"
+      ],
+      "first_entry": "2026-07-30T08:32:01",
+      "last_entry": "2026-07-30T09:36:29"
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "L4",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "L1",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "L5",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "L6",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "L7",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "L8",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L2",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.11.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.12.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.13.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "v0.13.1",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L3",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L4",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L1",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L5",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L6",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L7",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L8",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L2",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "v0.11.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "v0.12.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "v0.13.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "v0.13.1",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L3",
+      "key_shape": "epoch",
+      "entries": 6,
+      "players": 5,
+      "player_names": [
+        "AI Safety Lab",
+        "Cognitive Systems Studies",
+        "Cognitive Systems Studies II",
+        "Division of Machine Learning",
+        "Notkilleveryone Inc"
+      ],
+      "builds_seen": [
+        "v0.13.2"
+      ],
+      "first_entry": "2026-07-31T10:35:08",
+      "last_entry": "2026-08-06T13:02:18"
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L4",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L1",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L5",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L6",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L7",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L8",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "L2",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "v0.11.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "v0.12.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "v0.13.0",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "v0.13.1",
+      "key_shape": "build",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "L3",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "L4",
+      "key_shape": "epoch",
+      "entries": 11,
+      "players": 5,
+      "player_names": [
+        "GRIM",
+        "GRIM (Global Risk Intervention Mechanism",
+        "Kaur, Chen & Lindqvist",
+        "gronklabs",
+        "gronklabs the better"
+      ],
+      "builds_seen": [
+        "v0.14.0",
+        "v0.14.1"
+      ],
+      "first_entry": "2026-08-07T23:21:45",
+      "last_entry": "2026-08-12T14:36:57"
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "L1",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "L5",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "L6",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "L7",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "L8",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
     }
   ]
 }

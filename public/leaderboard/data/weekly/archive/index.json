@@ -1660,6 +1660,24 @@
       ],
       "first_entry": "2026-07-31T10:35:08",
       "last_entry": "2026-08-06T13:02:18"
+    },
+    {
+      "file": "2026-08-22-l4-epoch-close/weekly-2026-w32__L4.json",
+      "captured": "2026-08-22-l4-epoch-close",
+      "seed": "weekly-2026-w32",
+      "version": "L4",
+      "key_kind": "ladder",
+      "board_key": "(weekly-2026-w32, L4)",
+      "entry_count": 11,
+      "players": [
+        "GRIM",
+        "GRIM (Global Risk Intervention Mechanism",
+        "Kaur, Chen & Lindqvist",
+        "gronklabs",
+        "gronklabs the better"
+      ],
+      "first_entry": "2026-08-07T23:21:45",
+      "last_entry": "2026-08-12T14:36:57"
     }
   ],
   "epochs": {
@@ -1693,5 +1711,5 @@
       "reason": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L<n>) where L<n> is this stamp's own ladder_version, by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py. This sentence used to name L3 outright; it was stamped unchanged onto weeks that ran on L4."
     }
   },
-  "last_updated": "2026-08-21T11:47:48.874306Z"
+  "last_updated": "2026-08-21T22:42:50.529035Z"
 }
