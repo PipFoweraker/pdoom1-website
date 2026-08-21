@@ -14,7 +14,7 @@
   "epoch": {
     "id": "regularised",
     "anomalous": false,
-    "ladder_version": "L4",
+    "ladder_version": "L5",
     "boundary_ladder_version": "L3",
     "boundary_local": "2026-07-31T00:00:00+10:00",
     "boundary_tz": "Australia/Hobart",
@@ -65,7 +65,7 @@
     "epoch": {
       "id": "regularised",
       "anomalous": false,
-      "ladder_version": "L4",
+      "ladder_version": "L5",
       "boundary_ladder_version": "L3",
       "boundary_local": "2026-07-31T00:00:00+10:00",
       "boundary_tz": "Australia/Hobart",
