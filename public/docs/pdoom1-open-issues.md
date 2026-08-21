@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-21T12:25:48.762Z UTC
+Generated: 2026-08-21T18:25:19.619Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1259 | CLAUDE.md asserts four environment facts that were false on this machine, and nothing checks any of them | technical-debt |  | 2026-08-21 12:33:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1259) |
 | 1258 | P6 needs a mechanism or deletion: the worktree rule was broken by an agent on 2026-08-21 |  |  | 2026-08-21 12:19:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/1258) |
 | 1257 | D4 ruling wanted: a sixth origin value (authored_art), and splitting the Manifund claim off NON_MODEL |  |  | 2026-08-21 12:19:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1257) |
 | 1252 | Release Checklist: v0.14.2 | release, checklist |  | 2026-08-21 06:09:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1252) |
