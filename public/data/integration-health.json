@@ -1,10 +1,10 @@
 {
-  "generated": "2026-08-21T06:13:11.914782+00:00",
+  "generated": "2026-08-21T12:16:06.707661+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 2,
-    "ok": 31
+    "warn": 3,
+    "ok": 30
   },
   "checks": [
     {
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 0.7 days ago"
+      "detail": "generated 0.9 days ago"
     },
     {
       "name": "league:current_week",
@@ -124,8 +124,8 @@
     },
     {
       "name": "league:version_drift",
-      "status": "OK",
-      "detail": "game_version v0.14.1 matches deployed"
+      "status": "WARN",
+      "detail": "weekly league game_version=v0.14.1 but deployed game=v0.14.2 -- a v0.14.2 client's scores cannot land on a v0.14.1 board"
     },
     {
       "name": "league:seed",
@@ -155,7 +155,7 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 0.8h ago"
+      "detail": "live API checked 5.7h ago"
     },
     {
       "name": "board:liveness",
@@ -170,7 +170,7 @@
     {
       "name": "seed_leaderboards:version_census",
       "status": "WARN",
-      "detail": "NO stored seed file is stamped with the deployed version v0.14.1, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
+      "detail": "NO stored seed file is stamped with the deployed version v0.14.2, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
     }
   ]
 }
