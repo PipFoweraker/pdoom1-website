@@ -63,7 +63,13 @@ LIMITS = {
 # spelling (twitter vs x vs Twitter become three separate rows that never
 # re-merge)." `x` maps to `twitter` because that is the value already agreed in
 # the campaign table.
-CAMPAIGN_SLUG_MAX = 40
+# 32, not 40: on Bluesky the tagged URL costs 183 of the 300-character budget and
+# the UTMs are 88 of that, so every character here is taken from the copy. 26 is
+# the shortest cap that keeps all 18 current posts unique, which is too close to
+# the edge -- a future title could collide and merge two campaigns into one row.
+# 32 keeps headroom, and test-syndication-utm.py asserts uniqueness so a future
+# collision fails a build instead of quietly mis-grouping analytics.
+CAMPAIGN_SLUG_MAX = 32
 
 UTM_SOURCE = {
     "bluesky": "bluesky",
