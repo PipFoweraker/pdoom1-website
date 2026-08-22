@@ -57,8 +57,70 @@ LIMITS = {
 }
 
 
-def post_url(filename):
-    return "%s/blog/post.html?p=%s" % (SITE, filename)
+# utm_source per platform. These become permanent analytics groupings, so the
+# spelling is fixed here rather than left to whoever writes a draft --
+# content/campaigns/README.md: "Never reuse a utm_source value with different
+# spelling (twitter vs x vs Twitter become three separate rows that never
+# re-merge)." `x` maps to `twitter` because that is the value already agreed in
+# the campaign table.
+CAMPAIGN_SLUG_MAX = 40
+
+UTM_SOURCE = {
+    "bluesky": "bluesky",
+    "x": "twitter",
+    "linkedin": "linkedin",
+    "discord": "discord",
+}
+
+
+def campaign_slug(filename):
+    """One campaign slug per post, reused across every platform in it.
+
+    Derived from the post filename, which already begins with its date, so the
+    slug is stable and needs no separate register: blog-2026-08-15-1313-tests.
+    """
+    stem = filename[:-3] if filename.endswith(".md") else filename
+    # Whole words up to a cap, never a mid-word truncation. The full stem runs to
+    # 60+ characters, which is a fifth of Bluesky's 300 and reads badly as a
+    # Plausible grouping. A date alone will not do either: five dates in the blog
+    # index already carry two or three posts, and merging them would make two
+    # campaigns report as one.
+    slug, out = "blog", []
+    for word in stem.split("-"):
+        candidate = "-".join([slug] + out + [word])
+        if len(candidate) > CAMPAIGN_SLUG_MAX:
+            break
+        out.append(word)
+    return "-".join([slug] + out) if out else slug
+
+
+def post_url(filename, platform=None):
+    """The post URL, UTM-tagged when it is going out on a platform.
+
+    WHY THIS IS NOT OPTIONAL. content/campaigns/README.md is unambiguous:
+    Plausible groups traffic by utm_source/utm_medium/utm_campaign, and
+    public/index.html's attributionProps() copies them onto the Download event.
+    The download button leaves for github.com, so that click is the ONLY place a
+    download can ever be joined to the channel that produced it. "Post a link
+    without UTMs and that attribution is gone permanently. There is no way to
+    reconstruct it afterwards."
+
+    Until 2026-08-22 this function returned a bare URL and every draft it
+    generated therefore violated that rule. Nothing had been posted yet, so
+    nothing was lost -- but the first post from this pipeline would have been
+    unattributable forever.
+
+    The untagged form is still what `url` records in the draft, because that is
+    the canonical address of the post rather than a channel-specific link.
+    """
+    base = "%s/blog/post.html?p=%s" % (SITE, filename)
+    if not platform:
+        return base
+    source = UTM_SOURCE.get(platform)
+    if not source:
+        return base
+    return "%s&utm_source=%s&utm_medium=social&utm_campaign=%s" % (
+        base, source, campaign_slug(filename))
 
 
 def load_posts():
@@ -72,7 +134,7 @@ def draft_copy(post, platform):
     copy does."""
     title = post["title"]
     summary = post.get("summary", "").strip()
-    url = post_url(post["filename"])
+    url = post_url(post["filename"], platform)
     tags = post.get("tags") or []
 
     if platform in ("bluesky", "x"):
