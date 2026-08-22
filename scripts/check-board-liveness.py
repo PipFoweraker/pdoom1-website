@@ -115,6 +115,25 @@ PRESERVED_DIR = LB_DIR / "preserved"
 TARGETS_JSON = LB_DIR / "board-probe-targets.json"
 OUT_JSON = LB_DIR / "board-liveness.json"
 
+# An UNKNOWN verdict is honest once and negligent forever. `unreachable` and
+# `epoch-unknown` are deliberately exit 2 and deliberately green, because a red
+# a human cannot clear trains everyone to ignore red -- and that reasoning is
+# right for ONE run. It has no upper bound, and on 2026-08-17 the DreamCompute
+# instance was stopped and this workflow reported success every six hours for
+# five days while the API it probes was powered off.
+#
+# CLAUDE.md already states the rule this violated: "Refusing to act is itself a
+# silent-failure mode. A script that correctly declines every run is externally
+# identical to one that is broken. Anything that can refuse needs a staleness
+# escalation, not just a warning in a job summary."
+#
+# So the per-run verdict is unchanged -- tests pin those exit codes, and one
+# unknown really is an admission. What changes is that a SUSTAINED admission
+# becomes an incident. The cron is `17 */6 * * *`, four runs a day, so four
+# consecutive unknowns is roughly 24 hours of not being able to tell.
+UNKNOWN_VERDICTS = ("unreachable", "epoch-unknown", "unclassifiable")
+UNKNOWN_STREAK_ESCALATE = 4
+
 SCORE_API = "https://api.pdoom1.com/score_api.php"
 
 # Shape tests, not value lists. These classify a key; they never supply one.
@@ -555,6 +574,43 @@ def main():
         print("    players: %s" % ", ".join(names))
         print("    see %s" % PRESERVED_DIR.relative_to(PUBLIC))
 
+    # ---- how long have we been unable to tell? ----------------------------
+    # Read back the last observation this script wrote. That file is committed
+    # every run, so it is the only durable memory available to a stateless job.
+    # A missing or unreadable file means no history, which is a streak of one --
+    # never zero, because "I have no memory" must not read as "all is well".
+    previous = {}
+    try:
+        previous = json.loads(OUT_JSON.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        previous = {}
+
+    if verdict in UNKNOWN_VERDICTS:
+        prior_streak = previous.get("unknown_streak") or 0
+        prior_was_unknown = previous.get("verdict") in UNKNOWN_VERDICTS
+        unknown_streak = (prior_streak + 1) if prior_was_unknown else 1
+        unknown_since = (previous.get("unknown_since")
+                         if prior_was_unknown and previous.get("unknown_since")
+                         else now_iso())
+    else:
+        unknown_streak = 0
+        unknown_since = None
+
+    escalate = unknown_streak >= UNKNOWN_STREAK_ESCALATE
+
+    if unknown_streak:
+        print()
+        print("  UNKNOWN STREAK: %d consecutive run(s) unable to tell, since %s."
+              % (unknown_streak, unknown_since))
+        if escalate:
+            print("  ESCALATED: at or past %d consecutive unknowns (~%d hours at the 6-hourly"
+                  % (UNKNOWN_STREAK_ESCALATE, UNKNOWN_STREAK_ESCALATE * 6))
+            print("  cron). One unknown is an admission; this many is an incident. The job")
+            print("  fails on this, NOT on the verdict -- check whether the VPS is running.")
+        else:
+            print("  Not escalated yet: escalation is at %d consecutive."
+                  % UNKNOWN_STREAK_ESCALATE)
+
     record = {
         "_comment": "Read-only observation of the live score API. Not a score store. "
                     "Written by scripts/check-board-liveness.py. The board key is "
@@ -562,6 +618,13 @@ def main():
         "checked_at": now_iso(),
         "api": SCORE_API,
         "verdict": verdict,
+        # How many consecutive runs have been unable to tell, and since when.
+        # 0 whenever the run reached a real answer. `escalate` is the field the
+        # workflow gates on -- the verdict's own exit code stays an admission.
+        "unknown_streak": unknown_streak,
+        "unknown_since": unknown_since,
+        "escalate": escalate,
+        "escalate_threshold": UNKNOWN_STREAK_ESCALATE,
         # THE BOARD KEY THE SITE PUBLISHED -- both halves from published-board.json, never
         # one half from each of two files (#293). The current epoch is carried alongside as
         # a separate, separately-sourced fact, and `epochs_agree` says whether they match.

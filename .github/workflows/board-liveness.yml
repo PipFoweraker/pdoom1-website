@@ -58,6 +58,7 @@ on:
       - 'scripts/publish-live-board.py'
       - 'scripts/test-publish-live-board.py'
       - 'scripts/test-board-liveness-verdicts.py'
+      - 'scripts/test-board-liveness-escalation.py'
       - 'scripts/test-board-escaping.js'
       - 'scripts/test-board-honesty.js'
       - 'public/leaderboard/index.html'
@@ -75,6 +76,7 @@ on:
       - 'scripts/publish-live-board.py'
       - 'scripts/test-publish-live-board.py'
       - 'scripts/test-board-liveness-verdicts.py'
+      - 'scripts/test-board-liveness-escalation.py'
       - 'scripts/test-board-escaping.js'
       - 'scripts/test-board-honesty.js'
       - 'scripts/check-board-liveness.py'
@@ -142,6 +144,9 @@ jobs:
       # boundary offline -- no HTTP request, so it cannot touch the live score API.
       - name: The probe names a disagreement instead of composing a board key
         run: python scripts/test-board-liveness-verdicts.py
+
+      - name: A sustained "cannot tell" still escalates
+        run: python scripts/test-board-liveness-escalation.py
 
       # A per-request timeout does not bound a run: 2,070 candidate boards x 20s is
       # 11.5 hours. On 2026-08-20 an unreachable VPS made this workflow run for 13.9
@@ -245,6 +250,15 @@ jobs:
           python scripts/board_liveness_summary.py > summary.env
           . ./summary.env
           echo "verdict=$verdict"   >> "$GITHUB_OUTPUT"
+          # How long we have been unable to tell, read from the observation the
+          # script just wrote. The per-run verdict stays an admission; THIS is
+          # what makes a sustained admission an incident. See the gate below.
+          esc=$(python -c "import json;d=json.load(open('public/leaderboard/data/board-liveness.json'));print('1' if d.get('escalate') else '0')" 2>/dev/null || echo 0)
+          streak=$(python -c "import json;d=json.load(open('public/leaderboard/data/board-liveness.json'));print(d.get('unknown_streak') or 0)" 2>/dev/null || echo 0)
+          since=$(python -c "import json;d=json.load(open('public/leaderboard/data/board-liveness.json'));print(d.get('unknown_since') or '')" 2>/dev/null || echo "")
+          echo "escalate=$esc"      >> "$GITHUB_OUTPUT"
+          echo "streak=$streak"     >> "$GITHUB_OUTPUT"
+          echo "since=$since"       >> "$GITHUB_OUTPUT"
           echo "new_orphans=$newn"  >> "$GITHUB_OUTPUT"
           echo "archived=$archn"    >> "$GITHUB_OUTPUT"
           echo "exit_code=$code"    >> "$GITHUB_OUTPUT"
@@ -306,10 +320,38 @@ jobs:
           echo "::error::Could not push the board observation after 3 attempts. The published board is STALE until the next run."
           exit 1
 
-      # Only NEW loss is red. `epoch-unknown` and `unreachable` are genuine unknowns and
-      # stay green (they are already in the job summary above); the archived anomaly is
-      # permanent by ruling and must never fail. A job that is red forever gets muted, and
-      # then the one run that matters is muted with it.
+      # Only NEW loss is red ON ANY ONE RUN. `epoch-unknown` and `unreachable` are
+      # genuine unknowns and stay green; the archived anomaly is permanent by ruling
+      # and must never fail. A job that is red forever gets muted, and then the one
+      # run that matters is muted with it.
+      #
+      # CORRECTED 2026-08-22. That reasoning is right per run and had no upper bound.
+      # The DreamCompute instance was stopped on 2026-08-17 and this workflow reported
+      # SUCCESS every six hours for five days -- about twenty runs -- while the API it
+      # probes was powered off. The probe was never wrong: it wrote
+      # `verdict: "unreachable"` each time and nobody was told.
+      #
+      # CLAUDE.md already had the rule: "Refusing to act is itself a silent-failure
+      # mode ... Anything that can refuse needs a staleness escalation, not just a
+      # warning in a job summary." The step below is that escalation. One unknown is
+      # still green. Four in a row -- ~24h at the 6-hourly cron -- is red, and it is
+      # closeable by a human (start the box, or fix the epoch), which is what keeps
+      # it from becoming the permanent red this comment warns about.
+      - name: Fail if we have been unable to tell for too long
+        env:
+          ESCALATE: ${{ steps.probe.outputs.escalate }}
+          STREAK: ${{ steps.probe.outputs.streak }}
+          SINCE: ${{ steps.probe.outputs.since }}
+          VERDICT: ${{ steps.probe.outputs.verdict }}
+        run: |
+          if [ "$ESCALATE" = "1" ]; then
+            echo "::error::The board probe has been unable to tell for $STREAK consecutive runs (since $SINCE), verdict '$VERDICT'. That is roughly a day of not knowing whether players' scores are visible. Check that the DreamCompute instance serving api.pdoom1.com is RUNNING before anything else -- on 2026-08-17 it was simply stopped."
+            exit 1
+          fi
+          if [ "${STREAK:-0}" != "0" ]; then
+            echo "::notice::Probe unable to tell for $STREAK run(s) (since $SINCE). Not escalated yet."
+          fi
+
       - name: Fail only if NEW scores are landing where nobody can see them
         env:
           VERDICT: ${{ steps.probe.outputs.verdict }}
