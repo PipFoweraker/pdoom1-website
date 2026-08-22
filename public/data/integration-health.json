@@ -1,10 +1,10 @@
 {
-  "generated": "2026-08-21T12:16:06.707661+00:00",
-  "overall_status": "WARN",
+  "generated": "2026-08-22T06:10:19.752940+00:00",
+  "overall_status": "FAIL",
   "summary": {
-    "fail": 0,
-    "warn": 3,
-    "ok": 30
+    "fail": 1,
+    "warn": 5,
+    "ok": 29
   },
   "checks": [
     {
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 0.9 days ago"
+      "detail": "generated 1.7 days ago"
     },
     {
       "name": "league:current_week",
@@ -139,8 +139,8 @@
     },
     {
       "name": "board:key",
-      "status": "OK",
-      "detail": "published board key matches the current ladder epoch L4"
+      "status": "WARN",
+      "detail": "published board is keyed 'L4' (epoch-shaped) but the current ladder epoch is L5; the board shows 11 entries. Scores submitted under L5 cannot appear on a L4 board. Do not re-stamp -- that fabricates history."
     },
     {
       "name": "board:exclusions",
@@ -158,9 +158,19 @@
       "detail": "live API checked 5.7h ago"
     },
     {
+      "name": "board:archived_anomaly",
+      "status": "WARN",
+      "detail": "36 score entries across 5 board(s) from 12 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, CogDerp, Cognitive Development, Cognitive Systems Studies, Cognitive Systems Studies II, Division of Intelligent Agents, Division of Machine Learning, Hamthropic, Intelligent Agents Studies, Laboratory of Autonomous Systems, Notkilleveryone Inc). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
+    },
+    {
       "name": "board:liveness",
       "status": "WARN",
-      "detail": "the score API could not be reached at the last check -- board state is UNKNOWN, not empty"
+      "detail": "the published board (weekly-2026-w32, L4) is from a SUPERSEDED epoch -- the current ladder epoch is L5. No orphan claim can be made while the two disagree, because every board on the current epoch would score as an orphan. Reported as unresolved, deliberately NOT as scores being lost. Fix: run python scripts/publish-live-board.py. Do not re-stamp anything."
+    },
+    {
+      "name": "board:publish",
+      "status": "FAIL",
+      "detail": "we serve epoch L4 while the live epoch is L5 -- scores are being set on a board we do not show."
     },
     {
       "name": "seed_leaderboards:parse",
