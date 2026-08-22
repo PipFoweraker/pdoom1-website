@@ -1,16 +1,22 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-22T00:26:21.899Z UTC
+Generated: 2026-08-22T06:25:17.506Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1272 | score_api.php truncates the leaderboard before checking json_encode succeeded -- one submitted name empties it |  |  | 2026-08-22 06:22:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/1272) |
+| 1269 | RELEASING.md says ship from a release branch; four releases shipped from main and CI has no release/* handling | technical-debt |  | 2026-08-22 00:48:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1269) |
+| 1268 | AK1004: fix the four organisation-line hits, exempt the rule-stating file, teach the guard proper nouns |  |  | 2026-08-22 00:36:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/1268) |
+| 1267 | The league cycle handbook Pip asked to update does not appear to exist -- name it or rule create-vs-update |  |  | 2026-08-22 00:36:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1267) |
+| 1266 | Create the PDoom release-cycle playbook + check sheet, derived mechanically, used weekly |  |  | 2026-08-22 00:36:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1266) |
+| 1265 | guards: 15 running in pre-commit and nowhere else, and wired gates with no self-test |  |  | 2026-08-22 00:36:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/1265) |
 | 1258 | P6 needs a mechanism or deletion: the worktree rule was broken by an agent on 2026-08-21 |  |  | 2026-08-21 12:19:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/1258) |
 | 1257 | D4 ruling wanted: a sixth origin value (authored_art), and splitting the Manifund claim off NON_MODEL |  |  | 2026-08-21 12:19:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1257) |
 | 1252 | Release Checklist: v0.14.2 | release, checklist |  | 2026-08-21 06:09:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1252) |
 | 1250 | Month-end report clips could drift subtly over a run (PARKED -- Pip, 2026-08-21) | ui-ux, someday |  | 2026-08-21 05:19:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1250) |
 | 1249 | Music picker: no feedback for ~2s, and a pick made during a crossfade is dropped silently -- 'nudging the conductor....' | bug, ui-ux |  | 2026-08-21 05:19:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1249) |
 | 1248 | Game-over screen prints historical watermarks as CAUSE OF DEATH, including a crisis the player recovered from | bug, ux |  | 2026-08-21 05:13:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1248) |
-| 1247 | Acquired startup staff half-exist: they consume stationery and move doom, but occupy no desks and cannot be managed | bug, game-mechanics |  | 2026-08-21 05:10:49 | [link](https://github.com/PipFoweraker/pdoom1/issues/1247) |
+| 1247 | Acquired startup staff half-exist: they consume stationery and move doom, but occupy no desks and cannot be managed | bug, game-mechanics |  | 2026-08-22 00:26:46 | [link](https://github.com/PipFoweraker/pdoom1/issues/1247) |
 | 1229 | Design thread (explicitly not now): office simulation direction -- most of it already ships, it is top-down not isometric, and ADR-0018 is the live constraint | ui-ux, strategic, someday |  | 2026-08-14 07:12:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1229) |
 | 1228 | Events: 25 authored, 19 of them the same three-option shape, and the taxonomy built to vary them is used by zero of them | game-mechanics, strategic, event-system |  | 2026-08-14 07:12:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1228) |
 | 1227 | Design: the ledger and research progress both stop at the edge of the roster -- one missing object (a paper with contributors) blocks both | game-mechanics, strategic |  | 2026-08-14 07:11:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1227) |
