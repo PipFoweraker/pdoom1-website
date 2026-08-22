@@ -254,6 +254,14 @@ jobs:
       - name: Syndication endpoints are gated and fail closed
         run: node scripts/test-syndication-auth.js
 
+      # The auth gate above proves nothing can post without a credential. This
+      # proves nothing can post an UNATTRIBUTABLE link: content/campaigns/README.md
+      # -- "Post a link without UTMs and that attribution is gone permanently.
+      # There is no way to reconstruct it afterwards." The generator emitted bare
+      # URLs until 2026-08-22 and every queued draft carried one.
+      - name: No syndication link leaves untagged
+        run: python scripts/test-syndication-utm.py
+
       # Third parties' addresses scraped out of paper PDFs must never be served.
       #
       # The forced-failure test runs FIRST, for the same reason the platform one
