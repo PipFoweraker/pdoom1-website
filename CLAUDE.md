@@ -258,9 +258,16 @@ Pip's stated top priority. Practically:
    and commits with `[skip ci]`; `content-honesty.yml`'s email guard triggers on
    `push` to `public/**/*.html`. The guard therefore ran on human pushes and
    **never once** on the output it exists to check (#240, fixed 2026-08-03).
-   `update-game-data.yml` did the same to `issues-cache.json`. **A check must
-   take at least one output from inside the system it is checking.** When adding
-   a guard, ask which commits reach its trigger — and if the producer is a bot
+   `update-game-data.yml` did the same to `issues-cache.json`. **A check takes
+   its OBSERVATION from inside the system under test -- the system's actual
+   state, never the acting party's report that it acted -- and its EXPECTATION
+   from outside it.** (Corrected 2026-08-22. This file carried only the first
+   clause, which is the inversion `pdoom-data/CLAUDE.md` records and warns
+   about: *"the inverted form passes the exact failure the rule was written to
+   catch."* Canonical two-clause form: `coordination/PROTOCOL_UPDATES_2026-08-02.md`,
+   RULED 2026-08-03, from `pdoom1#1075`. Three repos took the inversion; this
+   was the one never fixed.) When adding a guard, ask which commits reach its
+   trigger — and if the producer is a bot
    with `[skip ci]`, put the check *inside the producer, before it writes*.
    Sweep: `grep -rn 'skip ci' .github/workflows/`.
 
@@ -896,9 +903,15 @@ and nobody was counting it. Enumerate by grepping for consumers, not from this l
   real submissions.
   **The score API has NO key validation.** A wrong seed or version returns
   `ok:true` with an empty board (verified 2026-07-29, read path) — indistinguishable
-  from "nobody is playing", and **no error is shown to the player**. Proving a key
-  needs a *positive* check (post a score, read it back). Suspect a key mismatch
-  before suspecting analytics.
+  from "nobody is playing", and **no error is shown to the player**. Suspect a key
+  mismatch before suspecting analytics.
+  **Prove a key by reading it out of the BUILT ARTIFACT, never by posting a score.**
+  (Corrected 2026-08-22. This line used to say "post a score, read it back", which
+  `pdoom1/docs/LEDGER_ROW_PROTOCOL_2026-08-21.md` forbids by name: a POST *"puts a
+  run on the opening board -- the exact thing being ruled out"*, and `ok:true` proves
+  nothing because every wrong key returns it too. The ledger protocol is newer and
+  governs. It also carried no scope note here, so a seat reading only this file did
+  the forbidden thing on precisely the board where it matters.)
 - **`board-liveness.yml` PUBLISHES BEFORE IT PROBES, and that order is load-bearing**
   (#293, fixed 2026-08-09). The probe reads `published-board.json`; the publisher rewrites
   it. Probe-first meant the probe always read the PREVIOUS run's answer and paired that
