@@ -404,8 +404,44 @@ check("the last L3 week keeps L3",
       wlm.ladder_version_for(datetime.fromisoformat("2026-08-06T00:00:00+10:00")), "L3")
 check("the first L4 week (Fri 2026-08-07) is L4",
       wlm.ladder_version_for(datetime.fromisoformat("2026-08-07T00:00:00+10:00")), "L4")
-check("a week opening after the fork takes the current epoch, not the boundary's",
-      wlm.ladder_version_for(datetime.fromisoformat("2026-08-14T00:00:00+10:00")),
+# CORRECTED 2026-08-23. This check read:
+#
+#     check("a week opening after the fork takes the current epoch, not the boundary's",
+#           wlm.ladder_version_for(datetime.fromisoformat("2026-08-14T00:00:00+10:00")),
+#           _declared_epoch)
+#
+# i.e. it asserted that the week of Fri 2026-08-14 resolves to THE FRONTIER. That is
+# precisely the live history-rewrite ladder_version_for()'s own docstring forbids -- a
+# week that has already run keeps the epoch it was PLAYED under, which is the entire
+# reason the epoch is half the board key. It passed from 2026-08-07 to 2026-08-21 only
+# by coincidence: the frontier happened to be L4 and the 14 Aug week is genuinely L4, so
+# the two sides agreed for reasons unrelated to what the check claimed to test. The L4 ->
+# L5 fork of 2026-08-21 broke the coincidence and the check went red asking a closed
+# epoch's week to relabel itself L5.
+#
+# This is the SAME literal-against-a-moving-value defect the comment 20 lines above
+# spends a paragraph naming -- committed a third time, in the file that names it. The
+# date was hardcoded and the comparand was made dynamic, so the assertion silently
+# changed meaning the moment a fork landed after 2026-08-14.
+#
+# Split into the two invariants that were being conflated:
+#   1. a week inside a CLOSED epoch keeps that epoch (literal is legitimate here -- a
+#      closed epoch's span is fixed history and cannot move), matching the L3 pattern
+#      three lines above;
+#   2. a week opening on the CURRENT epoch's own boundary takes the frontier, with the
+#      boundary read from the contract rather than typed, so the next fork still needs
+#      exactly one edit and a disagreement between the two files is still red.
+check("a week inside the closed L4 epoch keeps L4, not the frontier",
+      wlm.ladder_version_for(datetime.fromisoformat("2026-08-14T00:00:00+10:00")), "L4")
+
+_current_boundary = next(
+    (e.get("boundary_local") for e in (wlm.ladder_contract().get("epochs") or [])
+     if e.get("ladder_version") == _declared_epoch and e.get("boundary_local")), None)
+check("the current epoch declares its own boundary in epochs[]",
+      bool(_current_boundary), True)
+check("a week opening on the current epoch's boundary takes the frontier",
+      wlm.ladder_version_for(datetime.fromisoformat(_current_boundary or
+                                                    "1970-01-01T00:00:00+00:00")),
       _declared_epoch)
 
 # CORRECTED 2026-08-02. These three assertions used to read:
