@@ -1,6 +1,6 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-22T18:24:22.655Z UTC
+Generated: 2026-08-23T00:26:41.515Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
@@ -91,7 +91,6 @@ Generated: 2026-08-22T18:24:22.655Z UTC
 | 1025 | ritual: [Gate 2: THE FREEZE] can precede [Gate 4: PROVEN BUILD] -- Council of Elders vote before next league | documentation |  | 2026-07-29 22:25:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1025) |
 | 1024 | art: regen the endgame poster batch under the provisional rules, THEN decide which rules survive | post-launch |  | 2026-07-29 12:44:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1024) |
 | 1023 | LEAGUE-CRITICAL: game does not initialise on launch -- full UI, Phase: Not Started, no action buttons | bug, priority:critical |  | 2026-07-29 12:30:22 | [link](https://github.com/PipFoweraker/pdoom1/issues/1023) |
-| 1020 | ADR-0005 seed schedules are INERT in real play: nothing passes a schedule to GameState, so event_schedule is always empty | bug, technical-debt |  | 2026-07-29 06:04:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1020) |
 | 1018 | Philosophy Quest: progressive supersession scan over the ADR set + stricter admission rules | documentation, technical-debt, post-launch |  | 2026-07-29 05:52:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1018) |
 | 1017 | release: ship a FIRST-RUN.txt in the zip — macOS instructions currently reach nobody who has downloaded |  |  | 2026-07-29 02:34:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1017) |
 | 1016 | design(content): provenance real infrastructure failure modes into the event history as flavour text / metadata |  |  | 2026-07-29 01:40:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/1016) |
