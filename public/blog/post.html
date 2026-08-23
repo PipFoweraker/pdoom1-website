@@ -94,6 +94,21 @@
 <body>
     <div class="container">
         <div class="post-nav"><a href="/blog/">&larr; All dev-blog posts</a></div>
+        <!-- Every dev-blog post is served from THIS one file (post.html?p=...), so a
+             link Pip posts to a devlog lands here and nowhere else -- which makes it a
+             landing page, not a template detail. It has no site nav of its own, so the
+             campaign gets one line here instead.
+
+             Self-removing: `data-campaign-window` is the contract enforced by
+             assets/js/navigation.js, loaded at the end of this file for that purpose
+             alone. It logs "No header element found" here, which is correct and
+             harmless -- this page genuinely has no header, and the sweep does not need
+             one. See the CAMPAIGN_CLOSES block in that file. -->
+        <p class="post-nav" data-campaign-window style="margin-top: -0.4rem;">
+            p(Doom)1 is raising money on Manifund until 9 September 2026 &mdash;
+            <a href="https://manifund.org/projects/fund-development-of-pdoom1?utm_source=pdoom1.com&amp;utm_medium=blog-post&amp;utm_campaign=manifund-2026-09" target="_blank" rel="noopener">read the proposal</a>.
+            The game is free either way; a pledge funds the work, not access to it.
+        </p>
         <article id="post"><p class="post-error">Loading post&hellip;</p></article>
     </div>
     <!-- THE COLOPHON. One standing sentence, not per-post metadata: accountability here
@@ -282,5 +297,9 @@
             }
         })();
     </script>
+    <!-- Loaded for applyCampaignWindow(): it removes the campaign line above
+         once the Manifund campaign has closed. This page has no header, so
+         initNavigation() warns and returns without touching anything. -->
+    <script src="/assets/js/navigation.js"></script>
 </body>
 </html>
