@@ -1,6 +1,6 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-23T06:25:27.774Z UTC
+Generated: 2026-08-23T12:25:15.848Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
@@ -178,7 +178,6 @@ Generated: 2026-08-23T06:25:27.774Z UTC
 | 615 | Build lane L4 · Event taxonomy + ledger intake (ADR-0012) |  |  | 2026-07-12 08:23:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/615) |
 | 614 | Build lane L3 · Adoption, papers, conferences (ADR-0010, ADR-0014) |  |  | 2026-07-12 08:22:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/614) |
 | 613 | Build lane L2 · Effort economy: founder hours, staff lanes, managers (ADR-0011) |  |  | 2026-07-27 01:48:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/613) |
-| 608 | Architecture smell: two GameManager instances (scene-local + autoload); 'ready' prints twice | technical-debt |  | 2026-07-12 08:26:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/608) |
 | 603 | Popups: fanfare needs a dimming backdrop (events leak under it); bug-report 'thanks' Submit still clickable | bug, ui | First Contact | 2026-08-11 10:45:39 | [link](https://github.com/PipFoweraker/pdoom1/issues/603) |
 | 601 | Ledger UX: layout wrong/cramped, L-to-close, critical-due popup, distinct warning colour | bug, ux, ship:next-release |  | 2026-08-11 10:46:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/601) |
 | 600 | Dev overlays (DEV MODE + F3) can't read live game state; 29 runtime errors; nudge/advance-turn wiring | bug, ship:next-release |  | 2026-07-25 11:04:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/600) |
