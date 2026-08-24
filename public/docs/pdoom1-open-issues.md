@@ -1,9 +1,15 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-24T00:26:27.212Z UTC
+Generated: 2026-08-24T06:27:25.704Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1304 | Release Checklist: v0.14.3 | release, checklist |  | 2026-08-24 04:32:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1304) |
+| 1302 | Release Checklist: v0.14.3 | release, checklist |  | 2026-08-24 04:11:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1302) |
+| 1301 | Release ledger: a version was bumped and never tagged | release-ledger |  | 2026-08-24 04:08:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1301) |
+| 1299 | Release: pre-release-checks.yml cannot block enhanced-release.yml (independent workflows, same tag trigger) |  |  | 2026-08-24 02:04:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/1299) |
+| 1297 | guards: the five things #1265 deliberately left, with the measurements that justified leaving them |  |  | 2026-08-24 02:01:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1297) |
+| 1290 | No tag protection: pushing a release tag needs less review than merging a docs change |  |  | 2026-08-24 01:10:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/1290) |
 | 1279 | Documentation Sync has failed on 100% of PR runs since 2026-07-28, and that taught us to ignore red |  |  | 2026-08-22 11:17:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1279) |
 | 1276 | Balance key guard covers 2 files of ~213 call sites; one live silent-fallback found in upgrades.gd | technical-debt |  | 2026-08-22 07:46:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1276) |
 | 1272 | score_api.php truncates the leaderboard before checking json_encode succeeded -- one submitted name empties it |  |  | 2026-08-22 06:22:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/1272) |
