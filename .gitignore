@@ -18,3 +18,21 @@ page_audit.json
 # (weekly-league-reset.yml, weekly-deployment.yml) stage the whole tree that way.
 # Untracked is not enough on its own; ignored is.
 public/_review/
+
+# Agent worktrees created INSIDE the repo.
+#
+# On 2026-08-25 `git add -A` swept `.git-worktrees/platform-claims-render` --
+# an entire embedded git repository -- into a commit, and it reached a PR before
+# anyone noticed. Git warned about the embedded repo; the warning scrolled past
+# in a compound command and was not read.
+#
+# Two ghosts were also found still registered days after their work had merged,
+# and a separate agent measured 24 encoding-safety findings that were ALL inside
+# a stale worktree left by another agent -- a check reporting real findings about
+# files that are not part of the project.
+#
+# Worktrees belong OUTSIDE the repo (the scratchpad or D:/Local_Code/_wt). These
+# patterns exist so that when one is created here anyway, it cannot be committed.
+.git-worktrees/
+worktrees/
+*.worktree/
