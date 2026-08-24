@@ -466,6 +466,8 @@ python scripts/test-design-notes.py       # ADR scrubber + markdown subset   [en
 node    scripts/test-analytics-optout.js  # opt-out, DNT, no-injection       [content-honesty]
 node    scripts/test-navigation.js        # navigation.js ships its own CSS  [content-honesty]
 node    scripts/test-syndication-auth.js  # syndication gate fails closed    [content-honesty]
+python  scripts/check-issues-surface.py   # /issues/ numbers say what they count [content-honesty, update-game-data]
+python  scripts/test-issues-surface.py    # ...and that guard can still FAIL [content-honesty]
 python  scripts/test_ingest_scores.py     # leaderboard read path            [data-contract]
 python  scripts/validate_data.py          # data contracts                   [data-contract]
 python  scripts/check-stale-facts.py      # hardcoded facts that rot         [content-honesty ADVISORY]

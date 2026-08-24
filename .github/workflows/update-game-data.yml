@@ -106,6 +106,65 @@ jobs:
               issues_response.raise_for_status()
               issues_data = issues_response.json()
 
+              # THE TRUE TOTALS, and why the page could not have them before.
+              #
+              # /issues/ used to render `issues.length` as "<N> open issues". That is
+              # the PAGE SIZE OF THE REQUEST ABOVE -- per_page=15 -- displayed as a
+              # count of the world. On 2026-08-24 the page said "15 open issues" while
+              # the repository held 200. Wrong by more than a factor of thirteen, and it
+              # was the single sentence a visitor took away.
+              #
+              # The count cannot be derived from a 15-item sample, so it is fetched.
+              # /search/issues gives a total_count and, unlike /issues, can EXCLUDE
+              # pull requests -- which matters because /issues returns PRs too, and two
+              # of the fifteen cards on that page were PRs rendered under the heading
+              # "Known Issues".
+              #
+              # Failure here must NOT fall back to a plausible number. A None total
+              # renders as "unknown" on the page; a substituted one is the defect this
+              # whole block exists to remove.
+              def _search_total(q):
+                  try:
+                      r = requests.get(
+                          'https://api.github.com/search/issues',
+                          params={'q': q, 'per_page': 1},
+                          headers={'Accept': 'application/vnd.github.v3+json'},
+                          timeout=10)
+                      r.raise_for_status()
+                      return int(r.json().get('total_count'))
+                  except Exception as exc:
+                      print(f"::warning::could not resolve total for '{q}': {exc}. "
+                            "Writing null -- the page renders this as unknown, never as zero.")
+                      return None
+
+              total_open_issues = _search_total(
+                  'repo:PipFoweraker/pdoom1 is:issue is:open')
+              total_open_prs = _search_total(
+                  'repo:PipFoweraker/pdoom1 is:pr is:open')
+              print(f"True totals: {total_open_issues} open issues, {total_open_prs} open PRs")
+
+              # DROP PULL REQUESTS from the sample. The /issues endpoint returns both;
+              # a PR carries a "pull_request" key and an issue does not.
+              _before = len(issues_data)
+              issues_data = [i for i in issues_data if not i.get('pull_request')]
+              if _before != len(issues_data):
+                  print(f"Dropped {_before - len(issues_data)} pull request(s) from the "
+                        "issues sample -- /issues returns PRs and this page is not about them")
+
+              # DROP `body`. It is ~70 KB of other people's prose, it is served from
+              # pdoom1.com as a static file, and the page renders NONE of it. Keeping
+              # it is pure risk with no display value: the 2026-08-02 address leak and
+              # the 2026-08-13 severed-address republish both arrived inside a body.
+              # Removing it shrinks the file and the attack surface in one edit.
+              _body_bytes = sum(len(i.get('body') or '') for i in issues_data)
+              for _i in issues_data:
+                  _i.pop('body', None)
+              print(f"Dropped {_body_bytes} bytes of issue bodies -- rendered by nothing")
+
+              # Untriaged count, so the page can say so instead of defaulting every
+              # unlabelled issue to a "normal priority" icon it never earned.
+              _untriaged = sum(1 for i in issues_data if not (i.get('labels') or []))
+
               # Redact third-party email addresses BEFORE the mirror is committed.
               #
               # issues-cache.json is a VERBATIM MIRROR of other people's issue text, and
@@ -175,8 +234,27 @@ jobs:
 
               issues_cache = {
                   "issues": issues_data,
+                  # `count` is RETAINED for older readers but it is a sample size and
+                  # is now named as one everywhere it is consumed. It used to be
+                  # len(issues_data) presented as a count of open issues, which cannot
+                  # ever disagree with the array -- so it verified nothing while
+                  # reading like a total.
                   "count": len(issues_data),
-                  "last_updated": datetime.utcnow().isoformat()
+                  "sample_size": len(issues_data),
+                  "sample_requested": 15,
+                  "sample_sort": "recently updated",
+                  "total_open_issues": total_open_issues,
+                  "total_open_prs": total_open_prs,
+                  "untriaged_in_sample": _untriaged,
+                  "bodies_included": False,
+                  "last_updated": datetime.utcnow().isoformat(),
+                  "_comment": (
+                      "issues is a SAMPLE -- the `sample_requested` most recently updated "
+                      "open issues, pull requests removed. total_open_issues is the real "
+                      "count from /search/issues and may be null, which means UNKNOWN and "
+                      "must never render as zero. Bodies are deliberately absent: nothing "
+                      "renders them and they are third-party text on a public host."
+                  ),
               }
 
               # THIS FILE IS SERVED FROM pdoom1.com, and it is a verbatim dump of
@@ -219,10 +297,27 @@ jobs:
               exit(1)
           EOF
 
+      # RUN INSIDE THE PRODUCER, before the commit step, and that placement is the
+      # whole point. This job commits with the skip-CI marker, so a `push`-triggered
+      # guard NEVER sees the file it writes -- CLAUDE.md workflow trap #6, the
+      # lesson sync-events.yml paid for. A check must take at least one output from
+      # inside the system it is checking.
+      #
+      # It is also why the cache went out for months rendering a per_page value as a
+      # count of open issues: content-honesty.yml could not have caught it.
+      - name: The issues surface says what it counts
+        run: python scripts/check-issues-surface.py
+
       - name: Check for changes
         id: git-check
         run: |
-          git diff --exit-code public/data/ || echo "changes=true" >> $GITHUB_OUTPUT
+          # `git add` FIRST. `git diff` cannot see untracked files, so a run whose
+          # only output is a NEW file reports "no changes" and commits nothing while
+          # reporting success -- CLAUDE.md workflow trap #1, which sync-pdoom1-docs.yml
+          # did 4x/day for months. Three sibling workflows were converted to this
+          # shape and this one was missed.
+          git add -A public/data/
+          git diff --cached --quiet -- public/data/ || echo "changes=true" >> $GITHUB_OUTPUT
 
       - name: Commit and push if changed
         if: steps.git-check.outputs.changes == 'true'

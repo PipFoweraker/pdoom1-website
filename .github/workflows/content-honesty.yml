@@ -269,6 +269,18 @@ jobs:
       # credential cannot become an open relay. Same orphan story as above: no
       # caller since 2026-07-23. A security gate that nothing re-checks is a
       # security gate that holds only until someone edits a handler.
+      # /issues/ rendered "15 open issues" while the repository held 205 -- the page
+      # size of an API request displayed as a count of the world. Same page: the
+      # visitor's own clock shown as "last updated", an empty cache publishing
+      # "Everything is working smoothly", and 9 of 15 cards being pull requests.
+      # The forced-failure test runs FIRST: this check passes now, and a guard seen
+      # only in its passing state has not been shown to work.
+      - name: The issues surface guard can still fail (forced-failure test)
+        run: python scripts/test-issues-surface.py
+
+      - name: Every number /issues/ renders says what it counts
+        run: python scripts/check-issues-surface.py
+
       - name: Syndication endpoints are gated and fail closed
         run: node scripts/test-syndication-auth.js
 

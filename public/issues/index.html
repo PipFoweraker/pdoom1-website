@@ -463,10 +463,14 @@
 					</div>
 
 					<div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-						<div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-							<span id="issues-count">0</span> open issues -
-							Last updated: <span id="issues-timestamp">-</span>
+						<div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">
+							<span id="issues-count">an unknown number of</span> open issues on GitHub &middot;
+							cache updated <span id="issues-timestamp">unknown</span>
 						</div>
+						<!-- Filled by renderIssues(). Says the grid is a SAMPLE, so the
+						     15 cards and the real total cannot read as contradicting each
+						     other. Empty when there is nothing honest to put in it. -->
+						<div id="issues-sample-note" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;"></div>
 						<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
 							<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" rel="noopener" class="cta-button cta-button-secondary">
 								View All on GitHub
@@ -539,6 +543,11 @@
 					if (!response.ok) throw new Error(`Cache fetch error: ${response.status}`);
 
 					const cacheData = await response.json();
+					// Keep the WHOLE cache, not just the array. The page used to return
+					// `issues` alone and then render `issues.length` as a count of open
+					// issues -- so the totals, the sample labelling and the real cache
+					// timestamp were all present in the file and thrown away here.
+					this.cache = cacheData;
 					return cacheData.issues || [];
 				} catch (error) {
 					console.warn('Failed to fetch cached issues:', error);
@@ -611,6 +620,25 @@
 				return luminance > 0.5 ? '#000000' : '#ffffff';
 			}
 
+			// Cache age as words, with staleness stated rather than implied.
+			// Returns "unknown" when the stamp is missing or unparseable -- an absent
+			// timestamp is not a fresh one, and this page previously turned the second
+			// into the first by printing the visitor's own clock.
+			cacheAgeText(stamp) {
+				if (!stamp) return 'unknown — this cache carries no timestamp';
+				const when = new Date(/Z$|[+-]\d\d:?\d\d$/.test(stamp) ? stamp : stamp + 'Z');
+				if (isNaN(when)) return 'unknown — the timestamp could not be read';
+				const hours = (Date.now() - when.getTime()) / 3600000;
+				const local = when.toLocaleString();
+				if (hours < 0) return `${local} (dated in the future — treat as unknown)`;
+				if (hours < 1) return `${local} (under an hour ago)`;
+				if (hours < 24) return `${local} (${Math.round(hours)}h ago)`;
+				const days = Math.round(hours / 24);
+				// The refresh cadence is 6-hourly, so a day is already several missed
+				// runs. Say so on the page instead of leaving the reader to do the sum.
+				return `${local} (${days} day${days === 1 ? '' : 's'} ago — this may be out of date)`;
+			}
+
 			async renderIssues() {
 				const loadingEl = document.getElementById('issues-loading');
 				const errorEl = document.getElementById('issues-error');
@@ -628,19 +656,64 @@
 					loadingEl.style.display = 'none';
 					contentEl.style.display = 'block';
 
+					const c = this.cache || {};
+					const total = c.total_open_issues;
+					const haveTotal = Number.isFinite(total);
+
 					if (issues.length === 0) {
+						// This branch used to render a green tick and "No open issues!
+						// Everything is working smoothly." An empty array reaches here
+						// for THREE different reasons -- a genuinely empty tracker, a
+						// cache write that produced [], or a sample from which every
+						// item was filtered -- and only the first of those is good news.
+						// Publishing a clean bill of health for the other two is the
+						// repo's own rule broken in prose: absence of a marker is never
+						// a clean bill of health.
+						const genuinelyNone = haveTotal && total === 0;
 						gridEl.innerHTML = `
 							<div class="card" style="text-align: center; padding: 1.6rem; grid-column: 1 / -1;">
-								<div style="color: var(--success-color); margin-bottom: 1rem; font-size: 2rem;">✅</div>
-								<div style="color: var(--text-muted);">No open issues! Everything is working smoothly.</div>
+								<div style="color: var(--text-muted); margin-bottom: 1rem; font-size: 2rem;">${genuinelyNone ? '&#10003;' : '&#9432;'}</div>
+								<div style="color: var(--text-muted);">${genuinelyNone
+									? 'The tracker reports no open issues. That is the tracker&rsquo;s answer, not a claim that nothing is wrong.'
+									: 'No issues could be listed here. That is a problem with this page, not a statement about the project &mdash; the count and the list come from different places and only one of them answered.'}</div>
 							</div>
 						`;
 					} else {
 						gridEl.innerHTML = issues.map(issue => this.formatIssueCard(issue)).join('');
 					}
 
-					countEl.textContent = issues.length;
-					timestampEl.textContent = new Date().toLocaleTimeString();
+					// THE HEADLINE NUMBER. This was `issues.length` -- the page size of
+					// the API request -- rendered as a count of open issues. On
+					// 2026-08-24 it said 15 while the repository held 200.
+					//
+					// A null total means the totals fetch failed. It renders as unknown,
+					// never as the sample size, because substituting the number we do
+					// have for the number we wanted is exactly how the original defect
+					// read as correct.
+					countEl.textContent = haveTotal ? String(total) : 'an unknown number of';
+
+					// And say plainly that the grid is a sample, so the two numbers on
+					// screen cannot be read as disagreeing.
+					const sampleEl = document.getElementById('issues-sample-note');
+					if (sampleEl) {
+						const untriaged = c.untriaged_in_sample;
+						const bits = [];
+						if (issues.length > 0) {
+							bits.push(`Showing the ${issues.length} most recently updated`
+								+ (haveTotal && total > issues.length ? ` of ${total}` : '')
+								+ `, not a triaged shortlist.`);
+						}
+						if (Number.isFinite(untriaged) && untriaged > 0) {
+							bits.push(`${untriaged} of them carry no labels at all, so their priority is unknown rather than normal.`);
+						}
+						sampleEl.textContent = bits.join(' ');
+					}
+
+					// THE TIMESTAMP. This printed `new Date()` -- the moment the visitor
+					// loaded the page -- so it was guaranteed fresh and carried zero
+					// information. A cache frozen for six months still showed a current
+					// time. The real value was in the file all along.
+					timestampEl.textContent = this.cacheAgeText(c.last_updated);
 				} catch (error) {
 					loadingEl.style.display = 'none';
 					errorEl.style.display = 'block';
