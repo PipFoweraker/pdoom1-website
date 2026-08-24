@@ -1,23 +1,24 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-24T06:27:25.704Z UTC
+Generated: 2026-08-24T12:25:57.475Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1310 | In-game patch notes cite open issues as delivered, and nothing guards that file |  |  | 2026-08-24 09:07:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1310) |
+| 1309 | macOS build is missing from v0.14.3 -- broken by an .ico icon Godot cannot decode | build-missing, platform:macos |  | 2026-08-24 08:54:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1309) |
 | 1304 | Release Checklist: v0.14.3 | release, checklist |  | 2026-08-24 04:32:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1304) |
 | 1302 | Release Checklist: v0.14.3 | release, checklist |  | 2026-08-24 04:11:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1302) |
-| 1301 | Release ledger: a version was bumped and never tagged | release-ledger |  | 2026-08-24 04:08:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1301) |
+| 1301 | Release ledger: a version was bumped and never tagged | release-ledger |  | 2026-08-24 09:31:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1301) |
 | 1299 | Release: pre-release-checks.yml cannot block enhanced-release.yml (independent workflows, same tag trigger) |  |  | 2026-08-24 02:04:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/1299) |
 | 1297 | guards: the five things #1265 deliberately left, with the measurements that justified leaving them |  |  | 2026-08-24 02:01:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1297) |
 | 1290 | No tag protection: pushing a release tag needs less review than merging a docs change |  |  | 2026-08-24 01:10:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/1290) |
-| 1279 | Documentation Sync has failed on 100% of PR runs since 2026-07-28, and that taught us to ignore red |  |  | 2026-08-22 11:17:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1279) |
+| 1279 | Documentation Sync has failed on 100% of PR runs since 2026-07-28, and that taught us to ignore red |  |  | 2026-08-24 10:19:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1279) |
 | 1276 | Balance key guard covers 2 files of ~213 call sites; one live silent-fallback found in upgrades.gd | technical-debt |  | 2026-08-22 07:46:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1276) |
-| 1272 | score_api.php truncates the leaderboard before checking json_encode succeeded -- one submitted name empties it |  |  | 2026-08-22 06:22:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/1272) |
 | 1269 | RELEASING.md says ship from a release branch; four releases shipped from main and CI has no release/* handling | technical-debt |  | 2026-08-22 00:48:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1269) |
 | 1268 | AK1004: fix the four organisation-line hits, exempt the rule-stating file, teach the guard proper nouns |  |  | 2026-08-22 00:36:21 | [link](https://github.com/PipFoweraker/pdoom1/issues/1268) |
 | 1267 | The league cycle handbook Pip asked to update does not appear to exist -- name it or rule create-vs-update |  |  | 2026-08-22 00:36:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1267) |
 | 1266 | Create the PDoom release-cycle playbook + check sheet, derived mechanically, used weekly |  |  | 2026-08-22 00:36:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1266) |
-| 1265 | guards: 15 running in pre-commit and nowhere else, and wired gates with no self-test |  |  | 2026-08-22 00:36:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/1265) |
+| 1265 | guards: 15 running in pre-commit and nowhere else, and wired gates with no self-test |  |  | 2026-08-24 10:19:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1265) |
 | 1258 | P6 needs a mechanism or deletion: the worktree rule was broken by an agent on 2026-08-21 |  |  | 2026-08-21 12:19:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/1258) |
 | 1257 | D4 ruling wanted: a sixth origin value (authored_art), and splitting the Manifund claim off NON_MODEL |  |  | 2026-08-21 12:19:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1257) |
 | 1252 | Release Checklist: v0.14.2 | release, checklist |  | 2026-08-21 06:09:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1252) |
@@ -37,7 +38,6 @@ Generated: 2026-08-24T06:27:25.704Z UTC
 | 1198 | Two text-leak scanners on main with near-identical names -- and the numbers they produced are already cited as evidence |  |  | 2026-08-10 10:04:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1198) |
 | 1193 | #1137's event retiming made a simulated run ~38% more expensive -- is that the intended event density? |  |  | 2026-08-09 01:19:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1193) |
 | 1171 | Ladder eligibility must be visible BEFORE the run starts, not delivered at death (ruled by Pip 2026-08-07) |  |  | 2026-08-07 13:20:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1171) |
-| 1152 | docs: ladder epoch columns are off by one from v0.14 down in ROADMAP.md and RELEASE_NOMENCLATURE.md |  |  | 2026-08-06 07:11:29 | [link](https://github.com/PipFoweraker/pdoom1/issues/1152) |
 | 1151 | events: four measured defects in the pdoom-data ingest path (rarity boundary case, dropped-but-counted variables, inert-sink doc disagreement, constant significance) |  |  | 2026-08-06 07:11:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1151) |
 | 1150 | content: promote the real-people/real-venue content guardrail from a closing issue comment to a tracked doc |  |  | 2026-08-06 07:11:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1150) |
 | 1149 | ui(input): sweep the '_input shortcut + focused Control' double-fire shape across godot/scripts/ui |  |  | 2026-08-06 07:11:24 | [link](https://github.com/PipFoweraker/pdoom1/issues/1149) |
@@ -69,7 +69,7 @@ Generated: 2026-08-24T06:27:25.704Z UTC
 | 1085 | bug(window): minimising v0.13.2 does not minimise -- window left in a wrong state until re-maximised (first run after #1079) | bug, ux |  | 2026-08-11 10:45:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1085) |
 | 1078 | Postmortem contribution from pdoom1-website: the league opened, and the site hid it for 90 minutes |  |  | 2026-07-31 23:01:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1078) |
 | 1077 | Postmortem contribution from pdoom-data: load-bearing breakage, false greens, and asking the person |  |  | 2026-08-03 23:57:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1077) |
-| 1071 | No macOS build has ever been verified to run; the Steam framework breaks on non-mac checkouts |  |  | 2026-07-31 08:11:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1071) |
+| 1071 | No macOS build has ever been verified to run; the Steam framework breaks on non-mac checkouts |  |  | 2026-08-24 08:38:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1071) |
 | 1070 | Test suite writes REAL leaderboard files into the developer's player profile | bug |  | 2026-07-31 08:10:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/1070) |
 | 1066 | League: test seeds are visible in the public seed filter, on the GLOBAL board, and survive Clear Local Scores |  |  | 2026-07-31 07:51:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1066) |
 | 1065 | UNRESOLVED from the 10:24 playtest: "critical ladder bug, it's translated into the local thing" |  |  | 2026-07-31 06:15:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1065) |
