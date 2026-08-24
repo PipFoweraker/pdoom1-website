@@ -228,7 +228,11 @@
 			font-size: 0.7rem; color: var(--text-muted, #A79E92);
 			white-space: nowrap;
 		}
-		@media (max-width: 760px) {
+		/* 768px, NOT 760. Every page in this repo breaks at 768; the nav broke at 760,
+		   so between 761 and 768 the page was in mobile layout while the nav it carries
+		   was still in desktop layout. An 8-pixel band of disagreement is exactly the
+		   kind of defect that reproduces on one device and not another. */
+		@media (max-width: 768px) {
 			header[data-nav-injected] nav {
 				flex-direction: column; align-items: flex-start; gap: 0.5rem;
 			}
