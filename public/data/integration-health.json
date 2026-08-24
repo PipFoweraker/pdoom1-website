@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-24T06:18:03.025597+00:00",
+  "generated": "2026-08-24T09:56:24.390580+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 3.7 days ago"
+      "detail": "generated 3.8 days ago"
     },
     {
       "name": "league:current_week",
@@ -140,7 +140,7 @@
     {
       "name": "board:key",
       "status": "OK",
-      "detail": "published board key matches the current ladder epoch L5"
+      "detail": "published board key matches the current ladder epoch L6"
     },
     {
       "name": "board:exclusions",
@@ -150,12 +150,12 @@
     {
       "name": "board:status_integrity",
       "status": "OK",
-      "detail": "data_status=live-empty: current board key, no entries yet (an epoch fork or a seed roll opens a real board empty). Not presented as competitive results."
+      "detail": "data_status=live consistent with 1 entries"
     },
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 1.9h ago"
+      "detail": "live API checked 0.2h ago"
     },
     {
       "name": "board:archived_anomaly",
@@ -165,12 +165,12 @@
     {
       "name": "board:liveness",
       "status": "OK",
-      "detail": "live API checked: deployed board (weekly-2026-w33, L5) holds 0 entries and every other populated board is acknowledged -- genuinely empty, not misrouted"
+      "detail": "deployed board (weekly-2026-w35, L6) holds 1 entries"
     },
     {
       "name": "board:publish",
       "status": "OK",
-      "detail": "what we serve matches what the probe saw (0 entries on L5)"
+      "detail": "what we serve matches what the probe saw (1 entries on L6)"
     },
     {
       "name": "seed_leaderboards:parse",
