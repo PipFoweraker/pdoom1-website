@@ -503,6 +503,9 @@ python  scripts/test-publish-live-board.py # publisher refuses, never guesses [b
 python  scripts/test-board-liveness-verdicts.py # probe names an epoch disagreement, never composes a key [board-liveness]
 python  scripts/check-epoch-drift.py      # declared board key vs the published one [epoch-drift]
 python  scripts/test-epoch-drift.py       # ...and drift is red, absence is UNKNOWN  [epoch-drift]
+python  scripts/check-league-state.py     # published != open; 2 = CANNOT TELL   [data-contract]
+python  scripts/test-league-state.py      # ...and no seat can fake an opening    [data-contract]
+node    scripts/test-league-state-render.js # the page says unknown when it does not know [board-liveness]
 python  scripts/check-blessing-consistency.py # the four blessing artefacts agree [content-honesty ADVISORY]
 python  scripts/test-blessing-consistency.py  # ...and every disagreement shape is caught [content-honesty]
 python  scripts/check-token-drift.py      # token-named vars carry the token value [content-honesty ADVISORY]
@@ -886,3 +889,41 @@ and nobody was counting it. Enumerate by grepping for consumers, not from this l
   never a script literal.
 - pdoom1 PR #679 also rules that this repo is a **read-only consumer** of one PHP
   score API and must not stand up a second score store.
+- **PUBLISHED IS NOT OPEN, and they are separate fields now** (#351, 2026-08-24).
+  The board key is COMPILED INTO the build, so a shipped build posts scores to a key
+  that may never have been opened by anyone. `public/data/ladder-epochs.json` ->
+  `player_facing` answers three questions separately -- what is downloadable, which
+  league is OPEN, what is coming -- each with its own state and its own evidence;
+  `/leaderboard/` renders them via `buildLeagueStateHTML()`. **An opening must QUOTE
+  THE LEDGER**: `league_open.state: "open"` needs `opened_by`, `opened_utc` AND an
+  `opening_ledger_quote` present verbatim in `docs/LEAGUE_SEED_LEDGER.md`; the quote
+  may not itself be a refusal; and a standing `[Gate 6] ... HELD` naming that epoch
+  beats the claim until `hold_lifted_ledger_quote` records the lift. **Requiring only
+  a named opener was NOT enough, and was proven so** -- `opened_by: "Pip"` plus a
+  plausible timestamp exited 0 while the ledger said the gate was HELD (review of
+  #353, 2026-08-24). A seat inferring a blessing is #297; inferring an opening is
+  that error one gate later. **An empty board is not evidence of anything** --
+  `seed=NOTASEED-zzz9&version=L99` returns `ok:true` with no entries (measured
+  2026-08-24), so never argue open-or-not from a count. **The API answering 200 is
+  not an open league.** Runbook and the full state vocabulary:
+  `docs/LEAGUE_CYCLE_HANDBOOK.md` section 5b.
+- **Both boxes on `/leaderboard/` describe a key mismatch from ONE source**,
+  `boardMechanismHTML()`. They once said different things about the same key, one box
+  apart: *"will not appear here until this page catches up"* versus *"can never appear
+  -- not late, not ever"*. **Neither was right.** `publish-live-board.py` already
+  targets the client's epoch and already has its seed in the derived list, so "never"
+  is false; and "until this page catches up" is a promise conditional on catching up
+  before the next fork, which has failed twice this month. State the mechanism,
+  promise no timing. **An expired `player_facing.verified_utc` is RED in CI, not a
+  warning** -- the first wiring made it a green annotation forever, which is the
+  manufactured-confidence shape the guard was written to prevent.
+- **The FRONTIER and the CUT are different fields.**
+  `regularised_from.ladder_version` is the epoch the site publishes on and it moves
+  when a build carrying a fork is **published**; `regularised_from.cut_ladder_version`
+  records the latest fork cut in the game repo regardless. Moving the frontier to an
+  unshipped epoch would open weeks on a board no player can reach. It is also pinned:
+  `test-weekly-league-boundary.py` asserts the frontier equals
+  `board-probe-targets.json -> current_ladder_epoch.value`, so both move in ONE commit.
+- **`check-blessing-consistency.py` being green is NOT evidence this repo's blessing
+  record is consistent.** It compares only the CURRENT epoch and is advisory in CI,
+  so a disagreement about a closed epoch neither fails nor blocks. Do not cite it.

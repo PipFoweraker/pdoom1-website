@@ -60,6 +60,7 @@ on:
       - 'scripts/test-board-liveness-verdicts.py'
       - 'scripts/test-board-escaping.js'
       - 'scripts/test-board-honesty.js'
+      - 'scripts/test-league-state-render.js'
       - 'public/leaderboard/index.html'
       # The escaper is no longer inline on that page (2026-08-01). A change to the
       # shared file changes the board's escaping, so it must re-run these guards.
@@ -77,6 +78,7 @@ on:
       - 'scripts/test-board-liveness-verdicts.py'
       - 'scripts/test-board-escaping.js'
       - 'scripts/test-board-honesty.js'
+      - 'scripts/test-league-state-render.js'
       - 'scripts/check-board-liveness.py'
       - 'scripts/board_liveness_summary.py'
       - 'public/leaderboard/**'
@@ -130,6 +132,15 @@ jobs:
       # 27 real submissions.
       - name: A board-key mismatch cannot read as "nobody is playing"
         run: node scripts/test-board-honesty.js
+
+      # ...and separately, the page must be able to say which league is OPEN, which is
+      # a different fact from which board it publishes (#351). The failure this locks
+      # down is the page rendering an opening nobody performed, or an unblessed seed.
+      # It also pins the sharpened claim: when the published key differs in BOTH halves
+      # from the shipped client's, a run finished today can NEVER appear here -- it is
+      # not a list that catches up later, and saying so would be a false reassurance.
+      - name: The page cannot claim a league is open when nobody opened one
+        run: node scripts/test-league-state-render.js
 
       # Forced-failure tests: the publisher must refuse rather than guess, and must
       # never replace a board holding real scores with an empty one on a network blip.

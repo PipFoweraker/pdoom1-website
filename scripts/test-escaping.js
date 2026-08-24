@@ -79,6 +79,16 @@ function read(rel) {
 const GUARDED = [
   {
     page: 'public/leaderboard/index.html',
+    // NOTE, 2026-08-24 (#353 review): `epochs`/`pf` were briefly added here for
+    // buildLeagueStateHTML(), which renders /data/ladder-epochs.json. They were
+    // REMOVED again because they were decorative -- proven by mutation: drop
+    // escapeHTML() from lo.opened_by and this file still passes, because rule 3 below
+    // only matches expressions that literally name a declared root and that function
+    // aliases everything it reads (dl, lo, pubSeed, publishedKey). A guard that cannot
+    // fail is worse than no guard, because it is read as coverage.
+    // That function's escaping is guarded by scripts/test-league-state-render.js
+    // section 6, which pushes a payload through every rendered field including the
+    // open-league ones, and which DOES go red under the same mutation.
     roots: ['entry', 'data', 'e'],
     safeHelpers: ['identityHTML', 'devBadgeHTML'],
     fetches: ['/leaderboard/data/weekly/current.json', '/data/ladder-epochs.json',

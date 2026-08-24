@@ -158,6 +158,121 @@ naming the artifact that would retire the human step. Standing ask on PR #190.
 
 ---
 
+## 5b. Published is not open, and the site now says so separately
+
+Added 2026-08-24, pdoom1-website#351.
+
+`GameConfig.FEATURED_SEED_OVERRIDE` is a **compiled-in constant**, so both halves
+of the board key `(seed, ladder_epoch)` ship inside the binary. A build can
+therefore be posting scores to a board that no ceremony ever opened. Until this
+change the site had no way to say that: "what is downloadable" and "which league
+is open" were the same field, so a published-but-unopened board and an open board
+looked identical from outside.
+
+**Three questions, three answers, three pieces of evidence.** They live in
+`public/data/ladder-epochs.json` under `player_facing`, and `/leaderboard/`
+renders them with `buildLeagueStateHTML()`:
+
+| question | field | today |
+|---|---|---|
+| what is downloadable now | `downloadable_now` | v0.14.2, board `(weekly-2026-w33, L5)` |
+| which league is OPEN | `league_open` | **none-open** |
+| what is coming | `coming` | ladder epoch L6, cut in the game repo, no build carries it |
+
+**The state vocabulary is in the file itself** (`player_facing._states`), and a
+state name it does not define is a hard failure. The two that matter:
+`published-not-open` (a build posts to this key and nobody opened a league on it)
+and `open` (a named human performed [Gate 6] and it is recorded).
+
+### The rules this cannot be talked out of
+
+- **Nothing may infer an opening, and an opening must QUOTE THE LEDGER.**
+  `league_open.state: "open"` requires `opened_by`, `opened_utc`, and an
+  `opening_ledger_quote` that appears **verbatim** in
+  `docs/LEAGUE_SEED_LEDGER.md`. `/leaderboard/` will not print the word "Open"
+  without that quote either, and it shows the quote to the visitor.
+  **Why the quote and not just a named opener.** The first version of this guard
+  required only a non-empty `opened_by`, and adversarial review on 2026-08-24 walked
+  through it: `opened_by: "Pip"` with a plausible timestamp exited 0 and printed
+  *"no opening is claimed that a human did not record"*, while the ledger said
+  verbatim that [Gate 6] was HELD and the page rendered *"Open ... Opened by Pip"*.
+  It covered the fabrication no review would pass and missed the one that would.
+  Two rules follow: the quote may not itself be a refusal (quoting the sentence that
+  HOLDS the gate is not evidence the gate was lifted), and a standing
+  `[Gate 6] ... HELD` naming the same epoch beats the claim until
+  `hold_lifted_ledger_quote` records the lift as well.
+  A seat inferring a blessing is #297; inferring an *opening* is that error one gate
+  later.
+- **The page says ONE thing about a key mismatch, from one source.** Both boxes on
+  `/leaderboard/` call `boardMechanismHTML()`. They previously disagreed, adjacent,
+  about the same key: one promised a run would appear *"until this page catches
+  up"*, the other that it could *"never"* appear. **Both were wrong.**
+  `publish-live-board.py` reads its epoch from `board-probe-targets.json` and its
+  derived seed list already contains the shipped client's seed, so that key is
+  publishable by the existing 6-hourly job -- "never" is false. And "until this page
+  catches up" is an *unearned* promise: conditional on catching up before the next
+  fork, a condition that has already failed twice this month. State the mechanism,
+  promise no timing.
+- **An empty board is not evidence of anything.** The score API has no key
+  validation: `seed=NOTASEED-zzz9&version=L99` returns `ok:true` with an empty
+  entries array (measured 2026-08-24), exactly like a real board nobody has
+  played. Never argue "not open" -- or "open" -- from a count.
+- **The API answering 200 is not an open league.** Reachability is a fact about a
+  host; openness is a decision. Those two were fused in `ladder-epochs.json` until
+  2026-08-24 and the fused sentence outlived the fact it rested on.
+- **`check-blessing-consistency.py` passing proves nothing about consistency.** It
+  compares only the current epoch and is advisory in CI, so a disagreement about a
+  closed epoch neither fails nor blocks.
+- **Unknown is first-class, and an expired acceptance is RED.**
+  `player_facing.verified_utc` expires after `stale_after_days` (14 -- two league
+  weeks); past that the page renders **every** line as unknown, the mismatch warning
+  on row 4 included. Dropping that warning while keeping the bare board key was a
+  defect found in the same review: a true-looking fact with its safety notice
+  deleted reads as reassurance.
+  CI **fails** on expiry rather than warning. The first wiring turned exit 2 into a
+  green annotation, which would have gone permanently green-with-a-note from
+  2026-08-31 while the page showed Unknown -- manufactured confidence inside the
+  guard written to prevent it. Close it by re-running the commands under each
+  block's `evidence` and re-stamping; raising `stale_after_days` with a recorded
+  reason is also a legitimate close. Re-stamping without re-measuring is not.
+
+### The frontier and the cut are different fields now
+
+`regularised_from.ladder_version` is **the frontier the site publishes on**, and
+it moves when a build carrying a fork is **published** -- not when the fork is cut.
+`regularised_from.cut_ladder_version` records the latest fork cut in the game repo
+regardless. Same split, same reason, as `boundary_ladder_version` on 2026-08-13.
+
+Moving the frontier to an epoch no build ships would open weeks on a board no
+player can reach, and would make `/leaderboard/` tell a visitor their run is
+recorded on an epoch their client never posts to. It is also load-bearing:
+`test-weekly-league-boundary.py` pins the frontier equal to
+`board-probe-targets.json -> current_ladder_epoch.value`, so the two must move in
+one commit.
+
+### Operator step: opening a league on a new epoch
+
+Deliberately NOT automated, and deliberately not done by a seat.
+
+1. pdoom1 publishes a release whose `release_manifest.json` carries the new
+   `ladder_version` and `league_seed`. **Until that release exists, nothing below
+   may run** -- publishing a board for a client nobody has is the same class of
+   error as showing a board nobody's score can reach.
+2. Pip performs [Gate 5] (bless the seed) and writes the ledger row in
+   `docs/LEAGUE_SEED_LEDGER.md`, reading the value **from the release artifact**.
+3. Pip performs [Gate 6] (open the board), and the ledger row records who and when.
+4. Only then, by hand, in one commit:
+   - `public/leaderboard/data/board-probe-targets.json` -> `current_ladder_epoch.value`
+   - `public/data/ladder-epochs.json` -> `regularised_from.ladder_version`,
+     `regularised_from.seed`/`seed_status`, the `epochs[]` entry (which now gains
+     `boundary_local` and `first_build`), and `player_facing.downloadable_now` /
+     `league_open` / `coming`, re-stamping `player_facing.verified_utc`.
+5. `python scripts/publish-live-board.py` to publish the board itself.
+6. `python scripts/check-league-state.py` (expect 0) and
+   `python scripts/test-weekly-league-boundary.py` (expect all green).
+
+---
+
 ## 6. Quick reference
 
 **A board is empty on opening night.** Correct, not a fault, when the seed rolled.

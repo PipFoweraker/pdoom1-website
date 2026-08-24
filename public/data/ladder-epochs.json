@@ -14,7 +14,11 @@
   },
   "regularised_from": {
     "ladder_version": "L5",
-    "ladder_version_meaning": "THE FRONTIER -- the ladder epoch a NEW week opens on. Read by weekly-league-manager.start_new_week() to stamp meta.ladder_version and the board key, and by check-blessing-consistency.py as this file's claim about the current epoch. It MOVES at every ladder fork. It is NOT the epoch an archived week ran under: that is resolved per-week by ladder_version_for() from epochs[].boundary_local, so a restamp can never relabel a closed epoch's weeks. See boundary_ladder_version.",
+    "ladder_version_meaning": "THE FRONTIER -- the ladder epoch a NEW week opens on. Read by weekly-league-manager.start_new_week() to stamp meta.ladder_version and the board key, and by check-blessing-consistency.py as this file's claim about the current epoch. It MOVES at every ladder fork. It is NOT the epoch an archived week ran under: that is resolved per-week by ladder_version_for() from epochs[].boundary_local, so a restamp can never relabel a closed epoch's weeks. See boundary_ladder_version. AMENDED 2026-08-24 (#351): what MOVES this is a build carrying the fork being PUBLISHED, not the fork being cut in the game repo. pdoom1 cut L6 on 2026-08-23 (ladder_version.txt = 6, commit 38c5951e) and no release carries it, so setting this to L6 would open weeks on a board no player can reach and would make /leaderboard/ tell a visitor their run is recorded on L6 while their client posts to L5. The cut is recorded separately in cut_ladder_version, so the staleness is visible instead of being fixed by moving the field that drives publication.",
+    "cut_ladder_version": "L6",
+    "cut_ladder_version_meaning": "THE LATEST FORK CUT IN THE GAME REPO, published or not. Added 2026-08-24 for pdoom1-website#351. This is NOT the frontier and nothing reads it to stamp a week or pick a board: it exists so that 'the game repo has forked again' and 'players can reach the new epoch' stop being the same field. Same split, and the same reason, as boundary_ladder_version on 2026-08-13. When a release carries this value, ladder_version moves to it and the epochs[] entry gains a boundary_local and a first_build.",
+    "cut_ladder_version_published": false,
+    "cut_ladder_version_evidence": "pdoom1 origin/main, read 2026-08-24: ladder_version.txt contains '6', set by commit 38c5951e 'ladder: cut epoch L6 -- four bump declarations come due' (2026-08-23). version.txt contains '0.14.3'. `gh release list --repo PipFoweraker/pdoom1` on 2026-08-24 shows v0.14.2 (2026-08-21T06:15:10Z) as the latest release and NO v0.14.3, so no published artifact carries L6.",
     "boundary_ladder_version": "L3",
     "boundary_ladder_version_meaning": "HISTORICAL and fixed -- the ladder epoch in force at boundary_local, i.e. the epoch the regularisation cut itself was made on. Stamped into every weekly record as epoch.boundary_ladder_version; 44 archived records already carry 'L3'. This existed only implicitly until 2026-08-13, sharing the ladder_version field above, which meant moving the frontier L3 -> L4 would have silently rewritten all 44 of them.",
     "boundary_local": "2026-07-31T00:00:00+10:00",
@@ -29,7 +33,7 @@
     "seed_note": "NO BLESSED SEED ON L4 YET, and this field must stay null until there is one. It was left reading weekly-2026-w31/blessed after the L3 -> L4 fork of 2026-08-07, which is a blessing of a CLOSED board (L3 closed with (weekly-2026-w31, L3); the capture is at public/leaderboard/data/preserved/2026-08-08-l3-epoch-close/). The seed the shipped client posts to is an OBSERVATION and lives in public/leaderboard/data/published-board.json, never here: this field is the machine mirror of a row in docs/LEAGUE_SEED_LEDGER.md, and the ledger has no L4 row. pdoom1 rolled the featured seed const to weekly-2026-w33 on 2026-08-13 (pdoom1#1214, e44660c4) ready for the Fri 2026-08-14 league, and that string is deliberately NOT copied here: scripts/test-weekly-league-boundary.py pins the invariant 'a seed is present IFF the status is blessed', because unblessed-with-a-seed is a value sitting where code reads it as canonical that nobody has blessed. FILLING THIS IS PIP'S, AFTER the Gate 5 ceremony and AFTER the ledger row -- a seat inferring a blessing is pdoom1-website#297.",
     "reason_pre": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
     "reason_post": "Opened on or after the L2 -> L3 ladder fork, on a board keyed (seed, L<n>) where L<n> is this stamp's own ladder_version, by a rollover anchored to Friday 00:00 Australia/Hobart whose run-time -> week mapping is pinned by scripts/test-weekly-league-boundary.py. This sentence used to name L3 outright; it was stamped unchanged onto weeks that ran on L4.",
-    "seed_source": "Blessed by Pip at [Gate 5] on 2026-08-21 and recorded in docs/LEAGUE_SEED_LEDGER.md (L5 row). Verified FROM THE ARTIFACT: v0.14.2 release_manifest.json, \"league_seed\": \"weekly-2026-w33\", \"ladder_version\": \"5\", commit_hash 38528c22. NOTE: [Gate 6] is HELD -- api.pdoom1.com is unreachable and THE BOARD IS NOT OPEN. A blessed key is not an open board."
+    "seed_source": "Blessed by Pip at [Gate 5] on 2026-08-21 and recorded in docs/LEAGUE_SEED_LEDGER.md (L5 row). Verified FROM THE ARTIFACT: v0.14.2 release_manifest.json, \"league_seed\": \"weekly-2026-w33\", \"ladder_version\": \"5\", commit_hash 38528c22. NOTE: [Gate 6] is HELD and THE BOARD IS NOT OPEN. A blessed key is not an open board. CORRECTED 2026-08-24 (#351), whole sentence and not just its first clause. It read '[Gate 6] is HELD -- api.pdoom1.com is unreachable and THE BOARD IS NOT OPEN', which put a REASON and a DECISION in one sentence and left the decision resting on the reason. The reason is false: measured 2026-08-24T01:48Z, GET https://api.pdoom1.com/score_api.php?seed=weekly-2026-w32&version=L4&limit=3 answers 200 with real entries, and the website seat probed 208 board keys the same day with ZERO unreachable. The DECISION is unchanged and does not depend on that reason: [Gate 6] was never PERFORMED, so the board was never opened. Nothing here may lift a gate and nothing may infer that one was lifted (#297)."
   },
   "epochs": [
     {
@@ -83,9 +87,76 @@
       "blessed_utc": "2026-08-21",
       "blessed_by": "Pip",
       "seed_evidence": "Confirmed at ARTIFACT level, not from memory: the published v0.14.2 release_manifest.json carries \"ladder_version\": \"5\", \"league_seed\": \"weekly-2026-w33\" and \"commit_hash\": \"38528c22cd7b3d282dc825fa03e941d43a7c87fe\", which is the tagged commit. Cross-checked against the v0.14.2 git tag message and against godot/autoload/game_config.gd's FEATURED_SEED_OVERRIDE at that commit.",
-      "note": "Blessed at [Gate 5] on 2026-08-21. The ladder forked L4 -> L5 because pdoom1 #1233 (doom-stream routing, closing a sink of up to -6 doom/turn) and #1230 (28 new events) both change what a score means on a given seed. The SEED IS HELD, not rolled: the epoch half moved, which forks the board key on its own. [Gate 6: BOARD OPENS] is HELD by the Commissioner -- api.pdoom1.com is unreachable (ICMP, :22, :80 and :443 all TIME OUT rather than refuse, so the host is down; not a token, which would need a server to read it and say no). THE BOARD IS NOT OPEN. Gate 5 checks 1-6 and 8 passed; check 7 (a named human attesting the live board) is UNAVAILABLE and is recorded as such rather than skipped."
+      "note": "Blessed at [Gate 5] on 2026-08-21. The ladder forked L4 -> L5 because pdoom1 #1233 (doom-stream routing, closing a sink of up to -6 doom/turn) and #1230 (28 new events) both change what a score means on a given seed. The SEED IS HELD, not rolled: the epoch half moved, which forks the board key on its own. [Gate 6: BOARD OPENS] is HELD by the Commissioner and THE BOARD IS NOT OPEN. CORRECTED 2026-08-24 (#351): the reason recorded here -- 'api.pdoom1.com is unreachable (ICMP, :22, :80 and :443 all TIME OUT rather than refuse, so the host is down)' -- is false as of 2026-08-24T01:48Z. The host answers 200 on :443. The HOLD stands regardless, on its own ground: the ceremony was never performed. So (weekly-2026-w33, L5) is PUBLISHED-NOT-OPEN -- a v0.14.2 client posts to it and no league was ever opened on it. Do NOT argue that from the board being empty: the score API has no key validation and answers ok:true with an empty entries array to a key that never existed (measured 2026-08-24T01:48Z: seed=NOTASEED-zzz9&version=L99 -> ok:true, entries []). An empty read cannot tell 'nobody played' from 'the question was malformed'. Gate 5 checks 1-6 and 8 passed; check 7 (a named human attesting the live board) is UNAVAILABLE and is recorded as such rather than skipped."
+    },
+    {
+      "ladder_version": "L6",
+      "status": "cut-unpublished",
+      "seed": null,
+      "seed_status": "unblessed",
+      "published": false,
+      "reachable_by_players": false,
+      "boundary_local_note": "DELIBERATELY ABSENT. weekly-league-manager.ladder_version_for() resolves a week's epoch from epochs[].boundary_local and skips any entry without one, so an L6 boundary written today would relabel every week starting after it as L6 -- weeks played on a build that posts to L5. L6 gets a boundary when a release carries it, and not before.",
+      "seed_observed_in_game_repo": "weekly-2026-w34",
+      "seed_observed_note": "AN OBSERVATION OF A COMPILED-IN CONST, NOT A BLESSING, and deliberately not written to `seed` above -- that field is the machine mirror of a docs/LEAGUE_SEED_LEDGER.md row and the ledger has no L6 row. pdoom1 origin/main godot/autoload/game_config.gd:543 reads FEATURED_SEED_OVERRIDE = \"weekly-2026-w34\" (commit 4098f28e, 2026-08-24). /leaderboard/ must not render this string to a visitor: an unblessed seed shown as the competitive seed is the failure CLAUDE.md forbids, and the renderer only prints a seed whose seed_blessed is true.",
+      "note": "ADDED 2026-08-24 for pdoom1-website#351. The ladder forked L5 -> L6 in the game repo on 2026-08-23 (commit 38c5951e) and NO released build carries it, so no player can reach this epoch. It is recorded here because the site has to be able to say 'what is coming' without implying it is playable, and because the previous shape of this file could only express 'current' -- which is exactly the conflation #351 is about. This entry asserts nothing about a board: no board key exists for L6 until a build ships one, and a GET against a guessed L6 key would return ok:true with no entries whether or not the key is real."
     }
   ],
+  "player_facing": {
+    "_meaning": "The THREE questions the site must answer at once and separately: what is downloadable, which league is OPEN, and what is coming. Conflating the first two is pdoom1-website#351 -- before this block the site had no representation of (2) distinct from (1), so a published-but-unopened board and an open board looked identical from outside. Each block below carries its own state and its own evidence; none is derived from another. Rendered by public/leaderboard/index.html -> renderLeagueState(); invariants enforced by scripts/check-league-state.py, which scripts/test-league-state.py forces red.",
+    "_not_evidence": [
+      "AN EMPTY BOARD IS NOT EVIDENCE OF ANYTHING. The score API has no key validation: GET seed=NOTASEED-zzz9&version=L99 answers ok:true with an empty entries array (measured 2026-08-24T01:48Z), as does seed=weekly-2026-w33&version=NOTAVERSION. So 'entries: []' is equally consistent with nobody having played and with the question being malformed. Entries PRESENT on a key is a positive finding; entries absent is not a finding at all.",
+      "THE API ANSWERING 200 IS NOT AN OPEN LEAGUE. Reachability is a fact about a host. Openness is a decision by a named human at [Gate 6], recorded in docs/LEAGUE_SEED_LEDGER.md. The two were fused in this file until 2026-08-24 and the fusion outlived the fact it rested on.",
+      "check-blessing-consistency.py PASSING IS NOT EVIDENCE THIS FILE IS CONSISTENT. It compares only the CURRENT epoch and is ADVISORY in CI, so a disagreement about a closed epoch neither fails nor blocks. Do not cite it as a consistency proof."
+    ],
+    "_states": {
+      "unknown": "This site cannot establish the value. FIRST-CLASS (ruled 2026-08-23), never a fallback that ships exactly when the real lookup failed, and never rendered as a reassuring default. Any block whose verification is older than stale_after_days renders as this.",
+      "not-published": "A board key exists in the game repo and NO released build carries it. No player can reach it without building from source.",
+      "published-not-open": "A released build posts to this key, so scores CAN land on it, and no [Gate 6] board opening has been recorded. A blessed key is not an open board.",
+      "open": "A [Gate 6] opening has been recorded, naming who opened it and when. NOTHING may set this by inference -- not an entry count, not a 200 from the API, not a blessed seed, not a passing check. Only a named human's recorded act, mirrored from docs/LEAGUE_SEED_LEDGER.md. A seat inferring a blessing is pdoom1-website#297; a seat inferring an OPENING is the same error one gate later.",
+      "none-open": "No league is open. This is a POSITIVE finding about the league and not an unknown: the L5 [Gate 6] is recorded HELD, no later epoch has been published at all, and no opening has ever been recorded for L5. It is NOT derived from any board being empty.",
+      "closed": "A later ladder fork superseded this key. Preserved read-only; scores do not migrate forward."
+    },
+    "verified_utc": "2026-08-24T01:48Z",
+    "stale_after_days": 14,
+    "stale_note": "A verification date with no expiry is the class-5 shape CLAUDE.md names. Past this many days the renderer shows every block below as unknown rather than as still-true, INCLUDING the mismatch warning on the board this page is serving -- dropping that warning while keeping the bare board key was a defect found in review on 2026-08-24, because a true-looking fact with its safety notice deleted reads as reassurance. Fourteen days is two league weeks: long enough that an unrelated PR is unlikely to be the first thing to hit it, short enough that no more than two weeks of league can pass unverified. Expiry is RED, not a warning -- the first wiring of this turned exit 2 into a green annotation, which would have gone permanently green-with-a-note from 2026-08-31 while the page showed Unknown. Close it by re-running the commands under each block's `evidence` and re-stamping verified_utc; raising this number with a reason recorded here is also a legitimate close. Re-stamping WITHOUT re-measuring is not.",
+    "downloadable_now": {
+      "question": "What can a player download and play right now?",
+      "state": "published-not-open",
+      "build": "v0.14.2",
+      "released_utc": "2026-08-21T06:15:10Z",
+      "board_key": {
+        "seed": "weekly-2026-w33",
+        "ladder_version": "L5"
+      },
+      "seed_blessed": true,
+      "evidence": "Read FROM THE ARTIFACT, not from a summary: the v0.14.2 release's release_manifest.json carries \"league_seed\": \"weekly-2026-w33\", \"ladder_version\": \"5\" and \"commit_hash\": \"38528c22cd7b3d282dc825fa03e941d43a7c87fe\", the tagged commit. `gh release list --repo PipFoweraker/pdoom1` on 2026-08-24 shows v0.14.2 as the latest release. The seed is blessed in docs/LEAGUE_SEED_LEDGER.md (L5 row, 2026-08-21, Pip).",
+      "why_not_open": "[Gate 6] was never performed for L5. See league_open below and the L5 entry in epochs[]."
+    },
+    "league_open": {
+      "question": "Which league is OPEN -- a running competition that a named human started?",
+      "state": "none-open",
+      "seed": null,
+      "ladder_version": null,
+      "opened_by": null,
+      "opened_utc": null,
+      "evidence": "STRUCTURAL, not a read of the API. docs/LEAGUE_SEED_LEDGER.md's L5 row records '[Gate 6] HELD by the Commissioner ... The board is not open', and no row anywhere in that ledger records an opening for L5. L6 is not published, so it cannot be open. L4 and L3 are closed by later forks. There is therefore no epoch left that could be open. This conclusion rests on the ceremony record, NOT on any board being empty -- see _not_evidence.",
+      "since_utc": "2026-08-21T00:00:00+10:00",
+      "since_note": "The L4 -> L5 fork closed the last board that had ever been opened. No league has been open since.",
+      "how_this_becomes_open": "Pip performs [Gate 6], a row goes into docs/LEAGUE_SEED_LEDGER.md naming the seed, the epoch, who opened it and when, and that row is mirrored here by hand. No script may write this block, and no seat may fill it from an observation."
+    },
+    "coming": {
+      "question": "What has the game repo staged that no player has yet?",
+      "state": "not-published",
+      "ladder_version": "L6",
+      "seed": null,
+      "seed_blessed": false,
+      "build": null,
+      "build_note": "pdoom1 version.txt reads 0.14.3 on origin/main and there is no v0.14.3 release, so no build number here is a thing a player can download. Left null rather than filled with 'v0.14.3', which would read as a promise.",
+      "evidence": "pdoom1 origin/main read 2026-08-24: ladder_version.txt = 6 (commit 38c5951e, 2026-08-23); game_config.gd FEATURED_SEED_OVERRIDE = \"weekly-2026-w34\" (commit 4098f28e); version.txt = 0.14.3; no v0.14.3 release exists. The seed half is recorded in epochs[] L6 as seed_observed_in_game_repo and is NOT rendered to visitors, because it is an observation of a const and not a blessing.",
+      "date_note": "NO DATE IS GIVEN and none should be added. The ladder epoch is not forecastable (ruled in pdoom1, 2026-08-24) and a version-to-epoch table is a prediction wearing a table's clothes. If a horizon is ever needed here it is a comparability CEILING -- a score stays comparable until the next minor version at the latest -- not a schedule."
+    }
+  },
   "sources": [
     {
       "what": "The ladder forked 2 -> 3 mid-month on gameplay changes; the build shipping Friday is v0.13.2 on L3; board opens ~1700 AEST Fri 2026-07-31; exact board-key strings; the seed is unblessed until the ceremony.",
@@ -111,6 +182,11 @@
       "what": "The featured seed rolled to weekly-2026-w33 for the Fri 2026-08-14 league, and the ladder does NOT move with it: 14 August is the second Friday, so it is a weekly Seed and not an Epoch, and ladder_version.txt stays 4.",
       "where": "pdoom1 commit e44660c4, 'chore(league): roll the featured seed to weekly-2026-w33 (#1214)', 2026-08-13T15:52+10:00, authored by Pip",
       "authority": "AUTHORITATIVE FOR THE CONST, NOT A BLESSING -- Gate 5 (the blessing ceremony) is Friday afternoon and the ledger row is Pip's to write. The string is deliberately NOT mirrored into regularised_from.seed until then; see seed_note."
+    },
+    {
+      "what": "Measured 2026-08-24 for #351: api.pdoom1.com answers 200 and holds entries on (weekly-2026-w32, L4); (weekly-2026-w33, L5) and (weekly-2026-w34, L6) return ok:true with no entries; so do the nonsense keys (NOTASEED-zzz9, L99) and (weekly-2026-w33, NOTAVERSION). One real player's 2026-08-14 score sits orphaned on (weekly-2026-w33, L4) -- a key no shipped build ever posted to as a pair -- which is the existence proof that a key mismatch has already swallowed a real submission with no error shown anywhere.",
+      "where": "read-only GETs of https://api.pdoom1.com/score_api.php, run from the pdoom1 seat 2026-08-24T01:48Z, plus `gh release list --repo PipFoweraker/pdoom1` and pdoom1 origin/main at commit 28f8cd94",
+      "authority": "AUTHORITATIVE FOR REACHABILITY AND FOR THE PRESENT ENTRIES, AND FOR NOTHING ELSE. The empty results establish nothing: the same shape comes back from a key that never existed. Openness is not observable here at all -- it is a gate record."
     }
   ]
 }
