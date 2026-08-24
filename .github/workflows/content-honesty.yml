@@ -77,6 +77,10 @@ on:
       - 'scripts/test-analytics-optout.js'
       - 'scripts/test-changelog-render.js'
       - 'scripts/test-dashboard-devlog.js'
+      - 'scripts/test-manufactured-confidence.js'
+      # THE staleness gate, and the pages that call it. A change to either side
+      # can silently re-arm the manufactured-confidence class.
+      - 'public/assets/js/freshness.js'
       - 'scripts/test-metrics-render.js'
       # /metrics/ renders these two files and nothing else. A snapshot landing
       # without the index rebuilt is exactly the drift --check exists to catch.
@@ -137,6 +141,10 @@ on:
       - 'scripts/test-analytics-optout.js'
       - 'scripts/test-changelog-render.js'
       - 'scripts/test-dashboard-devlog.js'
+      - 'scripts/test-manufactured-confidence.js'
+      # THE staleness gate, and the pages that call it. A change to either side
+      # can silently re-arm the manufactured-confidence class.
+      - 'public/assets/js/freshness.js'
       - 'scripts/test-metrics-render.js'
       # /metrics/ renders these two files and nothing else. A snapshot landing
       # without the index rebuilt is exactly the drift --check exists to catch.
@@ -206,6 +214,16 @@ jobs:
       # forces the freshness gate, because a derived source can stop moving.
       - name: The dashboard development log derives AND is freshness-gated
         run: node scripts/test-dashboard-devlog.js
+
+      # THE SAME DEFECT CLASS, EVERYWHERE ELSE. /dashboard/ grew a freshness gate
+      # for its own box; the audit of 2026-08-24 found the class across nine more
+      # pages in four shapes: a set assembled from failed reads presented as
+      # complete, an absent field coerced to 0, an absent timestamp replaced by
+      # `new Date()`, and a figure derived correctly from a file that had stopped
+      # moving. Every case in this test FORCES the state -- it is not satisfied by
+      # a populated fixture.
+      - name: No card renders a reassuring value it did not measure
+        run: node scripts/test-manufactured-confidence.js
 
       # /metrics/ publishes the site's own traffic numbers back to its readers,
       # so every failure mode is a chance to state something false about

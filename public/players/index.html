@@ -533,6 +533,11 @@
     </div>
 
     <div id="player-content" style="display: none;">
+      <!-- Filled by displayPlayerProfile() ONLY when a week failed to load. Every
+           number below it is computed over the weeks that did load, so a hole in
+           that set has to be visible next to them -- a rank in particular is a
+           position within a set, and a set with silent gaps has no rank. -->
+      <div class="error-message" id="incomplete-note" style="display: none;"></div>
       <!-- Player Header -->
       <div class="player-header">
         <div class="player-avatar" id="player-avatar">?</div>
@@ -649,38 +654,105 @@
         return;
       }
 
+      /* ===== READ FAILURES ARE COUNTED, NOT DISCARDED ==========================
+
+         WHAT THIS USED TO DO, AND WHY IT WAS A LIE ABOUT A PERSON
+         Every one of the fetches below could fail independently, and each failure
+         turned into `null`, which the next line filtered away. A total read failure
+         -- the deploy behind, the files missing, the visitor offline -- therefore
+         produced `allWeeks = []`, `totalGames === 0`, and this sentence:
+
+             No data found for player "X". They may not have participated in
+             any weeks yet.
+
+         That is a claim about what a named person did, manufactured from zero
+         measurement. The page had not looked at a single week.
+
+         A PARTIAL failure was worse, because it looked like success: with three of
+         eight archives unreadable, `bestRank`, `weeksPlayed` and every average were
+         computed over whatever happened to load and rendered as the player's record,
+         with nothing on screen saying a week was missing. A rank is a position in a
+         set; a set with silent holes in it does not have one.
+
+         So: `weeksAttempted` and `weeksUnread` are carried out of the loader, an
+         all-failed read is a DIFFERENT sentence from an empty result, and a partial
+         read is stated on the page next to the numbers it undermines.
+      ======================================================================== */
+      let weeksAttempted = 0;
+      let weeksUnread = 0;
+
       try {
         // Load current week data
-        const currentResponse = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
-        const currentData = currentResponse.ok ? await currentResponse.json() : null;
-
-        // Load archive index
-        const indexResponse = await fetch('/leaderboard/data/weekly/archive/index.json', { cache: 'no-store' });
-        let archiveFiles = [];
-        
-        if (indexResponse.ok) {
-          const index = await indexResponse.json();
-          archiveFiles = index.archives.map(a => a.file);
+        weeksAttempted++;
+        let currentData = null;
+        try {
+          const currentResponse = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
+          if (!currentResponse.ok) { throw new Error('HTTP ' + currentResponse.status); }
+          currentData = await currentResponse.json();
+        } catch (e) {
+          weeksUnread++;
         }
-        // No fallback needed - empty array is fine
+
+        // Load archive index. An unreadable INDEX is not "no archives": it is an
+        // unknown number of archives, so the count of what could not be read is
+        // unknown too. Flagged with a sentinel rather than silently treated as zero.
+        let archiveFiles = [];
+        let indexUnread = false;
+        try {
+          const indexResponse = await fetch('/leaderboard/data/weekly/archive/index.json', { cache: 'no-store' });
+          if (!indexResponse.ok) { throw new Error('HTTP ' + indexResponse.status); }
+          const index = await indexResponse.json();
+          archiveFiles = ((index && index.archives) || []).map(a => a.file);
+        } catch (e) {
+          indexUnread = true;
+        }
 
         // Load all archive data
         const archiveData = await Promise.all(
-          archiveFiles.map(file => 
-            fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })
+          archiveFiles.map(file => {
+            weeksAttempted++;
+            return fetch(`/leaderboard/data/weekly/archive/${file}`, { cache: 'no-store' })
               .then(r => r.ok ? r.json() : null)
-              .catch(() => null)
-          )
+              .catch(() => null);
+          })
         );
+        weeksUnread += archiveData.filter(d => d === null).length;
 
         // Combine all data
         const allWeeks = [currentData, ...archiveData].filter(d => d !== null);
 
+        // NOTHING was read. This is not a fact about the player.
+        if (allWeeks.length === 0) {
+          showError(
+            'No week of league data could be read just now, so this page cannot say ' +
+            'anything about "' + playerName + '" — not that they played, and not that ' +
+            'they did not. ' +
+            (indexUnread ? 'The archive index did not load either, so even the number of ' +
+              'weeks that exist is unknown. ' : '') +
+            'Nothing is cached here; try again, or read the boards at /league/archive.html.'
+          );
+          return;
+        }
+
         // Aggregate player data
         const playerData = aggregatePlayerData(playerName, allWeeks);
+        playerData.weeksAttempted = weeksAttempted;
+        playerData.weeksUnread = weeksUnread;
+        playerData.indexUnread = indexUnread;
 
         if (playerData.totalGames === 0) {
-          showError(`No data found for player "${playerName}". They may not have participated in any weeks yet.`);
+          // Some weeks WERE read and the player is in none of them. That is a real
+          // finding -- but only over the weeks that were read, which is why the
+          // sentence names the denominator instead of implying it was all of them.
+          const complete = weeksUnread === 0 && !indexUnread;
+          showError(
+            complete
+              ? `"${playerName}" does not appear in any of the ${allWeeks.length} week(s) of league data on this site.`
+              : `"${playerName}" does not appear in the ${allWeeks.length} week(s) this page could read` +
+                (weeksUnread ? `, but ${weeksUnread} further week(s) did not load` : '') +
+                (indexUnread ? `, and the archive index did not load, so an unknown number more were never attempted` : '') +
+                `. That is an incomplete search, not a finding about this player.`
+          );
           return;
         }
 
@@ -748,6 +820,28 @@
     function displayPlayerProfile(data) {
       document.getElementById('loading').style.display = 'none';
       document.getElementById('player-content').style.display = 'block';
+
+      // An incomplete read is stated BEFORE any number derived from it. textContent,
+      // so nothing here can become markup; the only interpolated values are counts
+      // this page computed itself.
+      const note = document.getElementById('incomplete-note');
+      if (note) {
+        if (data.weeksUnread > 0 || data.indexUnread) {
+          note.textContent =
+            'Incomplete: ' +
+            (data.weeksUnread > 0
+              ? data.weeksUnread + ' of ' + data.weeksAttempted + ' week(s) of league data did not load. '
+              : '') +
+            (data.indexUnread
+              ? 'The archive index did not load, so an unknown number of past weeks were never attempted. '
+              : '') +
+            'Every figure below is computed only over the weeks that were read — ' +
+            'the ranks and totals are lower bounds, not this player’s record.';
+          note.style.display = 'block';
+        } else {
+          note.style.display = 'none';
+        }
+      }
 
       // Update header
       document.getElementById('player-name').textContent = data.playerName;

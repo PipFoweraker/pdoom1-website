@@ -166,25 +166,90 @@
     </div>
 
     <footer style="margin-top: 3rem; text-align: center; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 2rem;">
-      <p>Documentation last updated: <span id="last-updated">Loading...</span></p>
+      <p>Site data last updated: <span id="last-updated">Loading...</span></p>
       <p><a href="https://github.com/PipFoweraker/pdoom1-website">View website source</a> | 
          <a href="https://github.com/PipFoweraker/pdoom1">Main game repository</a></p>
     </footer>
   </main>
 
+  <!-- THE staleness gate (/assets/js/freshness.js). Plain blocking script, same rule
+       as escape.js: the inline renderer below calls it, so it must be defined first.
+       If it fails to load, Freshness is undefined, the renderer throws, and the stamp
+       keeps saying "Loading…" rather than showing an ungated date. Fail closed. -->
+  <script src="/assets/js/freshness.js"></script>
   <script>
-    // Load status to show last updated time
+    /* ========== STATUS STAMP: measured, or UNKNOWN. Never the visitor's clock ======
+
+       WHAT THIS USED TO DO, AND WHY IT WAS A LIE
+       This block read status.website.lastUpdated and, when that field was absent,
+       substituted `new Date().toISOString()` -- the moment the VISITOR loaded the
+       page. So the one state in which the page knew nothing about its own currency
+       was the state in which it printed the freshest possible timestamp. A file
+       frozen for a year, or a file that had lost the field entirely, both rendered
+       as "updated just now". That is the same defect /issues/ carried until
+       2026-08-24 ("This printed `new Date()` ... A cache frozen for six months still
+       showed a current time"), on a different page.
+
+       It also had two quieter halves: a non-200 left the placeholder reading
+       "Loading…" forever, and a date that WAS read was printed with no age gate at
+       all, so a stamp months old looked identical to one written this morning.
+
+       WHAT IT DOES NOW
+       The stamp renders only when Freshness.assess() says the source is current.
+       Unreadable, absent, future-dated and stale all take the SAME exit -- the value
+       is still shown, because a dated fact a reader can judge is better than
+       silence, but it is labelled with what it is and how old it is. Nothing is
+       substituted for a value that was never read.
+
+       The label changed too. It said "Documentation last updated", which named a
+       fact this page has never had: status.json's `website.lastUpdated` is the
+       SITE's own hand-typed stamp, not a measurement of when anything under /docs/
+       last changed. Printing one under the name of the other is the same class of
+       error one layer up.
+    ============================================================================= */
+
+    // POLICY, not an observation of any workflow: status.json's website block is
+    // hand-maintained, so a month is the outer edge of "someone has touched this
+    // recently". Deriving this from whatever writes the file would make the gate
+    // agree with the thing it exists to check.
+    const STATUS_MAX_AGE_HOURS = 24 * 30;
+
     (async function loadStatus(){
+      const el = document.getElementById('last-updated');
+      if (!el) { return; }
+
+      let status = null;
       try {
         const res = await fetch('../data/status.json', { cache: 'no-store' });
-        if (res.ok) {
-          const status = await res.json();
-          const lastUpdated = status.website?.lastUpdated || new Date().toISOString();
-          document.getElementById('last-updated').textContent = new Date(lastUpdated).toLocaleString();
-        }
-      } catch(e) {
-        document.getElementById('last-updated').textContent = 'Unknown';
+        if (!res.ok) { throw new Error('HTTP ' + res.status); }
+        status = await res.json();
+      } catch (e) {
+        // Could not look. Say so; do not print a time. textContent, so nothing
+        // fetched can become markup here.
+        const v = Freshness.unavailable('The site status file could not be read.');
+        el.textContent = 'unknown';
+        el.title = v.reason;
+        return;
       }
+
+      const when = (status && status.website) ? status.website.lastUpdated : null;
+      const verdict = Freshness.assess(when, STATUS_MAX_AGE_HOURS);
+
+      if (verdict.state === Freshness.UNKNOWN) {
+        // No readable stamp in the file. The old code printed NOW here.
+        el.textContent = 'unknown';
+        el.title = verdict.reason;
+        return;
+      }
+
+      // A readable date renders, and carries its own age. `.fresh` is the only key
+      // branched on, so a state added to freshness.js later cannot silently start
+      // rendering as current.
+      const stamp = new Date(when).toLocaleString();
+      el.textContent = verdict.fresh
+        ? stamp
+        : stamp + ' (' + verdict.label + ' — ' + verdict.ageText + ')';
+      el.title = verdict.fresh ? '' : verdict.reason;
     })();
   </script>
   <script src="/assets/js/navigation.js"></script>

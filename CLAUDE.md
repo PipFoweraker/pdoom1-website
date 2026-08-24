@@ -483,6 +483,61 @@ and the credential table live in `docs/SYNDICATION_QUICKSTART.md`.
   used proximity and its own forced-failure test showed a prose sentence
   elsewhere on the page satisfied it.
 
+## Manufactured confidence — the class, and the ONE gate
+Pip's ruling, 2026-08-23: **a value meaning "I could not tell" must never render as
+a value meaning "fine."** Anything reporting a count, status or coverage figure has
+to be able to emit UNKNOWN, and has to emit it when its input was unreachable,
+stale or absent.
+
+`public/assets/js/freshness.js` is the site's ONE staleness gate — sibling of
+`escape.js`, same rules: plain **blocking** `<script src>` before the inline
+renderer, so a failed load throws and the page shows nothing rather than an ungated
+value. **Do not write a second one.** `Freshness.assess(when, maxAgeHours)` returns
+a verdict; **`.fresh` is the only key a caller may branch on**, because a caller
+written against `state !== 'stale'` silently starts rendering any state added
+later. `maxAgeHours` is POLICY the caller declares — deriving it from the cron that
+writes the file makes the gate agree with the thing it is checking.
+
+**It is four shapes, and fixing one does nothing for the other three.** An audit on
+2026-08-24 found them across nine pages besides `/dashboard/` and `/monitoring/`:
+
+- **(A) Silent subset.** N independent reads, failures dropped with
+  `.filter(d => d !== null)`, survivors presented as the whole. `/players/` told a
+  visitor that a **named person** "may not have participated in any weeks yet"
+  having read **zero** weeks; `/league/archive.html` said "no league weeks have been
+  archived" when its index 404'd. A partial read was worse, because it looked like
+  success: a *rank* is a position in a set, and a set with silent holes has none.
+- **(B) Absent coerced to zero.** `field || 0`, `total ? avg : 0`, and
+  **`toNumber(field)` — whose fallback IS 0**, so the escaper's availability helper
+  manufactures a measured zero if you reach for it here. Presence must be tested
+  *before* coercion. `/leaderboard/` printed **"Average p(Doom) 0.0%"** — the best
+  possible outcome in this game — on a board with no entries.
+- **(C) Absent timestamp replaced by now.** `/docs/` did
+  `status.website?.lastUpdated || new Date().toISOString()`: the one state in which
+  it knew nothing about its own currency printed the freshest possible time. Same
+  defect `/issues/` carried until 2026-08-24.
+- **(D) Derived correctly from a source that stopped moving.** No literal, no
+  fallback, no coercion — and still wrong. This is the `/dashboard/` defect and the
+  `/monitoring/` one. `/metrics/` is the instructive case: it was already meticulous
+  about every value *inside* the snapshot (absent is an em dash, a gap is not a
+  zero, a failed section is named) and said nothing about the snapshot itself.
+
+**A gap is not a zero, on a chart either.** `/league/`'s trend chart plotted weeks
+whose files failed to load as absent and weeks with no participant count at 0 — a
+continuous participation line across weeks it had never read. Unreadable now keeps
+its slot with `null`, which Chart.js draws as a break.
+
+`scripts/test-manufactured-confidence.js` forces every one of these states — the
+functions are lifted out of the pages by name and run against a stub DOM and a stub
+fetch — and is wired BLOCKING in `content-honesty.yml`. It is organised by the four
+shapes above; add to the shape, not to the end.
+
+**Two things it deliberately does not do.** It does not test `freshness.js` itself
+(`scripts/test-freshness.js` owns that). And its handful of source-level assertions
+(`|| 0` must not return) are labelled `[source]` and are a *second* line — the lie
+is a single token whose reintroduction is invisible to any output test that happens
+to use a populated fixture.
+
 ## Design notes (ADRs)
 - `scripts/sync/sync-design-notes.py` renders the game's ADRs to
   `/design-notes/`, scrubbing internal process markers. It **refuses to write**
@@ -523,6 +578,7 @@ python  scripts/test-platform-claims.py   # ...and that guard can still FAIL [co
 node    scripts/test-download-resolution.js # download buttons resolve/degrade [content-honesty]
 node    scripts/test-changelog-render.js  # /game-changelog/ derives         [content-honesty]
 node    scripts/test-dashboard-devlog.js  # /dashboard/ derives + freshness  [content-honesty]
+node    scripts/test-manufactured-confidence.js # no card renders a value it did not measure [content-honesty]
 
 python  scripts/check-published-emails.py # no third party's address served  [content-honesty, sync-events]
 python  scripts/test-sync-events-pii.py   # ...and the sync REFUSES to write [content-honesty, sync-events]

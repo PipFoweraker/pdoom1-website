@@ -23,6 +23,11 @@
 	     PLAIN blocking script: the inline renderers below call it, so it has to be
 	     defined before they run. Not defer, not async. -->
 	<script src="/assets/js/escape.js"></script>
+	<!-- The site's ONE staleness gate (Freshness.assess / .unavailable). Same load
+	     rule as escape.js and for the same reason: the inline renderers call it, so
+	     it must be defined first, and if it fails to load they throw rather than
+	     render an ungated timestamp. Not defer, not async. -->
+	<script src="/assets/js/freshness.js"></script>
   <style>
     :root {
       /* Default theme colors */
@@ -1145,16 +1150,48 @@
       const entries = data.entries || [];
       const totalPlayers = new Set(entries.map(entry => entry.player_name)).size;
       const totalGames = entries.length;
+
+      /* ===== AN AVERAGE OF NOTHING IS NOT ZERO ==============================
+
+         These two used to end `: 0` and `: '0.0'`. On an empty board -- which is
+         the board's normal state between seasons, and its state whenever the key
+         is wrong (the score API returns ok:true with an empty board for a key
+         that has never existed) -- the page rendered:
+
+             Average Score   0
+             Average p(Doom) 0.0%
+
+         Neither was computed from anything. "0" is a measurement; "there is
+         nothing here to average" is the truth, and on the p(Doom) tile the
+         manufactured value is the *reassuring* one: 0.0% is the best possible
+         outcome in this game, printed at the moment nobody had played.
+
+         The COUNTS above them are different and stay as they are: `entries.length`
+         genuinely is zero when the array is empty, and the banner beside this
+         block (applyBoardHonesty) is what separates "nobody played" from "scores
+         landed on a board this page does not publish".
+      ==================================================================== */
+      const UNKNOWN_VALUE = '—';
+      const NO_BASIS = 'No entries on this board, so there is nothing to average. ' +
+        'That is not a score of zero.';
+
       // toNumber, not bare `+`: a string score makes `sum + entry.score` a STRING
       // concatenation, so the average silently becomes nonsense (or NaN) rather than
       // failing. The score API validates nothing, so field names promise no types.
-      const avgScore = totalGames ? Math.round(entries.reduce((sum, entry) => sum + toNumber(entry.score), 0) / totalGames) : 0;
-      const avgDoom = totalGames ? (entries.reduce((sum, entry) => sum + toNumber(entry.final_doom), 0) / totalGames).toFixed(1) : '0.0';
-      
+      const avgScore = totalGames ? Math.round(entries.reduce((sum, entry) => sum + toNumber(entry.score), 0) / totalGames) : null;
+      const avgDoom = totalGames ? (entries.reduce((sum, entry) => sum + toNumber(entry.final_doom), 0) / totalGames).toFixed(1) : null;
+
+      const setDerived = (id, text) => {
+        const el = document.getElementById(id);
+        if (!el) { return; }
+        el.textContent = text === null ? UNKNOWN_VALUE : text;
+        el.title = text === null ? NO_BASIS : '';
+      };
+
       document.getElementById('total-players').textContent = totalPlayers.toLocaleString();
       document.getElementById('total-games').textContent = totalGames.toLocaleString();
-      document.getElementById('avg-score').textContent = avgScore.toLocaleString();
-      document.getElementById('avg-pdoom').textContent = avgDoom + '%';
+      setDerived('avg-score', avgScore === null ? null : avgScore.toLocaleString());
+      setDerived('avg-pdoom', avgDoom === null ? null : avgDoom + '%');
       
       // Display seed information
       document.getElementById('current-seed').textContent = data.seed || 'Unknown';
@@ -1166,7 +1203,27 @@
       const tbody = document.getElementById('leaderboard-body');
       const lastUpdated = document.getElementById('last-updated');
       
-      lastUpdated.textContent = `Last updated: ${new Date(data.meta.generated).toLocaleString()}`;
+      // `new Date(undefined).toLocaleString()` is the string "Invalid Date", which
+      // reads as a rendering bug rather than as an unread field -- and a stamp that
+      // IS readable was printed with no age gate at all, so a board frozen for
+      // months looked exactly like one written this morning. Freshness.assess()
+      // makes unreadable, absent, future-dated and stale take the same exit, and
+      // labels the one case where a date can still be shown.
+      //
+      // POLICY: the league week is 7 days, so a board older than two weeks cannot be
+      // the current one under any cadence this site runs. Not derived from the cron
+      // that writes it -- a window derived from the writer agrees with the writer.
+      const BOARD_MAX_AGE_HOURS = 24 * 14;
+      const generated = data && data.meta ? data.meta.generated : null;
+      const freshness = Freshness.assess(generated, BOARD_MAX_AGE_HOURS);
+      if (freshness.state === Freshness.UNKNOWN) {
+        lastUpdated.textContent = 'Last updated: unknown — this board carries no readable timestamp';
+        lastUpdated.title = freshness.reason;
+      } else {
+        lastUpdated.textContent = 'Last updated: ' + new Date(generated).toLocaleString() +
+          (freshness.fresh ? '' : ' (' + freshness.label + ' — ' + freshness.ageText + ')');
+        lastUpdated.title = freshness.fresh ? '' : freshness.reason;
+      }
       
       // Store current data for player profile access
       currentDisplayData = data.entries;

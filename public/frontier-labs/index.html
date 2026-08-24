@@ -17,6 +17,8 @@
 	     so it must already exist. If this fails to load the renderer throws and the
 	     page shows nothing rather than showing unescaped roster data. Fail closed. -->
 	<script src="/assets/js/escape.js"></script>
+	<!-- THE staleness gate, same load rule and same fail-closed posture. -->
+	<script src="/assets/js/freshness.js"></script>
 	<style>
 		/* Fallbacks are the current shipped palette; the loader at the end of the
 		   page overrides each from /design/tokens.json (the upstream token channel
@@ -228,6 +230,11 @@
 					</div>
 				</div>
 				<p id="tally-fail" class="fail" hidden>Roster unavailable right now — no count is being shown rather than a remembered one.</p>
+				<!-- The roster's OWN as-of date, and this page's verdict on it. Filled by
+				     render(); the roster file carries `as_of` and this page used to throw
+				     it away, so a hand-maintained list frozen for a year published its
+				     count with nothing on screen to date it. -->
+				<p id="roster-asof" class="fail" hidden></p>
 				<p>
 					The roster count is the size of a list you can read, not a claim about how many frontier
 					labs exist in the world. Those are different statements and only the first one is ours to
@@ -515,6 +522,40 @@
 			document.getElementById('n-omissions').textContent = '≥' + omissions.length;
 			document.getElementById('n-hypothetical').textContent = hypos.length;
 
+			/* ===== A COUNT THAT DERIVES CORRECTLY CAN STILL BE OUT OF DATE =======
+
+			   These three numbers are derived from the file, not typed, which is why
+			   this page was already honest about WHAT it counts. It was silent about
+			   WHEN. The roster is hand-maintained -- no workflow writes it -- so the
+			   only thing standing between it and the /dashboard/ defect (a correctly
+			   derived number from a source that had stopped moving) is a human
+			   remembering. The file records `as_of`; this page discarded it.
+
+			   Now the date is on screen next to the count, and Freshness.assess()
+			   labels it. Unreadable, absent, future-dated and stale take the same
+			   exit -- the counts still render, because the list they count is right
+			   here to be read, but the reader is told how old the list is.
+			=================================================================== */
+			var ROSTER_MAX_AGE_HOURS = 24 * 180;   // POLICY: a hand-maintained roster
+			                                       // unexamined for six months is a
+			                                       // past state, not a current one.
+			var asOfNode = document.getElementById('roster-asof');
+			if (asOfNode) {
+				var v = Freshness.assess(d && d.as_of, ROSTER_MAX_AGE_HOURS);
+				if (v.state === Freshness.UNKNOWN) {
+					asOfNode.textContent = 'This roster carries no readable as-of date, so how ' +
+						'current these counts are is unknown — which is not the same as current.';
+					asOfNode.hidden = false;
+				} else if (!v.fresh) {
+					asOfNode.textContent = 'This roster was last reviewed ' + v.ageText +
+						' (as of ' + String(d.as_of) + '). ' + v.reason;
+					asOfNode.hidden = false;
+				} else {
+					asOfNode.textContent = '';
+					asOfNode.hidden = true;
+				}
+			}
+
 			document.getElementById('roster-grid').innerHTML =
 				labs.length
 					? labs.map(function (l) { return labCard(l, false); }).join('')
@@ -536,6 +577,8 @@
 			['n-roster', 'n-omissions', 'n-hypothetical'].forEach(function (id) {
 				document.getElementById(id).textContent = '—';
 			});
+			var asOfNode = document.getElementById('roster-asof');
+			if (asOfNode) { asOfNode.hidden = true; asOfNode.textContent = ''; }
 			var f = document.getElementById('tally-fail');
 			f.hidden = false;
 			f.textContent = msg;

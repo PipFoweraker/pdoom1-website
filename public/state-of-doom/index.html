@@ -159,7 +159,14 @@
 					+link+'</div></div>';
 			});
 			document.getElementById('rows').innerHTML=out;
-			document.getElementById('early').textContent = live.length+' live · '+pend.length+' coming online';
+			// The tally is only a measurement when there was something to count. An
+			// empty or absent `clocks` array reached here as "0 live · 0 coming
+			// online" -- a definite statement about the site's clocks, computed from
+			// a file that had told this page nothing. Callers guarantee a non-empty
+			// array; the guard stays because a future caller might not.
+			document.getElementById('early').textContent = clocks.length
+				? (live.length+' live · '+pend.length+' coming online')
+				: 'Clock list unreadable — this is not a count of zero clocks';
 			tick(); if(window._ct) clearInterval(window._ct); window._ct=setInterval(tick,1000);
 			window._live=live; window._max=maxMs;
 		}
@@ -171,10 +178,21 @@
 				if(f) f.style.width=Math.max(4, ms/window._max*100)+'%';
 			});
 		}
-		fetch('/data/clocks.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(cfg){
-			render(cfg.clocks||[]);
+		// `r.json()` alone: a 404 from shared hosting returns an HTML error page, which
+		// throws in the parser and lands in the catch -- but a 200 carrying `{}` did
+		// not, and render([]) printed "0 live · 0 coming online" under a heading that
+		// says "How this stays honest". A document with no clocks array is a document
+		// this page could not read; it takes the same exit as a failed fetch.
+		fetch('/data/clocks.json',{cache:'no-store'}).then(function(r){
+			if(!r.ok) throw new Error('HTTP '+r.status);
+			return r.json();
+		}).then(function(cfg){
+			var clocks = cfg && Array.isArray(cfg.clocks) ? cfg.clocks : null;
+			if(!clocks || clocks.length===0) throw new Error('clocks.json carries no clocks');
+			render(clocks);
 		}).catch(function(){
-			document.getElementById('rows').innerHTML='<div class="row"><div class="label" style="color:var(--ink-3)">Clocks unavailable right now.</div></div>';
+			document.getElementById('rows').innerHTML='<div class="row"><div class="label" style="color:var(--ink-3)">Clocks unavailable right now &mdash; nothing is being counted down, which is not the same as nothing to count down to.</div></div>';
+			document.getElementById('early').textContent='Clock list unreadable';
 		});
 	})();
 	</script>
