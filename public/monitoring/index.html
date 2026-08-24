@@ -1,823 +1,726 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Monitoring - p(Doom)1</title>
-    <link rel="canonical" href="https://pdoom1.com/monitoring/" />
-    <meta name="description" content="System health monitoring and deployment status for p(Doom)1 website and infrastructure." />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Instrument Panel - p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/monitoring/" />
+	<meta name="description" content="A developer surface: one indicator per source, each derived from a file some workflow actually writes, and each refusing to render when its source has stopped moving." />
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
 	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
-    <style>
-        :root {
-            --bg-primary: #12100f;
-            --bg-secondary: #1c1917;
-            --bg-tertiary: #3a3a3a;
-            --text-primary: #ffffff;
-            --text-secondary: #cfc7bb;
-            --text-muted: #a79e92;
-            --accent-primary: #f6a800;
-            --accent-secondary: #2fd4c2;
-            --accent-danger: #ff4444;
-            --accent-warning: #ffaa00;
-            --border-color: #3a342e;
-            --radius-lg: 10px;
-            --radius-md: 6px;
-        }
-        
-        body {
-            font-family: 'Courier New', monospace;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            margin: 0;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        header {
-            background: var(--bg-secondary);
-            border-bottom: 2px solid var(--accent-primary);
-            padding: 1rem;
-        }
-        
-        .back-link {
-            color: var(--accent-primary);
-            text-decoration: none;
-            font-weight: bold;
-        }
-        
-        h1 {
-            color: var(--accent-primary);
-            text-align: center;
-            margin: 2rem 0;
-            font-size: 2.5rem;
-        }
-        
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .status-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-        }
-        
-        .status-card.healthy {
-            border-left: 4px solid var(--accent-primary);
-        }
-        
-        .status-card.warning {
-            border-left: 4px solid var(--accent-warning);
-        }
-        
-        .status-card.error {
-            border-left: 4px solid var(--accent-danger);
-        }
-        
-        .status-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        
-        .status-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--text-primary);
-        }
-        
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-left: auto;
-        }
-        
-        .status-indicator.healthy { background: var(--accent-primary); }
-        .status-indicator.warning { background: var(--accent-warning); }
-        .status-indicator.error { background: var(--accent-danger); }
-        .status-indicator.unknown { background: var(--text-muted); }
-        
-        .status-details {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        
-        .metrics-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .metrics-list li {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .metrics-list li:last-child {
-            border-bottom: none;
-        }
-        
-        .metric-label {
-            color: var(--text-secondary);
-        }
-        
-        .metric-value {
-            color: var(--accent-primary);
-            font-weight: bold;
-        }
-        
-        .recent-checks {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .check-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .check-item:last-child {
-            border-bottom: none;
-        }
-        
-        .check-name {
-            color: var(--text-primary);
-        }
-        
-        .check-status {
-            padding: 0.25rem 0.75rem;
-            border-radius: var(--radius-md);
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .check-status.pass {
-            background: rgba(246, 168, 0, 0.2);
-            color: var(--accent-primary);
-            border: 1px solid var(--accent-primary);
-        }
-        
-        .check-status.fail {
-            background: rgba(255, 68, 68, 0.2);
-            color: var(--accent-danger);
-            border: 1px solid var(--accent-danger);
-        }
-        
-        .check-status.warn {
-            background: rgba(255, 170, 0, 0.2);
-            color: var(--accent-warning);
-            border: 1px solid var(--accent-warning);
-        }
-        
-        .refresh-controls {
-            text-align: center;
-            margin: 2rem 0;
-        }
-        
-        .refresh-btn {
-            background: var(--accent-primary);
-            color: var(--bg-primary);
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        
-        .refresh-btn:hover {
-            background: rgba(246, 168, 0, 0.8);
-        }
-        
-        .refresh-btn:disabled {
-            background: var(--text-muted);
-            cursor: not-allowed;
-        }
-        
-        .last-updated {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 2rem;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .status-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber). Deliberately a
-	     PLAIN blocking script: the inline renderers below call it, so it has to be
-	     defined before they run. Not defer, not async. -->
+	<style>
+		:root {
+			--bg-primary: #12100f;
+			--bg-secondary: #1c1917;
+			--bg-tertiary: #262220;
+			--text-primary: #ffffff;
+			--text-secondary: #cfc7bb;
+			--text-muted: #a79e92;
+			--accent-primary: #f6a800;
+			--accent-secondary: #2fd4c2;
+			--accent-danger: #ff4444;
+			--accent-warning: #ffaa00;
+			--border-color: #3a342e;
+			--radius-lg: 10px;
+			--radius-md: 6px;
+		}
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			margin: 0;
+			line-height: 1.6;
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+		}
+
+		.container {
+			max-width: 1100px;
+			margin: 0 auto;
+			padding: 2rem 1.5rem 4rem;
+		}
+
+		h1 {
+			color: var(--accent-primary);
+			margin: 2rem 0 0.5rem;
+			font-size: 2rem;
+		}
+
+		h2 {
+			color: var(--accent-secondary);
+			font-size: 1.15rem;
+			margin: 2.5rem 0 0.75rem;
+			border-bottom: 1px solid var(--border-color);
+			padding-bottom: 0.4rem;
+		}
+
+		p { color: var(--text-secondary); }
+		a { color: var(--accent-primary); }
+		code {
+			background: var(--bg-tertiary);
+			padding: 0.05rem 0.3rem;
+			border-radius: 3px;
+			color: var(--text-secondary);
+			font-size: 0.85em;
+		}
+
+		.lede {
+			color: var(--text-muted);
+			font-size: 0.95rem;
+			max-width: 70ch;
+		}
+
+		.audience {
+			border-left: 3px solid var(--accent-secondary);
+			background: var(--bg-secondary);
+			padding: 0.9rem 1.1rem;
+			border-radius: var(--radius-md);
+			margin: 1.5rem 0;
+			font-size: 0.9rem;
+			color: var(--text-secondary);
+			max-width: 80ch;
+		}
+
+		.legend {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+			gap: 0.75rem;
+			margin: 1rem 0 0;
+			font-size: 0.82rem;
+			color: var(--text-muted);
+		}
+		.legend div { border-left: 2px solid var(--border-color); padding-left: 0.7rem; }
+
+		.atom-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+			gap: 1.25rem;
+		}
+
+		.atom {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-left: 4px solid var(--text-muted);
+			border-radius: var(--radius-lg);
+			padding: 1.1rem 1.2rem;
+		}
+		.atom.is-current { border-left-color: var(--accent-primary); }
+		.atom.is-stale   { border-left-color: var(--accent-warning); }
+		.atom.is-unknown { border-left-color: var(--text-muted); }
+		.atom.is-nowriter { border-left-color: var(--accent-danger); }
+
+		.atom-head {
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: 0.75rem;
+		}
+		.atom-title { font-weight: bold; font-size: 1rem; color: var(--text-primary); }
+
+		.badge {
+			font-size: 0.7rem;
+			font-weight: bold;
+			letter-spacing: 0.05em;
+			padding: 0.15rem 0.55rem;
+			border-radius: var(--radius-md);
+			border: 1px solid currentColor;
+			white-space: nowrap;
+		}
+		.badge-current  { color: var(--accent-primary); }
+		.badge-stale    { color: var(--accent-warning); }
+		.badge-unknown  { color: var(--text-muted); }
+		.badge-nowriter { color: var(--accent-danger); }
+
+		.atom-derives {
+			font-size: 0.82rem;
+			color: var(--text-secondary);
+			margin: 0.5rem 0 0.6rem;
+		}
+		.atom-source {
+			font-size: 0.74rem;
+			color: var(--text-muted);
+			border-top: 1px dotted var(--border-color);
+			padding-top: 0.5rem;
+			word-break: break-word;
+		}
+		.atom-rows { list-style: none; padding: 0; margin: 0.6rem 0 0; }
+		.atom-rows li {
+			display: flex;
+			justify-content: space-between;
+			gap: 1rem;
+			padding: 0.3rem 0;
+			border-bottom: 1px solid var(--border-color);
+			font-size: 0.84rem;
+		}
+		.atom-rows li:last-child { border-bottom: none; }
+		.atom-rows .k { color: var(--text-muted); }
+		.atom-rows .v { color: var(--accent-primary); font-weight: bold; text-align: right; }
+
+		.atom-refusal {
+			margin-top: 0.6rem;
+			font-size: 0.82rem;
+			color: var(--text-secondary);
+			background: var(--bg-tertiary);
+			border-radius: var(--radius-md);
+			padding: 0.6rem 0.7rem;
+		}
+		.atom-refusal b { color: var(--accent-warning); }
+		.atom.is-nowriter .atom-refusal b { color: var(--accent-danger); }
+
+		.notes { max-width: 80ch; font-size: 0.88rem; }
+		.notes li { margin-bottom: 0.6rem; color: var(--text-secondary); }
+
+		.controls { margin: 1.5rem 0 0; }
+		.refresh-btn {
+			background: var(--accent-primary);
+			color: var(--bg-primary);
+			border: none;
+			padding: 0.6rem 1.2rem;
+			border-radius: var(--radius-md);
+			cursor: pointer;
+			font-family: inherit;
+			font-weight: bold;
+		}
+		.refresh-btn:disabled { background: var(--text-muted); cursor: not-allowed; }
+
+		.rendered-at {
+			margin-top: 1rem;
+			color: var(--text-muted);
+			font-size: 0.78rem;
+			max-width: 80ch;
+		}
+
+		@media (max-width: 700px) {
+			.atom-grid { grid-template-columns: 1fr; }
+			h1 { font-size: 1.6rem; }
+		}
+	</style>
+	<!-- The site's ONE HTML escaper (escapeHTML / safeUrl / toNumber) and the site's ONE
+	     staleness gate. Both are deliberately PLAIN blocking scripts: the inline renderer
+	     below calls them, so they have to be defined before it runs. Not defer, not async.
+	     If either fails to load the renderer throws and this page shows nothing, which is
+	     the intended failure -- an ungated number is worse than no number. -->
 	<script src="/assets/js/escape.js"></script>
+	<script src="/assets/js/freshness.js"></script>
 </head>
 <body>
-    <header>
+	<header>
 		<!-- Site navigation injected by navigation.js -->
 	</header>
-    
-    <div class="container">
-        <h1>System Monitoring</h1>
 
-        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">
-            Admin & Operations Dashboard - Infrastructure monitoring and automation status
-        </p>
+	<div class="container">
+		<h1>Instrument panel</h1>
+		<p class="lede">
+			One indicator per source. Each one is derived from a file that some workflow in
+			this repository actually writes, and each one refuses to show you a number when
+			the file behind it has stopped moving.
+		</p>
 
-        <div class="status-grid">
-            <div class="status-card" id="website-status">
-                <div class="status-header">
-                    <div class="status-title">Website Status</div>
-                    <div class="status-indicator unknown"></div>
-                </div>
-                <div class="status-details">
-                    <ul class="metrics-list">
-                        <li><span class="metric-label">Status</span><span class="metric-value" id="site-status">Checking...</span></li>
-                        <li><span class="metric-label">Response Time</span><span class="metric-value" id="response-time">--</span></li>
-                        <li><span class="metric-label">Last Check</span><span class="metric-value" id="last-check">--</span></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="status-card" id="deployment-status">
-                <div class="status-header">
-                    <div class="status-title">Deployment Status</div>
-                    <div class="status-indicator unknown"></div>
-                </div>
-                <div class="status-details">
-                    <ul class="metrics-list">
-                        <li><span class="metric-label">Last Deploy</span><span class="metric-value" id="last-deploy">--</span></li>
-                        <li><span class="metric-label">Version</span><span class="metric-value" id="current-version">--</span></li>
-                        <li><span class="metric-label">Health Score</span><span class="metric-value" id="health-score">--</span></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="status-card" id="data-status">
-                <div class="status-header">
-                    <div class="status-title">Data Freshness</div>
-                    <div class="status-indicator unknown"></div>
-                </div>
-                <div class="status-details">
-                    <ul class="metrics-list">
-                        <li><span class="metric-label">Version Data</span><span class="metric-value" id="version-age">--</span></li>
-                        <li><span class="metric-label">Game Stats</span><span class="metric-value" id="stats-age">--</span></li>
-                        <li><span class="metric-label">Next Update</span><span class="metric-value" id="next-update">--</span></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="status-card" id="github-status">
-                <div class="status-header">
-                    <div class="status-title">GitHub Integration</div>
-                    <div class="status-indicator unknown"></div>
-                </div>
-                <div class="status-details">
-                    <ul class="metrics-list">
-                        <li><span class="metric-label">API Status</span><span class="metric-value" id="github-api">--</span></li>
-                        <li><span class="metric-label">Open Issues</span><span class="metric-value" id="open-issues">--</span></li>
-                        <li><span class="metric-label">Last Release</span><span class="metric-value" id="last-release">--</span></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+		<div class="audience">
+			<b>This is a developer surface, not a status page for players.</b>
+			It is the sibling of <a href="/metabolism/">/metabolism/</a>, which maps every
+			recurring cycle this project runs. That page answers <i>what is supposed to
+			happen and how often</i>; this one answers <i>what actually landed on disk, and
+			how long ago</i>. Neither is a promise to anybody outside the repository.
+			If you are looking for whether the game is up, the honest answer lives on
+			<a href="/leaderboard/">/leaderboard/</a> and in the releases themselves.
+		</div>
 
-        <!-- Integration Health Section (data contracts + cross-repo drift) -->
-        <div class="recent-checks" style="margin-top: 3rem;">
-            <h2>🔗 Integration Health</h2>
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                Data-seam contracts (events + leaderboard) and cross-repo drift.
-                <strong>FAIL</strong> = broken, alerts; <strong>WARN</strong> = drift worth a glance, no alert.
-                Source: <code>scripts/validate_data.py</code> &rarr; <code>/data/integration-health.json</code>.
-            </p>
-            <div id="integration-health">
-                Loading integration health...
-            </div>
-        </div>
+		<h2>How to read this page</h2>
+		<p class="lede" style="margin-bottom:0.5rem;">
+			There is deliberately <b>no overall health score</b>. A single percentage over
+			eight unrelated sources reads 100% while three of them are dead, which is what
+			this page used to do. Every box below stands or falls on its own; re-aggregating
+			is a decision for later, once each atom is individually trustworthy.
+		</p>
+		<div class="legend">
+			<div><b style="color:var(--accent-primary);">CURRENT</b> &mdash; the source was
+				written inside this page's declared window, so its contents are shown.</div>
+			<div><b style="color:var(--accent-warning);">STALE</b> &mdash; the source is
+				real and readable and too old. No value is shown, only its age.</div>
+			<div><b style="color:var(--text-muted);">UNKNOWN</b> &mdash; the source could
+				not be read, or carries no timestamp. Unknown is not the same as fine.</div>
+			<div><b style="color:var(--accent-danger);">NO WRITER</b> &mdash; nothing
+				scheduled writes this file at all, so no age of it can mean anything.</div>
+		</div>
 
-        <!-- Automation Status Section -->
-        <div class="recent-checks" style="margin-top: 3rem;">
-            <h2>🤖 Automation Status</h2>
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                GitHub Actions automated tasks - scheduled jobs running infrastructure updates
-            </p>
-            <div id="automation-status">
-                Loading automation status...
-            </div>
-        </div>
+		<h2>Indicators</h2>
+		<div class="atom-grid" id="atoms">
+			<div class="atom is-unknown">
+				<div class="atom-head">
+					<span class="atom-title">Reading sources</span>
+					<span class="badge badge-unknown">PENDING</span>
+				</div>
+				<div class="atom-derives">
+					Nothing has been read yet. If this box is still here, the page's scripts
+					did not run.
+				</div>
+			</div>
+		</div>
 
-        <!-- Weekly League Management Section -->
-        <div class="recent-checks">
-            <h2>🏆 Weekly League Management</h2>
-            <div id="league-status">
-                Loading league status...
-            </div>
-            <div style="text-align: center; margin-top: 1rem;">
-                <button class="refresh-btn" onclick="triggerLeagueRollover()" id="league-rollover-btn">
-                    Manually Trigger League Rollover
-                </button>
-            </div>
-        </div>
+		<div class="controls">
+			<button class="refresh-btn" id="refresh-btn" type="button">Re-read every source</button>
+		</div>
+		<div class="rendered-at" id="rendered-at">
+			This page has not finished rendering.
+		</div>
 
-        <div class="recent-checks">
-            <h2>Recent Health Checks</h2>
-            <div id="recent-checks-list">
-                Loading health check history...
-            </div>
-        </div>
-        
-        <div class="refresh-controls">
-            <button class="refresh-btn" id="refresh-btn" onclick="refreshData()">
-                Refresh All Data
-            </button>
-        </div>
-        
-        <div class="last-updated" id="last-updated">
-            Last updated: Loading...
-        </div>
-    </div>
-    
-    <script>
-        let refreshing = false;
-        
-        async function loadHealthData() {
-            try {
-                const response = await fetch('/data/health-check.json', { cache: 'no-store' });
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.warn('Could not load health data:', error);
-                return null;
-            }
-        }
-        
-        async function loadVersionData() {
-            try {
-                const response = await fetch('/data/version.json', { cache: 'no-store' });
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.warn('Could not load version data:', error);
-                return null;
-            }
-        }
-        
-        async function loadDeploymentData() {
-            try {
-                const response = await fetch('/data/deployment-verification.json', { cache: 'no-store' });
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.warn('Could not load deployment data:', error);
-                return null;
-            }
-        }
-        
-        function updateStatusCard(cardId, status, details = {}) {
-            const card = document.getElementById(cardId);
-            const indicator = card.querySelector('.status-indicator');
-            
-            // Update indicator
-            indicator.className = `status-indicator ${status}`;
-            
-            // Update card styling
-            card.className = `status-card ${status}`;
-            
-            // Update details if provided
-            Object.entries(details).forEach(([key, value]) => {
-                const element = document.getElementById(key);
-                if (element) {
-                    element.textContent = value;
-                }
-            });
-        }
-        
-        function formatTimestamp(timestamp) {
-            if (!timestamp) return '--';
-            return new Date(timestamp).toLocaleString();
-        }
-        
-        function formatAge(timestamp) {
-            if (!timestamp) return '--';
-            const age = (new Date() - new Date(timestamp)) / 1000 / 60; // minutes
-            if (age < 60) return `${Math.floor(age)}m ago`;
-            if (age < 1440) return `${Math.floor(age / 60)}h ago`;
-            return `${Math.floor(age / 1440)}d ago`;
-        }
+		<h2>Other developer surfaces</h2>
+		<p class="lede" style="margin-bottom:0.75rem;">
+			MEASURED 2026-08-25, by grepping every deployed page and script for each path:
+			the four pages below are live, are rebuilt by tooling, and are in
+			<b>no navigation menu at all</b>. Before this list existed, <code>/metabolism/</code>
+			had exactly one inbound link on the whole deployed site &mdash; this page &mdash;
+			and <code>/design-questions/</code> and <code>/dev-notes/</code> had none.
+			(The internal <code>/_review/</code> pages link some of them, but that directory is
+			in <code>deploy-excludes.txt</code> and never ships, so it cannot be an entry point.)
+			This page is not in the navigation either; it is reached from
+			<a href="/about/">/about/</a>.
+		</p>
+		<ul class="notes" id="developer-surfaces">
+			<li>
+				<a href="/metabolism/">/metabolism/</a> &mdash; every recurring cycle this project
+				runs, derived at build time from the <code>cron:</code> lines and config files that
+				actually run them, each rendered with the <code>file:line</code> it was read from.
+				The reference for what an honest developer surface looks like here, and the page
+				this one is a sibling of: it answers what is <i>supposed</i> to happen; this one
+				answers what <i>landed</i>.
+			</li>
+			<li>
+				<a href="/design-notes/">/design-notes/</a> &mdash; the game's architecture decision
+				records, mirrored from the game repository and scrubbed of internal process markers
+				by a sync that refuses to write a page still carrying one.
+			</li>
+			<li>
+				<a href="/design-questions/">/design-questions/</a> &mdash; the open design questions,
+				mirrored from the game repository with their caveats intact rather than summarised away.
+			</li>
+			<li>
+				<a href="/dev-notes/">/dev-notes/</a> &mdash; development notes rendered from markdown.
+			</li>
+		</ul>
 
-        // Spelled-out age, for places where a reader needs to judge whether what
-        // they are looking at is current health or a historical snapshot.
-        function formatAgeLong(timestamp) {
-            if (!timestamp) return 'age unknown';
-            const ms = new Date() - new Date(timestamp);
-            if (!isFinite(ms) || isNaN(ms)) return 'age unknown';
-            const ago = (n, unit) => `${n} ${unit}${n === 1 ? '' : 's'} ago`;
-            const mins = ms / 60000;
-            if (mins < 60) return ago(Math.max(0, Math.floor(mins)), 'minute');
-            if (mins < 1440) return ago(Math.floor(mins / 60), 'hour');
-            const days = Math.floor(mins / 1440);
-            if (days < 60) return ago(days, 'day');
-            return ago(Math.floor(days / 30), 'month');
-        }
+		<h2>What this page cannot tell you</h2>
+		<ul class="notes">
+			<li>
+				<b>A fresh file is not a working system.</b> Every box above measures when a
+				file was last written, and then what that file says about itself. A workflow
+				that runs on time and writes a confidently wrong answer looks identical to one
+				that is right.
+			</li>
+			<li>
+				<b>The automation ledger is the acting party's self-report.</b> Each job writes
+				its own "I ran, and it went well" line at the end of its own run. A job that
+				dies before reaching that step logs nothing at all, so an absent entry and a
+				job that was never scheduled are the same bytes. A check should take its
+				observation from inside the system under test, never from the actor's report
+				that it acted; this one cannot.
+			</li>
+			<li>
+				<b>A parked workflow and a broken one look the same from here.</b> When a
+				schedule is deliberately removed, the file it wrote correctly stops moving and
+				this page correctly calls it stale. That is the right verdict and the wrong
+				explanation. The reason always lives in the header comment of the workflow in
+				<code>.github/workflows/</code>, and there is no way to read it from a browser.
+			</li>
+			<li>
+				<b>These files are what was last <i>deployed</i>, not what is in the repository.</b>
+				Everything above is fetched from this site, so a commit that has not been
+				rsynced yet is invisible here, and a file excluded from the deploy is invisible
+				forever.
+			</li>
+			<li>
+				<b>The clock at the bottom is your browser's.</b> Every age on this page is
+				computed against it. A wrong local clock makes every box wrong in the same
+				direction, which is precisely the failure that is hardest to notice.
+			</li>
+		</ul>
 
-        // health-checks.yml is scheduled every 6 hours. Anything older than four
-        // missed runs is reported as stale rather than presented as live health.
-        const HEALTH_STALE_AFTER_HOURS = 24;
+		<h2>What was removed, and why</h2>
+		<ul class="notes">
+			<li>
+				<b>The Health Score percentage.</b> It divided one file's passed-checks by its
+				total-checks and presented the result as the health of the site. Its source had
+				not been written in weeks, so it read a steady green 100%.
+			</li>
+			<li>
+				<b>The "Website Status: Online" card.</b> It fetched this site from the browser
+				that had already loaded this page. If the site were down you would not be
+				reading the card, so it could only ever say Online. A self-fetch measures
+				nothing.
+			</li>
+			<li>
+				<b>The "GitHub Integration: Connected" card.</b> It reported "Connected" whenever
+				a committed JSON file on this site contained a <code>repository_stats</code> key.
+				That is a statement about a file in this repository, not about GitHub. Whether
+				the data derived from GitHub is current is now the Release data box, which says
+				so honestly.
+			</li>
+			<li>
+				<b>The "Manually Trigger League Rollover" button.</b> It ran no rollover. It
+				opened a confirm dialog and then an alert telling the reader to go and use
+				GitHub Actions. A control that does not do the thing written on it is a lie
+				with a cursor.
+			</li>
+			<li>
+				<b>The weekly-league box.</b> Its numbers duplicate <a href="/leaderboard/">/leaderboard/</a>,
+				which owns them. Whether the rollover job is still logging runs is a genuine
+				developer signal and is kept, in the automation ledger box.
+			</li>
+		</ul>
+	</div>
 
-        // data-contract-validation.yml is scheduled daily (06:00 UTC). Two missed
-        // runs -> report the snapshot as stale. This matters more than it looks:
-        // the workflow commits integration-health.json as a BOT, and bot commits do
-        // not trigger the deploy, so the copy this page fetches only refreshes on
-        // the next human push. A frozen "OK" would otherwise read as live green.
-        const INTEGRATION_STALE_AFTER_HOURS = 48;
-        
-        async function updateWebsiteStatus() {
-            try {
-                const start = Date.now();
-                const response = await fetch(window.location.origin, { cache: 'no-store' });
-                const responseTime = Date.now() - start;
-                
-                if (response.ok) {
-                    updateStatusCard('website-status', 'healthy', {
-                        'site-status': 'Online',
-                        'response-time': `${responseTime}ms`,
-                        'last-check': 'Just now'
-                    });
-                } else {
-                    updateStatusCard('website-status', 'error', {
-                        'site-status': `Error ${response.status}`,
-                        'response-time': `${responseTime}ms`,
-                        'last-check': 'Just now'
-                    });
-                }
-            } catch (error) {
-                updateStatusCard('website-status', 'error', {
-                    'site-status': 'Offline',
-                    'response-time': 'Timeout',
-                    'last-check': 'Just now'
-                });
-            }
-        }
-        
-        async function updateDeploymentStatus() {
-            const deploymentData = await loadDeploymentData();
-            const versionData = await loadVersionData();
-            
-            if (deploymentData && versionData) {
-                const status = deploymentData.deployment_approved ? 'healthy' : 'error';
-                const healthScore = deploymentData.total_checks > 0 
-                    ? Math.round((deploymentData.passed / deploymentData.total_checks) * 100)
-                    : 0;
-                
-                updateStatusCard('deployment-status', status, {
-                    'last-deploy': formatAge(deploymentData.timestamp),
-                    'current-version': versionData.latest_release?.version || '--',
-                    'health-score': `${healthScore}%`
-                });
-            } else {
-                updateStatusCard('deployment-status', 'warning', {
-                    'last-deploy': 'Unknown',
-                    'current-version': '--',
-                    'health-score': '--'
-                });
-            }
-        }
-        
-        async function updateDataStatus() {
-            const versionData = await loadVersionData();
-            
-            if (versionData) {
-                const versionAge = formatAge(versionData.last_updated);
-                const statsAge = formatAge(versionData.game_stats?.last_calculated);
-                
-                // Determine status based on data age
-                const ageHours = (new Date() - new Date(versionData.last_updated)) / 1000 / 60 / 60;
-                const status = ageHours > 24 ? 'warning' : 'healthy';
-                
-                updateStatusCard('data-status', status, {
-                    'version-age': versionAge,
-                    'stats-age': statsAge || versionAge,
-                    'next-update': 'Within 6h'
-                });
-            } else {
-                updateStatusCard('data-status', 'error', {
-                    'version-age': 'No data',
-                    'stats-age': 'No data',
-                    'next-update': '--'
-                });
-            }
-        }
-        
-        async function updateGitHubStatus() {
-            const versionData = await loadVersionData();
-            
-            if (versionData && versionData.repository_stats) {
-                const stats = versionData.repository_stats;
-                const releaseAge = formatAge(versionData.latest_release?.published_at);
-                
-                updateStatusCard('github-status', 'healthy', {
-                    'github-api': 'Connected',
-                    'open-issues': stats.open_issues || '--',
-                    'last-release': releaseAge
-                });
-            } else {
-                updateStatusCard('github-status', 'error', {
-                    'github-api': 'Disconnected',
-                    'open-issues': '--',
-                    'last-release': '--'
-                });
-            }
-        }
-        
-        async function updateRecentChecks() {
-            const healthData = await loadHealthData();
-            const container = document.getElementById('recent-checks-list');
+	<script>
+/* ===== ATOMS: the indicators, one source each, each freshness-gated ==========
+   WHAT WENT WRONG (page created 2025-09-30, rewritten 2026-08-25)
+   ---------------------------------------------------------------
+   This page predated every honesty rule this project now runs on. It carried eight
+   status cards and one aggregate "Health Score" percentage. The deployment card
+   rendered a green "healthy / 100%" out of /data/deployment-verification.json --
+   a file whose only two writers are workflow_dispatch-only, so nothing has ever
+   refreshed it on a schedule and nothing ever will. The card was live and wrong,
+   and the aggregate percentage it fed was green the whole time.
 
-            if (healthData && healthData.results) {
-                const recentChecks = healthData.results.slice(-10).reverse();
+   THE SHAPE OF THE REWRITE
+   ------------------------
+    1. ATOMS, NOT AN AGGREGATE. Each entry below names exactly one source file and
+       what can be derived from it. Nothing here combines two sources into a third
+       number. A percentage over unrelated sources can read 100% while several of
+       them are dead, and cannot be checked by looking at it.
+    2. EVERY ATOM IS FRESHNESS-GATED, through the shared gate in
+       /assets/js/freshness.js. If the source is stale, unreadable, undated or
+       dated in the future, the box renders its AGE and its REASON and no value at
+       all. There is deliberately no remembered value to fall back to: a fallback
+       ships exactly when the real lookup failed, i.e. when nobody can notice it is
+       wrong.
+    3. THE WINDOWS ARE POLICY, NOT OBSERVATION. maxAgeHours below is a choice made
+       here about how old this page is willing to call current. It is deliberately
+       NOT derived from the cron that writes the file -- a gate derived from the
+       thing it is checking always agrees with it. /metabolism/ is the page that
+       derives real cadences, at build time, from the workflows themselves.
+    4. A SOURCE WITH NO WRITER IS NAMED, NOT DELETED. `noWriter` marks a file that
+       nothing schedules. Its box stays, shows how long ago a human last wrote it,
+       and says why no age of it can be a health signal.
 
-                // Never present a snapshot as current health without saying when it
-                // was taken -- this file is a committed artefact, not a live probe.
-                const ts = healthData.last_check;
-                const ageHours = ts ? (new Date() - new Date(ts)) / 3600000 : Infinity;
-                const stale = !(ageHours < HEALTH_STALE_AFTER_HOURS);
-                const when = ts ? new Date(ts).toLocaleString() : 'unknown';
-                let noteText = '';
-                if (!ts) {
-                    noteText = 'This snapshot carries no timestamp, so its age cannot be verified. Treat it as unknown rather than current.';
-                } else if (stale) {
-                    noteText = 'Scheduled health checks run every 6 hours. These results are older than that, so they describe a past state and not the current health of the site.';
-                }
-                const note = noteText
-                    ? `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">${noteText}</div>`
-                    : '';
+   Everything interpolated below is escaped with the site's one escaper. These files
+   are committed artefacts, but they are WRITTEN BY MACHINES out of whatever the
+   world handed them -- health-check.json once captured a raw Python traceback, and
+   board-liveness.json is built from an unauthenticated score API that validates
+   nothing. "Repo-controlled" is about who can commit, not about what the bytes are.
 
-                // Every ${} below that carries a value out of a JSON file goes through
-                // escapeHTML. These files are committed artefacts, but they are WRITTEN BY
-                // MACHINES from whatever the world handed them -- health-check.json once
-                // captured a raw Python traceback, and the weekly files are built from the
-                // unauthenticated score API. "Repo-controlled" is about who can commit,
-                // not about what the bytes are.
-                const banner = `
-                    <div class="check-item">
-                        <div>
-                            <div class="check-name">Last checked: ${escapeHTML(when)} (${escapeHTML(formatAgeLong(ts))})</div>
-                            ${note}
-                        </div>
-                        <span class="check-status ${stale ? 'warn' : 'pass'}">${stale ? 'STALE' : 'CURRENT'}</span>
-                    </div>
-                `;
+   Locked down by scripts/test-monitoring-atoms.js (this page) and
+   scripts/test-freshness.js (the shared gate). Both force the failing states.
+============================================================================= */
 
-                container.innerHTML = banner + recentChecks.map(check => {
-                    const statusClass = check.passed ? 'pass' : (check.is_warning ? 'warn' : 'fail');
-                    const statusText = check.passed ? 'PASS' : (check.is_warning ? 'WARN' : 'FAIL');
+// POLICY. Two windows, both stated as multiples of missed runs rather than as a
+// claim about any particular schedule -- see note 3 above.
+const WINDOW_FREQUENT_SOURCE = 24;  // hours: about four missed runs of a ~6-hourly writer
+const WINDOW_DAILY_SOURCE = 48;     // hours: two missed runs of a ~daily writer
 
-                    return `
-                        <div class="check-item"${stale ? ' style="opacity: 0.6;"' : ''}>
-                            <span class="check-name">${escapeHTML(check.test)}</span>
-                            <span class="check-status ${statusClass}">${statusText}</span>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                container.innerHTML = `
-                    <div class="check-item">
-                        <span class="check-name">No health check data available</span>
-                        <span class="check-status warn">NO DATA</span>
-                    </div>
-                `;
-            }
-        }
+// A "yes/no/unrecorded" field must never collapse into "no" when it is absent.
+function triState(value, yes, no) {
+	if (value === true) { return yes; }
+	if (value === false) { return no; }
+	return 'unrecorded';
+}
 
-        async function loadAutomationStatus() {
-            try {
-                const response = await fetch('/monitoring/data/automation-status.json', { cache: 'no-store' });
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.warn('Could not load automation status:', error);
-                return null;
-            }
-        }
+const ATOMS = [
+	{
+		id: 'health-checks',
+		title: 'Repository health checks',
+		url: '/data/health-check.json',
+		maxAgeHours: WINDOW_FREQUENT_SOURCE,
+		derives: 'File presence, JSON validity and script compilation across the repo, ' +
+			'as recorded by scripts/health-check.py.',
+		stampedAt: function (doc) { return doc.last_check; },
+		rows: function (doc) {
+			const failing = (doc.results || [])
+				.filter(function (check) { return check && check.passed === false; })
+				.map(function (check) { return String(check.test); });
+			return [
+				{ label: 'Checks passed', value: toNumber(doc.passed) + ' of ' + toNumber(doc.total_tests) },
+				{ label: 'Failing', value: failing.length ? failing.join(', ') : 'none recorded' }
+			];
+		}
+	},
+	{
+		id: 'data-contracts',
+		title: 'Data-seam contracts',
+		url: '/data/integration-health.json',
+		maxAgeHours: WINDOW_DAILY_SOURCE,
+		derives: 'Schema and drift checks across the events and leaderboard seams, as ' +
+			'recorded by scripts/validate_data.py. FAIL breaks CI and alerts; WARN does not.',
+		stampedAt: function (doc) { return doc.generated; },
+		rows: function (doc) {
+			const summary = doc.summary || {};
+			const notOk = (doc.checks || [])
+				.filter(function (check) { return check && check.status && check.status !== 'OK'; })
+				.map(function (check) { return String(check.status) + ' ' + String(check.name); });
+			return [
+				{ label: 'Overall', value: String(doc.overall_status || 'unrecorded') },
+				{ label: 'fail / warn / ok', value: toNumber(summary.fail) + ' / ' + toNumber(summary.warn) + ' / ' + toNumber(summary.ok) },
+				{ label: 'Not OK', value: notOk.length ? notOk.join(', ') : 'none recorded' }
+			];
+		}
+	},
+	{
+		id: 'release-data',
+		title: 'Release data',
+		url: '/data/version.json',
+		maxAgeHours: WINDOW_FREQUENT_SOURCE,
+		derives: 'The release this site advertises, derived by scripts/update-version-info.py ' +
+			'from the published GitHub release and its actual attached assets.',
+		stampedAt: function (doc) { return doc.last_updated; },
+		rows: function (doc) {
+			const release = doc.latest_release || {};
+			const platforms = release.platforms;
+			const shipped = platforms && typeof platforms === 'object'
+				? Object.keys(platforms).filter(function (key) { return platforms[key] === true; })
+				: null;
+			return [
+				{ label: 'Advertised release', value: String(release.version || 'unrecorded') },
+				{ label: 'Published', value: String(release.published_at || 'unrecorded') },
+				// An absent platforms block means UNRECORDED, never "nothing shipped".
+				{ label: 'Platforms with a build', value: shipped === null ? 'unrecorded' : (shipped.length ? shipped.join(', ') : 'none') }
+			];
+		}
+	},
+	{
+		id: 'board-liveness',
+		title: 'Score API board liveness',
+		url: '/leaderboard/data/board-liveness.json',
+		maxAgeHours: WINDOW_FREQUENT_SOURCE,
+		derives: 'A read-only probe of the live score API by scripts/check-board-liveness.py. ' +
+			'The board key is (seed, ladder epoch); the build version is not part of it.',
+		stampedAt: function (doc) { return doc.checked_at; },
+		rows: function (doc) {
+			const key = doc.board_key || {};
+			const board = doc.deployed_board || {};
+			return [
+				{ label: 'Verdict', value: String(doc.verdict || 'unrecorded') },
+				{ label: 'Board key', value: String(key.seed || 'unrecorded') + ' / ' + String(key.ladder_epoch || 'unrecorded') },
+				// epochs_agree is deliberately three-valued: null means one of the two
+				// epochs is absent, which is "cannot tell", not "they disagree".
+				{ label: 'Published epoch matches current', value: triState(key.epochs_agree, 'yes', 'NO -- publication is superseded') },
+				{ label: 'Entries on that board', value: String(toNumber(board.entries)) },
+				{ label: 'Consecutive cannot-tell runs', value: String(toNumber(doc.unknown_streak)) + ' of ' + String(toNumber(doc.escalate_threshold)) }
+			];
+		}
+	},
+	{
+		id: 'analytics-backup',
+		title: 'Analytics backup to git',
+		url: '/data/analytics/latest.json',
+		maxAgeHours: WINDOW_DAILY_SOURCE,
+		derives: 'The self-hosted Plausible instance has no backups of any kind. This file ' +
+			'is the hedge: scripts/snapshot-plausible.py commits a snapshot to the repo. It ' +
+			'writes nothing on a bad run rather than clobbering the last good one, so a file ' +
+			'that has stopped moving IS the failure signal.',
+		stampedAt: function (doc) { return doc.captured_at_utc; },
+		rows: function (doc) {
+			return [
+				{ label: 'Snapshot window', value: String(doc.period || doc.range || 'unrecorded') },
+				{ label: 'Source', value: String(doc.source || 'unrecorded') }
+			];
+		}
+	},
+	{
+		id: 'events-sync',
+		title: 'Events sync from pdoom-data',
+		url: '/data/events-sync-summary.json',
+		maxAgeHours: WINDOW_DAILY_SOURCE,
+		derives: 'The last run of scripts/sync/sync-events.py, which regenerates the event ' +
+			'corpus and redacts third-party email addresses out of raw PDF text before ' +
+			'writing a single page.',
+		stampedAt: function (doc) { return doc.sync_timestamp; },
+		rows: function (doc) {
+			const pii = doc.pii || {};
+			return [
+				{ label: 'Events published', value: String(toNumber(doc.included_events)) + ' of ' + String(toNumber(doc.total_events_in_source)) },
+				{ label: 'Addresses redacted', value: String(toNumber(pii.emails_redacted)) },
+				// Advisory count: address-shaped strings the pattern cannot match, and
+				// therefore did NOT redact. A zero here is not a clean bill of health.
+				{ label: 'Obfuscated suspects (advisory)', value: String(toNumber(pii.obfuscated_contact_suspects)) }
+			];
+		}
+	},
+	{
+		id: 'automation-ledger',
+		title: 'Automation ledger',
+		url: '/monitoring/data/automation-status.json',
+		maxAgeHours: WINDOW_DAILY_SOURCE,
+		derives: 'What the scheduled jobs say about themselves. Each job appends its own ' +
+			'line at the end of its own run, so this is the report of the actor that it acted, ' +
+			'not an observation from inside. A job that dies earlier logs nothing.',
+		stampedAt: function (doc) { return doc.last_updated; },
+		rows: function (doc) {
+			const jobs = doc.jobs && typeof doc.jobs === 'object' ? doc.jobs : {};
+			return Object.keys(jobs).map(function (jobName) {
+				const job = jobs[jobName] || {};
+				// The age of each job's own last line, judged against nothing: this page
+				// does not know any job's intended cadence, and inventing one per job
+				// would be exactly the derived-from-the-thing-it-checks mistake.
+				const age = Freshness.ageText(Freshness.ageHours(job.last_run));
+				const wins = toNumber(job.success_count);
+				const runs = toNumber(job.total_runs);
+				return {
+					label: String(jobName).replace(/-/g, ' '),
+					value: 'last logged ' + age + ', ' + String(wins) + '/' + String(runs) + ' logged as ok'
+				};
+			});
+		}
+	},
+	{
+		id: 'deployment-verification',
+		title: 'Deployment verification',
+		url: '/data/deployment-verification.json',
+		maxAgeHours: WINDOW_DAILY_SOURCE,
+		derives: 'Was written by scripts/verify-deployment.py. Rendered on this page, ' +
+			'until it was rewritten, as a green card claiming a perfect score.',
+		// NAMED, NOT DELETED. Ruling: where a card cannot be made honest because nothing
+		// writes its source, say so on the page. Both callers of verify-deployment.py --
+		// .github/workflows/version-aware-deploy.yml and weekly-deployment.yml -- are
+		// workflow_dispatch-only, so no schedule has refreshed this file and none will.
+		// That is a claim about two files in this repository: grep them before believing
+		// this line, in either direction.
+		noWriter: 'No scheduled job writes this file. Its only two writers, ' +
+			'version-aware-deploy.yml and weekly-deployment.yml, are manual-dispatch only, ' +
+			'so its timestamp measures when a human last ran one by hand and nothing else. ' +
+			'Even a fresh stamp here would not be a health signal. The box is kept rather ' +
+			'than deleted so that the gap is visible; closing it means either giving the ' +
+			'file a scheduled writer or removing it and everything that reads it.',
+		stampedAt: function (doc) { return doc.timestamp; },
+		rows: function () { return []; }
+	}
+];
 
-        async function updateAutomationStatus() {
-            const automationData = await loadAutomationStatus();
-            const container = document.getElementById('automation-status');
+// Read one source. Returns the parsed document, or a plain-text reason it could not
+// be used. Every failure mode collapses to the same thing for the caller: no doc.
+async function readSource(url) {
+	try {
+		const res = await fetch(url, { cache: 'no-store' });
+		if (!res.ok) {
+			return { doc: null, why: 'The request for this file came back HTTP ' + toNumber(res.status) + '.' };
+		}
+		const parsed = await res.json();
+		if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			return { doc: null, why: 'This file was fetched but did not parse into the object shape this page expects.' };
+		}
+		return { doc: parsed, why: '' };
+	} catch (err) {
+		return { doc: null, why: 'This file could not be fetched, or did not parse as JSON.' };
+	}
+}
 
-            if (automationData && automationData.jobs) {
-                const jobs = Object.entries(automationData.jobs);
+// Render one atom. `verdict` comes from the shared gate; `rows` is only ever passed
+// when verdict.fresh is true, so there is no path here that can print a value out of
+// a stale source.
+function renderAtom(atom, verdict, rows) {
+	const noWriter = typeof atom.noWriter === 'string' && atom.noWriter.length > 0;
+	const label = noWriter ? 'NO WRITER' : verdict.label;
+	const tone = noWriter ? 'nowriter'
+		: (verdict.fresh ? 'current'
+			: (verdict.state === Freshness.UNKNOWN ? 'unknown' : 'stale'));
 
-                container.innerHTML = jobs.map(([jobName, job]) => {
-                    // The job NAME is a JSON object key, so it is data too -- and object
-                    // keys are the sink people forget, because they read like identifiers.
-                    const runs = toNumber(job.total_runs);
-                    const wins = toNumber(job.success_count);
-                    const successRate = runs > 0 ? Math.round((wins / runs) * 100) : 0;
+	let body;
+	if (noWriter) {
+		body = '<div class="atom-refusal"><b>NO SCHEDULED WRITER</b> &mdash; ' +
+			escapeHTML(atom.noWriter) + '</div>';
+	} else if (verdict.fresh) {
+		body = '<ul class="atom-rows">' + rows.map(function (row) {
+			return '<li><span class="k">' + escapeHTML(row.label) + '</span>' +
+				'<span class="v">' + escapeHTML(row.value) + '</span></li>';
+		}).join('') + '</ul>';
+		if (!rows.length) {
+			body = '<div class="atom-refusal"><b>NOTHING TO SHOW</b> &mdash; this source is ' +
+				'current but contained no rows this page knows how to read.</div>';
+		}
+	} else {
+		body = '<div class="atom-refusal"><b>' + escapeHTML(label) + '</b> &mdash; ' +
+			escapeHTML(verdict.reason) + '</div>';
+	}
 
-                    const statusClass = successRate >= 80 ? 'pass' : (successRate >= 50 ? 'warn' : 'fail');
+	return '<div class="atom is-' + escapeHTML(tone) + '" id="atom-' + escapeHTML(atom.id) + '">' +
+		'<div class="atom-head">' +
+			'<span class="atom-title">' + escapeHTML(atom.title) + '</span>' +
+			'<span class="badge badge-' + escapeHTML(tone) + '">' + escapeHTML(label) + '</span>' +
+		'</div>' +
+		'<div class="atom-derives">' + escapeHTML(atom.derives) + '</div>' +
+		body +
+		'<div class="atom-source">source <code>' + escapeHTML(atom.url) + '</code> &middot; ' +
+			'last written ' + escapeHTML(verdict.ageText) + ' &middot; ' +
+			'window ' + escapeHTML(Freshness.windowText(atom.maxAgeHours)) + '</div>' +
+	'</div>';
+}
 
-                    return `
-                        <div class="check-item">
-                            <div>
-                                <div class="check-name">${escapeHTML(String(jobName).replace(/-/g, ' '))}</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">
-                                    Last run: ${escapeHTML(formatAge(job.last_run))} |
-                                    Success rate: ${successRate}% (${wins}/${runs})
-                                </div>
-                            </div>
-                            <span class="check-status ${statusClass}">
-                                ${job.last_success && job.last_success > (job.last_failure || '') ? 'OK' : 'ISSUE'}
-                            </span>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                container.innerHTML = `
-                    <div class="check-item">
-                        <span class="check-name">No automation runs logged yet</span>
-                        <span class="check-status warn">PENDING</span>
-                    </div>
-                    <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">
-                        Automation jobs will appear here once GitHub Actions workflows start running.
-                        Scheduled jobs: auto-update-data (every 6h), sync-leaderboards (daily), weekly-league-rollover (Thu 14:00 UTC = Fri 00:00 Hobart)
-                    </p>
-                `;
-            }
-        }
+// Read every source and render every atom. One source failing cannot take out the
+// others: each atom is resolved independently and a thrown reader becomes that
+// atom's own UNKNOWN rather than a blank page.
+async function loadAtoms() {
+	const container = document.getElementById('atoms');
+	if (!container) { return; }
 
-        async function updateLeagueStatus() {
-            try {
-                const response = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
-                const league = await response.json();
-                const container = document.getElementById('league-status');
+	const html = await Promise.all(ATOMS.map(async function (atom) {
+		const read = await readSource(atom.url);
+		if (!read.doc) {
+			return renderAtom(atom, Freshness.unavailable(read.why), []);
+		}
+		let stamp = null;
+		try {
+			stamp = atom.stampedAt(read.doc);
+		} catch (err) {
+			return renderAtom(atom, Freshness.unavailable(
+				'This file was read, but the field this page dates it by could not be reached.'), []);
+		}
+		const verdict = Freshness.assess(stamp, atom.maxAgeHours);
+		if (!verdict.fresh) { return renderAtom(atom, verdict, []); }
+		let rows;
+		try {
+			rows = atom.rows(read.doc);
+		} catch (err) {
+			return renderAtom(atom, Freshness.unavailable(
+				'This file is current, but its contents are not the shape this page reads.'), []);
+		}
+		return renderAtom(atom, verdict, Array.isArray(rows) ? rows : []);
+	}));
 
-                const weekInfo = league.week_info || {};
-                const daysRemaining = toNumber(weekInfo.days_remaining);
-                const statusClass = daysRemaining > 2 ? 'pass' : (daysRemaining > 0 ? 'warn' : 'fail');
+	container.innerHTML = html.join('');
 
-                container.innerHTML = `
-                    <div class="check-item">
-                        <div>
-                            <div class="check-name">Current Week: ${escapeHTML(weekInfo.week_id || 'Unknown')}</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">
-                                ${escapeHTML(weekInfo.start_date)} to ${escapeHTML(weekInfo.end_date)}
-                            </div>
-                        </div>
-                        <span class="check-status ${statusClass}">
-                            ${daysRemaining} days left
-                        </span>
-                    </div>
-                    <div class="check-item">
-                        <span class="check-name">Weekly Seed</span>
-                        <span style="font-family: monospace; color: var(--accent-primary);">
-                            ${escapeHTML(league.seed || 'Not generated')}
-                        </span>
-                    </div>
-                    <div class="check-item">
-                        <span class="check-name">Participants</span>
-                        <span class="metric-value">
-                            ${toNumber(league.meta && league.meta.total_participants)}
-                        </span>
-                    </div>
-                    <div class="check-item">
-                        <span class="check-name">Submissions</span>
-                        <span class="metric-value">
-                            ${toNumber(league.meta && league.meta.total_submissions)}
-                        </span>
-                    </div>
-                `;
-            } catch (error) {
-                document.getElementById('league-status').innerHTML = `
-                    <div class="check-item">
-                        <span class="check-name">Error loading league data</span>
-                        <span class="check-status fail">ERROR</span>
-                    </div>
-                `;
-            }
-        }
+	const stampEl = document.getElementById('rendered-at');
+	if (stampEl) {
+		// textContent, not innerHTML: this is the browser's own clock and nothing else.
+		stampEl.textContent = 'Rendered in your browser at ' + new Date().toLocaleString() +
+			'. Every age above is measured against that clock, not against a server. ' +
+			'This line says nothing whatsoever about the data.';
+	}
+}
 
-        function triggerLeagueRollover() {
-            if (!confirm('This will trigger a manual weekly league rollover. Are you sure?')) {
-                return;
-            }
+/* ===== END ATOMS =========================================================== */
 
-            alert('Manual trigger feature requires GitHub Actions workflow_dispatch.\n\nTo manually rollover:\n1. Run: npm run league:archive\n2. Run: npm run league:new-week\n\nOr visit GitHub Actions and run "Weekly League Rollover" workflow.');
-        }
-        
-        async function updateIntegrationHealth() {
-            const container = document.getElementById('integration-health');
-            try {
-                const res = await fetch('/data/integration-health.json', { cache: 'no-store' });
-                if (!res.ok) throw new Error(res.status);
-                const h = await res.json();
-                // color() returns one of three hardcoded hexes, never the input, so the
-                // style="" attribute here can only ever hold a literal. The visible label
-                // is the untrusted half, and it is escaped.
-                const color = st => st === 'FAIL' ? '#ff4444' : (st === 'WARN' ? '#ffb000' : '#f6a800');
-                const badge = st => `<span style="color:${color(st)};font-weight:bold;">${escapeHTML(st)}</span>`;
-                const rows = (h.checks || []).map(c => `
-                    <div style="display:flex;gap:0.75rem;padding:0.35rem 0;border-bottom:1px solid var(--border-color);flex-wrap:wrap;">
-                        <span style="min-width:52px;">${badge(c.status)}</span>
-                        <span style="min-width:190px;color:var(--text-primary);">${escapeHTML(c.name)}</span>
-                        <span style="color:var(--text-muted);flex:1;">${escapeHTML(c.detail || '')}</span>
-                    </div>`).join('');
-                const summary = h.summary || {};
-
-                // Never present a committed artefact as live health. Without this the
-                // page shows a green "OK" forever if the snapshot ever stops refreshing.
-                const ts = h.generated;
-                const ageHours = ts ? (new Date() - new Date(ts)) / 3600000 : Infinity;
-                const stale = !(ageHours < INTEGRATION_STALE_AFTER_HOURS);
-                const staleNote = !ts
-                    ? 'This snapshot carries no timestamp, so its age cannot be verified. Treat it as unknown rather than current.'
-                    : (stale ? 'Data-contract validation runs daily. This snapshot is older than that, so it describes a past state and not the current health of the data seams.' : '');
-                const staleBanner = staleNote
-                    ? `<div style="color:#ffb000;font-weight:bold;margin-bottom:0.35rem;">STALE SNAPSHOT</div>
-                       <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.75rem;">${staleNote}</div>`
-                    : '';
-
-                container.innerHTML = `
-                    ${staleBanner}
-                    <div style="margin-bottom:0.75rem;${stale ? 'opacity:0.6;' : ''}">
-                        Overall: ${badge(h.overall_status)} &nbsp;
-                        <span style="color:var(--text-muted);">
-                            ${toNumber(summary.fail)} fail &middot; ${toNumber(summary.warn)} warn &middot; ${toNumber(summary.ok)} ok
-                            &nbsp;|&nbsp; checked ${ts ? escapeHTML(new Date(ts).toLocaleString()) : 'n/a'}
-                            ${ts ? '(' + escapeHTML(formatAgeLong(ts)) + ')' : ''}
-                        </span>
-                    </div>${stale ? `<div style="opacity:0.6;">${rows}</div>` : rows}`;
-            } catch (e) {
-                container.innerHTML = '<span style="color:var(--text-muted);">integration-health.json not available yet (populated by the Data Contract Validation workflow).</span>';
-            }
-        }
-
-        async function refreshData() {
-            if (refreshing) return;
-            
-            refreshing = true;
-            const btn = document.getElementById('refresh-btn');
-            btn.disabled = true;
-            btn.textContent = 'Refreshing...';
-            
-            try {
-                await Promise.all([
-                    updateWebsiteStatus(),
-                    updateDeploymentStatus(),
-                    updateDataStatus(),
-                    updateGitHubStatus(),
-                    updateRecentChecks(),
-                    updateAutomationStatus(),
-                    updateLeagueStatus(),
-                    updateIntegrationHealth()
-                ]);
-
-                document.getElementById('last-updated').textContent = `Last updated: ${new Date().toLocaleString()}`;
-            } catch (error) {
-                console.error('Error refreshing data:', error);
-            } finally {
-                refreshing = false;
-                btn.disabled = false;
-                btn.textContent = 'Refresh All Data';
-            }
-        }
-        
-        // Initial load
-        document.addEventListener('DOMContentLoaded', refreshData);
-        
-        // Auto-refresh every 2 minutes
-        setInterval(refreshData, 2 * 60 * 1000);
-    </script>
+(function () {
+	const btn = document.getElementById('refresh-btn');
+	let busy = false;
+	async function go() {
+		if (busy) { return; }
+		busy = true;
+		if (btn) { btn.disabled = true; btn.textContent = 'Re-reading...'; }
+		try {
+			await loadAtoms();
+		} finally {
+			busy = false;
+			if (btn) { btn.disabled = false; btn.textContent = 'Re-read every source'; }
+		}
+	}
+	if (btn) { btn.addEventListener('click', go); }
+	document.addEventListener('DOMContentLoaded', go);
+})();
+	</script>
 	<script src="/assets/js/navigation.js"></script>
 </body>
 </html>

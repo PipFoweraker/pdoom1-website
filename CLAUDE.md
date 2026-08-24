@@ -668,6 +668,8 @@ node    scripts/test-download-resolution.js # download buttons resolve/degrade [
 node    scripts/test-changelog-render.js  # /game-changelog/ derives         [content-honesty]
 node    scripts/test-dashboard-devlog.js  # /dashboard/ derives + freshness  [content-honesty]
 node    scripts/test-manufactured-confidence.js # no card renders a value it did not measure [content-honesty]
+node    scripts/test-freshness.js         # the SHARED staleness gate refuses [monitoring-honesty]
+node    scripts/test-monitoring-atoms.js  # /monitoring/ prints no value from a dead source [monitoring-honesty]
 
 python  scripts/check-published-emails.py # no third party's address served  [content-honesty, sync-events]
 python  scripts/test-sync-events-pii.py   # ...and the sync REFUSES to write [content-honesty, sync-events]
@@ -962,6 +964,43 @@ platform that has no build.
     not done until the paragraph moves.** Grep CLAUDE.md for the symptom before closing
     a PR, and prefer "FIXED <date> in #nn" over deleting the entry — the history of a
     defect is why the guard exists.
+
+## Staleness: there is now exactly ONE gate, and it is a file
+`public/assets/js/freshness.js` — `assess`, `unavailable`, `ageHours`, `ageText`,
+`windowText`. Sibling of `escape.js`: plain **blocking** `<script src>`, fail closed,
+**do not write a second one**. Lifted out of `/dashboard/`'s `DEVLOG_MAX_AGE_DAYS` box
+on 2026-08-25 so the next page does not reinvent it — which is exactly how five
+separately-written escapers happened.
+
+- **`verdict.fresh` is the ONLY key a caller may branch on** to decide whether to
+  render a value. True for exactly one state, false for every other **including states
+  added later**. A caller written against `state !== 'stale'` silently starts rendering
+  a new failure mode; one written against `.fresh` cannot. `test-freshness.js` asserts
+  this by enumerating the module's own exported state constants, not a list of today's
+  three failure modes.
+- **There is deliberately no API that returns a remembered value.** A fallback ships
+  exactly when the real lookup failed. The test fails if an export ever appears whose
+  name suggests one.
+- **The window is POLICY, chosen by the caller.** Never derive it from the cron that
+  writes the file — a gate derived from the thing it checks always agrees with it.
+  `/metabolism/` is the page that derives real cadences.
+- A caller that forgets to pass a window gets `UNKNOWN`, not a default and not a pass.
+- **`/monitoring/` was the reason.** Created 2025-09-30, it predated every honesty rule
+  here: eight cards and one aggregate **Health Score** percentage. Its deployment card
+  rendered a green "healthy / 100%" from `public/data/deployment-verification.json`,
+  whose only two writers (`version-aware-deploy.yml`, `weekly-deployment.yml`) are
+  `workflow_dispatch`-only — so nothing had refreshed it since 2026-07-17 and nothing
+  ever would. **The aggregate stayed green throughout**, which is the argument against
+  aggregates: a percentage over unrelated sources reads 100% while several are dead.
+  Rewritten 2026-08-25 into freshness-gated atoms, one source each.
+- **`/monitoring/` is now the only deployed page that links `/metabolism/`.** Measured
+  2026-08-25: `/design-questions/` and `/dev-notes/` had **zero** inbound links on the
+  deployed site, and `/metabolism/` had one — this page. (`public/_review/` links some
+  of them and is in `deploy-excludes.txt`, so it is not an entry point.) The page
+  carries a `developer-surfaces` index, and `test-monitoring-atoms.js` §10 fails if a
+  listed surface stops being linked, or if `/monitoring/` itself becomes orphaned.
+  It is reached from `/about/`, not from the front page (Pip, 2026-08-25: infrastructure
+  status does not belong on a player-facing front page).
 
 ## Changelog surfaces — there are FOUR (this said "three" until 2026-08-03)
 The count itself was the bug: `/dashboard/`'s development-log box is a release surface
