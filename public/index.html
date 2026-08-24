@@ -888,9 +888,22 @@
 				     and degrades a platform to "coming soon" when the current release
 				     carries no build for it. Deliberately no version literal here: this
 				     comment said "(v0.13.1)" while v0.13.2 was live, which is the exact
-				     rot check-stale-facts.py exists to catch. -->
-				<a id="download-windows" data-platform-label="Windows" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
-					Download for Windows
+				     rot check-stale-facts.py exists to catch.
+
+				     THE SHIPPED LABEL IS A PLACEHOLDER, NOT A CLAIM (2026-08-24). It used
+				     to read "Download for macOS" in the static HTML. That is an
+				     availability claim nobody derived: with JS off, or with the GitHub API
+				     rate-limited (resolveDownloads' documented no-op path), a visitor read
+				     "Download for macOS" on a release that ships no macOS build and
+				     followed it to a release page with no macOS asset. check-platform-claims.py
+				     flagged this line, correctly, and it is the fourth finding the copy
+				     brief only counted three of. Two mechanisms now write these labels and
+				     they agree by construction: renderPlatformClaims() sets them from
+				     version.json (same-origin, so it survives a GitHub rate-limit), then
+				     resolveDownloads() refines the available ones to direct asset URLs.
+				     The static text is only ever seen before either has resolved. -->
+				<a id="download-windows" data-platform-claim="rendered" data-platform-slot="button" data-platform-key="windows" data-platform-label="Windows" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+					Windows &mdash; checking latest release
 				</a>
 				<!-- SHIPS DEGRADED, and that is the documented design rather than a
 				     regression: resolveDownloads()'s own comment says "macOS/Linux ship
@@ -910,11 +923,11 @@
 				     data-platform-label rather than this text, so promotion still yields
 				     "Download for macOS" and scripts/test-download-resolution.js is
 				     unaffected. -->
-				<a id="download-macos" data-platform-label="macOS" role="note" aria-disabled="true" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem; opacity: 0.55; cursor: default; pointer-events: none;" title="macOS build is not in the current release yet">
+				<a id="download-macos" data-platform-claim="rendered" data-platform-slot="button" data-platform-key="macos" data-platform-label="macOS" role="note" aria-disabled="true" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem; opacity: 0.55; cursor: default; pointer-events: none;" title="macOS build is not in the current release yet">
 					macOS &mdash; coming soon
 				</a>
-				<a id="download-linux" data-platform-label="Linux" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
-					Download for Linux
+				<a id="download-linux" data-platform-claim="rendered" data-platform-slot="button" data-platform-key="linux" data-platform-label="Linux" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+					Linux &mdash; checking latest release
 				</a>
 			</div>
 
@@ -950,8 +963,24 @@
 			     section and concluded the instructions were wrong.
 
 			     The real fix for macOS is notarisation (Apple Developer Program), which
-			     is a budget line, not a copy change. -->
-			<div id="first-run-note" style="text-align: left; margin: 0 auto 0.8rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.55; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.8rem 1rem;">
+			     is a budget line, not a copy change.
+
+			     data-platform-claim="explanatory" (2026-08-24). Everything in this box
+			     names operating systems in order to EXPLAIN how they behave -- Gatekeeper,
+			     SmartScreen, code-signing, notarization, chmod. None of it asserts that a
+			     build exists for any of them. check-platform-claims.py could not tell that
+			     apart from an availability claim and flagged the notarization sentence,
+			     which is a true statement about Apple's requirements and would be equally
+			     true if p(Doom)1 never shipped a Mac build at all. The attribute is the
+			     distinction, made in the markup so the guard can read it; the guard now
+			     exempts this subtree and PRINTS what it exempted, so the exemption cannot
+			     grow in silence.
+
+			     NOTE the macOS paragraph stays visible when no macOS build ships. Hiding
+			     it would make a safety note conditional on a fetch, which is the exact bug
+			     recorded above. It costs a confused reader; the alternative cost a
+			     playtest. -->
+			<div id="first-run-note" data-platform-claim="explanatory" style="text-align: left; margin: 0 auto 0.8rem; max-width: 46rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.55; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.8rem 1rem;">
 				<p style="margin: 0 0 0.5rem;">
 					<strong>Before you download: your OS will warn you, and that is expected.</strong>
 					These builds are <strong>unsigned</strong>. Signing means buying a code-signing
@@ -1033,11 +1062,14 @@
 			</div>
 			-->
 
+			<!-- The platform half of this line is RENDERED from version.json by
+			     renderPlatformClaims(); "Free / Source available" is static because
+			     neither is a platform claim. The static span is a placeholder that names
+			     no OS at all -- with JS off we genuinely cannot know which builds shipped,
+			     and UNKNOWN is the honest render (ruled 2026-08-23), not a reassuring
+			     default. This line used to read "Windows, macOS & Linux" as typed prose. -->
 			<p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
-				Windows &amp; Linux &middot; Free &middot; Source available<br>
-				<span style="font-size: 0.95em;">The current build does not include a Mac version &mdash;
-				the macOS build broke in this release and a fix is written.
-				<a href="https://github.com/PipFoweraker/pdoom1/issues/1309" target="_blank" rel="noopener" style="color: var(--accent-secondary);">What happened, and when it is back</a>.</span>
+				<span data-platform-claim="rendered" data-platform-slot="platform-list">Platform availability loads from the current release</span> &middot; Free &middot; Source available
 			</p>
 		</section>
 
@@ -1246,31 +1278,36 @@
 							<h3>System Requirements</h3>
 							<p style="margin-bottom: 0.8rem;"><strong>Minimum:</strong></p>
 							<ul style="color: var(--text-secondary); margin: 0 0 1rem 1.2rem; line-height: 1.8;">
-								<li>64-bit Windows or Linux &mdash; the current build has no Mac version</li>
+								<li><span data-platform-claim="rendered" data-platform-slot="requirements">64-bit desktop OS &mdash; the platform list loads from the current release</span></li>
 								<li>Native build &mdash; no runtime to install</li>
 								<li>Basic graphics support</li>
 								<li>Built with Godot 4.5.1</li>
 							</ul>
 							<p style="margin-bottom: 0.5rem;"><strong>Platforms:</strong></p>
-							<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">Windows</span>
-								<!-- NOT a bare "macOS" chip. Until 2026-08-25 this read `macOS` with no
-								     qualifier, eight lines below the same card saying "There is no macOS
-								     build in the current release". check-platform-claims.py could not see
-								     it: each chip is its own line, so there is no two-platform LIST and no
-								     availability VERB, and neither of the guard's two triggers fires on a
-								     bare noun. That is the third distinct shape that guard has been blind
-								     to this week -- the rule is right and its shape assumptions keep
-								     missing real markup.
-								     The durable fix is #363, which derives these from version.json so a
-								     typed claim becomes impossible. This is the honest text until it lands. -->
-								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem; opacity: 0.6;">macOS &mdash; not in this build</span>
-								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">Linux</span>
+							<!-- One chip per platform, BUILT by renderPlatformClaims() from
+							     version.json. It used to be three hand-typed chips, which is
+							     a claim per chip that nothing could ever falsify: the macOS
+							     chip sat there unchanged through a release with no macOS
+							     build. A platform with no build now renders as a chip that
+							     says so, linked to its tracking issue when the release feed
+							     carries one. -->
+							<div data-platform-claim="rendered" data-platform-slot="chips" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">Loading from the current release&hellip;</span>
 							</div>
 						</div>
 						<div class="card">
 							<h3>Quick Installation</h3>
-							<p style="margin-bottom: 0.8rem;">Download your platform's build from the buttons above &mdash; no installation, no runtime needed. Windows is the tested build; Linux is new and largely untested, so tell me if it falls over. There is no macOS build in the current release &mdash; it broke and a fix is written.</p>
+							<!-- The removed second sentence read "Windows is the tested build;
+							     macOS and Linux are new and largely untested, so tell me if
+							     they fall over." Two problems. It asserted a macOS build
+							     exists, on a release that ships none -- and it escaped
+							     check-platform-claims.py entirely, because the em dash
+							     earlier on the line matches SOFT_QUALIFIER and the whole
+							     line was skipped. It was a false claim the guard was
+							     structurally unable to see. Its replacement is rendered.
+							     "Tested" had no mechanism behind it either, so it is gone
+							     rather than reworded; nothing on this site measures it. -->
+							<p style="margin-bottom: 0.8rem;">Download your platform's build from the buttons above &mdash; no installation, no runtime needed. <span data-platform-claim="explanatory">Windows is the tested build; Linux is new and largely untested, so tell me if it falls over.</span> <span data-platform-claim="rendered" data-platform-slot="install-note">Which builds this release carries loads from the current release.</span></p>
 <pre style="background: var(--bg-primary); padding: 0.8rem; border-radius: var(--radius-sm); overflow-x: auto; color: var(--accent-primary); font-size: 0.85rem; line-height: 1.4; margin: 0;">git clone https://github.com/PipFoweraker/pdoom1.git
 # then open the project in Godot 4.5.1 to run from source</pre>
 							<p style="margin-top: 0.8rem; font-size: 0.85rem; color: var(--text-muted);">
@@ -1746,6 +1783,234 @@
 			}
 		}
 		
+		// ------------------------------------------------------------------------
+		// PLATFORM AVAILABILITY IS RENDERED, NEVER TYPED (2026-08-24).
+		//
+		// Every statement on this page about WHICH platforms have a build is written
+		// here, from public/data/version.json -> latest_release.platforms, which
+		// scripts/update-version-info.py derives from the release's actual assets. A
+		// build is either attached to the release or it is not; nobody can type it
+		// into being. That is the same field scripts/check-platform-claims.py reads,
+		// so the guard and the page cannot disagree about what shipped -- the guard
+		// is checking the placeholder, and this function is writing the claim.
+		//
+		// WHY THIS EXISTS. v0.14.3 published on 2026-08-24 with no macOS asset (the
+		// export failed). The download buttons self-healed with nobody touching them.
+		// Three lines of static prose did not, because no mechanism fed them: they
+		// said "Windows, macOS & Linux", "64-bit Windows, macOS, or Linux", and three
+		// hand-typed platform chips. Guarding typed prose only tells you it went
+		// wrong; rendering it means it cannot.
+		//
+		// TWO LAYERS, AND THEY DEGRADE INTO EACH OTHER:
+		//   1. this function -- version.json, SAME ORIGIN. Decides available vs not.
+		//   2. resolveDownloads() -- the GitHub releases API. Refines an available
+		//      button to its direct asset URL. Documented to no-op on rate-limit.
+		// Layer 2 is the one that goes down (it is a third-party API with an
+		// unauthenticated quota); layer 1 is served off our own origin alongside the
+		// page. So when layer 2 is unavailable the buttons still carry a derived,
+		// truthful label instead of the hardcoded "Download for macOS" they used to
+		// fall back to. They agree by construction: update-version-info.py's
+		// _PLATFORM_PATTERNS is a copy of resolveDownloads' filename table, kept in
+		// step deliberately.
+		//
+		// WHEN NEITHER RESOLVES, RENDER UNKNOWN. The shipped HTML placeholders name no
+		// operating system. An unreachable version.json, or one whose latest_release
+		// carries no `platforms` key, leaves them exactly as they are. Absence of the
+		// key means UNRECORDED, never "nothing shipped" -- update-game-data.yml has
+		// historically rebuilt version.json without it, and treating that as
+		// all-platforms-false would tell every visitor the game ships nowhere.
+		// ------------------------------------------------------------------------
+		const PLATFORM_ORDER = ['windows', 'macos', 'linux'];
+		const PLATFORM_LABEL = { windows: 'Windows', macos: 'macOS', linux: 'Linux' };
+
+		// CROSS-REPO CONTRACT, consumed optionally (2026-08-24).
+		// The pdoom1 repo is adding automatic issue creation when a platform's build
+		// fails, and exposing that issue in the release feed as
+		//     latest_release.platform_tracking = { "<platform>": {"url": "https://..."} }
+		// A bare string URL is accepted too, so whichever shape lands works. Until it
+		// lands the field is simply absent, and every absence path below renders the
+		// same honest sentence with no link. Nothing here hardcodes an issue number:
+		// a typed link is the same class of unfalsifiable claim as the typed prose
+		// this function replaced, and it would rot the moment the issue closed.
+		function platformTrackingUrl(release, key) {
+			const t = release && release.platform_tracking;
+			if (!t || typeof t !== 'object') return '';
+			const entry = t[key];
+			if (typeof entry === 'string') return entry;
+			if (entry && typeof entry === 'object' && typeof entry.url === 'string') return entry.url;
+			return '';
+		}
+
+		function joinPlatformNames(names) {
+			if (names.length === 0) return '';
+			if (names.length === 1) return names[0];
+			return names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+		}
+
+		// Append " -- no <X> build in <version>", linked to the tracking issue when the
+		// feed carries one. Built with createElement, never innerHTML: the version
+		// string and the URL come off a fetched JSON document.
+		function appendAbsenceClause(el, missing, release, opts) {
+			if (!missing.length) return;
+			const version = (release && release.version) ? release.version : 'this release';
+			const lead = (opts && opts.lead) || ' — no ';
+			el.appendChild(document.createTextNode(
+				lead + joinPlatformNames(missing.map(k => PLATFORM_LABEL[k])) +
+				(missing.length > 1 ? ' builds in ' : ' build in ') + version));
+			// One link only when exactly one platform is missing; with several, a
+			// single link would misattribute. Multiple absences get the honest
+			// sentence with no link rather than a link that means the wrong thing.
+			const url = missing.length === 1 ? platformTrackingUrl(release, missing[0]) : '';
+			if (url) {
+				el.appendChild(document.createTextNode(' ('));
+				const a = document.createElement('a');
+				a.href = url;
+				a.target = '_blank';
+				a.rel = 'noopener';
+				a.textContent = 'tracking the build';
+				a.style.color = 'var(--accent-secondary)';
+				el.appendChild(a);
+				el.appendChild(document.createTextNode(')'));
+			}
+		}
+
+		function renderPlatformChips(el, available, missing, release) {
+			el.textContent = '';
+			const base = 'padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;';
+			for (const key of PLATFORM_ORDER) {
+				if (available.indexOf(key) === -1 && missing.indexOf(key) === -1) continue;
+				const shipped = available.indexOf(key) !== -1;
+				const chip = document.createElement('span');
+				chip.style.cssText = base + ' background: var(--bg-primary);' +
+					(shipped ? '' : ' opacity: 0.6;');
+				if (shipped) {
+					chip.textContent = PLATFORM_LABEL[key];
+				} else {
+					chip.textContent = PLATFORM_LABEL[key] + ' — no build in ' +
+						((release && release.version) ? release.version : 'this release');
+					const url = platformTrackingUrl(release, key);
+					if (url) {
+						const a = document.createElement('a');
+						a.href = url;
+						a.target = '_blank';
+						a.rel = 'noopener';
+						a.textContent = ' (tracking)';
+						a.style.color = 'var(--accent-secondary)';
+						chip.appendChild(a);
+					}
+				}
+				el.appendChild(chip);
+			}
+		}
+
+		// A button for a platform version.json says has no build must not stay
+		// clickable. Its href points at the release page, which for that platform is a
+		// dead end that looks like a working download -- the precise failure
+		// resolveDownloads' markUnavailable() exists to prevent, applied one layer
+		// earlier so it survives a GitHub rate-limit. Wording is identical to
+		// markUnavailable's so the two layers never visibly contradict each other.
+		// The release page is the safe baseline every button falls back to; resolveDownloads()
+		// later upgrades it to a direct asset URL when it can identify one.
+		const RELEASES_URL = 'https://github.com/PipFoweraker/pdoom1/releases/latest';
+
+		function renderPlatformButton(el, key, shipped) {
+			const label = el.dataset.platformLabel || PLATFORM_LABEL[key] || 'this platform';
+			if (shipped) {
+				// SYMMETRIC WITH THE DEMOTE BRANCH BELOW. The static markup ships an
+				// unshipped platform's button DISABLED -- that is the safe default, so
+				// that a visitor with JS off, or whose fetch failed, is never invited to
+				// download a build that does not exist. Promotion therefore has to undo
+				// every attribute the demote branch sets, not just rewrite the label; a
+				// label-only promote leaves a button reading "Download for macOS" with no
+				// href and pointer-events:none, which is a worse lie than either state.
+				el.setAttribute('href', el.dataset.platformHref || RELEASES_URL);
+				el.setAttribute('target', '_blank');
+				el.setAttribute('rel', 'noopener');
+				el.removeAttribute('role');
+				el.removeAttribute('aria-disabled');
+				el.removeAttribute('title');
+				el.style.opacity = '';
+				el.style.cursor = '';
+				el.style.pointerEvents = '';
+				el.textContent = 'Download for ' + label;
+				return;
+			}
+			el.removeAttribute('href');
+			el.removeAttribute('target');
+			el.setAttribute('role', 'note');
+			el.setAttribute('aria-disabled', 'true');
+			el.title = label + ' build is not in the current release yet';
+			el.style.opacity = '0.55';
+			el.style.cursor = 'default';
+			el.style.pointerEvents = 'none';
+			el.textContent = label + ' — coming soon';
+		}
+
+		async function renderPlatformClaims() {
+			const targets = Array.prototype.slice.call(
+				document.querySelectorAll('[data-platform-claim="rendered"]'));
+			if (!targets.length) return;
+
+			let release = null;
+			try {
+				const res = await fetch('/data/version.json', { cache: 'no-store' });
+				if (!res.ok) return;            // UNKNOWN: placeholders stand
+				const data = await res.json();
+				release = (data && data.latest_release) || null;
+			} catch (_) {
+				return;                          // UNKNOWN: placeholders stand
+			}
+
+			const platforms = release && release.platforms;
+			if (!platforms || typeof platforms !== 'object') return;  // UNRECORDED, not "none"
+
+			// Only platforms the feed actually mentions. A key we do not recognise is
+			// ignored rather than guessed at, and a platform the feed omits is neither
+			// claimed nor denied.
+			const known = PLATFORM_ORDER.filter(k => typeof platforms[k] === 'boolean');
+			if (!known.length) return;
+			const available = known.filter(k => platforms[k]);
+			const missing = known.filter(k => !platforms[k]);
+
+			for (const el of targets) {
+				const slot = el.dataset.platformSlot;
+				if (slot === 'button') {
+					const key = el.dataset.platformKey;
+					if (typeof platforms[key] === 'boolean') {
+						renderPlatformButton(el, key, platforms[key]);
+					}
+					continue;
+				}
+				if (slot === 'chips') {
+					renderPlatformChips(el, available, missing, release);
+					continue;
+				}
+				el.textContent = '';
+				if (slot === 'platform-list') {
+					// Never "no platforms at all" as a bare phrase: if nothing shipped,
+					// the absence clause below is the whole sentence.
+					if (available.length) {
+						el.appendChild(document.createTextNode(
+							joinPlatformNames(available.map(k => PLATFORM_LABEL[k]))));
+						appendAbsenceClause(el, missing, release);
+					} else {
+						appendAbsenceClause(el, missing, release, { lead: 'No ' });
+					}
+				} else if (slot === 'requirements') {
+					el.appendChild(document.createTextNode(available.length
+						? '64-bit ' + joinPlatformNames(available.map(k => PLATFORM_LABEL[k]))
+						: '64-bit desktop OS'));
+					appendAbsenceClause(el, missing, release);
+				} else if (slot === 'install-note') {
+					el.appendChild(document.createTextNode(available.length
+						? 'This release carries builds for ' +
+						  joinPlatformNames(available.map(k => PLATFORM_LABEL[k])) + '.'
+						: 'This release carries no platform builds.'));
+					appendAbsenceClause(el, missing, release, { lead: ' No ' });
+				}
+			}
+		}
+
 		// Load version info when page loads
 		// Upgrade the platform download buttons from the safe release-page baseline to
 		// direct per-platform asset URLs, resolved from the latest release. Robust to any
@@ -1831,7 +2096,14 @@
 			loadGameStats();
 				populateStatusCards();
 			setupDownloadTracking();
-			resolveDownloads();
+			// AWAITED, and in this order, on purpose. Both functions write button
+			// labels. version.json (same origin) settles availability first; the
+			// GitHub API then refines an available button to its direct asset URL.
+			// Sequencing them removes the race -- fire-and-forget would let a slow
+			// version.json overwrite a resolved direct-download label with a
+			// less-specific one. If renderPlatformClaims() throws or the fetch fails
+			// it resolves anyway, so resolveDownloads() always runs.
+			renderPlatformClaims().then(resolveDownloads, resolveDownloads);
 		});
 
 		// Track download button clicks with Plausible Analytics

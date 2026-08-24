@@ -1,0 +1,15 @@
+{
+  "_comment": "Where a visitor goes to find out why a platform has no build in the current release, and when it is coming back. Read by scripts/update-version-info.py and merged into version.json -> latest_release.platform_tracking, which public/index.html renders (renderPlatformClaims -> appendAbsenceClause). A pinned value belongs in a data file with a source note, never a script literal.",
+  "_rules": [
+    "An entry is only ever SHOWN for a platform that has no build in the current release; when the build ships, the platform stops being 'missing' and the link is never rendered. A stale entry is therefore inert, not a lie -- but delete it once its issue closes.",
+    "Adding a key here asserts nothing about availability. That is derived from the release assets by derive_platforms(), and this file cannot override it."
+  ],
+  "platforms": {
+    "macos": {
+      "url": "https://github.com/PipFoweraker/pdoom1/issues/1309",
+      "why": "The macOS export failed inside the v0.14.3 build job. The upload step is if-no-files-found: warn, so the release published green over an empty directory.",
+      "source": "public/index.html as it stood on main 2026-08-25, which linked this issue in hand-written prose; this file is where that link moves so it survives the next update-version-info.py run.",
+      "declared_on": "2026-08-29"
+    }
+  }
+}
