@@ -31,8 +31,9 @@ Run: python scripts/test-weekly-league-boundary.py
 
 import importlib.util
 import json
+import re
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 for _s in (sys.stdout, sys.stderr):
@@ -611,8 +612,43 @@ finally:
 # --------------------------------------------------------------------------
 print("\n-- cron agrees with the anchor, in both DST states --")
 wf = (Path(__file__).parent.parent / ".github" / "workflows" / "weekly-league-reset.yml").read_text(encoding="utf-8")
-crons = [ln.split("'")[1] for ln in wf.splitlines() if "- cron:" in ln and "'" in ln]
-check("exactly one cron in weekly-league-reset.yml", len(crons), 1)
+
+# ACTIVE vs PARKED. This used to collect every line containing "- cron:" without
+# looking at whether it was commented out, so commenting the schedule would have
+# left all the assertions below passing over a schedule that no longer runs --
+# green while disarmed, which is the exact shape CLAUDE.md calls class 5.
+_cron_lines = [ln for ln in wf.splitlines() if "- cron:" in ln and "'" in ln]
+crons = [ln.split("'")[1] for ln in _cron_lines if not ln.lstrip().startswith("#")]
+parked_crons = [ln.split("'")[1] for ln in _cron_lines if ln.lstrip().startswith("#")]
+
+# PARKED-UNTIL is a clock on the ACCEPTANCE, not on the finding. While the date is
+# in the future the park is a legitimate state and this is green -- but it is
+# printed, never silent, because green must carry a number. Past the date the
+# check goes RED on "the park expired", which a human closes by restoring the
+# schedule or re-parking with a new date. A red on the underlying condition would
+# not be closeable by whoever hits it; this one always is.
+_park = re.search(r"PARKED-UNTIL:\s*(\d{4}-\d{2}-\d{2})", wf)
+_parked = bool(parked_crons) and not crons
+
+if _parked:
+    check("a parked schedule carries a PARKED-UNTIL date", bool(_park), True)
+    if _park:
+        _until = date.fromisoformat(_park.group(1))
+        _today = datetime.now(UTC).date()
+        print(f"   PARKED: the rollover schedule is commented out until {_until} "
+              f"({(_until - _today).days} day(s) left). "
+              f"{len(parked_crons)} parked cron line(s), still validated below.")
+        check(f"the park has not expired (PARKED-UNTIL {_until}); restore the "
+              f"schedule or re-park with a new date and reason",
+              _until >= _today, True)
+    # The parked VALUE is still checked against the constants below, so it cannot
+    # rot unnoticed and be restored wrong. That is why it is commented, not deleted.
+    crons = parked_crons
+else:
+    check("exactly one cron in weekly-league-reset.yml", len(crons), 1)
+    check("no leftover parked cron line while a schedule is active",
+          len(parked_crons), 0)
+
 if crons:
     minute, hour, _dom, _mon, dow = crons[0].split()
     check("cron hour matches ROLLOVER_HOUR_UTC", int(hour), wlm.ROLLOVER_HOUR_UTC)

@@ -20,9 +20,37 @@ on:
   # move which week is opened -- only how far into it the run happens.
   # scripts/test-weekly-league-boundary.py parses this cron and fails if it stops
   # agreeing with ROLLOVER_HOUR_UTC / ROLLOVER_CRON_DOW.
-  schedule:
-    - cron: '0 14 * * 4'  # Thursday 14:00 UTC = Friday 00:00 (winter) / 01:00 (summer) Hobart
-  
+  # PARKED 2026-08-24. PARKED-UNTIL: 2026-09-02
+  #
+  # WHY: this job pushes a league rollover straight to `main` unattended, and the
+  # repo's data contract is currently RED (`board:publish` -- the site serves
+  # epoch L4 while the live epoch is L5). Pip flies to Singapore Wed 2026-08-26
+  # and lands back in Hobart Tue 2026-09-01, so the Friday 2026-08-28 rollover
+  # would fire with nobody able to look at what it did. The deploy that follows a
+  # push to main runs no tests, so a bad rollover reaches pdoom1.com in ~20s.
+  #
+  # This is the third option in the "merge #349 or leave it red" choice: the test
+  # fix is right and the red was protecting nothing, but merging it alone re-arms
+  # THIS cron. Parking the schedule lets the fix land and keeps the unattended
+  # publish off until a human is back.
+  #
+  # The cron value is deliberately left in place, commented, rather than deleted:
+  # scripts/test-weekly-league-boundary.py still parses and validates it against
+  # ROLLOVER_HOUR_UTC / ROLLOVER_CRON_DOW while parked, so it cannot rot in the
+  # dark and be restored wrong.
+  #
+  # TO RESTORE: delete the `#` in front of the `- cron:` line below and the
+  # `schedule:` key above it. That is the whole change.
+  #
+  # PARKED-UNTIL is a CLOCK, not a note. On 2026-09-02 the boundary test goes RED
+  # with "the park expired" -- closeable by a human either restoring the schedule
+  # or re-parking with a new date and a reason. Per CLAUDE.md: an acknowledgement
+  # is a state with a clock, and the thing that expires is the ACCEPTANCE, never
+  # the finding.
+  #
+  # schedule:
+  #   - cron: '0 14 * * 4'  # Thursday 14:00 UTC = Friday 00:00 (winter) / 01:00 (summer) Hobart
+
   # Manual trigger for testing or manual league resets
   workflow_dispatch:
     inputs:
