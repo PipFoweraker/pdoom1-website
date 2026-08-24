@@ -444,6 +444,38 @@ Pip's stated top priority. Practically:
 - `index.json` has held entries pointing at files that don't exist; the feed
   generator skips and reports those rather than publishing a dead link.
 
+## Syndication — outbound social, and three defects fixed 2026-08-24
+Inbound automatic, outbound human-gated: `syndicate-content.yml` drafts copy into
+`content/syndication/<slug>.json` with `approved: false` and posts nothing; a
+manual dispatch with `publish=true` sends exactly what a human approved. Setup
+and the credential table live in `docs/SYNDICATION_QUICKSTART.md`.
+
+- **`SYNDICATION_TOKEN` must exist in BOTH the Netlify site env and GitHub
+  secrets, as the same string.** Setting only one yields a green workflow and a
+  401 from every function, because `_auth.js` fails closed. As of 2026-08-24
+  **neither `SYNDICATION_TOKEN` nor `NETLIFY_SITE_URL` is a GitHub secret**
+  (`gh secret list`), so the publish half refuses before sending. The Netlify
+  side cannot be read from a checkout — **unknown, not absent.**
+- **Success is recorded PER PLATFORM, in `draft["posted"]`, written to disk
+  immediately.** It used to be a whole-draft `posted_at` under `if all_ok`, so
+  the realistic first live run — one credential configured, three endpoints
+  returning 500 — posted to Bluesky, recorded nothing, and re-posted on the next
+  run. The docstring claimed "prevents double-posting on a re-run" throughout.
+  **The guard cannot protect a draft part-posted under the old code**: that file
+  has no ledger, which is byte-identical to never having run.
+  `scripts/test-post-syndication.py` asserts the limit as well as the fix.
+- **AT Protocol facet offsets are UTF-8 BYTES, not string indices.**
+  `syndicate-bluesky.js` used `text.indexOf()`. The two agree while the text
+  before the URL is ASCII — which every auto-generated draft is, so the defect
+  was invisible to any test written against the real corpus. One em dash shifts
+  it two bytes. `scripts/test-syndication-facets.js` asserts by round trip and
+  re-runs the old algorithm to prove the suite discriminates.
+- **`check-syndication-docs.py` derives the credential list from the code** and
+  fails if `SYNDICATION_QUICKSTART.md` omits one or files it on the wrong side.
+  It anchors on markdown table rows, not on word proximity — the first version
+  used proximity and its own forced-failure test showed a prose sentence
+  elsewhere on the page satisfied it.
+
 ## Design notes (ADRs)
 - `scripts/sync/sync-design-notes.py` renders the game's ADRs to
   `/design-notes/`, scrubbing internal process markers. It **refuses to write**
@@ -469,6 +501,10 @@ node    scripts/test-syndication-auth.js  # syndication gate fails closed    [co
 python  scripts/check-issues-surface.py   # /issues/ numbers say what they count [content-honesty, update-game-data]
 python  scripts/test-issues-surface.py    # ...and that guard can still FAIL [content-honesty]
 python  scripts/test-syndication-utm.py   # no outbound link ships untagged  [content-honesty]
+node    scripts/test-syndication-facets.js # bluesky link spans are BYTE offsets [content-honesty]
+python  scripts/test-post-syndication.py  # a partly-failed run never re-posts [content-honesty]
+python  scripts/check-syndication-docs.py # every credential documented, right side [content-honesty]
+python  scripts/test-check-syndication-docs.py # ...and that guard can still FAIL [content-honesty]
 python  scripts/test_ingest_scores.py     # leaderboard read path            [data-contract]
 python  scripts/validate_data.py          # data contracts                   [data-contract]
 python  scripts/check-stale-facts.py      # hardcoded facts that rot         [content-honesty ADVISORY]
