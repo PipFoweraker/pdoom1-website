@@ -91,7 +91,24 @@ SOFT_QUALIFIER = re.compile(
 # (file substring, line substring) pairs that are known-honest despite tripping the
 # heuristic. Add with a comment saying WHY; do not weaken the rules to clear one.
 ALLOWLIST = [
-    # (none yet)
+    # (file substring, line substring, and the reason must be readable here)
+    #
+    # 2026-08-24. The first-run note explains WHY unsigned builds trigger an OS
+    # warning, and names the two things that would stop it: a code-signing
+    # certificate on Windows, an Apple Developer identity plus notarization on
+    # macOS. That is a sentence about code signing, not a claim that a macOS
+    # build is available -- and it stays true whether or not one exists, which is
+    # the test for whether an allowlist entry is honest or a silencer.
+    #
+    # The guard cannot tell an availability claim from an explanatory mention,
+    # and it should not try: loosening the heuristic to exclude "notarization"
+    # would blind it to a real claim in a sentence that happened to use the word.
+    # Naming the exception is cheaper and leaves the finding visible.
+    #
+    # THIS ENTRY EXPIRES WITH ITS SENTENCE. If the first-run note is rewritten,
+    # re-read it before assuming this still applies.
+    ("public/index.html",
+     "Apple Developer identity plus notarization"),
 ]
 
 
