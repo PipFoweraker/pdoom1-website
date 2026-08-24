@@ -886,8 +886,26 @@ t	.hero {
 				<a id="download-windows" data-platform-label="Windows" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for Windows
 				</a>
-				<a id="download-macos" data-platform-label="macOS" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
-					Download for macOS
+				<!-- SHIPS DEGRADED, and that is the documented design rather than a
+				     regression: resolveDownloads()'s own comment says "macOS/Linux ship
+				     DISABLED in the HTML", and markAvailable() promotes a button the day
+				     its build lands. This one had drifted to a live href reading
+				     "Download for macOS".
+
+				     Restored 2026-08-24, when v0.14.3 shipped WITHOUT a macOS asset (the
+				     export failed inside the build job and the upload step is
+				     if-no-files-found: warn, so the release published green over an empty
+				     directory). With the live markup, a visitor with JS off -- or one
+				     whose GitHub API call is rate-limited -- was invited to "Download for
+				     macOS" and sent to a release that has no Mac build.
+
+				     The static default must therefore be the SAFE claim and JS may
+				     upgrade it, never the reverse. Both label paths read
+				     data-platform-label rather than this text, so promotion still yields
+				     "Download for macOS" and scripts/test-download-resolution.js is
+				     unaffected. -->
+				<a id="download-macos" data-platform-label="macOS" role="note" aria-disabled="true" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem; opacity: 0.55; cursor: default; pointer-events: none;" title="macOS build is not in the current release yet">
+					macOS &mdash; coming soon
 				</a>
 				<a id="download-linux" data-platform-label="Linux" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Download for Linux
@@ -987,7 +1005,8 @@ t	.hero {
 			-->
 
 			<p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
-				Windows, macOS & Linux · Free &middot; Source available
+				Windows &amp; Linux &middot; Free &middot; Source available<br>
+				<span style="font-size: 0.95em;">The current build does not include a Mac version.</span>
 			</p>
 		</section>
 
@@ -1205,7 +1224,7 @@ t	.hero {
 							<h3>System Requirements</h3>
 							<p style="margin-bottom: 0.8rem;"><strong>Minimum:</strong></p>
 							<ul style="color: var(--text-secondary); margin: 0 0 1rem 1.2rem; line-height: 1.8;">
-								<li>64-bit Windows, macOS, or Linux</li>
+								<li>64-bit Windows or Linux &mdash; the current build has no Mac version</li>
 								<li>Native build &mdash; no runtime to install</li>
 								<li>Basic graphics support</li>
 								<li>Built with Godot 4.5.1</li>
