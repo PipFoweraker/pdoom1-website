@@ -1,13 +1,15 @@
 {
-  "last_updated": "2026-08-24T18:11:32.707541Z",
+  "last_updated": "2026-08-24T23:45:09.675130Z",
   "jobs": {
     "auto-update-data": {
-      "last_run": "2026-08-24T18:11:32.707541Z",
-      "last_success": "2026-08-24T18:11:32.707541Z",
+      "last_run": "2026-08-24T23:45:09.675130Z",
+      "last_success": "2026-08-24T23:45:09.675130Z",
       "last_failure": null,
-      "total_runs": 1201,
-      "success_count": 1201,
-      "failure_count": 0
+      "total_runs": 1202,
+      "success_count": 1202,
+      "failure_count": 0,
+      "partial_count": 0,
+      "unknown_count": 0
     },
     "sync-leaderboards": {
       "last_run": "2026-07-29T02:57:58.825373Z",
