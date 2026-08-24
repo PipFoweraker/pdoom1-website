@@ -7,9 +7,31 @@ edited and explicitly marked approved.
 
 Refuses to act when:
   - approved is not literally true
-  - posted_at is already set (prevents double-posting on a re-run)
+  - the platform is already recorded in draft["posted"] (see below)
+  - posted_at is already set (the whole draft is done)
   - the copy fails the same length/URL validation used at draft time
   - SYNDICATION_TOKEN is missing (the endpoints would 401 anyway)
+
+WHAT "ALREADY POSTED" MEANS, AND WHY IT IS PER PLATFORM
+------------------------------------------------------
+This used to record `posted_at` only when EVERY platform in the draft
+succeeded. One draft lists four platforms, and the realistic first live run has
+exactly one credential configured, so three endpoints return 500 "credentials
+not configured", the run is not all-ok, and NOTHING was written down -- while a
+real post had already appeared on Bluesky. Re-running then posted it a second
+time. The docstring above claimed "prevents double-posting on a re-run" the
+whole time, and it was true only of a run in which nothing had gone wrong.
+
+So success is now recorded per platform, in `draft["posted"]`, and written to
+disk immediately after each one rather than at the end of the draft. A crash,
+a timeout or a missing credential can therefore cost a retry but never a
+duplicate. `posted_at` still marks the whole draft and is set once every
+platform in `copy` is present in `posted`, so anything reading it -- the queue
+listing, the workflow -- keeps its old meaning.
+
+Each ledger entry carries a hash of the exact text that went out. If someone
+edits the copy after a partial post, the record still says what was published,
+rather than what the file says today.
 
 Set DRY_RUN=false to actually post. Anything else, including unset, is a dry run
 -- an accidental invocation must not put words into the world.
@@ -20,6 +42,7 @@ Env:
     DRY_RUN             "false" to post; otherwise dry run
 """
 
+import hashlib
 import json
 import os
 import sys
@@ -49,6 +72,19 @@ _spec = importlib.util.spec_from_file_location(
     "prep", REPO_ROOT / "scripts" / "prepare-syndication.py")
 prep = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(prep)
+
+
+def copy_digest(text):
+    """Short hash of the exact text sent, so the ledger records what went out."""
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
+
+
+def write_draft(path, draft):
+    """Persist immediately. Called after EVERY successful platform, not once per
+    draft -- the whole point of the ledger is that an interrupted run has already
+    been written down."""
+    path.write_text(json.dumps(draft, indent=2, ensure_ascii=False) + "\n",
+                    encoding="utf-8", newline="\n")
 
 
 def post_one(base_url, token, platform, draft, dry_run):
@@ -126,26 +162,59 @@ def main():
             failures += 1
             continue
 
+        platforms = list(draft.get("copy") or {})
+        ledger = draft.get("posted") or {}
+        todo = [p for p in platforms if p not in ledger]
+
+        if not todo:
+            # Every platform is already in the ledger -- a previous run finished
+            # the job but was interrupted before it could stamp the draft as a
+            # whole. Close it out rather than leaving a draft that looks pending
+            # forever and invites somebody to "just re-run it".
+            if not dry_run and not draft.get("posted_at"):
+                draft["posted_at"] = datetime.now(timezone.utc).replace(
+                    microsecond=0).isoformat()
+                write_draft(path, draft)
+                print("%s: all platforms already posted - marked complete" % name)
+            else:
+                print("%s: all platforms already posted - nothing to do" % name)
+            continue
+
         considered += 1
-        print("%s: approved, posting to %d platform(s)"
-              % (name, len(draft.get("copy") or {})))
+        already = len(platforms) - len(todo)
+        print("%s: approved, posting to %d platform(s)%s"
+              % (name, len(todo),
+                 " (%d already posted, skipped)" % already if already else ""))
+
         results = {}
         all_ok = True
-        for platform in list(draft.get("copy") or {}):
+        for platform in todo:
             ok, detail = post_one(base, token, platform, draft, dry_run)
             results[platform] = detail
             print("    %-9s %s  %s" % (platform, "OK " if ok else "FAIL", detail))
             if not ok:
                 all_ok = False
+                continue
+            if dry_run:
+                continue
+            # Written to disk NOW. If the next platform hangs or the runner is
+            # killed, this one is still recorded and will not be sent again.
+            ledger[platform] = {
+                "at": datetime.now(timezone.utc).replace(
+                    microsecond=0).isoformat(),
+                "detail": detail,
+                "copy_sha256_12": copy_digest(draft["copy"][platform]),
+            }
+            draft["posted"] = ledger
+            write_draft(path, draft)
+            posted_any = True
 
-        if all_ok and not dry_run:
+        if not dry_run and all(p in ledger for p in platforms):
             draft["posted_at"] = datetime.now(timezone.utc).replace(
                 microsecond=0).isoformat()
             draft["post_results"] = results
-            path.write_text(json.dumps(draft, indent=2, ensure_ascii=False) + "\n",
-                            encoding="utf-8", newline="\n")
-            posted_any = True
-        elif not all_ok:
+            write_draft(path, draft)
+        if not all_ok:
             failures += 1
 
     if considered == 0 and not failures:
@@ -154,7 +223,12 @@ def main():
         print("\n%d draft(s) would be posted. Re-run the workflow with "
               "publish=true to send them." % considered)
     elif posted_any:
-        print("\nPosted %d draft(s)." % considered)
+        # Deliberately counts drafts ATTEMPTED, and says so, because a draft can
+        # now be part-posted. "Posted 1 draft" over a run where three of four
+        # platforms 500'd is the reassuring-value-instead-of-the-truth shape.
+        print("\n%d draft(s) attempted; see the per-platform lines above and "
+              "the `posted` ledger in each file for what actually went out."
+              % considered)
     if failures:
         print("\n%d draft(s) failed." % failures, file=sys.stderr)
         return 1

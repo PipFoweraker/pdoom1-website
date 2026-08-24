@@ -291,6 +291,35 @@ jobs:
       # URLs until 2026-08-22 and every queued draft carried one.
       - name: No syndication link leaves untagged
         run: python scripts/test-syndication-utm.py
+      # A Bluesky link facet is measured in UTF-8 BYTES. syndicate-bluesky.js
+      # used a JavaScript string index, which is the same number for as long as
+      # the text before the URL is ASCII -- true of every auto-generated draft,
+      # so the defect was live and a test against the real corpus would have
+      # passed. This asserts by round trip (cut the claimed byte range out of
+      # the encoded post, decode, require the URL back) and re-runs the OLD
+      # algorithm to prove the suite can tell the two apart.
+      - name: Bluesky link facets are byte offsets (forced-failure test)
+        run: node scripts/test-syndication-facets.js
+
+      # post-syndication.py recorded success only if EVERY platform succeeded,
+      # so the realistic first live run -- one credential, three 500s -- posted
+      # to Bluesky, wrote nothing down, and would have posted again on the next
+      # run. Success is now per-platform and written immediately. This forces
+      # the partial failure and asserts the second run does not re-post.
+      - name: A partly-failed syndication run never re-posts (forced-failure test)
+        run: python scripts/test-post-syndication.py
+
+      # The quickstart never mentioned SYNDICATION_TOKEN -- the one value whose
+      # absence 503s every endpoint. The required set is derived from the code
+      # that reads it, so a new handler fails this the day it lands. The
+      # forced-failure test runs FIRST: this check has passed since it was
+      # written, and a guard seen only in its passing state has not been shown
+      # to work.
+      - name: The syndication credential doc can still fail (forced-failure test)
+        run: python scripts/test-check-syndication-docs.py
+
+      - name: Every syndication credential is documented, on the right side
+        run: python scripts/check-syndication-docs.py
 
       # Third parties' addresses scraped out of paper PDFs must never be served.
       #
