@@ -1,0 +1,82 @@
+name: Monitoring honesty
+
+# The developer surface at /monitoring/ and the shared staleness gate it is built on.
+#
+# WHY A SEPARATE WORKFLOW RATHER THAN A STEP IN content-honesty.yml:
+# content-honesty.yml is the natural home and is where the sibling guard
+# (test-dashboard-devlog.js) lives. It was under concurrent edit when these tests
+# landed, and quietly folding two more steps into a file someone else was rewriting
+# is how a merge eats a guard. Merging this into content-honesty.yml later is a
+# welcome tidy-up; leaving the tests wired to nothing is not, because "it is in the
+# pre-PR suite" is not "it runs" -- the 2026-08-01 audit found ten checks here wired
+# to no workflow at all.
+#
+# NO SCHEDULE, ON PURPOSE. Both tests read committed source -- the page, the shared
+# gate, and the fetch declaration in scripts/test-escaping.js -- and drive the
+# renderer with their own fixtures. Nothing they assert can change without one of the
+# paths below changing, so a cron would only ever re-confirm the last push, and a
+# scheduled red has nobody watching it.
+#
+# THE ONE BLIND SPOT, stated rather than hidden: bot commits carrying the skip-CI
+# marker do not trigger any push-based guard, and one of them writes
+# public/monitoring/data/automation-status.json. That file is DATA the page reads at
+# runtime, not something these tests assert about, so the blindness costs nothing
+# here -- but if a future test starts asserting against that committed file, this
+# comment is wrong and the check belongs inside the producer instead.
+
+on:
+  pull_request:
+    paths:
+      - 'public/monitoring/**'
+      - 'public/assets/js/freshness.js'
+      - 'public/assets/js/escape.js'
+      - 'scripts/test-freshness.js'
+      - 'scripts/test-monitoring-atoms.js'
+      - 'scripts/test-escaping.js'
+      - '.github/workflows/monitoring-honesty.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'public/monitoring/**'
+      - 'public/assets/js/freshness.js'
+      - 'public/assets/js/escape.js'
+      - 'scripts/test-freshness.js'
+      - 'scripts/test-monitoring-atoms.js'
+      - 'scripts/test-escaping.js'
+      - '.github/workflows/monitoring-honesty.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  monitoring-honesty:
+    name: BLOCKING -- the staleness gate, and the page that uses it
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # The mechanism first. Every clause of the gate's contract is forced into its
+      # failing state here: an unreadable stamp, a missing window, a future date, a
+      # source that has stopped moving. A guard seen only in its passing state has
+      # not been shown to work.
+      - name: The shared staleness gate refuses (forced-failure test)
+        run: node scripts/test-freshness.js
+
+      # Then the page that has to use it correctly. /monitoring/ rendered a green
+      # "healthy / 100%" out of a file whose only two writers are dispatch-only, so
+      # nothing had refreshed it in weeks, and the aggregate percentage it fed was
+      # green throughout. This forces stale, undated, unreadable and future-dated
+      # sources and asserts that each renders its age and NO value.
+      - name: /monitoring/ renders no value from a source that stopped moving
+        run: node scripts/test-monitoring-atoms.js
+
+      # The page routes every fetch through one readSource(url), so rule 3 of the
+      # escaping guard finds no URL literal on it and passes having checked nothing.
+      # test-monitoring-atoms.js closes that loop from the other end -- but only if
+      # the escaping guard itself is still green, so run it here too.
+      - name: Every external interpolation still goes through the one escaper
+        run: node scripts/test-escaping.js

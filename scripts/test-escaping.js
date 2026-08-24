@@ -134,11 +134,25 @@ const GUARDED = [
   },
   {
     page: 'public/monitoring/index.html',
-    roots: ['check', 'job', 'jobName', 'league', 'weekInfo', 'c', 'h', 'summary'],
-    safeHelpers: ['badge'],
-    fetches: ['/data/health-check.json', '/data/version.json',
-              '/data/deployment-verification.json', '/monitoring/data/automation-status.json',
-              '/leaderboard/data/weekly/current.json', '/data/integration-health.json'],
+    // Rewritten 2026-08-25 into freshness-gated atoms. `doc` is a parsed source
+    // document, `atom` its declaration, `verdict` the staleness gate's answer, and
+    // check/row/job/jobName are rows within one source. Note that a JSON object KEY
+    // (jobName) is data too -- keys are the sink people forget, because they read
+    // like identifiers.
+    roots: ['doc', 'atom', 'verdict', 'check', 'row', 'job', 'jobName', 'summary'],
+    safeHelpers: [],
+    // RULE 3 IS PARTLY BLIND ON THIS PAGE, and saying so is cheaper than pretending
+    // otherwise: every fetch goes through one readSource(url) call, so the scan below
+    // finds no URL LITERAL here and reports "all 0 fetch target(s) declared" -- a
+    // green that has checked nothing. The list is still the declaration of record,
+    // and scripts/test-monitoring-atoms.js closes the loop from the other end: it
+    // reads this array out of this file and fails if it disagrees, in either
+    // direction, with the ATOMS table that actually does the fetching.
+    fetches: ['/data/health-check.json', '/data/integration-health.json',
+              '/data/version.json', '/leaderboard/data/board-liveness.json',
+              '/data/analytics/latest.json', '/data/events-sync-summary.json',
+              '/monitoring/data/automation-status.json',
+              '/data/deployment-verification.json'],
   },
   {
     page: 'public/blog/index.html',

@@ -1,9 +1,25 @@
 {
   "entries": [
     {
+      "version": "1.2.1",
+      "date": "2026-08-25",
+      "channel": "release",
+      "summary": "Rebuilt /monitoring/ as a developer surface made of honest atoms: one indicator per source, each freshness-gated, no aggregate health score.",
+      "items": [
+        "Dropped the single Health Score percentage. It averaged eight unrelated sources and could read 100% while several of them were dead, which is what it had been doing.",
+        "Split the page into atoms: one indicator per source file, each declaring what it derives, which file it derives it from, and how old that file is allowed to be.",
+        "Added public/assets/js/freshness.js, the site's ONE staleness gate, lifted out of the /dashboard/ development-log box so other pages can reuse it instead of writing a fourth one. Stale, undated, unreadable and future-dated sources all render UNKNOWN and no value; there is deliberately no remembered value to fall back to.",
+        "Named the deployment-verification card as unrefreshable rather than deleting it quietly: nothing schedules a write to /data/deployment-verification.json, because its only two writers are manual-dispatch workflows, so it now says that instead of rendering a green 100%.",
+        "Removed three indicators that could only ever say one thing: a Website Status card that fetched this site from the browser already showing the page, a GitHub Integration card that reported \"Connected\" whenever a committed local file had a repository_stats key, and a league rollover button that ran no rollover and opened an alert telling the reader to use GitHub Actions instead.",
+        "Added four indicators whose sources already exist and are written on a schedule: score-API board liveness, the analytics-to-git backup, the events sync from pdoom-data, and the automation ledger (labelled on the page as the jobs' own self-report, which is not an observation from inside the system).",
+        "Took /monitoring/ off the player-facing front page. The URL is unchanged, so no inbound link breaks; the page now describes itself as the sibling of /metabolism/.",
+        "New forced-failure tests: scripts/test-freshness.js (the shared gate refuses on every bad input shape) and scripts/test-monitoring-atoms.js (the page renders no value from a stale, undated, unreadable or future-dated source). Both wired into the Content Honesty workflow."
+      ]
+    },
+    {
       "version": "0.2.1",
       "date": "2025-10-09",
-      "channel": "release", 
+      "channel": "release",
       "summary": "Testing version-aware deployment system with patch release.",
       "items": [
         "Configured GitHub environments for production deployment safeguards",
