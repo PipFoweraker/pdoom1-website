@@ -21,17 +21,21 @@
     }
   },
   "current_ladder_epoch": {
-    "value": "L5",
+    "value": "L6",
     "_comment": "DECLARED, not derived -- pdoom1 still publishes no machine-readable epoch artifact, so this is the human channel standing in for one. It is populated because the game side has stated the value unambiguously and in writing, and because leaving it null made the site refuse to publish a board that real players were already scoring on. While it is set, every surface may name L4; if pdoom1 forks again and this is not updated, the site will confidently publish the WRONG board -- which is why the artifact ask below stays open until a workflow can read the epoch instead of a human typing it. The L3 -> L4 fork on 2026-08-07 is the second time this file has had to be hand-edited to keep up with a fork; the prior value was L3, declared 2026-07-30, and the L3 board (weekly-2026-w31, L3) is archived under preserved/2026-08-08-l3-epoch-close/.",
-    "source": "pdoom1 v0.14.2 release_manifest.json (a published release asset) carries \"ladder_version\": \"5\" and \"league_seed\": \"weekly-2026-w33\", commit_hash 38528c22cd7b3d282dc825fa03e941d43a7c87fe. Corroborated by the v0.14.2 git tag message and blessed by Pip at [Gate 5] on 2026-08-21 (docs/LEAGUE_SEED_LEDGER.md L5 row). NOT a value typed from a GitHub comment.",
-    "declared_on": "2026-08-21",
+    "source": "pdoom1 v0.14.3 release_manifest.json (a published release asset) carries \"ladder_version\": \"6\" and \"league_seed\": \"weekly-2026-w35\", commit_hash 161240bef1454851555ed042c640b67a0cf67d56. BLESSED by Pip at [Gate 5] 19:36 local on 2026-08-24 and recorded in docs/LEAGUE_SEED_LEDGER.md (L6 row); [Gate 6] opened in the same breath. NOT a value typed from a GitHub comment.",
+    "declared_on": "2026-08-24",
     "supersede_when": "SATISFIED 2026-08-21, not yet actioned. The condition was \"pdoom1 publishes the ladder epoch as a fetchable artifact (release asset or synced data file)\". pdoom1 #1175 added ladder_version and league_seed to release_manifest.json in v0.14.1, and v0.14.2 carries both; this value was READ from that asset rather than from a comment. The human channel can now be retired by fetching the manifest -- LEAGUE_CYCLE_HANDBOOK.md section 5 still says no such artifact exists and is stale. Until the fetch is automated, this field stays.",
     "verify_with": "python scripts/check-board-liveness.py -- if the epoch here is wrong, populated boards on the real epoch show up as NEW ORPHAN rather than DEPLOYED."
   },
   "extra_seeds": [
     {
-      "value": "weekly-2026-w33",
-      "source": "BLESSED by Pip at [Gate 5] 2026-08-21 and recorded in docs/LEAGUE_SEED_LEDGER.md (L5 row). Read from the published v0.14.2 release_manifest.json (\"league_seed\": \"weekly-2026-w33\"), not guessed and not pre-populated -- the ceremony had already happened when this line was written. The v0.14.2 client POSTs to (weekly-2026-w33, L5). NOT YET OBSERVED live: api.pdoom1.com is unreachable, so no GET has confirmed the board exists. Pinned so check-board-liveness.py can probe it the moment the host returns."
+      "value": "weekly-2026-w35",
+      "source": "READ FROM A PUBLISHED RELEASE ASSET: pdoom1 v0.14.3 release_manifest.json carries \"league_seed\": \"weekly-2026-w35\" alongside \"ladder_version\": \"6\", commit_hash 161240bef1454851555ed042c640b67a0cf67d56. v0.14.3 is the only build a player can currently download. BLESSED by Pip at [Gate 5] 19:36 local 2026-08-24; docs/LEAGUE_SEED_LEDGER.md carries the L6 row.",
+      "why_needed": "NOT to add a candidate -- the probe already derives this seed now a score exists on it. Pinned so the choice cannot become ambiguous again if the board is empty at some future publish: _pick_empty_fork() narrows by DECLARATION. The lesson from 2026-08-24 is that SPENT pins CAUSE the ambiguity they were added to prevent -- w31, w32 and w33 were all pinned with sources, so the pool never narrowed to one and publish-live-board.py refused. Removing two spent pins fixed it; adding a third would not have.",
+      "declared_on": "2026-08-24",
+      "declared_by": "website seat, on Pip's [Gate 5] blessing and [Gate 6] opening of 2026-08-24 19:36",
+      "remove_when": "The board is non-empty and has been published once. It already holds one entry, so this pin is close to removable already -- take it out rather than letting it accumulate, which is the failure this file has now demonstrated twice."
     }
   ],
   "extra_versions": []
