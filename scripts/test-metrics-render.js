@@ -57,6 +57,11 @@ const IDS = [
   'archive-line', 'archive-failure', 't-archive', 'archive-wrap',
 ];
 
+// The site's ONE staleness gate. renderLatest() calls Freshness.assess() on the
+// snapshot's own capture stamp, so the tiles cannot render a 30-day window that
+// has drifted into the past without saying so.
+const FRESHNESS = require(path.join(ROOT, 'public', 'assets', 'js', 'freshness.js'));
+
 function makeDoc() {
   const els = {};
   for (const id of IDS) {
@@ -111,9 +116,14 @@ async function run(opts) {
   // page by a blocking <script src>. Passing them in is the node-side equivalent
   // of that tag; without them the renderer throws ReferenceError, which is the
   // page's intended fail-closed behaviour rather than a test artefact.
-  new Function('document', 'fetch', 'escapeHTML', 'safeUrl', 'safeUrlRaw', 'isSafeUrl', 'toNumber', code)(
+  // Freshness is public/assets/js/freshness.js -- the site's ONE staleness gate,
+  // loaded on the page by a second blocking <script src>. Same reasoning as the
+  // escaper above: without it renderLatest() throws ReferenceError, which is the
+  // page's intended fail-closed behaviour rather than a test artefact.
+  new Function('document', 'fetch', 'escapeHTML', 'safeUrl', 'safeUrlRaw', 'isSafeUrl', 'toNumber', 'Freshness', code)(
     document, makeFetch(opts),
-    SHARED.escapeHTML, SHARED.safeUrl, SHARED.safeUrlRaw, SHARED.isSafeUrl, SHARED.toNumber);
+    SHARED.escapeHTML, SHARED.safeUrl, SHARED.safeUrlRaw, SHARED.isSafeUrl, SHARED.toNumber,
+    FRESHNESS);
   for (let i = 0; i < 30; i++) await new Promise((r) => setTimeout(r, 0));
   return { document, html: rendered(document) };
 }
@@ -124,6 +134,13 @@ async function run(opts) {
 const MAGIC = 7654321;          // no real traffic figure will ever be this
 const MAGIC_TEXT = '7,654,321';
 
+// NOTE (2026-08-25): these dates are deliberately far-future so no real snapshot
+// can ever match them. renderLatest() now runs Freshness.assess() over
+// captured_at_utc, so every fixture below ALSO renders a FUTURE-DATED banner into
+// #latest-errors -- correct behaviour for a record dated 2099, and harmless to the
+// assertions here, which look for their own MAGIC strings rather than for an empty
+// container. The freshness gate's own four states are forced in
+// scripts/test-manufactured-confidence.js, section D.
 const LATEST = {
   schema: 2,
   snapshot_date: '2099-02-03',

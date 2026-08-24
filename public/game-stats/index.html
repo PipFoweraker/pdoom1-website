@@ -14,6 +14,11 @@
 	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
 	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+	<!-- THE staleness gate (/assets/js/freshness.js). Plain blocking on purpose: the
+	     inline renderer at the end of this file calls Freshness.assess(), so it must
+	     already exist. If it fails to load the renderer throws and no tile is filled
+	     in, rather than every tile rendering with no statement of its age. -->
+	<script src="/assets/js/freshness.js"></script>
     <style>
         :root {
             --bg-primary: #12100f;
@@ -240,9 +245,24 @@
     </div>
     
     <script>
+        // Local copy of the same presence test /league/ and /leaderboard/ use. It is
+        // deliberately NOT in freshness.js: that file owns "how old is this source",
+        // one contract, and "did this source carry the field" is a different
+        // question. If a shared measured-or-unknown helper lands, these three call
+        // sites fold into it.
+        function measured(v) {
+            if (v === null || v === undefined || typeof v === 'boolean') { return false; }
+            if (typeof v === 'number') { return isFinite(v); }
+            if (typeof v === 'string') { return v.trim() !== '' && isFinite(Number(v)); }
+            return false;
+        }
+
         async function loadStats() {
             try {
                 const response = await fetch('/data/version.json', { cache: 'no-store' });
+                // A non-200 used to fall through to response.json(), which throws on
+                // shared hosting's HTML error page -- correct by accident. Say it.
+                if (!response.ok) { throw new Error('HTTP ' + response.status); }
                 const data = await response.json();
                 
                 // Update stats with live data
@@ -277,29 +297,79 @@
                              v => v >= 1000 ? `${(v/1000).toFixed(0)}k+` : String(v));
                 }
                 
-                // Update repository stats
-                if (data.repository_stats) {
-                    document.getElementById('open-issues').textContent = data.repository_stats.open_issues;
-                    document.getElementById('repo-stars').textContent = data.repository_stats.stars;
+                /* ===== THE THREE REPOSITORY TILES ==============================
+
+                   `textContent = data.repository_stats.open_issues` publishes the
+                   string "undefined" when the field is absent, and publishes a
+                   number with no statement of its age when it is present. The three
+                   stats above this block were fixed in #177 for exactly this reason
+                   -- an unmeasured value must render as an em dash -- and these
+                   three were left reading straight out of the file. Same page.
+
+                   `measured()` is the same test used on /league/ and /leaderboard/:
+                   presence is checked BEFORE coercion, because every "safe" numeric
+                   coercion in JS turns absent into 0.
+                ============================================================ */
+                const setStat2 = (id, raw, format) => {
+                    const el = document.getElementById(id);
+                    if (!el) { return; }
+                    if (!measured(raw)) {
+                        el.textContent = '—';
+                        el.classList.add('stat-unmeasured');
+                        el.title = 'This field was not present in /data/version.json. ' +
+                            'Absent is not zero.';
+                        return;
+                    }
+                    const n = Number(raw);
+                    el.textContent = format ? format(n) : String(n);
+                    el.classList.remove('stat-unmeasured');
+                    el.title = '';
+                };
+
+                const repo = data.repository_stats || {};
+                setStat2('open-issues', repo.open_issues, v => Math.round(v).toLocaleString());
+                setStat2('repo-stars', repo.stars, v => Math.round(v).toLocaleString());
+
+                // Days since last release: derived here, so an unreadable published_at
+                // must yield the dash rather than a number derived from NaN.
+                const publishedAt = (data.latest_release || {}).published_at;
+                const releaseMs = publishedAt ? new Date(publishedAt).getTime() : NaN;
+                setStat2('last-release',
+                    isFinite(releaseMs) ? Math.floor((Date.now() - releaseMs) / 86400000) : null,
+                    v => String(v));
+
+                /* THE AGE OF THE WHOLE CARD SET. Every tile above is a snapshot
+                   version.json happened to be holding. version.json is written by a
+                   workflow, and a workflow can stop; the file then stays on disk and
+                   these tiles keep rendering last month's counts in the present
+                   tense. Deriving correctly from a source that has stopped moving is
+                   the /dashboard/ defect, and this page has six tiles of it.
+
+                   POLICY: auto-update-data.yml writes version.json several times a
+                   day, so anything past three days means the writer is not running.
+                   Named here rather than read off the cron -- a window derived from
+                   the writer agrees with the writer by construction. */
+                const STATS_MAX_AGE_HOURS = 24 * 3;
+                const stamp = document.getElementById('last-updated');
+                const v = Freshness.assess(data.last_updated, STATS_MAX_AGE_HOURS);
+                if (v.state === Freshness.UNKNOWN) {
+                    stamp.textContent = 'These figures carry no readable timestamp, so how ' +
+                        'current they are is unknown.';
+                    stamp.title = v.reason;
+                } else {
+                    stamp.textContent = 'Last updated: ' +
+                        new Date(data.last_updated).toLocaleString() +
+                        (v.fresh ? '' : ' — ' + v.label + ', ' + v.ageText +
+                            '. Every figure above is what that snapshot said, not what is true now.');
+                    stamp.title = v.fresh ? '' : v.reason;
                 }
-                
-                // Calculate days since last release
-                if (data.latest_release && data.latest_release.published_at) {
-                    const releaseDate = new Date(data.latest_release.published_at);
-                    const now = new Date();
-                    const daysDiff = Math.floor((now - releaseDate) / (1000 * 60 * 60 * 24));
-                    document.getElementById('last-release').textContent = daysDiff;
-                }
-                
-                // Update last updated time
-                if (data.last_updated) {
-                    const updateTime = new Date(data.last_updated).toLocaleString();
-                    document.getElementById('last-updated').textContent = `Last updated: ${updateTime}`;
-                }
-                
+
             } catch (error) {
                 console.warn('Could not load stats:', error);
-                document.getElementById('last-updated').textContent = 'Last updated: Error loading data';
+                // A failed read leaves every tile showing its shipped placeholder and
+                // says which of the two states this is. It must not print a time.
+                document.getElementById('last-updated').textContent =
+                    'These figures could not be read just now, so none of them is being shown as current.';
             }
         }
         

@@ -622,12 +622,16 @@
       Failed to load archive data. Please try again later.
     </div>
 
-    <!-- No Results -->
+    <!-- No Results. TWO states, because an empty grid has two causes and only one
+         of them is a fact about the league. showNoResults(incomplete) picks. -->
     <div class="no-results" id="no-results" style="display: none;">
       No league weeks on ladder epoch L3 have been archived yet. The first one runs from
       Friday 31 July 2026 and closes on Thursday 6 August 2026. Everything set under the
       earlier rules is anomalous pre-history and is listed separately below.
     </div>
+
+    <!-- Filled by showCompleteness() only when part of the archive did not load. -->
+    <div class="no-results" id="completeness-note" style="display: none;"></div>
 
     <!-- Archive Grid -->
     <div class="archive-grid" id="archive-grid" style="display: none;">
@@ -761,14 +765,30 @@
         // First, try to load the archive index
         const indexResponse = await fetch('/leaderboard/data/weekly/archive/index.json', { cache: 'no-store' });
 
+        /* ===== "NOTHING TO SHOW" AND "COULD NOT LOOK" ARE DIFFERENT SENTENCES ==
+
+           The comment below used to read "No fallback needed - empty array is
+           fine", and it was wrong in the one direction that matters. An unreadable
+           index produced `archiveFiles = []`, which produced `allArchives = []`,
+           which called showNoResults() -- a page saying there are no archived
+           weeks, having failed to find out whether there are any. Per-file
+           failures had the same shape one line further down: `.catch(() => null)`
+           then `.filter(d => d !== null)`, so any subset of the archive could
+           vanish and the remaining weeks rendered as the complete history.
+
+           An archive page's whole claim is completeness. It has to say when it
+           does not have it.
+        ==================================================================== */
         let archiveFiles = [];
         let index = null;
+        let indexUnread = false;
         if (indexResponse.ok) {
           // Use index file if available
           index = await indexResponse.json();
           archiveFiles = (index.archives || []).map(a => a.file);
+        } else {
+          indexUnread = true;
         }
-        // No fallback needed - empty array is fine
 
         // Both of these render from the index or not at all: if the data does
         // not carry the fact, the page stays silent rather than asserting it.
@@ -784,10 +804,13 @@
           )
         );
 
-        // Filter out failed loads, then split the epochs apart
+        // Filter out failed loads -- but COUNT them first, then split the epochs apart
         const loaded = archiveData.filter(d => d !== null);
+        const filesUnread = archiveData.length - loaded.length;
         anomalousArchives = loaded.filter(isAnomalous);
         allArchives = loaded.filter(d => !isAnomalous(d));
+
+        showCompleteness(indexUnread, archiveFiles.length, filesUnread);
 
         displayAnomalies();
 
@@ -797,7 +820,9 @@
         populateSeasonFilter(seasons);
 
         if (allArchives.length === 0) {
-          showNoResults();
+          // Only a COMPLETE read may say "no archived weeks". Anything else says
+          // what it failed to read, because the two are the same empty grid.
+          showNoResults(indexUnread || filesUnread > 0);
           return;
         }
 
@@ -1101,10 +1126,43 @@
     }
 
     // Show no results
-    function showNoResults() {
+    // `incomplete` true means part of the archive could not be read, so the empty
+    // grid is a read failure and must not be presented as the league's history.
+    function showNoResults(incomplete) {
       document.getElementById('loading').style.display = 'none';
-      document.getElementById('no-results').style.display = 'block';
       document.getElementById('archive-grid').style.display = 'none';
+      const none = document.getElementById('no-results');
+      if (incomplete) {
+        none.style.display = 'none';   // the completeness note already says it
+      } else {
+        none.style.display = 'block';
+      }
+    }
+
+    // States what the page failed to read, in counts it computed itself. textContent,
+    // so nothing fetched can become markup here. Silent when the read was complete --
+    // a note that appears on every load is a note nobody reads.
+    function showCompleteness(indexUnread, filesListed, filesUnread) {
+      const note = document.getElementById('completeness-note');
+      if (!note) { return; }
+      if (!indexUnread && filesUnread === 0) {
+        note.style.display = 'none';
+        return;
+      }
+      const bits = [];
+      if (indexUnread) {
+        bits.push('The archive index could not be read, so this page does not know how ' +
+          'many league weeks have been archived. What is shown below — including nothing ' +
+          'at all — is not a record of the league.');
+      }
+      if (filesUnread > 0) {
+        bits.push(filesUnread + ' of ' + filesListed + ' archived week(s) failed to load and ' +
+          'are missing from everything on this page: the grid, the season filter, the ' +
+          'sort order and the preserved-board tallies. They are absent from this view, ' +
+          'not absent from the league.');
+      }
+      note.textContent = bits.join(' ');
+      note.style.display = 'block';
     }
 
     // Event listeners

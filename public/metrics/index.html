@@ -19,6 +19,10 @@
 		page renders nothing rather than rendering unescaped data. Fail closed.
 	-->
 	<script src="/assets/js/escape.js"></script>
+	<!-- THE staleness gate. Same load rule, same fail-closed reason: renderLatest()
+	     calls Freshness.assess() inline, so a 404 here throws before any tile is
+	     filled rather than filling them with no verdict on the snapshot's age. -->
+	<script src="/assets/js/freshness.js"></script>
 
 	<style>
 		:root {
@@ -671,6 +675,39 @@
 			// not do with a missing day. It belongs in front of a reader, not buried
 			// in a JSON file nobody opens.
 			var caveats = [];
+
+			/* ===== THE SNAPSHOT'S OWN AGE ====================================
+
+			   This page was already careful about every value INSIDE the snapshot:
+			   absent renders as an em dash, a gap is not a zero, a failed section is
+			   named. It said nothing about the snapshot itself. The capture date was
+			   printed in the window line above -- one date among three, in body text,
+			   with no verdict attached -- so a file that stopped being written kept
+			   publishing five confident totals and a full chart, and the only thing
+			   distinguishing that from a fresh read was a reader doing date
+			   arithmetic in their head.
+
+			   snapshot-plausible.py refuses to write on a bad fetch, which protects
+			   the CONTENT of latest.json and does nothing about its AGE: a file that
+			   is never rewritten is exactly what a correctly-refusing writer leaves
+			   behind. "Refusing to act is itself a silent-failure mode."
+
+			   POLICY: snapshot-analytics.yml runs daily, so three days is three
+			   consecutive missed runs -- past coincidence. Declared here, not read
+			   off the cron: a window derived from the writer agrees with the writer.
+			=============================================================== */
+			var SNAPSHOT_MAX_AGE_HOURS = 24 * 3;
+			var snapAge = Freshness.assess(
+				(latest && (latest.captured_at_utc || latest.snapshot_date)) || null,
+				SNAPSHOT_MAX_AGE_HOURS);
+			if (!snapAge.fresh) {
+				caveats.push('<div class="failure"><strong>' + escapeHTML(snapAge.label) +
+					': these totals are not a reading of now.</strong> ' +
+					escapeHTML(snapAge.reason) +
+					' The numbers above are exactly what that snapshot recorded &mdash; ' +
+					'nothing has been substituted &mdash; but the window they cover has ' +
+					'moved into the past and nothing here can tell you what has happened since.</div>');
+			}
 			if (cov && cov.note) {
 				caveats.push('<div class="notice">' + escapeHTML(cov.note) + '</div>');
 			}
