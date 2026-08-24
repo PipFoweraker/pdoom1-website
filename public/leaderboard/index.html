@@ -1050,12 +1050,28 @@
       const arch = (liveness && liveness.archived_orphans) || {};
       if (arch.entries_total > 0) {
         const names = (arch.player_names || []).map(escapeHTML).join(', ');
+        // CORRECTED 2026-08-24. This read "...before the current season scheme
+        // existed", which was true of every entry in the archive on the day it
+        // was written and became FALSE the moment a CLOSED SEASON was archived
+        // alongside the pre-scheme boards. On 2026-08-24 the L4 board closed and
+        // its 11 entries -- played 7-12 August, months after the scheme existed
+        // -- joined this set, along with one score from 14 August. The sentence
+        // would have told visitors that six named players' recent runs predated
+        // a scheme they were played under.
+        //
+        // The archive holds two different things and the mechanism cannot tell
+        // them apart: capture filenames register a key as known history whether
+        // it is a pre-scheme anomaly or an epoch that closed correctly. So the
+        // copy now says only what is true of BOTH -- these boards are not the
+        // one this page publishes -- and claims nothing about when or why.
         notes.push(
           `<strong>${arch.entries_total} earlier runs are preserved but not shown here.</strong> ` +
           `They were submitted by ${(arch.player_names || []).length} player(s) ` +
-          `(${names}) before the current season scheme existed, so they sit on boards this ` +
-          `page does not publish. They are kept exactly as recorded, and deliberately not ` +
-          `re-stamped onto a newer board &mdash; that would fabricate history.`
+          `(${names}) on boards this page no longer publishes &mdash; earlier seasons, and ` +
+          `boards from before the current season scheme existed. They are kept exactly as ` +
+          `recorded, and deliberately not re-stamped onto a newer board &mdash; that would ` +
+          `merge scores set under different rules, which is the whole reason a season is ` +
+          `half the board key.`
         );
       }
 
