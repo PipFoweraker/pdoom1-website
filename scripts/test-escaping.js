@@ -79,7 +79,13 @@ function read(rel) {
 const GUARDED = [
   {
     page: 'public/leaderboard/index.html',
-    roots: ['entry', 'data', 'e'],
+    // `epochs`/`pf` are the parsed /data/ladder-epochs.json and its player_facing
+    // block, read by buildLeagueStateHTML() since #351. Same-origin and
+    // hand-written rather than API-supplied, so the threat is a typo rather than an
+    // attacker -- but the escaping rule is per-SINK, not per-source, and the one
+    // exception is how the five separate escapers happened. Declared so a template
+    // literal added here later fails closed.
+    roots: ['entry', 'data', 'e', 'epochs', 'pf'],
     safeHelpers: ['identityHTML', 'devBadgeHTML'],
     fetches: ['/leaderboard/data/weekly/current.json', '/data/ladder-epochs.json',
               '/design/tokens.json', '/leaderboard/data/preserved/',

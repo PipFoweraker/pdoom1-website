@@ -718,6 +718,11 @@
       <h1>Leaderboard</h1>
       <p class="subtitle">Top players in the AI Safety Strategy Game</p>
       <div id="data-status-banner" style="display:none; margin-top:1rem; padding:0.9rem 1.1rem; border-radius:var(--radius-md); border:1px solid var(--accent-secondary); background:rgba(47, 212, 194,0.08); color:var(--text-primary); font-size:0.9rem; text-align:left;"></div>
+      <!-- Three questions, answered separately (#351). Populated by
+           renderLeagueState() from /data/ladder-epochs.json -> player_facing.
+           Hidden until it has something to say; if the file loads it always has
+           something to say, including "unknown". -->
+      <div id="league-state" style="display:none; margin-top:1rem; padding:0.9rem 1.1rem; border-radius:var(--radius-md); border:1px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary); font-size:0.9rem; text-align:left;"></div>
       <div id="seed-info" style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 0.9rem;">
         <div><strong>Seed:</strong> <span id="current-seed">-</span></div>
         <div><strong>Economic Model:</strong> <span id="economic-model">-</span></div>
@@ -972,6 +977,172 @@
     const devBadgeHTML = (entry) => isDevBuild(entry)
       ? ` <span class="dev-badge" title="Set on a development build. Dev builds can enable debug tooling, so this score is not comparable to a release-build score.">DEV BUILD</span>`
       : '';
+
+    // ------------------------------------------------------------------------
+    // LEAGUE STATE -- three questions, answered separately. pdoom1-website#351.
+    //
+    // WHAT WAS MISSING. This page could already say what is downloadable, and could
+    // already say the board it publishes is from a previous season. It had NO WAY TO
+    // SAY WHETHER ANY LEAGUE WAS OPEN. Those are different facts: the board key is
+    // COMPILED INTO the build, so a published build posts scores to a board key that
+    // may never have been opened by anyone. Published and open looked identical from
+    // outside, and that is the whole of #351.
+    //
+    // WHAT IT READS. /data/ladder-epochs.json -> player_facing, and the board key
+    // this page is actually serving. Nothing is derived and nothing is inferred. In
+    // particular this function CANNOT conclude that a league is open: openness is a
+    // named human's recorded act at [Gate 6], the data file refuses to carry it
+    // without an opener and a timestamp, and scripts/check-league-state.py forces
+    // that refusal red.
+    //
+    // AN EMPTY BOARD IS NOT EVIDENCE OF ANYTHING, so nothing here reasons from a
+    // count. The score API has no key validation: a key that never existed answers
+    // ok:true with an empty entries array, exactly like a real board nobody has
+    // played. Measured 2026-08-24 -- seed=NOTASEED-zzz9&version=L99 returns ok:true.
+    //
+    // UNKNOWN IS FIRST-CLASS (ruled 2026-08-23). Unreadable file, missing block, or
+    // an expired verification stamp: every line says "unknown" rather than falling
+    // back to the last confident-looking value. A default ships precisely when the
+    // real lookup failed.
+    //
+    // AN UNBLESSED SEED IS NEVER SHOWN. A seed prints only when its own block says
+    // seed_blessed === true. The game repo's current seed const is recorded in the
+    // data file as an OBSERVATION and deliberately does not reach a visitor.
+    // ------------------------------------------------------------------------
+    function buildLeagueStateHTML(epochs, publishedKey, nowMs) {
+      const UNKNOWN = 'Unknown &mdash; this site cannot currently establish this, ' +
+        'and an unknown is shown as an unknown.';
+      const row = (label, body) =>
+        '<div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin:0 0 0.7rem 0;">' +
+        '<div style="min-width:12rem; font-weight:600; opacity:0.85;">' + label + '</div>' +
+        '<div style="flex:1 1 20rem; min-width:0;">' + body + '</div></div>';
+
+      const pf = (epochs && epochs.player_facing) || null;
+      if (!pf) {
+        return '<div style="font-weight:600; margin-bottom:0.6rem;">Where the league stands</div>' +
+          row('Everything', UNKNOWN + ' The file describing the league state did not ' +
+              'load, so this page can say nothing about which board is open.');
+      }
+
+      // Freshness first: a stale stamp turns every answer below into an unknown,
+      // because a verified fact with no expiry is a claim that outlives its evidence.
+      const stampMs = Date.parse(String(pf.verified_utc || ''));
+      const windowDays = (typeof pf.stale_after_days === 'number' && pf.stale_after_days > 0)
+        ? pf.stale_after_days : null;
+      const stale = !windowDays || isNaN(stampMs) ||
+        (nowMs - stampMs) > windowDays * 86400000;
+
+      const dl = pf.downloadable_now || {};
+      const lo = pf.league_open || {};
+      const coming = pf.coming || {};
+      const dlKey = dl.board_key || {};
+
+      // 1. What is downloadable now.
+      let dlHTML = UNKNOWN;
+      if (!stale && dl.state && dl.state !== 'unknown' && dl.build) {
+        const keyBits = [];
+        if (dl.seed_blessed === true && dlKey.seed) {
+          keyBits.push('<code>' + escapeHTML(String(dlKey.seed)) + '</code>');
+        }
+        if (dlKey.ladder_version) {
+          keyBits.push('<code>' + escapeHTML(String(dlKey.ladder_version)) + '</code>');
+        }
+        dlHTML = '<strong>' + escapeHTML(String(dl.build)) + '</strong>' +
+          (keyBits.length
+            ? ' &mdash; a run finished on it is recorded on the board keyed ' +
+              keyBits.join(', ') + '.'
+            : ' &mdash; the board key it posts to is not established here.');
+      }
+
+      // 2. Which league is OPEN. This is the answer the page did not have before.
+      let loHTML = UNKNOWN;
+      if (!stale && lo.state === 'open' && lo.opened_by && lo.opened_utc) {
+        const bits = [];
+        if (lo.seed) bits.push('<code>' + escapeHTML(String(lo.seed)) + '</code>');
+        if (lo.ladder_version) bits.push('<code>' + escapeHTML(String(lo.ladder_version)) + '</code>');
+        loHTML = '<strong>Open</strong> on the board keyed ' + bits.join(', ') +
+          '. Opened by ' + escapeHTML(String(lo.opened_by)) +
+          ' on ' + escapeHTML(String(lo.opened_utc)) + '.';
+      } else if (!stale && lo.state === 'none-open') {
+        loHTML = '<strong>None. No league is currently open.</strong> ' +
+          'A board key being published is not a league being opened &mdash; opening ' +
+          'is a separate, deliberate step, and it has not been taken. Scores you set ' +
+          'are still recorded; they are not counting towards a running competition.';
+        if (lo.since_note) {
+          loHTML += ' <span style="opacity:0.8;">' + escapeHTML(String(lo.since_note)) + '</span>';
+        }
+      }
+
+      // 3. What is coming. No date, ever: the ladder epoch is not forecastable.
+      let comingHTML = UNKNOWN;
+      if (!stale && coming.state === 'not-published' && coming.ladder_version) {
+        comingHTML = 'A further scoring season (<code>' +
+          escapeHTML(String(coming.ladder_version)) + '</code>) has been prepared in ' +
+          'the game code and <strong>no released build carries it</strong>, so nobody ' +
+          'can reach it yet. No date is given here, because the timing of a season ' +
+          'change is not something this site can predict.';
+      } else if (!stale && coming.state === 'unknown') {
+        comingHTML = UNKNOWN;
+      }
+
+      // 4. The board THIS PAGE is showing, next to the board a run finished today
+      //    lands on. This is the visitor-facing harm in #351: the two keys differ in
+      //    BOTH halves, so a score set today does not appear here late -- it cannot
+      //    appear here at all, and nothing anywhere reports an error.
+      const pubSeed = publishedKey && publishedKey.seed;
+      const pubEpoch = publishedKey && (publishedKey.ladder_epoch || publishedKey.ladder_version);
+      let showingHTML = UNKNOWN;
+      if (pubSeed || pubEpoch) {
+        const shown = [];
+        if (pubSeed) shown.push('<code>' + escapeHTML(String(pubSeed)) + '</code>');
+        if (pubEpoch) shown.push('<code>' + escapeHTML(String(pubEpoch)) + '</code>');
+        showingHTML = 'The board keyed ' + shown.join(', ') + '.';
+        const seedDiffers = !!(pubSeed && dlKey.seed && pubSeed !== dlKey.seed);
+        const epochDiffers = !!(pubEpoch && dlKey.ladder_version &&
+                                pubEpoch !== dlKey.ladder_version);
+        if (!stale && seedDiffers && epochDiffers) {
+          showingHTML += ' <strong>That is not the board the current build submits ' +
+            'to, in either half of the key.</strong> A run you finish today is ' +
+            'recorded somewhere else entirely and can never appear in the table ' +
+            'below &mdash; not late, not ever. Your run is saved; this page is the ' +
+            'thing that is behind.';
+        } else if (!stale && (seedDiffers || epochDiffers)) {
+          showingHTML += ' <strong>That is not the board the current build submits ' +
+            'to.</strong> A run you finish today is recorded against a different key ' +
+            'and will not appear in the table below until this page catches up.';
+        }
+      }
+
+      let html = '<div style="font-weight:600; margin-bottom:0.7rem;">Where the league stands</div>';
+      html += row('Downloadable now', dlHTML);
+      html += row('League open now', loHTML);
+      html += row('Coming', comingHTML);
+      html += row('This page is showing', showingHTML);
+      if (stale) {
+        html += '<p style="margin:0.4rem 0 0 0; opacity:0.85;">These answers were ' +
+          'last verified on ' + escapeHTML(String(pf.verified_utc || 'an unrecorded date')) +
+          ', which is outside the window this site trusts them for, so they are shown ' +
+          'as unknown rather than as still true.</p>';
+      } else {
+        html += '<p style="margin:0.4rem 0 0 0; opacity:0.7;">Last verified ' +
+          escapeHTML(String(pf.verified_utc)) + '.</p>';
+      }
+      return html;
+    }
+
+    async function renderLeagueState(data) {
+      const host = document.getElementById('league-state');
+      if (!host) return;
+      let epochs = null;
+      try {
+        const r = await fetch('/data/ladder-epochs.json', { cache: 'no-store' });
+        if (r.ok) epochs = await r.json();
+      } catch (e) { epochs = null; }
+      const publishedKey = (data && data.meta && data.meta.board_key) ||
+        (data && data.seed ? { seed: data.seed } : null);
+      host.innerHTML = buildLeagueStateHTML(epochs, publishedKey, Date.now());
+      host.style.display = 'block';
+    }
 
     async function applyBoardHonesty(data) {
       const banner = document.getElementById('data-status-banner');
@@ -1253,6 +1424,12 @@
         // Independent of the snapshot: say plainly whether the board key matches the
         // deployed build, and what the last live check of the score API actually saw.
         applyBoardHonesty(filteredData);
+
+        // Separately again: which league is OPEN, which is a different question from
+        // which board this page publishes (#351). Deliberately NOT folded into the
+        // banner above -- that one is about this page's data, this one is about the
+        // league, and merging them is how the two facts became one in the first place.
+        renderLeagueState(filteredData);
 
       } catch (error) {
         console.error('Failed to load leaderboard:', error);

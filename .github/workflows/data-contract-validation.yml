@@ -18,6 +18,8 @@ on:
       - 'scripts/test_ingest_scores.py'
       - 'scripts/stamp-league-epoch.py'
       - 'scripts/test-stamp-league-epoch.py'
+      - 'scripts/check-league-state.py'
+      - 'scripts/test-league-state.py'
       - '.github/workflows/data-contract-validation.yml'
   pull_request:
     paths:
@@ -30,6 +32,8 @@ on:
       - 'scripts/test_ingest_scores.py'
       - 'scripts/stamp-league-epoch.py'
       - 'scripts/test-stamp-league-epoch.py'
+      - 'scripts/check-league-state.py'
+      - 'scripts/test-league-state.py'
       - '.github/workflows/data-contract-validation.yml'
   schedule:
     - cron: '0 6 * * *'   # daily 06:00 UTC -- catches drift even with no commits
@@ -86,6 +90,38 @@ jobs:
       # running-week and completed-week states rather than observing the tree.
       - name: Defect stamps claim only what they verify
         run: python scripts/test-stamp-league-epoch.py
+
+      # #351: the site must be able to say which league is OPEN, separately from what
+      # is downloadable. The dangerous failure is silent -- a seat filling in
+      # league_open from an observation publishes an opening that never happened, which
+      # is #297 one gate later -- so the forced-red test runs FIRST and offline
+      # (ADR-0002: no guard counts as installed until a RED run of it has been seen).
+      - name: Every league-state invariant can still go red
+        run: python scripts/test-league-state.py
+
+      # Then the real file. Three outcomes: 0 holds, 1 a claim on the site is wrong
+      # (blocking), 2 CANNOT TELL -- the verification stamp has expired. A 2 is NOT a
+      # pass and is NOT an incident: the page degrades those lines to `unknown` on its
+      # own, so it is surfaced as a warning rather than failing an unrelated PR for a
+      # clock. Same treatment as epoch-drift.yml's code 2.
+      - name: The league state claims nothing it cannot show
+        run: |
+          set +e
+          python scripts/check-league-state.py | tee league-state.log
+          code=${PIPESTATUS[0]}
+          set -e
+          {
+            echo "## League state"
+            echo ""
+            echo '```'
+            cat league-state.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::The league-state verification has expired. /leaderboard/ is showing those lines as unknown. Re-run the measurements each block's evidence names, then re-stamp player_facing.verified_utc."
+            exit 0
+          fi
+          exit "$code"
 
   validate:
     name: Validate data contracts

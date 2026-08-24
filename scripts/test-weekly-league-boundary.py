@@ -404,9 +404,33 @@ check("the last L3 week keeps L3",
       wlm.ladder_version_for(datetime.fromisoformat("2026-08-06T00:00:00+10:00")), "L3")
 check("the first L4 week (Fri 2026-08-07) is L4",
       wlm.ladder_version_for(datetime.fromisoformat("2026-08-07T00:00:00+10:00")), "L4")
-check("a week opening after the fork takes the current epoch, not the boundary's",
-      wlm.ladder_version_for(datetime.fromisoformat("2026-08-14T00:00:00+10:00")),
-      _declared_epoch)
+# CORRECTED 2026-08-24 (#351). This read:
+#
+#     check("a week opening after the fork takes the current epoch, not the boundary's",
+#           wlm.ladder_version_for(datetime.fromisoformat("2026-08-14T00:00:00+10:00")),
+#           _declared_epoch)
+#
+# and it was RED in main, unnoticed, because the literal 2026-08-14 fell BEHIND the
+# next fork: L5's boundary is 2026-08-21, so a week opening on the 14th correctly
+# resolves to L4 while _declared_epoch had moved to L5. That is the same defect the
+# paragraph above names -- a literal pinned against a moving value -- committed on
+# the assertion that exists to catch it. It also goes red at a moment nobody is
+# looking, and this file is the FIRST step of weekly-league-reset.yml, so a Friday
+# rollover aborts on it.
+#
+# The intent is "the epoch a week opening AFTER THE LATEST FORK takes", so derive the
+# probe instant from the contract's own latest boundary instead of typing a date; a
+# future fork then moves the probe with it. epochs[] entries with no boundary_local
+# are skipped for the same reason ladder_version_for() skips them: an epoch cut in
+# the game repo but never published has no boundary yet.
+_boundaries = sorted(
+    datetime.fromisoformat(_e["boundary_local"])
+    for _e in (_contract.get("epochs") or [])
+    if _e.get("boundary_local") and _e.get("ladder_version")
+)
+check("the contract has at least one epoch boundary to probe after", bool(_boundaries), True)
+check("a week opening after the LATEST fork takes the current epoch, not the boundary's",
+      wlm.ladder_version_for(_boundaries[-1] + timedelta(days=7)), _declared_epoch)
 
 # CORRECTED 2026-08-02. These three assertions used to read:
 #
