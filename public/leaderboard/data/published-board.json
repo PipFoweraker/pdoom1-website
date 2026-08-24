@@ -1,13 +1,13 @@
 {
   "_comment": "The board key this site publishes, written by publish-live-board.py. This is an OBSERVATION of what the shipped client posts to, not a choice made here. check-board-liveness.py reads it to decide whether a populated board is 'deployed' or an orphan. Kept separate from weekly/current.json because weekly-league-manager.py owns that file and rewrites it on rollover.",
-  "seed": "weekly-2026-w32",
-  "ladder_epoch": "L4",
-  "epoch_source": "pdoom1 v0.14.0 git tag message: 'Ladder L4. Featured seed weekly-2026-w32. Board key (weekly-2026-w32, L4).' Corroborated by the release's release_manifest.json, \"ladder_version\": \"4\". Game-side authority unchanged: GameConfig.get_board_version() returns 'L' + LADDER_VERSION. Positively verified 2026-08-08 by a read-only GET: (weekly-2026-w32, L4) held 9 entries from clients stamped v0.14.0 and v0.14.1 -- a positive check, since every WRONG key also returns ok:true with an empty board.",
+  "seed": "weekly-2026-w33",
+  "ladder_epoch": "L5",
+  "epoch_source": "pdoom1 v0.14.2 release_manifest.json (a published release asset) carries \"ladder_version\": \"5\" and \"league_seed\": \"weekly-2026-w33\", commit_hash 38528c22cd7b3d282dc825fa03e941d43a7c87fe. Corroborated by the v0.14.2 git tag message and blessed by Pip at [Gate 5] on 2026-08-21 (docs/LEAGUE_SEED_LEDGER.md L5 row). NOT a value typed from a GitHub comment.",
   "seed_provenance": {
     "blessed": false,
     "derivation": "observed live on the score API; the board the client is posting to",
     "note": "Not a blessing. Friday's competitive seed is drawn at the ceremony and recorded in docs/LEAGUE_SEED_LEDGER.md. This file records what IS, so that the site publishes the board players actually reach."
   },
-  "entries_at_publish": 11,
-  "published_at": "2026-08-17T12:26:36+00:00"
+  "entries_at_publish": 0,
+  "published_at": "2026-08-24T04:03:17+00:00"
 }
