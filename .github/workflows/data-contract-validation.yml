@@ -99,11 +99,23 @@ jobs:
       - name: Every league-state invariant can still go red
         run: python scripts/test-league-state.py
 
-      # Then the real file. Three outcomes: 0 holds, 1 a claim on the site is wrong
-      # (blocking), 2 CANNOT TELL -- the verification stamp has expired. A 2 is NOT a
-      # pass and is NOT an incident: the page degrades those lines to `unknown` on its
-      # own, so it is surfaced as a warning rather than failing an unrelated PR for a
-      # clock. Same treatment as epoch-drift.yml's code 2.
+      # Then the real file. Three outcomes: 0 holds, 1 a claim on the site is wrong,
+      # 2 CANNOT TELL -- the verification is past its own stale_after_days.
+      #
+      # BOTH 1 AND 2 ARE RED. Corrected 2026-08-24 in review of #353: this step used to
+      # turn a 2 into a ::warning:: and exit 0, on the reasoning that a clock running
+      # out is not a defect and should not fail an unrelated PR. The effect was that
+      # from the expiry date onward the daily cron was permanently green-with-an-
+      # annotation nobody reads, while /leaderboard/ quietly showed Unknown. That is
+      # manufactured confidence wired into the guard written to prevent it -- and the
+      # third instance of that shape in this repo in one day.
+      #
+      # An expired ACCEPTANCE must go red and must be closeable by whoever hits it.
+      # This one is: re-run the four commands named under each block's `evidence`,
+      # re-stamp `player_facing.verified_utc`, and change any answer that moved. If
+      # that is not the right call today, raising `stale_after_days` with a reason in
+      # `stale_note` is a legitimate close -- the same shape as the PARKED-UNTIL clock
+      # in weekly-league-reset.yml. What is NOT available is leaving it green.
       - name: The league state claims nothing it cannot show
         run: |
           set +e
@@ -118,8 +130,7 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           if [ "$code" -eq 2 ]; then
-            echo "::warning::The league-state verification has expired. /leaderboard/ is showing those lines as unknown. Re-run the measurements each block's evidence names, then re-stamp player_facing.verified_utc."
-            exit 0
+            echo "::error::EXPIRED ACCEPTANCE -- the league-state verification is past its own stale_after_days, so /leaderboard/ is showing those lines as Unknown. Close it by re-running the commands under each block's evidence and re-stamping player_facing.verified_utc, or by raising stale_after_days with a reason. Do NOT re-stamp without re-measuring."
           fi
           exit "$code"
 

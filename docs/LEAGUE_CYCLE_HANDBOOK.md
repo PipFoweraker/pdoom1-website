@@ -186,10 +186,33 @@ and `open` (a named human performed [Gate 6] and it is recorded).
 
 ### The rules this cannot be talked out of
 
-- **Nothing may infer an opening.** `league_open.state: "open"` requires
-  `opened_by` and `opened_utc`, and `scripts/check-league-state.py` fails without
-  them. A seat inferring a blessing is #297; inferring an *opening* is the same
-  error one gate later.
+- **Nothing may infer an opening, and an opening must QUOTE THE LEDGER.**
+  `league_open.state: "open"` requires `opened_by`, `opened_utc`, and an
+  `opening_ledger_quote` that appears **verbatim** in
+  `docs/LEAGUE_SEED_LEDGER.md`. `/leaderboard/` will not print the word "Open"
+  without that quote either, and it shows the quote to the visitor.
+  **Why the quote and not just a named opener.** The first version of this guard
+  required only a non-empty `opened_by`, and adversarial review on 2026-08-24 walked
+  through it: `opened_by: "Pip"` with a plausible timestamp exited 0 and printed
+  *"no opening is claimed that a human did not record"*, while the ledger said
+  verbatim that [Gate 6] was HELD and the page rendered *"Open ... Opened by Pip"*.
+  It covered the fabrication no review would pass and missed the one that would.
+  Two rules follow: the quote may not itself be a refusal (quoting the sentence that
+  HOLDS the gate is not evidence the gate was lifted), and a standing
+  `[Gate 6] ... HELD` naming the same epoch beats the claim until
+  `hold_lifted_ledger_quote` records the lift as well.
+  A seat inferring a blessing is #297; inferring an *opening* is that error one gate
+  later.
+- **The page says ONE thing about a key mismatch, from one source.** Both boxes on
+  `/leaderboard/` call `boardMechanismHTML()`. They previously disagreed, adjacent,
+  about the same key: one promised a run would appear *"until this page catches
+  up"*, the other that it could *"never"* appear. **Both were wrong.**
+  `publish-live-board.py` reads its epoch from `board-probe-targets.json` and its
+  derived seed list already contains the shipped client's seed, so that key is
+  publishable by the existing 6-hourly job -- "never" is false. And "until this page
+  catches up" is an *unearned* promise: conditional on catching up before the next
+  fork, a condition that has already failed twice this month. State the mechanism,
+  promise no timing.
 - **An empty board is not evidence of anything.** The score API has no key
   validation: `seed=NOTASEED-zzz9&version=L99` returns `ok:true` with an empty
   entries array (measured 2026-08-24), exactly like a real board nobody has
@@ -200,9 +223,18 @@ and `open` (a named human performed [Gate 6] and it is recorded).
 - **`check-blessing-consistency.py` passing proves nothing about consistency.** It
   compares only the current epoch and is advisory in CI, so a disagreement about a
   closed epoch neither fails nor blocks.
-- **Unknown is first-class.** `player_facing.verified_utc` expires after
-  `stale_after_days`; past that the page renders every line as unknown rather than
-  as still-true, and CI warns rather than failing an unrelated PR.
+- **Unknown is first-class, and an expired acceptance is RED.**
+  `player_facing.verified_utc` expires after `stale_after_days` (14 -- two league
+  weeks); past that the page renders **every** line as unknown, the mismatch warning
+  on row 4 included. Dropping that warning while keeping the bare board key was a
+  defect found in the same review: a true-looking fact with its safety notice
+  deleted reads as reassurance.
+  CI **fails** on expiry rather than warning. The first wiring turned exit 2 into a
+  green annotation, which would have gone permanently green-with-a-note from
+  2026-08-31 while the page showed Unknown -- manufactured confidence inside the
+  guard written to prevent it. Close it by re-running the commands under each
+  block's `evidence` and re-stamping; raising `stale_after_days` with a recorded
+  reason is also a legitimate close. Re-stamping without re-measuring is not.
 
 ### The frontier and the cut are different fields now
 

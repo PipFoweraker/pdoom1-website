@@ -36,6 +36,12 @@ function extract(re, name) {
   return m[0];
 }
 const srcApply = extract(/    function applyDataStatus\(data\) \{[\s\S]*?\n    \}/, 'applyDataStatus');
+// Both banner branches that describe a key mismatch now call boardMechanismHTML(), the
+// ONE source for that sentence (#353 review, 2026-08-24: the two boxes on this page had
+// drifted into contradicting each other about the same key -- one promised the run would
+// appear "until this page catches up", the other that it could "never" appear).
+// Extracted rather than stubbed, so the sandbox exercises the shipped sentence.
+const srcMech = extract(/    function boardMechanismHTML\(publishedEpoch, clientEpoch\) \{[\s\S]*?\n    \}/, 'boardMechanismHTML');
 const srcHonesty = extract(/    async function applyBoardHonesty\(data\) \{[\s\S]*?\n    \}/, 'applyBoardHonesty');
 
 // escapeHTML() is no longer inline on this page. As of 2026-08-01 it is the shared
@@ -86,7 +92,7 @@ async function run(data, fetchMap, { status } = {}) {
   const dom = makeDOM();
   const build = new Function(
     'document', 'fetch', 'escapeHTML', 'safeUrl', 'isSafeUrl', 'toNumber',
-    srcApply + '\n' + srcHonesty +
+    srcMech + '\n' + srcApply + '\n' + srcHonesty +
     '\nreturn { applyDataStatus, applyBoardHonesty, escapeHTML };'
   );
   const api = build(dom.document, makeFetch(fetchMap),
@@ -171,6 +177,33 @@ const BOARD_V11 = { data_status: 'pre-launch', entries: [], meta: { game_version
   check(/not the current season/i.test(r3.text), 'states the board is not the live season');
   check(r3.text.includes('L2') && r3.text.includes('L3'), 'names BOTH board keys');
   check(!r3.text.includes('v0.13.2'), 'still keeps the build out of the board-key claim');
+
+  // 3b. THE BRANCH THAT ACTUALLY RENDERS ON THE LIVE SITE, and which had no assertion
+  //     at all until 2026-08-24. `epochs_agree: false` is today's real state (published
+  //     L4, live L5). Its tail promised the run would appear "until this page catches
+  //     up" -- a promise conditional on catching up before the next fork, which has
+  //     failed twice this month -- while a second box on the same page said the run
+  //     could "never" appear. Both are gone; one mechanism sentence serves both.
+  console.log('3b. Superseded publication -> the mechanism, and no promise');
+  const r3b = await run({ ...BOARD_L3, meta: { game_version: 'L4' } }, {
+    'board-liveness.json': {
+      ...LIVENESS_LIVE, verdict: 'superseded-publication',
+      board_key: {
+        seed: 'weekly-2026-w32', ladder_epoch: 'L4', epoch_known: true,
+        published_ladder_epoch: 'L4', current_ladder_epoch: 'L5', epochs_agree: false,
+      },
+    },
+  });
+  check(/previous season/i.test(r3b.text), 'still says the board is a previous season');
+  check(r3b.text.includes('L4') && r3b.text.includes('L5'), 'still names both keys');
+  check(!/catches up/i.test(r3b.text),
+    'the unearned "until this page catches up" promise is gone');
+  check(!/never/i.test(r3b.text) && !/not ever/i.test(r3b.text),
+    'and it does not swing to the opposite false claim either');
+  check(/if and when this page publishes/i.test(r3b.text),
+    'states the mechanism, conditional on a publish rather than on a timeline');
+  check(/stays on/i.test(r3b.text),
+    'and says what happens if a new season opens first');
 
   // 4. The permanent archive is reported to the visitor, with counts and people.
   console.log('4. Archived anomaly is surfaced with counts');
@@ -257,7 +290,7 @@ const BOARD_V11 = { data_status: 'pre-launch', entries: [], meta: { game_version
   console.log('11. Re-running does not stack duplicate notices');
   const dom = makeDOM();
   const api = new Function('document', 'fetch', 'escapeHTML', 'safeUrl', 'isSafeUrl', 'toNumber',
-    srcApply + '\n' + srcHonesty +
+    srcMech + '\n' + srcApply + '\n' + srcHonesty +
     '\nreturn { applyDataStatus, applyBoardHonesty };')(
     dom.document, makeFetch({ 'board-liveness.json': LIVENESS_EPOCH_UNKNOWN }),
     SHARED.escapeHTML, SHARED.safeUrl, SHARED.isSafeUrl, SHARED.toNumber);

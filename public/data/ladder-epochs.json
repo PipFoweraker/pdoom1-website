@@ -118,8 +118,8 @@
       "closed": "A later ladder fork superseded this key. Preserved read-only; scores do not migrate forward."
     },
     "verified_utc": "2026-08-24T01:48Z",
-    "stale_after_days": 7,
-    "stale_note": "A verification date with no expiry is the class-5 shape CLAUDE.md names. Past this many days the renderer shows every block below as unknown rather than as still-true. Refresh by re-running the measurements each block's `evidence` names and re-stamping verified_utc.",
+    "stale_after_days": 14,
+    "stale_note": "A verification date with no expiry is the class-5 shape CLAUDE.md names. Past this many days the renderer shows every block below as unknown rather than as still-true, INCLUDING the mismatch warning on the board this page is serving -- dropping that warning while keeping the bare board key was a defect found in review on 2026-08-24, because a true-looking fact with its safety notice deleted reads as reassurance. Fourteen days is two league weeks: long enough that an unrelated PR is unlikely to be the first thing to hit it, short enough that no more than two weeks of league can pass unverified. Expiry is RED, not a warning -- the first wiring of this turned exit 2 into a green annotation, which would have gone permanently green-with-a-note from 2026-08-31 while the page showed Unknown. Close it by re-running the commands under each block's `evidence` and re-stamping verified_utc; raising this number with a reason recorded here is also a legitimate close. Re-stamping WITHOUT re-measuring is not.",
     "downloadable_now": {
       "question": "What can a player download and play right now?",
       "state": "published-not-open",

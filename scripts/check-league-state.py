@@ -19,6 +19,12 @@ WHAT IT REFUSES
 1. A state name that is not in the block's own `_states` vocabulary.
 2. `league_open.state == "open"` without a named opener and a timestamp -- openness
    is a recorded human act, never an inference from a board, a 200 or a blessing.
+2b. ...and, since the 2026-08-24 review of #353, an "open" claim that the LEDGER does
+   not carry. Requiring only a non-empty `opened_by` caught the incomplete fabrication
+   and waved through the complete one: `opened_by: "Pip"` plus a plausible timestamp
+   exited 0 while the ledger said [Gate 6] was HELD. So an opening must now quote
+   docs/LEAGUE_SEED_LEDGER.md verbatim, the quote may not itself be a refusal, and a
+   standing hold naming the same epoch beats the claim until the lift is recorded too.
 3. Any non-open state that nevertheless carries an open league's fields.
 4. A `seed` presented without `seed_blessed: true`, or a `seed_blessed: true` whose
    seed is not in docs/LEAGUE_SEED_LEDGER.md. CLAUDE.md: never present an unblessed
@@ -40,6 +46,7 @@ Run: python scripts/check-league-state.py [path-to-ladder-epochs.json]
 from __future__ import annotations
 
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -56,6 +63,97 @@ for _stream in (sys.stdout, sys.stderr):
 
 OPEN_FIELDS = ("seed", "ladder_version", "opened_by", "opened_utc")
 BLOCKS = ("downloadable_now", "league_open", "coming")
+
+
+MIN_QUOTE = 40
+# A quote that says the gate is HELD, or that the board is not open, is evidence of
+# the opposite of an opening. Without this the verbatim-quote rule below is trivially
+# satisfiable by quoting the very sentence that refuses the opening -- which is the
+# text most likely to be sitting in the ledger when someone fabricates one.
+_REFUSAL = ("held", "not open", "not yet open", "pending", "to be drawn")
+
+
+def _norm(text: str) -> str:
+    """Collapse whitespace so a markdown line-wrap cannot defeat a verbatim match."""
+    return " ".join(str(text or "").split())
+
+
+def _quote_is_corroborated(quote, ledger_norm: str):
+    """(ok, why-not). A quote must be substantial, present verbatim, and not a refusal."""
+    if not quote:
+        return False, "is missing"
+    q = _norm(quote)
+    if len(q) < MIN_QUOTE:
+        return False, ("is only %d characters; a fragment that short can match by "
+                       "accident, so at least %d are required" % (len(q), MIN_QUOTE))
+    if not ledger_norm:
+        return False, "cannot be corroborated because the ledger could not be read"
+    if q not in ledger_norm:
+        return False, ("does not appear in docs/LEAGUE_SEED_LEDGER.md. The ledger is "
+                       "the record an opening lives in; this file is its machine "
+                       "mirror, and a mirror may not show something the record does not")
+    low = q.lower()
+    hit = next((w for w in _REFUSAL if w in low), None)
+    if hit:
+        return False, ("quotes ledger text containing %r, which is a refusal to open "
+                       "rather than an opening. Quoting the sentence that HOLDS the "
+                       "gate is not evidence that the gate was lifted" % hit)
+    return True, ""
+
+
+def check_opening_corroborated(name: str, blk: dict, ledger_text: str) -> list:
+    """An OPENING must be corroborated by the ledger, the way a seed already is.
+
+    THE HOLE THIS CLOSES (found by adversarial review of PR #353, 2026-08-24).
+    The previous version enforced only against a MISSING opening record: it required
+    `opened_by` and `opened_utc` to be non-empty. So a seat that typed
+    `opened_by: "Pip"` with a plausible timestamp got exit 0 and the line
+    "no opening is claimed that a human did not record" -- while
+    docs/LEAGUE_SEED_LEDGER.md said verbatim that [Gate 6] was HELD and the board was
+    not open, and /leaderboard/ rendered "Open ... Opened by Pip". The guard covered
+    the shape that would never survive review and missed the one that would.
+
+    An opening is a human act recorded in the ledger. This file may only MIRROR it, so
+    the mirror has to point at the record: quote it verbatim, and do not claim an
+    opening while an unresolved hold naming the same epoch is still standing.
+    """
+    out = []
+    ledger_norm = _norm(ledger_text)
+
+    ok, why = _quote_is_corroborated(blk.get("opening_ledger_quote"), ledger_norm)
+    if not ok:
+        out.append("`%s.state` is \"open\" but `opening_ledger_quote` %s. An opening is "
+                   "a row in docs/LEAGUE_SEED_LEDGER.md; nothing here may assert one "
+                   "the ledger does not carry." % (name, why))
+
+    # A standing hold beats a claimed opening. `[Gate 6] ... HELD` next to this epoch
+    # means the ceremony refused, and a refusal is only undone by another recorded act.
+    epoch = str(blk.get("ladder_version") or "")
+    seed = str(blk.get("seed") or "")
+    if (epoch or seed) and ledger_text:
+        # Containers, NOT a character window. A fixed +/-400 window missed the real
+        # thing on 2026-08-24: the ledger's L5 row is one 828-character markdown table
+        # line with "L5" at the start and "[Gate 6] HELD" 591 characters later, so the
+        # two never landed in the same window and a standing hold read as absent. A
+        # table row is a line and a prose hold is a paragraph, so ask both.
+        lines = ledger_text.splitlines()
+        paras = ledger_text.split("\n\n")
+        names = [re.escape(x) for x in (epoch, seed) if x]
+        who = re.compile(r"\b(?:%s)\b" % "|".join(names)) if names else None
+        standing = any(
+            "gate 6" in c.lower() and "HELD" in c and who and who.search(c)
+            for c in lines + paras)
+        if standing:
+            ok2, why2 = _quote_is_corroborated(
+                blk.get("hold_lifted_ledger_quote"), ledger_norm)
+            if not ok2:
+                out.append(
+                    "`%s` claims %s is OPEN, but docs/LEAGUE_SEED_LEDGER.md still "
+                    "records [Gate 6] HELD next to %s, and `hold_lifted_ledger_quote` "
+                    "%s. A hold is lifted by a recorded act, not by editing this file. "
+                    "Write the lift into the ledger and quote it here."
+                    % (name, epoch, epoch, why2))
+    return out
 
 
 def _parse_stamp(raw: str):
@@ -125,6 +223,7 @@ def main(argv: list[str]) -> int:
                                "a named human's recorded act at [Gate 6] -- it may not "
                                "be inferred from a board, from a 200, or from a "
                                "blessing (#297)." % (name, f))
+            bad.extend(check_opening_corroborated(name, blk, ledger_text))
         elif name == "league_open":
             for f in OPEN_FIELDS:
                 if blk.get(f):
@@ -227,8 +326,8 @@ def main(argv: list[str]) -> int:
         for f in stale:
             print("     - %s" % f)
         return 2
-    print("  OK: three questions, three states, three pieces of evidence, and no")
-    print("  opening is claimed that a human did not record.")
+    print("  OK: three questions, three states, three pieces of evidence, and any")
+    print("  opening claimed here is quoted verbatim from the ledger that records it.")
     return 0
 
 

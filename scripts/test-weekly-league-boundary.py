@@ -31,8 +31,9 @@ Run: python scripts/test-weekly-league-boundary.py
 
 import importlib.util
 import json
+import re
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 for _s in (sys.stdout, sys.stderr):
@@ -404,33 +405,45 @@ check("the last L3 week keeps L3",
       wlm.ladder_version_for(datetime.fromisoformat("2026-08-06T00:00:00+10:00")), "L3")
 check("the first L4 week (Fri 2026-08-07) is L4",
       wlm.ladder_version_for(datetime.fromisoformat("2026-08-07T00:00:00+10:00")), "L4")
-# CORRECTED 2026-08-24 (#351). This read:
+# CORRECTED 2026-08-23. This check read:
 #
 #     check("a week opening after the fork takes the current epoch, not the boundary's",
 #           wlm.ladder_version_for(datetime.fromisoformat("2026-08-14T00:00:00+10:00")),
 #           _declared_epoch)
 #
-# and it was RED in main, unnoticed, because the literal 2026-08-14 fell BEHIND the
-# next fork: L5's boundary is 2026-08-21, so a week opening on the 14th correctly
-# resolves to L4 while _declared_epoch had moved to L5. That is the same defect the
-# paragraph above names -- a literal pinned against a moving value -- committed on
-# the assertion that exists to catch it. It also goes red at a moment nobody is
-# looking, and this file is the FIRST step of weekly-league-reset.yml, so a Friday
-# rollover aborts on it.
+# i.e. it asserted that the week of Fri 2026-08-14 resolves to THE FRONTIER. That is
+# precisely the live history-rewrite ladder_version_for()'s own docstring forbids -- a
+# week that has already run keeps the epoch it was PLAYED under, which is the entire
+# reason the epoch is half the board key. It passed from 2026-08-07 to 2026-08-21 only
+# by coincidence: the frontier happened to be L4 and the 14 Aug week is genuinely L4, so
+# the two sides agreed for reasons unrelated to what the check claimed to test. The L4 ->
+# L5 fork of 2026-08-21 broke the coincidence and the check went red asking a closed
+# epoch's week to relabel itself L5.
 #
-# The intent is "the epoch a week opening AFTER THE LATEST FORK takes", so derive the
-# probe instant from the contract's own latest boundary instead of typing a date; a
-# future fork then moves the probe with it. epochs[] entries with no boundary_local
-# are skipped for the same reason ladder_version_for() skips them: an epoch cut in
-# the game repo but never published has no boundary yet.
-_boundaries = sorted(
-    datetime.fromisoformat(_e["boundary_local"])
-    for _e in (_contract.get("epochs") or [])
-    if _e.get("boundary_local") and _e.get("ladder_version")
-)
-check("the contract has at least one epoch boundary to probe after", bool(_boundaries), True)
-check("a week opening after the LATEST fork takes the current epoch, not the boundary's",
-      wlm.ladder_version_for(_boundaries[-1] + timedelta(days=7)), _declared_epoch)
+# This is the SAME literal-against-a-moving-value defect the comment 20 lines above
+# spends a paragraph naming -- committed a third time, in the file that names it. The
+# date was hardcoded and the comparand was made dynamic, so the assertion silently
+# changed meaning the moment a fork landed after 2026-08-14.
+#
+# Split into the two invariants that were being conflated:
+#   1. a week inside a CLOSED epoch keeps that epoch (literal is legitimate here -- a
+#      closed epoch's span is fixed history and cannot move), matching the L3 pattern
+#      three lines above;
+#   2. a week opening on the CURRENT epoch's own boundary takes the frontier, with the
+#      boundary read from the contract rather than typed, so the next fork still needs
+#      exactly one edit and a disagreement between the two files is still red.
+check("a week inside the closed L4 epoch keeps L4, not the frontier",
+      wlm.ladder_version_for(datetime.fromisoformat("2026-08-14T00:00:00+10:00")), "L4")
+
+_current_boundary = next(
+    (e.get("boundary_local") for e in (wlm.ladder_contract().get("epochs") or [])
+     if e.get("ladder_version") == _declared_epoch and e.get("boundary_local")), None)
+check("the current epoch declares its own boundary in epochs[]",
+      bool(_current_boundary), True)
+check("a week opening on the current epoch's boundary takes the frontier",
+      wlm.ladder_version_for(datetime.fromisoformat(_current_boundary or
+                                                    "1970-01-01T00:00:00+00:00")),
+      _declared_epoch)
 
 # CORRECTED 2026-08-02. These three assertions used to read:
 #
@@ -599,8 +612,58 @@ finally:
 # --------------------------------------------------------------------------
 print("\n-- cron agrees with the anchor, in both DST states --")
 wf = (Path(__file__).parent.parent / ".github" / "workflows" / "weekly-league-reset.yml").read_text(encoding="utf-8")
-crons = [ln.split("'")[1] for ln in wf.splitlines() if "- cron:" in ln and "'" in ln]
-check("exactly one cron in weekly-league-reset.yml", len(crons), 1)
+
+# ACTIVE vs PARKED. This used to collect every line containing "- cron:" without
+# looking at whether it was commented out, so commenting the schedule would have
+# left all the assertions below passing over a schedule that no longer runs --
+# green while disarmed, which is the exact shape CLAUDE.md calls class 5.
+_cron_lines = [ln for ln in wf.splitlines() if "- cron:" in ln and "'" in ln]
+crons = [ln.split("'")[1] for ln in _cron_lines if not ln.lstrip().startswith("#")]
+parked_crons = [ln.split("'")[1] for ln in _cron_lines if ln.lstrip().startswith("#")]
+
+# PARKED-UNTIL is a clock on the ACCEPTANCE, not on the finding. While the date is
+# in the future the park is a legitimate state and this is green -- but it is
+# printed, never silent, because green must carry a number. Past the date the
+# check goes RED on "the park expired", which a human closes by restoring the
+# schedule or re-parking with a new date. A red on the underlying condition would
+# not be closeable by whoever hits it; this one always is.
+# ANCHORED to the `on:` block, not searched over the whole file. An adversarial
+# review defeated the whole-file version: a line reading
+# "# historical note: the sibling job used PARKED-UNTIL: 2027-01-01" placed above
+# `name:` -- outside `on:` entirely -- was picked up as THIS park's clock, and an
+# expired acceptance reported 108/108 green with 130 days left. For a mechanism
+# whose entire purpose is that it cannot be quietly defeated, first-match-wins
+# over the whole file is the wrong reader.
+_on_block = wf.split("\njobs:", 1)[0]
+if "\non:" in _on_block:
+    _on_block = _on_block.split("\non:", 1)[1]
+_park = re.search(r"PARKED-UNTIL:\s*(\d{4}-\d{2}-\d{2})", _on_block)
+_parked = bool(parked_crons) and not crons
+# A second PARKED-UNTIL anywhere in the file is ambiguous, and ambiguity in a
+# clock reads as whichever date the reader happens to find first.
+if len(re.findall(r"PARKED-UNTIL:\s*\d{4}-\d{2}-\d{2}", wf)) > 1:
+    check("exactly one PARKED-UNTIL date in weekly-league-reset.yml",
+          len(re.findall(r"PARKED-UNTIL:\s*\d{4}-\d{2}-\d{2}", wf)), 1)
+
+if _parked:
+    check("a parked schedule carries a PARKED-UNTIL date", bool(_park), True)
+    if _park:
+        _until = date.fromisoformat(_park.group(1))
+        _today = datetime.now(UTC).date()
+        print(f"   PARKED: the rollover schedule is commented out until {_until} "
+              f"({(_until - _today).days} day(s) left). "
+              f"{len(parked_crons)} parked cron line(s), still validated below.")
+        check(f"the park has not expired (PARKED-UNTIL {_until}); restore the "
+              f"schedule or re-park with a new date and reason",
+              _until >= _today, True)
+    # The parked VALUE is still checked against the constants below, so it cannot
+    # rot unnoticed and be restored wrong. That is why it is commented, not deleted.
+    crons = parked_crons
+else:
+    check("exactly one cron in weekly-league-reset.yml", len(crons), 1)
+    check("no leftover parked cron line while a schedule is active",
+          len(parked_crons), 0)
+
 if crons:
     minute, hour, _dom, _mon, dow = crons[0].split()
     check("cron hour matches ROLLOVER_HOUR_UTC", int(hour), wlm.ROLLOVER_HOUR_UTC)

@@ -38,15 +38,22 @@ for _stream in (sys.stdout, sys.stderr):
 failures = 0
 
 
-def run_on(mutate, label: str, want: int, want_text: str | None = None) -> None:
-    """Write a mutated copy into a temp tree that mirrors the repo layout."""
+def run_on(mutate, label: str, want: int, want_text: str | None = None,
+           ledger_extra: str = "") -> None:
+    """Write a mutated copy into a temp tree that mirrors the repo layout.
+
+    `ledger_extra` is appended to a COPY of the real ledger, so a case can ask what
+    happens once a real opening has been written down. The real ledger is never
+    touched: it is Pip's record and no test may edit it.
+    """
     global failures
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td)
         data_dir = tmp / "public" / "data"
         data_dir.mkdir(parents=True)
         (tmp / "docs").mkdir()
-        shutil.copyfile(LEDGER, tmp / "docs" / "LEAGUE_SEED_LEDGER.md")
+        (tmp / "docs" / "LEAGUE_SEED_LEDGER.md").write_text(
+            LEDGER.read_text(encoding="utf-8") + ledger_extra, encoding="utf-8")
 
         doc = json.loads(REAL.read_text(encoding="utf-8"))
         mutate(doc)
@@ -82,14 +89,94 @@ print()
 print("-- an opening nobody performed --")
 
 
+# THE CASE THIS FILE USED TO MISS (adversarial review of #353, 2026-08-24).
+# It only ever fabricated an INCOMPLETE opening -- state "open" with the opener left
+# null -- which is the shape no review would pass anyway. The dangerous shape is the
+# COMPLETE one: a seat that concludes "scores are landing, so the board must be open"
+# types a real name and a plausible timestamp. That exited 0, printing "no opening is
+# claimed that a human did not record", while the ledger said [Gate 6] was HELD.
+# Every fabrication below is now one a reviewer would have to look hard at.
+def _open_complete(doc):
+    fresh(doc)
+    doc["player_facing"]["league_open"].update({
+        "state": "open",
+        "seed": "weekly-2026-w33",              # the real blessed seed
+        "ladder_version": "L5",                 # the real current epoch
+        "seed_blessed": True,
+        "opened_by": "Pip",                     # the real Commissioner
+        "opened_utc": "2026-08-21T07:00:00Z",   # the real ceremony evening
+    })
+
+
+run_on(_open_complete,
+       "a COMPLETE, plausible opening with no ledger quote", 1, "opening_ledger_quote")
+
+
+def _quote_the_hold(doc):
+    _open_complete(doc)
+    # The most likely quote to hand: the ledger sentence that REFUSES the opening.
+    # Verbatim, over the length floor, and evidence of the opposite of an opening.
+    doc["player_facing"]["league_open"]["opening_ledger_quote"] = (
+        "[Gate 6] HELD by the Commissioner: `api.pdoom1.com` is unreachable")
+
+
+run_on(_quote_the_hold,
+       "the HELD sentence quoted as proof of an opening", 1, "refusal to open")
+
+
+def _quote_invented(doc):
+    _open_complete(doc)
+    doc["player_facing"]["league_open"]["opening_ledger_quote"] = (
+        "Pip opened the board for ladder epoch L5 at the ceremony on 21 August 2026.")
+
+
+run_on(_quote_invented,
+       "a plausible quote the ledger has never contained", 1, "does not appear")
+
+
+# The ledger as it would read AFTER a real opening. Used twice: once to show a quoted
+# opening is still refused while the hold stands, and once to show the guard is not
+# merely always-red for `open` -- a real opening has to be able to pass, or the check
+# becomes pressure to delete it rather than to record the opening.
+LEDGER_OPENED = (
+    "\n\n**[Gate 6] LIFTED 2026-08-25.** Pip opened the board for ladder epoch L5 on "
+    "the seed weekly-2026-w33 at the ceremony, and the board is now accepting scores "
+    "as a running competition.\n")
+QUOTE_OPENED = ("Pip opened the board for ladder epoch L5 on the seed weekly-2026-w33 "
+                "at the ceremony, and the board is now accepting scores as a running "
+                "competition.")
+
+
+def _opening_while_hold_stands(doc):
+    _open_complete(doc)
+    doc["player_facing"]["league_open"]["opening_ledger_quote"] = QUOTE_OPENED
+
+
+run_on(_opening_while_hold_stands,
+       "a real opening while the [Gate 6] HOLD is still on the record", 1,
+       "still records", ledger_extra=LEDGER_OPENED)
+
+
+def _opening_with_lift(doc):
+    _opening_while_hold_stands(doc)
+    doc["player_facing"]["league_open"]["hold_lifted_ledger_quote"] = (
+        "Pip opened the board for ladder epoch L5 on the seed weekly-2026-w33 at the "
+        "ceremony")
+
+
+run_on(_opening_with_lift,
+       "...and with the lift recorded too, a real opening PASSES", 0,
+       ledger_extra=LEDGER_OPENED)
+
+
 def _fabricate_open(doc):
     fresh(doc)
     lo = doc["player_facing"]["league_open"]
     lo["state"] = "open"
     lo["seed"] = "weekly-2026-w33"
     lo["ladder_version"] = "L5"
-    # opened_by / opened_utc deliberately left null -- this is the exact shape a
-    # seat produces when it concludes "the board must be open, scores are landing".
+    # opened_by / opened_utc left null. Kept because it is still a failure, but it is
+    # no longer the ONLY fabrication under test -- see the complete ones above.
 
 
 run_on(_fabricate_open, "state=open with no opener and no timestamp", 1, "named human")

@@ -894,14 +894,29 @@ and nobody was counting it. Enumerate by grepping for consumers, not from this l
   that may never have been opened by anyone. `public/data/ladder-epochs.json` ->
   `player_facing` answers three questions separately -- what is downloadable, which
   league is OPEN, what is coming -- each with its own state and its own evidence;
-  `/leaderboard/` renders them via `buildLeagueStateHTML()`. **Nothing may infer an
-  opening**: `league_open.state: "open"` requires `opened_by` + `opened_utc` and
-  `check-league-state.py` fails without them (a seat inferring a blessing is #297;
-  inferring an opening is that error one gate later). **An empty board is not
-  evidence of anything** -- `seed=NOTASEED-zzz9&version=L99` returns `ok:true` with
-  no entries (measured 2026-08-24), so never argue open-or-not from a count. **The
-  API answering 200 is not an open league.** Runbook and the full state vocabulary:
+  `/leaderboard/` renders them via `buildLeagueStateHTML()`. **An opening must QUOTE
+  THE LEDGER**: `league_open.state: "open"` needs `opened_by`, `opened_utc` AND an
+  `opening_ledger_quote` present verbatim in `docs/LEAGUE_SEED_LEDGER.md`; the quote
+  may not itself be a refusal; and a standing `[Gate 6] ... HELD` naming that epoch
+  beats the claim until `hold_lifted_ledger_quote` records the lift. **Requiring only
+  a named opener was NOT enough, and was proven so** -- `opened_by: "Pip"` plus a
+  plausible timestamp exited 0 while the ledger said the gate was HELD (review of
+  #353, 2026-08-24). A seat inferring a blessing is #297; inferring an opening is
+  that error one gate later. **An empty board is not evidence of anything** --
+  `seed=NOTASEED-zzz9&version=L99` returns `ok:true` with no entries (measured
+  2026-08-24), so never argue open-or-not from a count. **The API answering 200 is
+  not an open league.** Runbook and the full state vocabulary:
   `docs/LEAGUE_CYCLE_HANDBOOK.md` section 5b.
+- **Both boxes on `/leaderboard/` describe a key mismatch from ONE source**,
+  `boardMechanismHTML()`. They once said different things about the same key, one box
+  apart: *"will not appear here until this page catches up"* versus *"can never appear
+  -- not late, not ever"*. **Neither was right.** `publish-live-board.py` already
+  targets the client's epoch and already has its seed in the derived list, so "never"
+  is false; and "until this page catches up" is a promise conditional on catching up
+  before the next fork, which has failed twice this month. State the mechanism,
+  promise no timing. **An expired `player_facing.verified_utc` is RED in CI, not a
+  warning** -- the first wiring made it a green annotation forever, which is the
+  manufactured-confidence shape the guard was written to prevent.
 - **The FRONTIER and the CUT are different fields.**
   `regularised_from.ladder_version` is the epoch the site publishes on and it moves
   when a build carrying a fork is **published**; `regularised_from.cut_ladder_version`

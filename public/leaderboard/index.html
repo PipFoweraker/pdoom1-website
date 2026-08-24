@@ -979,6 +979,35 @@
       : '';
 
     // ------------------------------------------------------------------------
+    // THE MECHANISM SENTENCE -- one source, used by BOTH boxes on this page.
+    //
+    // The honesty banner and the league-state block below both have to describe what
+    // happens to a run when the published key and the client's key differ. On
+    // 2026-08-24 they said different things, adjacent, about the same key: one box
+    // said a run "will not appear here until this page catches up", the other said it
+    // "can never appear -- not late, not ever".
+    //
+    // NEITHER SURVIVED REVIEW. "Never" is simply false: publish-live-board.py reads
+    // its epoch from board-probe-targets.json (L5) and its derived seed list already
+    // contains weekly-2026-w33, so the key the shipped client posts to is publishable
+    // by the existing 6-hourly job; it refuses today only because several L5 boards
+    // are empty and indistinguishable, which a single real score resolves. And "until
+    // this page catches up" is an UNEARNED promise -- conditional on catching up
+    // before the next ladder fork, a condition that has already failed twice this
+    // month.
+    //
+    // So: state the mechanism, promise no timing, and be true in every state. One
+    // function, because two copies of a sentence is how the two boxes disagreed.
+    function boardMechanismHTML(publishedEpoch, clientEpoch) {
+      const pub = '<code>' + escapeHTML(String(publishedEpoch || 'an earlier season')) + '</code>';
+      const mine = '<code>' + escapeHTML(String(clientEpoch || 'the current season')) + '</code>';
+      return 'Your run is recorded against ' + mine + '. This page currently publishes ' +
+        pub + '. It will appear here if and when this page publishes ' + mine +
+        ' &mdash; and if a new season opens first, your run stays on ' + mine +
+        ' rather than moving.';
+    }
+
+    // ------------------------------------------------------------------------
     // LEAGUE STATE -- three questions, answered separately. pdoom1-website#351.
     //
     // WHAT WAS MISSING. This page could already say what is downloadable, and could
@@ -1056,13 +1085,22 @@
 
       // 2. Which league is OPEN. This is the answer the page did not have before.
       let loHTML = UNKNOWN;
-      if (!stale && lo.state === 'open' && lo.opened_by && lo.opened_utc) {
+      // `opening_ledger_quote` is required HERE too, not only by
+      // scripts/check-league-state.py. The checker is the gate on the data; this is
+      // the second lock, for the case where data reaches production without the gate
+      // having run on it. The page will not announce an open league unless the file
+      // carries the ledger sentence that opened it -- and it shows that sentence, so a
+      // visitor sees the evidence rather than an assertion.
+      if (!stale && lo.state === 'open' && lo.opened_by && lo.opened_utc &&
+          lo.opening_ledger_quote) {
         const bits = [];
         if (lo.seed) bits.push('<code>' + escapeHTML(String(lo.seed)) + '</code>');
         if (lo.ladder_version) bits.push('<code>' + escapeHTML(String(lo.ladder_version)) + '</code>');
         loHTML = '<strong>Open</strong> on the board keyed ' + bits.join(', ') +
           '. Opened by ' + escapeHTML(String(lo.opened_by)) +
-          ' on ' + escapeHTML(String(lo.opened_utc)) + '.';
+          ' on ' + escapeHTML(String(lo.opened_utc)) + '. ' +
+          '<span style="opacity:0.8;">From the league seed ledger: &ldquo;' +
+          escapeHTML(String(lo.opening_ledger_quote)) + '&rdquo;</span>';
       } else if (!stale && lo.state === 'none-open') {
         loHTML = '<strong>None. No league is currently open.</strong> ' +
           'A board key being published is not a league being opened &mdash; opening ' +
@@ -1086,30 +1124,40 @@
       }
 
       // 4. The board THIS PAGE is showing, next to the board a run finished today
-      //    lands on. This is the visitor-facing harm in #351: the two keys differ in
-      //    BOTH halves, so a score set today does not appear here late -- it cannot
-      //    appear here at all, and nothing anywhere reports an error.
+      //    lands on.
+      //
+      //    CORRECTED 2026-08-24, before this shipped. This row said a run finished
+      //    today "can never appear in the table below -- not late, not ever" whenever
+      //    both halves of the key differed. THAT IS FALSE. publish-live-board.py takes
+      //    its epoch from board-probe-targets.json (L5 today) and its derived seed list
+      //    already contains weekly-2026-w33, so the exact key the shipped client posts
+      //    to is publishable by the existing 6-hourly job. It refuses right now only
+      //    because three L5 boards are empty and nothing distinguishes them -- and a
+      //    real score landing is itself what resolves that. The number of differing key
+      //    halves is irrelevant; the mechanism is identical either way.
+      //
+      //    So this states the MECHANISM and claims nothing about outcome or timing.
       const pubSeed = publishedKey && publishedKey.seed;
       const pubEpoch = publishedKey && (publishedKey.ladder_epoch || publishedKey.ladder_version);
       let showingHTML = UNKNOWN;
-      if (pubSeed || pubEpoch) {
-        const shown = [];
-        if (pubSeed) shown.push('<code>' + escapeHTML(String(pubSeed)) + '</code>');
-        if (pubEpoch) shown.push('<code>' + escapeHTML(String(pubEpoch)) + '</code>');
+      const shown = [];
+      if (pubSeed) shown.push('<code>' + escapeHTML(String(pubSeed)) + '</code>');
+      if (pubEpoch) shown.push('<code>' + escapeHTML(String(pubEpoch)) + '</code>');
+      if (stale && shown.length) {
+        // Degrade like rows 1-3. Keeping the bare key and dropping the comparison
+        // would leave a true-looking fact with the safety notice deleted, which is
+        // the manufactured-confidence shape this whole block exists to refuse.
+        showingHTML = UNKNOWN + ' This page is serving the board keyed ' +
+          shown.join(', ') + ', and whether that is the board your build submits to ' +
+          'cannot be established right now.';
+      } else if (shown.length) {
         showingHTML = 'The board keyed ' + shown.join(', ') + '.';
         const seedDiffers = !!(pubSeed && dlKey.seed && pubSeed !== dlKey.seed);
         const epochDiffers = !!(pubEpoch && dlKey.ladder_version &&
                                 pubEpoch !== dlKey.ladder_version);
-        if (!stale && seedDiffers && epochDiffers) {
+        if (seedDiffers || epochDiffers) {
           showingHTML += ' <strong>That is not the board the current build submits ' +
-            'to, in either half of the key.</strong> A run you finish today is ' +
-            'recorded somewhere else entirely and can never appear in the table ' +
-            'below &mdash; not late, not ever. Your run is saved; this page is the ' +
-            'thing that is behind.';
-        } else if (!stale && (seedDiffers || epochDiffers)) {
-          showingHTML += ' <strong>That is not the board the current build submits ' +
-            'to.</strong> A run you finish today is recorded against a different key ' +
-            'and will not appear in the table below until this page catches up.';
+            'to.</strong> ' + boardMechanismHTML(pubEpoch, dlKey.ladder_version);
         }
       }
 
@@ -1185,19 +1233,28 @@
         // on a record written before #293. Neither of those is a disagreement, and
         // treating "unknown" as "disagrees" would put a false claim in front of a visitor.
         notes.push(
+          // CORRECTED 2026-08-24 (#351/#353 review). The tail used to read "...and
+          // will not appear here until this page catches up. Those runs are saved --
+          // they are not lost." The reassurance was true; the PROMISE was not earned.
+          // It is conditional on this page catching up before the next ladder fork,
+          // and that condition has already failed twice this month. It also sat one
+          // box above a new block asserting the opposite ("not late, not ever"), so a
+          // visitor got two contradictory sentences about one key. Both now come from
+          // boardMechanismHTML() -- one source, no promise, true in every state.
           `<strong>This board is from a previous season.</strong> It is keyed ` +
           `<code>${escapeHTML(String(key.published_ladder_epoch))}</code>, and the live ` +
-          `season is <code>${escapeHTML(String(key.current_ladder_epoch))}</code>. Runs ` +
-          `finished now are recorded against ` +
-          `<code>${escapeHTML(String(key.current_ladder_epoch))}</code> and will not appear ` +
-          `here until this page catches up. Those runs are saved &mdash; they are not lost.`
+          `season is <code>${escapeHTML(String(key.current_ladder_epoch))}</code>. ` +
+          boardMechanismHTML(key.published_ladder_epoch, key.current_ladder_epoch)
         );
       } else if (boardVersion && epoch && boardVersion !== epoch) {
         notes.push(
+          // Same treatment as the branch above: the claim stays, the mechanism
+          // replaces the outcome sentence, and it comes from the one source so the
+          // two branches cannot describe the same situation differently.
           `<strong>This board is not the current season.</strong> It is keyed ` +
           `<code>${escapeHTML(boardVersion)}</code>, and the live season is ` +
-          `<code>${escapeHTML(epoch)}</code>. Runs submitted now go to ` +
-          `<code>${escapeHTML(epoch)}</code> and will not appear on this board.`
+          `<code>${escapeHTML(epoch)}</code>. ` +
+          boardMechanismHTML(boardVersion, epoch)
         );
       }
 
