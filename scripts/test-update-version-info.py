@@ -366,6 +366,60 @@ for bad in ({}, {"assets": []}, {"tag_name": "", "name": ""}, {"body": "only not
               f"a response with no usable tag is refused, not published: {bad}")
 
 
+# =========================================================================== 8
+print("\n8. open_issues means OPEN ISSUES, and never silently means issues+PRs")
+
+# GitHub's /repos endpoint reports `open_issues_count` INCLUDING open pull
+# requests -- documented at their end. This script used to copy it to
+# `open_issues`, and public/index.html renders that beside the words "open
+# issues". Measured on the real repo 2026-08-25: 210 issues + 1 PR = 211.
+REPO_STATS = {"stargazers_count": 8, "forks_count": 1,
+              "open_issues_count": 211, "updated_at": "2030-01-01T00:00:00Z"}
+SEARCH_ISSUES = {"total_count": 210}
+
+with Sandbox(api={"/releases/latest": RELEASE,
+                  "/search/issues": SEARCH_ISSUES,
+                  "/repos/PipFoweraker/pdoom1": REPO_STATS}) as sb:
+    quiet(uvi.update_version_data)
+    stats = (sb.read("version.json") or {}).get("repository_stats") or {}
+    check(stats.get("open_issues") == 210,
+          f"open_issues is the issues-only search total, not 211: {stats.get('open_issues')!r}")
+    check(stats.get("open_issues_and_prs") == 211,
+          f"the repo field keeps its honest name: {stats.get('open_issues_and_prs')!r}")
+    check(stats.get("open_issues") != stats.get("open_issues_and_prs"),
+          "the two counts are distinguishable -- if they were equal this test "
+          "would pass on a build that never split them")
+
+# THE FORCED FAILURE. Search unavailable: the count must go to null (UNKNOWN),
+# never 0, and never a stale number carried forward from disk. A version carried
+# forward is merely old; a COUNT carried forward is a false claim about today
+# wearing a fresh timestamp.
+STALE_ON_DISK = {"latest_release": {"version": "v1.2.3",
+                                    "html_url": "https://x/tag/v1.2.3",
+                                    "platforms": {"windows": True, "macos": False,
+                                                  "linux": False}},
+                 "repository_stats": {"stars": 8, "forks": 1, "open_issues": 9,
+                                      "open_issues_and_prs": 9,
+                                      "last_updated": "2029-01-01T00:00:00Z"}}
+
+with Sandbox(api={"/releases/latest": RELEASE,
+                  "/repos/PipFoweraker/pdoom1": REPO_STATS},
+             version_json=STALE_ON_DISK) as sb:
+    _, out = quiet(uvi.update_version_data)
+    stats = (sb.read("version.json") or {}).get("repository_stats") or {}
+    check(stats.get("open_issues") is None,
+          f"a failed search publishes null, not a number: {stats.get('open_issues')!r}")
+    check(stats.get("open_issues") != 0,
+          "null is not coerced to zero -- zero is the claim 'this project has "
+          "no open issues'")
+    check(stats.get("open_issues") != 9,
+          "the stale 9 on disk is NOT carried forward; a count that moves must "
+          "not survive its own fetch failing")
+    check("UNKNOWN" in out or "null" in out,
+          f"the failure is announced on stdout, not silent: {out.strip()[:120]!r}")
+    check(stats.get("open_issues_and_prs") == 211,
+          "the field that DID fetch successfully is still published")
+
 print()
 if failures:
     print(f"{len(failures)} FAILURE(S)")
