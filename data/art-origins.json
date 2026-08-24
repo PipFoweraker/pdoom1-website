@@ -1,0 +1,114 @@
+{
+  "schema": "pdoom-art-origins/v1",
+  "note": "The ONLY hand-written input to data/art-register.json. Everything else in that file is derived by scripts/build-art-register.py; this holds the claims no machine in this repo can make. Read by that script, validated harshly, and the loader REFUSES the whole file rather than skipping a bad entry -- a skipped entry resurfaces as a fresh 'unknown' and sends the next person hunting a bug nobody introduced.",
+  "the_rule": "An entry here is an assertion about the world, so it carries a clock. verify=human costs why_not_machine plus a human_verified stamp with a review_by that EXPIRES; past that date scripts/check-art-staleness.py is RED on 'this verification expired', never on the underlying image. Same shape as content/campaigns/README.md section 2.1 and scripts/acknowledgements.py. Do not add an entry you would not re-check on the review date.",
+  "what_does_NOT_belong_here": "A guess. If nothing in this repo and nobody's actual knowledge supports the claim, leave the file out and let the register say origin=unknown. Unknown is a first-class value and today it is the commonest one; that is the honest state, not a gap to be filled in.",
+  "vocabulary": {
+    "origin": [
+      "generated -- a model produced the pixels",
+      "photograph -- a camera captured a real subject (further processing does not change this)",
+      "human-illustrated -- a person drew or painted it",
+      "screenshot -- a capture of the game's own rendered UI",
+      "unknown -- nothing here records which of the above it is"
+    ],
+    "verify": "checked | delegated | online | human | durable -- copied from content/campaigns/README.md section 2.1. Do not invent a sixth tier."
+  },
+  "assertions": [
+    {
+      "path": "assets/cats-gallery/web-arwen.jpg",
+      "origin": "photograph",
+      "verify": "human",
+      "why_not_machine": "The claim is that a real camera photographed a real cat. The only in-repo evidence is prose on the page that displays the image plus a comment in deploy-excludes.txt, and matching a gallery file to its original in assets/dump/ needs fuzzy name matching ('web-arwen.jpg' vs 'arwen matilda.jpeg'). A regex over page prose is exactly the pattern-matching that gave check-platform-claims.py two false positives; a human reading two sentences is more reliable and says so.",
+      "source": "public/cats/index.html:226 ('turn a photo of a real cat into a pixel office companion') and :242; deploy-excludes.txt ('Unprocessed cat originals ... The images /cats/ serves are the processed ones in assets/cats-gallery/'); public/assets/dump/'arwen matilda.jpeg'.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR feat/art-register. NOT Pip's ruling -- he has not been asked. This entry is what asking looks like when the asker cannot wait.",
+        "on": "2026-08-25",
+        "review_by": "2026-11-25",
+        "note": "Read both sources. The gallery page frames every cat except Doom Cat as a real animal belonging to a named custodian, and the unprocessed original in assets/dump/ is a .jpeg with a custodian name in the filename. Not verified with the custodian; if that matters, this is the entry to re-open."
+      }
+    },
+    {
+      "path": "assets/cats-gallery/web-arwen-chuck.jpg",
+      "origin": "photograph",
+      "verify": "human",
+      "why_not_machine": "As web-arwen.jpg: the claim is about a camera and a real animal, and the gallery-to-original join is fuzzy on the filename.",
+      "source": "public/cats/index.html:226, :251; public/assets/dump/'arwen and chuck custodian Matilda.jpeg'.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR feat/art-register. NOT Pip's ruling.",
+        "on": "2026-08-25",
+        "review_by": "2026-11-25",
+        "note": "Original filename names the custodian explicitly. Same caveat as web-arwen.jpg: no custodian was contacted."
+      }
+    },
+    {
+      "path": "assets/cats-gallery/web-chucky.jpg",
+      "origin": "photograph",
+      "verify": "human",
+      "why_not_machine": "As web-arwen.jpg.",
+      "source": "public/cats/index.html:226, :260; public/assets/dump/'chucky ccustodian Nicki T.jpg'.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR feat/art-register. NOT Pip's ruling.",
+        "on": "2026-08-25",
+        "review_by": "2026-11-25",
+        "note": "Original present in assets/dump/ with a custodian name (typo in the upstream filename is theirs, left alone)."
+      }
+    },
+    {
+      "path": "assets/cats-gallery/web-luna.jpg",
+      "origin": "photograph",
+      "verify": "human",
+      "why_not_machine": "As web-arwen.jpg.",
+      "source": "public/cats/index.html:226, :269; public/assets/dump/'Luna Chick custodian Nicki T.jpg'.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR feat/art-register. NOT Pip's ruling.",
+        "on": "2026-08-25",
+        "review_by": "2026-11-25",
+        "note": "Original present in assets/dump/ with a custodian name."
+      }
+    },
+    {
+      "path": "assets/cats-gallery/web-mando.jpg",
+      "origin": "photograph",
+      "verify": "human",
+      "why_not_machine": "As web-arwen.jpg.",
+      "source": "public/cats/index.html:226, :278; public/assets/dump/'mando aka jiggly custodian Nicki T.jpg'.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR feat/art-register. NOT Pip's ruling.",
+        "on": "2026-08-25",
+        "review_by": "2026-11-25",
+        "note": "Original present in assets/dump/ with a custodian name."
+      }
+    },
+    {
+      "path": "assets/cats-gallery/web-missy.jpg",
+      "origin": "photograph",
+      "verify": "human",
+      "why_not_machine": "As web-arwen.jpg.",
+      "source": "public/cats/index.html:226, :287; public/assets/dump/'missy custodian Spicy.jpeg'.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR feat/art-register. NOT Pip's ruling.",
+        "on": "2026-08-25",
+        "review_by": "2026-11-25",
+        "note": "Original present in assets/dump/ with a custodian name."
+      }
+    },
+    {
+      "path": "assets/cats-gallery/web-nigel.jpg",
+      "origin": "photograph",
+      "verify": "human",
+      "why_not_machine": "As web-arwen.jpg.",
+      "source": "public/cats/index.html:226, :296; public/assets/dump/'nigel 1 custodian Nicki T.jpg'.",
+      "human_verified": {
+        "by": "pdoom1-website seat, PR feat/art-register. NOT Pip's ruling.",
+        "on": "2026-08-25",
+        "review_by": "2026-11-25",
+        "note": "Original present in assets/dump/ with a custodian name."
+      }
+    }
+  ],
+  "deliberately_absent": {
+    "assets/cats-gallery/web-doom-cat.jpg": "The eighth image in the same gallery, and it stays UNKNOWN on purpose. Its alt text calls it 'The original AI Safety guardian' rather than naming a custodian, and the nearest file in assets/dump/ is 'zoomed in doom cat.png' -- a PNG among the custodians' JPEGs. Asserting 'photograph' for it because its seven neighbours are photographs is the generalisation this repo has been bitten by twice (the retired-mirror bullet in CLAUDE.md, and the _deprecated note on game-changes.json). Seven of eight is the honest answer.",
+    "assets/screenshots/*": "Almost certainly captures of the game's own UI, but 'almost certainly' is a guess and the register is not the place for one. optimize-screenshots.py proves the -web variants DERIVE from the .png masters; it says nothing about where a master came from.",
+    "assets/pdoom_logo_1.png": "scripts/make-og-card.py calls it 'the full-size source art' and 'the source painting'. Neither phrase distinguishes a human illustration from a generated one, and that distinction is the whole point of the origin field."
+  }
+}
