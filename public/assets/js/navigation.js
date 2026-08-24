@@ -228,12 +228,36 @@
 			font-size: 0.7rem; color: var(--text-muted, #A79E92);
 			white-space: nowrap;
 		}
-		@media (max-width: 760px) {
+		/* 768px, NOT 760. Every page in this repo breaks at 768; the nav broke at 760,
+		   so between 761 and 768 the page was in mobile layout while the nav it carries
+		   was still in desktop layout. An 8-pixel band of disagreement is exactly the
+		   kind of defect that reproduces on one device and not another. */
+		@media (max-width: 768px) {
 			header[data-nav-injected] nav {
 				flex-direction: column; align-items: flex-start; gap: 0.5rem;
 			}
 			header[data-nav-injected] .nav-links { justify-content: flex-start; }
-			header[data-nav-injected] .dropdown-menu { position: static; opacity: 1; visibility: visible; }
+			/* COLLAPSED, not expanded. This rule set position/opacity/visibility and
+			   never set 'display', so both dropdowns dropped into flow FULLY OPEN and
+			   stayed there: 6 top-level links + 6 Community children + 7 Info children
+			   + Fund the game = 20 visible links in a sticky header, above the content,
+			   on every page that takes the injected nav.
+
+			   The homepage looked like only three lines because it still carries a
+			   pre-migration '.dropdown-menu { display: none }' of its own -- an
+			   ACCIDENT that was holding the front page together. CLAUDE.md says of
+			   those leftover rules "if you see any, they are dead"; they are not, they
+			   match the injected nav because the class names are identical, and
+			   deleting index.html's would have broken the page that looked fine.
+			   That paragraph is corrected in this commit.
+
+			   So the fix is here, additive, and the leftovers can then go separately. */
+			header[data-nav-injected] .dropdown-menu {
+				position: static; opacity: 1; visibility: visible;
+				display: none;
+			}
+			header[data-nav-injected] .dropdown-toggle[aria-expanded="true"] + .dropdown-menu,
+			header[data-nav-injected] .dropdown.open .dropdown-menu { display: block; }
 		}
 	`;
 

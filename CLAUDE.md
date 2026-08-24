@@ -17,8 +17,18 @@ Deeper material lives in `docs/`:
   (as of 2026-07-28). 21 of the 25 hand-written pages delegate to it: an empty
   `<header></header>` in the body, `<script src="/assets/js/navigation.js">` at
   the end. It ships its own styles, scoped to `header[data-nav-injected]`, so a
-  page needs no `.nav-links`/`.dropdown` rules of its own — if you see any,
-  they are dead. Recipe and rationale: `public/includes/README.md`.
+  page needs no `.nav-links`/`.dropdown` rules of its own.
+  **CORRECTED 2026-08-25: this used to end "if you see any, they are dead". They
+  are NOT dead.** The injected nav uses the identical class names, and the leftover
+  rules are UNSCOPED class selectors, so they match it. Eight pages still carry them
+  (`index.html`, `about/`, `cats/`, `issues/`, `leaderboard/`, `league/index.html`,
+  `league/archive.html`, `players/`). On `index.html` the leftover rule was **the only
+  thing collapsing the mobile dropdown menus** — navigation.js set position, opacity and
+  visibility but never `display`, so on the other 26 delegating pages both menus rendered
+  permanently open: 20 links in a sticky header above every page's content, which is what
+  #358 reported as "pretty broken on many subpages". **Deleting them as dead would have
+  broken the one page that looked fine.** navigation.js now sets `display` itself, so the
+  leftovers can be removed — but that is a separate change and must land AFTER this one. Recipe and rationale: `public/includes/README.md`.
   - `public/includes/navigation.html` was **deleted**. It was wired into zero
     pages and hardcoded a stale `v0.11.0`. Do not recreate a second copy.
   - `docs/HTML_PAGE_TEMPLATE.md` used to tell authors to **hand-copy** the nav
