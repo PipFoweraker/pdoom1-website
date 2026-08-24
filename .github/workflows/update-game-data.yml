@@ -34,11 +34,20 @@ jobs:
           pip install requests
 
       - name: Fetch and cache game data
+        env:
+          # The search queries below are the only calls here that need a token.
+          # Unauthenticated search is 10 requests/minute PER IP, and an Actions
+          # runner's IP is shared, so an unauthenticated run can be throttled by
+          # somebody else's job. A 403 there is not fatal -- _search_count()
+          # returns None and the count publishes as UNKNOWN -- but a throttled
+          # run publishes a page full of "we could not read this" for no reason.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python - << 'EOF'
+          import os
           import requests
           import json
-          from datetime import datetime
+          from datetime import datetime, timezone
 
           print("Fetching latest game data...")
 
@@ -232,6 +241,112 @@ jobs:
               else:
                   print("No truncation-severed address shapes in the issues mirror")
 
+              # -----------------------------------------------------------------
+              # THE SUMMARY BLOCK -- the only counts pdoom1.com is allowed to say
+              # out loud about development.
+              #
+              # WHY IT EXISTS. The front page published `repository_stats.open_issues`
+              # from version.json under the words "open issues". That field is
+              # GitHub's `open_issues_count`, which is DOCUMENTED to include open pull
+              # requests: measured 2026-08-24, it read 207 against 200 open issues and
+              # 7 open pull requests. So the site's headline development figure was
+              # issues and pull requests summed and then labelled as issues -- the
+              # same category error frontier-labs.json records for its own count
+              # (6 real labs + 1 hypothetical entrant published as 7).
+              #
+              # Every count below is a `total_count` from ONE search query whose
+              # predicate is written down next to it. Nothing here is added,
+              # subtracted, estimated or floored.
+              #
+              # None means UNKNOWN -- nobody measured it on this run. It must NEVER
+              # collapse to 0: "no open bugs" and "we could not reach the tracker"
+              # are different statements and only one of them is ever true here.
+              # The renderer is required to print the second one in words.
+              SEARCH_URL = 'https://api.github.com/search/issues'
+              REPO_Q = 'repo:PipFoweraker/pdoom1'
+              _search_headers = {'Accept': 'application/vnd.github.v3+json'}
+              if os.environ.get('GITHUB_TOKEN'):
+                  _search_headers['Authorization'] = 'Bearer ' + os.environ['GITHUB_TOKEN']
+
+              _unmeasured = []
+
+              def _search_count(name, query):
+                  """total_count for one issue-search query, or None for UNKNOWN."""
+                  try:
+                      r = requests.get(SEARCH_URL, params={'q': query, 'per_page': 1},
+                                       headers=_search_headers, timeout=10)
+                      r.raise_for_status()
+                      n = r.json().get('total_count')
+                      if not isinstance(n, int):
+                          raise ValueError('total_count was not an integer')
+                      print(f"  {name}: {n}   [{query}]")
+                      return n
+                  except Exception as exc:
+                      # Deliberately NOT fatal. One throttled query should degrade one
+                      # number to UNKNOWN, not blank the whole panel or -- far worse --
+                      # leave the previous run's number in place under a fresh date.
+                      print(f"::warning::UNKNOWN count for {name} ({query}): {exc}")
+                      _unmeasured.append(name)
+                      return None
+
+              print("Counting open work (search API)...")
+              _counts = {
+                  # is:issue EXCLUDES pull requests. That exclusion is the whole point.
+                  "open_issues": _search_count(
+                      "open_issues", f"{REPO_Q} is:issue is:open"),
+                  "open_pull_requests": _search_count(
+                      "open_pull_requests", f"{REPO_Q} is:pr is:open"),
+                  # The denominator for every label count below. Labels are applied by
+                  # hand, so an unlabelled issue is not a bug-free issue -- it is an
+                  # uncategorised one, and the page must say how many there are.
+                  "open_issues_without_label": _search_count(
+                      "open_issues_without_label", f"{REPO_Q} is:issue is:open no:label"),
+                  "open_issues_labelled_bug": _search_count(
+                      "open_issues_labelled_bug", f"{REPO_Q} is:issue is:open label:bug"),
+                  "open_issues_labelled_enhancement": _search_count(
+                      "open_issues_labelled_enhancement",
+                      f"{REPO_Q} is:issue is:open label:enhancement"),
+              }
+
+              _as_of = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+              summary = {
+                  "as_of": _as_of,
+                  "source": {
+                      "repository": "PipFoweraker/pdoom1",
+                      "repository_url": "https://github.com/PipFoweraker/pdoom1",
+                      "api": SEARCH_URL,
+                      "generated_by": ".github/workflows/update-game-data.yml",
+                      "cadence": "every 6 hours (cron 0 */6 * * *)",
+                      "cadence_seconds": 21600
+                  },
+                  "stat_contract": {
+                      "open_issues": "total_count of `repo:PipFoweraker/pdoom1 is:issue is:open`. Pull requests are EXCLUDED by is:issue. This is not the same number as GitHub's repository `open_issues_count`, which includes them.",
+                      "open_pull_requests": "total_count of `... is:pr is:open`. A proposed change waiting to go in.",
+                      "open_issues_without_label": "total_count of `... is:issue is:open no:label`. Labels are hand-applied, so this is the count of open issues nobody has categorised. Every label count is a FLOOR, not a total, and this number is how far off the floor could be.",
+                      "label_counts": "total_count of `... is:issue is:open label:<name>` for each label named in `counts`. An issue carrying two of these labels is counted under both; the label counts therefore do NOT sum to open_issues and must never be presented as a partition.",
+                      "null_means": "UNKNOWN -- the query did not come back on this run. It does not mean zero, and nothing downstream may render it as a number.",
+                      "no_floor": "There is no minimum and no fallback. A count that could not be measured is null; the previous run's value is never carried forward under a new as_of."
+                  },
+                  "counts": _counts,
+                  # The frontier-labs.json vocabulary, deliberately: this file is now a
+                  # published statistic and answers the same questions its reader asks.
+                  "completeness": "known_incomplete",
+                  "known_uncategorised": _counts["open_issues_without_label"],
+                  "measurement": "partial" if _unmeasured else "complete",
+                  "unmeasured": sorted(_unmeasured),
+                  "recent_window": {
+                      "size": len(issues_data),
+                      "requested": 15,
+                      "sort": "recently updated first",
+                      "predicate": "GitHub's /issues?state=open endpoint, which returns PULL REQUESTS alongside issues. `pull_requests_in_window` says how many of the entries in `issues` are actually pull requests; an entry is one when it carries a `pull_request` key.",
+                      "pull_requests_in_window": sum(
+                          1 for _i in issues_data
+                          if isinstance(_i, dict) and _i.get('pull_request')),
+                      "is_not": "a complete list. It is the most recently touched fifteen. Absence from it proves nothing -- see content/campaigns/*.json, which already records that trap."
+                  }
+              }
+
               issues_cache = {
                   "issues": issues_data,
                   # `count` is RETAINED for older readers but it is a sample size and
@@ -247,7 +362,17 @@ jobs:
                   "total_open_prs": total_open_prs,
                   "untriaged_in_sample": _untriaged,
                   "bodies_included": False,
-                  "last_updated": datetime.utcnow().isoformat(),
+                  "summary": summary,
+                  # Z-SUFFIXED. This was `datetime.utcnow().isoformat()`, which
+                  # emits a naive string with no zone. JavaScript's `new Date()`
+                  # parses a bare date-time as LOCAL time (ECMA-262), so every
+                  # reader west of UTC read this cache as up to ~12 hours NEWER
+                  # than it was, and every reader east of it as older. A freshness
+                  # gate built on that arithmetic is wrong by up to half a day, in
+                  # the direction that HIDES staleness. _as_of is defined above and
+                  # is the same instant `summary.as_of` carries, so the two cannot
+                  # disagree about when this file was written.
+                  "last_updated": _as_of,
                   "_comment": (
                       "issues is a SAMPLE -- the `sample_requested` most recently updated "
                       "open issues, pull requests removed. total_open_issues is the real "

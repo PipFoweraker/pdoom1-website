@@ -198,9 +198,16 @@ const GUARDED = [
   },
   {
     page: 'public/index.html',
-    roots: ['status'],
-    safeHelpers: [],
+    // `summary`, `counts` and `item` are the "What we are working on" panel's data:
+    // summary/counts are ours and committed, `item` is a GitHub issue or pull request
+    // object, which anyone with a GitHub account can create. The committed half is
+    // listed for the same reason frontier-labs.json's roster is -- the rule is about
+    // the SINK (innerHTML), not about who we trust, and it is what stops the NEXT
+    // field being spliced in raw.
+    roots: ['status', 'summary', 'counts', 'item'],
+    safeHelpers: ['workFigureHtml', 'workItemHtml', 'workGroupHtml', 'workUnreadableHtml'],
     fetches: ['config.json', 'data/status.json', 'design/tokens.json', '/data/version.json',
+              '/data/issues-cache.json',
               'https://api.github.com/repos/PipFoweraker/pdoom1/releases/latest'],
   },
   {

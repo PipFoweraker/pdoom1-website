@@ -423,6 +423,108 @@
 			text-shadow: 0 0 10px var(--accent-secondary);
 		}
 
+		/* ---- Where-to-next strip ------------------------------------------- */
+		.front-jump {
+			max-width: 1200px;
+			margin: 0 auto 1.2rem;
+			padding: 0 1rem;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			justify-content: center;
+		}
+		.front-jump a {
+			color: var(--text-secondary);
+			text-decoration: none;
+			font-size: 0.9rem;
+			padding: 0.4rem 0.9rem;
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			background: var(--bg-secondary);
+		}
+		.front-jump a:hover, .front-jump a:focus {
+			color: var(--accent-primary);
+			border-color: var(--accent-primary);
+		}
+
+		/* ---- "What we are working on" panel --------------------------------
+		   The figure tiles are a grid of measured counts. `.work-figure.unknown`
+		   is the state a count takes when its query did not come back: it renders
+		   the WORD "not counted", muted, never a numeral. There is deliberately no
+		   styling that could make an unknown look like a small number. */
+		.work-figures {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+			gap: 0.8rem;
+			margin-bottom: 1rem;
+		}
+		.work-figure {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 0.9rem 1rem;
+		}
+		.work-figure .work-value {
+			display: block;
+			font-size: 2rem;
+			font-weight: bold;
+			color: var(--accent-primary);
+			line-height: 1.1;
+		}
+		.work-figure.unknown .work-value {
+			font-size: 1.1rem;
+			color: var(--text-muted);
+			font-weight: normal;
+			font-style: italic;
+		}
+		.work-figure .work-name {
+			display: block;
+			color: var(--text-primary);
+			font-size: 0.95rem;
+			margin-top: 0.3rem;
+		}
+		.work-figure .work-note {
+			display: block;
+			color: var(--text-muted);
+			font-size: 0.78rem;
+			margin-top: 0.2rem;
+			line-height: 1.4;
+		}
+		.work-banner {
+			border-left: 4px solid var(--accent-danger, #C0392B);
+			background: var(--bg-tertiary);
+			padding: 0.9rem 1rem;
+			border-radius: var(--radius-md);
+			margin-bottom: 1rem;
+			color: var(--text-primary);
+			font-size: 0.92rem;
+			line-height: 1.55;
+		}
+		.work-banner.warn { border-left-color: var(--accent-primary); }
+		.work-caveat, .work-provenance {
+			color: var(--text-muted);
+			font-size: 0.82rem;
+			line-height: 1.55;
+			max-width: 52rem;
+		}
+		.work-provenance { margin-top: 1rem; }
+		.work-group h3 {
+			font-size: 0.95rem;
+			color: var(--text-secondary);
+			margin: 1rem 0 0.2rem;
+		}
+		.work-list { list-style: none; margin: 0.4rem 0 0; padding: 0; }
+		.work-list li {
+			padding: 0.45rem 0;
+			border-bottom: 1px solid var(--border-color);
+			font-size: 0.9rem;
+			line-height: 1.5;
+		}
+		.work-list li:last-child { border-bottom: none; }
+		.work-list .work-when { color: var(--text-muted); font-size: 0.8rem; }
+		.work-list a { color: var(--accent-secondary); text-decoration: none; }
+		.work-list a:hover { text-decoration: underline; }
+
 		.roadmap-card:hover {
 			border-color: var(--accent-primary);
 			background: var(--bg-tertiary);
@@ -1127,6 +1229,22 @@
 				Read the proposal on Manifund &rarr;
 			</a>
 		</section>
+		<!-- Where to next.
+		     The site's own nav is organised by SECTION NAME (Game / Leaderboard /
+		     Stats / Community v / Info v), which is the map a maintainer has in
+		     their head. A first-time visitor arrives with four questions instead --
+		     how do I get it, what changed, what is the competition, and is anyone
+		     still working on this -- and three of the four answers were behind a
+		     dropdown or below several screens of scroll. This strip answers them by
+		     question rather than by section name. It is plain links, no JS: if
+		     anything below fails to load, this row still works. -->
+		<nav class="front-jump" aria-label="Common destinations">
+			<a href="/game-changelog/">What changed recently</a>
+			<a href="/leaderboard/">This week's league</a>
+			<a href="#working-on">What we are working on</a>
+			<a href="#about">Screenshots and requirements</a>
+			<a href="/bug-report/">Tell us something</a>
+		</nav>
 
 		<!-- Live Game Stats & Status - Combined Section -->
 		<section class="section" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(246, 168, 0, 0.05) 100%); border-left: 4px solid var(--accent-primary);">
@@ -1167,9 +1285,20 @@
 					<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
 						Released: <span id="release-date" class="loading-placeholder">...</span>
 					</p>
+					<!-- REMOVED 2026-08-24: `<span id="open-issues-count"> open issues`.
+					     It was filled from version.json's `repository_stats.open_issues`,
+					     which is GitHub's `open_issues_count` -- a field DOCUMENTED to
+					     include open pull requests. Measured on 2026-08-24 it read 207
+					     against 200 open issues and 7 open pull requests, so the site's
+					     one public development figure was two different things summed and
+					     then labelled as one of them. Exactly the error frontier-labs.json
+					     records against itself (6 real labs + 1 hypothetical published
+					     as 7), on the surface with the most readers.
+					     The honest counts now live in the "What we are working on" panel
+					     below, each with the query that produced it. -->
 					<p style="font-size: 0.75rem; color: var(--text-muted);">
-						<a href="https://github.com/PipFoweraker/pdoom1/issues" target="_blank" style="color: var(--accent-secondary); text-decoration: none;">
-							<span id="open-issues-count" class="loading-placeholder">--</span> open issues
+						<a href="#working-on" style="color: var(--accent-secondary); text-decoration: none;">
+							What we are working on &rarr;
 						</a>
 					</p>
 				</div>
@@ -1203,6 +1332,52 @@
 				<a href="/game-stats/" class="cta-button" style="display: inline-block; font-size: 0.85rem; padding: 0.5rem 1rem;">
 					📊 View Detailed Statistics →
 				</a>
+			</div>
+		</section>
+
+		<!-- ====================================================================
+		     WHAT WE ARE WORKING ON
+		     ====================================================================
+		     Replaces the single line `<span id="open-issues-count"> open issues`,
+		     which was the whole of this site's public account of development and
+		     was wrong three ways at once:
+
+		       1. WRONG NUMBER. It published GitHub's `open_issues_count`, which
+		          includes pull requests. Issues and proposed changes, summed, and
+		          labelled as issues.
+		       2. NO AS-OF. It rendered a bare integer. A visitor could not tell
+		          whether it was counted an hour ago or in March.
+		       3. FAILED SILENTLY. On a fetch error the catch below rewrote EVERY
+		          `.loading-placeholder` on the page to an em dash -- so a total
+		          outage and "we genuinely have nothing to say" looked identical,
+		          and neither said anything to the reader.
+
+		     What replaces it obeys three rules, in this order of priority:
+		       - A number that could not be measured is NOT rendered. Not as 0,
+		           not as the last value, not as a dash next to a fresh date.
+		       - Every number states when it was counted and what query counted it.
+		       - Stale and honest beats fresh-looking and wrong: past the staleness
+		           threshold the figures still show, under a banner in plain words
+		           saying they are old; past the abandonment threshold they stop.
+
+		     The panel is deliberately legible without a GitHub account: no issue
+		     numbers, no label chips, no API vocabulary in the figures. The one
+		     place raw upstream text appears is the recent-activity list, which
+		     says in so many words that it is unedited developer shorthand -- the
+		     honest framing, since nobody has summarised those titles for a general
+		     reader and pretending otherwise would be the flattering option. -->
+		<section class="section" id="working-on">
+			<h2>What we are working on</h2>
+			<p style="color: var(--text-secondary); max-width: 46rem;">
+				Work on p(Doom)1 is tracked publicly, item by item. This panel counts what is
+				on that tracker. Nothing here is typed by hand or edited by a person &mdash; it is
+				re-counted automatically, and when the count cannot be taken it says so
+				instead of showing you a number.
+			</p>
+			<div id="work-panel">
+				<div class="card" style="color: var(--text-muted);">
+					Reading the development tracker&hellip;
+				</div>
 			</div>
 		</section>
 
@@ -1720,7 +1895,10 @@
 					_setStatus('current-version-display', v.latest_release && v.latest_release.version);
 					_setStatus('release-date', v.latest_release && v.latest_release.published_at
 						? v.latest_release.published_at.slice(0, 10) : null);
-					_setStatus('open-issues-count', v.repository_stats && v.repository_stats.open_issues);
+					// `open-issues-count` used to be set here from
+					// v.repository_stats.open_issues -- GitHub's open_issues_count, which
+					// counts pull requests as issues. The span is gone (see the markup
+					// note above it) and the honest counts are in renderWorkPanel().
 					_setStatus('last-update-time', v.last_updated
 						? new Date(v.last_updated).toLocaleDateString(undefined,
 							{ year: 'numeric', month: 'short', day: 'numeric' }) : null);
@@ -1738,6 +1916,277 @@
 				}
 			}
 			// --- end injected block ---
+
+			/* =====================================================================
+			   "WHAT WE ARE WORKING ON" -- the renderer.
+
+			   The long note lives on the section markup above; this is the code.
+			   Everything here is PURE except loadWorkPanel(): renderWorkPanel()
+			   takes the parsed file, a host element and an explicit `now`, so
+			   scripts/test-work-status.js can drive every state it has -- fresh,
+			   stale, abandoned, undated, partly-unmeasured, unreadable, and a file
+			   whose counts are missing entirely -- with no browser and without
+			   waiting a month for a timestamp to rot.
+
+			   THE ONE INVARIANT: a count that is not a finite number is rendered as
+			   the words "not counted", never as a numeral and never as 0. Nothing
+			   below may add a fallback, a floor, or a remembered previous value.
+			   ===================================================================== */
+			const WORK_TRACKER_URL = 'https://github.com/PipFoweraker/pdoom1/issues';
+			// The producer runs on `cron 0 */6 * * *`. WORK_STALE_HOURS is four missed
+			// runs -- wide enough that one throttled job does not shout at a visitor,
+			// tight enough that a day of silence is visible. WORK_ABANDONED_DAYS is
+			// where a count stops being worth showing at all; past it this panel emits
+			// words and no figures, which is the same exit /dashboard/'s development
+			// log takes rather than print an old release under the word "Recent".
+			const WORK_STALE_HOURS = 24;
+			const WORK_ABANDONED_DAYS = 30;
+			const WORK_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+				'July', 'August', 'September', 'October', 'November', 'December'];
+
+			// ISO instant -> epoch ms, or null when it cannot be read at all.
+			// null is UNKNOWN and every caller must treat it as such.
+			//
+			// A string carrying NO ZONE is read as UTC. That is not pedantry: the
+			// producer wrote naive `datetime.utcnow().isoformat()` strings until
+			// 2026-08-24, and ECMA-262 says `new Date()` reads a bare date-time as
+			// LOCAL time. A reader west of UTC would therefore have seen the cache as
+			// up to twelve hours NEWER than it was -- error in exactly the direction
+			// that hides staleness, on the value the staleness gate is built from.
+			function workInstant(s) {
+				if (typeof s !== 'string' || !s.trim()) { return null; }
+				const raw = s.trim();
+				const zoned = /(?:Z|z|[+-]\d{2}:?\d{2})$/.test(raw);
+				const t = new Date(zoned ? raw : raw + 'Z').getTime();
+				return isFinite(t) ? t : null;
+			}
+
+			// "24 August 2026, 01:45 UTC". Built by hand from the UTC getters rather
+			// than toLocaleString(), so the stamp says the same thing to every reader
+			// and the node test asserts one string rather than the runner's locale.
+			function workStamp(ms) {
+				const d = new Date(ms);
+				return d.getUTCDate() + ' ' + WORK_MONTHS[d.getUTCMonth()] + ' ' +
+					d.getUTCFullYear() + ', ' +
+					String(d.getUTCHours()).padStart(2, '0') + ':' +
+					String(d.getUTCMinutes()).padStart(2, '0') + ' UTC';
+			}
+
+			function workAgo(hours) {
+				if (hours < 0) { return 'dated in the future'; }
+				if (hours < 1) { return 'less than an hour ago'; }
+				if (hours < 2) { return 'about an hour ago'; }
+				if (hours < 48) { return Math.round(hours) + ' hours ago'; }
+				const days = Math.round(hours / 24);
+				if (days < 60) { return days + ' days ago'; }
+				return Math.round(days / 30) + ' months ago';
+			}
+
+			// Four states, and 'unknown' is deliberately reachable two ways: an
+			// unreadable date, and a date more than an hour in the FUTURE. The second
+			// one matters -- a clock disagreement makes the age arithmetic meaningless,
+			// and a negative age would otherwise sail through as "very fresh".
+			function workFreshness(asOfMs, nowMs) {
+				if (asOfMs === null) { return { state: 'unknown', hours: null }; }
+				const hours = (nowMs - asOfMs) / 3600000;
+				if (hours < -1) { return { state: 'unknown', hours: hours }; }
+				if (hours > WORK_ABANDONED_DAYS * 24) { return { state: 'abandoned', hours: hours }; }
+				if (hours > WORK_STALE_HOURS) { return { state: 'stale', hours: hours }; }
+				return { state: 'fresh', hours: hours };
+			}
+
+			// Collapse whitespace and cut at a word boundary. Returns PLAIN TEXT and
+			// introduces no markup; the call site escapes it.
+			function workTrim(text, max) {
+				const s = String(text === null || text === undefined ? '' : text)
+					.replace(/\s+/g, ' ').trim();
+				if (s.length <= max) { return s; }
+				const cut = s.slice(0, max);
+				const sp = cut.lastIndexOf(' ');
+				return (sp > max * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s.,;:-]+$/, '') + '...';
+			}
+
+			// ---- fragments that emit ALREADY-ESCAPED html --------------------------
+
+			// One figure tile. `value` is a count from the data file: a finite number,
+			// or anything else, which means UNKNOWN. There is no third case and no
+			// coercion -- toNumber() with a fallback is exactly the mistake this whole
+			// panel exists to undo.
+			function workFigureHtml(value, name, note) {
+				const known = typeof value === 'number' && isFinite(value);
+				return '<div class="work-figure' + (known ? '' : ' unknown') + '">' +
+					'<span class="work-value">' +
+					(known ? escapeHTML(String(value)) : 'not counted') +
+					'</span><span class="work-name">' + escapeHTML(name) +
+					'</span><span class="work-note">' +
+					escapeHTML(known ? note
+						: 'This one did not come back the last time the tracker was read. ' +
+						  'It is unknown, which is not the same as none.') +
+					'</span></div>';
+			}
+
+			// One row of the recent-activity list. `item` is a GitHub issue or pull
+			// request object: anyone with a GitHub account can create one, so title
+			// and html_url are hostile text and go through the site's one escaper.
+			function workItemHtml(item) {
+				const href = safeUrl(item && item.html_url, '');
+				const title = escapeHTML(workTrim(item && item.title, 96));
+				const at = workInstant(item && item.updated_at);
+				const when = at === null ? ''
+					: ' <span class="work-when">&middot; last touched ' +
+					  escapeHTML(workAgo((Date.now() - at) / 3600000)) + '</span>';
+				return '<li>' + (href
+					? '<a href="' + href + '" target="_blank" rel="noopener">' + title + '</a>'
+					: title) + when + '</li>';
+			}
+
+			function workGroupHtml(heading, list) {
+				if (!list || !list.length) { return ''; }
+				let rows = '';
+				for (let i = 0; i < list.length; i++) { rows += workItemHtml(list[i]); }
+				return '<div class="work-group"><h3>' + escapeHTML(heading) + '</h3>' +
+					'<ul class="work-list">' + rows + '</ul></div>';
+			}
+
+			// THE HONEST EMPTY STATE. Takes already-escaped html so a caller can splice
+			// a date into it. Shows no figure of any kind -- that is the whole point of
+			// it, and a "0" or a dash sitting where a number goes would defeat it.
+			function workUnreadableHtml(whyHtml) {
+				return '<div class="work-banner">' + whyHtml +
+					' Rather than show you a figure that might be wrong, this panel is ' +
+					'showing none at all. You can look at the same thing it reads from, ' +
+					'directly: <a href="' + safeUrl(WORK_TRACKER_URL, '') +
+					'" target="_blank" rel="noopener">the p(Doom)1 tracker</a>.</div>';
+			}
+
+			// ---- the renderer ------------------------------------------------------
+			function renderWorkPanel(host, feed, nowMs) {
+				if (!host) { return; }
+				if (!feed || typeof feed !== 'object') {
+					host.innerHTML = workUnreadableHtml(
+						'We could not read our own development tracker just now.');
+					return;
+				}
+				const summary = feed.summary;
+				if (!summary || typeof summary !== 'object' ||
+					!summary.counts || typeof summary.counts !== 'object') {
+					host.innerHTML = workUnreadableHtml(
+						'The file this panel reads came back without the counts it expects, ' +
+						'which means the job that writes them did not finish.');
+					return;
+				}
+
+				const asOf = workInstant(summary.as_of);
+				const fresh = workFreshness(asOf, nowMs);
+
+				if (fresh.state === 'unknown') {
+					host.innerHTML = workUnreadableHtml(
+						'This panel cannot tell when its figures were last checked. ' +
+						'A number with no date on it is not evidence of anything.');
+					return;
+				}
+				if (fresh.state === 'abandoned') {
+					host.innerHTML = workUnreadableHtml(
+						'Nothing has updated this panel since ' + escapeHTML(workStamp(asOf)) +
+						' &mdash; ' + escapeHTML(workAgo(fresh.hours)) +
+						'. Figures that old would mislead you.');
+					return;
+				}
+
+				const counts = summary.counts;
+				let html = '';
+
+				if (fresh.state === 'stale') {
+					html += '<div class="work-banner"><strong>These figures are out of date.</strong> ' +
+						'The last time this panel managed to count anything was ' +
+						escapeHTML(workStamp(asOf)) + ' &mdash; ' + escapeHTML(workAgo(fresh.hours)) +
+						'. It is meant to re-count every six hours, so something has stopped. ' +
+						'What you see below was true then, and may not be true now.</div>';
+				}
+				if (summary.measurement === 'partial') {
+					html += '<div class="work-banner warn"><strong>Part of the last count did not ' +
+						'come back.</strong> Anything marked <em>not counted</em> below is unknown. ' +
+						'It does not mean none, and it is not a number we are rounding down.</div>';
+				}
+
+				html += '<div class="work-figures">' +
+					workFigureHtml(counts.open_issues, 'Open work items',
+						'Everything reported or planned that is not finished yet.') +
+					workFigureHtml(counts.open_issues_labelled_bug, 'Tagged as faults',
+						'Open items somebody has marked as something being broken.') +
+					workFigureHtml(counts.open_issues_labelled_enhancement, 'Tagged as improvements',
+						'Open items somebody has marked as a thing to make better.') +
+					workFigureHtml(counts.open_pull_requests, 'Changes waiting to go in',
+						'Written and proposed, not yet part of the game you can download.') +
+					'</div>';
+
+				// The floor caveat. Labels here are applied BY HAND, so an unlabelled
+				// item is an uncategorised one and not a clean one -- and with roughly
+				// half the tracker uncategorised, presenting the two middle tiles as
+				// totals would be the flattering reading rather than the true one.
+				const known = typeof counts.open_issues === 'number' &&
+					typeof counts.open_issues_without_label === 'number';
+				html += '<p class="work-caveat">' + (known
+					? 'Of the ' + escapeHTML(counts.open_issues) + ' open items, ' +
+					  escapeHTML(counts.open_issues_without_label) + ' have not been sorted into ' +
+					  'any category yet. The two middle figures are a floor, not a total: there ' +
+					  'are at least that many, and there may be more sitting in the uncategorised pile.'
+					: 'We could not establish how many open items are uncategorised, so treat the ' +
+					  'two middle figures as a floor rather than a total.') + '</p>';
+
+				const items = Array.isArray(feed.issues) ? feed.issues : [];
+				const changes = items.filter(function (i) { return i && i.pull_request; });
+				const open = items.filter(function (i) { return i && !i.pull_request; });
+				if (items.length) {
+					html += '<p class="work-caveat" style="margin-top:1.4rem;">' +
+						'Below are the items touched most recently, in the developers\' own ' +
+						'working titles &mdash; word for word, not rewritten for a general reader. ' +
+						'Most recently touched is not the same as most important, and something ' +
+						'missing from this list has not been dropped; the list is just short.</p>';
+					html += workGroupHtml('Recently worked on', open.slice(0, 6));
+					html += workGroupHtml('Changes proposed recently', changes.slice(0, 4));
+				}
+
+				// PROVENANCE. Every figure above is one search query's total_count, and
+				// the queries themselves are written out in the data file, so a reader
+				// who wants to check a number can run the same query.
+				html += '<p class="work-provenance">Counted ' + escapeHTML(workStamp(asOf)) +
+					' (' + escapeHTML(workAgo(fresh.hours)) + ') by an automated job (<code>' +
+					escapeHTML((summary.source && summary.source.generated_by) || 'unnamed') +
+					'</code>), which runs ' +
+					escapeHTML((summary.source && summary.source.cadence) || 'on a schedule') +
+					'. Each figure is the result of a single search of the tracker; the exact ' +
+					'searches are written out in <a href="/data/issues-cache.json">the file this ' +
+					'panel reads</a>, so any number here can be checked. Nothing on this panel ' +
+					'is typed or edited by a person. Source: <a href="' +
+					safeUrl((summary.source && summary.source.repository_url) || WORK_TRACKER_URL, '') +
+					'" target="_blank" rel="noopener">the p(Doom)1 tracker</a>.</p>';
+
+				host.innerHTML = html;
+			}
+
+			async function loadWorkPanel() {
+				const host = document.getElementById('work-panel');
+				if (!host) { return; }
+				let feed = null;
+				try {
+					// The URL is written out as a literal rather than through a constant
+					// on purpose: scripts/test-escaping.js rule 3 extracts fetch targets
+					// by string literal, and an identifier here would make this page's
+					// newest data source invisible to the guard that exists to notice it.
+					const res = await fetch('/data/issues-cache.json', { cache: 'no-store' });
+					if (!res.ok) { throw new Error('HTTP ' + res.status); }
+					feed = await res.json();
+				} catch (err) {
+					// feed stays null -> renderWorkPanel emits the honest empty state.
+					// There is deliberately no cached previous value to fall back on: a
+					// fallback ships exactly when the real lookup failed, which is when
+					// nobody is in a position to notice it is wrong.
+					console.warn('work panel: /data/issues-cache.json unavailable:', err);
+					feed = null;
+				}
+				renderWorkPanel(host, feed, Date.now());
+			}
 
 			async function loadGameStats() {
 			try {
@@ -2099,6 +2548,7 @@
 		document.addEventListener('DOMContentLoaded', () => {
 			loadGameStats();
 				populateStatusCards();
+			loadWorkPanel();
 			setupDownloadTracking();
 			// AWAITED, and in this order, on purpose. Both functions write button
 			// labels. version.json (same origin) settles availability first; the

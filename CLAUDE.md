@@ -671,6 +671,7 @@ node    scripts/test-dashboard-devlog.js  # /dashboard/ derives + freshness  [co
 node    scripts/test-manufactured-confidence.js # no card renders a value it did not measure [content-honesty]
 node    scripts/test-freshness.js         # the SHARED staleness gate refuses [monitoring-honesty]
 node    scripts/test-monitoring-atoms.js  # /monitoring/ prints no value from a dead source [monitoring-honesty]
+node    scripts/test-work-status.js       # the work panel can say UNKNOWN   [content-honesty]
 
 python  scripts/check-published-emails.py # no third party's address served  [content-honesty, sync-events]
 python  scripts/test-sync-events-pii.py   # ...and the sync REFUSES to write [content-honesty, sync-events]
@@ -1086,6 +1087,31 @@ and nobody was counting it. Enumerate by grepping for consumers, not from this l
   **no release at all** and links out, because deriving correctly from a source that has
   stopped moving reproduces the bug. `scripts/test-dashboard-devlog.js` forces every one
   of those states (`content-honesty.yml`).
+- **The front page's account of DEVELOPMENT is `#working-on`, and its numbers come from
+  `public/data/issues-cache.json` -> `summary.counts` only.** Every count there is one
+  GitHub search's `total_count`, with the query written out beside it in
+  `summary.stat_contract`; `null` is UNKNOWN and the renderer prints the words "not
+  counted", never a numeral and never 0. What it replaced (2026-08-24) is the shape to
+  recognise, not the specific bug: **`repository_stats.open_issues` in `version.json` is
+  GitHub's `open_issues_count`, which counts PULL REQUESTS as issues** — 207 against
+  200 + 7 when measured — and it was published under the words "open issues" on the
+  busiest page on the site. Same category error `frontier-labs.json` records against its
+  own count (6 real labs + 1 hypothetical, published as 7). **Do not reintroduce that
+  field to any reader-facing surface**; if you need a number of issues, count `is:issue`.
+  Two more from the same sweep, both on `/issues/`: `issues.length` (a FIFTEEN-item
+  window) rendered under "open issues", and `new Date().toLocaleTimeString()` — the
+  **reader's own clock at page load** — rendered as "Last updated", so a cache frozen
+  since March read as fresh to the second. `scripts/test-work-status.js` forces every
+  state of both panels, including a month-old cache and a legitimately measured zero
+  (`content-honesty.yml`).
+- **Timestamps in `public/data/` may be zone-less, and JS reads those as LOCAL time.**
+  `datetime.utcnow().isoformat()` emits `2026-08-23T18:02:00.187160` with no `Z`, and
+  ECMA-262 says `new Date()` parses a bare date-time in the reader's own zone — so a
+  freshness calculation on it is wrong by up to ~12 hours, in the direction that makes
+  a stale file look fresh. The producers are being moved to `Z`-suffixed stamps
+  (`update-game-data.yml` already is); until they all are, any renderer doing age
+  arithmetic must append `Z` when the string carries no zone. `workInstant()` in
+  `public/index.html` is the reference implementation.
 - **CORRECTED 2026-08-03:** this file said `public/data/game-changes.json` "is now read
   by nothing (it carries a `_deprecated` note saying so)". **Both were false, and both
   were false when written.** `/dashboard/` had fetched that file since 2025-11-06 and

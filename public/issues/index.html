@@ -430,7 +430,17 @@
 				<span class="status-indicator status-active"></span>
 				Known Issues & Development Status
 			</h2>
-			<p style="color: var(--text-secondary);">Live updates from our development repository. See what we're working on and known issues.</p>
+			<p style="color: var(--text-secondary);">
+				The fifteen items on our development tracker that were touched most recently.
+				This is a window, not the whole list &mdash; the totals, and where they come
+				from, are on the <a href="/#working-on" style="color: var(--accent-primary);">front page panel</a>.
+			</p>
+
+			<!-- Filled by renderIssues() when the cache is older than the six hours it is
+			     meant to refresh in. Deliberately EMPTY in the markup: a banner that is
+			     always present and merely hidden is a banner that ships visible the first
+			     time somebody edits the CSS. -->
+			<div id="issues-staleness" style="display: none;"></div>
 
 			<div id="github-issues-container">
 				<div id="issues-loading" class="card" style="text-align: center; padding: 1.6rem;">
@@ -533,6 +543,10 @@
 				this.cacheUrl = '/data/issues-cache.json';
 			}
 
+			// Returns the WHOLE cache object, not just `.issues`. It used to return the
+			// array alone, which is why this page had no timestamp to show and reached
+			// for the reader's clock instead -- the honest one was in the field this
+			// method was throwing away.
 			async fetchIssues() {
 				try {
 					// Fetch from pre-cached data (updated every 6 hours by GitHub Actions)
@@ -553,6 +567,30 @@
 					console.warn('Failed to fetch cached issues:', error);
 					throw error;
 				}
+			}
+
+			// ISO instant -> epoch ms, or null when it cannot be read. Same rule as the
+			// front page's workInstant(): a string with NO ZONE is read as UTC, because
+			// the producer wrote naive `datetime.utcnow().isoformat()` strings until
+			// 2026-08-24 and `new Date()` reads a bare date-time as LOCAL time -- an
+			// error of up to twelve hours, in the direction that hides staleness.
+			cacheInstant(s) {
+				if (typeof s !== 'string' || !s.trim()) { return null; }
+				const raw = s.trim();
+				const zoned = /(?:Z|z|[+-]\d{2}:?\d{2})$/.test(raw);
+				const t = new Date(zoned ? raw : raw + 'Z').getTime();
+				return isFinite(t) ? t : null;
+			}
+
+			// "24 August 2026, 01:45 UTC" -- built from the UTC getters so the stamp
+			// says the same thing to every reader.
+			cacheStamp(ms) {
+				const M = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+					'August', 'September', 'October', 'November', 'December'];
+				const d = new Date(ms);
+				return d.getUTCDate() + ' ' + M[d.getUTCMonth()] + ' ' + d.getUTCFullYear() +
+					', ' + String(d.getUTCHours()).padStart(2, '0') + ':' +
+					String(d.getUTCMinutes()).padStart(2, '0') + ' UTC';
 			}
 
 			formatIssueCard(issue) {
@@ -580,7 +618,17 @@
 				const updatedDate = new Date(issue.updated_at).toLocaleDateString();
 				const isPriority = labelNames.some(n => n.includes('priority-high') || n.includes('critical'));
 				const isBug = labelNames.some(n => n === 'bug');
-				const icon = isBug ? '🐛' : isPriority ? '⚠️' : '📋';
+				// GitHub's /issues endpoint returns PULL REQUESTS alongside issues -- an
+				// entry is one when it carries a `pull_request` key. Four of the fifteen
+				// in the cache were, on 2026-08-24, and every one of them rendered here
+				// as an "issue" with the same clipboard icon. A proposed change and a
+				// reported problem are not the same thing to a reader.
+				const isChange = !!(issue && issue.pull_request);
+				// ASCII chrome for the new case, not another emoji: scripts/test-header-consistency.js
+				// counts emoji on this page and the count may fall, never rise. The
+				// existing three predate that rule and are left where they are.
+				const icon = isChange ? '&gt;&gt;' : isBug ? '🐛' : isPriority ? '⚠️' : '📋';
+				const kind = isChange ? 'Proposed change' : isBug ? 'Reported problem' : 'Open item';
 				const cardClass = isPriority ? 'priority-issue' : '';
 
 				return `
@@ -597,7 +645,7 @@
 									${labels}
 								</div>
 								<div style="color: var(--text-muted); font-size: 0.8rem;">
-									#${escapeHTML(issue.number)} - Updated ${escapeHTML(updatedDate)}
+									${escapeHTML(kind)} &middot; #${escapeHTML(issue.number)} &middot; updated ${escapeHTML(updatedDate)}
 								</div>
 							</div>
 						</div>
@@ -644,15 +692,18 @@
 				const errorEl = document.getElementById('issues-error');
 				const contentEl = document.getElementById('issues-content');
 				const gridEl = document.getElementById('issues-grid');
-				const countEl = document.getElementById('issues-count');
-				const timestampEl = document.getElementById('issues-timestamp');
+				const provenanceEl = document.getElementById('issues-provenance');
+				const staleEl = document.getElementById('issues-staleness');
 
 				loadingEl.style.display = 'block';
 				errorEl.style.display = 'none';
 				contentEl.style.display = 'none';
+				staleEl.style.display = 'none';
+				staleEl.innerHTML = '';
 
 				try {
-					const issues = await this.fetchIssues();
+					const cacheData = await this.fetchIssues();
+					const issues = (cacheData && Array.isArray(cacheData.issues)) ? cacheData.issues : [];
 					loadingEl.style.display = 'none';
 					contentEl.style.display = 'block';
 
@@ -714,6 +765,58 @@
 					// information. A cache frozen for six months still showed a current
 					// time. The real value was in the file all along.
 					timestampEl.textContent = this.cacheAgeText(c.last_updated);
+					// PROVENANCE, from the file's own timestamp. Nothing here is derived
+					// from the reader's clock except the relative age, which is stated
+					// alongside the absolute instant rather than instead of it.
+					const summary = (cacheData && cacheData.summary) || {};
+					const at = this.cacheInstant(summary.as_of) ||
+						this.cacheInstant(cacheData && cacheData.last_updated);
+					// THIS BLOCK REPORTS ONE THING: when the file was written.
+					//
+					// It used to also count pull requests in the window and say how many
+					// of the items below were proposed changes. That became dead code the
+					// moment update-game-data.yml started filtering PRs out of the sample
+					// at source (`issues_data = [i for i in issues_data if not
+					// i.get('pull_request')]`), which is the better fix. The live cache
+					// carries 0 entries with a pull_request key, so the sentence could
+					// never fire -- and if the filter were ever removed, an unreviewed
+					// sentence would start rendering. `summary.pull_requests_in_window`
+					// records the pre-filter count for anyone who wants it.
+					//
+					// It also does NOT restate "showing the N most recently updated of
+					// TOTAL": #issues-sample-note above says that, and says it better
+					// because it names the total. Two elements restating one claim in
+					// different words reads to a visitor as two claims. The empty case is
+					// handled by the grid above, which separates an empty tracker from a
+					// failed fetch.
+					const parts = [];
+					if (at === null) {
+						// No readable date. Say so; do NOT substitute today.
+						parts.push('We cannot tell when this list was last refreshed, so treat it as ' +
+							'possibly out of date.');
+					} else {
+						parts.push('Last refreshed ' + this.cacheStamp(at) + '. It is meant to refresh ' +
+							'every six hours.');
+					}
+					provenanceEl.textContent = parts.join(' ');
+
+					// Staleness banner. 24 hours is four missed refreshes -- one failed
+					// job should not shout, a day of silence should.
+					if (at !== null) {
+						const hours = (Date.now() - at) / 3600000;
+						if (hours > 24) {
+							const ago = hours < 48
+								? Math.round(hours) + ' hours ago'
+								: Math.round(hours / 24) + ' days ago';
+							staleEl.style.display = 'block';
+							staleEl.style.cssText = 'display:block; border-left:4px solid var(--accent-danger);' +
+								'background: var(--bg-tertiary); padding: 0.9rem 1rem; border-radius: 4px;' +
+								'margin-bottom: 1.2rem; line-height: 1.55;';
+							staleEl.textContent = 'This list is out of date. It was last refreshed ' +
+								this.cacheStamp(at) + ' -- ' + ago + ' -- and it is meant to refresh every ' +
+								'six hours, so something has stopped. What is below was true then.';
+						}
+					}
 				} catch (error) {
 					loadingEl.style.display = 'none';
 					errorEl.style.display = 'block';

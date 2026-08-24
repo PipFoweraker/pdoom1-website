@@ -90,6 +90,13 @@ on:
       # THE staleness gate, and the pages that call it. A change to either side
       # can silently re-arm the manufactured-confidence class.
       - 'public/assets/js/freshness.js'
+      - 'scripts/test-work-status.js'
+      # The file the work panel reads. NOTE: update-game-data.yml commits this path
+      # with [skip ci], so a BOT write of it reaches no push trigger (CLAUDE.md,
+      # "a [skip ci] bot commit makes every push-triggered guard blind"). The path
+      # is here for human edits; test-work-status.js also checks the COMMITTED
+      # file's shape on every run, which is what actually covers the bot's writes.
+      - 'public/data/issues-cache.json'
       - 'scripts/test-metrics-render.js'
       # /metrics/ renders these two files and nothing else. A snapshot landing
       # without the index rebuilt is exactly the drift --check exists to catch.
@@ -184,6 +191,13 @@ on:
       # THE staleness gate, and the pages that call it. A change to either side
       # can silently re-arm the manufactured-confidence class.
       - 'public/assets/js/freshness.js'
+      - 'scripts/test-work-status.js'
+      # The file the work panel reads. NOTE: update-game-data.yml commits this path
+      # with [skip ci], so a BOT write of it reaches no push trigger (CLAUDE.md,
+      # "a [skip ci] bot commit makes every push-triggered guard blind"). The path
+      # is here for human edits; test-work-status.js also checks the COMMITTED
+      # file's shape on every run, which is what actually covers the bot's writes.
+      - 'public/data/issues-cache.json'
       - 'scripts/test-metrics-render.js'
       # /metrics/ renders these two files and nothing else. A snapshot landing
       # without the index rebuilt is exactly the drift --check exists to catch.
@@ -282,6 +296,18 @@ jobs:
       # a populated fixture.
       - name: No card renders a reassuring value it did not measure
         run: node scripts/test-manufactured-confidence.js
+      # The front page's account of development, and its sibling on /issues/. Both
+      # published a figure that was definitionally wrong rather than merely stale:
+      # the front page printed GitHub's `open_issues_count`, which counts pull
+      # requests as issues (207 against 200 + 7, measured 2026-08-24), and /issues/
+      # printed the size of a fifteen-item WINDOW under the words "open issues" while
+      # the tracker held 200 -- stamped with `new Date().toLocaleTimeString()`, the
+      # READER'S OWN CLOCK, so a cache frozen since March rendered as "Last updated:
+      # 4:32:10 PM". This drives every state the panel has -- unreachable, undated,
+      # future-dated, partially unmeasured, stale, a month abandoned, and a
+      # legitimately measured zero -- and asserts only the last may ever print a 0.
+      - name: The work panel can say UNKNOWN, and says it rather than a number
+        run: node scripts/test-work-status.js
 
       # /metrics/ publishes the site's own traffic numbers back to its readers,
       # so every failure mode is a chance to state something false about
