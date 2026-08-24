@@ -627,8 +627,23 @@ parked_crons = [ln.split("'")[1] for ln in _cron_lines if ln.lstrip().startswith
 # check goes RED on "the park expired", which a human closes by restoring the
 # schedule or re-parking with a new date. A red on the underlying condition would
 # not be closeable by whoever hits it; this one always is.
-_park = re.search(r"PARKED-UNTIL:\s*(\d{4}-\d{2}-\d{2})", wf)
+# ANCHORED to the `on:` block, not searched over the whole file. An adversarial
+# review defeated the whole-file version: a line reading
+# "# historical note: the sibling job used PARKED-UNTIL: 2027-01-01" placed above
+# `name:` -- outside `on:` entirely -- was picked up as THIS park's clock, and an
+# expired acceptance reported 108/108 green with 130 days left. For a mechanism
+# whose entire purpose is that it cannot be quietly defeated, first-match-wins
+# over the whole file is the wrong reader.
+_on_block = wf.split("\njobs:", 1)[0]
+if "\non:" in _on_block:
+    _on_block = _on_block.split("\non:", 1)[1]
+_park = re.search(r"PARKED-UNTIL:\s*(\d{4}-\d{2}-\d{2})", _on_block)
 _parked = bool(parked_crons) and not crons
+# A second PARKED-UNTIL anywhere in the file is ambiguous, and ambiguity in a
+# clock reads as whichever date the reader happens to find first.
+if len(re.findall(r"PARKED-UNTIL:\s*\d{4}-\d{2}-\d{2}", wf)) > 1:
+    check("exactly one PARKED-UNTIL date in weekly-league-reset.yml",
+          len(re.findall(r"PARKED-UNTIL:\s*\d{4}-\d{2}-\d{2}", wf)), 1)
 
 if _parked:
     check("a parked schedule carries a PARKED-UNTIL date", bool(_park), True)
