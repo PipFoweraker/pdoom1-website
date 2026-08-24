@@ -245,6 +245,24 @@ jobs:
       - name: navigation.js is self-contained (ships its own CSS)
         run: node scripts/test-navigation.js
 
+      # The Manifund campaign link must be UP while the campaign is open and GONE
+      # after it closes (2026-09-09), with no human in the loop either way. The
+      # honesty risk is the second half: a site inviting people to fund something
+      # that has stopped taking money is lying to a visitor, which is the prime
+      # directive this workflow exists to enforce.
+      #
+      # This is a clock, so the test pins a fake Date rather than reading the real
+      # one -- a time-dependent test that trusts the wall clock would go green-and
+      # -meaningless the day after the campaign closes. It also carries a
+      # forced-failure case (mutate the close date into the past, assert the link
+      # disappears), so a gate that had been quietly disconnected cannot pass.
+      #
+      # This step becomes vacuous once the campaign markup is deleted; delete the
+      # step with it. Until then it is the only thing checking that the deletion
+      # does not need to be remembered.
+      - name: The campaign link expires on its own
+        run: node scripts/test-campaign-window.js
+
       # The syndication endpoints are deployed, publicly reachable, and post to
       # real social accounts. This asserts the shared-secret gate is present on
       # every one of them and fails CLOSED when unconfigured -- so a missing

@@ -6,6 +6,71 @@
 (function() {
 	'use strict';
 
+	// ---- The funding campaign window ---------------------------------------
+	//
+	// p(Doom)1 is raising money on Manifund and the campaign CLOSES 2026-09-09.
+	// Source: pdoom1/docs/copy/budget.json `published` ({"closes": "2026-09-09"}),
+	// which manifund.org's own project page agrees with -- it renders
+	// "Closes September 9th, 2026".
+	//
+	// After that date a "fund the game" call to action is an invitation to a
+	// thing that has stopped happening, which is worse than no link at all. The
+	// obvious fix -- write the link in and remember to take it out -- is the one
+	// that fails, because nobody remembers. pdoom1-website#194 sat unread for 25
+	// days; a deletion scheduled for one specific Wednesday will do no better.
+	//
+	// So the link is not markup somebody has to remove. It EXPIRES:
+	//   * the nav entry below is injected ONLY while campaignIsOpen() is true;
+	//   * any element on any page carrying `data-campaign-window` is REMOVED
+	//     from the DOM once campaignIsOpen() is false.
+	// Removed, not hidden: `display:none` still answers Ctrl-F, still reaches a
+	// screen reader, and still shows up in a "view source". A dead campaign
+	// should be gone, not quiet.
+	//
+	// WHY THE CUTOFF ERRS LATE. CAMPAIGN_CLOSES is the END of 2026-09-09 in UTC.
+	// Manifund's close is recorded as a bare date with no timezone, so the exact
+	// closing instant is UNKNOWN to this file. Of the two available mistakes --
+	// the link outliving the campaign by some hours, or the link vanishing while
+	// people can still pledge -- the second costs money and the first does not,
+	// so this picks the first deliberately. Visitor clock skew moves this by
+	// minutes, not days, and a visitor with a badly wrong clock is not a case
+	// worth a network call to fix.
+	//
+	// TO END IT EARLY, OR AFTER: set CAMPAIGN_CLOSES to a past date. That alone
+	// takes down every campaign link on every page that loads this script. To
+	// remove it for good, delete this block, the CAMPAIGN_SLOT line in
+	// navigationHTML, the .nav-fund rules in navigationCSS, and grep the repo
+	// for `data-campaign-window`.
+	const CAMPAIGN_URL = 'https://manifund.org/projects/fund-development-of-pdoom1';
+	const CAMPAIGN_CLOSES = Date.UTC(2026, 8, 10, 0, 0, 0);  // month is 0-based: 8 = September
+
+	function campaignIsOpen() {
+		return Date.now() < CAMPAIGN_CLOSES;
+	}
+
+	// utm_medium distinguishes the nav link from the homepage band, so Manifund's
+	// referrer data can say WHICH of the two a backer actually used. Kept on the
+	// site side rather than baked into CAMPAIGN_URL because the band tags itself.
+	const campaignNavItem =
+		'<li role="none" data-campaign-window>' +
+		'<a class="nav-fund" href="' + CAMPAIGN_URL +
+		'?utm_source=pdoom1.com&amp;utm_medium=nav&amp;utm_campaign=manifund-2026-09"' +
+		' role="menuitem" target="_blank" rel="noopener">Fund the game</a></li>';
+
+	// Runs on EVERY page that loads this script, whether or not the nav is
+	// injected -- a page with its own hand-written nav still gets its
+	// data-campaign-window elements cleaned up. Defensive about parentNode
+	// because this also runs under the DOM stub in scripts/test-navigation.js.
+	function applyCampaignWindow() {
+		if (campaignIsOpen()) return;
+		const stale = document.querySelectorAll('[data-campaign-window]');
+		for (let i = 0; i < stale.length; i++) {
+			if (stale[i] && stale[i].parentNode) {
+				stale[i].parentNode.removeChild(stale[i]);
+			}
+		}
+	}
+
 	const navigationHTML = `
 		<nav role="navigation" aria-label="Main navigation">
 			<div class="logo-container">
@@ -68,6 +133,7 @@
 						<li role="none"><a href="/press/" role="menuitem">Press Kit</a></li>
 					</ul>
 				</li>
+				<!--CAMPAIGN_SLOT-->
 			</ul>
 		</nav>
 	`;
@@ -123,6 +189,23 @@
 		header[data-nav-injected] .nav-links a:hover {
 			color: var(--accent-primary, #F6A800);
 			border-color: var(--accent-primary, #F6A800);
+		}
+		/* The one nav item that is a call to action rather than a destination.
+		   Filled rather than outlined so it reads as the CTA at a glance, and
+		   scoped like every other rule here so it cannot leak onto a page that
+		   supplies its own nav. Injected only while the campaign is open --
+		   see campaignIsOpen() above -- so these rules match nothing after
+		   2026-09-09 and are harmless if left behind. */
+		header[data-nav-injected] .nav-links a.nav-fund {
+			color: var(--bg-primary, #12100E);
+			background: var(--accent-primary, #F6A800);
+			border-color: var(--accent-primary, #F6A800);
+			font-weight: bold;
+		}
+		header[data-nav-injected] .nav-links a.nav-fund:hover {
+			color: var(--bg-primary, #12100E);
+			background: var(--accent-secondary, #E08A00);
+			border-color: var(--accent-secondary, #E08A00);
 		}
 		header[data-nav-injected] .dropdown { position: relative; }
 		header[data-nav-injected] .dropdown-toggle { cursor: pointer; }
@@ -182,11 +265,16 @@
 		injectStyles();
 		header.setAttribute('data-nav-injected', '');
 
-		// Replace or insert navigation
+		// Replace or insert navigation. The campaign slot is filled HERE rather
+		// than in the navigationHTML literal so the decision is made at render
+		// time against the visitor's clock, not at file-parse time.
+		const html = navigationHTML.replace('<!--CAMPAIGN_SLOT-->',
+			campaignIsOpen() ? campaignNavItem : '');
+
 		if (existingNav) {
-			existingNav.outerHTML = navigationHTML;
+			existingNav.outerHTML = html;
 		} else {
-			header.innerHTML = navigationHTML;
+			header.innerHTML = html;
 		}
 
 		// Initialize dropdown functionality
@@ -276,6 +364,10 @@
 
 	function init() {
 		initNavigation();
+		// After initNavigation, so a page whose own nav was left in place still
+		// has its campaign markup swept. Before updateNavVersion, which is async
+		// and must not be able to delay the removal of an expired campaign.
+		applyCampaignWindow();
 		updateNavVersion();
 	}
 

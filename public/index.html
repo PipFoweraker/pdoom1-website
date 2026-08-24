@@ -991,6 +991,65 @@ t	.hero {
 			</p>
 		</section>
 
+		<!-- THE FUNDING BAND. Placed directly under the hero, above Live Game Stats,
+		     because a visitor who came for the download has already been served by
+		     the buttons above and this is the next thing worth their attention.
+		     Closes pdoom1-website#194, which asked for exactly this and sat with no
+		     comments from 2026-07-29.
+
+		     THIS ELEMENT DELETES ITSELF. `data-campaign-window` is the contract:
+		     assets/js/navigation.js removes every element carrying that attribute
+		     from the DOM once the campaign has closed (2026-09-09). Nobody has to
+		     remember. See the CAMPAIGN_CLOSES block in that file for the reasoning
+		     and for how to end it early.
+
+		     WHY THE MARKUP IS STATIC AND THE REMOVAL IS THE SCRIPTED HALF, rather
+		     than the other way round. The two failure modes are not symmetric. If
+		     navigation.js fails to load, static markup leaves a campaign link up a
+		     few hours past close -- to a Manifund page that will honestly say it has
+		     closed. Script-injected markup would instead show NOTHING during the
+		     window the campaign is actually live, which is the failure that costs
+		     money. Same reasoning as the first-run note above: the thing a visitor
+		     needs must not be conditional on a script succeeding.
+
+		     COPY IS BOUND by pdoom1/docs/copy/budget.json `constraints`. Four facts
+		     are declared stable there and may be typed: the $14,500 minimum, the
+		     $48,000 goal, the 2026-09-09 close, and all-or-nothing. The raised total
+		     and days-remaining are NOT -- they move daily -- so this panel names
+		     neither and lets manifund.org resolve them. Line labels come from the
+		     same file's `line_items`. Nothing here is in the past tense about
+		     hiring, because nobody has been hired. -->
+		<section class="section" data-campaign-window aria-labelledby="funding-heading"
+		         style="border-left: 4px solid var(--accent-primary); background: var(--bg-secondary);">
+			<h2 id="funding-heading" style="color: var(--accent-primary); margin-bottom: 0.6rem;">
+				p(Doom)1 is raising money on Manifund
+			</h2>
+			<p style="margin-bottom: 0.6rem;">
+				The game is free to download and stays that way. A pledge funds the work,
+				not access to it &mdash; there is no licence, no early access and no reward
+				tier attached to backing it.
+			</p>
+			<p style="margin-bottom: 0.6rem;">
+				It is all&#8209;or&#8209;nothing: unless the <strong>US$14,500</strong> minimum is
+				reached by <strong>9 September 2026</strong>, the campaign does not fund. The
+				full ask is US$48,000, and the proposal sets out what each line would pay
+				for &mdash; a part&#8209;time gameplay developer, a directed art pass by a human
+				illustrator, hosting and infrastructure, open dataset maintenance, and
+				partial recovery of Pip's time. Nobody has been hired, commissioned or
+				engaged; every figure is conditional on the money arriving.
+			</p>
+			<a class="cta-button"
+			   href="https://manifund.org/projects/fund-development-of-pdoom1?utm_source=pdoom1.com&amp;utm_medium=homepage-band&amp;utm_campaign=manifund-2026-09"
+			   target="_blank" rel="noopener"
+			   style="display: inline-block;">
+				Read the proposal on Manifund &rarr;
+			</a>
+			<p style="margin-top: 0.6rem; font-size: 0.85rem; color: var(--text-muted);">
+				Opens manifund.org in a new tab. Manifund holds the money and shows the
+				current total; this page deliberately does not repeat a figure that moves.
+			</p>
+		</section>
+
 		<!-- Live Game Stats & Status - Combined Section -->
 		<section class="section" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(246, 168, 0, 0.05) 100%); border-left: 4px solid var(--accent-primary);">
 			<h2 style="color: var(--accent-primary); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
@@ -1350,6 +1409,9 @@ t	.hero {
 				<ul class="footer-links">
 					<li><a href="https://github.com/PipFoweraker/pdoom1" target="_blank" rel="noopener">GitHub</a></li>
 					<li><a href="/blog/">Dev Blog</a></li>
+					<!-- Removed automatically once the campaign closes; see the
+					     data-campaign-window contract in assets/js/navigation.js. -->
+					<li data-campaign-window><a href="https://manifund.org/projects/fund-development-of-pdoom1?utm_source=pdoom1.com&amp;utm_medium=footer&amp;utm_campaign=manifund-2026-09" target="_blank" rel="noopener">Fund the game</a></li>
 					<li><a href="/#roadmap">Roadmap</a></li>
 					<li><a href="/resources/">AI Safety Resources</a></li>
 					<li><a href="https://stampy.ai" target="_blank" rel="noopener">Stampy.ai</a></li>
