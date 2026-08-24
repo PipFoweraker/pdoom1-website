@@ -70,9 +70,10 @@
       "seed_status": "blessed",
       "note": "BLESSED 2026-08-21 by Pip, retrospectively. This entry previously read seed null / seed_status unblessed because the LEDGER had no L4 row and nothing here may claim a blessing the ledger has not recorded. The ledger now has that row. Verified FROM THE ARTIFACT per LEAGUE_SEED_LEDGER.md's rule -- the v0.14.0 tag message and that release's release_manifest.json carrying \"ladder_version\": \"4\" -- corroborated by a read-only GET on 2026-08-08 returning 11 entries from 5 players on clients stamped v0.14.0 and v0.14.1. Never verified by POST, and never by ok:true alone: every wrong key returns ok:true.",
       "blessed_utc": "2026-08-21",
-      "blessed_by": "Pip",
+      "blessed_by": "Pip (retrospective; the original ceremony is unrecorded)",
       "closed_by_build": "v0.14.2",
-      "closed_local": "2026-08-21T00:00:00+10:00"
+      "closed_local": "2026-08-21T00:00:00+10:00",
+      "blessing_note": "THE CEREMONY IS UNRECORDED, same cause as L3. docs/LEAGUE_SEED_LEDGER.md row 4 records this epoch as LOST TO THE RECORD -- the seed is certain (v0.14.0 pins weekly-2026-w32 and 11 real scores were played on it) and whether the rite was performed, and when, is not. blessed_utc names the day the row was WRITTEN (2026-08-21), not a ceremony anybody can attest. ADDED 2026-08-24: this entry asserted an unqualified blessed_by while the ledger three files away called the same ceremony lost -- the document-versus-machine split #297 exists to prevent, shipped inside the PR that was fixing it for L3. check-blessing-consistency.py could not catch it: it compares only the CURRENT epoch and is advisory in CI."
     },
     {
       "ladder_version": "L6",
