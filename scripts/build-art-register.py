@@ -213,7 +213,23 @@ def deploy_state(relpath, patterns):
 # filesystem
 # ---------------------------------------------------------------------------
 
+# SVG is the one image format in IMAGE_SUFFIXES that git treats as TEXT, so its
+# line endings are decided by the checkout, not by the file. `core.autocrlf=true`
+# on Pip's box yields CRLF in the working tree while the index and every Linux
+# runner hold LF (`git ls-files --eol public/favicon.svg` -> `i/lf w/crlf`). A
+# straight byte hash therefore disagrees between the author and CI on a file
+# nobody touched, and check-art-staleness.py reports S3 "the bytes changed under
+# an unchanged filename" -- a FALSE finding, which is the worst kind: it teaches
+# the reader that S3 means nothing, and S3 is the guard for a regenerated asset.
+# Measured, not theorised: this fired on the first CI run of this branch.
+TEXT_IMAGE_SUFFIXES = {".svg"}
+
+
 def sha256_of(path):
+    path = Path(path)
+    if path.suffix.lower() in TEXT_IMAGE_SUFFIXES:
+        return hashlib.sha256(
+            path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
     h = hashlib.sha256()
     with open(path, "rb") as fh:
         for chunk in iter(lambda: fh.read(65536), b""):

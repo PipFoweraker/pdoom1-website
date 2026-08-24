@@ -237,6 +237,30 @@ def test_builder(tmp):
     code, out = build(paths, "--check")
     check("--check is green on a register it just wrote", code == 0, out[-300:])
 
+    # The line-ending trap, measured on this branch's first CI run. favicon.svg
+    # is `i/lf w/crlf` under core.autocrlf=true, so a straight byte hash
+    # disagrees between a Windows author and a Linux runner and S3 fires on a
+    # file nobody touched. A false S3 is worse than no S3: it teaches the reader
+    # that "the bytes changed" means nothing.
+    svg_lf = tmp / "b1" / "lf.svg"
+    svg_crlf = tmp / "b1" / "crlf.svg"
+    svg_lf.write_bytes(b"<svg>\n<rect/>\n</svg>\n")
+    svg_crlf.write_bytes(b"<svg>\r\n<rect/>\r\n</svg>\r\n")
+    import importlib.util as _ilu
+    _s = _ilu.spec_from_file_location("bar_for_test", BUILDER)
+    _m = _ilu.module_from_spec(_s)
+    _s.loader.exec_module(_m)
+    check("an SVG hashes the same under LF and CRLF",
+          _m.sha256_of(svg_lf) == _m.sha256_of(svg_crlf),
+          "git treats .svg as text; the checkout decides its line endings")
+    png_lf = tmp / "b1" / "a.png"
+    png_crlf = tmp / "b1" / "b.png"
+    png_lf.write_bytes(b"\x89PNG\n\x1a\n")
+    png_crlf.write_bytes(b"\x89PNG\r\n\x1a\n")
+    check("a BINARY image is NOT line-ending normalised",
+          _m.sha256_of(png_lf) != _m.sha256_of(png_crlf),
+          "normalising a PNG would make two genuinely different files hash alike")
+
     # FORCED: no corpus at all
     paths2 = make_tree(tmp / "b2", corpus=False)
     code, out = run(BUILDER, "--public", paths2["public"], "--excludes",
