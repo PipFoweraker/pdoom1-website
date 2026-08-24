@@ -1,10 +1,10 @@
 {
-  "generated": "2026-08-23T06:11:22.874763+00:00",
-  "overall_status": "FAIL",
+  "generated": "2026-08-24T04:25:02.439080+00:00",
+  "overall_status": "WARN",
   "summary": {
-    "fail": 1,
-    "warn": 5,
-    "ok": 29
+    "fail": 0,
+    "warn": 3,
+    "ok": 32
   },
   "checks": [
     {
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "OK",
-      "detail": "generated 2.7 days ago"
+      "detail": "generated 3.6 days ago"
     },
     {
       "name": "league:current_week",
@@ -139,8 +139,8 @@
     },
     {
       "name": "board:key",
-      "status": "WARN",
-      "detail": "published board is keyed 'L4' (epoch-shaped) but the current ladder epoch is L5; the board shows 11 entries. Scores submitted under L5 cannot appear on a L4 board. Do not re-stamp -- that fabricates history."
+      "status": "OK",
+      "detail": "published board key matches the current ladder epoch L5"
     },
     {
       "name": "board:exclusions",
@@ -150,27 +150,27 @@
     {
       "name": "board:status_integrity",
       "status": "OK",
-      "detail": "data_status=live consistent with 11 entries"
+      "detail": "data_status=live-empty: current board key, no entries yet (an epoch fork or a seed roll opens a real board empty). Not presented as competitive results."
     },
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 5.7h ago"
+      "detail": "live API checked 0.3h ago"
     },
     {
       "name": "board:archived_anomaly",
       "status": "WARN",
-      "detail": "36 score entries across 5 board(s) from 12 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, CogDerp, Cognitive Development, Cognitive Systems Studies, Cognitive Systems Studies II, Division of Intelligent Agents, Division of Machine Learning, Hamthropic, Intelligent Agents Studies, Laboratory of Autonomous Systems, Notkilleveryone Inc). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
+      "detail": "48 score entries across 7 board(s) from 18 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, Bureau of Catastrophe... -- Pip, CogDerp, Cognitive Development, Cognitive Systems Studies, Cognitive Systems Studies II, Division of Intelligent Agents, Division of Machine Learning, GRIM, GRIM (Global Risk Intervention Mechanism, Hamthropic, Intelligent Agents Studies, Kaur, Chen & Lindqvist, Laboratory of Autonomous Systems, Notkilleveryone Inc, gronklabs, gronklabs the better). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
     },
     {
       "name": "board:liveness",
-      "status": "WARN",
-      "detail": "the published board (weekly-2026-w32, L4) is from a SUPERSEDED epoch -- the current ladder epoch is L5. No orphan claim can be made while the two disagree, because every board on the current epoch would score as an orphan. Reported as unresolved, deliberately NOT as scores being lost. Fix: run python scripts/publish-live-board.py. Do not re-stamp anything."
+      "status": "OK",
+      "detail": "live API checked: deployed board (weekly-2026-w33, L5) holds 0 entries and every other populated board is acknowledged -- genuinely empty, not misrouted"
     },
     {
       "name": "board:publish",
-      "status": "FAIL",
-      "detail": "we serve epoch L4 while the live epoch is L5 -- scores are being set on a board we do not show."
+      "status": "OK",
+      "detail": "what we serve matches what the probe saw (0 entries on L5)"
     },
     {
       "name": "seed_leaderboards:parse",
