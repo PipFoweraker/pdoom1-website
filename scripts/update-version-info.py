@@ -153,15 +153,55 @@ def get_latest_release() -> Dict[str, Any]:
     )
 
 
+def search_total(query: str) -> Optional[int]:
+    """The number of things matching a GitHub search, or None for UNKNOWN.
+
+    None is a real answer here and must never be coerced to 0. A search that
+    failed and a search that found nothing are different facts, and only one of
+    them is safe to render.
+    """
+    data = fetch_github_data(f"/search/issues?q={query}&per_page=1")
+    if not isinstance(data, dict):
+        return None
+    total = data.get('total_count')
+    return total if isinstance(total, int) else None
+
+
 def get_repo_stats() -> Dict[str, Any]:
-    """Get repository statistics"""
+    """Get repository statistics.
+
+    THE FIELD NAME IS NOT THE MEASUREMENT. GitHub's `open_issues_count`
+    INCLUDES OPEN PULL REQUESTS -- documented behaviour at their end, not a bug
+    at ours. This function used to copy it straight into `open_issues`, and
+    public/index.html renders that value beside the words "open issues".
+    Measured against the live repo on 2026-08-25: 210 issues + 1 PR = 211,
+    which the homepage would have published as "211 open issues".
+
+    So the upstream number keeps the honest name `open_issues_and_prs`, and
+    `open_issues` comes from the search API, which can actually answer the
+    question the label asks. Rationale and two sibling instances:
+    coordination/NOTE_2026-08-25_the-field-name-is-not-the-measurement.md
+    """
     data = fetch_github_data(f"/repos/{REPO_OWNER}/{REPO_NAME}")
 
     if data:
+        # NOT carried forward from disk on failure, unlike every other field in
+        # this file. A version is stable, so a stale one is merely old; a COUNT
+        # moves, so a stale one is a false claim about today wearing a fresh
+        # timestamp. None renders as the em dash the markup already shows before
+        # any fetch resolves -- verified in both consumers: index.html's
+        # _setStatus() maps null to an em dash, and game-stats' measured() gate
+        # rejects null before Number() can coerce it to 0.
+        issues_only = search_total(
+            f"repo:{REPO_OWNER}/{REPO_NAME}+is:open+is:issue")
+        if issues_only is None:
+            print('Warning: issues-only search failed; publishing open_issues=null '
+                  '(UNKNOWN). Pages must render this as an em dash, never as zero.')
         return {
             'stars': data.get('stargazers_count', 0),
             'forks': data.get('forks_count', 0),
-            'open_issues': data.get('open_issues_count', 0),
+            'open_issues': issues_only,
+            'open_issues_and_prs': data.get('open_issues_count', 0),
             'last_updated': data.get('updated_at')
         }
 
