@@ -46,6 +46,24 @@ permissions:
   # and check-platform-claims.py -- and it carries three `continue-on-error`
   # steps, so it can report SUCCESS while having written nothing. A workflow
   # that can be green while broken needs its alarm to actually reach someone.
+  #
+  # CORRECTED 2026-08-25: the paragraph above described the hazard correctly and
+  # then described a mitigation that did not exist. Granting `issues: write` lets
+  # the handler run; it does not make the handler REACHABLE. Nothing that any of
+  # the three continue-on-error steps did could set the job to failed, and the
+  # commit step `exit 0`s early when there is nothing to commit -- so no failure
+  # of update-version-info.py or calculate-game-stats.py has ever fired this
+  # alarm. Measured: of the 20 most recent runs, the only red ones failed at
+  # "Commit changes if any" (e.g. run 32710311391 -- checkout, python, version,
+  # stats and log all green, commit red), which is a concurrent-push race, not a
+  # data failure. So the alarm was reachable in exactly one way, and it was the
+  # way that says nothing about the data.
+  #
+  # The consequence is the one CLAUDE.md warns about under update-version-info.py:
+  # that script "refuses to guess a version" and RAISES instead. A designed
+  # refusal is the loudest thing it can do, and it rendered as a green run with a
+  # `success` line on /monitoring/. "Adjudicate step outcomes" below is what
+  # closes this; the grant here is what lets the alarm it rings be heard.
   issues: write
 
 jobs:
@@ -79,6 +97,7 @@ jobs:
         continue-on-error: true
 
       - name: Log automation run
+        id: log-run
         run: |
           echo "Logging automation run to monitoring data..."
           python scripts/log-automation-run.py \
@@ -120,6 +139,77 @@ jobs:
           [automated]"
 
           git push
+
+      # Ported from sync-leaderboards.yml ("Fail the job if a sync step failed"),
+      # which fixed this exact class: every data step is continue-on-error, so the
+      # job could never reach a failed state and the `if: failure()` alert below
+      # was unreachable from anything that produces data. continue-on-error is
+      # right here -- we want the stats step to run even when the version step
+      # died, and both outcomes logged -- but the outcomes have to be adjudicated
+      # somewhere. This is that place.
+      #
+      # PLACEMENT DIFFERS from sync-leaderboards on purpose. There the
+      # adjudication precedes the commit, so a failed run commits nothing. Here
+      # the commit step is what publishes public/monitoring/data/ -- the record
+      # of the failure itself. Ringing the alarm before publishing the evidence
+      # would leave /monitoring/ with no entry for the run that went wrong, so
+      # this runs AFTER the commit and before the handler.
+      #
+      # STRICTER THAN THE ORIGINAL in one way: sync-leaderboards tolerates any
+      # non-"failure" outcome because its steps are gated by `if:` and legitimately
+      # report "skipped". Neither step here is gated, so both MUST produce one of
+      # the four real outcomes. An empty value means the step id did not resolve
+      # -- a renamed step -- and that is a defect in this file, not a pass.
+      - name: Adjudicate step outcomes
+        if: always()
+        env:
+          UPDATE_VERSION: ${{ steps.update-version.outcome }}
+          UPDATE_STATS: ${{ steps.update-stats.outcome }}
+          LOG_RUN: ${{ steps.log-run.outcome }}
+        run: |
+          bad=0
+          for name in UPDATE_VERSION UPDATE_STATS; do
+            outcome="${!name}"
+            case "$outcome" in
+              success)
+                echo "step $name: success"
+                ;;
+              failure)
+                echo "::error::step $name failed -- see its log above"
+                bad=1
+                ;;
+              "")
+                echo "::error::step $name produced an EMPTY outcome. The step id in"
+                echo "::error::this workflow does not resolve, so nothing was observed."
+                bad=1
+                ;;
+              *)
+                echo "::error::step $name reported an unexpected outcome: $outcome"
+                bad=1
+                ;;
+            esac
+          done
+
+          # The monitoring logger is NOT adjudicated. It records history; it does
+          # not produce the data this site serves. It also refuses (exit 4) when
+          # public/monitoring/data/automation-runs.json is unreadable, and that
+          # state is repaired by a human editing a file -- blocking on it would
+          # make every run of this workflow red until someone did, which is the
+          # permanent red CLAUDE.md's severity model forbids. It is loud instead:
+          # continue-on-error marks the step failed in the run, and the script
+          # emits its own ::error:: annotation.
+          if [ "$LOG_RUN" != "success" ]; then
+            echo "::warning::monitoring log step reported '${LOG_RUN:-not-run}'."
+            echo "::warning::/monitoring/ may be missing this run. Not blocking."
+          fi
+
+          if [ "$bad" = "1" ]; then
+            echo "At least one data step failed. Failing the job so the alert below"
+            echo "actually fires instead of reporting a green update. version.json"
+            echo "and status.json may be stale; nothing was guessed."
+            exit 1
+          fi
+          echo "All data steps reported success."
 
       - name: Create issue on failure
         if: failure()
