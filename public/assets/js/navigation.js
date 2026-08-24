@@ -237,7 +237,27 @@
 				flex-direction: column; align-items: flex-start; gap: 0.5rem;
 			}
 			header[data-nav-injected] .nav-links { justify-content: flex-start; }
-			header[data-nav-injected] .dropdown-menu { position: static; opacity: 1; visibility: visible; }
+			/* COLLAPSED, not expanded. This rule set position/opacity/visibility and
+			   never set 'display', so both dropdowns dropped into flow FULLY OPEN and
+			   stayed there: 6 top-level links + 6 Community children + 7 Info children
+			   + Fund the game = 20 visible links in a sticky header, above the content,
+			   on every page that takes the injected nav.
+
+			   The homepage looked like only three lines because it still carries a
+			   pre-migration '.dropdown-menu { display: none }' of its own -- an
+			   ACCIDENT that was holding the front page together. CLAUDE.md says of
+			   those leftover rules "if you see any, they are dead"; they are not, they
+			   match the injected nav because the class names are identical, and
+			   deleting index.html's would have broken the page that looked fine.
+			   That paragraph is corrected in this commit.
+
+			   So the fix is here, additive, and the leftovers can then go separately. */
+			header[data-nav-injected] .dropdown-menu {
+				position: static; opacity: 1; visibility: visible;
+				display: none;
+			}
+			header[data-nav-injected] .dropdown-toggle[aria-expanded="true"] + .dropdown-menu,
+			header[data-nav-injected] .dropdown.open .dropdown-menu { display: block; }
 		}
 	`;
 
