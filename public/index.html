@@ -148,7 +148,7 @@
 			}
 		}
 
-		header { background: rgba(45, 45, 45, 0.95); backdrop-filter: blur(10px);
+		header { background: rgba(45, 45, 45, 0.95); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px)
 			border-bottom: 2px solid var(--accent-primary);
 			padding: 0.4rem 0;
 			position: sticky;
@@ -292,7 +292,7 @@
 		.hero { max-width: 600px; margin-left: auto; margin-right: auto; box-sizing: border-box;
 			text-align: center;
 			padding: 0.5rem 0.6rem 0.4rem 0.6rem;
-			background: linear-gradient(135deg, rgba(45, 45, 45, 0.65) 0%, rgba(61, 61, 61, 0.65) 100%); backdrop-filter: blur(8px);
+			background: linear-gradient(135deg, rgba(45, 45, 45, 0.65) 0%, rgba(61, 61, 61, 0.65) 100%); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px)
 			border-radius: var(--radius-lg, 10px);
 			margin-bottom: 0.8rem;
 			border: var(--border-width, 1px) solid var(--border-color);
@@ -705,10 +705,16 @@
 				display: block;
 			}
             
+			/* CORRECTED 2026-08-25. This block was a botched paste: a stray `t`
+			   opened a declaration, the missing colon made it invalid, and CSS
+			   error recovery then consumed everything up to the next top-level
+			   semicolon -- so the .hero mobile override AND the h1 size were both
+			   silently dropped. Live in production, and nothing in the pre-PR
+			   suite validates CSS, so no check could have seen it. */
+			.hero {
+				max-width: 100%;
+			}
 			.hero h1 {
-t	.hero {
-			max-width: 100%;
-		}
 				font-size: 2rem;
 			}
             
@@ -945,7 +951,7 @@ t	.hero {
 
 			     The real fix for macOS is notarisation (Apple Developer Program), which
 			     is a budget line, not a copy change. -->
-			<div id="first-run-note" style="text-align: left; margin: 0 auto 0.8rem; max-width: 46rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.55; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.8rem 1rem;">
+			<div id="first-run-note" style="text-align: left; margin: 0 auto 0.8rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.55; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.8rem 1rem;">
 				<p style="margin: 0 0 0.5rem;">
 					<strong>Before you download: your OS will warn you, and that is expected.</strong>
 					These builds are <strong>unsigned</strong>. Signing means buying a code-signing
@@ -954,6 +960,27 @@ t	.hero {
 					operating system reports that it cannot verify who made the program. The warnings
 					mean &ldquo;we cannot check the publisher&rdquo;, not &ldquo;this is malware&rdquo;.
 				</p>
+				<!-- THE PROCEDURES FOLD; THE WARNING DOES NOT.
+				     Measured at 390px this note was ~714-820px tall -- one entire
+				     screenful of unsigned-binary explanation sitting between the
+				     download buttons and everything else on the page, which is what
+				     #358 reported as the OS warnings burying the downloads.
+
+				     The paragraph above stays OUTSIDE the disclosure and unconditional,
+				     because it is the honest claim: your OS will warn you and that is
+				     expected. Only the four platform PROCEDURES fold. Nothing is
+				     deleted and nothing is softened -- the steps are deferred to the
+				     person who needs them, which is the person who already clicked
+				     their platform's button.
+
+				     <details> and not JS, deliberately: it degrades to fully open with
+				     scripting off, it is keyboard and screen-reader native, and this
+				     note has a history of being lost when its visibility depended on a
+				     fetch (see the comment above -- it was display:none behind a GitHub
+				     API call, and a real backer hit the Sequoia dead end because of it). -->
+				<details style="margin-top: 0.5rem;">
+					<summary style="cursor: pointer; color: var(--accent-secondary); font-weight: bold;">What you will see, and what to click &mdash; Windows, macOS, Linux</summary>
+					<div style="margin-top: 0.5rem;">
 				<p style="margin: 0 0 0.5rem;">
 					<strong>Extract the whole zip to a folder before running the game.</strong>
 					Running it from inside the zip viewer hides <code>PDoom.pck</code>, and the game
@@ -978,6 +1005,8 @@ t	.hero {
 					<strong>Linux.</strong> You may need to set the executable bit:
 					<code>chmod +x PDoom.x86_64</code>.
 				</p>
+			</div>
+				</details>
 			</div>
 
 			<div style="text-align: center; margin-bottom: 0.8rem;">
@@ -1163,13 +1192,13 @@ t	.hero {
 			<!-- Tabbed Content -->
 			<div class="about-tabs">
 				<div class="tab-buttons" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
-					<button class="tab-btn active" data-tab="features" style="flex: 1; min-width: 120px; padding: 0.8rem 1rem; background: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: var(--radius-sm); font-family: inherit; font-weight: bold; cursor: pointer; transition: all 0.2s;">Features</button>
-					<button class="tab-btn" data-tab="screenshots" style="flex: 1; min-width: 120px; padding: 0.8rem 1rem; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-weight: bold; cursor: pointer; transition: all 0.2s;">Screenshots</button>
+					<button class="tab-btn" data-tab="features" style="flex: 1; min-width: 120px; padding: 0.8rem 1rem; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-weight: bold; cursor: pointer; transition: all 0.2s;">Features</button>
+					<button class="tab-btn active" data-tab="screenshots" style="flex: 1; min-width: 120px; padding: 0.8rem 1rem; background: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: var(--radius-sm); font-family: inherit; font-weight: bold; cursor: pointer; transition: all 0.2s;">Screenshots</button>
 					<button class="tab-btn" data-tab="requirements" style="flex: 1; min-width: 120px; padding: 0.8rem 1rem; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-weight: bold; cursor: pointer; transition: all 0.2s;">Requirements</button>
 				</div>
 
 				<!-- Features Tab -->
-				<div class="tab-content active" id="features-tab">
+				<div class="tab-content" id="features-tab" style="display: none;">
 					<div class="grid">
 						<div class="card">
 							<h3>Resource Management</h3>
@@ -1187,11 +1216,11 @@ t	.hero {
 				</div>
 
 				<!-- Screenshots Tab -->
-				<div class="tab-content" id="screenshots-tab" style="display: none;">
+				<div class="tab-content active" id="screenshots-tab">
 					<div style="text-align: center; margin-bottom: 1rem;">
 						<picture>
 							<source srcset="assets/screenshots/hero-main-office-web.webp" type="image/webp">
-							<img src="assets/screenshots/hero-bg-800w.webp" alt="p(Doom)1 Main Office Interface - Navigate AI Safety through bureaucracy" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
+							<img src="assets/screenshots/hero-main-office-web.jpg" alt="p(Doom)1 Main Office Interface - Navigate AI Safety through bureaucracy" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);" loading="lazy" decoding="async">
 						</picture>
 					</div>
 					<div class="grid">
