@@ -135,6 +135,46 @@ def load_available_platforms():
     return platforms
 
 
+# How far from a platform name a qualifier has to be to still be about it.
+# One clause, roughly -- long enough for "macOS -- coming soon" and
+# "macOS: not in this release", short enough that a dash at the far end of a
+# long sentence is not read as hedging a claim near the start.
+QUALIFIER_WINDOW = 60
+
+
+def hedged_near(line, platform):
+    """Is this platform's mention softened by a qualifier CLOSE TO IT?
+
+    This used to be a whole-line test -- `if SOFT_QUALIFIER.search(line): continue`
+    -- and an em dash counts as a qualifier, so ANY line containing one anywhere
+    was skipped entirely, claim and all.
+
+    TWO LIVE FALSE CLAIMS SURVIVED THAT, both found by reading pdoom1.com rather
+    than by running this script, on the day four sibling claims were fixed and it
+    reported OK:
+
+      "Windows, macOS and Linux are all available &mdash; Windows is the tested one"
+      "...from the buttons above &mdash; no installation... macOS and Linux are new"
+
+    In the first the dash follows the claim; in the second it precedes an unrelated
+    clause. Neither hedges anything, and both made the line invisible.
+
+    Scoping the search to a window around each platform mention keeps every genuine
+    "macOS -- coming soon" passing while making the claim before or after an
+    unrelated dash visible again. Checked per PLATFORM rather than per line, so one
+    hedged platform no longer excuses an unhedged one beside it.
+    """
+    rx = PLATFORM_NAMES.get(platform)
+    if not rx:
+        return False
+    for m in rx.finditer(line):
+        lo = max(0, m.start() - QUALIFIER_WINDOW)
+        hi = min(len(line), m.end() + QUALIFIER_WINDOW)
+        if not SOFT_QUALIFIER.search(line[lo:hi]):
+            return False       # at least one mention of this platform is unhedged
+    return True
+
+
 def allowlisted(path, line):
     for f_sub, l_sub in ALLOWLIST:
         if f_sub in path and l_sub in line:
@@ -167,10 +207,9 @@ def scan():
             visible = strip_to_visible_text(f.read())
         for n, raw in enumerate(visible.split("\n"), 1):
                 line = raw.rstrip("\n")
-                if SOFT_QUALIFIER.search(line):
-                    continue  # a softened promise, not a present-tense claim
                 names_hit = [p for p, rx in PLATFORM_NAMES.items() if rx.search(line)]
-                unavail_hit = [p for p in names_hit if p in unavailable]
+                unavail_hit = [p for p in names_hit
+                               if p in unavailable and not hedged_near(line, p)]
                 if not unavail_hit:
                     continue
                 is_list = len(names_hit) >= 2
