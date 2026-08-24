@@ -1,14 +1,11 @@
 {
-  "_README": "Edit the copy below, then set approved to true and commit. Nothing is posted until you do. Delete a platform's entry to skip it.",
+  "_README": "FIRST POST. Trimmed to bluesky only on 2026-08-24 because only Bluesky credentials are being configured. post-syndication.py sends to EVERY platform listed here; with one credential the other three return 500 and the run exits red -- and a red run that is expected is a red run nobody reads. Add a platform back when its credentials exist. THE COPY BELOW IS THE AUTO-GENERATED PLACEHOLDER: title and link, nothing else. Rewrite it in your own voice before setting approved to true. Nothing posts until you do.",
   "post": "2026-08-15-1313-tests-passed-and-the-game-had-no-buttons.md",
   "title": "1,313 tests passed and the game had no buttons",
   "url": "https://pdoom1.com/blog/post.html?p=2026-08-15-1313-tests-passed-and-the-game-had-no-buttons.md",
   "approved": false,
   "posted_at": null,
   "copy": {
-    "bluesky": "1,313 tests passed and the game had no buttons\n\nhttps://pdoom1.com/blog/post.html?p=2026-08-15-1313-tests-passed-and-the-game-had-no-buttons.md&utm_source=bluesky&utm_medium=social&utm_campaign=blog-2026-08-15-1313-tests",
-    "x": "1,313 tests passed and the game had no buttons\n\nhttps://pdoom1.com/blog/post.html?p=2026-08-15-1313-tests-passed-and-the-game-had-no-buttons.md&utm_source=twitter&utm_medium=social&utm_campaign=blog-2026-08-15-1313-tests",
-    "linkedin": "1,313 tests passed and the game had no buttons\n\nOn Thursday a first-time player sat down, the game drew its art and a doom percentage, and offered nothing to click. 1,313 tests were green. The cause is a per-checkout cache that CI can never see go stale, because CI always starts clean. The guard shipped Friday afternoon; the identical failure shape was back within hours - and this time it was caught.\n\nhttps://pdoom1.com/blog/post.html?p=2026-08-15-1313-tests-passed-and-the-game-had-no-buttons.md&utm_source=linkedin&utm_medium=social&utm_campaign=blog-2026-08-15-1313-tests\n\n#playtest #testing #process #devnotes",
-    "discord": "**1,313 tests passed and the game had no buttons**\n\nOn Thursday a first-time player sat down, the game drew its art and a doom percentage, and offered nothing to click. 1,313 tests were green. The cause is a per-checkout cache that CI can never see go stale, because CI always starts clean. The guard shipped Friday afternoon; the identical failure shape was back within hours - and this time it was caught.\n\nhttps://pdoom1.com/blog/post.html?p=2026-08-15-1313-tests-passed-and-the-game-had-no-buttons.md&utm_source=discord&utm_medium=social&utm_campaign=blog-2026-08-15-1313-tests"
+    "bluesky": "1,313 tests passed and the game had no buttons\n\nhttps://pdoom1.com/blog/post.html?p=2026-08-15-1313-tests-passed-and-the-game-had-no-buttons.md&utm_source=bluesky&utm_medium=social&utm_campaign=blog-2026-08-15-1313-tests"
   }
 }
