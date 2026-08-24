@@ -1138,11 +1138,6 @@ t	.hero {
 					<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
 						Data syncs every 6 hours
 					</p>
-					<p style="font-size: 0.75rem; color: var(--text-muted);">
-						<a href="/monitoring/" style="color: var(--accent-secondary); text-decoration: none;">
-							System status →
-						</a>
-					</p>
 				</div>
 			</div>
 
@@ -1234,7 +1229,17 @@ t	.hero {
 							<p style="margin-bottom: 0.5rem;"><strong>Platforms:</strong></p>
 							<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
 								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">Windows</span>
-								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">macOS</span>
+								<!-- NOT a bare "macOS" chip. Until 2026-08-25 this read `macOS` with no
+								     qualifier, eight lines below the same card saying "There is no macOS
+								     build in the current release". check-platform-claims.py could not see
+								     it: each chip is its own line, so there is no two-platform LIST and no
+								     availability VERB, and neither of the guard's two triggers fires on a
+								     bare noun. That is the third distinct shape that guard has been blind
+								     to this week -- the rule is right and its shape assumptions keep
+								     missing real markup.
+								     The durable fix is #363, which derives these from version.json so a
+								     typed claim becomes impossible. This is the honest text until it lands. -->
+								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem; opacity: 0.6;">macOS &mdash; not in this build</span>
 								<span style="background: var(--bg-primary); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem;">Linux</span>
 							</div>
 						</div>
@@ -1443,14 +1448,17 @@ t	.hero {
 				<ul class="footer-links">
 					<li><a href="/sitemap.xml">Sitemap</a></li>
 					<li><a href="/website-changelog/">Changelog</a></li>
-					<li><a href="/monitoring/">System Status</a></li>
 					<li><a href="/about/">About This Site</a></li>
 					<li style="margin-top: 0.8rem;">
 						<span class="status-indicator status-active"></span>
 						<span style="font-size: 0.85rem; color: var(--text-muted);">Live</span>
 					</li>
 					<li>
-						<span id="website-version" style="font-size: 0.85rem; color: var(--text-muted);">v1.1.1</span>
+						<!-- Deliberately EMPTY. This shipped the literal `v1.1.1` while data/status.json
+					     said 1.2.0 -- a fallback that was already wrong, which is the exact shape
+					     CLAUDE.md flags as dangerous: a default ships precisely when the real
+					     lookup failed. Empty renders as nothing rather than as a stale version. -->
+						<span id="website-version" style="font-size: 0.85rem; color: var(--text-muted);"></span>
 					</li>
 				</ul>
 			</div>
