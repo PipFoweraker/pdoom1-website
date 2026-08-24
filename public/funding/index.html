@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>What the money is for - p(Doom)1</title>
+	<link rel="canonical" href="https://pdoom1.com/funding/" />
+	<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+	<meta name="description" content="Where the money goes if p(Doom)1 is funded: every budget line, how far each figure can be defended, the ones that still need a quote, and the gap left open." />
+	<meta name="author" content="p(Doom)1" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="p(Doom)1" />
+	<meta property="og:title" content="What the money is for - p(Doom)1" />
+	<meta property="og:description" content="Where the money goes if p(Doom)1 is funded: every budget line, how far each figure can be defended, the ones that still need a quote, and the gap left open." />
+	<meta property="og:url" content="https://pdoom1.com/funding/" />
+	<meta property="og:image" content="https://pdoom1.com/assets/og-card.jpg" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<!-- Plausible Analytics - Privacy-first, self-hosted analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+	<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+	<style>
+		:root {
+			--bg-primary: #12100f;
+			--bg-secondary: #1c1917;
+			--bg-tertiary: #262220;
+			--text-primary: #ffffff;
+			--text-secondary: #cfc7bb;
+			--text-muted: #a79e92;
+			--accent-primary: #f6a800;
+			--accent-secondary: #2fd4c2;
+			--accent-danger: #ff4444;
+			--border-color: #3a342e;
+			--radius-sm: 4px;
+			--radius-md: 6px;
+			--radius-lg: 10px;
+			--duration-base: 300ms;
+			--easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Courier New', monospace;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+		}
+
+		header {
+			background: var(--bg-secondary);
+			border-bottom: 2px solid var(--accent-primary);
+			padding: 1rem 0;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		/* Nav styling lives in navigation.js, scoped to
+		   header[data-nav-injected]. Do not re-add nav rules here. */
+
+		main { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+
+		.hero { text-align: center; margin-bottom: 3rem; }
+
+		.hero h1 {
+			font-size: 2.6rem;
+			color: var(--accent-primary);
+			text-shadow: 0 0 20px var(--accent-primary);
+			margin-bottom: 1rem;
+		}
+
+		.hero p {
+			font-size: 1.1rem;
+			color: var(--text-secondary);
+			max-width: 640px;
+			margin: 0 auto;
+		}
+
+		.panel {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-lg);
+			padding: 2rem;
+			margin-bottom: 2rem;
+		}
+
+		.panel h2 {
+			color: var(--accent-primary);
+			font-size: 1.5rem;
+			margin-bottom: 1.25rem;
+		}
+
+		.panel h3 {
+			color: var(--accent-secondary);
+			font-size: 1.05rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel p { margin-bottom: 1rem; max-width: 72ch; }
+		.panel p:last-child { margin-bottom: 0; }
+		.panel a { color: var(--accent-secondary); }
+
+		.note {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+			border-left: 3px solid var(--border-color);
+			padding-left: 1rem;
+		}
+
+		.tiers {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+			gap: 1.5rem;
+		}
+
+		.tier {
+			background: var(--bg-tertiary);
+			border: 1px solid var(--border-color);
+			border-radius: var(--radius-md);
+			padding: 1.5rem;
+		}
+
+		.tier ul, ul.slots { list-style: none; margin: 0 0 1rem 0; }
+
+		.tier li, ul.slots li {
+			padding: 0.4rem 0;
+			border-bottom: 1px solid var(--border-color);
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+		}
+
+		.tier li:last-child, ul.slots li:last-child { border-bottom: none; }
+
+		.amt {
+			color: var(--accent-primary);
+			font-weight: bold;
+			display: inline-block;
+			min-width: 5.5rem;
+		}
+
+		.scroll { overflow-x: auto; }
+
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.82rem;
+			min-width: 720px;
+		}
+
+		th {
+			text-align: left;
+			font-size: 0.68rem;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--text-muted);
+			padding: 0.4rem 0.6rem 0.5rem;
+			border-bottom: 1px solid var(--accent-primary);
+		}
+
+		td {
+			padding: 0.7rem 0.6rem;
+			border-bottom: 1px solid var(--border-color);
+			vertical-align: top;
+			color: var(--text-secondary);
+		}
+
+		td b, td.num { color: var(--text-primary); }
+		th.num, td.num { text-align: right; white-space: nowrap; }
+		tfoot td { border-bottom: none; border-top: 2px solid var(--accent-primary); }
+
+		.mark { display: block; margin-bottom: 0.25rem; }
+		.m-measured { color: var(--accent-secondary); }
+		.m-own-labour { color: var(--text-primary); }
+		.m-needs-quote, .m-needs-definition { color: var(--accent-primary); }
+
+		.cta { text-align: center; }
+		.cta p { max-width: none; }
+
+		.btn {
+			background: var(--accent-primary);
+			color: var(--bg-primary);
+			text-decoration: none;
+			padding: 0.75rem 1.5rem;
+			border-radius: var(--radius-md);
+			font-weight: bold;
+			display: inline-block;
+			margin-top: 1rem;
+		}
+
+		.btn.ghost {
+			background: transparent;
+			color: var(--accent-secondary);
+			border: 1px solid var(--accent-secondary);
+		}
+
+		@media (max-width: 768px) {
+			.hero h1 { font-size: 1.8rem; }
+			main { padding: 2rem 1rem; }
+			.panel { padding: 1.25rem; }
+		}
+	</style>
+</head>
+<body data-budget-sha256="57a6b81a1d3bdde4e2eb44704dc861ee067a6bb898676ff06713d2e3cbf14c4e">
+	<!--
+	     GENERATED FILE. Do not hand-edit: the next render overwrites it.
+	     Source of truth: pdoom1 docs/copy/budget.json
+	     Renderer:        pdoom1 tools/render_budget.py
+	     Regenerate:      from a pdoom1 checkout, run render_budget.py
+	                      with format html and out set to this path. The
+	                      exact command line is in that file's docstring
+	                      and cannot be repeated here, because a double
+	                      hyphen is not legal inside an HTML comment.
+	     This page is current when a fresh render leaves
+	     `git diff public/funding/` empty. The render is deterministic:
+	     no timestamps, no counters, so any diff is a real difference.
+	     data-budget-sha256 on the body element is the hash of the exact
+	     budget.json this was rendered from.
+
+	     Constraints carried by the data. Not machine-checkable in full;
+	     the renderer greps the finished bytes for the ones that can be.
+	       - NOBODY has been hired, commissioned, approached, quoted or engaged. Every figure is conditional. A single slip into past tense makes this a misrepresentation.
+	       - The game is free and source-available and stays that way. A pledge funds the work, not a licence, and not early access.
+	       - Do not type the raised total or days remaining. Link the page and let it resolve.
+	       - Do not identify the project's first backer, by name OR by description, until he has been asked.
+	       - p(Doom)1 is not finished. No copy may frame this as a launch, a 1.0, or a completed thing.
+
+	     NOT DECIDED HERE: this is the first reader-visible mention of
+	     Manifund on the site. Adding /funding/ to navigation.js and to
+	     sitemap.xml are separate decisions and have not been made.
+	-->
+
+	<header>
+		<!-- Navigation loaded by navigation.js -->
+	</header>
+
+	<main>
+		<section class="hero">
+			<h1>What the money is for</h1>
+			<p>The whole budget behind the p(Doom)1 funding round, including the parts I cannot price yet.</p>
+		</section>
+
+		<section class="panel">
+			<h2>The ask</h2>
+			<p>p(Doom)1 is asking for a minimum of <strong>$14,500</strong> on <a href="https://manifund.org/projects/fund-development-of-pdoom1" target="_blank" rel="noopener">Manifund</a>, with a goal of <strong>$48,000</strong>, and the round closes on 9 September 2026. It is all-or-nothing: below the minimum every pledge is returned and nobody is out of pocket. Asking for $14,500 without showing the working is a wish rather than a proposal, so this page is the working.</p>
+			<p>The live figures are on the Manifund page and are deliberately not typed here. They move daily, this page does not, and a stale number is worse than no number at all.</p>
+			<p class="note">Neither figure buys a product. The game is free and source-available and stays that way &mdash; a pledge funds the work, not a licence, and not early access. p(Doom)1 is also not finished, which is rather the point of funding it.</p>
+		</section>
+
+		<section class="panel">
+			<h2>The two numbers, and what each one changes</h2>
+			<p>The difference between them is not scale. It is who does the work.</p>
+			<div class="tiers">
+				<div class="tier">
+					<h3>At $14,500, the project does not stop</h3>
+					<ul>
+						<li><span class="amt">$900</span> Hosting and infrastructure, 12 months</li>
+						<li><span class="amt">$1,100</span> Asset generation and tooling</li>
+						<li><span class="amt">$3,000</span> Open dataset maintenance, 12 months</li>
+						<li><span class="amt">$9,000</span> Partial recovery of Pip&rsquo;s time</li>
+					</ul>
+					<p>Nobody else is paid anything. The dataset stays maintained rather than drifting, and the art keeps improving the way it improved on 14 August: generate a great deal of it, throw most of it away, and write down why. That is a real answer to the art problem, but it is not the answer people mean when they ask about it.</p>
+				</div>
+				<div class="tier">
+					<h3>At $48,000, somebody other than me draws it</h3>
+					<ul>
+						<li><span class="amt">$20,000</span> Part-time gameplay developer, ~6 months</li>
+						<li><span class="amt">$6,000</span> Directed art pass, human illustrator</li>
+						<li><span class="amt">$2,000</span> Community support</li>
+					</ul>
+					<p>Every dollar of the human-artist line sits above the minimum, and at $14,500 none of it is committed. I could have spread that line across both columns to make the floor look better. The only public criticism this project has had is that the art looks too AI-generated, and answering that with a budget that quietly defers the answer would be worse than not answering at all.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="panel">
+			<h2>The line items, and how far each number can be defended</h2>
+			<p>There are seven lines. One is backed by receipts; four are marked as needing a quote or a definition, with the thing that would settle each one named; and two are my own labour priced at my own rate, which is a decision I made rather than a price anybody quoted me.</p>
+			<div class="scroll">
+			<table>
+				<thead>
+					<tr><th>Line item</th><th class="num">Minimum</th><th class="num">Goal</th><th>How the number is known</th></tr>
+				</thead>
+				<tbody>
+					<tr><td><b>Hosting and infrastructure, 12 months</b></td><td class="num">$900</td><td class="num">$1,500</td><td><strong class="mark m-needs-quote">Needs a quote.</strong> No first-party invoice exists in any repo. The only written figures are Plausible cloud analytics at $9/month and an archived note reading DreamHost $5-15/month. <strong>Settled by:</strong> Twelve months of DreamHost and domain-registrar invoices, plus the current analytics plan.</td></tr>
+					<tr><td><b>Asset generation and tooling</b></td><td class="num">$1,100</td><td class="num">$2,500</td><td><strong class="mark m-measured">Measured.</strong> Image generation runs $0.06 to $0.36 per image by size and quality; July 2026 came to $15.78 across 62 logged images. The sprite pipeline carries a 2,000-generation monthly pool at about $12/month, near $0.006 a generation. Dollars are not the constraint here; review time is. <em>Softest number here: The ~$12/month sprite subscription was read off third-party pricing rather than an invoice.</em></td></tr>
+					<tr><td><b>Open dataset maintenance, 12 months</b></td><td class="num">$3,000</td><td class="num">$4,000</td><td><strong class="mark m-own-labour">Own labour, own rate.</strong> Derived from the day rate below, not from a quote. Pip&rsquo;s labour priced as his labour.</td></tr>
+					<tr><td><b>Partial recovery of Pip&rsquo;s time</b></td><td class="num">$9,000</td><td class="num">$12,000</td><td><strong class="mark m-own-labour">Own labour, own rate.</strong> One focused day a week for twelve months. $9,000 prices the day near $170, well under what his operations and governance work commands. Deliberate, and better noticed than not.</td></tr>
+					<tr><td><b>Part-time gameplay developer, ~6 months</b></td><td class="num">&mdash;</td><td class="num">$20,000</td><td><strong class="mark m-needs-quote">Needs a quote.</strong> No developer has been engaged and no rate agreed. $20,000 over six months is a placeholder written to size the ask. <strong>Settled by:</strong> Two or three actual rate conversations with people who would plausibly do the work.</td></tr>
+					<tr><td><b>Directed art pass, human illustrator</b></td><td class="num">&mdash;</td><td class="num">$6,000</td><td><strong class="mark m-needs-quote">Needs a quote.</strong> No illustrator has been engaged and no rate card obtained. <strong>Settled by:</strong> Quotes taken against the written brief and the slot count.</td></tr>
+					<tr><td><b>Community support</b></td><td class="num">&mdash;</td><td class="num">$2,000</td><td><strong class="mark m-needs-definition">Needs a definition.</strong> Chat and forum hosting at this size is close to free, so this line is either moderation time, events, or nothing. Undecided, and pricing it before deciding would be inventing a number. <strong>Settled by:</strong> Deciding what it is.</td></tr>
+				</tbody>
+				<tfoot>
+					<tr><td><b>Total</b></td><td class="num"><b>$14,000</b></td><td class="num"><b>$48,000</b></td><td></td></tr>
+				</tfoot>
+			</table>
+			</div>
+		</section>
+
+		<section class="panel">
+			<h2>Two gaps I would rather name than close</h2>
+			<p>The minimum column sums to $14,000 against a published minimum of $14,500. That $500 is rounding from the evening the figure was set, not a hidden line item, and I would rather flag it than retrofit a line item to cover it.</p>
+			<p>Whether Manifund takes a platform fee is unknown and unasked. If there is one, the gap above is larger than $500, and it is better that I find that out than that you do.</p>
+			<p class="note">A reader who adds the column up and finds it short with no acknowledgement concludes the table was reverse-engineered from the ask. One who finds the gap already flagged concludes the opposite, and is right.</p>
+		</section>
+
+		<section class="panel">
+			<h2>The size of the art problem, measured rather than gestured at</h2>
+			<p>On 14 August 2026 I judged 468 generated assets in about 23 minutes and discarded 273. That is one decision roughly every three seconds. That is the measurement the art line should be priced against, and it needs one correction first &mdash; a correction that cuts the number down rather than up.</p>
+			<p><strong>273 discards is not 273 things that need drawing.</strong> The session was a selection sweep: several versions of the same slot competed and the losers were discarded, which is what the process is for. Decomposed properly, those judgements resolve to <strong>198 distinct art slots</strong> &mdash; 194 with a surviving pick and 4 with nothing worth keeping at all. Anyone pricing a human pass should price 198 slots, not 273 discards, and I would rather publish the correction that lowers my own number than quote the one that flatters it.</p>
+			<p>The slots break down as:</p>
+			<ul class="slots">
+				<li><span class="amt">84</span> interface and action icons</li>
+				<li><span class="amt">53</span> hero banners, key art and screen backgrounds</li>
+				<li><span class="amt">12</span> researcher portraits</li>
+				<li><span class="amt">49</span> further slots across smaller sets</li>
+			</ul>
+			<p>The hero surfaces are the ones a stranger sees first, and they are where the sweep was harshest: 73 hero candidates judged, 19 kept.</p>
+			<p>Now the division, which is the part I would want to see in somebody else&rsquo;s budget. $6,000 across 198 slots is about $30 a slot. I do not believe that is a real rate for commissioned illustration and I am not going to pretend otherwise. The shape I think the money actually buys is narrower and more useful. A style bible plus a directed pass over the ~53 hero and background slots, near $113 each, with the icon set regenerated against that direction rather than drawn by hand.</p>
+			<p class="note">A hypothesis about what an illustrator would say. Not a plan anyone has agreed to. Precisely what a quote would settle.</p>
+		</section>
+
+		<section class="panel">
+			<h2>Nobody has been hired</h2>
+			<p>No artist, illustrator, developer or contractor has been engaged for this project. No rate has been agreed with anyone, and no approach has been made. Every figure on this page describes what the money <em>would</em> pay for if the round closes above the minimum; the conditional tense throughout is not hedging, it is accuracy.</p>
+			<p>If it does not fund, the pledges return, nobody loses anything, and I keep going at the rate I have been going at. The game does not stop; it stays a thing done in the gaps, the dataset stays a thing maintained in the gaps, and somebody other than me does not get to draw it. That is a real outcome and not a catastrophic one, and I would rather say so than manufacture an emergency.</p>
+		</section>
+
+		<section class="panel cta">
+			<p>The round closes 9 September 2026, all-or-nothing at $14,500. A pledge costs nothing unless it works.</p>
+			<p><a class="btn" href="https://manifund.org/projects/fund-development-of-pdoom1" target="_blank" rel="noopener">Back it on Manifund</a> <a class="btn ghost" href="/">Play it, free</a></p>
+		</section>
+	</main>
+
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>
