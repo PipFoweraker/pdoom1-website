@@ -1232,15 +1232,59 @@ def build():
 
     reset = next((w for w in workflows
                   if w["file"].name == "weekly-league-reset.yml"), None)
-    if reset is None or not reset["crons"]:
-        raise SourceError("weekly-league-reset.yml has no schedule to check")
-    reset_cron = reset["crons"][0]
-    reset_parsed = reset_cron["parsed"]
+    if reset is None:
+        raise SourceError("weekly-league-reset.yml has vanished")
+
+    # A PARKED league rollover is a legitimate state and a different one from a
+    # schedule that silently disappeared. This used to raise on both, which meant
+    # the page could not be regenerated at all while the rollover was parked --
+    # and the pressure then is to un-park the workflow to get CI green, i.e. to
+    # re-arm an unattended production publish for the sake of a build.
+    #
+    # The parked case is rendered, not skipped. Checks 1-3 below replay a cron
+    # that is not currently firing, so running them would publish a cadence to a
+    # visitor that no job is keeping. Instead this states the park, and states
+    # that clocks.json still DECLARES an anchor -- because that is the thing a
+    # reader could be misled by, and it is true whether or not anyone noticed.
+    if not reset["crons"]:
+        if not reset["park"]:
+            raise SourceError(
+                "weekly-league-reset.yml has no schedule and no park notice. A "
+                "cadence vanished without anybody saying so -- add a park marker "
+                "with a reason, or restore the schedule.")
+        _declared = next((c for c in clocks["clocks"]
+                          if (c.get("cadence") or {}).get("anchor_utc")), None)
+        checks.append({
+            "name": "The weekly league rollover is PARKED, not running",
+            "verdict": "PARKED",
+            "cls": "p-warn",
+            "detail": ("%s carries the park marker %r and has no schedule, so "
+                       "no league week rolls over on a clock right now; it runs "
+                       "only when a person dispatches it. Reason recorded in the "
+                       "workflow: %s%s"
+                       % (reset["file"].name, reset["park"][0],
+                          reset["park"][1],
+                          (" clocks.json still declares an anchor of %s, which "
+                           "is what the league WILL resume to -- it is not a "
+                           "cadence anything is keeping today."
+                           % _declared["cadence"]["anchor_utc"])
+                          if _declared else "")),
+            "cites": ([cite(CLOCKS_JSON, '"anchor_utc"')] if _declared else [])
+                     + [reset["cite_name"]],
+        })
+        reset_cron = None
+        reset_parsed = None
+    else:
+        reset_cron = reset["crons"][0]
+        reset_parsed = reset_cron["parsed"]
 
     # 1. clocks.json's declared anchor vs the cron that actually runs.
     league_clock = next((c for c in clocks["clocks"]
                          if (c.get("cadence") or {}).get("anchor_utc")), None)
-    if league_clock:
+    # `and reset_cron` -- while the rollover is parked there is no cron to
+    # compare the declared anchor against, and the parked state is already
+    # reported above. Rendering an "agree" here would be agreeing with nothing.
+    if league_clock and reset_cron:
         anchor = league_clock["cadence"]["anchor_utc"]
         m = re.match(r"([A-Za-z]{3})\s+(\d{1,2}):(\d{2})", anchor)
         declared = "%s %02d:%02d UTC weekly" % (m.group(1), int(m.group(2)),
@@ -1294,7 +1338,7 @@ def build():
         })
 
     # 3. Which week does the rollover actually open? Replayed, not asserted.
-    roll = derive_rollover_phase(reset_cron["expr"])
+    roll = derive_rollover_phase(reset_cron["expr"]) if reset_cron else None
     if roll:
         off_by_one = roll["hours_to_week_end"] < 24
         checks.append({

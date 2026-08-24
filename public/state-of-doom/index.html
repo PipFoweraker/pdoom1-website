@@ -83,7 +83,7 @@
 			<div id="rows"><div class="row"><div class="label" style="color:var(--ink-3)">Loading clocks…</div></div></div>
 		</section>
 
-		<p class="note"><b>How this stays honest:</b> the internal clocks derive from a real cadence (the league resets Thursdays 14:00 UTC, which is Friday 00:00 in Hobart); the milestone clocks are wired to <b>pdoom-data</b>, cleaned and human-verified, and show <em>“awaiting data”</em> rather than a made-up date until that lands. The AGI clock waits on the game's own calibration. Colours are pulled from the game's shipped palette.</p>
+		<p class="note"><b>How this stays honest:</b> the internal clocks derive from a real cadence (the league resets Thursdays 14:00 UTC, which is Friday 00:00 in Hobart) — and a cadence that has been <em>paused</em> says so and stops counting, rather than ticking down to a date nothing is keeping; the milestone clocks are wired to <b>pdoom-data</b>, cleaned and human-verified, and show <em>“awaiting data”</em> rather than a made-up date until that lands. The AGI clock waits on the game's own calibration. Colours are pulled from the game's shipped palette.</p>
 	</main>
 
 	<script src="/assets/js/navigation.js"></script>
@@ -106,6 +106,14 @@
 		// Resolve a clock's target date from its config. Only cadences we can honestly
 		// compute return a date; everything else returns null -> renders "awaiting data".
 		function resolveTarget(c){
+			// A PAUSED clock has an anchor and no cadence. Parking the rollover
+			// workflow on 2026-08-24 did not stop this page counting down to it:
+			// anchor_utc still said "Thu 14:00", so the page rendered a live
+			// ticking countdown to a rollover that would not happen, under a
+			// heading that says "How this stays honest". Checked here FIRST,
+			// before the anchor is read, so the honest state cannot be
+			// overtaken by a value that is only true again later.
+			if(c.paused) return null;
 			if(c.cadence && c.cadence.type==='weekly' && c.cadence.anchor_utc){
 				var m=/([A-Za-z]{3})\s+(\d{1,2}):(\d{2})/.exec(c.cadence.anchor_utc);
 				var dows={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
@@ -133,14 +141,22 @@
 					+(o.c.note?'<div class="src">'+escapeHTML(o.c.note)+'</div>':'')+'</div>';
 			});
 			pend.forEach(function(o){
-				var src=o.c.date_source||{}, ref=src.issue?('awaiting '+escapeHTML(src.issue)):(o.c.calibration?'awaiting game calibration':'awaiting data');
+				// "paused" is a THIRD state and must not borrow either of the other
+				// two labels: "awaiting data" would say we are missing a value we
+				// are not missing, and a countdown would name a date nothing keeps.
+				var src=o.c.date_source||{},
+				    ref=o.c.paused
+				        ? ('paused'+(o.c.paused.until?' until '+escapeHTML(o.c.paused.until):''))
+				        : (src.issue?('awaiting '+escapeHTML(src.issue)):(o.c.calibration?'awaiting game calibration':'awaiting data'));
 				var href=safeUrl(o.c.link);
 				var link=href?' · <a href="'+href+'" target="_blank" rel="noopener">source</a>':'';
 				out+='<div class="row pending" data-id="'+escapeHTML(o.c.id)+'">'
 					+'<div class="row-top"><div class="label">'+escapeHTML(o.c.title)
 					+'<span class="kindtag '+(o.c.kind==='act'?'kind-act':'kind-watch')+'">'+escapeHTML(o.c.kind||'watch')+'</span></div>'
 					+'<div class="val"><span class="n">'+ref+'</span></div></div>'
-					+'<div class="src">'+escapeHTML(o.c.metabolism||'')+link+'</div></div>';
+					+'<div class="src">'+escapeHTML(o.c.metabolism||'')
+					+(o.c.paused&&o.c.paused.why?' &middot; '+escapeHTML(o.c.paused.why):'')
+					+link+'</div></div>';
 			});
 			document.getElementById('rows').innerHTML=out;
 			document.getElementById('early').textContent = live.length+' live · '+pend.length+' coming online';
