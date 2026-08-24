@@ -13,7 +13,7 @@
     "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z"
   },
   "regularised_from": {
-    "ladder_version": "L5",
+    "ladder_version": "L6",
     "ladder_version_meaning": "THE FRONTIER -- the ladder epoch a NEW week opens on. Read by weekly-league-manager.start_new_week() to stamp meta.ladder_version and the board key, and by check-blessing-consistency.py as this file's claim about the current epoch. It MOVES at every ladder fork. It is NOT the epoch an archived week ran under: that is resolved per-week by ladder_version_for() from epochs[].boundary_local, so a restamp can never relabel a closed epoch's weeks. See boundary_ladder_version.",
     "boundary_ladder_version": "L3",
     "boundary_ladder_version_meaning": "HISTORICAL and fixed -- the ladder epoch in force at boundary_local, i.e. the epoch the regularisation cut itself was made on. Stamped into every weekly record as epoch.boundary_ladder_version; 44 archived records already carry 'L3'. This existed only implicitly until 2026-08-13, sharing the ladder_version field above, which meant moving the frontier L3 -> L4 would have silently rewritten all 44 of them.",
@@ -24,7 +24,7 @@
     "board_opens_local": "2026-07-31T17:00:00+10:00",
     "board_opens_confirmed": true,
     "board_opens_note": "Approximate, from pdoom1: 'Fri ~1700: board opens', with the seed blessed at a ceremony ~1645 AEST the same day. Treat as approximate until the game side confirms.",
-    "seed": "weekly-2026-w33",
+    "seed": "weekly-2026-w35",
     "seed_status": "blessed",
     "seed_note": "NO BLESSED SEED ON L4 YET, and this field must stay null until there is one. It was left reading weekly-2026-w31/blessed after the L3 -> L4 fork of 2026-08-07, which is a blessing of a CLOSED board (L3 closed with (weekly-2026-w31, L3); the capture is at public/leaderboard/data/preserved/2026-08-08-l3-epoch-close/). The seed the shipped client posts to is an OBSERVATION and lives in public/leaderboard/data/published-board.json, never here: this field is the machine mirror of a row in docs/LEAGUE_SEED_LEDGER.md, and the ledger has no L4 row. pdoom1 rolled the featured seed const to weekly-2026-w33 on 2026-08-13 (pdoom1#1214, e44660c4) ready for the Fri 2026-08-14 league, and that string is deliberately NOT copied here: scripts/test-weekly-league-boundary.py pins the invariant 'a seed is present IFF the status is blessed', because unblessed-with-a-seed is a value sitting where code reads it as canonical that nobody has blessed. FILLING THIS IS PIP'S, AFTER the Gate 5 ceremony and AFTER the ledger row -- a seat inferring a blessing is pdoom1-website#297.",
     "reason_pre": "Opened before the L2 -> L3 ladder fork. L3 removed the action-point pool entirely in favour of an attention economy, added office lease and lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance. Scores set under the earlier rules are not comparable to scores set after them -- that non-comparability is the whole reason the ladder version is a separate key. Retained as a record of what the pipeline produced, NOT as a comparable competition result.",
@@ -74,8 +74,25 @@
       "closed_local": "2026-08-21T00:00:00+10:00"
     },
     {
-      "ladder_version": "L5",
+      "ladder_version": "L6",
       "status": "current",
+      "seed": "weekly-2026-w35",
+      "boundary_local": "2026-08-24T00:00:00+10:00",
+      "first_build": "v0.14.3",
+      "seed_status": "blessed",
+      "blessed_utc": "2026-08-24",
+      "blessed_by": "Pip",
+      "board_open": true,
+      "board_opened_utc": "2026-08-24T09:36:00Z",
+      "board_opened_by": "Pip",
+      "gate5": "BLESSED by Pip at 19:36 local on 2026-08-24, in the website seat. Recorded on the day it was given; docs/LEAGUE_SEED_LEDGER.md carries the row. Nothing here inferred it -- pdoom1-website#297 exists to stop a seat writing this field without a ruling.",
+      "gate6": "OPENED by Pip at 19:36 local on 2026-08-24, in the same breath as [Gate 5]. Check 4 -- one run has travelled the whole way and arrived -- was ALREADY SATISFIED at the moment of opening, by a real player rather than a test run: the board held one entry (lab 'bubble gum factory -- mic oxe', score 21) posted earlier the same day by the site's first external reviewer. That score sat on a board the site was not publishing for roughly five hours. Opening the gate is what ended that, not what caused it.",
+      "seed_evidence": "Confirmed at ARTIFACT level, not from memory and not from a GitHub comment: the published v0.14.3 release_manifest.json carries \"ladder_version\": \"6\", \"league_seed\": \"weekly-2026-w35\" and \"commit_hash\": \"161240bef1454851555ed042c640b67a0cf67d56\". Read from the release asset, which is the standard the ceremony checklist requires -- artifact beats intention.",
+      "note": "v0.14.3 forked L5 -> L6 AND rolled the seed, moving both halves of the board key at once. That is why (weekly-2026-w33, L5) closed with ZERO entries: it was published for one afternoon, on a client v0.14.3 had already superseded, and no run ever reached it. Capture: public/leaderboard/data/preserved/2026-08-24-l5-epoch-close/. The release notes record the slip honestly -- the seed rolls to w34 (23 Aug) and w35 (24 Aug) were made in the repository and never reached a published build, so players stayed on w33/L5 until this release carried them across."
+    },
+    {
+      "ladder_version": "L5",
+      "status": "closed",
       "seed": "weekly-2026-w33",
       "boundary_local": "2026-08-21T00:00:00+10:00",
       "first_build": "v0.14.2",

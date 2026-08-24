@@ -1,20 +1,22 @@
 {
   "meta": {
-    "generated": "2026-08-24T04:03:17+00:00",
+    "generated": "2026-08-24T09:41:33+00:00",
     "export_source": "website:publish-live-board.py",
-    "total_players": 0,
-    "total_entries": 0,
+    "total_players": 1,
+    "total_entries": 1,
     "board_key": {
-      "seed": "weekly-2026-w33",
-      "ladder_epoch": "L5"
+      "seed": "weekly-2026-w35",
+      "ladder_epoch": "L6"
     },
-    "builds_seen": [],
+    "builds_seen": [
+      "v0.14.3"
+    ],
     "note": "Fetched read-only from the score API. The board key is (seed, ladder_epoch); the build version is NOT part of it, which is why one board legitimately spans several builds. Scores from other epochs are not merged in -- different rules produced them.",
     "source_api": "https://api.pdoom1.com/score_api.php"
   },
-  "data_status": "live-empty",
+  "data_status": "live",
   "legacy": false,
-  "seed": "weekly-2026-w33",
+  "seed": "weekly-2026-w35",
   "economic_model": "unknown",
   "exclusions": {
     "version_mismatched_files": 0,
@@ -24,5 +26,18 @@
     "test_dev_files": 0,
     "note": "publish-live-board.py publishes one board key whole and excludes nothing. Build version is deliberately NOT a filter: a board spans builds by design, so excluding on it would drop real scores. Entries from OTHER epochs are not excluded here either -- they are simply not on this board."
   },
-  "entries": []
+  "entries": [
+    {
+      "score": 21,
+      "doom_integral": 1581,
+      "player_name": "bubble gum factory -- mic oxe",
+      "date": "2026-08-24T18:04:47",
+      "level_reached": 21,
+      "game_mode": "v0.14.3",
+      "duration_seconds": 285.215,
+      "entry_uuid": "1213662104-013214-99715-414512-1413159127801512109",
+      "baseline_score": 0,
+      "baseline_doom_integral": 0
+    }
+  ]
 }
