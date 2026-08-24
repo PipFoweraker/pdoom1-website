@@ -163,7 +163,34 @@ def main():
             continue
 
         platforms = list(draft.get("copy") or {})
+
+        # An approved draft with no platforms would fall straight through to the
+        # "all platforms already posted" branch below and be stamped posted_at
+        # having sent nothing -- a draft permanently marked as sent, which is
+        # the same lie as a double-post pointing the other way. prep.validate()
+        # cannot catch it: it iterates `copy`, so an empty one has no problems.
+        # The quickstart tells a human to DELETE platforms from `copy` before the
+        # first live run, so deleting all of them is a live path, not a theory.
+        if not platforms:
+            print("%s: APPROVED BUT HAS NO PLATFORMS - not posted, not stamped"
+                  % name, file=sys.stderr)
+            failures += 1
+            continue
+
         ledger = draft.get("posted") or {}
+        # Type, not just presence. `ledger[platform] = ...` below happens AFTER a
+        # successful POST, so a hand-edited `"posted": ["bluesky"]` raised
+        # TypeError with the post already sent and nothing written down -- and
+        # the next run sent it again. That is precisely the defect this ledger
+        # exists to prevent, reachable through the one field the quickstart asks
+        # a human to go and inspect by hand.
+        if not isinstance(ledger, dict):
+            print("%s: `posted` is %s, not an object - refusing to touch this "
+                  "draft. Fix it by hand (an object keyed by platform) or "
+                  "remove it." % (name, type(ledger).__name__), file=sys.stderr)
+            failures += 1
+            continue
+
         todo = [p for p in platforms if p not in ledger]
 
         if not todo:

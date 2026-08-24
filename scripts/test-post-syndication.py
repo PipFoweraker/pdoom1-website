@@ -199,6 +199,41 @@ try:
     ok("no posted_at was written", not load(p4).get("posted_at"))
 
     # ------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # Both of these were found by an adversarial review AFTER the first version
+    # of this file passed 24/24. Each reaches a real POST and then fails to
+    # record it, which is the exact defect the ledger exists to prevent --
+    # arriving through the one field the quickstart asks a human to hand-edit.
+    print("a hand-mangled `posted` must not reach a POST at all")
+    q6 = tmp / "bad-ledger"
+    q6.mkdir()
+    for bad, label in (([u"bluesky"], "a list"), (u"bluesky", "a string"),
+                       (5, "a number")):
+        p6 = make_draft(q6, name="draft.json")
+        d6 = load(p6)
+        d6["posted"] = bad
+        p6.write_text(json.dumps(d6, indent=2) + "\n", encoding="utf-8")
+        code, calls = run(q6, ok_platforms={"bluesky", "x"})
+        ok("`posted` as %s: nothing was posted" % label, calls == [], calls)
+        ok("`posted` as %s: run reports failure" % label, code == 1,
+           "exit %s" % code)
+        ok("`posted` as %s: the draft was not stamped" % label,
+           not load(p6).get("posted_at"), load(p6).get("posted_at"))
+
+    print("an approved draft with no platforms is refused, not stamped")
+    q7 = tmp / "no-platforms"
+    q7.mkdir()
+    p7 = make_draft(q7)
+    d7 = load(p7)
+    d7["copy"] = {}
+    p7.write_text(json.dumps(d7, indent=2) + "\n", encoding="utf-8")
+    code7, calls7 = run(q7, ok_platforms={"bluesky", "x"})
+    ok("nothing was posted", calls7 == [], calls7)
+    ok("it was NOT marked complete", not load(p7).get("posted_at"),
+       load(p7).get("posted_at"))
+    ok("the run reports failure rather than success", code7 == 1,
+       "exit %s" % code7)
+
     print("the limit of the fix, asserted rather than assumed")
     # A draft part-posted under the OLD code is on disk with no `posted` key and
     # no `posted_at` -- byte-identical to a draft that has never run. Nothing can

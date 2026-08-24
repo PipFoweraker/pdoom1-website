@@ -116,25 +116,50 @@ def main():
     doc_lines = DOC.read_text(encoding="utf-8").splitlines()
     findings = []
 
-    # A DECLARATION is a markdown table row naming the variable in backticks.
-    # Anchoring on structure rather than on "the words appear near each other"
-    # is deliberate: the first version of this check searched the whole document
-    # for `NAME ... Netlify` on one line, and scripts/test-check-syndication-docs.py
-    # immediately showed that a prose sentence elsewhere on the page
-    # ("Treat `BLUESKY_HANDLE`, ... and Netlify's ...") satisfied it, so a row
-    # filed on the WRONG side still passed. A guard that a passing mention can
-    # satisfy is measuring the wrong thing.
+    # A DECLARATION is a markdown table row naming the variable in backticks,
+    # and the side is read from that row's SECOND CELL -- the "where" column --
+    # never from the row as a whole.
+    #
+    # This has now been wrong twice, in the same way, and the second time is the
+    # instructive one. v1 searched the whole document for `NAME ... Netlify` on
+    # one line; the forced-failure test showed a prose sentence elsewhere on the
+    # page satisfied it. v2 narrowed the search to the table row and I recorded
+    # that as fixed -- but narrowing the window is not changing the mechanism,
+    # and an adversarial review found the hole still open on the committed
+    # document: SYNDICATION_TOKEN's GitHub row carries the note "Identical
+    # string to the Netlify one", so deleting the Netlify row entirely -- THE
+    # historical defect, the one whose absence 503s every endpoint -- still
+    # exited 0. The notes column is prose and prose is not a declaration.
+    #
+    # Cell-scoped is a different mechanism, not a smaller window: the "where"
+    # cell is a controlled vocabulary, so a word in it means what it says.
+    def cells(row):
+        # A markdown row is |a|b|c| -- strip the outer empties.
+        parts = [c.strip() for c in row.strip().strip("|").split("|")]
+        return parts
+
     def declarations(name):
         needle = "`%s`" % name
-        return [ln for ln in doc_lines
-                if ln.lstrip().startswith("|") and needle in ln]
+        out = []
+        for ln in doc_lines:
+            if not ln.lstrip().startswith("|") or needle not in ln:
+                continue
+            parts = cells(ln)
+            # The name must be in the FIRST cell. A variable mentioned in
+            # another row's notes is a cross-reference, not a declaration.
+            if not parts or needle not in parts[0]:
+                continue
+            out.append(parts)
+        return out
 
     for name in sorted(need):
         info = need[name]
         rows = declarations(name)
         if not rows:
             findings.append(
-                "%s is read by %s but has no row declaring it in %s"
+                "%s is read by %s but has no row declaring it in %s (the name "
+                "must appear in the first cell of a table row -- a mention in "
+                "another row's notes is a cross-reference, not a declaration)"
                 % (name, ", ".join(sorted(info["seen_in"])), DOC.name))
             continue
         # Naming it is not enough -- the failure this guard exists for was a
@@ -142,9 +167,11 @@ def main():
         # needs BOTH, and setting only one yields a green workflow and a 401.
         for side in sorted(info["sides"]):
             word = "netlify" if side == "netlify" else "github"
-            if not any(word in row.lower() for row in rows):
+            # Second cell only. len(r) > 1 guards a malformed one-cell row.
+            if not any(len(r) > 1 and word in r[1].lower() for r in rows):
                 findings.append(
-                    "%s is %s, but no row in %s files it under %s"
+                    "%s is %s, but no row in %s files it under %s in its "
+                    "'where' column"
                     % (name,
                        "read by a Netlify function" if side == "netlify"
                        else "sent by the workflow",

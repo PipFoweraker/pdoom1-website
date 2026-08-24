@@ -86,6 +86,36 @@ try:
     ok("exit 1 when a Netlify value is documented as a GitHub secret",
        run_against(wrong_side) == 1)
 
+    print("the historical defect itself -- found by adversarial review, not by this file")
+    # v2 of the checker searched the whole TABLE ROW for the side word, and
+    # SYNDICATION_TOKEN's GitHub row carries the note "Identical string to the
+    # Netlify one". So deleting the Netlify row -- the row whose absence 503s
+    # every endpoint, the exact defect the checker was written for -- still
+    # exited 0. This file passed 8/8 at the time. Narrowing a window is not
+    # changing a mechanism, and only a review that tried to defeat it found out.
+    only_github = "\n".join(
+        line for line in REAL_DOC.splitlines()
+        if not (line.lstrip().startswith("|")
+                and "`SYNDICATION_TOKEN`" in line
+                and "**Netlify** site env" in line))
+    ok("the mutation removed exactly one row",
+       len(REAL_DOC.splitlines()) - len(only_github.splitlines()) == 1,
+       "check the table shape before trusting this test")
+    ok("exit 1 when SYNDICATION_TOKEN's Netlify row is deleted but the GitHub "
+       "row mentions Netlify in its notes",
+       run_against(only_github) == 1)
+
+    # The same mechanism from the other direction: a variable named only in
+    # another row's notes column is a cross-reference, not a declaration.
+    cross_ref_only = "\n".join(
+        line for line in REAL_DOC.splitlines()
+        if not (line.lstrip().startswith("|") and "`BLUESKY_HANDLE`" in line
+                and "**Netlify** site env" in line)
+    ).replace("| `BLUESKY_APP_PASSWORD` | **Netlify** site env |",
+              "| `BLUESKY_APP_PASSWORD` | **Netlify** site env | pairs with `BLUESKY_HANDLE` |")
+    ok("exit 1 when a variable appears only in another row's notes",
+       run_against(cross_ref_only) == 1)
+
     print("an empty document is caught")
     ok("exit 1 on an empty doc", run_against("# nothing here\n") == 1)
 
