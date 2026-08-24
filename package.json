@@ -10,6 +10,8 @@
     "test:all": "python scripts/health-check.py && python scripts/verify-deployment.py",
     "test:integration": "python scripts/export-leaderboard-bridge.py --validate",
     "test:syndication": "node scripts/test-syndication.js",
+    "test:monitoring-log": "python scripts/test-log-automation-run.py",
+    "test:workflow-alarm": "python scripts/test-auto-update-adjudication.py",
     "generate:issues": "node scripts/generate_pdoom1_issues_md.js",
     "generate:roadmap": "node scripts/generate_roadmap_from_milestones.js",
     "update:version": "python scripts/update-version-info.py",

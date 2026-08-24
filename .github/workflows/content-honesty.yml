@@ -103,6 +103,16 @@ on:
       - '.github/workflows/content-honesty.yml'
       - '.github/workflows/snapshot-analytics.yml'
       - '.github/workflows/sync-events.yml'
+      # The monitoring logger writes the success rate /monitoring/ publishes, and
+      # auto-update-data.yml is the workflow whose alarm that rate depended on.
+      # Both were green-by-construction until 2026-08-25; a check that does not
+      # trigger on the file it guards is the trap in CLAUDE.md's workflow note #6.
+      - 'scripts/log-automation-run.py'
+      - 'scripts/test-log-automation-run.py'
+      - 'scripts/test-auto-update-adjudication.py'
+      - 'scripts/syndication-helpers.js'
+      - 'scripts/test-syndication.js'
+      - '.github/workflows/auto-update-data.yml'
   push:
     branches: [main]
     paths:
@@ -338,6 +348,38 @@ jobs:
 
       - name: Every syndication credential is documented, on the right side
         run: python scripts/check-syndication-docs.py
+
+      # scripts/test-syndication.js could not fail. Measured before the rewrite:
+      # zero occurrences of process.exit/exitCode/assert/throw, every failure path
+      # a catch-and-continue, and one block that printed a generated URL with no
+      # assertion at all -- while being exposed as `npm run test:syndication`, the
+      # command a human types to check syndication. A test that cannot go red is
+      # "a red test is worse than no test" wearing the opposite mask: it reads as
+      # coverage to everyone who does not open it.
+      - name: The syndication helpers test can actually fail
+        run: node scripts/test-syndication.js
+
+      # log-automation-run.py opened with `status = "success"` and downgraded only
+      # on an explicit "failure"/"skipped", so a run with NO observations logged a
+      # success and incremented success_count. Both callers interpolate
+      # `${{ steps.<id>.outcome }}`, which is the EMPTY STRING when a step id does
+      # not resolve. /monitoring/ published auto-update-data at 1201/1201 = 100%.
+      # This forces the corrupt-log and failed-write refusals and re-runs the old
+      # rule to prove the two can be told apart.
+      - name: The automation logger never records unearned success (forced-failure test)
+        run: python scripts/test-log-automation-run.py
+
+      # auto-update-data.yml granted `issues: write` for a failure handler and
+      # explained why: it "can report SUCCESS while having written nothing". But
+      # its three continue-on-error steps were the only things that could fail and
+      # the commit step exits 0 early, so `if: failure()` was reachable only by a
+      # push race -- never by update-version-info.py's designed refusal. This
+      # extracts the adjudication step's shell body from the YAML and RUNS it
+      # across every outcome combination, including the empty one.
+      - name: Auto-Update Data can go red on a data failure (forced-failure test)
+        run: |
+          pip install --quiet PyYAML
+          python scripts/test-auto-update-adjudication.py
 
       # Third parties' addresses scraped out of paper PDFs must never be served.
       #
