@@ -96,6 +96,16 @@ on:
       - 'scripts/check-deploy-excludes.py'
       - 'scripts/make-og-card.py'
       - 'public/assets/og-card.jpg'
+      # Art this repo UPLIFTED from pdoom1. `public/assets/**` is here because
+      # the register's whole job is to notice a NEW image, and a path filter
+      # that only watches the register would never fire on the one commit that
+      # matters -- the one that adds art without recording where it came from.
+      - 'public/assets/**'
+      - 'data/art-register.json'
+      - 'data/art-origins.json'
+      - 'scripts/build-art-register.py'
+      - 'scripts/check-art-staleness.py'
+      - 'scripts/test-art-staleness.py'
       - '.github/workflows/auto-deploy-on-push.yml'
       - '.github/workflows/deploy-dreamhost.yml'
       - '.github/workflows/version-aware-deploy.yml'
@@ -167,6 +177,16 @@ on:
       - 'scripts/check-deploy-excludes.py'
       - 'scripts/make-og-card.py'
       - 'public/assets/og-card.jpg'
+      # Art this repo UPLIFTED from pdoom1. `public/assets/**` is here because
+      # the register's whole job is to notice a NEW image, and a path filter
+      # that only watches the register would never fire on the one commit that
+      # matters -- the one that adds art without recording where it came from.
+      - 'public/assets/**'
+      - 'data/art-register.json'
+      - 'data/art-origins.json'
+      - 'scripts/build-art-register.py'
+      - 'scripts/check-art-staleness.py'
+      - 'scripts/test-art-staleness.py'
       - '.github/workflows/auto-deploy-on-push.yml'
       - '.github/workflows/deploy-dreamhost.yml'
       - '.github/workflows/version-aware-deploy.yml'
@@ -486,6 +506,27 @@ jobs:
       # Also asserts all four rsync workflows read the one shared list.
       - name: Nothing deployed points at an excluded file
         run: python scripts/check-deploy-excludes.py
+
+      # ART. Two steps, forced-failure test FIRST, because a guard seen only in
+      # its passing state has not been shown to work -- and this one is more
+      # exposed to that than most: on the real tree its verdict is UNKNOWN with
+      # zero findings, which looks exactly like a check that examines nothing.
+      #
+      # Neither step needs a pdoom1 checkout, and that is a deliberate split.
+      # scripts/build-art-register.py --check DOES need one (it re-derives the
+      # register from tools/art_review/), so it is NOT wired here for the same
+      # reason sync-keybinds.py's drift half is not: blocking on something whose
+      # only fix is a local game checkout makes an unrelated content PR
+      # un-mergeable until someone with the other repo intervenes. What runs here
+      # is the half that is fixable here -- a new image with no record, an asset
+      # regenerated in place, deployability drift, an expired human assertion,
+      # and an expired acceptance in data/acknowledgements.json. The mirror half
+      # reports UNKNOWN, out loud, with the command that would resolve it.
+      - name: The art staleness guard can still fail (forced-failure test)
+        run: python scripts/test-art-staleness.py
+
+      - name: No uplifted art has gone stale, and unknowns are named as unknown
+        run: python scripts/check-art-staleness.py
 
       - name: Pillow (for the share-card check)
         run: pip install --quiet Pillow

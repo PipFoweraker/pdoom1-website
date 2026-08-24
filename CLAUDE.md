@@ -557,6 +557,85 @@ to use a populated fixture.
   contains the prose "…anchors this session:", which is design content, not a
   process artefact. A loose match would train everyone to ignore the guard.
 
+## Art: this repo UPLIFTS it, so it carries provenance and it goes stale
+Added 2026-08-25 (`feat/art-register`), on Pip's ruling that the uplift is
+deliberate — **a copy with provenance, not a live link**.
+
+- **`data/art-register.json` is one record per image under `public/`** — all 173,
+  not just the 43 that deploy, because recording only the deployed ones makes a
+  file appear from nowhere the day someone edits `deploy-excludes.txt`. It is
+  **generated** by `scripts/build-art-register.py`; do not hand-edit it. The only
+  hand-written input is `data/art-origins.json`, and that holds human assertions
+  and nothing else.
+- **It is at the repo root, NOT under `public/`, and that was a decision.**
+  `public/` is rsynced to production, and this file names another repo's internal
+  review verdicts over a corpus that is gitignored (`pdoom1/.gitignore:133
+  art_generated/`) precisely to keep it private. `docs/ART_DRIP_2026-08.md`
+  **gate 3** — a published-asset export with selected/rejected labelled — is an
+  unmet decision that is Pip's. Promoting the register to `public/data/` is one
+  line plus a ruling; do not do it without the ruling.
+- **`origin` is `unknown` unless something in this repo says otherwise, and today
+  163 of 173 are unknown** (33 of the 43 that deploy). That is the honest number,
+  not a gap to be filled in with "probably a screenshot". Seven cats-gallery
+  images are `photograph` at the `human` tier with a dated clock; three event
+  icons are `generated`, derived from `PROVENANCE.json`. `web-doom-cat.jpg` is
+  deliberately left `unknown` next to its seven photograph siblings — generalising
+  from seven to eight is the move that produced the `game-changes.json` and
+  `redact_pii()` mistakes already recorded above.
+- **`verify` tiers are copied from `content/campaigns/README.md` §2.1** —
+  `checked` / `delegated` / `online` / `human` / `durable`. Do not invent a sixth
+  and do not fork the vocabulary. `field_verification` declares the default for
+  every field once; a record carries a `claims` entry only where it **deviates**,
+  which today means exactly one thing: an origin a person asserted.
+- **The generator REFUSES to write rather than guess.** No pdoom1 checkout →
+  refuse (exit 2), because writing `null` into every upstream block is
+  byte-identical to "we looked and this art has no review record".
+  `--allow-no-upstream` is the recorded downgrade and stamps `"unknown"` instead.
+  It also refuses on a human assertion pointing at a missing file, a clockless or
+  zero-length `human_verified`, a `PROVENANCE.json` entry whose file is gone, an
+  upstream asset id absent from the corpus, and a corpus with no `gen:` keys.
+- **`scripts/check-art-staleness.py` has THREE verdicts: `OK`, `UNKNOWN`, `FAIL`.**
+  It never prints the word PASS, and **any unknown caps the top line at UNKNOWN**.
+  Today it is UNKNOWN — 0 findings, 334 things it could not determine — and it
+  says so out loud rather than reading as green. `scripts/test-art-staleness.py`
+  proves `OK` is *reachable*, because a permanently-UNKNOWN check is a permanently
+  red one wearing a nicer word.
+- **The observation comes from inside the system.** The checker walks `public/`
+  itself and re-derives sha256, deployability and references; the register is the
+  *expectation*, never the observation. Do not "optimise" it to trust the
+  register's roster — that is the inversion corrected on 2026-08-22.
+- **It found a live defect on its first run, and that defect is the whole point.**
+  `public/assets/icons/events/action_funding_grant_proposal_v2_128.png` deploys.
+  #283 recorded v2 as the selected variant on **2026-08-07**, copied faithfully
+  from `pdoom1/art_prompts/batch_2_actions_and_ui.yaml:116`. On **2026-08-14** a
+  human reviewed the same variant and recorded `discard` in
+  `pdoom1/tools/art_review/review_state.json`. **The bytes never changed, so every
+  filesystem check stayed green and nothing in this repo would ever have asked.**
+  #283 was not wrong; it was overtaken. Held under
+  `data/acknowledgements.json` → `S1:assets/icons/events/action_funding_grant_proposal_v2_128.png`,
+  **review_by 2026-10-10**, because deciding whether the generation spec or the
+  human review governs "what art ships" is a cross-repo ruling and not a seat's.
+- **`build-art-register.py --check` is NOT wired to CI**, on purpose and for the
+  same reason as `sync-keybinds.py`'s drift half: it re-derives from
+  `tools/art_review/`, which no runner has, so blocking on it would make an
+  unrelated content PR un-mergeable until someone with the game repo intervenes.
+  The CI-safe half — new art with no record, an asset regenerated in place,
+  deployability drift, an expired human assertion, an expired acceptance — runs
+  in `content-honesty.yml` and needs no checkout.
+- **Never copy a reviewer's prose into this repo.** `review_state.json` carries
+  `note` and `pullquotes.jsonl` carries `text_verbatim`; the register copies **ids
+  and verdicts only**. ART_DRIP gate 2 records that consent from a named second
+  reviewer is an **open question** and that attribution in that corpus is
+  known-uncertain at variant level. `test-art-staleness.py` asserts the upstream
+  block's key set, so a new upstream field fails the test rather than being copied
+  through.
+- **A metadata sidecar is not a page reference.** `PROVENANCE.json` names all three
+  event icons; counting that as "referenced" would have hidden the fact that **no
+  page in this repo reaches any of them** — the #283 precondition. The register
+  keeps `referenced_by_pages` and `referenced_by_data` separate for that reason.
+  Ten deployed images have no page reference at all; they print under INVENTORY,
+  explicitly labelled *facts, not findings*.
+
 ## Local test suite (run these before opening a PR)
 
 **Every line below is now also wired to CI** (PR #TBD, `ci/wire-the-guards`,
@@ -627,6 +706,9 @@ node    scripts/test-roadmap-render.js    # roadmap markdown subset + escaping  
 node    scripts/test-blog-render.js       # blog markdown subset               [generate-feeds]
 
 python  scripts/check-deploy-excludes.py  # nothing deployed points at an excluded file [content-honesty]
+python  scripts/test-art-staleness.py     # every art finding forced; OK is reachable [content-honesty]
+python  scripts/check-art-staleness.py    # uplifted art: verdicts, bytes, roster, clocks [content-honesty]
+python  scripts/build-art-register.py --check # register in step; needs ../pdoom1  [local only]
 python  scripts/make-og-card.py --check   # share card is 1200x630 and under budget [content-honesty]
 
 python  scripts/test-sync-events.py         # PII redaction; no event text reshapes a page [content-honesty]
@@ -692,6 +774,11 @@ dict** — that is the shape this replaces.
   `--ci` runs all three and lets only no-hardcoding set the exit code, printing
   the other two as `WARN`. Same reasoning applies to anything else needing
   `$PDOOM1_REPO`.
+- `build-art-register.py --check` — same class, same reason: it re-derives the
+  register from `pdoom1/tools/art_review/`, and refuses (exit 2) without a
+  checkout rather than writing a guess. `check-art-staleness.py` runs the half
+  that needs nothing external and reports the mirror half as **UNKNOWN**, named,
+  with the command that would resolve it.
 
 **Naming a script in a test file is not coverage.** `test-orchestrator.py` and
 `test-integration.py` between them "cover" `update-version-info.py`,
