@@ -2,16 +2,6 @@
   {
     "job": "auto-update-data",
     "trigger": "schedule",
-    "timestamp": "2026-08-03T00:48:06.618254Z",
-    "status": "success",
-    "details": {
-      "version-status": "success",
-      "stats-status": "success"
-    }
-  },
-  {
-    "job": "auto-update-data",
-    "trigger": "schedule",
     "timestamp": "2026-08-03T07:18:37.746561Z",
     "status": "success",
     "details": {
@@ -1000,6 +990,17 @@
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2026-08-25T00:19:37.981072Z",
+    "status": "success",
+    "status_reason": "all 2 observed outcomes reported success",
+    "details": {
+      "version-status": "success",
+      "stats-status": "success"
+    }
+  },
+  {
+    "job": "auto-update-data",
+    "trigger": "schedule",
+    "timestamp": "2026-08-25T06:13:59.903588Z",
     "status": "success",
     "status_reason": "all 2 observed outcomes reported success",
     "details": {
