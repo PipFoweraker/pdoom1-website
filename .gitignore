@@ -1,6 +1,27 @@
-# Dependencies\nnode_modules/\n# Builds\ndist/\nbuild/\n# Env\n.env\n.env.*\n# OS/editor\n.DS_Store\nThumbs.db\n.vscode/\n
+# Repaired 2026-08-24. The first line of this file was written with LITERAL
+# backslash-n sequences instead of newlines, so git read eight rules as one
+# comment and ignored NOTHING -- not .env, not node_modules, not dist. Verified
+# with `git check-ignore -q .env` returning not-ignored in a repo whose
+# .env.example names a GitHub dispatch token. Same defect fused NUL to the
+# filename below it. Nothing had leaked: no .env exists on disk and only
+# .env.example is tracked.
+
+# Dependencies
+node_modules/
+# Builds
+dist/
+build/
+# Env
+.env
+.env.*
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+
 # Windows reserved device name
-NULdeployment-prep-report.json
+NUL
+deployment-prep-report.json
 __pycache__/
 *.pyc
 public/data/version.json
@@ -18,13 +39,3 @@ page_audit.json
 # (weekly-league-reset.yml, weekly-deployment.yml) stage the whole tree that way.
 # Untracked is not enough on its own; ignored is.
 public/_review/
-
-# Agent worktrees. Claude Code creates these under .claude/worktrees/ and a
-# stray `git add -A` sweeps the whole embedded checkout into a commit -- that
-# happened twice on 2026-08-24, once burying another agent's uncommitted edits
-# inside a PR whose body described two changes and whose commit made four.
-# .git-worktrees/ is listed too because CLAUDE.md and an earlier handover both
-# named it; it is not the path in use, and ignoring a path that does not exist
-# costs nothing while ignoring the wrong one cost a session.
-.claude/worktrees/
-.git-worktrees/
