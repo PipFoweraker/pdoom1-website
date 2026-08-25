@@ -3,14 +3,20 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, follow">
 	<title>[AN #128]: Prioritizing research on AI existential safety based on its application to governance demands | p(Doom)1 Events</title>
 	<link rel="canonical" href="https://pdoom1.com/events/alignmentforum_f56abd059a454b21.html" />
 	<meta name="description" content="Alignment Newsletter is a weekly publication with recent content relevant to AI alignment around the world. Find all Alignment Newsletter **[resources here" />
+
+	<!-- Consent shim. Reads localStorage.plausible_ignore and honours DNT.
+	     It never injects a tracker -- see public/assets/js/analytics.js. -->
+	<script src="/assets/js/analytics.js"></script>
 
 	<!-- Plausible Analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
 
 	<link rel="stylesheet" href="/css/site.css">
+	<link rel="stylesheet" href="/css/stamp.css">
 	<style>
 		:root {
 			/* Palette derived from the game's shipped art: amber-dominant CRT chrome
@@ -384,6 +390,21 @@
 	</header>
 
 	<main>
+		<div class="section stamp-block orphan-provenance">
+			<span class="stamp stamp--provisional stamp--sm">Archived, not maintained</span>
+			<p class="stamp-body">
+				<strong>The title, summary and sources below are a real post from the AI
+				Alignment Forum, written by its author.</strong> The rarity tier, the game
+				impacts and the two &ldquo;reactions&rdquo; are machine-generated for
+				p(Doom)1, have not been verified against the shipped game, and are not the
+				author&rsquo;s words or views. <strong>The authors of the linked post have no
+				association with p(Doom)1 and have not endorsed it.</strong>
+				This page is part of an archived import that nothing currently regenerates;
+				it is kept reachable so its links keep working, and it is excluded from
+				search indexing until it is rebuilt.
+			</p>
+		</div>
+
 		<div class="event-header">
 			<div class="event-icon">📜</div>
 			<h1 class="event-title">[AN #128]: Prioritizing research on AI existential safety based on its application to governance demands</h1>
@@ -411,13 +432,28 @@
 			<p class="description">Alignment Newsletter is a weekly publication with recent content relevant to AI alignment around the world. Find all Alignment Newsletter **[resources here](https://rohinshah.com/alignment-newsletter/)**. In particular, you can look through **[this spreadsheet](https://docs.google.com/spreadsheets/d/1PwWbWZ6FPqAgZWOoOcXM8N_tUCuxpEyMbN1NYYC02aM/edit?usp=sharing)** of all summaries that have ever been in the newsletter.</p>
 		</div>
 
-		<div class="section">
+		<div class="section stamp-block">
 			<h2>📊 Game Impacts</h2>
+			<span class="stamp stamp--restricted stamp--sm">Not verified in game</span>
+			<p class="stamp-body">
+				Which variables this event was <em>proposed</em> to move, and in which
+				direction. The magnitudes are held in the corpus but are not shown here,
+				because they have not been verified against the shipped game. They come from
+				<a href="https://github.com/PipFoweraker/pdoom-data" target="_blank" rel="noopener">pdoom-data</a>.
+				They describe what an event was <em>proposed</em> to do, not what the
+				shipped game does with it. <strong>Most events in the corpus are flavour:
+				they are shown for colour and do not move any game variable.</strong> Only a
+				small minority reach the systems below, and several of the variables listed
+				here are not read by the game at all yet.
+				Treat this table as a design proposal under review, not as a measurement of
+				play. Corrections and arguments are welcome &mdash; the suggestion links at
+				the foot of this page go straight to the data repo.
+			</p>
 			<table class="impacts-table">
 				<thead>
 					<tr>
 						<th>Variable</th>
-						<th>Change</th>
+						<th>Direction</th>
 						<th>Condition</th>
 					</tr>
 				</thead>
@@ -425,19 +461,19 @@
 					
 				<tr>
 					<td>Research</td>
-					<td class="impact-positive">+10</td>
+					<td class="impact-positive">proposed: up</td>
 					<td>Always</td>
 				</tr>
 		
 				<tr>
 					<td>Vibey Doom</td>
-					<td class="impact-positive">+5</td>
+					<td class="impact-positive">proposed: up</td>
 					<td>Always</td>
 				</tr>
 		
 				<tr>
 					<td>Ethics Risk</td>
-					<td class="impact-negative">-5</td>
+					<td class="impact-negative">proposed: down</td>
 					<td>Always</td>
 				</tr>
 		
@@ -510,7 +546,7 @@
 
 				<div class="metadata-item">
 					<span class="metadata-label">☢️ p(Doom) Impact</span>
-					<span class="metadata-value">No direct impact</span>
+					<span class="metadata-value">Not recorded</span>
 					<a href="https://github.com/PipFoweraker/pdoom1/issues/new?labels=game-mechanics,event-system,community&title=Event%20metadata%3A%20Change%20p(doom)%20impact%20for%20alignmentforum_f56abd059a454b21&body=Event%3A%20%5BAN%20%23128%5D%3A%20Prioritizing%20research%20on%20AI%20existential%20safety%20based%20on%20its%20application%20to%20governance%20demands%0A%0ACurrent%20p(doom)%20impact%3A%20None%0A%0ASuggested%20p(doom)%20impact%3A%20%0A%0AReason%3A%20" class="suggest-link" target="_blank">→ Suggest p(doom) change</a>
 				</div>
 
