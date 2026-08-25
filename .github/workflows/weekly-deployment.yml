@@ -139,18 +139,42 @@ jobs:
             exit 1
           fi
 
+      # These four used to end `|| echo "... (non-critical)"`. Behaviour is
+      # unchanged -- they stay non-blocking, which is a deliberate call about a
+      # weekly deploy and not mine to reverse here -- but "(non-critical)" is a
+      # severity nobody measured, and it was applied to `update:version`, which
+      # writes the version.json this deploy then publishes. A stale release
+      # shipping under the word "non-critical" is the whole D4 shape.
+      # Now: the outcome is named, and a real failure raises an annotation a
+      # human actually sees in the run. pdoom1-website#384.
       - name: Sync game data
         run: |
           echo "🎮 Syncing game data from pdoom1 repository..."
-          python scripts/game-integration.py --sync-leaderboards || echo "⚠️  Game sync failed (non-critical)"
-          python scripts/game-integration.py --weekly-sync || echo "⚠️  Weekly sync failed (non-critical)"
+          run_step() {
+            set +e; "$@"; rc=$?; set -e
+            if [ "$rc" -ne 0 ]; then
+              echo "::warning::'$*' exited $rc. Not blocking this deploy, but nothing here checked whether that matters."
+            else
+              echo "ok: $*"
+            fi
+          }
+          run_step python scripts/game-integration.py --sync-leaderboards
+          run_step python scripts/game-integration.py --weekly-sync
           python scripts/game-integration.py --status
 
       - name: Update version info
         run: |
           echo "📊 Updating version and stats..."
-          npm run update:version || echo "⚠️  Version update failed (non-critical)"
-          npm run update:stats || echo "⚠️  Stats update failed (non-critical)"
+          run_step() {
+            set +e; "$@"; rc=$?; set -e
+            if [ "$rc" -ne 0 ]; then
+              echo "::warning::'$*' exited $rc. version.json / stats may be STALE, and this deploy publishes them."
+            else
+              echo "ok: $*"
+            fi
+          }
+          run_step npm run update:version
+          run_step npm run update:stats
 
       - name: Generate deployment summary
         id: summary
@@ -284,15 +308,41 @@ jobs:
           echo "⏳ Waiting 30 seconds for deployment to propagate..."
           sleep 30
 
+      # These two run AFTER the deploy, so failing the job would not un-deploy
+      # anything -- staying non-blocking is right. What was wrong is what they
+      # SAID: "(non-critical)" is an invented severity, asserted without
+      # checking anything, and it masked the exit code that carries the actual
+      # answer. Same shape as D4, applied to D2's and D3's scripts, and it made
+      # both of those fixes inert on this path. pdoom1-website#384.
+      #
+      # Both scripts now use three-state exit codes: 0 fine, 1 something is
+      # wrong, 2 could not be established. Reported as an annotation so a human
+      # scanning the run sees it, without blocking a deploy that has happened.
       - name: Run post-deployment verification
         run: |
           echo "🔍 Running post-deployment verification..."
-          python scripts/verify-deployment.py || echo "⚠️  Verification failed (non-critical)"
+          set +e
+          python scripts/verify-deployment.py
+          rc=$?
+          set -e
+          case "$rc" in
+            0) echo "Deployment verification: APPROVED." ;;
+            2) echo "::warning::Deployment verification could NOT be established (exit 2). Not a pass. See the log above for what it could not reach." ;;
+            *) echo "::warning::Deployment verification REFUSED (exit $rc). The site is already deployed; this is a real finding, not a formality." ;;
+          esac
 
       - name: Health check
         run: |
           echo "🏥 Running health checks on live site..."
-          python scripts/health-check.py || echo "⚠️  Health check failed (non-critical)"
+          set +e
+          python scripts/health-check.py
+          rc=$?
+          set -e
+          case "$rc" in
+            0) echo "Health check: PASS." ;;
+            2) echo "::warning::Health check could NOT be established (exit 2). Reported as UNKNOWN, not fine." ;;
+            *) echo "::warning::Health check reported a problem (exit $rc). See the summary above for which status and why." ;;
+          esac
 
       - name: Archive current week (if Sunday)
         if: github.event.inputs.reset_league != 'false'

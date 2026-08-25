@@ -21,22 +21,77 @@ for _stream in (sys.stdout, sys.stderr):
     except (AttributeError, ValueError):
         pass
 
+# A DEPLOY GATE THAT CANNOT TELL MUST NOT APPROVE.  D3 of pdoom1-website#384.
+#
+# This script printed "DEPLOYMENT APPROVED" over freshness it could not
+# establish: verify_version_data_fresh() logged a PASS with the word WARNING in
+# its message when the data was older than a day, warnings never reached the
+# verdict, and `checks_failed == 0` was the whole decision. Two outcomes, so
+# "I could not tell" had nowhere to go but into the approving one.
+#
+# It is not a cosmetic defect here in particular, because this script WRITES
+# public/data/deployment-verification.json -- the file /monitoring/ renders. It
+# manufactures the evidence the card displays.
+#
+# Three verdicts now. UNVERIFIABLE is a first-class outcome with its own exit
+# code, and it is NOT a pass.
+VERDICT_APPROVED = "APPROVED"
+VERDICT_REFUSED = "REFUSED"
+VERDICT_CANNOT_VERIFY = "CANNOT VERIFY"
+
+EXIT_BY_VERDICT = {
+    VERDICT_APPROVED: 0,
+    VERDICT_REFUSED: 1,
+    VERDICT_CANNOT_VERIFY: 2,
+}
+
+# POLICY, declared here rather than derived from the cron that writes the file.
+# A window derived from the writer always agrees with the writer.
+# auto-update-data.yml runs every 6 hours, so 24h is four missed runs: long
+# enough that a single transient failure is not a deploy block, short enough
+# that a stopped writer is caught the same day.
+VERSION_DATA_MAX_AGE_HOURS = 24
+
+
 class DeploymentVerifier:
     def __init__(self):
         self.checks_passed = 0
         self.checks_failed = 0
         self.warnings = []
-        
+        # Things this run could not establish either way. Never a pass, never a
+        # failure -- an admission. Kept separate from `warnings`, which is where
+        # the old stale-data message went to be ignored.
+        self.unverifiable = []
+
     def log_check(self, check_name, passed, message=""):
         """Log a verification check result"""
         status = "✓ PASS" if passed else "✗ FAIL"
         print(f"{status} {check_name}" + (f": {message}" if message else ""))
-        
+
         if passed:
             self.checks_passed += 1
         else:
             self.checks_failed += 1
-            
+
+    def log_unverifiable(self, check_name, reason):
+        """Record something this run could not determine. NOT a pass."""
+        print(f"? UNKNOWN {check_name}: {reason}")
+        self.unverifiable.append(f"{check_name}: {reason}")
+
+    def verdict(self):
+        """APPROVED / REFUSED / CANNOT VERIFY, in that order of precedence.
+
+        A real failure outranks an unknown: if something is definitely broken,
+        say so rather than hiding it behind "could not tell". But an unknown
+        ALWAYS outranks approval.
+        """
+        if self.checks_failed > 0:
+            return VERDICT_REFUSED
+        if self.unverifiable:
+            return VERDICT_CANNOT_VERIFY
+        return VERDICT_APPROVED
+
+
     def verify_file_integrity(self):
         """Verify all critical files exist and are valid"""
         print("🔍 Verifying file integrity...")
@@ -147,16 +202,55 @@ class DeploymentVerifier:
                 else:
                     self.log_check("Version data structure", True, "All fields present")
                 
-                # Check freshness
-                last_updated = datetime.fromisoformat(data['last_updated'])
-                age_hours = (datetime.now() - last_updated).total_seconds() / 3600
-                
-                if age_hours > 24:
-                    self.warnings.append(f"Version data is {age_hours:.1f} hours old")
-                    self.log_check("Version data freshness", True, f"{age_hours:.1f} hours old (WARNING)")
+                # Check freshness.
+                #
+                # Age is a HARD INPUT to the verdict, not a side note. It used to
+                # be logged as a PASS with the word WARNING in the message, and
+                # warnings were not read by anything -- so 966-day-old data
+                # approved a deployment.
+                #
+                # Three outcomes, matching the three verdicts:
+                #   no usable timestamp -> CANNOT VERIFY   (we do not know)
+                #   older than the window -> REFUSED       (we know, and it is stale)
+                #   inside the window -> PASS
+                raw = data.get('last_updated')
+                age_hours = None
+                if raw in (None, ""):
+                    self.log_unverifiable(
+                        "Version data freshness",
+                        "version.json has no last_updated, so its age cannot be established",
+                    )
                 else:
-                    self.log_check("Version data freshness", True, f"{age_hours:.1f} hours old")
-                
+                    try:
+                        last_updated = datetime.fromisoformat(str(raw))
+                        if last_updated.tzinfo is not None:
+                            last_updated = last_updated.replace(tzinfo=None)
+                        age_hours = (datetime.now() - last_updated).total_seconds() / 3600
+                    except (ValueError, TypeError) as exc:
+                        self.log_unverifiable(
+                            "Version data freshness",
+                            f"last_updated {raw!r} is not a timestamp this script can read ({exc})",
+                        )
+
+                if age_hours is not None:
+                    if age_hours < 0:
+                        # A future stamp is not fresh data, it is a clock
+                        # disagreement, and we cannot tell which clock is wrong.
+                        self.log_unverifiable(
+                            "Version data freshness",
+                            f"last_updated is {abs(age_hours):.1f} hours in the FUTURE",
+                        )
+                    elif age_hours > VERSION_DATA_MAX_AGE_HOURS:
+                        self.log_check(
+                            "Version data freshness",
+                            False,
+                            f"{age_hours:.1f} hours old, window is {VERSION_DATA_MAX_AGE_HOURS}h",
+                        )
+                    else:
+                        self.log_check(
+                            "Version data freshness", True, f"{age_hours:.1f} hours old"
+                        )
+
             except Exception as e:
                 self.log_check("Version data", False, f"Error reading: {e}")
         else:
@@ -200,30 +294,54 @@ class DeploymentVerifier:
         print(f"✗ Failed: {self.checks_failed}")
         print(f"⚠ Warnings: {len(self.warnings)}")
         
+        print(f"? Could not determine: {len(self.unverifiable)}")
+
         if self.warnings:
             print(f"\n⚠️  WARNINGS:")
             for warning in self.warnings:
                 print(f"  - {warning}")
-        
-        # Deployment decision
-        if self.checks_failed == 0:
+
+        if self.unverifiable:
+            print(f"\n❓ COULD NOT BE DETERMINED:")
+            for item in self.unverifiable:
+                print(f"  - {item}")
+
+        # Deployment decision -- three verdicts, never two.
+        verdict = self.verdict()
+        if verdict == VERDICT_APPROVED:
             print(f"\n🎉 DEPLOYMENT APPROVED")
             print(f"✅ All verification checks passed. Safe to deploy!")
-            return True
-        else:
+        elif verdict == VERDICT_REFUSED:
             print(f"\n🚨 DEPLOYMENT BLOCKED")
             print(f"❌ {self.checks_failed} checks failed. Do not deploy!")
-            return False
-            
+        else:
+            print(f"\n❓ CANNOT VERIFY")
+            print(f"❌ {len(self.unverifiable)} thing(s) could not be established, listed above.")
+            print(f"   Nothing here failed. Nothing here passed either, and a deploy")
+            print(f"   gate that cannot tell must not approve. Resolve them or deploy")
+            print(f"   deliberately without this gate.")
+        return verdict
+
+
     def create_deployment_report(self):
         """Create a deployment readiness report"""
+        verdict = self.verdict()
         report = {
             'timestamp': datetime.now().isoformat(),
             'total_checks': self.checks_passed + self.checks_failed,
             'passed': self.checks_passed,
             'failed': self.checks_failed,
             'warnings': self.warnings,
-            'deployment_approved': self.checks_failed == 0
+            # `verdict` is the field to read. `unverifiable` is what the third
+            # state is made of -- an empty list means nothing was unknown, NOT
+            # that nothing was checked, because `total_checks` is right there.
+            'verdict': verdict,
+            'unverifiable': self.unverifiable,
+            # KEPT for anything still reading the old boolean, and narrowed:
+            # it is true ONLY on APPROVED. Under the old code it was
+            # `checks_failed == 0`, which was also true for every run that
+            # could not establish freshness at all.
+            'deployment_approved': verdict == VERDICT_APPROVED,
         }
         
         report_file = 'public/data/deployment-verification.json'
@@ -245,18 +363,21 @@ def main():
     os.chdir(project_root)
     
     # Run verification
-    deployment_approved = verifier.verify_deployment_readiness()
-    
+    verdict = verifier.verify_deployment_readiness()
+
     # Create report
     verifier.create_deployment_report()
-    
-    # Exit with appropriate code
-    if deployment_approved:
+
+    # Exit codes match the three verdicts: 0 approved, 1 refused, 2 could not
+    # tell. A caller that treats non-zero as "do not deploy" keeps working; a
+    # caller that wants to distinguish "broken" from "unknown" now can.
+    if verdict == VERDICT_APPROVED:
         print(f"\n✅ READY FOR DEPLOYMENT")
-        sys.exit(0)
-    else:
+    elif verdict == VERDICT_REFUSED:
         print(f"\n❌ NOT READY FOR DEPLOYMENT")
-        sys.exit(1)
+    else:
+        print(f"\n❓ READINESS UNKNOWN -- not approved")
+    sys.exit(EXIT_BY_VERDICT[verdict])
 
 if __name__ == '__main__':
     main()

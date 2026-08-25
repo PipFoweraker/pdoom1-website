@@ -55,6 +55,7 @@
 import importlib.util
 import io
 import json
+from datetime import datetime, timedelta
 import os
 import shutil
 import sys
@@ -286,14 +287,24 @@ with FakeRepo(version_json=GOOD_VERSION) as fr:
     summary = fr.run()
     n = summary["total_tests"]
     check(n == len(summary["results"]), "total_tests equals the number of results recorded")
-    check(summary["passed_tests"] + summary["failed_tests"] == n,
-          "passed + failed == total (the counters are derived, not asserted)")
-    expected_rate = summary["passed_tests"] / n * 100 if n else 0
+    # THREE buckets since D2 (pdoom1-website#384). An unknown is neither a pass
+    # nor a failure; folding it into either is the defect being repaired.
+    check(summary["passed_tests"] + summary["failed_tests"] + summary["unknown_tests"]
+          + summary["stale_tests"] == n,
+          "passed + failed + unknown + stale == total (the counters are derived)")
+    expected_rate = (summary["passed_tests"] / summary["determined_tests"] * 100
+                     if summary["determined_tests"] else 0)
     check(abs(summary["success_rate"] - expected_rate) < 1e-9,
-          "success_rate is computed from the counters, not stated")
+          "success_rate is over DETERMINED tests, and the denominator is published")
+    check(summary["determined_tests"] == summary["passed_tests"] + summary["failed_tests"]
+          + summary["stale_tests"],
+          "determined_tests counts stale (we know its age) and excludes unknown (we do not)")
     check((summary["overall_status"] == "PASS")
-          == (len(summary["failed_test_details"]) == 0),
-          "overall_status is PASS iff nothing non-warning failed")
+          == (len(summary["failed_test_details"]) == 0
+              and not summary["unknown_details"]
+              and not summary["stale_details"]
+              and not summary["warnings_details"]),
+          "overall_status is PASS only when nothing failed, went stale, or was unknown")
 
 # A warning must stay visible as a warning. Recording an unmeasurable thing as a
 # silent pass is how "we could not check" becomes indistinguishable from "it is fine".
@@ -304,13 +315,21 @@ with FakeRepo(version_json=json.dumps({
                                                "strategic_possibilities": None},
         "last_updated": "not-a-timestamp"})) as fr:
     summary = fr.run()
-    warned = [r for r in summary["results"] if r["is_warning"]]
-    check(warned, "an unparseable timestamp is recorded, not swallowed")
+    unknown = [r for r in summary["results"] if r.get("is_unknown")]
+    check(unknown, "an unparseable timestamp is recorded, not swallowed")
+    check(summary["overall_status"] != "PASS",
+          "...and it can never leave the verdict at PASS")
+    # This fixture also has two genuinely missing scripts, so FAIL outranks the
+    # unknown -- which is the correct precedence. What must NOT happen is the
+    # louder verdict swallowing the quieter finding.
+    check(summary["unknown_details"],
+          "a FAIL verdict still publishes what could not be determined")
+    check(summary["unknown_tests"] == len(summary["unknown_details"]),
+          "the unknown count matches the unknown list")
+    check(all(not r["passed"] for r in unknown),
+          "an unknown is never recorded as passed")
     check(summary["warnings"] == len(summary["warnings_details"]),
           "the warning count matches the warning list")
-    check(all("not-a-timestamp" not in json.dumps(r) or r["is_warning"]
-              for r in summary["results"]),
-          "the un-checkable case is flagged as a warning rather than a bare pass")
 
 
 # =========================================================================== 5
@@ -344,6 +363,106 @@ with FakeRepo(version_json="{not json at all") as fr:
 
 
 print()
+
+# =========================================================================== 6
+# D2 of pdoom1-website#384. Age is a HARD INPUT to the verdict.
+#
+# Before this, every outcome of the freshness block logged a PASS -- fresh,
+# stale, and "could not parse timestamp" -- with the last two carrying
+# is_warning=True, and warnings never reached overall_status. Measured against a
+# 2024 timestamp the script returned PASS, 100%, exit 0. That exact input is the
+# ready-made regression, so it is the first thing below.
+print("\n6. Stale and un-datable version data can never report PASS")
+
+# Both scripts staged, so nothing else in the run fails and the freshness block
+# is the ONLY thing deciding the verdict. Without this the FAIL from two missing
+# scripts would mask whatever the freshness block did -- which is how a test can
+# pass while proving nothing about the line it names.
+STAGED_SCRIPTS = {
+    "scripts/update-version-info.py": "print('ok')\n",
+    "scripts/calculate-game-stats.py": "print('ok')\n",
+}
+
+
+def version_with(last_updated):
+    return json.dumps({
+        "latest_release": {"version": "v1", "name": "n", "published_at": "p", "html_url": "u"},
+        "repository_stats": {},
+        "game_stats": {"baseline_doom_percent": None, "frontier_labs_count": None,
+                       "strategic_possibilities": None},
+        "last_updated": last_updated,
+    })
+
+
+# The literal input CLAUDE.md and #384 both name.
+with FakeRepo(version_json=version_with("2024-01-01T00:00:00"),
+              extra=dict(STAGED_SCRIPTS)) as fr:
+    summary = fr.run()
+    check(summary["overall_status"] == hc.STATUS_STALE,
+          "a 2024 timestamp reports STALE, not PASS")
+    check(hc.EXIT_BY_STATUS[summary["overall_status"]] != 0,
+          "...and it exits non-zero")
+    check(summary["stale_details"], "...and says how old, against which window")
+    check(any(str(hc.VERSION_DATA_MAX_AGE_DAYS) in d for d in summary["stale_details"]),
+          "...and names the declared window rather than a bare literal")
+
+# NEGATIVE CONTROL. The same fixture, current timestamp. Without this the STALE
+# assertion above is consistent with a checker that returns STALE always.
+with FakeRepo(version_json=version_with(datetime.now().isoformat()),
+              extra=dict(STAGED_SCRIPTS)) as fr:
+    summary = fr.run()
+    check(summary["overall_status"] == hc.STATUS_PASS,
+          "NEGATIVE CONTROL: fresh data still reports PASS")
+    check(hc.EXIT_BY_STATUS[summary["overall_status"]] == 0,
+          "...and exits 0, so the STALE result above is discriminating")
+
+# Un-datable is distinct from stale, and neither is a pass.
+for label, stamp in [("absent", None), ("empty", ""), ("garbage", "not-a-timestamp")]:
+    with FakeRepo(version_json=version_with(stamp) if stamp is not None
+                  else version_with(None),
+                  extra=dict(STAGED_SCRIPTS)) as fr:
+        summary = fr.run()
+        check(summary["overall_status"] == hc.STATUS_UNKNOWN,
+              f"a {label} last_updated reports UNKNOWN")
+        check(hc.EXIT_BY_STATUS[summary["overall_status"]] == 2,
+              f"...and a {label} last_updated exits 2, distinct from a failure's 1")
+
+# A FUTURE stamp is not fresh. It is a clock disagreement and we cannot say
+# which clock is wrong -- so it is unknown, never the freshest possible reading.
+future = (datetime.now() + timedelta(days=3)).isoformat()
+with FakeRepo(version_json=version_with(future), extra=dict(STAGED_SCRIPTS)) as fr:
+    summary = fr.run()
+    check(summary["overall_status"] == hc.STATUS_UNKNOWN,
+          "a future timestamp reports UNKNOWN, not PASS")
+
+# Precedence, unit-tested on the pure function. Enumerated rather than spot
+# checked, because the danger is a state ADDED later falling through to PASS.
+def status_for(failed=(), stale=(), unknown=(), warnings=()):
+    c = hc.HealthChecker()
+    c.failed_tests, c.stale, c.unknowns, c.warnings = (
+        list(failed), list(stale), list(unknown), list(warnings))
+    return c.overall_status()
+
+
+check(status_for() == hc.STATUS_PASS, "nothing recorded -> PASS")
+check(status_for(warnings=["w"]) == hc.STATUS_WARN, "a warning alone -> WARN")
+check(status_for(unknown=["u"]) == hc.STATUS_UNKNOWN, "an unknown alone -> UNKNOWN")
+check(status_for(stale=["s"]) == hc.STATUS_STALE, "stale alone -> STALE")
+check(status_for(failed=["f"]) == hc.STATUS_FAIL, "a failure alone -> FAIL")
+check(status_for(unknown=["u"], warnings=["w"]) == hc.STATUS_UNKNOWN,
+      "an unknown outranks a warning")
+check(status_for(stale=["s"], unknown=["u"], warnings=["w"]) == hc.STATUS_STALE,
+      "stale outranks an unknown")
+check(status_for(failed=["f"], stale=["s"], unknown=["u"], warnings=["w"]) == hc.STATUS_FAIL,
+      "a real failure outranks everything")
+check(all(hc.EXIT_BY_STATUS[st] != 0 for st in
+          (hc.STATUS_FAIL, hc.STATUS_STALE, hc.STATUS_UNKNOWN, hc.STATUS_WARN)),
+      "PASS is the ONLY status that exits 0")
+check(set(hc.EXIT_BY_STATUS) == {hc.STATUS_FAIL, hc.STATUS_STALE, hc.STATUS_UNKNOWN,
+                                 hc.STATUS_WARN, hc.STATUS_PASS},
+      "every declared status has an exit code, so a new one cannot default to 0")
+
+
 if failures:
     print(f"{len(failures)} FAILURE(S)")
     for f in failures:

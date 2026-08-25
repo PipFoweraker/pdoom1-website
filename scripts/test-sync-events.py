@@ -54,6 +54,7 @@
 """
 
 import importlib.util
+import contextlib
 import io
 import json
 import re
@@ -356,10 +357,35 @@ class Sandbox:
         return False
 
 
+# THE FLOOR IS REAL IN PRODUCTION AND SCOPED HERE, not weakened there.
+#
+# sync-events.py refuses a corpus below MIN_EVENTS (D6, pdoom1-website#384) and
+# has NO override -- no flag, no environment variable -- because an override is a
+# disarm switch that eventually gets used in anger. The fixtures below are four
+# events on purpose: they exist to test escaping and redaction, not corpus size.
+#
+# So the test patches the module constant it imported, for the sections that are
+# not about the floor, and restores it. Section 7 asserts the floor against
+# REAL_MIN_EVENTS, so a change to the ruling is caught there rather than being
+# silently satisfied by whatever this helper happens to set.
+REAL_MIN_EVENTS = se.MIN_EVENTS
+
+
+@contextlib.contextmanager
+def floor_of(n):
+    """Run a block with the corpus floor at n. Restores unconditionally."""
+    before = se.MIN_EVENTS
+    se.MIN_EVENTS = n
+    try:
+        yield
+    finally:
+        se.MIN_EVENTS = before
+
+
 def run_main(sandbox):
     sys.argv = ["sync-events.py", "--pdoom-data-path", str(sandbox.data_path)]
     buf = io.StringIO()
-    with redirect_stdout(buf):
+    with floor_of(1), redirect_stdout(buf):
         se.main()
     return buf.getvalue()
 
@@ -432,6 +458,90 @@ with Sandbox({}) as sb:
     check("not found" in buf.getvalue().lower(), "names the missing file")
     check(not (sb.tmp / "data" / "events.json").exists(),
           "wrote no events.json on the refusal path")
+
+# THE HALF THIS TEST DID NOT COVER, and the reason D6 was the most instructive of
+# the seven vacuous guards (pdoom1-website#384). The section above is titled
+# "Missing source data is a hard stop, not a quiet empty publish" and forced only
+# the MISSING half. An empty-but-valid upstream parses, len() is 0, and the sync
+# went on to overwrite events.json with {} -- the quiet empty publish the title
+# rules out. A test that covers half of what its name says is worse than no test,
+# because it retires the question.
+
+EXISTING = "the events.json that is already published"
+
+for label, corpus in [("an empty object", {}),
+                      ("a single event", {"only_one": {"id": "only_one"}})]:
+    with Sandbox({}) as sb:
+        src = (sb.data_path / "data" / "serveable" / "api" / "timeline_events"
+               / "all_events.json")
+        src.write_text(json.dumps(corpus), encoding="utf-8")
+
+        # A good events.json already on disk. The property that matters is not
+        # just "refuses" -- it is "refuses WITHOUT touching what is published".
+        published = sb.tmp / "data" / "events.json"
+        published.parent.mkdir(parents=True, exist_ok=True)
+        published.write_text(EXISTING, encoding="utf-8")
+
+        buf = io.StringIO()
+        code = None
+        try:
+            with redirect_stdout(buf):
+                se.load_events_from_pdoom_data(sb.data_path)
+        except SystemExit as exc:
+            code = exc.code
+        out = buf.getvalue()
+
+        check(code == 1, f"{label} upstream exits 1, not 0 (got {code})")
+        check("REFUSING" in out, f"...and says it is refusing, for {label}")
+        check(str(REAL_MIN_EVENTS) in out, f"...and names the floor, for {label}")
+        check(published.read_text(encoding="utf-8") == EXISTING,
+              f"...and the already-published events.json is byte-identical, for {label}")
+
+# NEGATIVE CONTROL. Without this, every assertion above is consistent with a
+# floor that refuses everything -- which would look identical from outside and
+# would be a far worse bug than the one being fixed.
+with Sandbox({}) as sb:
+    big = {f"e{i}": {"id": f"e{i}"} for i in range(REAL_MIN_EVENTS)}
+    (sb.data_path / "data" / "serveable" / "api" / "timeline_events"
+     / "all_events.json").write_text(json.dumps(big), encoding="utf-8")
+    buf = io.StringIO()
+    code = None
+    try:
+        with redirect_stdout(buf):
+            loaded = se.load_events_from_pdoom_data(sb.data_path)
+    except SystemExit as exc:
+        code = exc.code
+    check(code is None, "NEGATIVE CONTROL: a corpus exactly at the floor is ACCEPTED")
+    check(len(loaded) == REAL_MIN_EVENTS, "...and every event survives the check")
+
+# The floor applies on the far side of the filter too. A healthy upstream whose
+# events all become excluded publishes the same empty index, and the load-time
+# check would have passed it.
+excluded = {f"e{i}": {"id": f"e{i}", "event_status": "excluded"}
+            for i in range(REAL_MIN_EVENTS * 2)}
+buf = io.StringIO()
+code = None
+try:
+    with redirect_stdout(buf):
+        # filter_events() stays a PURE filter -- a floor inside it would make it
+        # unusable on any small fixture. The refusal lives at the call site, so
+        # that is what is exercised here.
+        se.assert_corpus_floor(se.filter_events(excluded), "the corpus after filtering")
+except SystemExit as exc:
+    code = exc.code
+check(code == 1, "a corpus filtered down to nothing exits 1, not 0")
+check("after filtering" in buf.getvalue(),
+      "...and says the floor was crossed AFTER filtering, not upstream")
+check("assert_corpus_floor(events" in open(
+          ROOT / "scripts" / "sync" / "sync-events.py", encoding="utf-8").read(),
+      "...and the sync actually calls it after filtering, not just in this test")
+
+# The floor must not be derived from the corpus it protects -- a floor computed
+# from the current size agrees with it by construction and can never fire.
+check(isinstance(REAL_MIN_EVENTS, int) and REAL_MIN_EVENTS > 0,
+      "MIN_EVENTS is a declared integer ruling")
+check(REAL_MIN_EVENTS < 1194,
+      "...set below the live corpus, so ordinary curation does not trip it")
 
 
 # =========================================================================== 8

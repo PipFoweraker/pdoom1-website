@@ -75,6 +75,45 @@ def ensure_directories():
     log(f"Ensured directories exist: {EVENTS_DIR}, {DATA_DIR}, {ICONS_DIR}")
 
 
+# THE CORPUS FLOOR.  D6 of pdoom1-website#384.
+#
+# The absent-file case was already a hard stop. The EMPTY-BUT-VALID case was not:
+# an upstream `{}` parses, `len(events)` is 0, and the sync went on to overwrite
+# public/data/events.json with `{}` -- so /events/ served an empty index while
+# 2,197 generated pages stayed on disk pointing into it. And this file's own test
+# claimed to force that state while forcing only the file-absent half, which made
+# D6 the most instructive of the seven: the test retired the question.
+#
+# MIN_EVENTS IS A RULING, NOT A GUESS. The corpus has been ~1,194 for its whole
+# life (measured 2026-08-25: 1,194 in source, 1,194 included, 0 excluded). 100 is
+# an order of magnitude below that: low enough that deliberate curation, or
+# pdoom-data splitting a collection out, never trips it; high enough that a
+# truncated fetch, an empty object, or a filter that swallowed everything does.
+#
+# It is deliberately NOT derived from the current corpus size. A floor computed
+# from the thing it is protecting agrees with that thing by construction --
+# the same defect as a staleness window derived from its own writer.
+MIN_EVENTS = 100
+
+
+def assert_corpus_floor(events: Dict[str, Any], where: str) -> None:
+    """Refuse to proceed on a corpus too small to be real. Never returns falsely.
+
+    Fails CLOSED: the exit happens before anything is written, so the previous
+    events.json and the previous pages survive untouched. A stale index is
+    recoverable; an empty one that overwrote a good one is not.
+    """
+    count = len(events)
+    if count < MIN_EVENTS:
+        log(f"REFUSING TO WRITE: {where} holds {count} events, floor is {MIN_EVENTS}.",
+            "ERROR")
+        log("Nothing has been written. The previously published events.json and "
+            "every generated page are untouched.", "ERROR")
+        log("If the corpus really has shrunk this far, MIN_EVENTS is a ruling in "
+            "this file and changing it is a decision, not a workaround.", "ERROR")
+        sys.exit(1)
+
+
 def load_events_from_pdoom_data(pdoom_data_path: Path) -> Dict[str, Any]:
     """Load all events from pdoom-data repository"""
     events_file = pdoom_data_path / "data" / "serveable" / "api" / "timeline_events" / "all_events.json"
@@ -88,6 +127,7 @@ def load_events_from_pdoom_data(pdoom_data_path: Path) -> Dict[str, Any]:
         events = json.load(f)
 
     log(f"Loaded {len(events)} events from pdoom-data")
+    assert_corpus_floor(events, "upstream all_events.json")
     return events
 
 
@@ -1616,11 +1656,37 @@ def render_events_json(events: Dict[str, Any]) -> str:
 
 
 def write_events_json(text: str):
-    """Write events.json for the events index page"""
-    output_file = DATA_DIR / "events.json"
+    """Write events.json for the events index page.
 
-    with open(output_file, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(text)
+    TEMP-AND-RENAME, so a crash mid-write cannot leave a truncated or empty file
+    behind. D6 of pdoom1-website#384: the floor above stops us CHOOSING to write
+    an empty index; this stops us leaving one by accident. os.replace is atomic
+    within a filesystem on both POSIX and Windows, so a reader either sees the
+    whole old file or the whole new one and never a half-written index.
+
+    The temp file is created in the SAME directory as the target, not in the
+    system temp dir -- a cross-filesystem replace is not atomic and would
+    degrade silently back to the behaviour this replaces.
+    """
+    output_file = DATA_DIR / "events.json"
+    tmp_file = output_file.with_suffix(".json.tmp")
+
+    try:
+        with open(tmp_file, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_file, output_file)
+    except BaseException:
+        # Includes KeyboardInterrupt and SystemExit on purpose: an interrupted
+        # sync must not leave a .tmp beside the real file for someone to find
+        # later and wonder about.
+        try:
+            if tmp_file.exists():
+                tmp_file.unlink()
+        except OSError:
+            pass
+        raise
 
     log(f"Wrote events index to {output_file}")
 
@@ -1686,6 +1752,15 @@ def main():
 
     # Filter events (exclude newsletters and explicitly excluded)
     events = filter_events(all_events)
+
+    # The floor again, on THIS side of the filter, and at the CALL SITE rather
+    # than inside filter_events(). A healthy upstream whose events all suddenly
+    # carry event_status: excluded publishes exactly the same empty index as an
+    # empty upstream, and the check on load would have passed it. Putting it
+    # here keeps filter_events() a pure filter -- a floor inside it would make
+    # the function unusable on any small fixture, including this repo's own
+    # tests, which is how a guard ends up being loosened until it cannot fire.
+    assert_corpus_floor(events, "the corpus after filtering")
 
     # Sanitize HTTP URLs to HTTPS
     log("Sanitizing HTTP URLs to HTTPS...")

@@ -73,6 +73,13 @@ on:
       - 'scripts/test-update-version-info.py'
       - 'scripts/health-check.py'
       - 'scripts/test-health-check.py'
+      - 'scripts/verify-deployment.py'
+      - 'scripts/test-verify-deployment.py'
+      - 'scripts/weekly-league-manager.py'
+      - 'scripts/test-league-archive-outcomes.py'
+      - '.github/workflows/weekly-league-reset.yml'
+      - '.github/workflows/weekly-deployment.yml'
+      - '.github/workflows/version-aware-deploy.yml'
       - 'scripts/snapshot-copy.py'
       - 'scripts/snapshot-plausible.py'
       - 'scripts/test-snapshot-plausible.py'
@@ -159,6 +166,13 @@ on:
       - 'scripts/test-update-version-info.py'
       - 'scripts/health-check.py'
       - 'scripts/test-health-check.py'
+      - 'scripts/verify-deployment.py'
+      - 'scripts/test-verify-deployment.py'
+      - 'scripts/weekly-league-manager.py'
+      - 'scripts/test-league-archive-outcomes.py'
+      - '.github/workflows/weekly-league-reset.yml'
+      - '.github/workflows/weekly-deployment.yml'
+      - '.github/workflows/version-aware-deploy.yml'
       - 'scripts/snapshot-copy.py'
       - 'scripts/snapshot-plausible.py'
       - 'scripts/test-snapshot-plausible.py'
@@ -463,6 +477,16 @@ jobs:
       # needs network, a pdoom1 checkout, or the `requests` this job does not install.
       - name: sync-events redacts PII and no event text can reshape a page
         run: python scripts/test-sync-events.py
+
+      # D3 and D4 of #384. Both scripts they cover are called only from
+      # workflow_dispatch deploys, so nothing routine exercises them -- which is
+      # how verify-deployment.py went on printing an approval over freshness it
+      # could not establish. These run on every PR instead.
+      - name: A deploy gate that cannot tell does not approve (forced-failure test)
+        run: python scripts/test-verify-deployment.py
+
+      - name: The league archive step never invents a cause (forced-failure test)
+        run: python scripts/test-league-archive-outcomes.py
 
       - name: update-version-info refuses to guess, and derives platforms from assets
         run: python scripts/test-update-version-info.py

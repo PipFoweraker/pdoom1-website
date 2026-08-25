@@ -145,9 +145,21 @@ def point_module_at(module, root: Path):
 
 
 def run_sync(module, corpus: Path):
-    """Call the real main(). Returns (exit_code, captured_stdout)."""
+    """Call the real main(). Returns (exit_code, captured_stdout).
+
+    THE CORPUS FLOOR IS SCOPED HERE, NOT WEAKENED THERE. sync-events.py refuses
+    a corpus below MIN_EVENTS (D6, pdoom1-website#384) and has no override flag,
+    because an override is a disarm switch. The fixtures in this file are one or
+    two events on purpose -- they exist to force a PII regression, not to be a
+    realistic corpus -- so the constant is patched on the imported module for the
+    duration of the call and restored unconditionally. Nothing in production can
+    reach this. scripts/test-sync-events.py owns the assertions about the floor
+    itself, against its real value.
+    """
     buf = io.StringIO()
     argv = sys.argv
+    before_floor = module.MIN_EVENTS
+    module.MIN_EVENTS = 1
     sys.argv = ["sync-events.py", "--pdoom-data-path", str(corpus)]
     code = 0
     try:
@@ -157,6 +169,7 @@ def run_sync(module, corpus: Path):
         code = exc.code if isinstance(exc.code, int) else 1
     finally:
         sys.argv = argv
+        module.MIN_EVENTS = before_floor
     return code, buf.getvalue()
 
 
