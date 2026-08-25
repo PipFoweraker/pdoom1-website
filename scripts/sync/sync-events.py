@@ -922,6 +922,20 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 				</tr>
 		"""
 
+    # ABSENT IS NOT A FINDING.  `pdoom_impact` is None on 2,188 of the 2,197
+    # generated event pages, and this used to render that as "No direct impact"
+    # -- an affirmative claim about what the game does, manufactured out of a
+    # missing field.  CLAUDE.md's manufactured-confidence shape (B), absent
+    # coerced to a measurement.  The page contradicted itself three lines later:
+    # the suggestion link beside this value has always read "Current p(doom)
+    # impact: None".  WEB-E1, ruled by Pip 2026-08-24.
+    #
+    # "Not recorded" is a statement about the corpus, which is what we can see.
+    # "No direct impact" is a statement about the game, which we cannot.
+    pdoom_display = (
+        event['pdoom_impact'] if event.get('pdoom_impact') is not None else 'Not recorded'
+    )
+
     # Generate sources list
     sources_html = ""
     for i, source in enumerate(event['sources'], 1):
@@ -1556,7 +1570,7 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 
 				<div class="metadata-item">
 					<span class="metadata-label">☢️ p(Doom) Impact</span>
-					<span class="metadata-value">{event.get('pdoom_impact') if event.get('pdoom_impact') is not None else 'No direct impact'}</span>
+					<span class="metadata-value">{pdoom_display}</span>
 					<a href="{pdoom_suggestion_url}" class="suggest-link" target="_blank">→ Suggest p(doom) change</a>
 				</div>
 

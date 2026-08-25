@@ -3,14 +3,20 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, follow">
 	<title>Extrapolating GPT-N performance | p(Doom)1 Events</title>
 	<link rel="canonical" href="https://pdoom1.com/events/alignmentforum_e93eef718fe8472c.html" />
 	<meta name="description" content="[Brown et al. (2020)](https://arxiv.org/pdf/2005.14165.pdf) (which describes the development of GPT-3) contains measurements of how 8 transformers of diffe" />
+
+	<!-- Consent shim. Reads localStorage.plausible_ignore and honours DNT.
+	     It never injects a tracker -- see public/assets/js/analytics.js. -->
+	<script src="/assets/js/analytics.js"></script>
 
 	<!-- Plausible Analytics -->
 	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
 
 	<link rel="stylesheet" href="/css/site.css">
+	<link rel="stylesheet" href="/css/stamp.css">
 	<style>
 		:root {
 			/* Palette derived from the game's shipped art: amber-dominant CRT chrome
@@ -384,6 +390,21 @@
 	</header>
 
 	<main>
+		<div class="section stamp-block orphan-provenance">
+			<span class="stamp stamp--provisional stamp--sm">Archived, not maintained</span>
+			<p class="stamp-body">
+				<strong>The title, summary and sources below are a real post from the AI
+				Alignment Forum, written by its author.</strong> The rarity tier, the game
+				impacts and the two &ldquo;reactions&rdquo; are machine-generated for
+				p(Doom)1, have not been verified against the shipped game, and are not the
+				author&rsquo;s words or views. <strong>The authors of the linked post have no
+				association with p(Doom)1 and have not endorsed it.</strong>
+				This page is part of an archived import that nothing currently regenerates;
+				it is kept reachable so its links keep working, and it is excluded from
+				search indexing until it is rebuilt.
+			</p>
+		</div>
+
 		<div class="event-header">
 			<div class="event-icon">📢</div>
 			<h1 class="event-title">Extrapolating GPT-N performance</h1>
@@ -411,13 +432,28 @@
 			<p class="description">[Brown et al. (2020)](https://arxiv.org/pdf/2005.14165.pdf) (which describes the development of GPT-3) contains measurements of how 8 transformers of different sizes perform on several different benchmarks. In this post, I project how performance could improve for larger models, and give an overview of issues that may appear when scaling-up. Note that these benchmarks are for 'downstream tasks' that are different from the training task (which is to predict the next token); these extrapolations thus cannot be directly read off the scaling laws in OpenAI's Scaling Laws for Neural Language Models ([Kaplan et al., 2020](https://arxiv.org/pdf/2001.08361.pdf)) or Scaling Laws for Autoregressive Generative Modelling ([Henighan et al., 2020](https://arxiv.org/pdf/2010.14701.pdf)).</p>
 		</div>
 
-		<div class="section">
+		<div class="section stamp-block">
 			<h2>📊 Game Impacts</h2>
+			<span class="stamp stamp--restricted stamp--sm">Not verified in game</span>
+			<p class="stamp-body">
+				Which variables this event was <em>proposed</em> to move, and in which
+				direction. The magnitudes are held in the corpus but are not shown here,
+				because they have not been verified against the shipped game. They come from
+				<a href="https://github.com/PipFoweraker/pdoom-data" target="_blank" rel="noopener">pdoom-data</a>.
+				They describe what an event was <em>proposed</em> to do, not what the
+				shipped game does with it. <strong>Most events in the corpus are flavour:
+				they are shown for colour and do not move any game variable.</strong> Only a
+				small minority reach the systems below, and several of the variables listed
+				here are not read by the game at all yet.
+				Treat this table as a design proposal under review, not as a measurement of
+				play. Corrections and arguments are welcome &mdash; the suggestion links at
+				the foot of this page go straight to the data repo.
+			</p>
 			<table class="impacts-table">
 				<thead>
 					<tr>
 						<th>Variable</th>
-						<th>Change</th>
+						<th>Direction</th>
 						<th>Condition</th>
 					</tr>
 				</thead>
@@ -425,13 +461,13 @@
 					
 				<tr>
 					<td>Research</td>
-					<td class="impact-positive">+10</td>
+					<td class="impact-positive">proposed: up</td>
 					<td>Always</td>
 				</tr>
 		
 				<tr>
 					<td>Vibey Doom</td>
-					<td class="impact-positive">+2</td>
+					<td class="impact-positive">proposed: up</td>
 					<td>Always</td>
 				</tr>
 		
@@ -504,7 +540,7 @@
 
 				<div class="metadata-item">
 					<span class="metadata-label">☢️ p(Doom) Impact</span>
-					<span class="metadata-value">No direct impact</span>
+					<span class="metadata-value">Not recorded</span>
 					<a href="https://github.com/PipFoweraker/pdoom1/issues/new?labels=game-mechanics,event-system,community&title=Event%20metadata%3A%20Change%20p(doom)%20impact%20for%20alignmentforum_e93eef718fe8472c&body=Event%3A%20Extrapolating%20GPT-N%20performance%0A%0ACurrent%20p(doom)%20impact%3A%20None%0A%0ASuggested%20p(doom)%20impact%3A%20%0A%0AReason%3A%20" class="suggest-link" target="_blank">→ Suggest p(doom) change</a>
 				</div>
 
