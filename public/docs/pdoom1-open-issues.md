@@ -1,9 +1,14 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-24T18:25:36.278Z UTC
+Generated: 2026-08-25T00:26:29.428Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1321 | Stranded art: the sandbox that does everything Pip asked for is 2,291 lines that no player can open -- reclassify it as an alpha tool and put it in front of a base-builder player |  |  | 2026-08-24 21:29:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1321) |
+| 1320 | Free actions cannot be declared (7 of the 18 zero-attention actions are lying), and snap decisions need a pause button that is currently a disabled stub |  |  | 2026-08-24 21:29:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/1320) |
+| 1319 | The office as a persistent visual loop: it is WATCH-only, permanently 'decent', hardcoded to tier 1, and buying furniture changes no pixel |  |  | 2026-08-24 21:29:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1319) |
+| 1318 | First actions: browsing the internet is how the player learns the date, and the bank account should be discovered by checking it (SA is currently a stat that does not exist) |  |  | 2026-08-24 21:29:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1318) |
+| 1317 | Intro: replace the phone with keys on a keychain -- the address explains the office, and the strangers who help you up become your first contacts |  |  | 2026-08-24 21:29:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/1317) |
 | 1310 | In-game patch notes cite open issues as delivered, and nothing guards that file |  |  | 2026-08-24 09:07:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1310) |
 | 1309 | macOS build is missing from v0.14.3 -- broken by an .ico icon Godot cannot decode | build-missing, platform:macos |  | 2026-08-24 08:54:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1309) |
 | 1304 | Release Checklist: v0.14.3 | release, checklist |  | 2026-08-24 04:32:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1304) |
@@ -23,7 +28,7 @@ Generated: 2026-08-24T18:25:36.278Z UTC
 | 1257 | D4 ruling wanted: a sixth origin value (authored_art), and splitting the Manifund claim off NON_MODEL |  |  | 2026-08-21 12:19:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1257) |
 | 1252 | Release Checklist: v0.14.2 | release, checklist |  | 2026-08-21 06:09:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1252) |
 | 1250 | Month-end report clips could drift subtly over a run (PARKED -- Pip, 2026-08-21) | ui-ux, someday |  | 2026-08-21 05:19:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1250) |
-| 1229 | Design thread (explicitly not now): office simulation direction -- most of it already ships, it is top-down not isometric, and ADR-0018 is the live constraint | ui-ux, strategic, someday |  | 2026-08-14 07:12:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1229) |
+| 1229 | Design thread (explicitly not now): office simulation direction -- most of it already ships, it is top-down not isometric, and ADR-0018 is the live constraint | ui-ux, strategic, someday |  | 2026-08-24 21:31:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/1229) |
 | 1228 | Events: 25 authored, 19 of them the same three-option shape, and the taxonomy built to vary them is used by zero of them | game-mechanics, strategic, event-system |  | 2026-08-14 07:12:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1228) |
 | 1227 | Design: the ledger and research progress both stop at the edge of the roster -- one missing object (a paper with contributors) blocks both | game-mechanics, strategic |  | 2026-08-14 07:11:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1227) |
 | 1226 | Firing exists -- on a screen the player never reaches, and it is the one departure that costs nothing but cash | bug, game-mechanics, ux |  | 2026-08-14 07:11:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1226) |
@@ -56,10 +61,10 @@ Generated: 2026-08-24T18:25:36.278Z UTC
 | 1117 | Dead-path sweep leftovers: the tests/ Python suite CI pretends to run, and ~25 docs naming files that do not exist |  |  | 2026-08-04 07:26:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1117) |
 | 1115 | No working re-sync path from pdoom-data (dead sync script deleted; capability still needed) |  |  | 2026-08-04 07:01:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1115) |
 | 1113 | art request: jocular interior art personifying the three sister repos — let them grow their own lore |  |  | 2026-08-04 05:44:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1113) |
-| 1112 | Pip's rulings on intro + poster art, 2026-08-04 11:34 -- B1/B2 approved, dev-vs-alpha tool split, and a prior story beat |  |  | 2026-08-04 02:38:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1112) |
+| 1112 | Pip's rulings on intro + poster art, 2026-08-04 11:34 -- B1/B2 approved, dev-vs-alpha tool split, and a prior story beat |  |  | 2026-08-24 21:31:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1112) |
 | 1109 | art: promotion adds ~105 MB to the pack -- subtle refinement pass owed for a future epoch | ship:next-release |  | 2026-08-03 20:24:34 | [link](https://github.com/PipFoweraker/pdoom1/issues/1109) |
 | 1097 | Pip's rulings, 2026-08-02 -- velocity portfolio weights, and a review pdoom-data is waiting on |  |  | 2026-08-02 02:48:03 | [link](https://github.com/PipFoweraker/pdoom1/issues/1097) |
-| 1093 | art(review): generation was paid for and the outputs were never reviewed -- inventory the backlog and package a decision session | enhancement |  | 2026-08-01 00:43:56 | [link](https://github.com/PipFoweraker/pdoom1/issues/1093) |
+| 1093 | art(review): generation was paid for and the outputs were never reviewed -- inventory the backlog and package a decision session | enhancement |  | 2026-08-24 21:31:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1093) |
 | 1092 | art(sweep): events name physical things the office never shows -- install a security system, no cameras appear; sweep events for asset refs, then bulk-generate | enhancement |  | 2026-08-01 00:43:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1092) |
 | 1091 | design(hiring): no hire may be onboarded-by-silence -- every hiring route must surface the choice; arrivals come through a door | enhancement, game-mechanics |  | 2026-08-01 00:43:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1091) |
 | 1090 | design(research): Research Quality (Rushed/Standard/Thorough) is still a global Plan-screen toggle -- the ruling moved it to research-project level | game-mechanics, ux |  | 2026-08-11 10:45:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/1090) |
