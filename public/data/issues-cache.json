@@ -1098,6 +1098,6 @@
   "total_open_prs": 2,
   "untriaged_in_sample": 10,
   "bodies_included": false,
-  "last_updated": "2026-08-27T01:09:09.119155",
+  "last_updated": "2026-08-27T08:58:00.230110",
   "_comment": "issues is a SAMPLE -- the `sample_requested` most recently updated open issues, pull requests removed. total_open_issues is the real count from /search/issues and may be null, which means UNKNOWN and must never render as zero. Bodies are deliberately absent: nothing renders them and they are third-party text on a public host."
 }
