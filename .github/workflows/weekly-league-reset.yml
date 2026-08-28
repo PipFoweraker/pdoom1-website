@@ -128,12 +128,45 @@ jobs:
           echo "📊 Current league status:"
           python scripts/weekly-league-manager.py --status
 
+      # NEVER WRITE A REASON YOU DID NOT MEASURE.  D4 of pdoom1-website#384.
+      #
+      # This step used to end with `|| echo` and a message speculating that the
+      # week had probably been archived already. That is worse than a bare
+      # `|| true`, because a plausible reason stops the reader looking -- and
+      # the reason was not merely unchecked, it was IMPOSSIBLE. (The literal is
+      # deliberately not repeated here: the guard below greps this file, and
+      # quoting a defect to explain it is how three guards in this repo have
+      # been tripped by their own documentation.)
+      #
+      # Measured in weekly-league-manager.py: archive_current_week() returns
+      # True and the CLI exits 0 when there is no current league to archive
+      # ("INFO: No current league to archive"). Exit 1 happens only in the
+      # `except` branch, i.e. a real failure. So a non-zero here has NEVER once
+      # meant "may already be archived" -- every time that message printed, it
+      # printed a false explanation over a genuine fault.
+      #
+      # The second-order effect is why it mattered. `|| echo` makes the step
+      # SUCCEED, so `steps.archive.outcome` was "success" and the "Log
+      # automation run" step below recorded that invented success into
+      # public/monitoring/data/, which /monitoring/ publishes. The excuse was
+      # not just printed, it was filed.
+      #
+      # No branch is needed here because the script already distinguishes the
+      # two cases in its exit code. scripts/test-league-archive-outcomes.py
+      # forces all three states and asserts that contract, so this comment is
+      # evidence rather than a claim.
       - name: Archive previous week
         id: archive
-        if: github.event.inputs.archive_previous != 'false'
+        # The old gate read the dispatch inputs context, which is EMPTY on a
+        # schedule trigger (CLAUDE.md, workflow trap #2) -- so a condition that
+        # looks like a safety toggle was unconditionally true on cron. Harmless
+        # while the schedule is parked; the park expires 2026-09-02. Written
+        # explicitly instead: always archive on a schedule, honour the toggle
+        # on a dispatch.
+        if: github.event_name != 'workflow_dispatch' || inputs.archive_previous
         run: |
           echo "📦 Archiving previous week..."
-          python scripts/weekly-league-manager.py --archive-week || echo "⚠️  Archive failed (may already be archived)"
+          python scripts/weekly-league-manager.py --archive-week
 
       - name: Generate new competitive seed
         run: |

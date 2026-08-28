@@ -25,13 +25,53 @@ for _stream in (sys.stdout, sys.stderr):
         pass
 
 
+# POLICY, declared here rather than derived from the cron that writes
+# version.json. A window derived from its own writer always agrees with it.
+# 7 days is the value this check has always used; it is named now so that
+# changing it is a decision someone makes rather than a literal they edit.
+VERSION_DATA_MAX_AGE_DAYS = 7
+
+# The status vocabulary, in order of severity. Precedence runs left to right:
+# a real failure outranks stale data, stale data outranks an unknown, and an
+# unknown ALWAYS outranks a warning or a pass.
+#
+#   FAIL     something is broken and this run established that
+#   STALE    the data is real, readable, and older than the declared window
+#   UNKNOWN  this run could not establish something either way
+#   WARN     nothing failed, but something is worth a human's eye
+#   PASS     everything checked, everything current
+#
+# The old vocabulary was PASS/FAIL, so "I could not tell" had nowhere to go but
+# into PASS -- which is exactly what it did, for 966-day-old data.
+STATUS_FAIL = 'FAIL'
+STATUS_STALE = 'STALE'
+STATUS_UNKNOWN = 'UNKNOWN'
+STATUS_WARN = 'WARN'
+STATUS_PASS = 'PASS'
+
+# Exit codes. 2 is reserved for "could not run honestly", matching
+# verify-deployment.py and the estate's convention.
+EXIT_BY_STATUS = {
+    STATUS_FAIL: 1,
+    STATUS_STALE: 1,
+    STATUS_UNKNOWN: 2,
+    STATUS_WARN: 1,
+    STATUS_PASS: 0,
+}
+
+
 class HealthChecker:
     """Comprehensive health check system for website deployment"""
-    
+
     def __init__(self) -> None:
         self.results: List[Dict[str, Any]] = []
         self.failed_tests: List[str] = []
         self.warnings: List[str] = []
+        # Things this run could not establish either way, and things it
+        # established are too old. Both are distinct from `warnings`, which is
+        # where the stale-data message used to go to be ignored.
+        self.unknowns: List[str] = []
+        self.stale: List[str] = []
         self.start_time = datetime.now()
         
         # Define critical paths. Resolved, so rel() below can always compute a
@@ -140,7 +180,64 @@ class HealthChecker:
         
         if not passed and not is_warning:
             self.failed_tests.append(f"{test_name}: {message}")
-    
+
+    def log_stale(self, test_name: str, message: str = "") -> None:
+        """Record data that is real and readable but older than its window.
+
+        Deliberately NOT routed through log_result: that would put it in
+        failed_tests, and FAIL outranks STALE, so the distinct verdict this file
+        just gained would never once be reachable. Stale IS determined -- we
+        know exactly how old it is -- so it counts toward the denominator, which
+        is what separates it from an unknown.
+        """
+        message = self.scrub(message)
+        test_name = self.scrub(test_name)
+        print(f"\U0001f570️  STALE {test_name}" + (f": {message}" if message else ""))
+        self.stale.append(f"{test_name}: {message}")
+        self.results.append({
+            'test': test_name,
+            'passed': False,
+            'message': message,
+            'timestamp': datetime.now().isoformat(),
+            'is_warning': False,
+            'is_stale': True,
+        })
+
+    def log_unknown(self, test_name: str, message: str = "") -> None:
+        """Record something this run could not determine. NOT a pass.
+
+        Goes through log_result so the scrubbing chokepoint above still applies
+        -- an unknown's message is usually an exception string, which is exactly
+        the shape that put absolute paths on pdoom1.com. Recorded as not-passed
+        and not-a-warning would make it a failure, so it carries its own flag and
+        is kept out of failed_tests by the is_warning path, then counted here.
+        """
+        message = self.scrub(message)
+        test_name = self.scrub(test_name)
+        print(f"? UNKNOWN {test_name}" + (f": {message}" if message else ""))
+        self.unknowns.append(f"{test_name}: {message}")
+        self.results.append({
+            'test': test_name,
+            'passed': False,
+            'message': message,
+            'timestamp': datetime.now().isoformat(),
+            'is_warning': False,
+            'is_unknown': True,
+        })
+
+    def overall_status(self) -> str:
+        """Derive the verdict. Severity precedence, never a coin toss."""
+        if self.failed_tests:
+            return STATUS_FAIL
+        if self.stale:
+            return STATUS_STALE
+        if self.unknowns:
+            return STATUS_UNKNOWN
+        if self.warnings:
+            return STATUS_WARN
+        return STATUS_PASS
+
+
     def test_file_exists(self, filepath: str, test_name: str) -> bool:
         """Test if a critical file exists"""
         exists = os.path.exists(filepath)
@@ -243,19 +340,44 @@ class HealthChecker:
             
             self.log_result("Version Data Structure", True, "✓ All required fields present")
             
-            # Validate data freshness (warn if older than 7 days)
-            try:
-                last_updated = datetime.fromisoformat(data['last_updated'].replace('Z', '+00:00'))
-                age_days = (datetime.now() - last_updated.replace(tzinfo=None)).days
-                
-                if age_days > 7:
-                    self.log_result("Data Freshness", True, 
-                                  f"Data is {age_days} days old", is_warning=True)
+            # AGE IS A HARD INPUT TO THE VERDICT.  D2 of pdoom1-website#384.
+            #
+            # This block used to log a PASS in all three of its outcomes --
+            # fresh, stale, and "could not parse timestamp" -- with the last two
+            # carrying is_warning=True. Warnings never reached overall_status,
+            # which was `PASS if not failed_tests`. Measured against a 2024
+            # timestamp the script returned PASS, 100%, exit 0.
+            #
+            # Three outcomes now, and only one of them is a pass.
+            age_days = None
+            raw = data.get('last_updated')
+            if raw in (None, ""):
+                self.log_unknown("Data Freshness", "version.json has no last_updated")
+            else:
+                try:
+                    last_updated = datetime.fromisoformat(str(raw).replace('Z', '+00:00'))
+                    age_days = (datetime.now() - last_updated.replace(tzinfo=None)).days
+                except Exception as e:
+                    self.log_unknown("Data Freshness", f"Could not parse timestamp: {e}")
+
+            if age_days is not None:
+                if age_days < 0:
+                    # Not fresh -- a clock disagreement, and we cannot say which
+                    # clock is wrong. Absence of a marker is never a clean bill.
+                    self.log_unknown(
+                        "Data Freshness",
+                        f"last_updated is {abs(age_days)} day(s) in the future",
+                    )
+                elif age_days > VERSION_DATA_MAX_AGE_DAYS:
+                    self.log_stale(
+                        "Data Freshness",
+                        f"version.json is {age_days} days old, "
+                        f"window is {VERSION_DATA_MAX_AGE_DAYS}",
+                    )
                 else:
                     self.log_result("Data Freshness", True, f"✓ Data is {age_days} days old")
-            except Exception as e:
-                self.log_result("Data Freshness", True, f"Could not parse timestamp: {e}", is_warning=True)
-            
+
+
             return True
             
         except Exception as e:
@@ -304,22 +426,38 @@ class HealthChecker:
         # Generate summary
         total_tests = len(self.results)
         passed_tests = len([r for r in self.results if r['passed']])
+        # THREE buckets, not two. An unknown is not a pass and it is not a
+        # failure; folding it into either is the defect this file is being
+        # repaired for. success_rate therefore has an explicit denominator: the
+        # things that were actually determined. A run where everything was
+        # unknown reports 0 determined, not 100%.
+        unknown_tests = len([r for r in self.results if r.get('is_unknown')])
+        stale_tests = len([r for r in self.results if r.get('is_stale')])
+        failed_count = total_tests - passed_tests - unknown_tests - stale_tests
+        # STALE counts as determined -- we know exactly how old it is. UNKNOWN
+        # does not. That difference is the whole reason they are two states.
+        determined = passed_tests + failed_count + stale_tests
         warning_count = len(self.warnings)
-        
+
         end_time = datetime.now()
         duration = (end_time - self.start_time).total_seconds()
-        
+
         summary = {
             'timestamp': end_time.isoformat(),
             'duration_seconds': duration,
             'total_tests': total_tests,
             'passed_tests': passed_tests,
-            'failed_tests': total_tests - passed_tests,
+            'failed_tests': failed_count,
+            'unknown_tests': unknown_tests,
+            'stale_tests': stale_tests,
             'warnings': warning_count,
-            'success_rate': (passed_tests / total_tests * 100) if total_tests > 0 else 0,
-            'overall_status': 'PASS' if len(self.failed_tests) == 0 else 'FAIL',
+            'success_rate': (passed_tests / determined * 100) if determined > 0 else 0,
+            'determined_tests': determined,
+            'overall_status': self.overall_status(),
             'results': self.results,
             'failed_test_details': self.failed_tests,
+            'unknown_details': self.unknowns,
+            'stale_details': self.stale,
             'warnings_details': self.warnings
         }
         
@@ -337,11 +475,27 @@ class HealthChecker:
         print("🏥 HEALTH CHECK SUMMARY")
         print("=" * 50)
         
-        status_emoji = "✅" if summary['overall_status'] == 'PASS' else "❌"
+        status_emoji = {
+            STATUS_PASS: "✅",
+            STATUS_WARN: "⚠️",
+            STATUS_UNKNOWN: "❓",
+            STATUS_STALE: "🕰️",
+            STATUS_FAIL: "❌",
+        }.get(summary['overall_status'], "❌")
         print(f"{status_emoji} Overall Status: {summary['overall_status']}")
         print(f"⏱️  Duration: {summary['duration_seconds']:.2f} seconds")
-        print(f"📊 Success Rate: {summary['success_rate']:.1f}%")
+        # The denominator is named. A rate over things that were DETERMINED,
+        # printed beside how many were not, so a run that could establish
+        # nothing cannot read as 100%.
+        print(f"📊 Success Rate: {summary['success_rate']:.1f}% "
+              f"of {summary['determined_tests']} determined")
         print(f"✅ Passed: {summary['passed_tests']}/{summary['total_tests']}")
+        if summary.get('unknown_tests'):
+            print(f"❓ Could not determine: {summary['unknown_tests']}")
+            for item in summary.get('unknown_details', []):
+                print(f"   • {item}")
+        for item in summary.get('stale_details', []):
+            print(f"🕰️  STALE: {item}")
         
         if summary['failed_tests'] > 0:
             print(f"❌ Failed: {summary['failed_tests']}")
@@ -365,11 +519,11 @@ def main() -> None:
     summary = checker.run_all_checks()
     checker.print_summary(summary)
     
-    # Exit with error code if any tests failed
-    if summary['overall_status'] == 'FAIL':
-        sys.exit(1)
-    else:
-        sys.exit(0)
+    # Exit on the verdict, not on a two-way guess. 2 means "could not run
+    # honestly" and is deliberately distinct from 1, "something is wrong":
+    # a caller that treats non-zero as bad keeps working, and a caller that
+    # wants to tell an outage from a defect now can.
+    sys.exit(EXIT_BY_STATUS.get(summary['overall_status'], 1))
 
 
 if __name__ == '__main__':
