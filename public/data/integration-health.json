@@ -1,26 +1,26 @@
 {
-  "generated": "2026-08-28T09:15:39.059746+00:00",
+  "generated": "2026-08-28T23:00:40.332452+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 4,
-    "ok": 31
+    "warn": 7,
+    "ok": 28
   },
   "checks": [
     {
       "name": "schema:events",
-      "status": "OK",
-      "detail": "valid"
+      "status": "WARN",
+      "detail": "jsonschema not installed -- schema check skipped (pip install jsonschema)"
     },
     {
       "name": "schema:league_weekly",
-      "status": "OK",
-      "detail": "valid"
+      "status": "WARN",
+      "detail": "jsonschema not installed -- schema check skipped (pip install jsonschema)"
     },
     {
       "name": "schema:league_seed",
-      "status": "OK",
-      "detail": "valid"
+      "status": "WARN",
+      "detail": "jsonschema not installed -- schema check skipped (pip install jsonschema)"
     },
     {
       "name": "encoding:events",
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "WARN",
-      "detail": "current.json is 7.8 days old (rollover due)"
+      "detail": "current.json is 8.4 days old (rollover due)"
     },
     {
       "name": "league:current_week",
@@ -125,7 +125,7 @@
     {
       "name": "league:version_drift",
       "status": "WARN",
-      "detail": "weekly league game_version=v0.14.1 but deployed game=v0.14.3 -- a v0.14.3 client's scores cannot land on a v0.14.1 board"
+      "detail": "weekly league game_version=v0.14.1 but deployed game=v0.14.4 -- a v0.14.4 client's scores cannot land on a v0.14.1 board"
     },
     {
       "name": "league:seed",
@@ -155,7 +155,7 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 5.9h ago"
+      "detail": "live API checked 1.0h ago"
     },
     {
       "name": "board:archived_anomaly",
@@ -180,7 +180,7 @@
     {
       "name": "seed_leaderboards:version_census",
       "status": "WARN",
-      "detail": "NO stored seed file is stamped with the deployed version v0.14.3, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
+      "detail": "NO stored seed file is stamped with the deployed version v0.14.4, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
     }
   ]
 }
