@@ -692,6 +692,7 @@ python  scripts/stamp-league-epoch.py --check   # weekly records carry epoch [da
 python  scripts/test-stamp-league-epoch.py      # defect texts claim only what they verify [data-contract]
 node    scripts/test-board-escaping.js    # no API field reaches innerHTML   [board-liveness]
 node    scripts/test-board-honesty.js     # key mismatch stays visible       [board-liveness]
+node    scripts/test-leaderboard-current-week.js # "Current Week" refuses a week that ended [board-liveness]
 python  scripts/test-publish-live-board.py # publisher refuses, never guesses [board-liveness]
 python  scripts/test-board-liveness-verdicts.py # probe names an epoch disagreement, never composes a key [board-liveness]
 python  scripts/test-board-liveness-escalation.py # a sustained "cannot tell" escalates [board-liveness]
