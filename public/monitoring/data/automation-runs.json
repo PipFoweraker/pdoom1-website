@@ -1,15 +1,5 @@
 [
   {
-    "job": "auto-update-data",
-    "trigger": "schedule",
-    "timestamp": "2026-08-06T12:43:55.903965Z",
-    "status": "success",
-    "details": {
-      "version-status": "success",
-      "stats-status": "success"
-    }
-  },
-  {
     "job": "weekly-league-rollover",
     "trigger": "schedule",
     "timestamp": "2026-08-06T14:47:41.483726Z",
@@ -1014,6 +1004,17 @@
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2026-08-28T21:25:34.220644Z",
+    "status": "success",
+    "status_reason": "all 2 observed outcomes reported success",
+    "details": {
+      "version-status": "success",
+      "stats-status": "success"
+    }
+  },
+  {
+    "job": "auto-update-data",
+    "trigger": "repository_dispatch",
+    "timestamp": "2026-08-28T22:24:25.642689Z",
     "status": "success",
     "status_reason": "all 2 observed outcomes reported success",
     "details": {
