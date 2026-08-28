@@ -61,6 +61,7 @@ on:
       - 'scripts/test-board-liveness-escalation.py'
       - 'scripts/test-board-escaping.js'
       - 'scripts/test-board-honesty.js'
+      - 'scripts/test-leaderboard-current-week.js'
       - 'public/leaderboard/index.html'
       # The escaper is no longer inline on that page (2026-08-01). A change to the
       # shared file changes the board's escaping, so it must re-run these guards.
@@ -79,6 +80,7 @@ on:
       - 'scripts/test-board-liveness-escalation.py'
       - 'scripts/test-board-escaping.js'
       - 'scripts/test-board-honesty.js'
+      - 'scripts/test-leaderboard-current-week.js'
       - 'scripts/check-board-liveness.py'
       - 'scripts/board_liveness_summary.py'
       - 'public/leaderboard/**'
@@ -132,6 +134,16 @@ jobs:
       # 27 real submissions.
       - name: A board-key mismatch cannot read as "nobody is playing"
         run: node scripts/test-board-honesty.js
+
+      # The OTHER path into this page's board. filterBySeedOrWeek() replaced the data
+      # and re-rendered without applyDataStatus()/applyBoardHonesty() -- which had one
+      # call site each, in the first-load path -- and without the end-timestamp check
+      # that populateSeedFilter() already applied to the dropdown. "Current Week" is a
+      # static <option>, so selecting it walked past that guard and rendered a finished
+      # week as though it were running. Forces the dead-week, failed-fetch and
+      # absent-timestamp paths, with an open-week negative control.
+      - name: The "Current Week" filter fails closed on a week that has ended
+        run: node scripts/test-leaderboard-current-week.js
 
       # Forced-failure tests: the publisher must refuse rather than guess, and must
       # never replace a board holding real scores with an empty one on a network blip.

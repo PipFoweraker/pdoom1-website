@@ -1566,6 +1566,37 @@
     });
     
     // Filter by seed or week
+    // Is this league week still running? THE END TIMESTAMP IS THE AUTHORITY, never an
+    // is_current flag -- a stalled or parked rollover leaves the flag set on a week that
+    // finished days ago. This logic existed only inside populateSeedFilter(), guarding
+    // the dropdown; the path a visitor could actually reach had no copy of it. One
+    // function, two callers, so the two answers cannot drift apart.
+    function weekIsOpen(weekData) {
+      const endsAt = Date.parse(
+        (weekData && weekData.week_info && weekData.week_info.end_timestamp) ||
+        (weekData && weekData.meta && weekData.meta.end_date) || ''
+      );
+      return Number.isFinite(endsAt) && endsAt > Date.now();
+    }
+
+    // One place to say "this page is deliberately not showing you a board, and here is
+    // why". Reuses the existing honesty banner rather than inventing a second notice
+    // surface that could contradict it.
+    //
+    // ESCAPING: every caller passes a trusted string literal defined in this file. No
+    // fetched field reaches this sink, which is why there is no escapeHTML() call here.
+    // If that ever changes, escape at the call site.
+    function showFilterNotice(html) {
+      const banner = document.getElementById('data-status-banner');
+      if (banner) { banner.innerHTML = html; banner.style.display = 'block'; }
+      const table = document.getElementById('leaderboard-table');
+      if (table) table.style.display = 'none';
+      const cards = document.getElementById('cards-view');
+      if (cards) cards.style.display = 'none';
+      const loading = document.getElementById('loading');
+      if (loading) loading.style.display = 'none';
+    }
+
     async function filterBySeedOrWeek() {
       const seedFilter = document.getElementById('filter-by-seed').value;
       
@@ -1576,36 +1607,81 @@
       }
       
       if (seedFilter === 'current-week') {
-        // Load current week data
+        let weekData;
         try {
           const response = await fetch('/leaderboard/data/weekly/current.json', { cache: 'no-store' });
-          if (response.ok) {
-            const weekData = await response.json();
-            // Replace originalData with new week data
-            originalData = weekData;
-            filteredData = originalData;
-            displayStats(filteredData);
-            displayLeaderboard(filteredData);
-          }
+          // A non-ok response used to fall through the `if` and return silently, leaving
+          // whatever board was already on screen sitting under a dropdown that now said
+          // "Current Week". Name the failure instead.
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          weekData = await response.json();
         } catch (error) {
           console.error('Failed to load current week:', error);
+          showFilterNotice(
+            'Could not load this week&rsquo;s board, so this page cannot say whether any ' +
+            'scores exist for it. This is a site fault, not an empty board.'
+          );
+          return;
         }
+
+        // FAIL CLOSED ON A WEEK THAT HAS ALREADY ENDED.
+        // populateSeedFilter() has always refused to OFFER a finished week -- the end
+        // timestamp is the authority there, not the is_current flag. But "Current Week"
+        // is a static <option> in the markup, always present, so selecting it walked
+        // straight past that guard and rendered the dead week as though it were running.
+        // Observed 2026-08-29: current.json still described 21-27 Aug, a week that had
+        // closed two days earlier, stamped ladder_version L4 in meta and L5 in epoch
+        // while the live epoch was L6, with 0 participants. A visitor who had just played
+        // the shipped build and submitted a score would have read that as "the league is
+        // empty", when their score was on a different board key entirely.
+        // The rollover being parked (weekly-league-reset.yml, PARKED-UNTIL 2026-09-02)
+        // is exactly the stalled-rollover case the sibling guard's comment anticipates.
+        if (!weekIsOpen(weekData)) {
+          showFilterNotice(
+            '&#9432; <strong>The most recent league week has closed, and a new one has not ' +
+            'opened yet.</strong> The board for it is not shown here, because presenting a ' +
+            'finished week under &ldquo;Current Week&rdquo; would describe a competition ' +
+            'that is not running. This does not mean a score was lost: runs are recorded ' +
+            'against the board key the game submits to.'
+          );
+          return;
+        }
+
+        originalData = weekData;
+        filteredData = originalData;
+        // These two calls were missing, and that is the same defect recorded in the note
+        // above loadLeaderboardWithFiltering(): applyDataStatus() and applyBoardHonesty()
+        // each had exactly ONE call site, inside the first-load path. Switching the filter
+        // swapped the data out from under a banner that still described the previous
+        // board -- so a 'pre-launch' or 'unknown' week could render under a banner that
+        // had been hidden because the FIRST board loaded was 'live'.
+        applyDataStatus(filteredData);
+        displayStats(filteredData);
+        displayLeaderboard(filteredData);
+        applyBoardHonesty(filteredData);
         return;
       }
-      
-      // Load specific seed data
+
+      // Load specific seed data. No freshness check here on purpose: an explicitly
+      // chosen archived seed IS a finished week, and the visitor asked for it by name.
+      // The honesty calls still apply -- a past board must not inherit the current
+      // board's banner.
       try {
         const response = await fetch(`/leaderboard/data/seed_${seedFilter}.json`, { cache: 'no-store' });
-        if (response.ok) {
-          const seedData = await response.json();
-          // Replace originalData with new seed data
-          originalData = seedData;
-          filteredData = originalData;
-          displayStats(filteredData);
-          displayLeaderboard(filteredData);
-        }
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const seedData = await response.json();
+        originalData = seedData;
+        filteredData = originalData;
+        applyDataStatus(filteredData);
+        displayStats(filteredData);
+        displayLeaderboard(filteredData);
+        applyBoardHonesty(filteredData);
       } catch (error) {
         console.error('Failed to load seed data:', error);
+        showFilterNotice(
+          'Could not load the board for that seed, so this page cannot say whether any ' +
+          'scores exist for it. This is a site fault, not an empty board.'
+        );
       }
     }
     
@@ -1627,10 +1703,7 @@
           // anchored to Friday 00:00 Australia/Hobart and no longer produces that skew,
           // but the guard stays: it is cheap, and it is what makes a stalled rollover
           // fail closed instead of advertising a dead week.
-          const endsAt = Date.parse(
-            weekData.week_info?.end_timestamp || weekData.meta?.end_date || ''
-          );
-          const weekStillOpen = Number.isFinite(endsAt) && endsAt > Date.now();
+          const weekStillOpen = weekIsOpen(weekData);
 
           // NEVER offer a seed the game side has not blessed. The website mints
           // a placeholder seed for every week, and no client has ever submitted
