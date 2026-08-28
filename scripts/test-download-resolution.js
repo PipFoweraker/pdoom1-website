@@ -175,13 +175,32 @@ function noteUntouched(els) {
       // The shipped HTML entity-encodes the dash; the DOM the browser builds does
       // not, and neither does the shim. Compare on the decoded form.
       const shipped = tag[1].replace(/&mdash;/g, '—');
-      check(shipped === PLACEHOLDER_LABEL(label),
-        id + ' ships the placeholder this test models (' + shipped + ')');
+      // TWO LEGAL SHIPPED STATES, and the difference is whether a build exists today.
+      //   deferred: "<OS> - checking latest release", with the release-page href, so a
+      //             JS-off reader still reaches a real page and JS refines it;
+      //   disabled: "<OS> - coming soon", with NO href, because there is no build and
+      //             the static default must be the safe claim.
+      // Neither may be "Download for <OS>", which asserts a build exists on every path
+      // the renderer does not take. Accepting only the first form would forbid the
+      // safe default outright -- which is what this assertion did until 2026-08-29.
+      const deferred = shipped === PLACEHOLDER_LABEL(label);
+      const disabled = shipped === label + ' — coming soon';
+      check(deferred || disabled,
+        id + ' ships a legal placeholder (' + shipped + ')');
       check(!/^Download for/.test(shipped),
         id + ' ships no static "Download for <OS>" availability claim');
+
+      const anchor = src.match(new RegExp('<a id="' + id + '"[^>]*>'))[0];
+      if (disabled) {
+        // A "coming soon" label on a live href is the same lie with extra steps.
+        check(!/\shref=/.test(anchor), id + ' ships inert: no href behind "coming soon"');
+        check(/aria-disabled="true"/.test(anchor), id + ' ships aria-disabled');
+        check(/pointer-events:\s*none/.test(anchor), id + ' ships pointer-events:none');
+      } else {
+        check(new RegExp('href="' + BASE.replace(/\//g, '\\/') + '"').test(anchor),
+          id + ' still ships the release-page href baseline');
+      }
     }
-    check(new RegExp('<a id="' + id + '"[^>]*href="' + BASE.replace(/\//g, '\\/') + '"').test(src),
-      id + ' still ships the release-page href baseline');
   }
 
   console.log(failures ? `\n${failures} FAILURE(S)` : '\nAll checks passed.');
