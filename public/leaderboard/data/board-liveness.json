@@ -1,6 +1,6 @@
 {
   "_comment": "Read-only observation of the live score API. Not a score store. Written by scripts/check-board-liveness.py. The board key is (seed, ladder_epoch); the build version is NOT part of it.",
-  "checked_at": "2026-08-28T22:03:13+00:00",
+  "checked_at": "2026-08-28T22:56:44+00:00",
   "api": "https://api.pdoom1.com/score_api.php",
   "verdict": "live",
   "unknown_streak": 0,
@@ -20,7 +20,7 @@
     "epoch_known": true,
     "note": "epoch_known=false means this site cannot confirm which board is current. It is NOT a mismatch finding. epochs_agree=false means the published board is from a superseded epoch: the fix is to run scripts/publish-live-board.py, not to re-stamp anything. epoch_composed=true means ladder_epoch is a fallback to the current epoch because published-board.json predates the field -- the pair is composed, not observed."
   },
-  "deployed_build": "v0.14.3",
+  "deployed_build": "v0.14.4",
   "deployed_board": {
     "seed": "weekly-2026-w35",
     "version": "L6",
@@ -124,13 +124,15 @@
       "L69",
       "L70",
       "L71",
-      "L72"
+      "L72",
+      "L73",
+      "L74"
     ],
-    "boards_probed": 684,
+    "boards_probed": 702,
     "unreachable": 0,
     "notes": [
       "14 board key(s) derived from the anomaly archive",
-      "epoch window L1..L72 (highest seen L70, +2 lookahead)"
+      "epoch window L1..L74 (highest seen L72, +2 lookahead)"
     ]
   },
   "archived_orphans": {
@@ -1130,6 +1132,28 @@
       "last_entry": null
     },
     {
+      "seed": "weekly_2026_W35_a97e68ae",
+      "version": "L73",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W35_a97e68ae",
+      "version": "L74",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
       "seed": "weekly-2026-w35",
       "version": "L2",
       "key_shape": "epoch",
@@ -1970,6 +1994,28 @@
       "last_entry": null
     },
     {
+      "seed": "weekly-2026-w35",
+      "version": "L73",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w35",
+      "version": "L74",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
       "seed": "league_2026-07_7d6ced29",
       "version": "L2",
       "key_shape": "epoch",
@@ -2797,6 +2843,28 @@
     {
       "seed": "league_2026-07_7d6ced29",
       "version": "L72",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L73",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "league_2026-07_7d6ced29",
+      "version": "L74",
       "key_shape": "epoch",
       "entries": 0,
       "players": 0,
@@ -3644,6 +3712,28 @@
     {
       "seed": "weekly-2026-w0",
       "version": "L72",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L73",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w0",
+      "version": "L74",
       "key_shape": "epoch",
       "entries": 0,
       "players": 0,
@@ -4502,6 +4592,28 @@
       "last_entry": null
     },
     {
+      "seed": "weekly-2026-w30",
+      "version": "L73",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w30",
+      "version": "L74",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
       "seed": "weekly_2026_W30_18a08709",
       "version": "L2",
       "key_shape": "epoch",
@@ -5329,6 +5441,28 @@
     {
       "seed": "weekly_2026_W30_18a08709",
       "version": "L72",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L73",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly_2026_W30_18a08709",
+      "version": "L74",
       "key_shape": "epoch",
       "entries": 0,
       "players": 0,
@@ -6173,6 +6307,28 @@
     {
       "seed": "weekly-2026-w31",
       "version": "L72",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L73",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w31",
+      "version": "L74",
       "key_shape": "epoch",
       "entries": 0,
       "players": 0,
@@ -7027,6 +7183,28 @@
       "last_entry": null
     },
     {
+      "seed": "weekly-2026-w32",
+      "version": "L73",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w32",
+      "version": "L74",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
       "seed": "weekly-2026-w33",
       "version": "L2",
       "key_shape": "epoch",
@@ -7858,6 +8036,28 @@
     {
       "seed": "weekly-2026-w33",
       "version": "L72",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "L73",
+      "key_shape": "epoch",
+      "entries": 0,
+      "players": 0,
+      "player_names": [],
+      "builds_seen": [],
+      "first_entry": null,
+      "last_entry": null
+    },
+    {
+      "seed": "weekly-2026-w33",
+      "version": "L74",
       "key_shape": "epoch",
       "entries": 0,
       "players": 0,
