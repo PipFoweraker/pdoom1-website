@@ -1928,7 +1928,11 @@
 				el.setAttribute('rel', 'noopener');
 				el.removeAttribute('role');
 				el.removeAttribute('aria-disabled');
-				el.removeAttribute('title');
+				// Cleared as a PROPERTY, mirroring how the demote branch sets it
+				// (el.title = ...). removeAttribute('title') also works in a browser,
+				// but only because title reflects; writing the same channel in both
+				// directions means the pair cannot drift if one of them is edited.
+				el.title = '';
 				el.style.opacity = '';
 				el.style.cursor = '';
 				el.style.pointerEvents = '';
