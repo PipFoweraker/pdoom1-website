@@ -9,6 +9,9 @@
       "windows": true,
       "macos": true,
       "linux": true
+    },
+    "platform_tracking": {
+      "macos": "https://github.com/PipFoweraker/pdoom1/issues/1309"
     }
   },
   "repository_stats": {

@@ -111,7 +111,10 @@ function freshSlots() {
 // file; `throws:true` models a network error mid-fetch.
 async function render(payload, opts) {
   opts = opts || {};
-  const slots = freshSlots();
+  // Scenarios A-D use the default set, every button live. Scenario E supplies its
+  // own, because the page ships an UNSHIPPED platform's button disabled and the
+  // promote path out of that state is the thing under test there.
+  const slots = opts.slots || freshSlots();
   const document = {
     querySelectorAll(sel) {
       if (sel !== '[data-platform-claim="rendered"]') {
@@ -340,10 +343,89 @@ function claimsAvailable(text, name) {
   const btnLabels = [...src.matchAll(
     /data-platform-slot="button"[^>]*>\s*([^<]*?)\s*\n/g)].map(x => x[1]);
   check(btnLabels.length === 3, 'three button placeholders found');
-  check(btnLabels.every(l => /checking latest release/.test(l)),
-    'every button placeholder says it is still checking, not "Download for <OS>"');
+  // THE RULE IS ABOUT CLAIMS, NOT ABOUT ONE WORDING. A button may ship either
+  // "<OS> - checking latest release" (live baseline href, claim deferred to JS) or
+  // "<OS> - coming soon" (shipped DISABLED because no build exists today). What
+  // none may ship is a static "Download for <OS>", which asserts a build exists on
+  // every path the renderer does not take -- JS off, fetch failed, rate-limited.
+  // That is why the macOS button is disabled in the markup: the static default must
+  // be the safe claim, and JS may only upgrade it.
+  check(btnLabels.every(l => /checking latest release|coming soon/.test(l)),
+    'every button placeholder either defers to JS or says "coming soon"');
   check(btnLabels.every(l => !/^Download for/.test(l)),
     'no button ships a static "Download for <OS>" availability claim');
+  // A button that ships "coming soon" must also ship INERT. A disabled-looking
+  // label on a live href is the same lie with extra steps.
+  for (const m of src.matchAll(/<a[^>]*data-platform-slot="button"[^>]*>\s*([^<]*?)\s*\n/g)) {
+    if (!/coming soon/.test(m[1])) continue;
+    const who = m[1].trim();
+    check(!/\shref=/.test(m[0]), `the "${who}" button ships with no href`);
+    check(/aria-disabled="true"/.test(m[0]), `the "${who}" button ships aria-disabled`);
+    check(/pointer-events:\s*none/.test(m[0]),
+      `the "${who}" button ships pointer-events:none`);
+  }
+
+  // -------------------------------------------------------------------------
+  // Scenario E: the promote path, out of the state the markup actually ships in.
+  //
+  // Scenarios A-D start every button live and check that an ABSENT platform gets
+  // demoted. This is the other direction, and the page depends on it: macOS ships
+  // DISABLED in index.html (no href, role=note, aria-disabled, pointer-events:none),
+  // so when a macOS build lands, renderPlatformButton has to undo all of that -- not
+  // just rewrite the label.
+  //
+  // Before this was fixed the shipped branch set textContent and returned. On the
+  // real markup that produced a button reading "Download for macOS" that could not
+  // be clicked: an availability claim welded to a dead control, worse than either
+  // honest state. A label-only assertion would have passed it, so every attribute
+  // the demote branch sets is checked to be gone.
+  const disabledMacButton = () => {
+    const el = makeEl('a', {
+      dataset: { platformClaim: 'rendered', platformSlot: 'button',
+                 platformKey: 'macos', platformLabel: 'macOS' },
+      attrs: { role: 'note', 'aria-disabled': 'true' },
+      text: 'macOS \u2014 coming soon',
+    });
+    el.title = 'macOS build is not in the current release yet';
+    el.style.opacity = '0.55';
+    el.style.cursor = 'default';
+    el.style.pointerEvents = 'none';
+    return el;
+  };
+
+  console.log('\nScenario E: a button that ships DISABLED promotes completely');
+  {
+    const el = disabledMacButton();
+    await render(feed({ windows: true, macos: true, linux: true }), { slots: [el] });
+    check(el.textContent === 'Download for macOS', 'the label promotes to "Download for macOS"');
+    check(el.hasAttribute('href'),
+      'and it regains an href -- a label-only promote leaves a dead button');
+    check(el.getAttribute('target') === '_blank' && el.getAttribute('rel') === 'noopener',
+      'and target/rel, so it opens like every other download button');
+    check(!el.hasAttribute('aria-disabled'),
+      'aria-disabled is removed, not left on a working control');
+    check(!el.hasAttribute('role'), 'role=note is removed');
+    check(!el.title, 'the "not in the current release yet" title is cleared');
+    check(!el.style.pointerEvents, 'pointer-events is cleared, so it is clickable');
+    check(!el.style.opacity && !el.style.cursor, 'the greyed-out styling is cleared');
+  }
+
+  console.log('\nScenario E2: still absent -> stays disabled, and says so once');
+  {
+    const el = disabledMacButton();
+    await render(feed({ windows: true, macos: false, linux: true }), { slots: [el] });
+    check(el.textContent === 'macOS \u2014 coming soon', 'it still says coming soon, once');
+    check(!el.hasAttribute('href'), 'and it still has no href');
+  }
+
+  console.log('\nScenario E3: feed unreachable -> the safe default is left alone');
+  {
+    const el = disabledMacButton();
+    await render(null, { slots: [el], ok: false });
+    check(el.textContent === 'macOS \u2014 coming soon',
+      'an unreachable feed cannot promote a button (placeholders stand)');
+    check(!el.hasAttribute('href'), 'and cannot hand it an href');
+  }
 
   console.log(failures ? `\n${failures} FAILURE(S)` : '\nAll checks passed.');
   process.exit(failures ? 1 : 0);
