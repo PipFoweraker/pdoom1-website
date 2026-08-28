@@ -123,6 +123,34 @@ def derive_platforms(assets: List[Dict[str, Any]]) -> Dict[str, bool]:
     }
 
 
+def read_platform_tracking() -> Dict[str, Any]:
+    """data/platform-tracking.json -> {platform: url}, or {} if unusable.
+
+    Missing or malformed is NOT an error: the link is an enhancement, and the
+    absence sentence ("no macOS build in v0.14.3") is already true without it.
+    Failing the whole version.json write over a missing nicety would take out
+    the platform data that the honesty guard depends on.
+    """
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        'data', 'platform-tracking.json')
+    try:
+        with open(path, encoding='utf-8') as f:
+            raw = json.load(f)
+    except (OSError, ValueError) as exc:
+        print(f"Note: no usable platform-tracking.json ({exc}); absence clauses carry no link")
+        return {}
+    out = {}
+    for key, entry in (raw.get('platforms') or {}).items():
+        url = entry.get('url') if isinstance(entry, dict) else entry
+        # Only https, and only to the project's own tracker. This string is
+        # written into version.json and becomes an href on the homepage.
+        if isinstance(url, str) and url.startswith('https://github.com/PipFoweraker/'):
+            out[key] = url
+        else:
+            print(f"Note: ignoring platform-tracking entry {key!r}: not a project https URL")
+    return out
+
+
 def get_latest_release() -> Dict[str, Any]:
     """Get latest release information"""
     data = fetch_github_data(f"/repos/{REPO_OWNER}/{REPO_NAME}/releases/latest")
@@ -137,6 +165,13 @@ def get_latest_release() -> Dict[str, Any]:
             # Derived from THIS release's assets. Fresh fetch, so it is safe to
             # write; the failure branch below keeps the last known-good instead.
             'platforms': derive_platforms(data.get('assets', [])),
+            # Where a reader finds out why a missing platform is missing. This dict
+            # is rebuilt from the API on every successful run, so a value hand-added
+            # to version.json would be silently dropped within the hour -- the link
+            # has to come from a file this function reads. It asserts nothing about
+            # availability: index.html only renders an entry for a platform that
+            # derive_platforms() already reported as absent.
+            'platform_tracking': read_platform_tracking(),
         }
 
     # API failed. This function's output is written straight into version.json, which

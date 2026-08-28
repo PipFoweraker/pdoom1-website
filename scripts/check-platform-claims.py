@@ -17,9 +17,53 @@ carries a soft qualifier (coming soon / this week / in progress / later / a dash
 A qualified line ("macOS -- coming soon") is honest and passes; a bare list
 ("Windows, macOS, Linux") is not and fails.
 
+TWO CATEGORIES, DECLARED IN THE MARKUP (new rule, 2026-08-24)
+------------------------------------------------------------
+The heuristic above cannot tell an availability CLAIM from an EXPLANATION that
+happens to name an OS. On 2026-08-24 it flagged this line on the homepage:
+
+    certificate (Windows) or an Apple Developer identity plus notarization (macOS).
+
+That is a true statement about what code-signing costs. It would be equally true
+if p(Doom)1 never shipped a Mac build at all -- it asserts no build exists. But it
+names two operating systems on one line, so `is_list` fired. No amount of regex
+tuning fixes that: the difference is authorial intent, which is not in the text.
+
+So the intent is now written down, in the markup, where a reviewer sees it in the
+diff and this script can read it:
+
+  data-platform-claim="explanatory"
+      A subtree that names operating systems to EXPLAIN how they behave --
+      Gatekeeper, SmartScreen, notarization, chmod. It asserts no build exists.
+      EXEMPT from the scan, and every exempted line is PRINTED, so the exemption
+      cannot grow in silence the way an ALLOWLIST quietly can.
+
+  data-platform-claim="rendered"
+      A subtree whose text is written at runtime from version.json by
+      renderPlatformClaims(). NOT exempt, and deliberately so: what ships in the
+      HTML is a placeholder that a visitor with JS off, or a visitor served
+      before the fetch resolves, actually reads. If that placeholder names an
+      unshipped platform in an availability context it is exactly as false as
+      typed prose, and it is flagged exactly the same. The attribute is a claim
+      about WHO WRITES the text, not a licence to say anything.
+
+Any other value is a typo and FAILS -- an unrecognised value must never silently
+degrade into "not exempt but looks handled".
+
+Why "rendered" is worth marking at all, given it changes nothing here: it is the
+hook the JS tests assert against (scripts/test-platform-render.js checks that every
+slot declared in the markup is one renderPlatformClaims() actually writes, and that
+every shipped placeholder names no OS), and it tells the next person that editing
+that text by hand accomplishes nothing.
+
 Limits (stated, not hidden): it reads raw HTML lines, so a claim split across lines
 can slip through, and it only scans the curated reachable set below. It is a
 regression net for the specific failure mode above, not a proof of total honesty.
+The em-dash entry in SOFT_QUALIFIER is a known hole -- ANY em dash on a line
+disarms the check for that whole line, which is how "Windows is the tested build;
+macOS and Linux are new and largely untested" sat on the homepage unflagged
+through a release that shipped no macOS build. Narrowing it is a separate change;
+it would need every genuine "macOS -- coming soon" re-checked first.
 
 Exit 1 on any finding (so CI blocks it). Genuine false positives go in ALLOWLIST
 with a reason, never by loosening the heuristic.
@@ -126,6 +170,84 @@ def strip_to_visible_text(html):
     return html
 
 
+# --- the declared-category machinery (2026-08-24) --------------------------------
+# See the module docstring for WHY this cannot be a regex refinement.
+
+VALID_CLAIM_VALUES = {"explanatory", "rendered"}
+
+CLAIM_ATTR = re.compile(r"data-platform-claim\s*=\s*[\"']([^\"']*)[\"']", re.I)
+
+# Attribute soup, quote-aware so a `>` inside an attribute value does not end the tag.
+_ATTRS = r"(?:[^>\"']|\"[^\"]*\"|'[^']*')*"
+OPEN_TAG = re.compile(r"<([a-zA-Z][\w:-]*)(" + _ATTRS + r")>")
+
+VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input",
+             "link", "meta", "param", "source", "track", "wbr"}
+
+
+def _line_of(html, offset):
+    return html.count("\n", 0, offset) + 1
+
+
+def _matching_close(html, tag, pos):
+    """End offset of the close tag matching an open `tag` at `pos`, or None.
+
+    Counts opens/closes of THIS TAG NAME ONLY. Deliberately not a real parser: HTML
+    in the wild leaves <p> and <li> unclosed, and a general depth counter would
+    desynchronise and hand back a span running to end of file -- which, for an
+    exemption, means silently exempting the whole page. Same-name counting is immune
+    to that. An unclosed tag returns None and is reported as an error rather than
+    guessed at, for the same reason.
+    """
+    rx = re.compile(r"<(/?)" + re.escape(tag) + r"(?=[\s/>])(" + _ATTRS + r")>", re.I)
+    depth = 1
+    for m in rx.finditer(html, pos):
+        if m.group(1):
+            depth -= 1
+            if depth == 0:
+                return m.end()
+        elif not m.group(2).rstrip().endswith("/"):
+            depth += 1
+    return None
+
+
+def declared_categories(html):
+    """(exempt_lines, rendered_count, errors) for one page's raw HTML.
+
+    exempt_lines is the set of 1-based line numbers covered by a
+    data-platform-claim="explanatory" subtree. `rendered` subtrees are counted and
+    NOT exempted -- what ships in the HTML is what a JS-off reader reads.
+    """
+    exempt, rendered, errors = set(), 0, []
+    for m in OPEN_TAG.finditer(html):
+        tag, attrs = m.group(1), m.group(2)
+        cm = CLAIM_ATTR.search(attrs)
+        if not cm:
+            continue
+        value = cm.group(1).strip().lower()
+        if value not in VALID_CLAIM_VALUES:
+            errors.append((_line_of(html, m.start()),
+                           "unknown data-platform-claim value %r (expected one of %s)"
+                           % (cm.group(1), ", ".join(sorted(VALID_CLAIM_VALUES)))))
+            continue
+        if value == "rendered":
+            rendered += 1
+            continue
+        # explanatory: exempt its whole subtree
+        if tag.lower() in VOID_TAGS or attrs.rstrip().endswith("/"):
+            end = m.end()
+        else:
+            end = _matching_close(html, tag, m.end())
+        if end is None:
+            errors.append((_line_of(html, m.start()),
+                           'data-platform-claim="explanatory" on an unclosed <%s> -- '
+                           "refusing to guess how far the exemption reaches" % tag))
+            continue
+        for n in range(_line_of(html, m.start()), _line_of(html, end) + 1):
+            exempt.add(n)
+    return exempt, rendered, errors
+
+
 def load_available_platforms():
     with open(VERSION_JSON, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -198,13 +320,21 @@ def scan():
         return 0
 
     findings = []
+    errors = []
+    exempted = []   # (file, line, text) -- printed, so the exemption cannot grow quietly
+    rendered_total = 0
     for rel in REACHABLE:
         path = os.path.join(ROOT, rel)
         if not os.path.isfile(path):
             print(f"  note: {rel} not found, skipped")
             continue
         with open(path, "r", encoding="utf-8", errors="replace") as f:
-            visible = strip_to_visible_text(f.read())
+            html = f.read()
+        exempt_lines, rendered, page_errors = declared_categories(html)
+        rendered_total += rendered
+        for n, msg in page_errors:
+            errors.append((rel, n, msg))
+        visible = strip_to_visible_text(html)
         for n, raw in enumerate(visible.split("\n"), 1):
                 line = raw.rstrip("\n")
                 names_hit = [p for p, rx in PLATFORM_NAMES.items() if rx.search(line)]
@@ -214,8 +344,27 @@ def scan():
                     continue
                 is_list = len(names_hit) >= 2
                 is_verb = bool(AVAILABILITY_VERB.search(line))
-                if (is_list or is_verb) and not allowlisted(rel, line):
-                    findings.append((rel, n, unavail_hit, line.strip()[:160]))
+                if not (is_list or is_verb) or allowlisted(rel, line):
+                    continue
+                # The category is declared in the markup, not inferred. Explanation
+                # about an OS is not a claim that a build for it exists.
+                if n in exempt_lines:
+                    exempted.append((rel, n, line.strip()[:160]))
+                    continue
+                findings.append((rel, n, unavail_hit, line.strip()[:160]))
+
+    print(f"declared categories: {rendered_total} rendered element(s) "
+          f"(scanned like any other -- the shipped placeholder is what a JS-off "
+          f"reader reads), {len(exempted)} line(s) exempted as explanatory")
+    for rel, n, text in exempted:
+        print(f"  exempt (explanatory)  {rel}:{n}")
+        print(f"      {text}")
+
+    if errors:
+        print(f"\nFAIL: {len(errors)} malformed data-platform-claim declaration(s):\n")
+        for rel, n, msg in errors:
+            print(f"  {rel}:{n}  {msg}")
+        return 1
 
     if not findings:
         print(f"OK: no reachable page claims {unavailable} as available.")

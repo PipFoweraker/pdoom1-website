@@ -11,10 +11,21 @@
 //     buttons resolve to a direct .zip, the release page carrying this guidance is
 //     never visited -- pdoom1.com is the only place a visitor can read it.
 //
-// NOTE: all three buttons ship LIVE in the HTML (href = release page, "Download
-// for <OS>"). That is copy-pass's launch shape: v0.13.1 ships Windows, macOS AND
-// Linux builds, so every button starts live and only degrades if a future release
-// drops a platform. This mirrors makeEl() below.
+// NOTE, CORRECTED 2026-08-24. This used to read: "all three buttons ship LIVE in
+// the HTML (href = release page, 'Download for <OS>') ... every button starts live
+// and only degrades if a future release drops a platform."
+//
+// A future release did drop a platform -- v0.14.3 shipped with no macOS asset -- and
+// that static label was then a false availability claim on exactly the paths this
+// function deliberately does NOT take: JS off, and the documented rate-limit no-op.
+// check-platform-claims.py flagged it. The buttons now ship with an "<OS> -- checking
+// latest release" placeholder that claims nothing, and TWO mechanisms write the real
+// label: renderPlatformClaims() from same-origin version.json (covered by
+// scripts/test-platform-render.js), then this function refining the available ones to
+// direct asset URLs. The href baseline is unchanged -- still the release page, still
+// never 404s, still untouched on a rate-limit. makeEl() below mirrors the new shipped
+// shape and Scenario 6 asserts that it still does, so this comment cannot rot the way
+// the sentence above it did.
 const fs = require('fs');
 const path = require('path');
 const src = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
@@ -24,14 +35,17 @@ if (!m) { console.error('FAIL: could not extract resolveDownloads()'); process.e
 
 const BASE = 'https://github.com/PipFoweraker/pdoom1/releases/latest';
 
-// Model the REAL initial DOM: every platform ships LIVE, pointing at the release
-// page with a "Download for <OS>" label. resolveDownloads() upgrades each to its
-// direct asset URL, or degrades it to "coming soon" only if the release actually
-// dropped that platform's build.
+// Model the REAL initial DOM: every platform points at the release page (never a
+// 404) under a placeholder label that claims nothing. resolveDownloads() upgrades
+// each to its direct asset URL, or degrades it to "coming soon" only if the release
+// actually dropped that platform's build. Scenario 6 pins this string against the
+// shipped HTML.
+const PLACEHOLDER_LABEL = (label) => label + ' — checking latest release';
+
 function makeEl(id, label) {
   return {
     id, dataset: { platformLabel: label },
-    textContent: 'Download for ' + label,
+    textContent: PLACEHOLDER_LABEL(label),
     style: {},
     _attrs: { href: BASE, target: '_blank' },
     hasAttribute(k) { return k in this._attrs; },
@@ -108,6 +122,11 @@ function noteUntouched(els) {
   check(els['download-windows'].href === BASE, 'Windows keeps release-page baseline');
   check(els['download-macos'].href === BASE, 'macOS keeps release-page baseline');
   check(els['download-linux'].href === BASE, 'Linux keeps release-page baseline');
+  // ...and it must not INVENT a label either. On this path renderPlatformClaims()
+  // has already written the truth from version.json; resolveDownloads() overwriting
+  // it, or a static "Download for macOS" standing here, is the bug being closed.
+  check(els['download-macos'].textContent === PLACEHOLDER_LABEL('macOS'),
+    'macOS label untouched on rate-limit (whatever version.json wrote survives)');
 
   // Scenario 4: assets exist but none match our naming guess -> keep baseline.
   els = await run('unrecognised', [A('SomethingWeird.bin'), A('checksums.txt')]);
@@ -142,6 +161,47 @@ function noteUntouched(els) {
   }
   check(!/getElementById\(['"]macos-gatekeeper-note['"]\)/.test(src),
     'no JS still reaches for the retired macos-gatekeeper-note id');
+
+  // Scenario 6: the shim above is a claim about the shipped HTML. Check it. The
+  // header comment of this file asserted the old shape for weeks after it stopped
+  // being true; an assertion cannot do that.
+  console.log('Scenario 6: the modelled initial DOM matches the shipped markup');
+  for (const [id, label] of [['download-windows', 'Windows'],
+                             ['download-macos', 'macOS'],
+                             ['download-linux', 'Linux']]) {
+    const tag = src.match(new RegExp('<a id="' + id + '"[^>]*>\\s*([^<]*?)\\s*\\n'));
+    check(!!tag, id + ' anchor found in index.html');
+    if (tag) {
+      // The shipped HTML entity-encodes the dash; the DOM the browser builds does
+      // not, and neither does the shim. Compare on the decoded form.
+      const shipped = tag[1].replace(/&mdash;/g, '—');
+      // TWO LEGAL SHIPPED STATES, and the difference is whether a build exists today.
+      //   deferred: "<OS> - checking latest release", with the release-page href, so a
+      //             JS-off reader still reaches a real page and JS refines it;
+      //   disabled: "<OS> - coming soon", with NO href, because there is no build and
+      //             the static default must be the safe claim.
+      // Neither may be "Download for <OS>", which asserts a build exists on every path
+      // the renderer does not take. Accepting only the first form would forbid the
+      // safe default outright -- which is what this assertion did until 2026-08-29.
+      const deferred = shipped === PLACEHOLDER_LABEL(label);
+      const disabled = shipped === label + ' — coming soon';
+      check(deferred || disabled,
+        id + ' ships a legal placeholder (' + shipped + ')');
+      check(!/^Download for/.test(shipped),
+        id + ' ships no static "Download for <OS>" availability claim');
+
+      const anchor = src.match(new RegExp('<a id="' + id + '"[^>]*>'))[0];
+      if (disabled) {
+        // A "coming soon" label on a live href is the same lie with extra steps.
+        check(!/\shref=/.test(anchor), id + ' ships inert: no href behind "coming soon"');
+        check(/aria-disabled="true"/.test(anchor), id + ' ships aria-disabled');
+        check(/pointer-events:\s*none/.test(anchor), id + ' ships pointer-events:none');
+      } else {
+        check(new RegExp('href="' + BASE.replace(/\//g, '\\/') + '"').test(anchor),
+          id + ' still ships the release-page href baseline');
+      }
+    }
+  }
 
   console.log(failures ? `\n${failures} FAILURE(S)` : '\nAll checks passed.');
   process.exit(failures ? 1 : 0);

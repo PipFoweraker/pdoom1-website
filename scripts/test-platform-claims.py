@@ -219,6 +219,123 @@ with Sandbox(NO_MAC, {"public/p.html": BLATANT_LIE}):
     check(code == 1 and "p.html" in out,
           "with an unavailable platform present, pages ARE opened and scanned")
 
+# ---------------------------------------------------------------------------
+# THE DECLARED CATEGORIES (added 2026-08-24). The heuristic cannot separate a claim
+# that a build exists from an explanation of how an OS behaves; the markup now says
+# which is which. Both answers are forced below -- an exemption seen only in its
+# passing state is indistinguishable from a disabled guard.
+# ---------------------------------------------------------------------------
+
+# The real sentence that tripped the guard on 2026-08-24. It names two OSes, so
+# is_list fires, and it is true whether or not any Mac build exists.
+NOTARIZATION = ("certificate (Windows) or an Apple Developer identity plus "
+                "notarization (macOS).")
+
+print('\n11. data-platform-claim="explanatory" exempts a subtree -- and SAYS it did')
+with Sandbox(NO_MAC, {"public/p.html":
+                      "<html><body>\n"
+                      '<div data-platform-claim="explanatory">\n'
+                      "<p>" + NOTARIZATION + "</p>\n"
+                      "</div>\n"
+                      "</body></html>"}):
+    code, out = run()
+    check(code == 0, "explanation about an OS is not a claim that a build exists")
+    check("exempt (explanatory)" in out and "notarization" in out,
+          "the exempted line is PRINTED, so the exemption cannot grow in silence")
+
+print("\n12. THE SAME SENTENCE, UNDECLARED, still fails -- the attribute does the work")
+with Sandbox(NO_MAC, {"public/p.html":
+                      "<html><body>\n<div>\n<p>" + NOTARIZATION + "</p>\n"
+                      "</div>\n</body></html>"}):
+    code, out = run()
+    check(code == 1,
+          "without the declaration it is flagged exactly as before -- so test 11's "
+          "green is the attribute, not a loosened heuristic")
+
+print("\n13. The exemption stops at the closing tag; a claim AFTER it still fails")
+with Sandbox(NO_MAC, {"public/p.html":
+                      "<html><body>\n"
+                      '<div data-platform-claim="explanatory">\n'
+                      "<p>" + NOTARIZATION + "</p>\n"
+                      "</div>\n"
+                      "<p>Download for macOS today.</p>\n"
+                      "</body></html>"}):
+    code, out = run()
+    check(code == 1, "a real claim outside the exempt subtree is still caught")
+    check("public/p.html:5" in out,
+          "and the line named is line 5, the one after </div>, not the exempt one")
+
+print("\n14. Nested same-name tags do not end the exemption early")
+with Sandbox(NO_MAC, {"public/p.html":
+                      "<html><body>\n"
+                      '<div data-platform-claim="explanatory">\n'
+                      "<div><p>inner</p></div>\n"
+                      "<p>" + NOTARIZATION + "</p>\n"
+                      "</div>\n"
+                      "</body></html>"}):
+    code, out = run()
+    check(code == 0,
+          "the inner </div> does not close the exemption -- depth is counted, and a "
+          "miscount would have left the notarization line flagged")
+
+print('\n15. data-platform-claim="rendered" is NOT exempt: the shipped text is read')
+with Sandbox(NO_MAC, {"public/p.html":
+                      "<html><body>\n"
+                      '<span data-platform-claim="rendered" data-platform-slot="x">'
+                      "Download for macOS</span>\n"
+                      "</body></html>"}):
+    code, out = run()
+    check(code == 1,
+          "a rendered slot whose SHIPPED text claims macOS is flagged like any other "
+          "-- a JS-off reader reads the placeholder, and 'a script will fix it' is "
+          "not a defence")
+    check("rendered element" in out, "the count of rendered elements is reported")
+
+print("\n16. An honest rendered placeholder passes")
+with Sandbox(NO_MAC, {"public/p.html":
+                      "<html><body>\n"
+                      '<span data-platform-claim="rendered" data-platform-slot="x">'
+                      "Platform availability loads from the current release</span>\n"
+                      "</body></html>"}):
+    code, out = run()
+    check(code == 0, "a placeholder that names no OS claims nothing and passes")
+
+print("\n17. An unrecognised category value FAILS rather than degrading silently")
+with Sandbox(NO_MAC, {"public/p.html":
+                      "<html><body>\n"
+                      '<div data-platform-claim="explanitory">\n'   # typo, on purpose
+                      "<p>" + NOTARIZATION + "</p>\n</div>\n</body></html>"}):
+    code, out = run()
+    check(code == 1, "a typo in the value is an error, not an accidental exemption")
+    check("unknown data-platform-claim value" in out and "explanitory" in out,
+          "and it names the bad value and its line")
+
+print("\n18. An UNCLOSED explanatory tag is refused, not guessed at")
+with Sandbox(NO_MAC, {"public/p.html":
+                      "<html><body>\n"
+                      '<div data-platform-claim="explanatory">\n'
+                      "<p>" + NOTARIZATION + "</p>\n"
+                      "<p>Download for macOS today.</p>\n"
+                      "</body></html>"}):
+    code, out = run()
+    check(code == 1,
+          "an unclosed subtree would otherwise exempt everything to end of file -- "
+          "silently disarming the guard for the rest of the page")
+    check("unclosed" in out, "and it says the tag was unclosed")
+
+print("\n19. The LIVE homepage carries the declarations this rule assumes")
+live = (ROOT / "public" / "index.html").read_text(encoding="utf-8", errors="replace")
+check('data-platform-claim="explanatory"' in live,
+      "index.html declares its explanatory subtree")
+_exempt, _rendered, _errs = cpc.declared_categories(live)
+check(not _errs, f"the live page has no malformed declarations ({_errs})")
+check(_rendered == 7,
+      f"declared_categories() sees all 7 rendered slots on index.html (got {_rendered})")
+_lines = live.count("\n") + 1
+check(len(_exempt) < _lines // 4,
+      f"the explanatory exemption covers {len(_exempt)} lines of a {_lines}-line page "
+      f"-- a narrow subtree, not a blanket over the page")
+
 print()
 if failures:
     print(f"{len(failures)} FAILURE(S)")

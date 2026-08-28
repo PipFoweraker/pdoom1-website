@@ -665,6 +665,7 @@ python  scripts/test-campaign-facts.py    # ...and that guard can still FAIL [co
 python  scripts/check-platform-claims.py  # no page claims an unshipped OS   [content-honesty, encoding-safety]
 python  scripts/test-platform-claims.py   # ...and that guard can still FAIL [content-honesty]
 node    scripts/test-download-resolution.js # download buttons resolve/degrade [content-honesty]
+node    scripts/test-platform-render.js    # platform PROSE renders from version.json [content-honesty]
 node    scripts/test-changelog-render.js  # /game-changelog/ derives         [content-honesty]
 node    scripts/test-dashboard-devlog.js  # /dashboard/ derives + freshness  [content-honesty]
 node    scripts/test-manufactured-confidence.js # no card renders a value it did not measure [content-honesty]
@@ -910,6 +911,60 @@ the field (see `about/index.html`'s `platforms-available` stat). `check-platform
 (also wired to CI via `content-honesty.yml`) fails if a reachable page advertises a
 platform that has no build.
 
+- **The homepage no longer states it in prose at all (2026-08-24).** v0.14.3 shipped
+  with no macOS asset. `resolveDownloads()` degraded the macOS button with nobody
+  touching a file -- and four static things did not, because no mechanism fed them:
+  the hero tagline, the system-requirements line, three hand-typed platform chips,
+  and the buttons' own `Download for <OS>` labels. `renderPlatformClaims()` in
+  `public/index.html` now writes all of them from `version.json`. The shipped
+  placeholders name no operating system, with ONE deliberate exception: a platform
+  known to have no build ships its button **disabled**, labelled "<OS> - coming
+  soon". That names an OS on purpose. The static default must be the SAFE claim and
+  JS may only upgrade it -- a live "checking latest release" href is what a JS-off,
+  offline or rate-limited visitor would be left clicking, and there is no build at
+  the other end. `renderPlatformButton()`'s promote branch is therefore symmetric
+  with its demote branch: it restores href/target/rel and clears
+  role/aria-disabled/title/styling, because a label-only promote leaves a button
+  reading "Download for <OS>" that cannot be clicked. Scenario E of
+  `test-platform-render.js` forces that path and asserts each attribute separately. **Guarding typed prose
+  only tells you it went wrong; rendering it means it cannot.** The two layers
+  degrade into each other -- `renderPlatformClaims()` reads same-origin
+  `/data/version.json` and decides available vs not, then `resolveDownloads()` reads
+  the GitHub API and refines an available button to its direct asset URL. Layer 2 is
+  the one with a rate limit, so a button now carries a derived label even when
+  GitHub is unreachable. Covered by `scripts/test-platform-render.js`, which forces
+  BOTH answers.
+- **Why a missing platform is missing lives in `data/platform-tracking.json`**, not
+  in prose. `update-version-info.py` reads it into `version.json` ->
+  `latest_release.platform_tracking`, which `appendAbsenceClause()` renders as a link
+  beside the absence sentence. It CANNOT live in `version.json` directly:
+  `get_latest_release()` rebuilds that dict from the API on every successful run, so a
+  hand-added key is dropped within the hour -- which is why the pdoom1#1309 link had
+  to move out of hand-written homepage prose to survive. The file asserts nothing
+  about availability (that is `derive_platforms()`, from the release assets, and this
+  file cannot override it) and any URL that is not an https project URL is ignored,
+  because the value becomes an `href`. Missing or malformed is a note and an empty
+  dict, never a failed write -- the absence sentence is true without the link.
+
+- **Two categories, declared in the markup, because no regex can separate them.**
+  `data-platform-claim="explanatory"` marks prose that names an OS to explain how it
+  behaves (Gatekeeper, SmartScreen, notarization, chmod) and asserts no build exists;
+  the guard exempts that subtree and PRINTS every line it exempted, so the exemption
+  cannot grow in silence. `data-platform-claim="rendered"` marks text a script writes
+  and is deliberately **not** exempt -- the shipped placeholder is what a JS-off
+  reader reads, so a placeholder naming an unshipped OS fails exactly like typed
+  prose. Any other value is an error. Tests 11-19 of `test-platform-claims.py` force
+  each branch, including that the same sentence UNDECLARED still fails -- otherwise
+  the green would be a loosened heuristic wearing a category's clothes.
+- **Known hole, left open deliberately: `SOFT_QUALIFIER` matches any em dash**, so
+  one anywhere on a line disarms the check for that whole line. That is how
+  "Windows is the tested build; macOS and Linux are new and largely untested" sat on
+  the homepage unflagged through a release that shipped no macOS build. Its FALSE
+  half is gone; the true half ("Windows is the tested build; Linux is new and largely
+  untested") is kept and marked `explanatory`, since it sets a player's expectations
+  and asserts no build exists. The hole is not closed -- narrowing it needs every
+  genuine "macOS -- coming soon" on the site re-checked first, and that now includes
+  the disabled button labels described above.
 - **Its green was vacuous until 2026-08-01.** `scan()` returns 0 *before opening a
   single page* when every platform is `true` — which is the state today — so the
   passing run said nothing whatsoever about the pages. That is CLAUDE.md's "a guard

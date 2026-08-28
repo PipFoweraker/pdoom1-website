@@ -96,6 +96,7 @@ on:
       - 'scripts/generate-analytics-index.py'
       - 'public/data/analytics/**'
       - 'scripts/test-download-resolution.js'
+      - 'scripts/test-platform-render.js'
       - 'scripts/test-header-consistency.js'
       - 'scripts/sync/sync-keybinds.py'
       # What does and does not ship. A bad exclude 404s an asset in production
@@ -189,6 +190,7 @@ on:
       - 'scripts/generate-analytics-index.py'
       - 'public/data/analytics/**'
       - 'scripts/test-download-resolution.js'
+      - 'scripts/test-platform-render.js'
       - 'scripts/test-header-consistency.js'
       - 'scripts/sync/sync-keybinds.py'
       - 'deploy-excludes.txt'
@@ -249,6 +251,14 @@ jobs:
 
       - name: Download buttons resolve/degrade correctly
         run: node scripts/test-download-resolution.js
+
+      # The buttons self-healed when v0.14.3 shipped without a macOS asset;
+      # three lines of static prose did not, because nothing fed them. They are
+      # rendered from version.json now, and this asserts BOTH answers: three
+      # platforms present renders three, macOS absent renders an honest absence
+      # and never an availability claim.
+      - name: Platform availability prose renders, never hardcodes
+        run: node scripts/test-platform-render.js
 
       # /game-changelog/ is the player-facing changelog and derives every version at
       # runtime. A hardcoded literal there is a release-day lie.
