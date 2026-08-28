@@ -39,3 +39,13 @@ page_audit.json
 # (weekly-league-reset.yml, weekly-deployment.yml) stage the whole tree that way.
 # Untracked is not enough on its own; ignored is.
 public/_review/
+
+# Agent worktrees. Claude Code creates these under .claude/worktrees/ and a
+# stray `git add -A` sweeps the whole embedded checkout into a commit -- that
+# happened twice on 2026-08-24, once burying another agent's uncommitted edits
+# inside a PR whose body described two changes and whose commit made four.
+# .git-worktrees/ is listed too because CLAUDE.md and an earlier handover both
+# named it; it is not the path in use, and ignoring a path that does not exist
+# costs nothing while ignoring the wrong one cost a session.
+.claude/worktrees/
+.git-worktrees/
