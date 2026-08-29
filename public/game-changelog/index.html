@@ -185,7 +185,7 @@
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
         .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
     }
-    var FENCE = /^CB(\d+)$/;
+    var FENCE = /^\u0001CB(\d+)\u0001$/;
     function isBlockStart(l){
       return !l.trim() || /^#{1,6}\s/.test(l) || /^\s*\|/.test(l) ||
              /^\s*([-*+]|\d+\.)\s+/.test(l) || FENCE.test(l.trim());
@@ -196,7 +196,7 @@
       var text = escapeHTML(src).replace(/\r\n/g,'\n')
         .replace(/```[^\n]*\n([\s\S]*?)```/g, function(m, code){
           blocks.push('<pre><code>' + code.replace(/\n+$/,'') + '</code></pre>');
-          return 'CB' + (blocks.length - 1) + '';
+          return '\u0001CB' + (blocks.length - 1) + '\u0001';
         });
       var lines = text.split('\n'), out = [], i = 0;
       function cells(row){

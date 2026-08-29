@@ -505,6 +505,18 @@ jobs:
       - name: No third party's email address is published
         run: python scripts/check-published-emails.py
 
+      # WIRED 2026-08-29, once the generator stopped producing them. CLAUDE.md
+      # listed this under "Not wired, on purpose": it was red on 28 control
+      # characters in generated event pages, and wiring a red check creates the
+      # permanent red that section forbids. sync-events.py now strips the class
+      # before rendering, the 77 that had accumulated are gone, and the tree is
+      # clean -- so the check can block without being red on arrival.
+      - name: No stray control characters in published text
+        run: python scripts/check-control-characters.py
+
+      - name: ...and the strip can still FAIL
+        run: python scripts/test-sync-events-control-chars.py
+
       # The three generators that publish reader-facing data on committing crons.
       # check-published-emails.py above walks what is ALREADY COMMITTED, so it can only
       # report a leak that has already shipped; these force the failure at the generator,
