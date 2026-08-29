@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ADR-0020 -- Machine actor identity: a bot acts under its own name, or the attribution record is fiction | p(Doom)1 Design Notes</title>
+	<link rel="canonical" href="https://pdoom1.com/design-notes/adr-0020-machine-actor-identity.html" />
+	<meta name="description" content="### The observation that earned this" />
+	<meta property="og:title" content="ADR-0020 -- Machine actor identity: a bot acts under its own name, or the attribution record is fiction | p(Doom)1 Design Notes" />
+	<meta property="og:description" content="### The observation that earned this" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/design-notes/adr-0020-machine-actor-identity.html" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #12100f;
+			--bg-secondary: #1c1917;
+			--bg-tertiary: #262220;
+			--text-primary: #ffffff;
+			--text-secondary: #cfc7bb;
+			--text-muted: #a79e92;
+			--accent-primary: #f6a800;
+			--accent-secondary: #2fd4c2;
+			--accent-danger: #ff4444;
+			--border-color: #3a342e;
+			--success-color: #4fb37a;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(47, 212, 194, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+		<h1>ADR-0020 -- Machine actor identity: a bot acts under its own name, or the attribution record is fiction</h1>
+		<div class="meta"><strong>Status:</strong> PROPOSED -- built not released, per Pip's constraint. Design gates below are unanswered and BLOCK creation. &middot; <strong>Decided:</strong> 2026-08-23</div>
+<div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
+<ul>
+<li><strong>Status:</strong> PROPOSED -- built not released, per Pip's constraint. Design gates below are unanswered and BLOCK creation.</li>
+<li><strong>Date:</strong> 2026-08-23</li>
+<li><strong>Summary:</strong> Agent work is currently indistinguishable from Pip's in every repo's attribution record, because agents act through his credentials. This proposes a single machine actor with its own identity, its own audit trail, and permissions strictly narrower than Pip's -- and names the six questions that must be answered before one is created.</li>
+</ul>
+<h2>Context</h2>
+<h3>The observation that earned this</h3>
+<p>Pip, reading a printed pack, 2026-08-23:</p>
+<blockquote><em>"every one of the 130 was filed by me not one by a bot account... if I can give a bot the same rights as me in my repos and it can differentiate from when things are fully run and then I can come in as a human and review it, we can see what my vs the bot interactions with the repos are, which I think is more honest."</em></blockquote>
+<p><strong>The word doing the work is "honest".</strong> This is not a permissions problem or a throughput problem. It is an <em>evidence</em> problem.</p>
+<h3>What the record currently claims, and why it is false</h3>
+<p>Every issue, PR, comment and commit produced by an agent in this estate is attributed to <code>PipFoweraker</code>. The <code>Co-Authored-By</code> trailer on commits is the only marker, and it:</p>
+<ul>
+<li>appears on <strong>commits only</strong> -- not on issues, comments, reviews, labels, merges, or closures;</li>
+<li>is <strong>self-asserted</strong> -- an agent that omitted it would be invisible, and nothing checks;</li>
+<li>is <strong>not queryable</strong> -- no view anywhere answers "what did the machines do last week".</li>
+</ul>
+<p>So a reader of any repo's history sees one prolific human. On 2026-08-23 alone that record absorbed roughly a dozen merges, four issue closures, two cross-repo issues and several thousand lines of documentation, all stamped with one person's name. <strong>The attribution record is not a lie anyone told. It is a lie the tooling tells by default</strong>, and it is the same silent-failure shape catalogued in <code>docs/design/SILENT_FAILURE_REGISTER.md</code>: the false state is the <em>plausible</em> one, and nothing generates an event when it happens.</p>
+<h3>Why this matters now rather than later</h3>
+<p>Three reasons converged this week:</p>
+<ol>
+<li><strong>A hundred and fifty people are about to look.</strong> Some will read the repo before running the binary -- #1038 exists because one already did.</li>
+<li><strong><code>docs/TRUST.md</code> now makes provable claims</strong> about what the game touches. A trust artifact in a repo whose authorship record is fictional is a weaker artifact than it deserves to be.</li>
+<li><strong>Certificates are being bought in a human's legal name.</strong> Code signing asserts <em>a named person vouches for this binary</em>. That assertion should not quietly cover work no human read.</li>
+</ol>
+<h2>Decision</h2>
+<p><strong>PROPOSED, not accepted. Nothing is created until the gates below are answered.</strong></p>
+<h3>D1. One machine actor, not one per seat</h3>
+<p>A single identity, not <code>pdoom1-bot</code> / <code>website-bot</code> / <code>coordination-bot</code>.</p>
+<p>Rationale: the question the record must answer is <em>"human or machine?"</em>, and that is one bit. Which seat did it is already recoverable from the repo and the branch name. Multiple bot identities multiply the credential surface, the audit surfaces, and the number of things that can be silently misconfigured, to answer a question nothing is asking.</p>
+<h3>D2. A GitHub App, not a machine user</h3>
+<div class="table-scroll"><table>
+<thead><tr><th></th><th>machine user (PAT)</th><th>GitHub App</th></tr></thead>
+<tbody>
+<tr><td>shows as</td><td>a second human account</td><td>a distinctly-rendered bot</td></tr>
+<tr><td>credential</td><td>long-lived token</td><td>short-lived, auto-expiring installation token</td></tr>
+<tr><td>permissions</td><td>per-account, coarse</td><td>per-repo, per-scope, revocable</td></tr>
+<tr><td>seat cost</td><td>may consume a paid seat</td><td>none</td></tr>
+<tr><td>audit</td><td>mixed into user events</td><td>separate installation event log</td></tr>
+</tbody></table></div>
+<p>A machine user is a fake human, and the entire purpose here is to <strong>stop the record containing fake humans</strong>. Adding a second one to fix the first is the wrong shape.</p>
+<h3>D3. Strictly narrower permissions than Pip's -- explicitly NOT "the same rights"</h3>
+<p>This departs from Pip's phrasing and the departure is deliberate.</p>
+<p><strong>Grant:</strong> open issues, open PRs, comment, push to non-default branches, add labels.</p>
+<p><strong>Withhold:</strong> merge to <code>main</code>, close issues, force-push, administer branch protection, publish releases, touch secrets, modify workflow files.</p>
+<p>The reason is not distrust of an agent. It is that <strong>the value of the record is that the two identities can do different things.</strong> If the bot can do everything Pip can, "reviewed by a human" becomes unfalsifiable again -- a merge stamped with his name would prove nothing, because the bot could have made it. The separation is what converts a label into evidence.</p>
+<p>There is a live example: three branch-protection bypasses happened on 2026-08-23, agent-driven, under Pip's admin rights. Under this ADR the agent could not have performed them and would have had to ask.</p>
+<h3>D4. A commit trailer is not attribution -- it is a courtesy</h3>
+<p><code>Co-Authored-By</code> stays, because it is useful. It does not satisfy this ADR. Attribution means <strong>the actor field GitHub records</strong>, which no trailer can change.</p>
+<h3>What is NOT decided here</h3>
+<ul>
+<li>Whether the bot may act in repos beyond pdoom1. <strong>Out of scope</strong>; each repo admits it separately or not at all.</li>
+<li>Whether agents keep operating under Pip's credentials during any transition. They will, until the gates are answered.</li>
+<li>Anything about the bot's <em>name</em>. See the naming note below -- deliberately provisional.</li>
+<li>Whether this generalises to Beacon's or CVTas's repositories, which have different governance and, in beacon-internal's case, sensitive material.</li>
+</ul>
+<h2>Design gates -- these BLOCK creation</h2>
+<p>Pip asked for gates rather than silent resolutions. Six, roughly in the order they bite.</p>
+<p><strong>GATE 1 -- Does the bot's output count as reviewed?</strong> If a bot opens a PR and Pip merges it, the record says a human reviewed it. Is that true? Today a human merges agent PRs after reading a summary, sometimes after reading the diff. <strong>The honest record is only as good as the honesty of that step</strong>, and this ADR makes it <em>visible</em> without making it <em>true</em>. Naming the risk: a bot identity could make review-theatre easier to perform, not harder. That would be worse than the current state, which at least has no ceremony to hide behind.</p>
+<p><strong>GATE 2 -- Who is accountable for what the bot does?</strong> Legally and practically, Pip. The identity separation is evidentiary, not a liability shield, and it must never be described as one. If a bot opens an issue containing something defamatory or a PR containing someone's private data, the answer to "who did this" is Pip, with an extra step.</p>
+<p><strong>GATE 3 -- What happens to the existing 130?</strong> Backfill is impossible: GitHub authorship cannot be rewritten. So the record has a <strong>discontinuity</strong> at the date the bot starts. Either that boundary is documented, or every future analysis of "human vs machine over time" silently reads the pre-boundary period as all-human. <strong>An undocumented discontinuity is a silent failure by this estate's own definition.</strong></p>
+<p><strong>GATE 4 -- Does the bot get to close things?</strong> D3 says no, and it is the gate most likely to be argued. Closing is a judgement that work is finished. #732 was closed with half its criteria undone <em>by a human</em>; a machine closing issues would industrialise that failure. The counter- argument -- that stale-issue hygiene is exactly the drudgery to delegate -- is real. <strong>Unresolved.</strong></p>
+<p><strong>GATE 5 -- Is the bot one actor or a fleet?</strong> D1 says one. But if several agents run concurrently under one identity, their work is mutually indistinguishable, and this ADR's whole premise is that indistinguishable actors make a record fictional. <strong>The premise may apply recursively and D1 may be wrong.</strong></p>
+<p><strong>GATE 6 -- What does the bot do when it is uncertain?</strong> A human who is unsure asks. A bot with issue-opening rights that is unsure will open an issue -- and the cheapest possible action becomes the default response to uncertainty. That is how a tracker acquires 200 open issues. <strong>The failure mode is not bad work; it is cheap work at volume.</strong></p>
+<h2>Beacons served / violated</h2>
+<ul>
+<li><strong>Rams #6 (honest):</strong> the attribution record stops asserting that one person did work that a machine did. This is the beacon the whole ADR exists to serve.</li>
+<li><strong>Rams #10 (as little design as possible):</strong> one identity, one bit of new information, no per-seat proliferation. The question "human or machine" is answered once.</li>
+<li><strong>Violated -- convenience:</strong> every agent operation gains a credential boundary. Some things Pip does in one step become two. That cost is accepted because the separation is the product.</li>
+</ul>
+<h2>Rejected alternatives</h2>
+<p><strong>Do nothing, rely on <code>Co-Authored-By</code>.</strong> Rejected: covers commits only, is self-asserted, is unqueryable, and is absent from every issue and comment. It is a courtesy, and courtesies are not evidence.</p>
+<p><strong>A machine user account.</strong> Rejected under D2: it is a fake human, and the problem is fake humans.</p>
+<p><strong>Label agent work instead of separating identity.</strong> Rejected: a label is applied by the same actor doing the work, so it is self-assertion again -- sighting #9's shape, where <code>bump</code> and <code>none</code> were mechanically identical.</p>
+<p><strong>Give the bot Pip's full rights, as originally phrased.</strong> Rejected under D3, with the reasoning stated there: identical capability makes "a human did this" unfalsifiable, which destroys the evidence the exercise is meant to create.</p>
+<h2>Consequences / open questions</h2>
+<ul>
+<li><strong>A trust artifact gets stronger.</strong> <code>TRUST.md</code> and a signed binary both say "a named party vouches for this". A queryable human/machine split makes that claim checkable rather than asserted.</li>
+<li><strong>Some agent work will be slower</strong>, and a small amount will require Pip that does not require him today. That is the intended cost of Gate 1 being real.</li>
+<li><strong>This ADR could make things worse</strong> if the identity split becomes a performance of review rather than review. Gate 1 is the one to keep watching, and it is not resolvable by tooling.</li>
+<li><strong>The naming is provisional on purpose.</strong> Pip, 2026-08-23: <em>"we'll call it that until it's mature enough to decide if it wants to rename itself."</em> A name held in trust rather than assigned, which is the same stance as guardian-rather-than-owner. Candidates and reasoning are in the PR; the ADR deliberately does not fix one, because a name chosen inside a design document is harder to give back.</li>
+</ul>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>

@@ -98,7 +98,7 @@
 	<main>
 		<h1>Design Notes</h1>
 <div class="notice">These are the actual decision records the game is built from, published unedited except for internal process notes. They describe <em>why</em> the game works the way it does. They are not a strategy guide, and some of them argue with each other.</div>
-		<p>Every significant design decision in p(Doom)1 is written down before it is built. 19 of those records are published here.</p>
+		<p>Every significant design decision in p(Doom)1 is written down before it is built. 20 of those records are published here.</p>
 		<ul class="card-list">
 			<li><a href="/design-notes/adr-0001-spending-buys-sight.html">ADR-0001 -- Situational Awareness as the primary sink (&quot;spending buys sight&quot;)</a><p>P(Doom)1 is source-rich and sink-poor: money and reputation accumulate faster than anything competes to spend them, which is mechanically identical to being vulnerable to simple dominant-strategy exploits. We need sinks ...</p></li>
 			<li><a href="/design-notes/adr-0002-scoring-turns-survived.html">ADR-0002 -- Scoring: turns survived, lexicographic doom-integral tiebreak, flows only</a><p>The implemented score formula -- (100-doom)x1000 + papersx5000 + researchersx2000 + turnx500 + moneyx0.1 + 50,000 victory bonus (doom&lt;20) -- was scaffolding built to test the end-game screen, never a design statement (Pi...</p></li>
@@ -119,6 +119,7 @@
 			<li><a href="/design-notes/adr-0017-anti-hollow-test-strategy.html">ADR-0017 -- Anti-hollow test strategy (load-time smoke + property-based invariants)</a><p>Two real failures on 2026-07-17 share one root cause -- tests that pass without exercising the thing they claim to protect (call it a &quot;hollow&quot; test):</p></li>
 			<li><a href="/design-notes/adr-0018-render-only-office-doctrine.html">ADR-0018 -- Render-only office doctrine: no spatial fact becomes a gameplay input</a><p>The office floor (godot/scripts/ui/office_floor/office_sandbox.gd) is a dev-tool sandbox for placing props and previewing worker sprites on a 32px snap grid (GRID := 32.0, _snap_to_grid(), _cell_of() at lines 52-58 and 8...</p></li>
 			<li><a href="/design-notes/adr-0019-pull-from-demand-asset-pipeline.html">ADR-0019 -- Pull-from-demand asset pipeline: the pack is a function of declared demand</a><p>### The failure that earned this decision (measured 2026-08-03)</p></li>
+			<li><a href="/design-notes/adr-0020-machine-actor-identity.html">ADR-0020 -- Machine actor identity: a bot acts under its own name, or the attribution record is fiction</a><p>### The observation that earned this</p></li>
 		</ul>
 	</main>
 	<footer>

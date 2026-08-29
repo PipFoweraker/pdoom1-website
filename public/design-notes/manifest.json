@@ -1,5 +1,5 @@
 {
-  "count": 19,
+  "count": 20,
   "generated_by": "scripts/sync/sync-design-notes.py",
   "records": [
     {
@@ -153,6 +153,14 @@
       "slug": "adr-0019-pull-from-demand-asset-pipeline",
       "status": "ACCEPTED",
       "title": "ADR-0019 -- Pull-from-demand asset pipeline: the pack is a function of declared demand"
+    },
+    {
+      "date": "2026-08-23",
+      "id": "ADR-0020-machine-actor-identity",
+      "scrubbed_items": 1,
+      "slug": "adr-0020-machine-actor-identity",
+      "status": "PROPOSED -- built not released, per Pip's constraint. Design gates below are unanswered and BLOCK creation.",
+      "title": "ADR-0020 -- Machine actor identity: a bot acts under its own name, or the attribution record is fiction"
     }
   ],
   "source_path": "docs/game-design/decisions",
