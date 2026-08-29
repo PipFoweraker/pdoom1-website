@@ -189,6 +189,20 @@ Pip's stated top priority. Practically:
     suspiciously low count means re-read the commit message. Recovery is
     `gh workflow run "Deploy to DreamHost (manual)" --ref main -f dry_run=true`
     (confirm no `deleting ` lines), then the same with `dry_run=false`.
+  - **NOW PREVENTED, not merely detected (2026-08-29, after it happened a second
+    time).** `skip-ci-guard.yml` fails any PR whose **title or body** carries a
+    marker, on `opened`/`edited`/`reopened`/`synchronize` -- `edited` because the
+    body is where it usually appears and editing one raises no `synchronize`.
+    `scripts/check-skip-ci-marker.py` holds the logic so it runs locally too;
+    `scripts/test-skip-ci-marker.py` forces every marker GitHub honours, in both
+    fields, inside backticks/fences/blockquotes/tables, plus seven negative
+    controls so it cannot degrade into failing on everything. Both files build the
+    token from fragments rather than writing it out, so neither trips the thing it
+    guards. **The check-run count after a merge is still worth reading** -- the
+    guard covers the squash path, not a marker typed into a hand-written commit.
+    The second occurrence was **#354**: one sentence explaining
+    `update-game-data.yml`'s own marker, **zero** check runs, five files under
+    `public/` left undeployed until a human dispatched the manual deploy.
 
 ## Environment / tooling
 - Python is **`python`** (3.11), not `python3`. **Pillow IS installed** (12.3.0,
@@ -711,6 +725,8 @@ node    scripts/test-roadmap-render.js    # roadmap markdown subset + escaping  
 node    scripts/test-blog-render.js       # blog markdown subset               [generate-feeds]
 
 python  scripts/check-deploy-excludes.py  # nothing deployed points at an excluded file [content-honesty]
+python  scripts/check-skip-ci-marker.py --title "$T" --body "$B" # PR text cannot suppress its own merge [skip-ci-guard]
+python  scripts/test-skip-ci-marker.py    # ...and that guard can still FAIL  [skip-ci-guard]
 python  scripts/test-art-staleness.py     # every art finding forced; OK is reachable [content-honesty]
 python  scripts/check-art-staleness.py    # uplifted art: verdicts, bytes, roster, clocks [content-honesty]
 python  scripts/build-art-register.py --check # register in step; needs ../pdoom1  [local only]

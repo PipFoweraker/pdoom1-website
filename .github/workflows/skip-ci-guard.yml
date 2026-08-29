@@ -1,0 +1,59 @@
+name: BLOCKING -- no CI-skip marker in the PR text
+
+# A squash merge composes its commit message from the PR TITLE plus the PR
+# BODY. GitHub matches a CI-skip marker anywhere in that message and then runs
+# nothing at all -- not skipped, not queued, absent. Auto-Deploy is one of the
+# workflows that does not fire, so a PR touching public/ merges green and
+# pdoom1.com keeps serving the old bytes.
+#
+# Happened twice: #244 (2026-08-02, 1 check run where neighbours ran 8-15) and
+# #354 (2026-08-29, ZERO check runs, five files under public/ left undeployed
+# until a human dispatched the manual deploy). Both were PRs *explaining* a
+# bot's use of a marker, not using one.
+#
+# CLAUDE.md already said to check the check-run count after merging. That is
+# detection: by then the deploy is already missed and recovery is a manual
+# rsync to production. This fires while it is still an edit to a text box.
+#
+# `edited` is in the trigger list on purpose -- the body is the usual place the
+# marker appears, and editing it does not produce a `synchronize`.
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skip-ci-guard-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    name: The PR text must not suppress its own merge
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # CLAUDE.md workflow trap #5: a PR title and body are author-controlled
+      # and GitHub substitutes ${{ }} into the shell text BEFORE it runs, so
+      # templating them inline would make a pull request title executable.
+      # They go in env: and are read as quoted "$VAR".
+      - name: No CI-skip marker in the title or body
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          python scripts/check-skip-ci-marker.py \
+            --title "$PR_TITLE" \
+            --body "$PR_BODY"
+
+      # The guard is only worth its slot if it can still fail. Runs after, so a
+      # real finding above is what a reader sees first.
+      - name: ...and the guard can still fail
+        run: python scripts/test-skip-ci-marker.py
