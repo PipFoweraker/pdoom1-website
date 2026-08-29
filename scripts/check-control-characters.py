@@ -45,6 +45,7 @@ Run:  python scripts/check-control-characters.py           (exit 1 on any FAIL)
 """
 
 import argparse
+import importlib.util
 import re
 import subprocess
 import sys
@@ -62,7 +63,29 @@ ROOT = Path(__file__).resolve().parent.parent
 TEXT_SUFFIX = re.compile(r"\.(py|js|mjs|cjs|md|json|ya?ml|html|css|sh|txt)$", re.I)
 
 # Everything in C0 except tab (09), newline (0a) and carriage return (0d).
-CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+#
+# IMPORTED FROM THE GENERATOR, not written out again. sync-events.py strips this
+# same class from scraped event text before rendering, and a checker carrying its
+# own copy of the rule is a checker that can quietly come to disagree with the
+# thing it checks. Same reason, same direction, as check-published-emails.py
+# importing EMAIL_PATTERN. If the import fails the check FAILS -- it does not fall
+# back to a local literal, because a guard that silently substitutes its own idea
+# of the rule is worse than one that stops.
+def _pattern_from_generator():
+    path = ROOT / "scripts" / "sync" / "sync-events.py"
+    spec = importlib.util.spec_from_file_location("sync_events", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.CONTROL_CHAR_PATTERN
+
+
+try:
+    CONTROL = _pattern_from_generator()
+except Exception as exc:  # noqa: BLE001 -- any import failure must be loud
+    print(f"FAIL: cannot import CONTROL_CHAR_PATTERN from sync-events.py ({exc}).")
+    print("The rule lives in the generator so the two cannot drift; this check")
+    print("will not substitute a local copy.")
+    sys.exit(2)
 
 # Paths whose CONTENT is scraped from elsewhere. Damage here is upstream's to fix.
 GENERATED = ("public/events/", "public/data/events.json", "public/design-notes/",

@@ -271,6 +271,70 @@ def redact_emails_in_text(text: str) -> str:
     return EMAIL_PATTERN.sub(REDACTION_MARKER, text)
 
 
+# CONTROL CHARACTERS IN SCRAPED TEXT.
+# arXiv/ACM descriptions are raw PDF text extraction, and PDF text layers carry
+# separators that mean something to a page layout engine and nothing to HTML:
+# form feeds at page breaks, file/group separators between columns, and stray
+# SOH/ETX/SI bytes from mis-decoded ligatures. 77 of them across 8 published
+# event pages as of 2026-08-29.
+#
+# They are invisible in a browser and mostly harmless, which is exactly why they
+# survived: nothing that renders them complains, and nobody reading the page can
+# see them. They are still corruption -- they break search and copy-paste, they
+# defeat text diffing, and one of them (0x0c) sits precisely where a word ends.
+#
+# THE CLASS IS SHARED WITH THE CHECKER, not copied. scripts/
+# check-control-characters.py imports CONTROL_CHAR_PATTERN from this module, the
+# same way check-published-emails.py imports EMAIL_PATTERN, so the generator and
+# the guard cannot come to disagree about what a control character is. TAB, LF
+# and CR are deliberately NOT in the class: they are legitimate text.
+CONTROL_CHAR_PATTERN = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+
+# REPLACED WITH A SPACE, NOT DELETED. Deletion is the tempting one-liner and it
+# is wrong: a form feed sits at a page break, i.e. between the last word of one
+# page and the first of the next, so deleting it yields "modelsWe" -- a word
+# that never existed, silently, in text a reader may quote. A space cannot
+# invent a word, and HTML collapses whitespace runs in normal flow so the extra
+# space is invisible where these appear. Nothing here renders inside <pre>.
+CONTROL_CHAR_REPLACEMENT = " "
+
+
+def strip_control_chars(text: str) -> str:
+    """Replace disallowed control characters with a space."""
+    return CONTROL_CHAR_PATTERN.sub(CONTROL_CHAR_REPLACEMENT, text)
+
+
+def strip_control_chars_deep(value: Any) -> Any:
+    """Recursively strip control characters from any nested str/list/dict.
+
+    Walks the WHOLE record for the same reason redact_pii() does: a field added
+    upstream tomorrow would otherwise ship uncleaned. Fail closed.
+    """
+    if isinstance(value, str):
+        return strip_control_chars(value)
+    if isinstance(value, list):
+        return [strip_control_chars_deep(v) for v in value]
+    if isinstance(value, dict):
+        return {k: strip_control_chars_deep(v) for k, v in value.items()}
+    return value
+
+
+def count_control_chars(value: Any) -> int:
+    """Count control characters in a nested structure (for the sync log).
+
+    Reports what the PATTERN MATCHED, so like count_emails() it prints a happy
+    number on a run where the strip did nothing. It is a log line, not evidence;
+    the evidence is scripts/test-sync-events-control-chars.py forcing the strip.
+    """
+    if isinstance(value, str):
+        return len(CONTROL_CHAR_PATTERN.findall(value))
+    if isinstance(value, list):
+        return sum(count_control_chars(v) for v in value)
+    if isinstance(value, dict):
+        return sum(count_control_chars(v) for v in value.values())
+    return 0
+
+
 def redact_pii(value: Any) -> Any:
     """Recursively redact email addresses in any nested str/list/dict value.
 
@@ -1791,6 +1855,27 @@ def main():
         log(f"Redacted {emails_found} email addresses across {events_with_emails} events")
     else:
         log("No email addresses found in event data")
+
+    # Control characters from the upstream PDF text layer. Runs AFTER redaction
+    # on purpose: EMAIL_PATTERN would not match an address with a stray 0x0f in
+    # the middle of it, so stripping first could turn an unmatchable fragment
+    # into a matchable address that redaction has already walked past. Cleaning
+    # second means anything the strip newly joins up is still caught -- by
+    # check-published-emails.py over the rendered tree, which is the backstop for
+    # exactly this ordering question.
+    log("Stripping control characters from scraped text...")
+    ctrl_found = 0
+    events_with_ctrl = 0
+    for event_id, event in events.items():
+        n = count_control_chars(event)
+        if n:
+            ctrl_found += n
+            events_with_ctrl += 1
+            events[event_id] = strip_control_chars_deep(event)
+    if ctrl_found:
+        log(f"Stripped {ctrl_found} control characters across {events_with_ctrl} events")
+    else:
+        log("No control characters found in event data")
 
     # ADVISORY: address-shaped strings EMAIL_PATTERN cannot match. Never blocks;
     # see OBFUSCATED_CONTACT_PATTERN for why the alternative is a noisy gate.

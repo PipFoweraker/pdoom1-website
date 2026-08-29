@@ -725,6 +725,8 @@ node    scripts/test-roadmap-render.js    # roadmap markdown subset + escaping  
 node    scripts/test-blog-render.js       # blog markdown subset               [generate-feeds]
 
 python  scripts/check-deploy-excludes.py  # nothing deployed points at an excluded file [content-honesty]
+python  scripts/check-control-characters.py # no stray control chars in published text [content-honesty]
+python  scripts/test-sync-events-control-chars.py # ...and the strip can still FAIL [content-honesty]
 python  scripts/check-skip-ci-marker.py --title "$T" --body "$B" # PR text cannot suppress its own merge [skip-ci-guard]
 python  scripts/test-skip-ci-marker.py    # ...and that guard can still FAIL  [skip-ci-guard]
 python  scripts/test-art-staleness.py     # every art finding forced; OK is reachable [content-honesty]
@@ -784,10 +786,23 @@ porting checklist for `pdoom1`/`pdoom-data`, and five known weaknesses are in
 dict** — that is the shape this replaces.
 
 **Not wired, on purpose:**
-- `check-control-characters.py` — red (28 control chars across generated
-  `public/events/arxiv_*.html`). Genuine, but the fix belongs in
-  `sync/sync-events.py` at the generator, and wiring it before that lands would
-  create exactly the permanent red this section forbids.
+- `check-control-characters.py` — **WIRED 2026-08-29, and the reason it was not
+  is now the record of how it got fixed.** It was red on control characters in
+  generated `public/events/arxiv_*.html`, and the note here said the fix belonged
+  in the generator. It did. `sync-events.py` now carries `CONTROL_CHAR_PATTERN` +
+  `strip_control_chars_deep()`, walking the whole record the way `redact_pii()`
+  does; the checker **imports that pattern rather than keeping its own copy**, so
+  the two cannot drift. The count had grown from 28 to **77 across 8 pages** while
+  the check sat unwired — a reported-but-unblocked finding is one that grows.
+  Also fixed: **4 in HAND-WRITTEN source**, `public/game-changelog/index.html`,
+  which the note above never mentioned because it was written before they landed.
+  Those were deliberate `U+0001` sentinels fencing code blocks in the markdown
+  renderer, stored as RAW bytes; they are now `\u0001` escapes, identical at
+  runtime and visible in review.
+  **The strip replaces with a SPACE, never deletes.** A form feed sits at a PDF
+  page break, i.e. between two words, so deleting it invents a word that never
+  existed — silently, in text a reader may quote. `test-sync-events-control-chars.py`
+  forces that case by name.
 - `sync-keybinds.py --check`'s **drift** and **freshness** halves — both are only
   fixable by re-running the sync against a **local pdoom1 checkout**, which no
   runner has and this repo cannot produce. Blocking on them would make an
