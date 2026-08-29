@@ -4,12 +4,6 @@
     "An entry is only ever SHOWN for a platform that has no build in the current release; when the build ships, the platform stops being 'missing' and the link is never rendered. A stale entry is therefore inert, not a lie -- but delete it once its issue closes.",
     "Adding a key here asserts nothing about availability. That is derived from the release assets by derive_platforms(), and this file cannot override it."
   ],
-  "platforms": {
-    "macos": {
-      "url": "https://github.com/PipFoweraker/pdoom1/issues/1309",
-      "why": "The macOS export failed inside the v0.14.3 build job. The upload step is if-no-files-found: warn, so the release published green over an empty directory.",
-      "source": "public/index.html as it stood on main 2026-08-25, which linked this issue in hand-written prose; this file is where that link moves so it survives the next update-version-info.py run.",
-      "declared_on": "2026-08-29"
-    }
-  }
+  "platforms": {},
+  "_closed_entries_note": "macos was removed 2026-08-28: pdoom1#1309 closed at 21:49Z (an .ico icon Godot could not decode) and v0.14.4 shipped PDoom-macOS-v0.14.4.zip 34 minutes later. This file's own rule is to delete an entry once its issue closes; an entry for a platform that ships is inert rather than wrong, which is exactly the kind of thing that survives for a year because nothing complains."
 }

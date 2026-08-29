@@ -1025,8 +1025,18 @@
 				     data-platform-label rather than this text, so promotion still yields
 				     "Download for macOS" and scripts/test-download-resolution.js is
 				     unaffected. -->
-				<a id="download-macos" data-platform-claim="rendered" data-platform-slot="button" data-platform-key="macos" data-platform-label="macOS" role="note" aria-disabled="true" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem; opacity: 0.55; cursor: default; pointer-events: none;" title="macOS build is not in the current release yet">
-					macOS &mdash; coming soon
+				<!-- RE-ARMED 2026-08-28, when v0.14.4 shipped PDoom-macOS-v0.14.4.zip and
+				     PDoom.app.zip. This shipped DISABLED from 2026-08-24, correctly: no Mac
+				     build existed and "coming soon" was true.
+				     It is a CLAIM, though, and it went false the moment the build landed. The
+				     placeholder below claims nothing -- it names no availability either way and
+				     its href is the releases page, where the truth is visible whatever ships.
+				     A claim-free default is the one that cannot rot, so this is what the
+				     button should sit at between renders. renderPlatformClaims() still owns
+				     the answer and will demote it again, with no edit here, if a release
+				     stops carrying a Mac asset. -->
+				<a id="download-macos" data-platform-claim="rendered" data-platform-slot="button" data-platform-key="macos" data-platform-label="macOS" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
+					macOS &mdash; checking latest release
 				</a>
 				<a id="download-linux" data-platform-claim="rendered" data-platform-slot="button" data-platform-key="linux" data-platform-label="Linux" href="https://github.com/PipFoweraker/pdoom1/releases/latest" class="cta-button" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;" target="_blank" rel="noopener">
 					Linux &mdash; checking latest release
