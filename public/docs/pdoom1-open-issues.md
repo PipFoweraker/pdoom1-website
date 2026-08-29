@@ -1,19 +1,22 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-28T21:31:24.218Z UTC
+Generated: 2026-08-29T00:50:52.927Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1331 | ASCII-only rule: 52 docs in breach, ~3,700 characters, invisible because the test never ran |  |  | 2026-08-28 23:37:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1331) |
+| 1328 | Release Checklist: v0.14.4 | release, checklist |  | 2026-08-28 22:18:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1328) |
+| 1327 | 1,194 invented 'safety researcher' quotes ship as player-facing flavor text, and the next pdoom-data resync will hand you null |  |  | 2026-08-28 22:05:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1327) |
+| 1325 | WARNING Pre-Release Checks Failed: v0.14.4 | release, build-failed |  | 2026-08-28 21:50:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/1325) |
+| 1324 | Release Checklist: v0.14.4 | release, checklist |  | 2026-08-28 21:49:46 | [link](https://github.com/PipFoweraker/pdoom1/issues/1324) |
 | 1321 | Stranded art: the sandbox that does everything Pip asked for is 2,291 lines that no player can open -- reclassify it as an alpha tool and put it in front of a base-builder player |  |  | 2026-08-24 21:29:11 | [link](https://github.com/PipFoweraker/pdoom1/issues/1321) |
 | 1320 | Free actions cannot be declared (7 of the 18 zero-attention actions are lying), and snap decisions need a pause button that is currently a disabled stub |  |  | 2026-08-24 21:29:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/1320) |
 | 1319 | The office as a persistent visual loop: it is WATCH-only, permanently 'decent', hardcoded to tier 1, and buying furniture changes no pixel |  |  | 2026-08-24 21:29:08 | [link](https://github.com/PipFoweraker/pdoom1/issues/1319) |
 | 1318 | First actions: browsing the internet is how the player learns the date, and the bank account should be discovered by checking it (SA is currently a stat that does not exist) |  |  | 2026-08-24 21:29:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1318) |
 | 1317 | Intro: replace the phone with keys on a keychain -- the address explains the office, and the strangers who help you up become your first contacts |  |  | 2026-08-24 21:29:05 | [link](https://github.com/PipFoweraker/pdoom1/issues/1317) |
 | 1310 | In-game patch notes cite open issues as delivered, and nothing guards that file |  |  | 2026-08-24 09:07:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1310) |
-| 1309 | macOS build is missing from v0.14.3 -- broken by an .ico icon Godot cannot decode | build-missing, platform:macos |  | 2026-08-24 08:54:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1309) |
 | 1304 | Release Checklist: v0.14.3 | release, checklist |  | 2026-08-24 04:32:12 | [link](https://github.com/PipFoweraker/pdoom1/issues/1304) |
 | 1302 | Release Checklist: v0.14.3 | release, checklist |  | 2026-08-24 04:11:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1302) |
-| 1301 | Release ledger: a version was bumped and never tagged | release-ledger |  | 2026-08-24 09:31:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1301) |
 | 1299 | Release: pre-release-checks.yml cannot block enhanced-release.yml (independent workflows, same tag trigger) |  |  | 2026-08-24 02:04:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/1299) |
 | 1297 | guards: the five things #1265 deliberately left, with the measurements that justified leaving them |  |  | 2026-08-24 02:01:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1297) |
 | 1290 | No tag protection: pushing a release tag needs less review than merging a docs change |  |  | 2026-08-24 01:10:57 | [link](https://github.com/PipFoweraker/pdoom1/issues/1290) |
@@ -58,7 +61,6 @@ Generated: 2026-08-28T21:31:24.218Z UTC
 | 1128 | sync-documentation.yml commits arbitrary dirty state into pdoom1-website (git add . in a foreign checkout) |  |  | 2026-08-05 08:01:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1128) |
 | 1126 | The Local/Global toggle silently un-presses itself on fetch failure -- indistinguishable from a dead button | bug, ux |  | 2026-08-11 10:45:46 | [link](https://github.com/PipFoweraker/pdoom1/issues/1126) |
 | 1121 | The dot-matrix printer: a diegetic anti-rot machine that cannot report quietly | ux |  | 2026-08-11 10:45:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/1121) |
-| 1117 | Dead-path sweep leftovers: the tests/ Python suite CI pretends to run, and ~25 docs naming files that do not exist |  |  | 2026-08-04 07:26:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1117) |
 | 1115 | No working re-sync path from pdoom-data (dead sync script deleted; capability still needed) |  |  | 2026-08-04 07:01:51 | [link](https://github.com/PipFoweraker/pdoom1/issues/1115) |
 | 1113 | art request: jocular interior art personifying the three sister repos — let them grow their own lore |  |  | 2026-08-04 05:44:07 | [link](https://github.com/PipFoweraker/pdoom1/issues/1113) |
 | 1112 | Pip's rulings on intro + poster art, 2026-08-04 11:34 -- B1/B2 approved, dev-vs-alpha tool split, and a prior story beat |  |  | 2026-08-24 21:31:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1112) |
