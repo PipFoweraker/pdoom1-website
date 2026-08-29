@@ -1,26 +1,26 @@
 {
-  "generated": "2026-08-28T23:00:40.332452+00:00",
+  "generated": "2026-08-29T06:20:51.469850+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
-    "warn": 7,
-    "ok": 28
+    "warn": 4,
+    "ok": 31
   },
   "checks": [
     {
       "name": "schema:events",
-      "status": "WARN",
-      "detail": "jsonschema not installed -- schema check skipped (pip install jsonschema)"
+      "status": "OK",
+      "detail": "valid"
     },
     {
       "name": "schema:league_weekly",
-      "status": "WARN",
-      "detail": "jsonschema not installed -- schema check skipped (pip install jsonschema)"
+      "status": "OK",
+      "detail": "valid"
     },
     {
       "name": "schema:league_seed",
-      "status": "WARN",
-      "detail": "jsonschema not installed -- schema check skipped (pip install jsonschema)"
+      "status": "OK",
+      "detail": "valid"
     },
     {
       "name": "encoding:events",
@@ -115,7 +115,7 @@
     {
       "name": "league:freshness",
       "status": "WARN",
-      "detail": "current.json is 8.4 days old (rollover due)"
+      "detail": "current.json is 8.7 days old (rollover due)"
     },
     {
       "name": "league:current_week",
@@ -155,7 +155,7 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 1.0h ago"
+      "detail": "live API checked 5.5h ago"
     },
     {
       "name": "board:archived_anomaly",
