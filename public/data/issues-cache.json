@@ -1137,7 +1137,7 @@
   "untriaged_in_sample": 8,
   "bodies_included": false,
   "summary": {
-    "as_of": "2026-08-30T12:02:18Z",
+    "as_of": "2026-08-30T18:01:51Z",
     "source": {
       "repository": "PipFoweraker/pdoom1",
       "repository_url": "https://github.com/PipFoweraker/pdoom1",
@@ -1174,6 +1174,6 @@
       "is_not": "a complete list. It is the most recently touched fifteen. Absence from it proves nothing -- see content/campaigns/*.json, which already records that trap."
     }
   },
-  "last_updated": "2026-08-30T12:02:18Z",
+  "last_updated": "2026-08-30T18:01:51Z",
   "_comment": "issues is a SAMPLE -- the `sample_requested` most recently updated open issues, pull requests removed. total_open_issues is the real count from /search/issues and may be null, which means UNKNOWN and must never render as zero. Bodies are deliberately absent: nothing renders them and they are third-party text on a public host."
 }
