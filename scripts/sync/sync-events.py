@@ -945,9 +945,13 @@ def sanitize_event_urls(event: Dict[str, Any]) -> Dict[str, Any]:
     if 'description' in event:
         event['description'] = sanitize_urls_in_text(event['description'])
 
-    # Sanitize reactions
+    # Sanitize reactions. `is not None` rather than a truth test: pdoom-data
+    # now serves null for a reaction nobody has been asked for, and the key
+    # STAYS PRESENT so consumers indexing on it keep working. A bare
+    # `if reaction_key in event` therefore passes None to a str-only helper,
+    # which raises AttributeError on .replace. See pdoom-data#96.
     for reaction_key in ['safety_researcher_reaction', 'media_reaction']:
-        if reaction_key in event:
+        if event.get(reaction_key) is not None:
             event[reaction_key] = sanitize_urls_in_text(event[reaction_key])
 
     # Sanitize sources
@@ -1129,10 +1133,22 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
         elif prov_type == "not_applicable":
             badge_html = '<span class="provenance-badge" style="opacity: 0.5;">N/A</span>'
 
-        return badge_html, source_html
+        # A null reaction is an ABSENCE, and it renders as one. The template
+        # wraps this value in literal quotation marks, so returning the text
+        # unconditionally would publish the four characters "None" as what a
+        # safety researcher said. An empty quote line removes the marks with it.
+        if reaction_text is None:
+            badge_html = ('<span class="provenance-badge" style="opacity: 0.6;">'
+                          'Not recorded</span>')
+            return badge_html, "", ""
 
-    safety_badge, safety_source = build_reaction_html(event['safety_researcher_reaction'], 'safety_researcher_reaction')
-    media_badge, media_source = build_reaction_html(event['media_reaction'], 'media_reaction')
+        quote_html = f'"{reaction_text}"'
+        return badge_html, source_html, quote_html
+
+    safety_badge, safety_source, safety_quote = build_reaction_html(
+        event['safety_researcher_reaction'], 'safety_researcher_reaction')
+    media_badge, media_source, media_quote = build_reaction_html(
+        event['media_reaction'], 'media_reaction')
 
     # Values shared by <meta name="description"> and the OpenGraph / Twitter
     # card block. Built from `raw`, NOT from the already-escaped `event`:
@@ -1617,7 +1633,7 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 				<span class="quote-label">🔬 Safety Researcher Reaction:</span>
 				{safety_badge}
 				<br>
-				"{event['safety_researcher_reaction']}"
+				{safety_quote}
 				{safety_source}
 			</div>
 
@@ -1625,7 +1641,7 @@ def generate_event_detail_page(event_id: str, event: Dict[str, Any]) -> str:
 				<span class="quote-label">📰 Media Reaction:</span>
 				{media_badge}
 				<br>
-				"{event['media_reaction']}"
+				{media_quote}
 				{media_source}
 			</div>
 
@@ -2028,6 +2044,10 @@ def main():
     # Analyze quote quality
     def get_provenance_type(event: Dict[str, Any], reaction_key: str) -> str:
         """Get the provenance type for a reaction"""
+        # Null means nobody has been asked. That is not a placeholder awaiting
+        # a real quote; it is a field with nothing in it, deliberately.
+        if event.get(reaction_key) is None:
+            return 'not_applicable'
         prov = event.get('reaction_provenance', {}).get(reaction_key, 'placeholder')
         if isinstance(prov, str):
             return prov
