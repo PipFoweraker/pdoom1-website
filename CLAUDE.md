@@ -728,6 +728,8 @@ python  scripts/check-deploy-excludes.py  # nothing deployed points at an exclud
 python  scripts/check-control-characters.py # no stray control chars in published text [content-honesty]
 python  scripts/render-ledger.py --check  # /ledger/ in step with LEAGUE_SEED_LEDGER.md [content-honesty]
 python  scripts/test-render-ledger.py     # ...and it withholds infra detail, keeps the facts [content-honesty]
+python  scripts/render-known-wrong.py --check # /known-wrong/ in step with the ack ledger [content-honesty]
+python  scripts/test-render-known-wrong.py # ...no clock baked in; no undated acceptance ships [content-honesty]
 python  scripts/test-sync-events-control-chars.py # ...and the strip can still FAIL [content-honesty]
 python  scripts/check-skip-ci-marker.py --title "$T" --body "$B" # PR text cannot suppress its own merge [skip-ci-guard]
 python  scripts/test-skip-ci-marker.py    # ...and that guard can still FAIL  [skip-ci-guard]

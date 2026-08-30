@@ -33,28 +33,6 @@
       "review_by": "2026-09-15",
       "on_expiry": "Pick one: post the campaign with the platform lines updated, rewrite them, or archive the campaign as superseded by ladder-fork-l4-2026-08. All three close this; none of them is a shrug.",
       "source": "public/data/version.json -> latest_release.platforms (windows/macos/linux all true at v0.14.1); pdoom1/README.md:12-16. Found by scripts/check-campaign-facts.py on the run that introduced it."
-    },
-    {
-      "check": "check-campaign-facts",
-      "key": "content/campaigns/2026-08-07-ladder-fork-l4.json::new-runs-on-the-current-epoch",
-      "what": "OBSERVED BOARD IS NOT THE PUBLISHED BOARD: published (weekly-2026-w32, L4) vs observed (None, None). The campaign also names L4 as the epoch new runs land on, and L4 closed on 2026-08-21 when v0.14.2 forked the ladder to L5.",
-      "why": "The finding is real and the guard is right. It cannot be CLEARED tonight: it compares the published board against an OBSERVED one, and observed is (None, None) because api.pdoom1.com is unreachable -- ICMP, :22, :80 and :443 all time out rather than refuse, so the host is down, not the web server. The prescribed fix, scripts/publish-live-board.py, needs that same host. So the only ways to green it tonight are to fake an observation or to disarm the guard, and both are worse than saying so on a date. Nothing false has reached a reader: VERIFIED, not assumed -- both campaigns are approved:false with every posted[*] null. The finding predates this work: the identical two findings fire on origin/main, so the L5 blessing neither caused nor worsened it. This entry is the more urgent of the two: its copy names a specific epoch that is now CLOSED, so the fix is a re-read of the copy and not merely a key swap -- which is exactly what the guard's own remediation line says.",
-      "accepted_by": "Pip, Commissioner, 2026-08-21, explicitly ('2'), choosing a dated acknowledgement over admin-merging past a BLOCKING reader-facing guard or rewriting campaign copy at night.",
-      "accepted_on": "2026-08-21",
-      "review_by": "2026-09-05",
-      "on_expiry": "Do NOT bulk re-accept. By then api.pdoom1.com is either back or it is not. If back: run scripts/publish-live-board.py then scripts/check-board-liveness.py, and re-read the campaign copy against the epoch that is actually current -- L5 or later, not L4. If still down: that is no longer an outage, it is the league being offline for over two weeks, and the honest move is to change what the site CLAIMS about a live leaderboard rather than to re-accept this entry.",
-      "source": "pdoom1-website PR #340 (league(bless): L5 blessed, L3 and L4 regularised). Ladder fork L4 -> L5 shipped in pdoom1 v0.14.2, blessed at [Gate 5] 2026-08-21; [Gate 6] HELD by the Commissioner because the board cannot open. See docs/LEAGUE_SEED_LEDGER.md L5 row."
-    },
-    {
-      "check": "check-campaign-facts",
-      "key": "content/campaigns/2026-07-24-alpha-launch.json::leaderboard-live",
-      "what": "OBSERVED BOARD IS NOT THE PUBLISHED BOARD: published (weekly-2026-w32, L4) vs observed (None, None). The alpha-launch copy asserts a live leaderboard.",
-      "why": "The finding is real and the guard is right. It cannot be CLEARED tonight: it compares the published board against an OBSERVED one, and observed is (None, None) because api.pdoom1.com is unreachable -- ICMP, :22, :80 and :443 all time out rather than refuse, so the host is down, not the web server. The prescribed fix, scripts/publish-live-board.py, needs that same host. So the only ways to green it tonight are to fake an observation or to disarm the guard, and both are worse than saying so on a date. Nothing false has reached a reader: VERIFIED, not assumed -- both campaigns are approved:false with every posted[*] null. The finding predates this work: the identical two findings fire on origin/main, so the L5 blessing neither caused nor worsened it. Reviewed later than its sibling deliberately: this campaign asserts that a leaderboard is live WITHOUT naming an epoch, so it survives a fork and only needs the board to actually be serving. It becomes true again the moment the host does.",
-      "accepted_by": "Pip, Commissioner, 2026-08-21, explicitly ('2'), choosing a dated acknowledgement over admin-merging past a BLOCKING reader-facing guard or rewriting campaign copy at night.",
-      "accepted_on": "2026-08-21",
-      "review_by": "2026-09-19",
-      "on_expiry": "If the board is serving, this clears itself -- confirm with scripts/check-board-liveness.py and delete the entry. If it is not, the copy claims a live leaderboard that has not existed for a month; rewrite it or do not post the campaign. Deleting this entry without checking the board is the failure this ledger exists to prevent.",
-      "source": "pdoom1-website PR #340 (league(bless): L5 blessed, L3 and L4 regularised). Ladder fork L4 -> L5 shipped in pdoom1 v0.14.2, blessed at [Gate 5] 2026-08-21; [Gate 6] HELD by the Commissioner because the board cannot open. See docs/LEAGUE_SEED_LEDGER.md L5 row."
     }
   ]
 }

@@ -523,6 +523,15 @@ jobs:
       - name: ...and it still refuses to publish infrastructure detail
         run: python scripts/test-render-ledger.py
 
+      # /known-wrong/ publishes the acknowledgement ledger. Its whole subject is
+      # expiry dates, so the two things that must not break are that no clock is
+      # baked into the markup and that an acceptance with no date cannot ship.
+      - name: /known-wrong/ is in step with the acknowledgement ledger
+        run: python scripts/render-known-wrong.py --check
+
+      - name: ...and an acceptance with no expiry cannot be published
+        run: python scripts/test-render-known-wrong.py
+
       - name: ...and the strip can still FAIL
         run: python scripts/test-sync-events-control-chars.py
 
