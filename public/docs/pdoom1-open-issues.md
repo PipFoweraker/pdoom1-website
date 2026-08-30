@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-08-30T01:02:18.595Z UTC
+Generated: 2026-08-30T06:34:58.400Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1343 | tech-debt sweep: nothing states what 'paused' means, so 9 timers, 18 tweens and 47 input surfaces each decided for themselves (due 2026-09-04) | technical-debt |  | 2026-08-30 01:40:27 | [link](https://github.com/PipFoweraker/pdoom1/issues/1343) |
 | 1331 | ASCII-only rule: 52 docs in breach, ~3,700 characters, invisible because the test never ran |  |  | 2026-08-28 23:37:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1331) |
 | 1328 | Release Checklist: v0.14.4 | release, checklist |  | 2026-08-28 22:18:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1328) |
 | 1327 | 1,194 invented 'safety researcher' quotes ship as player-facing flavor text, and the next pdoom-data resync will hand you null |  |  | 2026-08-28 22:05:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1327) |
