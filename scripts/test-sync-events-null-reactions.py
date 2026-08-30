@@ -31,6 +31,16 @@ import importlib.util
 import sys
 from pathlib import Path
 
+# Pip's console is cp1252, and this module prints on every run. Without this a
+# single non-ASCII character in any output aborts the whole test rather than
+# reporting a result. Required by scripts/check-encoding-safety.py (W1), which
+# caught its absence here.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 ROOT = Path(__file__).resolve().parents[1]
 _spec = importlib.util.spec_from_file_location(
     "sync_events", ROOT / "scripts" / "sync" / "sync-events.py")
