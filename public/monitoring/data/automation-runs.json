@@ -1,16 +1,6 @@
 [
   {
     "job": "auto-update-data",
-    "trigger": "workflow_dispatch",
-    "timestamp": "2026-08-07T16:21:32.658875Z",
-    "status": "success",
-    "details": {
-      "version-status": "success",
-      "stats-status": "success"
-    }
-  },
-  {
-    "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2026-08-07T18:20:16.987782Z",
     "status": "success",
@@ -1018,6 +1008,17 @@
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2026-08-30T00:49:58.079005Z",
+    "status": "success",
+    "status_reason": "all 2 observed outcomes reported success",
+    "details": {
+      "version-status": "success",
+      "stats-status": "success"
+    }
+  },
+  {
+    "job": "auto-update-data",
+    "trigger": "schedule",
+    "timestamp": "2026-08-30T06:25:47.864207Z",
     "status": "success",
     "status_reason": "all 2 observed outcomes reported success",
     "details": {
