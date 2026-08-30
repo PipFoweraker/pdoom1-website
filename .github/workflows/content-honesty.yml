@@ -514,6 +514,15 @@ jobs:
       - name: No stray control characters in published text
         run: python scripts/check-control-characters.py
 
+      # /ledger/ publishes a maintainer document verbatim. The only thing between the
+      # repo's ledger and pdoom1.com is the withholding pass, so both halves run: the
+      # page must be in step with its source, and the refusal must still fire.
+      - name: /ledger/ is in step with the ledger document
+        run: python scripts/render-ledger.py --check
+
+      - name: ...and it still refuses to publish infrastructure detail
+        run: python scripts/test-render-ledger.py
+
       - name: ...and the strip can still FAIL
         run: python scripts/test-sync-events-control-chars.py
 
