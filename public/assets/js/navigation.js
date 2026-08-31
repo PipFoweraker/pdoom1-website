@@ -126,6 +126,9 @@
 							page and concludes the numbers are wrong.
 						-->
 						<li role="none"><a href="/metrics/" role="menuitem">Site Metrics</a></li>
+						<li role="none"><a href="/development-rhythm/" role="menuitem">Development Rhythm</a></li>
+						<li role="none"><a href="/ledger/" role="menuitem">League Ledger</a></li>
+						<li role="none"><a href="/known-wrong/" role="menuitem">Known Wrong</a></li>
 						<li role="none"><a href="/resources/" role="menuitem">AI Safety Resources</a></li>
 						<li role="none"><a href="/events/" role="menuitem">AI Safety Timeline</a></li>
 						<li role="none"><a href="/docs/roadmap/" role="menuitem">Roadmap</a></li>

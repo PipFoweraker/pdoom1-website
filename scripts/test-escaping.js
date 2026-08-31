@@ -78,6 +78,17 @@ function read(rel) {
 // a helper someone adds LATER is not listed, so it fails closed until declared.
 const GUARDED = [
   {
+    // Renders two fetched documents: the in-repo epoch record and the GitHub releases
+    // API. The API is third-party and a release name/tag is author-controlled, so `r.*`
+    // is external data in the same sense entry.* is on /leaderboard/.
+    page: 'public/development-rhythm/index.html',
+    roots: ['e', 'r'],
+    // No page-local helper is trusted to escape: every interpolation calls
+    // escapeHTML() from the shared escaper directly.
+    safeHelpers: [],
+    fetches: ['/data/ladder-epochs.json', 'api.github.com/repos/PipFoweraker/pdoom1/releases'],
+  },
+  {
     page: 'public/leaderboard/index.html',
     roots: ['entry', 'data', 'e'],
     safeHelpers: ['identityHTML', 'devBadgeHTML'],

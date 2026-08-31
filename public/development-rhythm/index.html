@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Development Rhythm - p(Doom)1</title>
+  <link rel="canonical" href="https://pdoom1.com/development-rhythm/" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+  <meta name="description" content="How irregularly p(Doom)1 actually gets built - ladder epochs, release cadence, and what that means for your scores. Every number derived at runtime, none typed by hand." />
+  <meta name="author" content="p(Doom)1" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="p(Doom)1" />
+  <meta property="og:title" content="Development Rhythm - p(Doom)1" />
+  <meta property="og:description" content="How irregularly p(Doom)1 actually gets built - ladder epochs, release cadence, and what that means for your scores." />
+  <meta property="og:url" content="https://pdoom1.com/development-rhythm/" />
+  <meta property="og:image" content="https://pdoom1.com/assets/og-card.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+  <script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+  <!--
+    DERIVED PAGE, AND THE SUBJECT IS ITS OWN HONESTY.
+    This page exists to show how irregular development has been. A page about
+    irregularity that reported a hand-typed number would be the joke telling itself,
+    so there is deliberately NO figure, date, version or count written into this file.
+    Everything is read at run time from:
+      /data/ladder-epochs.json   - the ladder epoch record (in-repo, same origin)
+      the pdoom1 releases API    - release tags and publication dates
+    WHY RUNTIME AND NOT BUILD TIME. /metabolism/ is generated and its --check fails a
+    PR when it drifts. That is right for cadences that change when a workflow changes.
+    It is wrong here: release data moves every time the game ships, so a generated
+    version of this page would go stale on a schedule nobody controls and turn its
+    check permanently red -- the exact state CLAUDE.md forbids. /game-changelog/
+    already solved this by deriving at run time; this follows it.
+    Every branch degrades to "we cannot tell you", never to a substituted value.
+  -->
+  <style>
+    :root{
+      --bg:#12100F; --panel:#1C1917; --panel-2:#262220; --hair:#3A342E; --hair-2:#2a2622;
+      --ink:#E9F2F2; --ink-2:#CFC7BB; --ink-3:#A79E92;
+      --amber:#F6A800; --teal:#2FD4C2; --doom:#E2524A; --phosphor:#5BE87A;
+      --radius:10px;
+      --mono:ui-monospace,"SFMono-Regular",Menlo,"Courier New",monospace;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{color-scheme:dark}
+    body{
+      background:var(--bg); color:var(--ink); font-family:var(--mono); line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      background-image:radial-gradient(60rem 40rem at 50% -10%, rgba(246,168,0,.05), transparent 60%);
+      background-attachment:fixed;
+    }
+    .wrap{max-width:60rem;margin:0 auto;padding:2rem 1.2rem 5rem}
+    h1{font-size:1.9rem;letter-spacing:-.02em;margin-bottom:.4rem}
+    h2{font-size:1.15rem;color:var(--amber);margin:2.4rem 0 .8rem;letter-spacing:.02em}
+    .lede{color:var(--ink-2);margin-bottom:.6rem}
+    .sub{color:var(--ink-3);font-size:.85rem}
+    .panel{background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);
+           padding:1.1rem 1.2rem;margin:1rem 0}
+    .scroller{overflow-x:auto}
+    table{border-collapse:collapse;width:100%;font-size:.87rem;min-width:34rem}
+    th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--hair-2);
+          vertical-align:top}
+    th{color:var(--ink-3);font-weight:normal;font-size:.78rem;letter-spacing:.06em;
+       text-transform:uppercase;white-space:nowrap}
+    td.num{text-align:right;white-space:nowrap}
+    .tag{display:inline-block;padding:.05rem .45rem;border-radius:99px;font-size:.72rem;
+         border:1px solid var(--hair)}
+    .t-current{color:var(--phosphor);border-color:var(--phosphor)}
+    .t-closed{color:var(--ink-3)}
+    .t-legacy{color:var(--ink-3);opacity:.7}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.8rem}
+    .stat{background:var(--panel-2);border:1px solid var(--hair-2);border-radius:var(--radius);
+          padding:.7rem .8rem}
+    .stat .v{font-size:1.35rem;color:var(--teal);line-height:1.2}
+    .stat .k{font-size:.74rem;color:var(--ink-3);margin-top:.2rem}
+    .note{border-left:2px solid var(--amber);padding-left:.9rem;margin:1rem 0;
+          color:var(--ink-2);font-size:.9rem}
+    .warn{border-left-color:var(--doom)}
+    a{color:var(--teal)}
+    a:hover{color:var(--amber)}
+    .loading{color:var(--ink-3);font-style:italic}
+    footer{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--hair);
+           color:var(--ink-3);font-size:.82rem}
+  </style>
+  <!-- The site's ONE escaper. Plain blocking script, not defer: the renderers below
+       call it, so if it fails to load escapeHTML is undefined, the template throws and
+       the page renders nothing. Fail closed. -->
+  <script src="/assets/js/escape.js"></script>
+</head>
+<body>
+  <header></header>
+
+  <div class="wrap">
+    <h1>Development Rhythm</h1>
+    <p class="lede">How irregularly this actually gets built &mdash; and what that means
+      for a score you set.</p>
+    <p class="sub">Every number below is read from the release record when you load the
+      page. None of them is typed into it.</p>
+
+    <div class="note">
+      <strong>This is an alpha.</strong> The ladder forks whenever the rules change enough
+      that old scores stop being comparable, and during an alpha that can be any week.
+      Global boards close when it happens. <strong>Your local scores never do</strong>
+      &mdash; the game writes those to your own machine and that file has no network code
+      in it at all, so nothing here can reach them.
+    </div>
+
+    <h2>Ladder epochs</h2>
+    <p class="sub">An epoch is a set of rules. A score is only comparable to other scores
+      set under the same one, which is why a fork closes the board rather than extending
+      it. <a href="/leaderboard/">The current board</a>.</p>
+    <div class="panel">
+      <div id="epochs" class="scroller"><p class="loading">Reading the epoch record&hellip;</p></div>
+    </div>
+    <div id="epoch-note"></div>
+
+    <h2>Release cadence</h2>
+    <p class="sub">Published releases, oldest to newest. <a href="/game-changelog/">What
+      changed in each</a>.</p>
+    <div id="cadence"><p class="loading">Reading the release record&hellip;</p></div>
+    <div id="cadence-note"></div>
+
+    <h2>Why this page exists</h2>
+    <p class="lede">Most projects show you a roadmap. This one has been too erratic for a
+      roadmap to be honest, so it shows you the record instead.</p>
+    <p class="sub">If that looks rough, it is because it is being built. The alternative
+      was a tidier page that told you less. See also
+      <a href="/metabolism/">what runs on a schedule here</a>,
+      <a href="/design-notes/">the design decisions behind the game</a>, and
+      <a href="/blog/">the dev blog</a>.</p>
+
+    <footer>
+      Sources: <a href="/data/ladder-epochs.json">ladder-epochs.json</a> and the
+      <a href="https://github.com/PipFoweraker/pdoom1/releases" target="_blank" rel="noopener">pdoom1
+      releases API</a>. Both are public; nothing on this page is computed anywhere you
+      cannot check.
+    </footer>
+  </div>
+
+  <script src="/assets/js/navigation.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var RELEASES_API = 'https://api.github.com/repos/PipFoweraker/pdoom1/releases?per_page=100';
+    var DAY = 86400000;
+
+    function fail(id, msg) {
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '<p class="loading">' + escapeHTML(msg) + '</p>';
+    }
+
+    // Every date on this page comes off a fetched document, so nothing is trusted to
+    // parse. An unparseable stamp renders as unknown, never as today: substituting the
+    // reader's clock for a missing value is the bug /issues/ used to have.
+    function when(raw) {
+      if (!raw) return null;
+      var t = Date.parse(raw);
+      return isFinite(t) ? t : null;
+    }
+
+    function ymd(ms) {
+      var d = new Date(ms);
+      return d.toISOString().slice(0, 10);
+    }
+
+    // Durations read in the unit that carries information. "0.2 d" tells a reader less
+    // than "4.9 h", and an epoch that lived under a day is exactly the case this page
+    // exists to make visible.
+    function dur(ms) {
+      if (ms == null) return '&mdash;';
+      var d = ms / DAY;
+      if (d >= 1) return (Math.round(d * 10) / 10) + ' d';
+      var h = ms / 3600000;
+      if (h >= 1) return (Math.round(h * 10) / 10) + ' h';
+      return Math.max(1, Math.round(ms / 60000)) + ' min';
+    }
+
+    function median(xs) {
+      if (!xs.length) return null;
+      var s = xs.slice().sort(function (a, b) { return a - b; });
+      var m = Math.floor(s.length / 2);
+      return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+    }
+
+    // ---------------------------------------------------------------- epochs
+    fetch('/data/ladder-epochs.json', { cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (d) {
+        var list = (d && d.epochs) || [];
+        // Only epochs with a boundary can be placed on a timeline. The earliest ones
+        // predate the record and are listed as legacy rather than given invented dates.
+        var dated = list.filter(function (e) { return when(e.boundary_local) !== null; });
+        dated.sort(function (a, b) { return when(a.boundary_local) - when(b.boundary_local); });
+        if (!dated.length) { fail('epochs', 'The epoch record carries no dated epochs, so this table cannot be built.'); return; }
+
+        var now = Date.now();
+        var rows = '';
+        var shortOpen = null;
+
+        for (var i = 0; i < dated.length; i++) {
+          var e = dated[i];
+          var start = when(e.boundary_local);
+          // An epoch's end is its own closing stamp where one exists. Where it does not,
+          // the successor's boundary is used and the cell SAYS SO -- an inferred end is
+          // not the same fact as a recorded one, and the ledger currently records no
+          // closing act for any epoch. See the note under this table.
+          var recorded = when(e.closed_local);
+          var inferred = (i + 1 < dated.length) ? when(dated[i + 1].boundary_local) : null;
+          var end = recorded != null ? recorded : inferred;
+          var running = (e.status === 'current') || (end == null);
+          var life = running ? (now - start) : (end - start);
+
+          var status = String(e.status || 'unknown');
+          var cls = status === 'current' ? 't-current'
+                  : status === 'legacy' ? 't-legacy' : 't-closed';
+
+          var endCell = running ? '<span class="t-current">running</span>'
+                      : recorded != null ? escapeHTML(ymd(end))
+                      : escapeHTML(ymd(end)) + ' <span class="sub">(inferred)</span>';
+
+          // The gap between how long an epoch nominally lasted and how long its board
+          // was actually open is the most honest number available, and it only exists
+          // where an opening was recorded.
+          var opened = when(e.board_opened_utc);
+          var openLife = (opened != null && end != null && end > opened) ? (end - opened) : null;
+          if (openLife != null && (shortOpen === null || openLife < shortOpen.ms)) {
+            shortOpen = { ms: openLife, v: String(e.ladder_version || ''), nominal: life };
+          }
+
+          rows += '<tr>'
+            + '<td><strong>' + escapeHTML(String(e.ladder_version || '?')) + '</strong></td>'
+            + '<td>' + escapeHTML(ymd(start)) + '</td>'
+            + '<td>' + endCell + '</td>'
+            + '<td class="num">' + dur(life) + '</td>'
+            + '<td class="num">' + (openLife != null ? dur(openLife) : '&mdash;') + '</td>'
+            + '<td>' + escapeHTML(String(e.first_build || '—')) + '</td>'
+            + '<td><span class="tag ' + cls + '">' + escapeHTML(status) + '</span></td>'
+            + '</tr>';
+        }
+
+        document.getElementById('epochs').innerHTML =
+          '<table><thead><tr>'
+          + '<th>Epoch</th><th>Opened</th><th>Ended</th><th>Lifetime</th>'
+          + '<th>Board open for</th><th>First build</th><th>Status</th>'
+          + '</tr></thead><tbody>' + rows + '</tbody></table>';
+
+        var notes = '';
+        if (shortOpen && shortOpen.ms < DAY) {
+          notes += '<div class="note"><strong>' + escapeHTML(shortOpen.v)
+            + ' was open for ' + dur(shortOpen.ms) + '.</strong> Its epoch nominally ran '
+            + dur(shortOpen.nominal) + ', but the board only accepted scores from the moment '
+            + 'it was opened to the moment the next epoch replaced it. That difference is '
+            + 'the honest measure of how fast this has been moving.</div>';
+        }
+        notes += '<div class="note warn"><strong>&ldquo;Ended&rdquo; is mostly inferred, '
+          + 'not recorded.</strong> Opening a board is a deliberate act with a name and a '
+          + 'timestamp against it. Closing one currently is not &mdash; an epoch ends '
+          + 'because the next one arrives. Where a cell says <em>inferred</em>, that is '
+          + 'the successor&rsquo;s start date standing in for a closing nobody wrote down.'
+          + '</div>';
+        document.getElementById('epoch-note').innerHTML = notes;
+      })
+      .catch(function () {
+        fail('epochs', 'Could not read the epoch record, so this page cannot say how the '
+           + 'ladder has moved. That is a fault here, not an empty history.');
+      });
+
+    // -------------------------------------------------------------- releases
+    fetch(RELEASES_API, { headers: { 'Accept': 'application/vnd.github+json' } })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        var rel = (data || []).filter(function (r) { return r && r.published_at && !r.draft; });
+        rel.sort(function (a, b) { return when(a.published_at) - when(b.published_at); });
+        if (rel.length < 2) { fail('cadence', 'Fewer than two published releases are visible, so there is no cadence to report yet.'); return; }
+
+        var first = when(rel[0].published_at);
+        var last = when(rel[rel.length - 1].published_at);
+        var gaps = [];
+        for (var i = 1; i < rel.length; i++) {
+          gaps.push(when(rel[i].published_at) - when(rel[i - 1].published_at));
+        }
+        var mean = gaps.reduce(function (a, b) { return a + b; }, 0) / gaps.length;
+        var med = median(gaps);
+        var min = Math.min.apply(null, gaps);
+        var max = Math.max.apply(null, gaps);
+        var cut = Date.now() - 30 * DAY;
+        var recent = rel.filter(function (r) { return when(r.published_at) >= cut; }).length;
+
+        document.getElementById('cadence').innerHTML =
+          '<div class="stats">'
+          + '<div class="stat"><div class="v">' + escapeHTML(String(rel.length)) + '</div><div class="k">releases published</div></div>'
+          + '<div class="stat"><div class="v">' + dur(last - first) + '</div><div class="k">from first to latest</div></div>'
+          + '<div class="stat"><div class="v">' + dur(med) + '</div><div class="k">median gap</div></div>'
+          + '<div class="stat"><div class="v">' + dur(mean) + '</div><div class="k">mean gap</div></div>'
+          + '<div class="stat"><div class="v">' + dur(min) + '</div><div class="k">shortest gap</div></div>'
+          + '<div class="stat"><div class="v">' + dur(max) + '</div><div class="k">longest gap</div></div>'
+          + '<div class="stat"><div class="v">' + escapeHTML(String(recent)) + '</div><div class="k">in the last 30 days</div></div>'
+          + '</div>';
+
+        // The divergence is the content. Reporting one number would hide the shape:
+        // the mean is dragged by a long dormancy, the median describes a recent week,
+        // and neither is wrong. Resolving them into a single "our cadence" would be.
+        var note = '<div class="note"><strong>The mean and the median disagree, and both '
+          + 'are true.</strong> The mean gap is ' + dur(mean) + ' and the median is '
+          + dur(med) + '. The mean is dragged by a long quiet stretch; the median is '
+          + 'closer to what a recent week looks like. Neither one on its own is an honest '
+          + 'answer to &ldquo;how often does it ship&rdquo;, so both are here.</div>';
+        note += '<div class="note"><strong>The spread is the point.</strong> The shortest '
+          + 'gap between two releases was ' + dur(min) + '. The longest was ' + dur(max)
+          + '. That is the same project in both cases.</div>';
+        document.getElementById('cadence-note').innerHTML = note;
+      })
+      .catch(function () {
+        // The GitHub API is rate-limited by IP and unauthenticated here, so this is an
+        // ordinary outcome rather than an incident. Say which failure it was.
+        fail('cadence', 'Could not read the release list just now — the GitHub API is '
+           + 'rate-limited and this page asks for it without a token. The releases '
+           + 'themselves are fine; refresh in a few minutes, or read them on GitHub.');
+      });
+  })();
+  </script>
+</body>
+</html>

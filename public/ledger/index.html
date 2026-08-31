@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>League Ledger</title>
+	<link rel="canonical" href="https://pdoom1.com/ledger/" />
+	<meta name="description" content="The record of which seed governs which p(Doom)1 league epoch, when it was blessed and by whom - the working document, not a summary." />
+	<meta property="og:title" content="League Ledger" />
+	<meta property="og:description" content="The record of which seed governs which p(Doom)1 league epoch, when it was blessed and by whom - the working document, not a summary." />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://pdoom1.com/ledger/" />
+
+	<!-- Plausible Analytics -->
+	<script defer data-domain="pdoom1.com" src="https://analytics.pdoom1.com/js/script.file-downloads.outbound-links.pageview-props.tagged-events.js"></script>
+
+	<link rel="stylesheet" href="/css/site.css">
+	<style>
+		:root {
+			--bg-primary: #12100f;
+			--bg-secondary: #1c1917;
+			--bg-tertiary: #262220;
+			--text-primary: #ffffff;
+			--text-secondary: #cfc7bb;
+			--text-muted: #a79e92;
+			--accent-primary: #f6a800;
+			--accent-secondary: #2fd4c2;
+			--accent-danger: #ff4444;
+			--border-color: #3a342e;
+			--success-color: #4fb37a;
+			--radius-md: 6px;
+		}
+
+		body { font-family: 'Courier New', monospace; background: var(--bg-primary);
+			color: var(--text-primary); line-height: 1.6; margin: 0; padding: 0; }
+		header { background: rgba(45, 45, 45, 0.95);
+			border-bottom: 2px solid var(--accent-primary); padding: 1rem 0; }
+		nav { max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+			display: flex; justify-content: space-between; align-items: center;
+			flex-wrap: wrap; gap: 0.5rem; }
+		nav a { color: var(--accent-primary); text-decoration: none; }
+		nav a:hover { text-decoration: underline; }
+		main { max-width: 860px; margin: 2rem auto 4rem; padding: 0 1rem; }
+		h1 { color: var(--accent-primary); line-height: 1.3; }
+		h2 { color: var(--accent-primary); margin-top: 2.5rem;
+			border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+		h3 { color: var(--accent-secondary); margin-top: 1.8rem; }
+		a { color: var(--accent-primary); }
+		code { background: var(--bg-tertiary); padding: 0.1rem 0.35rem;
+			border-radius: 3px; font-size: 0.92em; }
+		blockquote { border-left: 3px solid var(--accent-secondary);
+			margin: 1.2rem 0; padding: 0.4rem 1rem; color: var(--text-secondary);
+			background: var(--bg-secondary); }
+		hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+		/* Wide content must scroll in its own box, never the page body. */
+		.table-scroll { overflow-x: auto; margin: 1.2rem 0; }
+		table { border-collapse: collapse; width: 100%; min-width: 480px; }
+		th, td { border: 1px solid var(--border-color); padding: 0.5rem 0.7rem;
+			text-align: left; vertical-align: top; }
+		th { background: var(--bg-secondary); color: var(--accent-primary); }
+		.meta { color: var(--text-muted); font-size: 0.9rem;
+			border: 1px solid var(--border-color); border-radius: var(--radius-md);
+			padding: 0.8rem 1rem; margin-bottom: 2rem; background: var(--bg-secondary); }
+		.meta strong { color: var(--text-secondary); }
+		.notice { border: 1px solid var(--accent-secondary); border-radius: var(--radius-md);
+			padding: 0.9rem 1rem; margin-bottom: 2rem; color: var(--text-secondary);
+			background: rgba(47, 212, 194, 0.08); font-size: 0.92rem; }
+		.card-list { list-style: none; padding: 0; }
+		.card-list li { border: 1px solid var(--border-color);
+			border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+			background: var(--bg-secondary); }
+		.card-list a { text-decoration: none; font-weight: 700; }
+		.card-list p { margin: 0.4rem 0 0; color: var(--text-secondary);
+			font-size: 0.92rem; }
+		footer { border-top: 1px solid var(--border-color); margin-top: 3rem;
+			padding: 1.5rem 1rem; text-align: center; color: var(--text-muted);
+			font-size: 0.85rem; }
+	</style>
+</head>
+<body>
+	<header>
+		<!-- Progressive enhancement, deliberately. navigation.js (loaded at the
+		     end of body) replaces the contents of <header> UNLESS it finds a
+		     <nav> containing .nav-links. This fallback has no .nav-links class,
+		     so the script overwrites it with the full site nav -- but if the
+		     script is blocked or fails, these links still render, and they
+		     render on first paint rather than after it.
+
+		     Do NOT hand-copy the full nav here. The site already carries ten
+		     divergent hand-copied nav variants across its top-level pages;
+		     navigation.js is the de-facto single source (7 pages use it) and
+		     these pages should inherit its fixes automatically. -->
+		<nav>
+			<a href="/">p(Doom)1</a>
+			<span><a href="/design-notes/">Design Notes</a> &middot; <a href="/leaderboard/">Leaderboard</a> &middot; <a href="/bug-report/">Report a Bug</a></span>
+		</nav>
+	</header>
+	<main>
+<p class="lede">The record of which seed governs which league epoch, when it was blessed, and by whom. This is the working document, not a summary of it — including the entries where a gate was held and nothing happened for days.</p><p class="sub">Rendered from <code>docs/LEAGUE_SEED_LEDGER.md</code> in the website repository. Infrastructure detail from outage notes is withheld and marked where that happens; nothing else is altered. See also <a href="/development-rhythm/">how irregular the pace has been</a> and <a href="/leaderboard/">the current board</a>.</p><p>The authoritative, human-readable record of which competitive seed governs which league epoch — when it was blessed, and by whom. A "blessing" is Pip's explicit sign-off that a seed is the real one for an epoch.</p>
+<p><strong>The seed is not a free website-side choice.</strong> The game client is built to POST scores under a specific <code>(seed, ladder_version)</code> key; the board MUST use exactly that key or submitted scores land in a board nobody displays — a silent failure with no error shown to the player. So the canonical seed is <strong>whatever the shipped client sends</strong>, confirmed against the game's protocol docs, not a value picked here.</p>
+<p><strong>Authoritative source (read these, not issue comments):</strong></p>
+<ul>
+<li><code>pdoom1/docs/game-design/BUILD_VS_LADDER_VERSION_SPLIT.md</code> — key/epoch nomenclature + bump rule</li>
+<li><code>pdoom1/docs/RELEASE_AND_LEAGUE_CYCLE.html</code> — cadence + epoch-cut runbook</li>
+</ul>
+<div class="table-scroll"><table>
+<thead><tr><th>epoch</th><th>seed</th><th>ladder</th><th>board file</th><th>blessed (UTC)</th><th>by</th><th>notes</th></tr></thead>
+<tbody>
+<tr><td>L2</td><td><code>weekly-2026-w30</code></td><td>L2</td><td><code>board_weekly-2026-w30__L2.json</code></td><td>2026-07-25</td><td>Pip</td><td><strong>First epoch cut.</strong> Client sends <code>version="L2"</code>, seed <code>weekly-2026-w30</code> (pdoom1 #151, gate-green; echoed in <code>public/data/version.json</code> release notes). Legacy L1 board preserved as <code>board_weekly-2026-w0__L1.json</code>.</td></tr>
+<tr><td>L3</td><td><code>weekly-2026-w31</code></td><td>L3</td><td><code>board_weekly-2026-w31__L3.json</code></td><td>2026-08-21</td><td>Pip</td><td><strong>Regularised retrospectively on 2026-08-21</strong>, not blessed on the night. Verified FROM THE ARTIFACT per this ledger's own rule, never by POST: the v0.13.2 client's <code>FEATURED_SEED_OVERRIDE</code>, corroborated by the 6 real entries preserved at <code>public/leaderboard/data/preserved/2026-08-08-l3-epoch-close/</code>. <strong>Closed history</strong> — do not re-stamp these onto a later epoch; they were played under different rules.</td></tr>
+<tr><td>L4</td><td><code>weekly-2026-w32</code></td><td>L4</td><td><code>board_weekly-2026-w32__L4.json</code></td><td>2026-08-21</td><td>Pip</td><td><strong>Regularised retrospectively on 2026-08-21.</strong> The ladder forked 2026-08-07 with pdoom1 v0.14.0 and no ceremony completed; the factual record below (recorded 2026-08-08, explicitly NOT a blessing) stands and this row now blesses it. Artifact: the v0.14.0 tag message plus that release's <code>release_manifest.json</code> carrying <code>"ladder_version": "4"</code>. Positively verified 2026-08-08 by read-only GET — 11 entries from 5 players on clients stamped v0.14.0/v0.14.1.</td></tr>
+<tr><td><strong>L6</strong></td><td><code>weekly-2026-w35</code></td><td>L6</td><td><code>board_weekly-2026-w35__L6.json</code></td><td>2026-08-24</td><td>Pip</td><td><strong>BLESSED at [Gate 5] by Pip at 19:36 on 2026-08-24, in the website seat.</strong> <strong>[Gate 6] OPENED in the same breath: the board on <code>weekly-2026-w35</code> at ladder epoch <code>L6</code> is open and may take scores.</strong> pdoom1 <strong>v0.14.3</strong> forked L5 -&gt; L6 and rolled the seed in the same release. Verified FROM THE ARTIFACT, not from a comment or a memory: the published v0.14.3 <code>release_manifest.json</code> carries <code>"ladder_version": "6"</code>, <code>"league_seed": "weekly-2026-w35"</code> and <code>"commit_hash": "161240bef1454851555ed042c640b67a0cf67d56"</code>. <strong>Gate 6 check 4 -- one run has travelled the whole way and arrived -- was already satisfied when the gate was opened, by a real player rather than a test run:</strong> the board held one entry, lab <code>bubble gum factory -- mic oxe</code>, score 21, posted 2026-08-24 by the site's first external reviewer. That score existed on a board the site was not publishing for roughly five hours, which is the harm this ceremony exists to end rather than a reason to delay it. <strong>The seed WAS rolled this time</strong>, unlike the L4 -&gt; L5 fork where it was held: v0.14.3 moved both halves of the key, so <code>(weekly-2026-w33, L5)</code> is closed with zero entries and is archived at <code>public/leaderboard/data/preserved/2026-08-24-l5-epoch-close/</code>. The release notes record the slip honestly -- the rolls to <code>w34</code> (23 Aug) and <code>w35</code> (24 Aug) were made in the repository and never reached a published build, so players stayed on <code>w33</code>/<code>L5</code> until this release carried them across.</td></tr>
+<tr><td><strong>L5</strong></td><td><code>weekly-2026-w33</code></td><td>L5</td><td><code>board_weekly-2026-w33__L5.json</code></td><td>2026-08-21</td><td>Pip</td><td><strong>Blessed at [Gate 5] on the night.</strong> pdoom1 <strong>v0.14.2</strong> forked L4 -&gt; L5; the seed is HELD, not rolled, because the epoch half moved and forking twice buys nothing. Verified FROM THE ARTIFACT: v0.14.2 <code>release_manifest.json</code> carries <code>"ladder_version": "5"</code>, <code>"league_seed": "weekly-2026-w33"</code>, <code>"commit_hash": "38528c22..."</code> — the tagged commit. Gate 5 checks 1-6 and 8 all passed (difficulty locked to Standard; scenarios and Alpha Tools routed through <code>is_ranked_run()</code>). <strong>Check 7 was UNAVAILABLE and [Gate 6] was HELD by the Commissioner on 2026-08-21: <code>api.pdoom1.com</code> was unreachable</strong> — every service probed timed out rather than refuse, so the host is down; not a token, which would require a server to read it and say no. The board was not open. <strong>[Gate 6] OPENED by Pip on 2026-08-24 at approximately 14:40 AEST: the board on <code>weekly-2026-w33</code> at ladder epoch <code>L5</code> is open and may take scores.</strong> The hold's stated cause ended when the host returned on 2026-08-21T22:22Z; re-measured 2026-08-24, 208 board keys probed, 0 unreachable. Three days elapsed between the cause ending and the hold being lifted, and that lag is the record's, not the Commissioner's -- nobody was asked.</td></tr>
+</tbody></table></div>
+<h3>⏳ L3 — pending blessing (do not fill this in from memory)</h3>
+<p><strong>Nothing here may be guessed.</strong> The L3 seed is <strong>drawn and spoken at the ceremony ~1645 AEST Fri 2026-07-31</strong>, and the game side posts the confirmed string on pdoom1-website#151. pdoom1's words: <em>"Please do not hardcode it anywhere before then."</em> This repo has already blessed the wrong value once (<code>league_2026-07_7d6ced29</code>, superseded the same day) — that is why this row is empty rather than optimistic.</p>
+<p>What is already known and sourced (pdoom1 on #151, 2026-07-28T23:13Z):</p>
+<ul>
+<li>The ladder moved <strong>2 → 3 mid-month</strong>, on gameplay changes — the action-point pool was removed entirely in favour of an attention economy, plus office lease/lock-in, four-way founder hours, six previously-inert upgrades and a quirk rebalance.</li>
+<li>The build shipping Fri 2026-07-31 is <strong>v0.13.2</strong>, running on <strong>L3</strong>. Nothing has ever been published on L3; the current public build v0.13.1 is L2.</li>
+<li>The board key is <code>(seed, L3)</code> — <strong>literally <code>L3</code></strong>, not <code>v0.13.2</code> and not <code>L3.0</code>. <code>GameConfig.get_board_version()</code> returns <code>"L" + LADDER_VERSION</code>. Local file <code>leaderboard_&lt;seed&gt;__L3.json</code>; remote POST body <code>version=L3</code>; remote GET <code>?version=L3</code>. <strong>The build version never touches the board key again.</strong></li>
+<li>The board opens <strong>~1700 AEST Fri 2026-07-31</strong> (approximate until confirmed).</li>
+<li>The read path is confirmed clear: <code>GET ?seed=…&amp;version=L3</code> returns <code>ok:true</code> with an empty board — <strong>and so does every wrong key</strong>, including <code>version=L99</code> and <code>version=NOTAVERSION</code>. The API has no validation, so a typo produces a valid-looking empty board rather than an error. Proving the key needs a <strong>positive</strong> check, not an absence of errors.</li>
+<li><strong>UPDATE 2026-07-31 — the positive check now exists, and it passed.</strong> The board <code>(weekly-2026-w30, L3)</code> holds <strong>3 real entries</strong> posted by the shipped client on 2026-07-30 (08:32, 09:10, 09:36 AEST), spanning builds <code>v0.13.1</code> and <code>v0.13.2</code>. So <strong>POST auto-creation on an <code>L3</code> key is verified by observation, not inferred</strong>: the API accepted a key that had never existed and stored real rows under it. Item 1 of pdoom1-website#151 — <em>"the one item that would actually break Friday"</em> — is <strong>closed</strong>. What remains unverified is only which seed string the shipped client sends; see the roll decision below.</li>
+</ul>
+<h3>Roll, not bless-in-place — ruled 2026-07-31</h3>
+<p><strong>Decision (Pip, 2026-07-31 morning): the league opens on a NEW seed, and the Gate 4 proving runs do not carry over.</strong></p>
+<p>Why this follows rather than being a preference: the board <code>(weekly-2026-w30, L3)</code> already holds three runs — the Thursday proving runs that passed [Gate 4: PROVEN BUILD]. Pip ruled those should not be on the opening board. <strong>The website does not filter a live board</strong> — removing entries is editing standings, and a board that can be edited is no longer a record of what happened. So the only honest way to exclude them is for the league to open on a <em>different board key</em>.</p>
+<p>The epoch half cannot move: the rules have not changed again, so it stays <code>L3</code>. <strong>The only half that can move is the seed.</strong> Hence the roll.</p>
+<p>Consequence to accept knowingly: <strong>the board opens empty</strong> and stays empty until the first real player finishes a run. That is correct, not a fault. The leaderboard says so honestly rather than showing a live-looking empty table.</p>
+<p><strong>The verification wrinkle.</strong> This ledger's discipline is <em>bless what the client actually sends, verified</em>. But the new seed <strong>must not</strong> be verified by submitting a score — that would put a run on the opening board, which is the thing being ruled out. So:</p>
+<ul>
+<li><strong>Verify from the artifact</strong>: read the seed const out of the built v0.13.2 zip. That is the source of truth for what the client will send, needs no submission, and is stronger evidence than a round trip.</li>
+<li><strong>Do not</strong> verify by POST. <strong>Do not</strong> verify by GET-returns-<code>ok:true</code> — every wrong key does that too.</li>
+<li>The API's acceptance of an <code>L3</code> key is already proven (above) and does not need re-proving.</li>
+</ul>
+<p><strong>Re-cut, not patch.</strong> Changing the seed const after [Gate 2: THE FREEZE] means a re-cut by the standing rule. A seed const is not gameplay-shaped, so the Commissioner may rule that the full [Gate 4] sequence is not required — but that must be an <strong>explicit ruling recorded here</strong>, not a silent exception. "We patched instead of re-cutting, just this once" is how the rule dies.</p>
+<p><strong>Website work required: none.</strong> <code>publish-live-board.py</code> observes whichever board the client posts to and publishes that. No code change, no deploy race.</p>
+<p><strong>Checklist for whoever blesses it (a human, on the day):</strong></p>
+<ul>
+<li>[ ] Copy the confirmed seed string from pdoom1's #151 comment — not from any website-derived value, and not from this document. <strong>The probable value is <code>weekly-2026-w31</code>; treat that as UNCONFIRMED until the ceremony.</strong></li>
+<li>[ ] <strong>Roll-specific:</strong> confirm the seed const in the <em>built artifact</em> matches the string being blessed. Artifact beats intention.</li>
+<li>[ ] <strong>Roll-specific:</strong> record the Commissioner's ruling on whether the re-cut re-ran [Gate 4], and if not, why not.</li>
+<li>[ ] Fill the L3 row above: seed, board file, blessed date, by.</li>
+<li>[ ] Set <code>regularised_from.seed</code> in <code>public/data/ladder-epochs.json</code> and change <code>seed_status</code> to <code>blessed</code>. That is the <em>only</em> place a script reads it; <code>weekly-league-manager.py</code> picks it up automatically and stamps <code>seed_provenance.blessed: true</code>.</li>
+<li>[ ] Confirm <code>regularised_from.board_opens_local</code> against what actually happened and set <code>board_opens_confirmed: true</code>.</li>
+<li>[ ] Re-run <code>python scripts/weekly-league-manager.py --rebuild-archive-index</code> and <code>python scripts/test-weekly-league-boundary.py</code>.</li>
+</ul>
+<p>Until that is done, the website <strong>derives a placeholder seed and refuses to show it to players</strong>: <code>public/leaderboard/index.html</code> only offers a seed whose record says <code>seed_provenance.blessed === true</code>, and the boundary test fails if the probable string is hardcoded anywhere in <code>scripts/</code> or <code>public/data/</code>.</p>
+<h3>L3 closed, L4 opened — recorded 2026-08-08 (NOT a blessing)</h3>
+<p><strong>This section records a fact; it does not bless anything.</strong> The L3 row above is still unfilled and only a human can fill it. Written here because the ladder moved while that row was open, and a ledger silent about a fork is worse than one with a gap in it.</p>
+<ul>
+<li>pdoom1 <strong>v0.14.0</strong> forked the ladder <strong>L3 → L4</strong> on 2026-08-07. Authority is the v0.14.0 <strong>git tag message</strong> — <em>"Ladder L4. Featured seed weekly-2026-w32. Board key (weekly-2026-w32, L4)."</em> — corroborated by that release's <code>release_manifest.json</code> carrying <code>"ladder_version": "4"</code>. Pip has blessed the key <code>(weekly-2026-w32, L4)</code>.</li>
+<li><strong>Positively verified 2026-08-08</strong> by a read-only <code>GET</code>: <code>(weekly-2026-w32, L4)</code> held <strong>9 entries</strong> from clients stamped <code>v0.14.0</code> and <code>v0.14.1</code>. That is the positive check this ledger demands — an <code>ok:true</code> alone proves nothing, since every wrong key returns it. Nothing was POSTed to obtain this.</li>
+<li>The <strong>L3 board <code>(weekly-2026-w31, L3)</code> is closed history</strong> and holds 6 real entries. It is captured at <code>public/leaderboard/data/preserved/2026-08-08-l3-epoch-close/</code>, which is what stops <code>check-board-liveness.py</code> reading it as a new orphan once the site publishes L4. <strong>Do not re-stamp those entries onto L4</strong> — they were played under different rules.</li>
+<li><code>public/leaderboard/data/board-probe-targets.json</code> now declares <code>current_ladder_epoch: "L4"</code> with that source, and pins <code>weekly-2026-w32</code> under <code>extra_seeds</code>.</li>
+</ul>
+<p><strong>Still owed by a human:</strong> the L3 row above (seed <code>weekly-2026-w31</code>, blessed date, by), an L4 row, <code>regularised_from</code> / <code>seed_status</code> in <code>public/data/ladder-epochs.json</code>, and the Commissioner's ruling on the L3→L4 cut. Until those exist, <code>public/leaderboard/index.html</code> will still refuse to <em>offer</em> a seed to a player, because nothing sets <code>seed_provenance.blessed: true</code>.</p>
+<h3>L4 -&gt; L5 fork, and why the seed was held -- 2026-08-21</h3>
+<p><strong>The Commissioner's ruling on the L3 -&gt; L4 cut, owed since 2026-08-08, is also given here: both cuts stand.</strong></p>
+<p>pdoom1 v0.14.2 forked the ladder because two merged changes alter what a score MEANS on a given seed:</p>
+<ul>
+<li><code>6b65338b</code> (pdoom1 #1233) routed runtime pdoom-data event options through the doom streams, closing a sink of up to <strong>-6 doom per turn</strong>. Identical seeds now produce different trajectories.</li>
+<li><code>56d46c40</code> (pdoom1 #1230) added <strong>28 events</strong>, filling every risk-pool and severity cell, changing which events fire on a given seed.</li>
+</ul>
+<p>Both are BUMP triggers under <code>BUILD_VS_LADDER_VERSION_SPLIT.md</code> Section 3.1.</p>
+<p><strong>The seed was HELD at <code>weekly-2026-w33</code>, deliberately.</strong> The 2026-07-31 "roll, not bless-in-place" ruling exists for when the RULES did not change and the seed is the only half that can move. Here the epoch half moved, which forks the board key on its own; rolling as well would move two things at once for no gain. <code>gate_5_seed_blessing.md</code>: blessing the seed the const actually names "costs nothing and is usually right".</p>
+<p><strong><code>weekly-2026-w33</code> had never shipped.</strong> It was rolled on 2026-08-13 (pdoom1 <code>e44660c4</code>, #1214) for a league that never opened. v0.14.2 is the first build to carry it.</p>
+<p><strong>Gate 6 is HELD.</strong> The board key is blessed and the board is not open. That is recorded here rather than left as a gap, per the 2026-08-08 precedent: a ledger silent about the state of a board is worse than one that says the board is down.</p>
+<h2>Blessings log</h2>
+<p>The ceremony, for the record — including the one that missed, because the log is history, not a tidy final answer.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>#</th><th>when (AEST)</th><th>seed</th><th>rite</th><th>outcome</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>2026-07-24 ~08:00</td><td><code>league_2026-07_7d6ced29</code></td><td><em>waves doom staff</em></td><td><strong>Superseded.</strong> Blessed in good faith, but conflicted with the already-shipped client key. Corrected same day.</td></tr>
+<tr><td>2</td><td>2026-07-25 ~09:20</td><td><code>weekly-2026-w30</code></td><td><em>waves doom staff</em></td><td><strong>Canonical.</strong> Matches the shipped v0.13 client. This is the seed the L2 board uses.</td></tr>
+<tr><td>3</td><td>2026-07-31 ~16:45</td><td><code>weekly-2026-w31</code></td><td><em>unrecorded</em></td><td><strong>LOST TO THE RECORD.</strong> Ruled by Pip 2026-08-22: the ceremony was skipped or said in a hurry, late in the evening, not at the appointed time -- and nobody wrote down which. The seed is certain (v0.13.2 pins it; 6 real scores were played on it); the rite is not. Regularised in the table above on 2026-08-21. <strong>This row stays as it is.</strong> A log that quietly acquires a ceremony nobody remembers is worth less than one with an honest hole in it.</td></tr>
+<tr><td>4</td><td>2026-08-07 ~--</td><td><code>weekly-2026-w32</code></td><td><em>unrecorded</em></td><td><strong>LOST TO THE RECORD</strong>, same cause. L4 forked with v0.14.0 and no ceremony was recorded; 11 real scores were played on it regardless. Regularised 2026-08-21.</td></tr>
+<tr><td>5</td><td>2026-08-21 ~16:45</td><td><code>weekly-2026-w33</code></td><td><em>waves doom staff</em></td><td><strong>BLESSED.</strong> The first completed [Gate 5] since L2 on 2026-07-25 -- four weeks and three epochs. Checks 1-6 and 8 passed; check 7 (a named human attesting the live board) was UNAVAILABLE because api.pdoom1.com was down, and was recorded as such rather than skipped. [Gate 6] was HELD that night and the board opened 2026-08-22 once the host returned.</td></tr>
+</tbody></table></div>
+<h3>On the two lost blessings -- ruled 2026-08-22</h3>
+<p>L3 and L4 both ran their whole lives without a recorded ceremony. The seeds were right, the boards were right, the scores were real, and the rite either did not happen or happened in a hurry late at night with nobody writing it down.</p>
+<p>That is recorded here as a hole rather than patched over, for a reason that is not sentimental. This ledger's entire job is to distinguish <strong>what a machine can derive</strong> from <strong>what a human decided</strong>. The seed is derivable -- it is pinned in a released binary and anybody can read it back out. The blessing is not: it exists only if somebody performed it and said so. Writing a plausible date into that column would make the ledger indistinguishable from a file that just reads the client's constants, which is the one thing it must never be.</p>
+<p>So: two epochs, no ceremony, honestly logged. The league ran anyway.</p>
+<h2>Correction note (2026-07-24)</h2>
+<p>The first blessing initially landed on <code>league_2026-07_7d6ced29</code>, a website-side <strong>proposal</strong> for a monthly-derived naming scheme (<code>league_&lt;YYYY-MM&gt;_&lt;hash&gt;</code>). That proposal was made after — and without reconciling against — the game side's already-shipped key <code>weekly-2026-w30</code> (pdoom1 #151 comment, 01:50 UTC). The client wins by construction (it is the thing that actually POSTs scores), so this ledger records <code>weekly-2026-w30</code>. <code>league_2026-07_7d6ced29</code> is <strong>superseded for this cut</strong> and must not appear in any board file or page.</p>
+<p><strong>Pip: this needs a one-line re-bless of <code>weekly-2026-w30</code></strong> — the marker above stays "pending re-confirm" until you do, because the first blessing was cast on the wrong value in good faith.</p>
+<p>The monthly-derivation <em>idea</em> is not dead — it is parked for the game's own <strong>release/league nomenclature reflective review (pdoom1 #808, on/after 2026-08-24)</strong>, where a naming change belongs (it's a client const, cheap to re-cut between epochs, expensive to fork mid-launch). <code>tools/derive_league_seed.py</code> stays as a reference implementation of that <em>proposed</em> scheme, not the current one.</p>
+<h2>Legacy / superseded</h2>
+<ul>
+<li><strong>L1 epoch</strong> ran on the <code>(seed, game_version)</code> weekly key through v0.12.0. Its live board (<code>board_weekly-2026-w0__v0.12.0.json</code> on the DreamCompute DATA_DIR) is preserved at the L2 cutover as <code>board_weekly-2026-w0__L1.json</code>, read-only, so the friends-and-family alpha scores survive as "legacy epoch L1".</li>
+</ul>
+<h2>How to add a row</h2>
+<ol>
+<li>Read the seed the <strong>shipped client</strong> sends, from the game's protocol docs above.</li>
+<li>Get Pip's explicit blessing on that value.</li>
+<li>Add the row with the real UTC date. Never edit a past row's seed; a corrected seed is a new epoch, not a rewrite of history.</li>
+</ol>
+	</main>
+	<footer>
+		Design notes are generated from the game repository's decision records.
+		Source: <a href="https://github.com/PipFoweraker/pdoom1">PipFoweraker/pdoom1</a>
+	</footer>
+	<script src="/assets/js/navigation.js"></script>
+</body>
+</html>
