@@ -1,26 +1,26 @@
 {
-  "generated": "2026-08-30T06:21:27.527722+00:00",
+  "generated": "2026-08-31T03:40:36.679802+00:00",
   "overall_status": "FAIL",
   "summary": {
     "fail": 1,
-    "warn": 4,
-    "ok": 30
+    "warn": 7,
+    "ok": 27
   },
   "checks": [
     {
       "name": "schema:events",
-      "status": "OK",
-      "detail": "valid"
+      "status": "WARN",
+      "detail": "jsonschema not installed -- schema check skipped (pip install jsonschema)"
     },
     {
       "name": "schema:league_weekly",
-      "status": "OK",
-      "detail": "valid"
+      "status": "WARN",
+      "detail": "jsonschema not installed -- schema check skipped (pip install jsonschema)"
     },
     {
       "name": "schema:league_seed",
-      "status": "OK",
-      "detail": "valid"
+      "status": "WARN",
+      "detail": "jsonschema not installed -- schema check skipped (pip install jsonschema)"
     },
     {
       "name": "encoding:events",
@@ -115,12 +115,12 @@
     {
       "name": "league:freshness",
       "status": "FAIL",
-      "detail": "current.json is 9.7 days old -- weekly rollover likely stalled"
+      "detail": "current.json is 10.6 days old -- weekly rollover likely stalled"
     },
     {
       "name": "league:current_week",
       "status": "WARN",
-      "detail": "week 2026_W35 is marked is_current but ended 2.7 days ago -- rollover cadence off"
+      "detail": "week 2026_W35 is marked is_current but ended 3.6 days ago -- rollover cadence off"
     },
     {
       "name": "league:version_drift",
@@ -155,7 +155,7 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 5.3h ago"
+      "detail": "live API checked 2.6h ago"
     },
     {
       "name": "board:archived_anomaly",
