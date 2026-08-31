@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-31T07:45:38.407126+00:00",
+  "generated": "2026-08-31T07:48:06.603525+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -164,7 +164,7 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 0.9h ago"
+      "detail": "live API checked 1.0h ago"
     },
     {
       "name": "board:archived_anomaly",
