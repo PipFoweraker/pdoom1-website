@@ -1,16 +1,24 @@
 {
-  "generated": "2026-08-31T06:30:45.320058+00:00",
-  "overall_status": "FAIL",
+  "generated": "2026-08-31T07:45:38.407126+00:00",
+  "overall_status": "WARN",
   "summary": {
-    "fail": 2,
+    "fail": 0,
     "warn": 4,
-    "ok": 29
+    "acknowledged": 1,
+    "ok": 30
   },
+  "acknowledged": [
+    {
+      "key": "league:freshness",
+      "review_by": "2026-09-04",
+      "why": "THE FINDING IS TRUE AND THE REMEDY IT NAMES WOULD BREAK THE BOARD. The check assumes the site's league week should advance on a calendar. Under the (seed, ladder_version) key model it must not: the seed comes from the SHIPPED CLIENT and changes only when a new build ships. v0.14.4's release_manifest.json carries league_seed weekly-2026-w35, and that is what the site publishes. MEASURED, not assumed: weekly-league-manager.py --status reports it would open week 2026_W36 on a DERIVED seed (weekly_2026_W36_4810cf21), so running the rollover today would publish a board no shipped client posts to -- the key mismatch that stranded 23 submissions, recreated in the week Pip is inviting EAGx attendees to play. Being ~10 days old is currently CORRECT BEHAVIOUR. The property that actually matters -- does the site's key match the shipped client's -- is measured by check-epoch-drift.py, which is GREEN: both sides on (weekly-2026-w35, L6). This is acknowledged rather than fixed tonight because the real fix is to the CHECK, and rewriting a blocking data-contract gate deserves a reviewed change rather than a fast one."
+    }
+  ],
   "checks": [
     {
       "name": "schema:events",
-      "status": "FAIL",
-      "detail": "2388 violation(s); first at academic_safety_funding_cuts_2024/media_reaction: None is not of type 'string'"
+      "status": "OK",
+      "detail": "valid"
     },
     {
       "name": "schema:league_weekly",
@@ -114,8 +122,9 @@
     },
     {
       "name": "league:freshness",
-      "status": "FAIL",
-      "detail": "current.json is 10.7 days old -- weekly rollover likely stalled"
+      "status": "ACK",
+      "detail": "current.json is 10.7 days old -- weekly rollover likely stalled",
+      "acknowledged": true
     },
     {
       "name": "league:current_week",
@@ -155,7 +164,7 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 5.4h ago"
+      "detail": "live API checked 0.9h ago"
     },
     {
       "name": "board:archived_anomaly",

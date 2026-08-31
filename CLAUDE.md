@@ -672,6 +672,7 @@ python  scripts/check-syndication-docs.py # every credential documented, right s
 python  scripts/test-check-syndication-docs.py # ...and that guard can still FAIL [content-honesty]
 python  scripts/test_ingest_scores.py     # leaderboard read path            [data-contract]
 python  scripts/validate_data.py          # data contracts                   [data-contract]
+python  scripts/test-validate-data-acknowledgements.py # ...and its clock cannot swallow a finding [data-contract]
 python  scripts/check-stale-facts.py      # hardcoded facts that rot         [content-honesty ADVISORY]
 python  scripts/check-stale-facts.py --min-severity HIGH  # the gate         [content-honesty]
 python  scripts/check-campaign-facts.py   # campaign fact-guards vs their sources [content-honesty]
@@ -774,6 +775,27 @@ never silence. After `review_by` the check is red on *"this acceptance expired,
 re-accept or fix"*. That red is always closeable by a human decision, which is what
 stops it becoming the permanent red this section forbids; a red on the underlying
 finding would not be, because whoever hits it usually cannot fix it.
+
+**`validate_data.py` joined the clock on 2026-08-31**, making four participating
+checks. Its keys are the row `name` (e.g. `league:freshness`), and only **FAIL**
+rows can be acknowledged -- a WARN already prints without blocking, so a clock on
+one would buy nothing. Three properties are forced by
+`test-validate-data-acknowledgements.py`, and the third is the one that matters:
+an acknowledged finding still **prints** and holds `overall_status` off `OK` (a
+green dashboard bought with a signed note is the class-5 shape all over again);
+an **expired** acceptance is red *about the acceptance*; and an **unacknowledged**
+FAIL still fails, which is the negative control without which the other two are
+equally consistent with a mechanism that swallows everything.
+
+**The first entry is instructive about what an acknowledgement is FOR.**
+`league:freshness` fires because `current.json` is ~10 days old and the check reads
+that as a stalled rollover. It is not stalled, it is parked -- and running the
+rollover, which is the remedy the check names, would open a week on a **derived**
+seed (`weekly_2026_W36_...`) while the shipped v0.14.4 client posts to the blessed
+`weekly-2026-w35`. That is the key mismatch that stranded 23 submissions. **The
+finding is true and its named remedy is harmful**, which is exactly when a dated
+acceptance beats both fixing and disarming. `check-epoch-drift.py` measures the
+property that actually matters and is green.
 
 Machinery: `scripts/acknowledgements.py` + `data/acknowledgements.json` (repo root,
 NOT under `public/` — it is CI metadata and `public/` is rsynced). Every entry needs

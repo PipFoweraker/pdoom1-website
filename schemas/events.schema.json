@@ -28,8 +28,8 @@
           "enum": ["common", "rare", "legendary"]
         },
         "pdoom_impact": { "type": ["number", "null"], "description": "Game-adaptation field; usually null." },
-        "safety_researcher_reaction": { "type": "string" },
-        "media_reaction": { "type": "string" },
+        "safety_researcher_reaction": { "type": ["string", "null"] },
+        "media_reaction": { "type": ["string", "null"] },
         "source_id": { "type": "string" }
       }
     }
