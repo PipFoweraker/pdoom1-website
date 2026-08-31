@@ -14,6 +14,8 @@ on:
       - 'public/leaderboard/data/**'
       - 'schemas/**'
       - 'scripts/validate_data.py'
+      - 'scripts/test-validate-data-acknowledgements.py'
+      - 'data/acknowledgements.json'
       - 'scripts/ingest_scores.py'
       - 'scripts/test_ingest_scores.py'
       - 'scripts/stamp-league-epoch.py'
@@ -26,6 +28,8 @@ on:
       - 'public/leaderboard/data/**'
       - 'schemas/**'
       - 'scripts/validate_data.py'
+      - 'scripts/test-validate-data-acknowledgements.py'
+      - 'data/acknowledgements.json'
       - 'scripts/ingest_scores.py'
       - 'scripts/test_ingest_scores.py'
       - 'scripts/stamp-league-epoch.py'
@@ -99,6 +103,13 @@ jobs:
           python-version: '3.11'
       - name: Install validation deps
         run: pip install --quiet jsonschema==4.26.0
+
+      # The suppression mechanism is tested BEFORE the gate that relies on it. A
+      # bug here does not make the gate noisy, it makes it quiet -- so this runs
+      # first and its negative control (an unacknowledged FAIL still fails) is the
+      # assertion that matters.
+      - name: The acknowledgement wiring cannot swallow a finding
+        run: python scripts/test-validate-data-acknowledgements.py
       - name: Run validation
         id: run
         run: |

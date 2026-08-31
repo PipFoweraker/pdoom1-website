@@ -45,7 +45,22 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
 SCHEMAS = ROOT / "schemas"
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from acknowledgements import (  # noqa: E402  (must follow the sys.path line)
+    AcknowledgementError, load_ledger)
+
 FAIL, WARN, OK = "FAIL", "WARN", "OK"
+# A FOURTH STATUS, and it is not a synonym for OK. ACK means "this is a real
+# finding, somebody decided on a date to live with it, and that decision has not
+# run out yet". It prints, it is counted, and it keeps overall_status off OK --
+# green here would be the class-5 shape the acknowledgement clock exists to
+# abolish, where a check sees a divergence and the exit code says otherwise.
+ACK = "ACK"
+
+# The name this check registers under in data/acknowledgements.json. Keys are the
+# `name` field of a row -- e.g. "league:freshness" -- which are stable, readable,
+# and already unique.
+ACK_CHECK_NAME = "validate_data"
 checks = []  # list of {name, status, detail}
 
 
@@ -540,8 +555,35 @@ def check_seed_leaderboards():
 
 
 # ---- main ----------------------------------------------------------------------
+def _flag_value(flag):
+    """`--flag value` from argv, or None. argparse is not used here because this
+    script has always been argv-sniffing (`--check`) and switching it wholesale
+    would change behaviour for every existing caller."""
+    if flag in sys.argv:
+        i = sys.argv.index(flag)
+        if i + 1 < len(sys.argv):
+            return sys.argv[i + 1]
+    return None
+
+
 def main():
     check_only = "--check" in sys.argv
+    # --as-of / --ledger exist so the expiry boundary can be forced in a test
+    # without waiting for a date or editing the real ledger.
+    as_of = _flag_value("--as-of")
+    ledger_path = _flag_value("--ledger")
+
+    # LOADED BEFORE ANY CHECK RUNS. A malformed ledger stops the run outright: if
+    # it were tolerated, every acknowledged finding would resurface as a fresh
+    # one and send somebody hunting a bug nobody introduced.
+    try:
+        ledger = load_ledger(ACK_CHECK_NAME, ledger_path)
+    except AcknowledgementError as exc:
+        print(f"REFUSED: the acknowledgement ledger cannot be trusted, so this "
+              f"check cannot say what it is tolerating.\n  {exc}", file=sys.stderr)
+        sys.exit(2)
+    today = (datetime.fromisoformat(as_of).date() if as_of
+             else datetime.now(timezone.utc).date())
 
     validate_schema("events", PUBLIC / "data" / "events.json", "events.schema.json")
     validate_schema("league_weekly", PUBLIC / "leaderboard" / "data" / "weekly" / "current.json", "leaderboard-weekly.schema.json")
@@ -564,30 +606,67 @@ def main():
     check_board_liveness()
     check_seed_leaderboards()
 
+    # ---- acknowledgements -----------------------------------------------------
+    # Applied AFTER every check has run and BEFORE the tally, so an acknowledged
+    # finding is still computed, still printed and still in the published report.
+    # Suppressing it earlier would make the report say the check never fired.
+    report_ack = ledger.assess(
+        fired_keys={c["name"] for c in checks if c["status"] == FAIL},
+        today=today)
+    suppressed = report_ack.acknowledged_keys
+    for c in checks:
+        if c["status"] == FAIL and c["name"] in suppressed:
+            c["status"] = ACK
+            c["acknowledged"] = True
+
     n_fail = sum(1 for c in checks if c["status"] == FAIL)
     n_warn = sum(1 for c in checks if c["status"] == WARN)
-    overall = FAIL if n_fail else (WARN if n_warn else OK)
+    n_ack = sum(1 for c in checks if c["status"] == ACK)
+    # An acknowledged finding holds overall at WARN, never OK. /monitoring/ reads
+    # this file, and a dashboard that went green because somebody signed a note
+    # would be worse than one that never had the note.
+    overall = FAIL if n_fail else (WARN if (n_warn or n_ack) else OK)
 
     report = {
         "generated": datetime.now(timezone.utc).isoformat(),
         "overall_status": overall,
-        "summary": {"fail": n_fail, "warn": n_warn, "ok": sum(1 for c in checks if c["status"] == OK)},
+        "summary": {"fail": n_fail, "warn": n_warn, "acknowledged": n_ack,
+                    "ok": sum(1 for c in checks if c["status"] == OK)},
+        # Named in the published artefact so a reader of /monitoring/ can see WHAT
+        # was tolerated and until when, rather than only that a count exists.
+        "acknowledged": [
+            {"key": a.key, "review_by": a.review_by.isoformat(), "why": a.why}
+            for a in report_ack.acknowledged + report_ack.expired],
         "checks": checks,
     }
 
     # console
-    icon = {OK: "OK  ", WARN: "WARN", FAIL: "FAIL"}
+    icon = {OK: "OK  ", WARN: "WARN", FAIL: "FAIL", ACK: "ACK "}
     print(f"Data contract & integrity validation -- overall: {overall}")
     print("-" * 72)
     for c in checks:
         print(f"[{icon[c['status']]}] {c['name']}: {c['detail']}")
     print("-" * 72)
-    print(f"{n_fail} fail, {n_warn} warn, {report['summary']['ok']} ok")
+    print(f"{n_fail} fail, {n_warn} warn, {n_ack} acknowledged, "
+          f"{report['summary']['ok']} ok")
+    if report_ack.acknowledged or report_ack.expired or report_ack.stale:
+        print()
+        report_ack.print_to(sys.stdout)
 
     if not check_only:
         out = PUBLIC / "data" / "integration-health.json"
         out.write_text(json.dumps(report, indent=2), encoding="utf-8")
         print(f"wrote {out.relative_to(ROOT)}")
+
+    # An EXPIRED acceptance is red, and the red is about the expiry, not about the
+    # finding underneath it. That distinction is what stops this becoming the
+    # permanent red CLAUDE.md forbids: "re-accept or fix" is a question a person
+    # can answer today, whereas the finding itself may need a release to clear.
+    if report_ack.blocking:
+        print(f"\nFAIL: {len(report_ack.expired)} acknowledgement(s) expired. "
+              f"Every data-contract finding is either clean or acknowledged -- "
+              f"what is red is the ACCEPTANCE, listed above with what to do.")
+        sys.exit(1)
 
     sys.exit(1 if n_fail else 0)
 
