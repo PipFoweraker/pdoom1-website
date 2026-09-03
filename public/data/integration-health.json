@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-02T06:29:03.589958+00:00",
+  "generated": "2026-09-03T06:24:06.731131+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -123,13 +123,13 @@
     {
       "name": "league:freshness",
       "status": "ACK",
-      "detail": "current.json is 12.7 days old -- weekly rollover likely stalled",
+      "detail": "current.json is 13.7 days old -- weekly rollover likely stalled",
       "acknowledged": true
     },
     {
       "name": "league:current_week",
       "status": "WARN",
-      "detail": "week 2026_W35 is marked is_current but ended 5.7 days ago -- rollover cadence off"
+      "detail": "week 2026_W35 is marked is_current but ended 6.7 days ago -- rollover cadence off"
     },
     {
       "name": "league:version_drift",
