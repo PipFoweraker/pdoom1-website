@@ -59,7 +59,57 @@ actually launches.
 **If unanswered:** the contradiction stays live. Low harm while traffic is small;
 it becomes consequential the moment merch points strangers at the site.
 
-### D2-D4. Merch blockers -- held in coordination, not duplicated here
+### D2. The fabricated-quote pipeline into this site is armed, and its only guard counts rather than refuses
+
+**Nothing fabricated is live right now.** Verified: 0 of 1194 events in
+`public/data/events.json` carry a `safety_researcher_reaction`. That is the good
+news and it is the reason this is a decision rather than an incident.
+
+**But the machinery is fully wired.** The event schema carries
+`safety_researcher_reaction` and `media_reaction`; `sync-events.py:1633` renders
+a reaction as a labelled quote (`Safety Researcher Reaction:`) on the public
+event page; and event pages are built from real arXiv papers by real, named
+authors. pdoom1 PR #1339 proposes **1,194 fabricated researcher quotes** -- the
+same count as this site's event corpus, which is consistent with both deriving
+from the same pdoom-data collection.
+
+**The provenance system is a counter, not a gate.** `get_provenance_type()`
+(`sync-events.py:2045`) classifies each reaction as `real_quote`,
+`human_summary`, `placeholder` or `not_applicable`, and feeds `quote_stats` into
+`events-sync-summary.json`. Nothing consults it before rendering. An unlabelled
+reaction defaults to `placeholder` -- and a placeholder is **still published**.
+So if fabricated reactions reach `all_events.json` without a
+`reaction_provenance` block, this site renders invented sentences in quotation
+marks, labelled as a safety researcher's reaction, attached to named people's
+papers, on up to 1,194 public pages, and the only consequence is a number in a
+summary file nobody reads.
+
+This is the defect class in `docs/TECH_DEBT.md` and issue #384: a guard that
+reports a value it never enforces.
+
+**Verify with:**
+```
+python -c "import json;d=json.load(open('public/data/events.json',encoding='utf-8'));e=d if isinstance(d,list) else d.get('events',d);e=list(e.values()) if isinstance(e,dict) else e;print(sum(1 for x in e if x.get('safety_researcher_reaction')),'of',len(e))"
+grep -n 'def get_provenance_type' -A 10 scripts/sync/sync-events.py
+```
+
+**The precise ask.** Should `sync-events.py` refuse to render a reaction whose
+provenance is not `real_quote` or `human_summary` -- the same fail-closed shape
+`redact_pii()` already uses, where the generator declines to write rather than
+publishing something it cannot vouch for?
+
+Claude's recommendation is **yes, and before #1339 is decided upstream**, because
+the gate belongs on the consuming side regardless of what the game does: this
+repo is a read-only consumer of pdoom-data and cannot control what arrives. Not
+done unattended because it changes what a visitor-facing page would show, and
+because the honest wording of a refusal ("no reaction recorded" vs. rendering
+nothing at all) is a presentation call that is yours.
+
+**If unanswered:** no immediate harm -- the corpus is clean today. The risk is
+that #1339 lands upstream while nobody here is watching, and the next scheduled
+sync publishes it. That sync runs daily.
+
+### D3-D5. Merch blockers -- held in coordination, not duplicated here
 
 `DECISIONS-NEEDED_2026-09-07.md` in the coordination repo carries, as entries
 3, 4 and 5: the unresolved wordmark blocking any print run; the absent fact gate
