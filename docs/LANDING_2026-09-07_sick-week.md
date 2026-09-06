@@ -174,13 +174,38 @@ thousand times), zero `reaction_provenance`, and zero arXiv sources. Upstream of
 that, `data/raw/alignment_research/` is HuggingFace extraction metadata and
 `data/enrichment/` is a quality-score table. No commentary at any layer.
 
-That kills the fix Claude had hoped for. Teaching the sync to read the real
-collection cannot fix the quotes and close TECH_DEBT E-0 together, **because
-there is no real collection.** The choice narrows to: suppress the two fields, or
-generate them and label them as generated. Claude recommends **suppress** -- a
-field with nothing truthful behind it is better absent than labelled, and
-`redact_pii()` already establishes "decline to publish what you cannot vouch for"
-as this repo's house rule.
+That kills the substitute fix. Teaching the sync to read the real collection
+cannot fix the quotes and close TECH_DEBT E-0 together, **because there is no
+real collection.**
+
+**RECOMMENDATION REVISED 2026-09-07, and the revision is better than what it
+replaces.** This card first recommended SUPPRESS -- delete the two fields. That
+was wrong, and verifying a peer's retraction is what turned it up.
+
+The pages already carry an honest disclosure and a **working** correction
+channel:
+
+- `Placeholder - Needs Real Quote` renders as visible body text, not as a CSS
+  class. It names the deficiency rather than euphemising it.
+- Every page carries `<a href="/events/suggest-quote.html?event=<id>">`. That
+  page exists (12.5 KB), is **not** in `deploy-excludes.txt` so it ships, holds a
+  real form, and submits by opening a prefilled GitHub issue against
+  **pdoom-data** with labels `quote-suggestion,metadata,events` -- which is the
+  correct repo, since that is where the data lives.
+
+So suppressing the fields would delete a working disclosure and the mechanism
+built to retire it. **The invented sentence is the only defective part.**
+
+**Recommended instead: keep the badge, keep the suggest link, drop the invented
+sentence** -- render the 1,000 orphans into the same state the 1,194 synced pages
+are already in. The template puts the badge, a `<br>` and the quote in separate
+elements, so removing only the quote is a clean edit.
+
+**The strongest evidence for this is that the end state already ships.** The
+suggest link is on all 2,194 event pages, including the 1,194 that render
+`Not recorded` and carry no quote at all. Those pages demonstrate the badge-plus-
+hook-without-fabrication state working in production today. The ask is therefore
+not "design something" but "make the 1,000 look like the 1,194".
 
 Its "zero arXiv, all Alignment Forum" independently reproduces the same result
 Claude measured from the rendered pages, which is a real cross-check: two seats
