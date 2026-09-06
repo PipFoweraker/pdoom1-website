@@ -78,6 +78,14 @@ Sample, from `alignmentforum_00671cab97bcd7dc.html`:
 > Safety Researcher Reaction: [Placeholder - Needs Real Quote]
 > "Important work advancing our understanding of AI safety"
 
+**Do not merge this with pdoom1's version of the problem.** They share a pool of
+33 boilerplate strings and nothing else. In the GAME corpus, 1,132 of 1,194
+records are arXiv-keyed, so an invented reaction sits against a real paper by
+real, NAMED authors. In this repo's 1,000 orphan pages, the sources are Alignment
+Forum, there are zero arXiv links, and the attribution is a generic "safety
+researcher". The game's is the more serious of the two. Stating them as one
+finding overstates this one and understates that one.
+
 **Settled 2026-09-07: the quotation marks are real, and they are added here.**
 The coordination and pdoom1 seats both recorded this as NOT MEASURED, because at
 the data layer these are bare phrases with no quote characters. On the rendered
@@ -154,9 +162,29 @@ rewritten to the `Not recorded` state now? That is a scripted edit to published
 HTML with no generator behind it, so it needs a human to say yes. Claude's
 recommendation is yes: the badge is honest, but an invented sentence in quotation
 marks beside real research is a poor thing to serve when the alternative is two
-words. NOT MEASURED: whether pdoom-data's `alignment_research` collection carries
-real reactions that could be synced instead, which would be the better fix and
-is a pdoom-data question.
+words.
+
+**MEASURED 2026-09-07 by the coordination seat, which has pdoom-data checked out:
+there is no real reaction to substitute, anywhere.**
+`timeline_events/alignment_research/alignment_research_events.json` holds exactly
+1,000 records -- a 1:1 match with the 1,000 orphan pages -- with 1,000 non-null
+`safety_researcher_reaction` values across **9 distinct strings**, 1,000 non-null
+`media_reaction` values across **1 distinct string** (one sentence repeated a
+thousand times), zero `reaction_provenance`, and zero arXiv sources. Upstream of
+that, `data/raw/alignment_research/` is HuggingFace extraction metadata and
+`data/enrichment/` is a quality-score table. No commentary at any layer.
+
+That kills the fix Claude had hoped for. Teaching the sync to read the real
+collection cannot fix the quotes and close TECH_DEBT E-0 together, **because
+there is no real collection.** The choice narrows to: suppress the two fields, or
+generate them and label them as generated. Claude recommends **suppress** -- a
+field with nothing truthful behind it is better absent than labelled, and
+`redact_pii()` already establishes "decline to publish what you cannot vouch for"
+as this repo's house rule.
+
+Its "zero arXiv, all Alignment Forum" independently reproduces the same result
+Claude measured from the rendered pages, which is a real cross-check: two seats
+measuring different artifacts of one pipeline and agreeing.
 
 **This second ask does NOT depend on the source-marking question.** The
 coordination seat is right that a gate for the synced corpus should wait for
