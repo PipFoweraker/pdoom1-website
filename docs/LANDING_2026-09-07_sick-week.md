@@ -201,7 +201,24 @@ sentence** -- render the 1,000 orphans into the same state the 1,194 synced page
 are already in. The template puts the badge, a `<br>` and the quote in separate
 elements, so removing only the quote is a clean edit.
 
-**The strongest evidence for this is that the end state already ships.** The
+**Settled: the sync does not clean anything, so nothing will ever fix these
+pages on its own.** It was worth asking whether `sync-events.py` already drops
+fabricated reactions for the main corpus, which would have narrowed this to a
+code path. It does not. The only reaction handling is a URL sanitiser guarded by
+`is not None` (`sync-events.py:953-955`), and the comment above it states why the
+synced corpus is clean: *"pdoom-data now serves null for a reaction nobody has
+been asked for, and the key STAYS PRESENT so consumers indexing on it keep
+working. See pdoom-data#96."*
+
+So the 1,194 pages are clean **because pdoom-data cleaned them at source**, not
+because anything here filtered them. pdoom-data nulled the main collection and
+did not null `alignment_research`. Combined with the orphans having no generator
+that regenerates them, the consequence is that **the 1,000 pages are frozen: no
+sync, no upstream fix, and no future release changes them.** Only a human running
+a script moves them, which is why this is a decision and not a backlog item.
+
+**The strongest evidence for the shape of the fix is that the end state already
+ships.** The
 suggest link is on all 2,194 event pages, including the 1,194 that render
 `Not recorded` and carry no quote at all. Those pages demonstrate the badge-plus-
 hook-without-fabrication state working in production today. The ask is therefore
