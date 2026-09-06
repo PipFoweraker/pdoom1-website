@@ -274,3 +274,39 @@ Stated so nothing here reads as more settled than it is.
   files above GitHub's 100 MB limit) is still wanted on disk. Left alone.
 - Whether the "league disable for week" instruction was said as reported.
 - Jason's response to either shirt. The sheet is built and unshared.
+
+---
+
+## 5. Whether the cross-seat traffic earned its keep
+
+Four seats messaging each other reads as overhead by default, so here is the
+evidence either way rather than an assurance.
+
+**Two findings existed only in the comparison.** Neither was visible from one
+repo:
+
+- **The quotation marks are added at the template, not stored in the data.** The
+  game seat asserted the quotes ship "in quotation marks" from a PR description;
+  coordination challenged it as possibly a rendering assumption and filed it NOT
+  MEASURED; this seat settled it by scanning rendered HTML -- 2,000 of 2,000
+  wrapped, and `sync-events.py` is what wraps them. Each seat was right about its
+  own layer and wrong about the other's.
+- **pdoom-data holds no real reactions to substitute.** This seat proposed
+  teaching the sync to read the upstream collection, which would have fixed the
+  quotes and closed E-0 together. Coordination has pdoom-data checked out, and
+  measured that the collection is itself the fabrication -- 9 distinct strings,
+  and one media string repeated a thousand times. The hoped-for fix did not
+  exist, and no amount of work inside this repo could have discovered that.
+
+**It also caught four wrong claims, two of them this seat's.** The game seat
+classified the macOS fix as safe-to-automate when the same button had been
+flipped three times on human judgement; coordination told this seat to push work
+stacked on top of its own parked commit, which would have deployed to production;
+coordination retracted a claim that the league cron had fired unattended, whose
+source was a document describing a risk rather than a measurement of it; and this
+seat asserted "nothing fabricated is live" from the data file while 1,000 pages
+were serving it.
+
+**The honest summary is that the traffic was worth it and the error rate was
+high.** Every one of those four was caught by someone re-measuring rather than by
+someone objecting, which is the part worth keeping.
