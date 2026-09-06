@@ -78,6 +78,20 @@ Sample, from `alignmentforum_00671cab97bcd7dc.html`:
 > Safety Researcher Reaction: [Placeholder - Needs Real Quote]
 > "Important work advancing our understanding of AI safety"
 
+**Settled 2026-09-07: the quotation marks are real, and they are added here.**
+The coordination and pdoom1 seats both recorded this as NOT MEASURED, because at
+the data layer these are bare phrases with no quote characters. On the rendered
+page they are not: **2,000 of 2,000 placeholder blocks are wrapped in literal
+`"` characters**, added by this repo's template. So "a fabricated sentence in
+quotation marks" is an accurate description of what pdoom1.com serves, and "a
+boilerplate phrase in a data field" is an accurate description of what pdoom1
+stores. Both seats were right about their own layer.
+
+**All 1,000 pages pair the invented quote with a real source link** (Alignment
+Forum; zero arXiv links in this corpus, unlike the synced one). The genuine
+citation sits beside the invented reaction and lends it credibility -- which is
+the sharper form of the honesty problem than fabrication alone.
+
 **Two things make this less bad than it sounds, and one makes it worse.**
 Less bad: the quote carries a visible provenance badge reading *Placeholder -
 Needs Real Quote*, so it is disclosed rather than passed off; and it is attributed
@@ -143,6 +157,15 @@ marks beside real research is a poor thing to serve when the alternative is two
 words. NOT MEASURED: whether pdoom-data's `alignment_research` collection carries
 real reactions that could be synced instead, which would be the better fix and
 is a pdoom-data question.
+
+**This second ask does NOT depend on the source-marking question.** The
+coordination seat is right that a gate for the synced corpus should wait for
+pdoom-data to mark fabrications at source, because a gate that infers which
+strings are invented is a heuristic and every consumer's heuristic is wrong
+differently. That argument does not reach the 1,000 orphans: their pages already
+carry an explicit `provenance-placeholder` class on every one of the 2,000
+blocks, so a cleanup keys on a marker that is already present and guesses at
+nothing. The two asks can be answered independently and in either order.
 
 **How the error above happened, because the mechanism recurs.** The check ran
 against `events.json` and the conclusion was stated about the website. The data
