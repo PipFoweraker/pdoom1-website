@@ -314,7 +314,48 @@ has a convention for the second answer.
 **If unanswered:** the leaderboard keeps failing closed, which is the safe
 direction, and the advisory keeps exiting 1 where nobody looks.
 
-### D4-D6. Merch blockers -- held in coordination, not duplicated here
+### D4. Token drift: 41 files, and the fix splits three ways
+
+`python scripts/check-token-drift.py` exits **1**. Also ADVISORY, so also green
+in CI. The script is explicit that this is *"a MECHANICAL divergence, not a
+design decision -- the same variable names with stale values"*, and calls it
+Step 1 of the token plan. Examples: `--bg-primary` is `#000000` on the homepage
+where the token is `#12100f`; `--accent-secondary` is `#ffb347` on two pages
+where the token is `#2fd4c2`.
+
+**Scoped so this is a decision and not an investigation.** From
+`check-token-drift.py --list-files`, 41 files drift, and they are **not** one
+population:
+
+| Owner | Files | Where the fix belongs |
+|---|---|---|
+| `scripts/sync/sync-events.py` | 3 | the generator's f-string template |
+| `scripts/sync/sync-design-notes.py` | 17 (16 `adr-*` + index) | that generator's template |
+| genuinely hand-written | 21 | the pages themselves |
+
+**Claude nearly got this wrong and it is worth recording why.** The obvious split
+is "in `public/events/` = generated, everything else = hand-written". That is
+false: every `design-notes/adr-*.html` is rendered by `sync-design-notes.py` and
+would be overwritten by the next sync. Hand-editing those 17 would look like a
+fix, pass the checker, and silently revert. The script warns about the events
+pages for exactly this reason but does not know about design-notes.
+
+**The precise ask.** Three separable yeses, in increasing risk:
+- (a) The 17 design-note pages -- fix in the generator, re-run it, no judgement
+  needed and no visible change beyond palette correction.
+- (b) The 3 event pages -- same, in `scripts/sync/sync-events.py`.
+- (c) The 21 hand-written pages -- **this one changes what visitors see**,
+  including the homepage background going from `#000000` to `#12100f`. Mechanical
+  in principle; a visible design change in practice.
+
+Claude recommends taking (a) and (b) as one commit and holding (c) for you to
+eyeball, because a generator fix is verifiable by re-running the generator and a
+palette change across 21 hand-built pages is not.
+
+**If unanswered:** nothing breaks. Two dialects of the same token names persist,
+which is what makes `public/design/tokens.json` "not a design system yet".
+
+### D5-D7. Merch blockers -- held in coordination, not duplicated here
 
 `DECISIONS-NEEDED_2026-09-07.md` in the coordination repo carries, as entries
 3, 4 and 5: the unresolved wordmark blocking any print run; the absent fact gate
