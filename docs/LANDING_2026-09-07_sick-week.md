@@ -44,6 +44,13 @@ under a running agent with work in flight is its own hazard:
 Re-run any of it against the ref rather than the tree:
 `git fetch && git show origin/main:public/index.html | grep -c 'no build in the current release'`
 
+**If this seat dies, resume from here.** Everything is on the branch
+`docs/sick-week-landing` (`git fetch && git log origin/docs/sick-week-landing`).
+This file is the whole manifest -- no decision, measurement or open thread lives
+only in a transcript. To continue: `git fetch`, read this file, re-run any
+command it cites against `origin/main`, and take the next unanswered card. Do not
+pull and do not push `main`.
+
 ---
 
 ## 1. Decisions needed
@@ -365,12 +372,52 @@ index of what is waiting on you.
 
 ---
 
+### D5. #14 is the oldest open item in the estate and needs two strings from you
+
+**Opened 2025-09-09. A year old on Tuesday 9 September, and it is two meta tags.**
+Across eight repos and ~420 open issues, coordination measured this as the single
+oldest thing anyone holds. Recorded here with its age rather than skipped, because
+an item nobody can close and nobody has recorded as blocked is how a backlog
+reaches twelve months.
+
+**What is already done, so nobody re-investigates.** The crawl substrate is in
+good shape: `public/robots.txt` and `public/sitemap.xml` both exist on
+`origin/main`, robots declares the sitemap (`Sitemap: https://pdoom1.com/sitemap.xml`),
+and the file carries verified per-path reasoning. **#14 is not about
+crawlability.** It is only about proving ownership so you can *see* indexing data
+in the two consoles.
+
+**Verified absent:** `git show origin/main:public/index.html | grep -c
+'google-site-verification\|msvalidate'` returns 0. No `google*.html` or
+`BingSiteAuth.xml` file either.
+
+**Why no agent can close it.** Step one of the issue is "collect verification
+codes". Those come from your Google Search Console and Bing Webmaster accounts.
+There is no way to derive, guess or verify them from here, and a placeholder meta
+tag would be a false claim shipped to production.
+
+**Your part is about thirty seconds.** Get both codes, paste them here, and an
+agent adds the two `<meta>` tags to `public/index.html` and re-runs the checks.
+Bing can also import verification from Search Console, so it may be one code
+rather than two.
+
+**If unanswered:** nothing breaks and nothing is lied to. You continue not to see
+crawl errors or index coverage for pdoom1.com, which matters more the moment merch
+starts pointing strangers at it.
+
+---
+
 ## 2. Work that needs a human, not an agent
+
+**Note on dates:** Monday 8 and Tuesday 9 September are a double Sabbath. **Staff
+can act; Pip cannot.** Anything above phrased as a decision for Pip means
+**Wednesday 10**. The macOS launch check below is unaffected -- it needs *a
+human*, not Pip specifically.
 
 **Verify the macOS build launches.** pdoom1 issue #1071 states no macOS build has
 ever been verified to run. No agent can establish this; it needs a Mac and five
 minutes. It gates D1's wording and it gates whether stranger-legible merch can
-safely point at the site at all. Staff are in Monday and Tuesday -- this is the
+safely point at the site at all. Staff are in Monday 8 and Tuesday 9 -- this is the
 highest-value five minutes available to a human this week.
 
 **Share the Shirt Inspection Sheet.** Published private at
