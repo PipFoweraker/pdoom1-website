@@ -20,7 +20,17 @@ on:
   # move which week is opened -- only how far into it the run happens.
   # scripts/test-weekly-league-boundary.py parses this cron and fails if it stops
   # agreeing with ROLLOVER_HOUR_UTC / ROLLOVER_CRON_DOW.
-  # PARKED 2026-08-24. PARKED-UNTIL: 2026-09-02
+  # PARKED 2026-08-24. PARKED-UNTIL: 2026-09-21
+  #
+  # RE-PARKED 2026-09-07, on Pip's instruction ("league disable for week").
+  # The 2026-09-02 park expired and the boundary test went RED as designed --
+  # measured, not assumed: 1/108 FAILED, "the park has not expired". The
+  # documented closure is restore-or-re-park, and the conditions that justified
+  # the original park have not improved: Pip is ill this week, four agent seats
+  # are running with no human reading their output, and the deploy that follows
+  # a push to main still runs no tests, so a bad rollover reaches pdoom1.com in
+  # ~20s. New date is the Monday after the 2026-09-15 machine move, which is the
+  # first day a human is reliably available to watch an unattended publish.
   #
   # WHY: this job pushes a league rollover straight to `main` unattended, and the
   # repo's data contract is currently RED (`board:publish` -- the site serves
