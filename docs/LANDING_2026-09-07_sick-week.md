@@ -405,6 +405,53 @@ rather than two.
 crawl errors or index coverage for pdoom1.com, which matters more the moment merch
 starts pointing strangers at it.
 
+### D6. Two campaign acceptances expired on 2026-09-05, and the branch they were waiting on has resolved
+
+`python scripts/check-campaign-facts.py` exits **1**. Also ADVISORY. **Neither red
+is a new defect** -- both are dated acceptances whose review date passed two days
+ago. The guard is working exactly as designed; the clock ran out.
+
+**The one that matters: the escalation branch is now determined.** The acceptance
+on `content/campaigns/2026-08-07-ladder-fork-l4.json` was written by you on
+2026-08-21 and says, verbatim: *"By then api.pdoom1.com is either back or it is
+not. If back: run `scripts/publish-live-board.py` then
+`scripts/check-board-liveness.py`, and re-read the campaign copy against the epoch
+that is actually current -- L5 or later, not L4. If still down: that is no longer
+an outage, it is the league being offline for over two weeks, and the honest move
+is to change what the site CLAIMS about a live leaderboard."*
+
+**It is back.** `git show origin/main:public/leaderboard/data/board-liveness.json`
+gives `verdict: "live"` at `(weekly-2026-w35, L6)`, published and current epochs
+agreeing, generated `2026-09-06T12:31:45Z`. So the harsher branch does not apply
+and no site claim about a live leaderboard needs retracting.
+
+What remains is the milder branch: the campaign copy names **L4**, which is now
+**two forks stale** (L4 → L5 → L6). The guard's own note records that the fix is a
+re-read of the copy rather than a key swap, because the copy names a specific
+closed epoch.
+
+**Severity ceiling, from the guard's verification not Claude's:** both campaigns
+are `approved: false` with every `posted[*]` null, so **nothing false has reached
+a reader.** This is unposted draft copy.
+
+**The second red is a signature, not a claim.**
+`2026-08-15-august-watch.json::four-atoms-are-the-august-list` reports *"HUMAN
+VERIFICATION EXPIRED... What is red is the VERIFICATION, not the claim -- which is
+why a person can always close it."* An agent re-verifying its own source and
+signing your name to it is exactly the failure #297 records, so Claude did not.
+
+**The precise ask.** Two things, both yours:
+- (a) Re-read `2026-08-07-ladder-fork-l4.json` against **L6** and update the copy,
+  or set a new `review_by` with a reason that is true today.
+- (b) Re-verify the four August atoms and sign the `human_verified` block, or fix
+  the constraint.
+
+The guard says it plainly and Claude agrees: *"Both are decisions; neither is a
+shrug."*
+
+**If unanswered:** the advisory stays red where nobody looks, and the next person
+to touch campaigns inherits an expired acceptance that reads as tolerated.
+
 ---
 
 ## 2. Work that needs a human, not an agent
