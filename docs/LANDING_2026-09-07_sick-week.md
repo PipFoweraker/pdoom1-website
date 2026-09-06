@@ -1,0 +1,133 @@
+# Landing document -- pdoom1-website seat, sick week (from 2026-09-07)
+
+Pip is ill from 2026-09-07. This is the ONE document to read on return from this
+seat. It accumulates through the week; newest entries go at the top of each
+section. Decisions are batched so they can be answered in a single sitting.
+
+**Nothing has been pushed.** A push to `main` here auto-deploys to pdoom1.com
+with no test gate (CLAUDE.md, "Deploy"), so unattended landing is off for the
+week. Work sits as local commits and branches.
+
+**Evidence standard for this file:** every claim in a heading or a bolded
+sentence reduces to a command someone else can run, and the command is written
+next to it. Where a thing was not measured, it says NOT MEASURED rather than a
+plausible number.
+
+---
+
+## 1. Decisions needed
+
+Answer these in one sitting. Nothing here has been decided by an agent.
+
+### D1. The homepage tells a Mac visitor two contradictory things
+
+**Context.** `public/index.html:1038` renders the macOS download button from data
+(`data-platform-claim="rendered"`), and `public/data/version.json` reports
+`platforms.macos: true` for v0.14.4 because `PDoom-macOS-v0.14.4.zip` is attached
+to the release. Meanwhile `public/index.html:1602`, in the FAQ prose, is a typed
+literal reading *"macOS -- no build in the current release; it broke and a fix is
+written"*. Both are on the same page. One of them is now false.
+
+Separately, `public/about/index.html:503` says *"Windows is the tested one, Mac
+and Linux are fresh and largely untested"*, which is accurate and should not be
+contradicted by whatever replaces the FAQ line.
+
+**Verify with:**
+```
+grep -n 'no build in the current release' public/index.html
+python -c "import json;print(json.load(open('public/data/version.json',encoding='utf-8'))['latest_release']['platforms'])"
+```
+
+**Why an agent did not just fix it.** The one-sentence fix is reader-facing prose
+making a promise about platform support, which CLAUDE.md records as copy you
+review. More decisively, the comment block at `public/index.html:1013-1037`
+documents this same button being disarmed, restored, re-disarmed and re-armed on
+2026-08-10, 2026-08-24 and 2026-08-28, each on a judgement call. A fifth
+unattended flip while you are ill is the move that history argues against.
+
+**The precise ask.** Which of these should the FAQ line say?
+- (a) "macOS -- a build ships, but nobody has confirmed it launches yet."
+- (b) "macOS -- available; Windows is the tested one." (matches /about/)
+- (c) Delete the platform sentence from the FAQ entirely and let the rendered
+  buttons and /about/ carry it, so there is one source instead of two.
+
+Claude's recommendation is **(c)**, because the defect is that a typed literal
+exists at all next to derived data -- (a) and (b) both leave a second literal to
+rot. NOT MEASURED and it would change the wording: whether the v0.14.4 Mac zip
+actually launches.
+
+**If unanswered:** the contradiction stays live. Low harm while traffic is small;
+it becomes consequential the moment merch points strangers at the site.
+
+### D2-D4. Merch blockers -- held in coordination, not duplicated here
+
+`DECISIONS-NEEDED_2026-09-07.md` in the coordination repo carries, as entries
+3, 4 and 5: the unresolved wordmark blocking any print run; the absent fact gate
+on merch copy; and whether the "nothing may read as a launch" ruling still holds.
+Answer them there. They are recorded here only so this document is a complete
+index of what is waiting on you.
+
+---
+
+## 2. Work that needs a human, not an agent
+
+**Verify the macOS build launches.** pdoom1 issue #1071 states no macOS build has
+ever been verified to run. No agent can establish this; it needs a Mac and five
+minutes. It gates D1's wording and it gates whether stranger-legible merch can
+safely point at the site at all. Staff are in Monday and Tuesday -- this is the
+highest-value five minutes available to a human this week.
+
+**Share the Shirt Inspection Sheet.** Published private at
+`https://claude.ai/code/artifact/f09930eb-00ee-471b-9d41-03cd2ce7781f`. It needs
+sharing from the page's share menu before anyone can open it. All social is RED
+this week on your own call, so no agent posts it.
+
+---
+
+## 3. Verified findings
+
+Each of these was run, not inferred.
+
+**The league rollover cron was parked five days past its own expiry, and is now
+re-parked to 2026-09-21.** Committed by the coordination seat as `54cb0e2a` in
+this repo, local and unpushed. `PARKED-UNTIL: 2026-09-21` at
+`.github/workflows/weekly-league-reset.yml:23`, with the `schedule:`/`cron:`
+lines still commented at 76-77 -- both halves are required or
+`generate-metabolism.py` exits 2 on "one of the two is a lie".
+Verify: `python scripts/test-weekly-league-boundary.py` gives `PASSED: 108/108`;
+`python scripts/generate-metabolism.py --check` gives rc=0.
+**Unconfirmed input:** the re-park rests on an instruction reported as "league
+disable for week", which did not come through this seat. Conservative in either
+direction, but it holds the league off for two more weeks.
+
+**A repo comment claims the game is stable, and the shipped build contradicts
+it.** `public/index.html:869` reads "Alpha warning banner removed as game is now
+stable". pdoom1 #1341 -- the pause menu did not pause -- was found by you on the
+shipped v0.14.4 and is fixed on pdoom1 `main` (2026-08-30) but is in no release.
+Latest release is still v0.14.4, tagged 2026-08-28; the v0.15 train was due
+2026-09-04 and slipped. Comment only, no visitor sees it. Recorded so nobody
+reasons from it.
+Verify: `grep -n 'game is now stable' public/index.html`
+
+**CI is clean and the local checkout was 25 days stale.** Zero non-success
+conclusions across the last 100 workflow runs. Local `main` was 611 commits
+behind at session start and was fast-forwarded on 2026-09-05.
+Verify: `gh run list --limit 100 --json conclusion`
+
+**Issue #388 ("Health checks failing") is stale.** Open since 2026-08-26 with
+zero comments, while `public/data/health-check.json` reads
+`overall_status: PASS` and every Health Checks run since is green. It is an
+auto-alert with no closer -- the shape #376 is about.
+Verify: `python -c "import json;print(json.load(open('public/data/health-check.json',encoding='utf-8'))['overall_status'])"`
+
+---
+
+## 4. Not measured
+
+Stated so nothing here reads as more settled than it is.
+
+- Whether the v0.14.4 macOS artifact launches. Needs a Mac.
+- Whether `temp_windows_build/` (untracked, ~836 MB per the pdoom1 seat, two
+  files above GitHub's 100 MB limit) is still wanted on disk. Left alone.
+- Whether the "league disable for week" instruction was said as reported.
+- Jason's response to either shirt. The sheet is built and unshared.
