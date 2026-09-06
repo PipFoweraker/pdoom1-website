@@ -61,9 +61,34 @@ it becomes consequential the moment merch points strangers at the site.
 
 ### D2. The fabricated-quote pipeline into this site is armed, and its only guard counts rather than refuses
 
-**Nothing fabricated is live right now.** Verified: 0 of 1194 events in
-`public/data/events.json` carry a `safety_researcher_reaction`. That is the good
-news and it is the reason this is a decision rather than an incident.
+**CORRECTED 2026-09-07, same day, before anyone acted on it.** This card first
+said "nothing fabricated is live right now", on the evidence that 0 of 1194
+records in `public/data/events.json` carry a reaction. That measured the DATA
+FILE and asserted about the SITE. They disagree.
+
+**1,000 published pages carry fabricated quotes right now.** Scanning the
+rendered HTML rather than its source data: 2,388 reaction blocks render the
+clean `Not recorded` state, and **2,000 blocks across exactly 1,000 files render
+an invented sentence in literal quotation marks**, two per page (a safety
+reaction and a media reaction). Every one of the 1,000 is an
+`alignmentforum_*` page. Zero `arxiv_*` pages are affected.
+
+Sample, from `alignmentforum_00671cab97bcd7dc.html`:
+
+> Safety Researcher Reaction: [Placeholder - Needs Real Quote]
+> "Important work advancing our understanding of AI safety"
+
+**Two things make this less bad than it sounds, and one makes it worse.**
+Less bad: the quote carries a visible provenance badge reading *Placeholder -
+Needs Real Quote*, so it is disclosed rather than passed off; and it is attributed
+to a generic "safety researcher", not to a named person. Worse: **these are
+exactly the 1,000 orphan pages that no generator can reach.** Per
+`docs/TECH_DEBT.md` E-0, they have no entry in `all_events.json`; pdoom-data
+holds them in a separate collection (`timeline_events/alignment_research/`) the
+sync has never read. So a gate in `sync-events.py` protects against future
+arrivals and **does nothing for the 1,000 already published.** Cleaning them is a
+scripted one-off rewrite, the same shape as the two orphan pages that had to be
+hand-fixed for the email marker.
 
 **But the machinery is fully wired.** The event schema carries
 `safety_researcher_reaction` and `media_reaction`; `sync-events.py:1633` renders
@@ -105,9 +130,26 @@ done unattended because it changes what a visitor-facing page would show, and
 because the honest wording of a refusal ("no reaction recorded" vs. rendering
 nothing at all) is a presentation call that is yours.
 
-**If unanswered:** no immediate harm -- the corpus is clean today. The risk is
-that #1339 lands upstream while nobody here is watching, and the next scheduled
-sync publishes it. That sync runs daily.
+**If unanswered:** the 1,000 orphan pages keep serving invented quotes, badge and
+all. No sync will change that either way, so waiting costs nothing new -- but
+nothing improves either, and the gate question stays open for the corpus that
+IS synced.
+
+**Second ask, separable from the first.** Should the 1,000 orphan pages be
+rewritten to the `Not recorded` state now? That is a scripted edit to published
+HTML with no generator behind it, so it needs a human to say yes. Claude's
+recommendation is yes: the badge is honest, but an invented sentence in quotation
+marks beside real research is a poor thing to serve when the alternative is two
+words. NOT MEASURED: whether pdoom-data's `alignment_research` collection carries
+real reactions that could be synced instead, which would be the better fix and
+is a pdoom-data question.
+
+**How the error above happened, because the mechanism recurs.** The check ran
+against `events.json` and the conclusion was stated about the website. The data
+file is one input to the site, not a picture of it -- and for the orphan corpus
+it is not even an input. `check-published-emails.py` exists in this repo for
+exactly this reason: it walks what is committed under `public/`, not what the
+generator was handed. **When asking "what does the site show", scan `public/`.**
 
 ### D3-D5. Merch blockers -- held in coordination, not duplicated here
 
