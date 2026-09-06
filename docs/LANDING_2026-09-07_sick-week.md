@@ -4,9 +4,20 @@ Pip is ill from 2026-09-07. This is the ONE document to read on return from this
 seat. It accumulates through the week; newest entries go at the top of each
 section. Decisions are batched so they can be answered in a single sitting.
 
-**Nothing has been pushed.** A push to `main` here auto-deploys to pdoom1.com
+**Nothing has been landed.** A push to `main` here auto-deploys to pdoom1.com
 with no test gate (CLAUDE.md, "Deploy"), so unattended landing is off for the
-week. Work sits as local commits and branches.
+week. This document and the league re-park live on the branch
+`docs/sick-week-landing`, pushed so they are not on one laptop only. `main` is
+untouched at `6add8299` and nothing has deployed.
+
+**Every path cited below resolves.** Each was checked against `origin/main`
+after the coordination seat found a citation in its own runbook that a reader
+could not paste. Bare filenames were qualified to full paths -- `sync-events.py`
+lives at `scripts/sync/sync-events.py`, and the short form silently returns an
+empty `git log` that reads exactly like "nothing touched this file" while hiding
+18 commits. Paths in `timeline_events/` and `DECISIONS-NEEDED_2026-09-07.md`
+belong to pdoom-data and coordination respectively and correctly do not resolve
+here.
 
 **Evidence standard for this file:** every claim in a heading or a bolded
 sentence reduces to a command someone else can run, and the command is written
@@ -127,13 +138,13 @@ to a generic "safety researcher", not to a named person. Worse: **these are
 exactly the 1,000 orphan pages that no generator can reach.** Per
 `docs/TECH_DEBT.md` E-0, they have no entry in `all_events.json`; pdoom-data
 holds them in a separate collection (`timeline_events/alignment_research/`) the
-sync has never read. So a gate in `sync-events.py` protects against future
+sync has never read. So a gate in `scripts/sync/sync-events.py` protects against future
 arrivals and **does nothing for the 1,000 already published.** Cleaning them is a
 scripted one-off rewrite, the same shape as the two orphan pages that had to be
 hand-fixed for the email marker.
 
 **But the machinery is fully wired.** The event schema carries
-`safety_researcher_reaction` and `media_reaction`; `sync-events.py:1633` renders
+`safety_researcher_reaction` and `media_reaction`; `scripts/sync/sync-events.py:1633` renders
 a reaction as a labelled quote (`Safety Researcher Reaction:`) on the public
 event page; and event pages are built from real arXiv papers by real, named
 authors. pdoom1 PR #1339 proposes **1,194 fabricated researcher quotes** -- the
@@ -141,7 +152,7 @@ same count as this site's event corpus, which is consistent with both deriving
 from the same pdoom-data collection.
 
 **The provenance system is a counter, not a gate.** `get_provenance_type()`
-(`sync-events.py:2045`) classifies each reaction as `real_quote`,
+(`scripts/sync/sync-events.py:2045`) classifies each reaction as `real_quote`,
 `human_summary`, `placeholder` or `not_applicable`, and feeds `quote_stats` into
 `events-sync-summary.json`. Nothing consults it before rendering. An unlabelled
 reaction defaults to `placeholder` -- and a placeholder is **still published**.
@@ -160,7 +171,7 @@ python -c "import json;d=json.load(open('public/data/events.json',encoding='utf-
 grep -n 'def get_provenance_type' -A 10 scripts/sync/sync-events.py
 ```
 
-**The precise ask.** Should `sync-events.py` refuse to render a reaction whose
+**The precise ask.** Should `scripts/sync/sync-events.py` refuse to render a reaction whose
 provenance is not `real_quote` or `human_summary` -- the same fail-closed shape
 `redact_pii()` already uses, where the generator declines to write rather than
 publishing something it cannot vouch for?
@@ -222,10 +233,10 @@ are already in. The template puts the badge, a `<br>` and the quote in separate
 elements, so removing only the quote is a clean edit.
 
 **Settled: the sync does not clean anything, so nothing will ever fix these
-pages on its own.** It was worth asking whether `sync-events.py` already drops
+pages on its own.** It was worth asking whether `scripts/sync/sync-events.py` already drops
 fabricated reactions for the main corpus, which would have narrowed this to a
 code path. It does not. The only reaction handling is a URL sanitiser guarded by
-`is not None` (`sync-events.py:953-955`), and the comment above it states why the
+`is not None` (`scripts/sync/sync-events.py:953-955`), and the comment above it states why the
 synced corpus is clean: *"pdoom-data now serves null for a reaction nobody has
 been asked for, and the key STAYS PRESENT so consumers indexing on it keep
 working. See pdoom-data#96."*
@@ -260,7 +271,7 @@ nothing. The two asks can be answered independently and in either order.
 **How the error above happened, because the mechanism recurs.** The check ran
 against `events.json` and the conclusion was stated about the website. The data
 file is one input to the site, not a picture of it -- and for the orphan corpus
-it is not even an input. `check-published-emails.py` exists in this repo for
+it is not even an input. `scripts/check-published-emails.py` exists in this repo for
 exactly this reason: it walks what is committed under `public/`, not what the
 generator was handed. **When asking "what does the site show", scan `public/`.**
 
@@ -298,7 +309,7 @@ re-parked to 2026-09-21.** Committed by the coordination seat as `54cb0e2a` in
 this repo, local and unpushed. `PARKED-UNTIL: 2026-09-21` at
 `.github/workflows/weekly-league-reset.yml:23`, with the `schedule:`/`cron:`
 lines still commented at 76-77 -- both halves are required or
-`generate-metabolism.py` exits 2 on "one of the two is a lie".
+`scripts/generate-metabolism.py` exits 2 on "one of the two is a lie".
 Verify: `python scripts/test-weekly-league-boundary.py` gives `PASSED: 108/108`;
 `python scripts/generate-metabolism.py --check` gives rc=0.
 **Unconfirmed input:** the re-park rests on an instruction reported as "league
@@ -351,7 +362,7 @@ repo:
   game seat asserted the quotes ship "in quotation marks" from a PR description;
   coordination challenged it as possibly a rendering assumption and filed it NOT
   MEASURED; this seat settled it by scanning rendered HTML -- 2,000 of 2,000
-  wrapped, and `sync-events.py` is what wraps them. Each seat was right about its
+  wrapped, and `scripts/sync/sync-events.py` is what wraps them. Each seat was right about its
   own layer and wrong about the other's.
 - **pdoom-data holds no real reactions to substitute.** This seat proposed
   teaching the sync to read the upstream collection, which would have fixed the
