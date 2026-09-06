@@ -275,7 +275,46 @@ it is not even an input. `scripts/check-published-emails.py` exists in this repo
 exactly this reason: it walks what is committed under `public/`, not what the
 generator was handed. **When asking "what does the site show", scan `public/`.**
 
-### D3-D5. Merch blockers -- held in coordination, not duplicated here
+### D3. The blessing record disagrees with itself, and only you can settle it
+
+**Found by running the suite, not by reading about it.**
+`python scripts/check-blessing-consistency.py` exits **1** today. It is wired as
+ADVISORY in `content-honesty.yml`, so CI is green and nothing surfaced it.
+
+    current epoch (declared)   L6
+    ledger row                 seed=weekly-2026-w35  blessed=True  by=Pip on 2026-08-24
+    ladder-epochs.json         seed=weekly-2026-w35  status=blessed  epoch=L6
+    weekly/current.json        seed=weekly_2026_W35_a97e68ae  blessed=False  epoch=L4
+    published-board.json       seed=weekly-2026-w35  epoch=L6
+
+Two findings: `weekly/current.json` is stamped **L4 while the declared epoch is
+L6**, and it carries a **different seed form** (`weekly_2026_W35_a97e68ae` vs
+`weekly-2026-w35`).
+
+**Severity, measured rather than assumed.** `/league/` is **not** reachable --
+zero `href="/league` references in `navigation.js` or the homepage, consistent
+with retired-and-hidden. But `/leaderboard/` **is** in the nav, and it reads
+`weekly/current.json`. It also guards correctly: `public/leaderboard/index.html:1714`
+tests `weekData.seed_provenance?.blessed === true` before offering a seed, so a
+`blessed: false` record means the page **offers nothing rather than offering the
+wrong thing**. So no visitor is lied to. A visitor may simply be shown less than
+they should be, and nobody would know why.
+
+**Why an agent did not fix it.** The script refuses to fill a ledger row on
+purpose, and says why: that row records **who** blessed and **when**, and a seat
+inferring it is how #297 started. The same applies to restamping the epoch. This
+is one decision written by hand to four places, and the decision is yours.
+
+**The precise ask.** Is `weekly_2026_W35_a97e68ae` at L4 a stale artefact that
+should be restamped to L6 with the canonical seed form, or is it a real L4-era
+record that should be preserved and excluded from the current-epoch comparison?
+The `preserved/2026-08-24-l4-epoch-close/` directory suggests the project already
+has a convention for the second answer.
+
+**If unanswered:** the leaderboard keeps failing closed, which is the safe
+direction, and the advisory keeps exiting 1 where nobody looks.
+
+### D4-D6. Merch blockers -- held in coordination, not duplicated here
 
 `DECISIONS-NEEDED_2026-09-07.md` in the coordination repo carries, as entries
 3, 4 and 5: the unresolved wordmark blocking any print run; the absent fact gate
