@@ -13,6 +13,26 @@ sentence reduces to a command someone else can run, and the command is written
 next to it. Where a thing was not measured, it says NOT MEASURED rather than a
 plausible number.
 
+**Position against origin, because a measurement without one is not a claim.**
+Everything below was first measured on a working tree **31 commits behind
+`origin/main`** (and 9 ahead, carrying this document). The coordination seat
+caught that after finding its own pdoom-data checkout was 34 stale and that one
+of its reports had come from a month-old tree. Re-checked on 2026-09-07 with
+`git fetch` and `git show origin/main:<path>`, without pulling, because pulling
+under a running agent with work in flight is its own hazard:
+
+- Of the paths these findings rest on, **only `public/data/version.json` moved**
+  in those 31 commits -- six `Auto-update: version info and game stats` runs.
+  `public/events/`, `scripts/sync/sync-events.py`, `public/index.html`,
+  `deploy-excludes.txt` and `public/data/events.json` are all unchanged, so every
+  D2 measurement stands as written.
+- Both D1 facts re-verify on `origin/main`: `latest_release.platforms` is still
+  `{windows: true, macos: true, linux: true}` at v0.14.4, and the false FAQ
+  literal is still present, once.
+
+Re-run any of it against the ref rather than the tree:
+`git fetch && git show origin/main:public/index.html | grep -c 'no build in the current release'`
+
 ---
 
 ## 1. Decisions needed
