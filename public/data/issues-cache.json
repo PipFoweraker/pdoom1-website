@@ -40,7 +40,9 @@
           "name": "technical-debt",
           "color": "fef2c0",
           "default": false,
-          "description": "Technical debt that needs addressing"
+          "description": "Technical debt that needs addressing",
+          "archived_at": null,
+          "archived_by": null
         }
       ],
       "state": "open",
@@ -196,7 +198,9 @@
           "name": "release",
           "color": "5319E7",
           "default": false,
-          "description": "Release engineering"
+          "description": "Release engineering",
+          "archived_at": null,
+          "archived_by": null
         },
         {
           "id": 11905765365,
@@ -205,7 +209,9 @@
           "name": "checklist",
           "color": "ededed",
           "default": false,
-          "description": null
+          "description": null,
+          "archived_at": null,
+          "archived_by": null
         }
       ],
       "state": "open",
@@ -361,7 +367,9 @@
           "name": "release",
           "color": "5319E7",
           "default": false,
-          "description": "Release engineering"
+          "description": "Release engineering",
+          "archived_at": null,
+          "archived_by": null
         },
         {
           "id": 11992145369,
@@ -370,7 +378,9 @@
           "name": "build-failed",
           "color": "ededed",
           "default": false,
-          "description": null
+          "description": null,
+          "archived_at": null,
+          "archived_by": null
         }
       ],
       "state": "open",
@@ -453,7 +463,9 @@
           "name": "release",
           "color": "5319E7",
           "default": false,
-          "description": "Release engineering"
+          "description": "Release engineering",
+          "archived_at": null,
+          "archived_by": null
         },
         {
           "id": 11905765365,
@@ -462,7 +474,9 @@
           "name": "checklist",
           "color": "ededed",
           "default": false,
-          "description": null
+          "description": null,
+          "archived_at": null,
+          "archived_by": null
         }
       ],
       "state": "open",
@@ -618,7 +632,9 @@
           "name": "enhancement",
           "color": "a2eeef",
           "default": true,
-          "description": "New feature or request"
+          "description": "New feature or request",
+          "archived_at": null,
+          "archived_by": null
         }
       ],
       "state": "open",
@@ -701,7 +717,9 @@
           "name": "ui-ux",
           "color": "bfd4f2",
           "default": false,
-          "description": "User interface and user experience"
+          "description": "User interface and user experience",
+          "archived_at": null,
+          "archived_by": null
         },
         {
           "id": 9290966065,
@@ -710,7 +728,9 @@
           "name": "strategic",
           "color": "5319e7",
           "default": false,
-          "description": "Strategic planning and high-level architectural decisions"
+          "description": "Strategic planning and high-level architectural decisions",
+          "archived_at": null,
+          "archived_by": null
         },
         {
           "id": 11799822890,
@@ -719,7 +739,9 @@
           "name": "someday",
           "color": "C5DEF5",
           "default": false,
-          "description": "Parked deliberately, not abandoned. Keeps it out of the orphan count honestly."
+          "description": "Parked deliberately, not abandoned. Keeps it out of the orphan count honestly.",
+          "archived_at": null,
+          "archived_by": null
         }
       ],
       "state": "open",
@@ -913,12 +935,12 @@
   "sample_size": 11,
   "sample_requested": 15,
   "sample_sort": "recently updated",
-  "total_open_issues": null,
-  "total_open_prs": null,
+  "total_open_issues": 213,
+  "total_open_prs": 5,
   "untriaged_in_sample": 5,
   "bodies_included": false,
   "summary": {
-    "as_of": "2026-09-12T00:04:30Z",
+    "as_of": "2026-09-12T06:02:29Z",
     "source": {
       "repository": "PipFoweraker/pdoom1",
       "repository_url": "https://github.com/PipFoweraker/pdoom1",
@@ -955,6 +977,6 @@
       "is_not": "a complete list. It is the most recently touched fifteen. Absence from it proves nothing -- see content/campaigns/*.json, which already records that trap."
     }
   },
-  "last_updated": "2026-09-12T00:04:30Z",
+  "last_updated": "2026-09-12T06:02:29Z",
   "_comment": "issues is a SAMPLE -- the `sample_requested` most recently updated open issues, pull requests removed. total_open_issues is the real count from /search/issues and may be null, which means UNKNOWN and must never render as zero. Bodies are deliberately absent: nothing renders them and they are third-party text on a public host."
 }
