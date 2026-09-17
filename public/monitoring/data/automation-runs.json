@@ -2,16 +2,6 @@
   {
     "job": "auto-update-data",
     "trigger": "repository_dispatch",
-    "timestamp": "2026-08-24T08:48:35.461792Z",
-    "status": "success",
-    "details": {
-      "version-status": "success",
-      "stats-status": "success"
-    }
-  },
-  {
-    "job": "auto-update-data",
-    "trigger": "repository_dispatch",
     "timestamp": "2026-08-24T09:13:12.530525Z",
     "status": "success",
     "details": {
@@ -1088,6 +1078,17 @@
     "job": "auto-update-data",
     "trigger": "schedule",
     "timestamp": "2026-09-17T12:25:16.239334Z",
+    "status": "success",
+    "status_reason": "all 2 observed outcomes reported success",
+    "details": {
+      "version-status": "success",
+      "stats-status": "success"
+    }
+  },
+  {
+    "job": "auto-update-data",
+    "trigger": "schedule",
+    "timestamp": "2026-09-17T18:20:33.938201Z",
     "status": "success",
     "status_reason": "all 2 observed outcomes reported success",
     "details": {
