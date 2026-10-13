@@ -4,34 +4,29 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-10-12T02:01:39+00:00",
+  "captured_at_utc": "2026-10-13T01:57:35+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 309
+          "value": 306
         },
         "visit_duration": {
-          "value": 25
+          "value": 20
         },
         "visitors": {
-          "value": 215
+          "value": 209
         },
         "visits": {
-          "value": 219
+          "value": 214
         },
         "bounce_rate": {
-          "value": 81
+          "value": 80
         }
       }
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-09-12",
-          "pageviews": 12,
-          "visitors": 11
-        },
         {
           "date": "2026-09-13",
           "pageviews": 6,
@@ -176,6 +171,11 @@
           "date": "2026-10-11",
           "pageviews": 9,
           "visitors": 9
+        },
+        {
+          "date": "2026-10-12",
+          "pageviews": 9,
+          "visitors": 5
         }
       ]
     },
@@ -183,19 +183,19 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 109
+          "visitors": 107
         },
         {
           "source": "Google",
-          "visitors": 58
+          "visitors": 57
         },
         {
           "source": "DuckDuckGo",
-          "visitors": 21
+          "visitors": 20
         },
         {
           "source": "Bing",
-          "visitors": 11
+          "visitors": 10
         },
         {
           "source": "Facebook",
@@ -214,11 +214,11 @@
           "visitors": 2
         },
         {
-          "source": "chatgpt.com",
-          "visitors": 2
+          "source": "Yahoo!",
+          "visitors": 1
         },
         {
-          "source": "Yahoo!",
+          "source": "chatgpt.com",
           "visitors": 1
         },
         {
@@ -231,18 +231,18 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 135,
-          "visitors": 109
+          "pageviews": 137,
+          "visitors": 108
         },
         {
           "page": "/dashboard/",
-          "pageviews": 75,
-          "visitors": 60
+          "pageviews": 73,
+          "visitors": 58
         },
         {
           "page": "/leaderboard/",
-          "pageviews": 16,
-          "visitors": 15
+          "pageviews": 17,
+          "visitors": 16
         },
         {
           "page": "/game-stats/",
@@ -250,28 +250,28 @@
           "visitors": 14
         },
         {
-          "page": "/about/",
-          "pageviews": 8,
-          "visitors": 8
-        },
-        {
-          "page": "/blog/",
-          "pageviews": 8,
-          "visitors": 8
-        },
-        {
           "page": "/game-changelog/",
           "pageviews": 8,
           "visitors": 8
         },
         {
-          "page": "/events/",
-          "pageviews": 9,
-          "visitors": 6
+          "page": "/about/",
+          "pageviews": 7,
+          "visitors": 7
+        },
+        {
+          "page": "/blog/",
+          "pageviews": 7,
+          "visitors": 7
         },
         {
           "page": "/docs/",
           "pageviews": 5,
+          "visitors": 5
+        },
+        {
+          "page": "/events/",
+          "pageviews": 8,
           "visitors": 5
         },
         {
@@ -310,13 +310,13 @@
           "visitors": 1
         },
         {
-          "page": "/events/arxiv_901b2797a974e580.html",
+          "page": "/events/arxiv_beb53e03ce611e66.html",
           "pageviews": 1,
           "visitors": 1
         },
         {
-          "page": "/events/arxiv_beb53e03ce611e66.html",
-          "pageviews": 1,
+          "page": "/launch",
+          "pageviews": 0,
           "visitors": 1
         },
         {
@@ -345,7 +345,7 @@
       "results": [
         {
           "country": "US",
-          "visitors": 85
+          "visitors": 81
         },
         {
           "country": "CN",
@@ -353,7 +353,7 @@
         },
         {
           "country": "AU",
-          "visitors": 10
+          "visitors": 12
         },
         {
           "country": "DE",
@@ -362,10 +362,6 @@
         {
           "country": "ES",
           "visitors": 7
-        },
-        {
-          "country": "FR",
-          "visitors": 6
         },
         {
           "country": "CA",
@@ -384,7 +380,7 @@
           "visitors": 5
         },
         {
-          "country": "DK",
+          "country": "FR",
           "visitors": 4
         },
         {
@@ -392,7 +388,7 @@
           "visitors": 4
         },
         {
-          "country": "JP",
+          "country": "DK",
           "visitors": 3
         },
         {
@@ -401,6 +397,10 @@
         },
         {
           "country": "TR",
+          "visitors": 3
+        },
+        {
+          "country": "TW",
           "visitors": 3
         },
         {
@@ -413,6 +413,10 @@
         },
         {
           "country": "IN",
+          "visitors": 2
+        },
+        {
+          "country": "JP",
           "visitors": 2
         },
         {
@@ -444,15 +448,7 @@
           "visitors": 1
         },
         {
-          "country": "AR",
-          "visitors": 1
-        },
-        {
           "country": "CH",
-          "visitors": 1
-        },
-        {
-          "country": "FI",
           "visitors": 1
         },
         {
@@ -504,10 +500,6 @@
           "visitors": 1
         },
         {
-          "country": "TW",
-          "visitors": 1
-        },
-        {
           "country": "VN",
           "visitors": 1
         }
@@ -524,9 +516,9 @@
           "visitors": 11
         },
         {
-          "events": 1,
+          "events": 2,
           "goal": "Download",
-          "visitors": 1
+          "visitors": 2
         }
       ]
     }
@@ -534,11 +526,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-09-12",
-    "last_date": "2026-10-11",
+    "first_date": "2026-09-13",
+    "last_date": "2026-10-12",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-10-12"
+  "snapshot_date": "2026-10-13"
 }
