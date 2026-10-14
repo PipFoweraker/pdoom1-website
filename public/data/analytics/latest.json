@@ -4,21 +4,21 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-10-13T01:57:35+00:00",
+  "captured_at_utc": "2026-10-14T01:39:54+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 306
+          "value": 307
         },
         "visit_duration": {
           "value": 20
         },
         "visitors": {
-          "value": 209
+          "value": 208
         },
         "visits": {
-          "value": 214
+          "value": 213
         },
         "bounce_rate": {
           "value": 80
@@ -27,11 +27,6 @@
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-09-13",
-          "pageviews": 6,
-          "visitors": 5
-        },
         {
           "date": "2026-09-14",
           "pageviews": 17,
@@ -176,6 +171,11 @@
           "date": "2026-10-12",
           "pageviews": 9,
           "visitors": 5
+        },
+        {
+          "date": "2026-10-13",
+          "pageviews": 7,
+          "visitors": 4
         }
       ]
     },
@@ -183,19 +183,19 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 107
+          "visitors": 109
         },
         {
           "source": "Google",
-          "visitors": 57
+          "visitors": 59
         },
         {
           "source": "DuckDuckGo",
-          "visitors": 20
+          "visitors": 17
         },
         {
           "source": "Bing",
-          "visitors": 10
+          "visitors": 9
         },
         {
           "source": "Facebook",
@@ -206,12 +206,12 @@
           "visitors": 4
         },
         {
-          "source": "Ecosia",
+          "source": "app.swapcard.com",
           "visitors": 2
         },
         {
-          "source": "app.swapcard.com",
-          "visitors": 2
+          "source": "Ecosia",
+          "visitors": 1
         },
         {
           "source": "Yahoo!",
@@ -231,13 +231,13 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 137,
-          "visitors": 108
+          "pageviews": 142,
+          "visitors": 111
         },
         {
           "page": "/dashboard/",
-          "pageviews": 73,
-          "visitors": 58
+          "pageviews": 68,
+          "visitors": 54
         },
         {
           "page": "/leaderboard/",
@@ -250,17 +250,17 @@
           "visitors": 14
         },
         {
+          "page": "/blog/",
+          "pageviews": 8,
+          "visitors": 8
+        },
+        {
           "page": "/game-changelog/",
           "pageviews": 8,
           "visitors": 8
         },
         {
           "page": "/about/",
-          "pageviews": 7,
-          "visitors": 7
-        },
-        {
-          "page": "/blog/",
           "pageviews": 7,
           "visitors": 7
         },
@@ -286,8 +286,8 @@
         },
         {
           "page": "/frontier-labs/",
-          "pageviews": 5,
-          "visitors": 4
+          "pageviews": 4,
+          "visitors": 3
         },
         {
           "page": "/state-of-doom/",
@@ -303,6 +303,11 @@
           "page": "/issues/",
           "pageviews": 2,
           "visitors": 2
+        },
+        {
+          "page": "/events/alignmentforum_372ff158811c3362.html",
+          "pageviews": 1,
+          "visitors": 1
         },
         {
           "page": "/events/alignmentforum_3a4b57ffc4de8239.html",
@@ -349,15 +354,11 @@
         },
         {
           "country": "CN",
-          "visitors": 27
+          "visitors": 26
         },
         {
           "country": "AU",
           "visitors": 12
-        },
-        {
-          "country": "DE",
-          "visitors": 7
         },
         {
           "country": "ES",
@@ -365,6 +366,10 @@
         },
         {
           "country": "CA",
+          "visitors": 5
+        },
+        {
+          "country": "DE",
           "visitors": 5
         },
         {
@@ -448,7 +453,15 @@
           "visitors": 1
         },
         {
+          "country": "AT",
+          "visitors": 1
+        },
+        {
           "country": "CH",
+          "visitors": 1
+        },
+        {
+          "country": "CZ",
           "visitors": 1
         },
         {
@@ -526,11 +539,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-09-13",
-    "last_date": "2026-10-12",
+    "first_date": "2026-09-14",
+    "last_date": "2026-10-13",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-10-13"
+  "snapshot_date": "2026-10-14"
 }
