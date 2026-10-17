@@ -1,0 +1,551 @@
+{
+  "schema": 2,
+  "site": "pdoom1.com",
+  "period": "30d",
+  "range": null,
+  "source": "https://analytics.pdoom1.com",
+  "captured_at_utc": "2026-10-17T01:38:06+00:00",
+  "sections": {
+    "aggregate": {
+      "results": {
+        "pageviews": {
+          "value": 275
+        },
+        "visit_duration": {
+          "value": 15
+        },
+        "visitors": {
+          "value": 191
+        },
+        "visits": {
+          "value": 195
+        },
+        "bounce_rate": {
+          "value": 82
+        }
+      }
+    },
+    "timeseries": {
+      "results": [
+        {
+          "date": "2026-09-17",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "date": "2026-09-18",
+          "pageviews": 5,
+          "visitors": 4
+        },
+        {
+          "date": "2026-09-19",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "date": "2026-09-20",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "date": "2026-09-21",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "date": "2026-09-22",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "date": "2026-09-23",
+          "pageviews": 8,
+          "visitors": 6
+        },
+        {
+          "date": "2026-09-24",
+          "pageviews": 12,
+          "visitors": 10
+        },
+        {
+          "date": "2026-09-25",
+          "pageviews": 8,
+          "visitors": 7
+        },
+        {
+          "date": "2026-09-26",
+          "pageviews": 16,
+          "visitors": 16
+        },
+        {
+          "date": "2026-09-27",
+          "pageviews": 19,
+          "visitors": 9
+        },
+        {
+          "date": "2026-09-28",
+          "pageviews": 18,
+          "visitors": 9
+        },
+        {
+          "date": "2026-09-29",
+          "pageviews": 11,
+          "visitors": 4
+        },
+        {
+          "date": "2026-09-30",
+          "pageviews": 10,
+          "visitors": 9
+        },
+        {
+          "date": "2026-10-01",
+          "pageviews": 23,
+          "visitors": 10
+        },
+        {
+          "date": "2026-10-02",
+          "pageviews": 4,
+          "visitors": 3
+        },
+        {
+          "date": "2026-10-03",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "date": "2026-10-04",
+          "pageviews": 8,
+          "visitors": 6
+        },
+        {
+          "date": "2026-10-05",
+          "pageviews": 8,
+          "visitors": 4
+        },
+        {
+          "date": "2026-10-06",
+          "pageviews": 10,
+          "visitors": 7
+        },
+        {
+          "date": "2026-10-07",
+          "pageviews": 7,
+          "visitors": 6
+        },
+        {
+          "date": "2026-10-08",
+          "pageviews": 7,
+          "visitors": 6
+        },
+        {
+          "date": "2026-10-09",
+          "pageviews": 23,
+          "visitors": 13
+        },
+        {
+          "date": "2026-10-10",
+          "pageviews": 11,
+          "visitors": 9
+        },
+        {
+          "date": "2026-10-11",
+          "pageviews": 9,
+          "visitors": 9
+        },
+        {
+          "date": "2026-10-12",
+          "pageviews": 9,
+          "visitors": 5
+        },
+        {
+          "date": "2026-10-13",
+          "pageviews": 7,
+          "visitors": 4
+        },
+        {
+          "date": "2026-10-14",
+          "pageviews": 8,
+          "visitors": 7
+        },
+        {
+          "date": "2026-10-15",
+          "pageviews": 12,
+          "visitors": 7
+        },
+        {
+          "date": "2026-10-16",
+          "pageviews": 4,
+          "visitors": 3
+        }
+      ]
+    },
+    "sources": {
+      "results": [
+        {
+          "source": "Direct / None",
+          "visitors": 102
+        },
+        {
+          "source": "Google",
+          "visitors": 62
+        },
+        {
+          "source": "Bing",
+          "visitors": 9
+        },
+        {
+          "source": "DuckDuckGo",
+          "visitors": 7
+        },
+        {
+          "source": "LinkedIn",
+          "visitors": 4
+        },
+        {
+          "source": "Facebook",
+          "visitors": 3
+        },
+        {
+          "source": "app.swapcard.com",
+          "visitors": 2
+        },
+        {
+          "source": "Yahoo!",
+          "visitors": 1
+        },
+        {
+          "source": "inbrowserapp.com",
+          "visitors": 1
+        }
+      ]
+    },
+    "pages": {
+      "results": [
+        {
+          "page": "/",
+          "pageviews": 135,
+          "visitors": 103
+        },
+        {
+          "page": "/dashboard/",
+          "pageviews": 51,
+          "visitors": 42
+        },
+        {
+          "page": "/leaderboard/",
+          "pageviews": 16,
+          "visitors": 15
+        },
+        {
+          "page": "/game-stats/",
+          "pageviews": 15,
+          "visitors": 12
+        },
+        {
+          "page": "/blog/",
+          "pageviews": 7,
+          "visitors": 7
+        },
+        {
+          "page": "/game-changelog/",
+          "pageviews": 7,
+          "visitors": 7
+        },
+        {
+          "page": "/about/",
+          "pageviews": 6,
+          "visitors": 6
+        },
+        {
+          "page": "/resources/",
+          "pageviews": 5,
+          "visitors": 5
+        },
+        {
+          "page": "/cats/",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "page": "/docs/",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "page": "/events/",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "page": "/frontier-labs/",
+          "pageviews": 4,
+          "visitors": 3
+        },
+        {
+          "page": "/state-of-doom/",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "page": "/bug-report/",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/issues/",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/press/",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/events/alignmentforum_054a2bfba124eaa8.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/alignmentforum_372ff158811c3362.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/alignmentforum_3a4b57ffc4de8239.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_30334862e967a234.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_669a2a89fe0b6b86.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_beb53e03ce611e66.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/launch",
+          "pageviews": 0,
+          "visitors": 1
+        },
+        {
+          "page": "/metabolism/",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/monitoring/",
+          "pageviews": 1,
+          "visitors": 1
+        }
+      ]
+    },
+    "countries": {
+      "results": [
+        {
+          "country": "US",
+          "visitors": 66
+        },
+        {
+          "country": "CN",
+          "visitors": 26
+        },
+        {
+          "country": "AU",
+          "visitors": 11
+        },
+        {
+          "country": "ES",
+          "visitors": 7
+        },
+        {
+          "country": "GB",
+          "visitors": 6
+        },
+        {
+          "country": "NL",
+          "visitors": 6
+        },
+        {
+          "country": "CA",
+          "visitors": 5
+        },
+        {
+          "country": "KR",
+          "visitors": 5
+        },
+        {
+          "country": "SG",
+          "visitors": 5
+        },
+        {
+          "country": "DE",
+          "visitors": 4
+        },
+        {
+          "country": "TR",
+          "visitors": 3
+        },
+        {
+          "country": "TW",
+          "visitors": 3
+        },
+        {
+          "country": "BR",
+          "visitors": 2
+        },
+        {
+          "country": "CH",
+          "visitors": 2
+        },
+        {
+          "country": "DK",
+          "visitors": 2
+        },
+        {
+          "country": "EE",
+          "visitors": 2
+        },
+        {
+          "country": "FR",
+          "visitors": 2
+        },
+        {
+          "country": "HK",
+          "visitors": 2
+        },
+        {
+          "country": "IN",
+          "visitors": 2
+        },
+        {
+          "country": "JP",
+          "visitors": 2
+        },
+        {
+          "country": "NZ",
+          "visitors": 2
+        },
+        {
+          "country": "PL",
+          "visitors": 2
+        },
+        {
+          "country": "RU",
+          "visitors": 2
+        },
+        {
+          "country": "SE",
+          "visitors": 2
+        },
+        {
+          "country": "SO",
+          "visitors": 2
+        },
+        {
+          "country": "UA",
+          "visitors": 2
+        },
+        {
+          "country": "AG",
+          "visitors": 1
+        },
+        {
+          "country": "AT",
+          "visitors": 1
+        },
+        {
+          "country": "CL",
+          "visitors": 1
+        },
+        {
+          "country": "CZ",
+          "visitors": 1
+        },
+        {
+          "country": "HU",
+          "visitors": 1
+        },
+        {
+          "country": "IE",
+          "visitors": 1
+        },
+        {
+          "country": "IT",
+          "visitors": 1
+        },
+        {
+          "country": "KZ",
+          "visitors": 1
+        },
+        {
+          "country": "LV",
+          "visitors": 1
+        },
+        {
+          "country": "MO",
+          "visitors": 1
+        },
+        {
+          "country": "MV",
+          "visitors": 1
+        },
+        {
+          "country": "MY",
+          "visitors": 1
+        },
+        {
+          "country": "NO",
+          "visitors": 1
+        },
+        {
+          "country": "PK",
+          "visitors": 1
+        },
+        {
+          "country": "SA",
+          "visitors": 1
+        },
+        {
+          "country": "VN",
+          "visitors": 1
+        }
+      ]
+    },
+    "utm_campaign": {
+      "results": []
+    },
+    "goals": {
+      "results": [
+        {
+          "events": 11,
+          "goal": "Outbound Link: Click",
+          "visitors": 8
+        },
+        {
+          "events": 2,
+          "goal": "Download",
+          "visitors": 2
+        }
+      ]
+    }
+  },
+  "errors": {},
+  "coverage": {
+    "days_returned": 30,
+    "first_date": "2026-09-17",
+    "last_date": "2026-10-16",
+    "missing_dates": [],
+    "zero_dates": [],
+    "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
+  },
+  "snapshot_date": "2026-10-17"
+}
