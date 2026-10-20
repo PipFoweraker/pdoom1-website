@@ -4,7 +4,7 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-10-19T01:46:22+00:00",
+  "captured_at_utc": "2026-10-20T01:42:18+00:00",
   "sections": {
     "aggregate": {
       "results": {
@@ -27,11 +27,6 @@
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-09-19",
-          "pageviews": 4,
-          "visitors": 4
-        },
         {
           "date": "2026-09-20",
           "pageviews": 4,
@@ -176,6 +171,11 @@
           "date": "2026-10-18",
           "pageviews": 6,
           "visitors": 5
+        },
+        {
+          "date": "2026-10-19",
+          "pageviews": 4,
+          "visitors": 4
         }
       ]
     },
@@ -183,7 +183,7 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 108
+          "visitors": 111
         },
         {
           "source": "Google",
@@ -191,15 +191,15 @@
         },
         {
           "source": "DuckDuckGo",
-          "visitors": 7
-        },
-        {
-          "source": "Bing",
           "visitors": 6
         },
         {
+          "source": "Bing",
+          "visitors": 5
+        },
+        {
           "source": "LinkedIn",
-          "visitors": 4
+          "visitors": 3
         },
         {
           "source": "Facebook",
@@ -232,8 +232,8 @@
         },
         {
           "page": "/dashboard/",
-          "pageviews": 47,
-          "visitors": 38
+          "pageviews": 45,
+          "visitors": 36
         },
         {
           "page": "/leaderboard/",
@@ -246,12 +246,12 @@
           "visitors": 12
         },
         {
-          "page": "/about/",
-          "pageviews": 7,
-          "visitors": 7
+          "page": "/blog/",
+          "pageviews": 8,
+          "visitors": 8
         },
         {
-          "page": "/blog/",
+          "page": "/about/",
           "pageviews": 7,
           "visitors": 7
         },
@@ -259,6 +259,11 @@
           "page": "/game-changelog/",
           "pageviews": 6,
           "visitors": 6
+        },
+        {
+          "page": "/events/",
+          "pageviews": 5,
+          "visitors": 5
         },
         {
           "page": "/resources/",
@@ -276,22 +281,12 @@
           "visitors": 4
         },
         {
-          "page": "/events/",
-          "pageviews": 4,
-          "visitors": 4
-        },
-        {
           "page": "/frontier-labs/",
           "pageviews": 5,
           "visitors": 4
         },
         {
           "page": "/issues/",
-          "pageviews": 3,
-          "visitors": 3
-        },
-        {
-          "page": "/state-of-doom/",
           "pageviews": 3,
           "visitors": 3
         },
@@ -307,6 +302,11 @@
         },
         {
           "page": "/press/",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/state-of-doom/",
           "pageviews": 2,
           "visitors": 2
         },
@@ -341,6 +341,11 @@
           "visitors": 1
         },
         {
+          "page": "/events/arxiv_ec060a99eb4e8e9a.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
           "page": "/metabolism/",
           "pageviews": 1,
           "visitors": 1
@@ -356,11 +361,11 @@
       "results": [
         {
           "country": "US",
-          "visitors": 67
+          "visitors": 65
         },
         {
           "country": "CN",
-          "visitors": 26
+          "visitors": 27
         },
         {
           "country": "AU",
@@ -372,6 +377,10 @@
         },
         {
           "country": "GB",
+          "visitors": 7
+        },
+        {
+          "country": "SG",
           "visitors": 7
         },
         {
@@ -387,16 +396,12 @@
           "visitors": 5
         },
         {
-          "country": "SG",
-          "visitors": 5
+          "country": "BR",
+          "visitors": 4
         },
         {
           "country": "DE",
           "visitors": 4
-        },
-        {
-          "country": "BR",
-          "visitors": 3
         },
         {
           "country": "TR",
@@ -475,10 +480,6 @@
           "visitors": 1
         },
         {
-          "country": "IE",
-          "visitors": 1
-        },
-        {
           "country": "IN",
           "visitors": 1
         },
@@ -515,10 +516,6 @@
           "visitors": 1
         },
         {
-          "country": "SA",
-          "visitors": 1
-        },
-        {
           "country": "VN",
           "visitors": 1
         }
@@ -545,11 +542,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-09-19",
-    "last_date": "2026-10-18",
+    "first_date": "2026-09-20",
+    "last_date": "2026-10-19",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-10-19"
+  "snapshot_date": "2026-10-20"
 }
