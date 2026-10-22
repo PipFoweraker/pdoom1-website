@@ -4,21 +4,21 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-10-21T01:43:57+00:00",
+  "captured_at_utc": "2026-10-22T01:42:49+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 276
+          "value": 286
         },
         "visit_duration": {
-          "value": 16
+          "value": 15
         },
         "visitors": {
-          "value": 191
+          "value": 198
         },
         "visits": {
-          "value": 195
+          "value": 202
         },
         "bounce_rate": {
           "value": 81
@@ -27,11 +27,6 @@
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-09-21",
-          "pageviews": 2,
-          "visitors": 2
-        },
         {
           "date": "2026-09-22",
           "pageviews": 1,
@@ -176,6 +171,11 @@
           "date": "2026-10-20",
           "pageviews": 1,
           "visitors": 1
+        },
+        {
+          "date": "2026-10-21",
+          "pageviews": 12,
+          "visitors": 9
         }
       ]
     },
@@ -183,11 +183,11 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 108
+          "visitors": 113
         },
         {
           "source": "Google",
-          "visitors": 62
+          "visitors": 64
         },
         {
           "source": "DuckDuckGo",
@@ -227,8 +227,8 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 138,
-          "visitors": 105
+          "pageviews": 143,
+          "visitors": 109
         },
         {
           "page": "/dashboard/",
@@ -237,18 +237,18 @@
         },
         {
           "page": "/leaderboard/",
-          "pageviews": 18,
-          "visitors": 17
+          "pageviews": 19,
+          "visitors": 18
         },
         {
           "page": "/game-stats/",
-          "pageviews": 14,
-          "visitors": 11
+          "pageviews": 15,
+          "visitors": 12
         },
         {
           "page": "/about/",
-          "pageviews": 7,
-          "visitors": 7
+          "pageviews": 9,
+          "visitors": 8
         },
         {
           "page": "/blog/",
@@ -261,13 +261,13 @@
           "visitors": 6
         },
         {
-          "page": "/frontier-labs/",
+          "page": "/resources/",
           "pageviews": 6,
-          "visitors": 5
+          "visitors": 6
         },
         {
-          "page": "/resources/",
-          "pageviews": 5,
+          "page": "/frontier-labs/",
+          "pageviews": 6,
           "visitors": 5
         },
         {
@@ -361,7 +361,7 @@
       "results": [
         {
           "country": "US",
-          "visitors": 64
+          "visitors": 67
         },
         {
           "country": "CN",
@@ -369,7 +369,7 @@
         },
         {
           "country": "AU",
-          "visitors": 11
+          "visitors": 12
         },
         {
           "country": "ES",
@@ -388,20 +388,20 @@
           "visitors": 6
         },
         {
+          "country": "BR",
+          "visitors": 5
+        },
+        {
+          "country": "DE",
+          "visitors": 5
+        },
+        {
           "country": "KR",
           "visitors": 5
         },
         {
           "country": "NL",
           "visitors": 5
-        },
-        {
-          "country": "BR",
-          "visitors": 4
-        },
-        {
-          "country": "DE",
-          "visitors": 4
         },
         {
           "country": "TR",
@@ -508,6 +508,10 @@
           "visitors": 1
         },
         {
+          "country": "PH",
+          "visitors": 1
+        },
+        {
           "country": "PK",
           "visitors": 1
         },
@@ -538,11 +542,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-09-21",
-    "last_date": "2026-10-20",
+    "first_date": "2026-09-22",
+    "last_date": "2026-10-21",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-10-21"
+  "snapshot_date": "2026-10-22"
 }
