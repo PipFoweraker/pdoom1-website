@@ -4,34 +4,29 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-10-23T01:45:08+00:00",
+  "captured_at_utc": "2026-10-24T01:41:53+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 299
+          "value": 302
         },
         "visit_duration": {
           "value": 16
         },
         "visitors": {
-          "value": 205
-        },
-        "visits": {
           "value": 209
         },
+        "visits": {
+          "value": 214
+        },
         "bounce_rate": {
-          "value": 80
+          "value": 81
         }
       }
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-09-23",
-          "pageviews": 8,
-          "visitors": 6
-        },
         {
           "date": "2026-09-24",
           "pageviews": 12,
@@ -176,6 +171,11 @@
           "date": "2026-10-22",
           "pageviews": 14,
           "visitors": 8
+        },
+        {
+          "date": "2026-10-23",
+          "pageviews": 11,
+          "visitors": 11
         }
       ]
     },
@@ -183,11 +183,11 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 119
+          "visitors": 126
         },
         {
           "source": "Google",
-          "visitors": 65
+          "visitors": 63
         },
         {
           "source": "DuckDuckGo",
@@ -227,7 +227,7 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 147,
+          "pageviews": 148,
           "visitors": 112
         },
         {
@@ -242,12 +242,17 @@
         },
         {
           "page": "/game-stats/",
-          "pageviews": 15,
-          "visitors": 12
+          "pageviews": 14,
+          "visitors": 11
         },
         {
           "page": "/about/",
-          "pageviews": 9,
+          "pageviews": 10,
+          "visitors": 9
+        },
+        {
+          "page": "/game-changelog/",
+          "pageviews": 8,
           "visitors": 8
         },
         {
@@ -256,24 +261,9 @@
           "visitors": 7
         },
         {
-          "page": "/game-changelog/",
-          "pageviews": 6,
-          "visitors": 6
-        },
-        {
           "page": "/resources/",
-          "pageviews": 6,
-          "visitors": 6
-        },
-        {
-          "page": "/frontier-labs/",
-          "pageviews": 6,
+          "pageviews": 5,
           "visitors": 5
-        },
-        {
-          "page": "/cats/",
-          "pageviews": 4,
-          "visitors": 4
         },
         {
           "page": "/docs/",
@@ -286,6 +276,26 @@
           "visitors": 4
         },
         {
+          "page": "/events/arxiv_41f01220cbd1248e.html",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "page": "/frontier-labs/",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "page": "/cats/",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "page": "/events/arxiv_c328090bc4305415.html",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
           "page": "/issues/",
           "pageviews": 3,
           "visitors": 3
@@ -296,22 +306,12 @@
           "visitors": 2
         },
         {
-          "page": "/events/arxiv_41f01220cbd1248e.html",
-          "pageviews": 2,
-          "visitors": 2
-        },
-        {
           "page": "/launch",
           "pageviews": 0,
           "visitors": 2
         },
         {
           "page": "/press/",
-          "pageviews": 2,
-          "visitors": 2
-        },
-        {
-          "page": "/state-of-doom/",
           "pageviews": 2,
           "visitors": 2
         },
@@ -364,6 +364,11 @@
           "page": "/monitoring/",
           "pageviews": 1,
           "visitors": 1
+        },
+        {
+          "page": "/state-of-doom/",
+          "pageviews": 1,
+          "visitors": 1
         }
       ]
     },
@@ -371,34 +376,30 @@
       "results": [
         {
           "country": "US",
-          "visitors": 72
+          "visitors": 71
         },
         {
           "country": "CN",
-          "visitors": 27
+          "visitors": 26
         },
         {
           "country": "AU",
           "visitors": 13
         },
         {
-          "country": "ES",
-          "visitors": 7
+          "country": "SG",
+          "visitors": 8
         },
         {
           "country": "GB",
           "visitors": 7
         },
         {
-          "country": "SG",
-          "visitors": 7
+          "country": "ES",
+          "visitors": 6
         },
         {
           "country": "BR",
-          "visitors": 5
-        },
-        {
-          "country": "CA",
           "visitors": 5
         },
         {
@@ -414,6 +415,22 @@
           "visitors": 5
         },
         {
+          "country": "AR",
+          "visitors": 4
+        },
+        {
+          "country": "CA",
+          "visitors": 4
+        },
+        {
+          "country": "CO",
+          "visitors": 3
+        },
+        {
+          "country": "PL",
+          "visitors": 3
+        },
+        {
           "country": "TR",
           "visitors": 3
         },
@@ -423,10 +440,6 @@
         },
         {
           "country": "CH",
-          "visitors": 2
-        },
-        {
-          "country": "CO",
           "visitors": 2
         },
         {
@@ -451,10 +464,6 @@
         },
         {
           "country": "NZ",
-          "visitors": 2
-        },
-        {
-          "country": "PL",
           "visitors": 2
         },
         {
@@ -530,6 +539,10 @@
           "visitors": 1
         },
         {
+          "country": "VE",
+          "visitors": 1
+        },
+        {
           "country": "VN",
           "visitors": 1
         }
@@ -541,9 +554,9 @@
     "goals": {
       "results": [
         {
-          "events": 13,
+          "events": 14,
           "goal": "Outbound Link: Click",
-          "visitors": 10
+          "visitors": 11
         },
         {
           "events": 2,
@@ -556,11 +569,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-09-23",
-    "last_date": "2026-10-22",
+    "first_date": "2026-09-24",
+    "last_date": "2026-10-23",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-10-23"
+  "snapshot_date": "2026-10-24"
 }
