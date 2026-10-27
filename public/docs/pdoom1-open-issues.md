@@ -1,6 +1,6 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-10-27T06:41:37.722Z UTC
+Generated: 2026-10-27T12:38:00.901Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
@@ -110,7 +110,7 @@ Generated: 2026-10-27T06:41:37.722Z UTC
 | 1016 | design(content): provenance real infrastructure failure modes into the event history as flavour text / metadata |  |  | 2026-07-29 01:40:09 | [link](https://github.com/PipFoweraker/pdoom1/issues/1016) |
 | 1015 | positioning: the AI-generated-art immune reaction is a reputational risk, not just an art-quality one | post-launch |  | 2026-10-25 19:12:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/1015) |
 | 1014 | deploy(web): playable browser demo via Godot HTML5 export -- lower the try-it barrier to zero | distribution, post-launch |  | 2026-07-29 01:39:15 | [link](https://github.com/PipFoweraker/pdoom1/issues/1014) |
-| 1012 | leaderboard integrity: no dev-mode/verification field reaches a submitted score, so the website cannot filter on it |  |  | 2026-10-25 19:12:10 | [link](https://github.com/PipFoweraker/pdoom1/issues/1012) |
+| 1012 | leaderboard integrity: no dev-mode/verification field reaches a submitted score, so the website cannot filter on it |  |  | 2026-10-27 12:31:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1012) |
 | 1011 | docs+emit(keybinds): three docs disagree with keybind_manager.gd; emit a keybind artifact so the website derives instead of mirroring |  |  | 2026-07-29 00:55:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1011) |
 | 1009 | devblog automation: repair as a draft-generator (never auto-publish) -- post-league | documentation, technical-debt, post-launch |  | 2026-07-28 19:51:50 | [link](https://github.com/PipFoweraker/pdoom1/issues/1009) |
 | 1008 | Release feed index is hand-maintained in practice: generated feed is uploaded as an artifact, never committed back | bug |  | 2026-07-28 10:29:25 | [link](https://github.com/PipFoweraker/pdoom1/issues/1008) |
