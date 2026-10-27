@@ -19,7 +19,7 @@
     "open_issues_and_prs": 222,
     "last_updated": "2026-10-25T19:09:05Z"
   },
-  "last_updated": "2026-10-27T00:44:00.793981",
+  "last_updated": "2026-10-27T06:28:37.700959",
   "game_stats": {
     "baseline_doom_percent": null,
     "frontier_labs_count": 6,
@@ -36,7 +36,7 @@
         "tracking": "https://github.com/PipFoweraker/pdoom1-website/issues/177"
       }
     },
-    "last_calculated": "2026-10-27T00:44:00.793974",
+    "last_calculated": "2026-10-27T06:28:37.700952",
     "frontier_labs_source": {
       "file": "/data/frontier-labs.json",
       "predicate": "roster.labs where kind == \"real\" and status == \"active\"",
