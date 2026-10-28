@@ -9,17 +9,17 @@
     "status": "alpha",
     "repository": "https://github.com/PipFoweraker/pdoom1",
     "latestRelease": {
-      "version": "v0.14.4",
-      "date": "2026-08-28",
+      "version": "v0.14.5",
+      "date": "2026-10-28",
       "downloadUrl": "https://github.com/PipFoweraker/pdoom1/releases/latest",
       "changelog": "See CHANGELOG.md for details"
     },
     "development": {
       "phase": "Ongoing feature development",
-      "progress": "v0.14.4 released",
+      "progress": "v0.14.5 released",
       "nextMilestone": "Public alpha readiness (the First Contact milestone)"
     },
-    "lastUpdated": "2026-10-28T18:15:32.100692"
+    "lastUpdated": "2026-10-28T22:25:58.648775"
   },
   "api": {
     "bugReporting": "/bug-submit.php",
