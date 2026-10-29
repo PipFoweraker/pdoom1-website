@@ -1,11 +1,11 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-10-29T00:43:43.946Z UTC
+Generated: 2026-10-29T06:30:03.127Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
 | 1357 | Release Checklist: v0.14.5 | release, checklist |  | 2026-10-28 21:43:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/1357) |
-| 1356 | Release ledger: a version was bumped and never tagged | release-ledger |  | 2026-10-28 21:35:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/1356) |
+| 1356 | Release ledger: a version was bumped and never tagged | release-ledger |  | 2026-10-29 04:29:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1356) |
 | 1355 | Release candidate playtest window: friends get days with a build before the tag |  |  | 2026-10-25 23:17:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1355) |
 | 1353 | Lab names: hall-of-fame names enter the rolls, plus a reserved hand-written list for dense lists (low priority) |  |  | 2026-10-25 22:16:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1353) |
 | 1343 | tech-debt sweep: nothing states what 'paused' means, so 9 timers, 18 tweens and 47 input surfaces each decided for themselves (due 2026-09-04) | technical-debt |  | 2026-10-25 19:11:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1343) |
