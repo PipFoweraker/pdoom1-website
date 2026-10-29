@@ -1,9 +1,11 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-10-28T18:23:53.975Z UTC
+Generated: 2026-10-29T00:43:43.946Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1357 | Release Checklist: v0.14.5 | release, checklist |  | 2026-10-28 21:43:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/1357) |
+| 1356 | Release ledger: a version was bumped and never tagged | release-ledger |  | 2026-10-28 21:35:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/1356) |
 | 1355 | Release candidate playtest window: friends get days with a build before the tag |  |  | 2026-10-25 23:17:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1355) |
 | 1353 | Lab names: hall-of-fame names enter the rolls, plus a reserved hand-written list for dense lists (low priority) |  |  | 2026-10-25 22:16:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1353) |
 | 1343 | tech-debt sweep: nothing states what 'paused' means, so 9 timers, 18 tweens and 47 input surfaces each decided for themselves (due 2026-09-04) | technical-debt |  | 2026-10-25 19:11:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1343) |
@@ -77,7 +79,7 @@ Generated: 2026-10-28T18:23:53.975Z UTC
 | 1085 | bug(window): minimising v0.13.2 does not minimise -- window left in a wrong state until re-maximised (first run after #1079) | bug, ux |  | 2026-08-11 10:45:58 | [link](https://github.com/PipFoweraker/pdoom1/issues/1085) |
 | 1078 | Postmortem contribution from pdoom1-website: the league opened, and the site hid it for 90 minutes |  |  | 2026-07-31 23:01:47 | [link](https://github.com/PipFoweraker/pdoom1/issues/1078) |
 | 1077 | Postmortem contribution from pdoom-data: load-bearing breakage, false greens, and asking the person |  |  | 2026-08-03 23:57:04 | [link](https://github.com/PipFoweraker/pdoom1/issues/1077) |
-| 1071 | No macOS build has ever been verified to run; the Steam framework breaks on non-mac checkouts |  |  | 2026-08-24 08:38:19 | [link](https://github.com/PipFoweraker/pdoom1/issues/1071) |
+| 1071 | No macOS build has ever been verified to run; the Steam framework breaks on non-mac checkouts |  |  | 2026-10-28 21:34:17 | [link](https://github.com/PipFoweraker/pdoom1/issues/1071) |
 | 1070 | Test suite writes REAL leaderboard files into the developer's player profile | bug |  | 2026-07-31 08:10:48 | [link](https://github.com/PipFoweraker/pdoom1/issues/1070) |
 | 1066 | League: test seeds are visible in the public seed filter, on the GLOBAL board, and survive Clear Local Scores |  |  | 2026-07-31 07:51:13 | [link](https://github.com/PipFoweraker/pdoom1/issues/1066) |
 | 1065 | UNRESOLVED from the 10:24 playtest: "critical ladder bug, it's translated into the local thing" |  |  | 2026-07-31 06:15:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1065) |
