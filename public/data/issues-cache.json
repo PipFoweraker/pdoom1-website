@@ -1041,18 +1041,91 @@
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
+    },
+    {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1004",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1004/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1004/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1004/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/1004",
+      "id": 4997173806,
+      "node_id": "I_kwDOPVWa588AAAABKdrSLg",
+      "number": 1004,
+      "title": "design(upgrades): next-epoch review -- three parked upgrade-backed mechanics (chairs attrition, board oversight/payroll UI, ethicist headcount)",
+      "user": {
+        "login": "PipFoweraker",
+        "id": 77564415,
+        "node_id": "MDQ6VXNlcjc3NTY0NDE1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77564415?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/PipFoweraker",
+        "html_url": "https://github.com/PipFoweraker",
+        "followers_url": "https://api.github.com/users/PipFoweraker/followers",
+        "following_url": "https://api.github.com/users/PipFoweraker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/PipFoweraker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/PipFoweraker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/PipFoweraker/subscriptions",
+        "organizations_url": "https://api.github.com/users/PipFoweraker/orgs",
+        "repos_url": "https://api.github.com/users/PipFoweraker/repos",
+        "events_url": "https://api.github.com/users/PipFoweraker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/PipFoweraker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [],
+      "state": "open",
+      "locked": false,
+      "assignees": [],
+      "milestone": null,
+      "comments": 1,
+      "created_at": "2026-07-28T09:45:06Z",
+      "updated_at": "2026-10-25T19:12:15Z",
+      "closed_at": null,
+      "assignee": null,
+      "author_association": "OWNER",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1004/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1004/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null,
+      "pinned_comment": null
     }
   ],
-  "count": 13,
-  "sample_size": 13,
+  "count": 14,
+  "sample_size": 14,
   "sample_requested": 15,
   "sample_sort": "recently updated",
   "total_open_issues": 214,
-  "total_open_prs": 6,
-  "untriaged_in_sample": 8,
+  "total_open_prs": 5,
+  "untriaged_in_sample": 9,
   "bodies_included": false,
   "summary": {
-    "as_of": "2026-10-30T00:03:17Z",
+    "as_of": "2026-10-30T06:02:16Z",
     "source": {
       "repository": "PipFoweraker/pdoom1",
       "repository_url": "https://github.com/PipFoweraker/pdoom1",
@@ -1071,7 +1144,7 @@
     },
     "counts": {
       "open_issues": 214,
-      "open_pull_requests": 6,
+      "open_pull_requests": 5,
       "open_issues_without_label": 103,
       "open_issues_labelled_bug": 17,
       "open_issues_labelled_enhancement": 16
@@ -1081,7 +1154,7 @@
     "measurement": "complete",
     "unmeasured": [],
     "recent_window": {
-      "size": 13,
+      "size": 14,
       "requested": 15,
       "sort": "recently updated first",
       "predicate": "GitHub's /issues?state=open endpoint, which returns PULL REQUESTS alongside issues. `pull_requests_in_window` says how many of the entries in `issues` are actually pull requests; an entry is one when it carries a `pull_request` key.",
@@ -1089,6 +1162,6 @@
       "is_not": "a complete list. It is the most recently touched fifteen. Absence from it proves nothing -- see content/campaigns/*.json, which already records that trap."
     }
   },
-  "last_updated": "2026-10-30T00:03:17Z",
+  "last_updated": "2026-10-30T06:02:16Z",
   "_comment": "issues is a SAMPLE -- the `sample_requested` most recently updated open issues, pull requests removed. total_open_issues is the real count from /search/issues and may be null, which means UNKNOWN and must never render as zero. Bodies are deliberately absent: nothing renders them and they are third-party text on a public host."
 }
