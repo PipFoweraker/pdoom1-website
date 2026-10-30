@@ -1,6 +1,6 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-10-29T18:24:05.903Z UTC
+Generated: 2026-10-30T00:44:27.835Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
@@ -8,7 +8,6 @@ Generated: 2026-10-29T18:24:05.903Z UTC
 | 1356 | Release ledger: a version was bumped and never tagged | release-ledger |  | 2026-10-29 04:29:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1356) |
 | 1355 | Release candidate playtest window: friends get days with a build before the tag |  |  | 2026-10-25 23:17:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1355) |
 | 1353 | Lab names: hall-of-fame names enter the rolls, plus a reserved hand-written list for dense lists (low priority) |  |  | 2026-10-25 22:16:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1353) |
-| 1343 | tech-debt sweep: nothing states what 'paused' means, so 9 timers, 18 tweens and 47 input surfaces each decided for themselves (due 2026-09-04) | technical-debt |  | 2026-10-25 19:11:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1343) |
 | 1331 | ASCII-only rule: 52 docs in breach, ~3,700 characters, invisible because the test never ran |  |  | 2026-08-28 23:37:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1331) |
 | 1328 | Release Checklist: v0.14.4 | release, checklist |  | 2026-08-28 22:18:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1328) |
 | 1325 | WARNING Pre-Release Checks Failed: v0.14.4 | release, build-failed |  | 2026-08-28 21:50:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/1325) |
