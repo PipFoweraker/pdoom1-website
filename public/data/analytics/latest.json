@@ -4,21 +4,21 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-10-31T01:31:58+00:00",
+  "captured_at_utc": "2026-11-01T01:31:52+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 287
+          "value": 274
         },
         "visit_duration": {
-          "value": 24
+          "value": 22
         },
         "visitors": {
-          "value": 204
+          "value": 202
         },
         "visits": {
-          "value": 208
+          "value": 206
         },
         "bounce_rate": {
           "value": 81
@@ -27,11 +27,6 @@
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-10-01",
-          "pageviews": 23,
-          "visitors": 10
-        },
         {
           "date": "2026-10-02",
           "pageviews": 4,
@@ -176,6 +171,11 @@
           "date": "2026-10-30",
           "pageviews": 22,
           "visitors": 13
+        },
+        {
+          "date": "2026-10-31",
+          "pageviews": 10,
+          "visitors": 8
         }
       ]
     },
@@ -191,11 +191,11 @@
         },
         {
           "source": "DuckDuckGo",
-          "visitors": 4
+          "visitors": 3
         },
         {
           "source": "LinkedIn",
-          "visitors": 4
+          "visitors": 3
         },
         {
           "source": "Facebook",
@@ -231,23 +231,23 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 127,
-          "visitors": 95
+          "pageviews": 117,
+          "visitors": 92
         },
         {
           "page": "/dashboard/",
-          "pageviews": 42,
-          "visitors": 30
+          "pageviews": 44,
+          "visitors": 31
         },
         {
           "page": "/leaderboard/",
-          "pageviews": 21,
-          "visitors": 19
+          "pageviews": 20,
+          "visitors": 18
         },
         {
           "page": "/game-stats/",
-          "pageviews": 13,
-          "visitors": 10
+          "pageviews": 10,
+          "visitors": 9
         },
         {
           "page": "/about/",
@@ -255,17 +255,22 @@
           "visitors": 8
         },
         {
-          "page": "/game-changelog/",
-          "pageviews": 8,
-          "visitors": 8
+          "page": "/blog/",
+          "pageviews": 7,
+          "visitors": 7
         },
         {
-          "page": "/blog/",
+          "page": "/game-changelog/",
+          "pageviews": 7,
+          "visitors": 7
+        },
+        {
+          "page": "/events/arxiv_41f01220cbd1248e.html",
           "pageviews": 6,
           "visitors": 6
         },
         {
-          "page": "/events/arxiv_41f01220cbd1248e.html",
+          "page": "/resources/",
           "pageviews": 6,
           "visitors": 6
         },
@@ -275,24 +280,9 @@
           "visitors": 5
         },
         {
-          "page": "/resources/",
-          "pageviews": 5,
-          "visitors": 5
-        },
-        {
           "page": "/issues/",
           "pageviews": 4,
           "visitors": 4
-        },
-        {
-          "page": "/cats/",
-          "pageviews": 3,
-          "visitors": 3
-        },
-        {
-          "page": "/docs/",
-          "pageviews": 3,
-          "visitors": 3
         },
         {
           "page": "/events/arxiv_0b1f4debe314fa2e.html",
@@ -303,6 +293,16 @@
           "page": "/events/arxiv_c328090bc4305415.html",
           "pageviews": 3,
           "visitors": 3
+        },
+        {
+          "page": "/cats/",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/docs/",
+          "pageviews": 2,
+          "visitors": 2
         },
         {
           "page": "/events/arxiv_e7bcd86ebcadbd8e.html",
@@ -323,11 +323,6 @@
           "page": "/press/",
           "pageviews": 2,
           "visitors": 2
-        },
-        {
-          "page": "/bug-report/",
-          "pageviews": 1,
-          "visitors": 1
         },
         {
           "page": "/events/alignmentforum_054a2bfba124eaa8.html",
@@ -430,6 +425,11 @@
           "visitors": 1
         },
         {
+          "page": "/monitoring/",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
           "page": "/state-of-doom/",
           "pageviews": 2,
           "visitors": 1
@@ -440,11 +440,11 @@
       "results": [
         {
           "country": "US",
-          "visitors": 56
+          "visitors": 57
         },
         {
           "country": "CN",
-          "visitors": 18
+          "visitors": 21
         },
         {
           "country": "AU",
@@ -460,15 +460,11 @@
         },
         {
           "country": "CO",
-          "visitors": 8
+          "visitors": 9
         },
         {
           "country": "GB",
-          "visitors": 7
-        },
-        {
-          "country": "SG",
-          "visitors": 7
+          "visitors": 8
         },
         {
           "country": "CA",
@@ -479,11 +475,11 @@
           "visitors": 6
         },
         {
-          "country": "HK",
+          "country": "SG",
           "visitors": 5
         },
         {
-          "country": "ES",
+          "country": "HK",
           "visitors": 4
         },
         {
@@ -495,15 +491,19 @@
           "visitors": 4
         },
         {
-          "country": "RU",
-          "visitors": 4
-        },
-        {
           "country": "EC",
           "visitors": 3
         },
         {
+          "country": "ES",
+          "visitors": 3
+        },
+        {
           "country": "PL",
+          "visitors": 3
+        },
+        {
+          "country": "RU",
           "visitors": 3
         },
         {
@@ -515,15 +515,7 @@
           "visitors": 3
         },
         {
-          "country": "DK",
-          "visitors": 2
-        },
-        {
           "country": "EE",
-          "visitors": 2
-        },
-        {
-          "country": "JP",
           "visitors": 2
         },
         {
@@ -555,6 +547,10 @@
           "visitors": 1
         },
         {
+          "country": "DK",
+          "visitors": 1
+        },
+        {
           "country": "FR",
           "visitors": 1
         },
@@ -568,6 +564,10 @@
         },
         {
           "country": "IT",
+          "visitors": 1
+        },
+        {
+          "country": "JP",
           "visitors": 1
         },
         {
@@ -595,10 +595,6 @@
           "visitors": 1
         },
         {
-          "country": "PK",
-          "visitors": 1
-        },
-        {
           "country": "TR",
           "visitors": 1
         },
@@ -614,9 +610,9 @@
     "goals": {
       "results": [
         {
-          "events": 13,
+          "events": 12,
           "goal": "Outbound Link: Click",
-          "visitors": 11
+          "visitors": 10
         },
         {
           "events": 4,
@@ -629,11 +625,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-10-01",
-    "last_date": "2026-10-30",
+    "first_date": "2026-10-02",
+    "last_date": "2026-10-31",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-10-31"
+  "snapshot_date": "2026-11-01"
 }
