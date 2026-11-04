@@ -52,7 +52,7 @@ def dial_svg(w, r1_frac=0.36, labels=True, label_size=None, needle=None,
     """
     r2 = w / 2.0
     r1 = r2 * r1_frac
-    pad = max(3.0, r2 * 0.14)   # headroom so rim labels never clip
+    pad = max(4.0, r2 * 0.22)   # headroom so rim labels never clip
     h = r2 + 6
     cx, cy = r2, r2 + 1
     ls = label_size if label_size else max(2.6, r2 * 0.052)
@@ -858,7 +858,7 @@ zine_panels = (
 PAGES.append(sheet(f"""
 {zine_panels}
 <div style="position:absolute; left:0; right:0; top:{ZH}mm" class="foldline"></div>
-<div style="position:absolute; top:0; bottom:0; left:{ZW}mm" class="foldline" style2=""></div>
+<div style="position:absolute; top:0; bottom:0; left:{ZW}mm" class="foldline"></div>
 <div style="position:absolute; top:0; bottom:0; left:{ZW}mm; border-left:0.3mm dashed #999"></div>
 <div style="position:absolute; top:0; bottom:0; left:{2*ZW}mm; border-left:0.3mm dashed #999"></div>
 <div style="position:absolute; top:0; bottom:0; left:{3*ZW}mm; border-left:0.3mm dashed #999"></div>
