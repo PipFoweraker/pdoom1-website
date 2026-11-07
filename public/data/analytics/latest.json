@@ -4,21 +4,21 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-11-06T01:31:49+00:00",
+  "captured_at_utc": "2026-11-07T01:31:56+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 304
+          "value": 305
         },
         "visit_duration": {
           "value": 20
         },
         "visitors": {
-          "value": 229
+          "value": 230
         },
         "visits": {
-          "value": 236
+          "value": 237
         },
         "bounce_rate": {
           "value": 84
@@ -27,11 +27,6 @@
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-10-07",
-          "pageviews": 7,
-          "visitors": 6
-        },
         {
           "date": "2026-10-08",
           "pageviews": 7,
@@ -176,6 +171,11 @@
           "date": "2026-11-05",
           "pageviews": 8,
           "visitors": 8
+        },
+        {
+          "date": "2026-11-06",
+          "pageviews": 8,
+          "visitors": 7
         }
       ]
     },
@@ -183,18 +183,18 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 153
+          "visitors": 157
         },
         {
           "source": "Google",
-          "visitors": 63
-        },
-        {
-          "source": "DuckDuckGo",
-          "visitors": 3
+          "visitors": 61
         },
         {
           "source": "Facebook",
+          "visitors": 3
+        },
+        {
+          "source": "aocr.org",
           "visitors": 3
         },
         {
@@ -202,7 +202,7 @@
           "visitors": 3
         },
         {
-          "source": "LinkedIn",
+          "source": "DuckDuckGo",
           "visitors": 2
         },
         {
@@ -210,11 +210,7 @@
           "visitors": 1
         },
         {
-          "source": "aocr.org",
-          "visitors": 1
-        },
-        {
-          "source": "app.swapcard.com",
+          "source": "LinkedIn",
           "visitors": 1
         }
       ]
@@ -223,18 +219,18 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 117,
-          "visitors": 90
+          "pageviews": 118,
+          "visitors": 91
         },
         {
           "page": "/dashboard/",
-          "pageviews": 51,
-          "visitors": 36
+          "pageviews": 50,
+          "visitors": 35
         },
         {
           "page": "/leaderboard/",
-          "pageviews": 24,
-          "visitors": 20
+          "pageviews": 23,
+          "visitors": 19
         },
         {
           "page": "/game-stats/",
@@ -329,6 +325,11 @@
         {
           "page": "/launch",
           "pageviews": 0,
+          "visitors": 2
+        },
+        {
+          "page": "/monitoring/",
+          "pageviews": 2,
           "visitors": 2
         },
         {
@@ -465,11 +466,6 @@
           "page": "/events/distill_8ef6f034b4508a82.html",
           "pageviews": 1,
           "visitors": 1
-        },
-        {
-          "page": "/events/distill_fe09c2226ea40329.html",
-          "pageviews": 1,
-          "visitors": 1
         }
       ]
     },
@@ -485,18 +481,18 @@
         },
         {
           "country": "CO",
-          "visitors": 17
+          "visitors": 18
         },
         {
           "country": "AU",
-          "visitors": 14
-        },
-        {
-          "country": "BR",
-          "visitors": 11
+          "visitors": 15
         },
         {
           "country": "GB",
+          "visitors": 12
+        },
+        {
+          "country": "BR",
           "visitors": 11
         },
         {
@@ -504,16 +500,16 @@
           "visitors": 10
         },
         {
-          "country": "CA",
-          "visitors": 7
-        },
-        {
           "country": "EC",
-          "visitors": 7
+          "visitors": 8
         },
         {
           "country": "SG",
           "visitors": 7
+        },
+        {
+          "country": "CA",
+          "visitors": 6
         },
         {
           "country": "DE",
@@ -529,14 +525,10 @@
         },
         {
           "country": "KR",
-          "visitors": 4
+          "visitors": 5
         },
         {
           "country": "ES",
-          "visitors": 3
-        },
-        {
-          "country": "NL",
           "visitors": 3
         },
         {
@@ -556,11 +548,15 @@
           "visitors": 2
         },
         {
+          "country": "DK",
+          "visitors": 2
+        },
+        {
           "country": "IT",
           "visitors": 2
         },
         {
-          "country": "JP",
+          "country": "NL",
           "visitors": 2
         },
         {
@@ -584,10 +580,6 @@
           "visitors": 1
         },
         {
-          "country": "DK",
-          "visitors": 1
-        },
-        {
           "country": "FI",
           "visitors": 1
         },
@@ -597,6 +589,10 @@
         },
         {
           "country": "HU",
+          "visitors": 1
+        },
+        {
+          "country": "JP",
           "visitors": 1
         },
         {
@@ -620,15 +616,7 @@
           "visitors": 1
         },
         {
-          "country": "NZ",
-          "visitors": 1
-        },
-        {
           "country": "PH",
-          "visitors": 1
-        },
-        {
-          "country": "SO",
           "visitors": 1
         },
         {
@@ -658,11 +646,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-10-07",
-    "last_date": "2026-11-05",
+    "first_date": "2026-10-08",
+    "last_date": "2026-11-06",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-11-06"
+  "snapshot_date": "2026-11-07"
 }
