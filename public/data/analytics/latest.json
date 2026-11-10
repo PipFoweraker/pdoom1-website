@@ -4,21 +4,21 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-11-09T01:31:57+00:00",
+  "captured_at_utc": "2026-11-10T01:31:39+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 303
+          "value": 299
         },
         "visit_duration": {
           "value": 19
         },
         "visitors": {
-          "value": 235
+          "value": 233
         },
         "visits": {
-          "value": 242
+          "value": 239
         },
         "bounce_rate": {
           "value": 85
@@ -27,11 +27,6 @@
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-10-10",
-          "pageviews": 11,
-          "visitors": 9
-        },
         {
           "date": "2026-10-11",
           "pageviews": 9,
@@ -176,6 +171,11 @@
           "date": "2026-11-08",
           "pageviews": 9,
           "visitors": 8
+        },
+        {
+          "date": "2026-11-09",
+          "pageviews": 7,
+          "visitors": 7
         }
       ]
     },
@@ -183,19 +183,15 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 165
+          "visitors": 161
         },
         {
           "source": "Google",
-          "visitors": 55
+          "visitors": 56
         },
         {
           "source": "chatgpt.com",
           "visitors": 4
-        },
-        {
-          "source": "Facebook",
-          "visitors": 3
         },
         {
           "source": "aocr.org",
@@ -203,6 +199,10 @@
         },
         {
           "source": "DuckDuckGo",
+          "visitors": 2
+        },
+        {
+          "source": "Facebook",
           "visitors": 2
         },
         {
@@ -216,6 +216,14 @@
         {
           "source": "Gmail",
           "visitors": 1
+        },
+        {
+          "source": "Twitter",
+          "visitors": 1
+        },
+        {
+          "source": "go.bsky.app",
+          "visitors": 1
         }
       ]
     },
@@ -223,13 +231,13 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 122,
+          "pageviews": 121,
           "visitors": 96
         },
         {
           "page": "/dashboard/",
-          "pageviews": 45,
-          "visitors": 33
+          "pageviews": 42,
+          "visitors": 31
         },
         {
           "page": "/leaderboard/",
@@ -237,8 +245,8 @@
           "visitors": 15
         },
         {
-          "page": "/about/",
-          "pageviews": 9,
+          "page": "/events/",
+          "pageviews": 8,
           "visitors": 8
         },
         {
@@ -247,14 +255,14 @@
           "visitors": 8
         },
         {
-          "page": "/blog/",
-          "pageviews": 7,
+          "page": "/about/",
+          "pageviews": 8,
           "visitors": 7
         },
         {
-          "page": "/events/",
-          "pageviews": 7,
-          "visitors": 7
+          "page": "/blog/",
+          "pageviews": 6,
+          "visitors": 6
         },
         {
           "page": "/events/arxiv_41f01220cbd1248e.html",
@@ -262,12 +270,12 @@
           "visitors": 6
         },
         {
-          "page": "/issues/",
-          "pageviews": 6,
-          "visitors": 6
+          "page": "/game-changelog/",
+          "pageviews": 5,
+          "visitors": 5
         },
         {
-          "page": "/game-changelog/",
+          "page": "/issues/",
           "pageviews": 5,
           "visitors": 5
         },
@@ -397,6 +405,11 @@
           "visitors": 1
         },
         {
+          "page": "/events/arxiv_402f917ef1f85b47.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
           "page": "/events/arxiv_41880a502afdcb9f.html",
           "pageviews": 1,
           "visitors": 1
@@ -437,6 +450,11 @@
           "visitors": 1
         },
         {
+          "page": "/events/arxiv_a444c76549f57bb1.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
           "page": "/events/arxiv_a76d89c0283d4a2e.html",
           "pageviews": 1,
           "visitors": 1
@@ -460,16 +478,6 @@
           "page": "/events/arxiv_ec060a99eb4e8e9a.html",
           "pageviews": 1,
           "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_f48be4c3fb9d9ad0.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_fda9554f87844fc3.html",
-          "pageviews": 1,
-          "visitors": 1
         }
       ]
     },
@@ -477,7 +485,7 @@
       "results": [
         {
           "country": "US",
-          "visitors": 65
+          "visitors": 62
         },
         {
           "country": "CN",
@@ -489,7 +497,7 @@
         },
         {
           "country": "AU",
-          "visitors": 17
+          "visitors": 16
         },
         {
           "country": "BR",
@@ -497,11 +505,11 @@
         },
         {
           "country": "AR",
-          "visitors": 10
+          "visitors": 12
         },
         {
           "country": "GB",
-          "visitors": 10
+          "visitors": 11
         },
         {
           "country": "SG",
@@ -513,7 +521,7 @@
         },
         {
           "country": "DE",
-          "visitors": 7
+          "visitors": 6
         },
         {
           "country": "IN",
@@ -528,11 +536,11 @@
           "visitors": 5
         },
         {
-          "country": "KR",
-          "visitors": 4
+          "country": "AT",
+          "visitors": 3
         },
         {
-          "country": "AT",
+          "country": "KR",
           "visitors": 3
         },
         {
@@ -608,6 +616,10 @@
           "visitors": 1
         },
         {
+          "country": "NO",
+          "visitors": 1
+        },
+        {
           "country": "PH",
           "visitors": 1
         },
@@ -638,11 +650,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-10-10",
-    "last_date": "2026-11-08",
+    "first_date": "2026-10-11",
+    "last_date": "2026-11-09",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-11-09"
+  "snapshot_date": "2026-11-10"
 }
