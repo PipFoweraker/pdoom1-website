@@ -4,34 +4,29 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-11-11T01:31:57+00:00",
+  "captured_at_utc": "2026-11-12T01:32:00+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 301
+          "value": 317
         },
         "visit_duration": {
-          "value": 34
+          "value": 32
         },
         "visitors": {
-          "value": 235
+          "value": 249
         },
         "visits": {
-          "value": 241
+          "value": 255
         },
         "bounce_rate": {
-          "value": 84
+          "value": 85
         }
       }
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-10-12",
-          "pageviews": 9,
-          "visitors": 5
-        },
         {
           "date": "2026-10-13",
           "pageviews": 7,
@@ -176,6 +171,11 @@
           "date": "2026-11-10",
           "pageviews": 11,
           "visitors": 11
+        },
+        {
+          "date": "2026-11-11",
+          "pageviews": 25,
+          "visitors": 20
         }
       ]
     },
@@ -183,15 +183,15 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 165
+          "visitors": 177
         },
         {
           "source": "Google",
-          "visitors": 53
+          "visitors": 52
         },
         {
           "source": "chatgpt.com",
-          "visitors": 4
+          "visitors": 6
         },
         {
           "source": "Facebook",
@@ -218,6 +218,10 @@
           "visitors": 1
         },
         {
+          "source": "T-Online",
+          "visitors": 1
+        },
+        {
           "source": "Twitter",
           "visitors": 1
         },
@@ -231,8 +235,8 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 120,
-          "visitors": 95
+          "pageviews": 124,
+          "visitors": 101
         },
         {
           "page": "/dashboard/",
@@ -241,11 +245,16 @@
         },
         {
           "page": "/leaderboard/",
-          "pageviews": 20,
-          "visitors": 16
+          "pageviews": 19,
+          "visitors": 15
         },
         {
           "page": "/game-stats/",
+          "pageviews": 9,
+          "visitors": 9
+        },
+        {
+          "page": "/events/",
           "pageviews": 8,
           "visitors": 8
         },
@@ -255,19 +264,19 @@
           "visitors": 7
         },
         {
-          "page": "/events/",
-          "pageviews": 7,
+          "page": "/resources/",
+          "pageviews": 8,
           "visitors": 7
-        },
-        {
-          "page": "/blog/",
-          "pageviews": 6,
-          "visitors": 6
         },
         {
           "page": "/events/arxiv_41f01220cbd1248e.html",
           "pageviews": 6,
           "visitors": 6
+        },
+        {
+          "page": "/blog/",
+          "pageviews": 5,
+          "visitors": 5
         },
         {
           "page": "/game-changelog/",
@@ -280,7 +289,7 @@
           "visitors": 5
         },
         {
-          "page": "/resources/",
+          "page": "/press/",
           "pageviews": 5,
           "visitors": 5
         },
@@ -295,9 +304,14 @@
           "visitors": 4
         },
         {
-          "page": "/press/",
-          "pageviews": 4,
-          "visitors": 4
+          "page": "/docs/",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "page": "/events/arxiv_137bbec0e331870d.html",
+          "pageviews": 3,
+          "visitors": 3
         },
         {
           "page": "/events/arxiv_c328090bc4305415.html",
@@ -310,12 +324,7 @@
           "visitors": 3
         },
         {
-          "page": "/docs/",
-          "pageviews": 2,
-          "visitors": 2
-        },
-        {
-          "page": "/events/arxiv_137bbec0e331870d.html",
+          "page": "/docs/roadmap/",
           "pageviews": 2,
           "visitors": 2
         },
@@ -330,13 +339,13 @@
           "visitors": 2
         },
         {
-          "page": "/frontier-labs/",
+          "page": "/events/suggest-metadata.html",
           "pageviews": 2,
           "visitors": 2
         },
         {
-          "page": "/launch",
-          "pageviews": 0,
+          "page": "/frontier-labs/",
+          "pageviews": 2,
           "visitors": 2
         },
         {
@@ -355,7 +364,22 @@
           "visitors": 1
         },
         {
-          "page": "/docs/roadmap/",
+          "page": "/design-notes/adr-0003-liability-ledger.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/design-notes/adr-0008-deferrals-and-rejections.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/design-notes/adr-0010-adoption-routing.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/docs/CONTRIBUTING_TO_EVENTS.html",
           "pageviews": 1,
           "visitors": 1
         },
@@ -458,26 +482,6 @@
           "page": "/events/arxiv_a69c2e9998290359.html",
           "pageviews": 1,
           "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_a76d89c0283d4a2e.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_a7adb7958fc7de7b.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_b8666a1c7c7a0192.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_bd5055688c17e701.html",
-          "pageviews": 1,
-          "visitors": 1
         }
       ]
     },
@@ -485,26 +489,26 @@
       "results": [
         {
           "country": "US",
-          "visitors": 61
+          "visitors": 69
         },
         {
           "country": "CN",
-          "visitors": 21
+          "visitors": 23
         },
         {
           "country": "CO",
-          "visitors": 18
+          "visitors": 19
         },
         {
           "country": "AU",
-          "visitors": 17
-        },
-        {
-          "country": "AR",
-          "visitors": 13
+          "visitors": 15
         },
         {
           "country": "BR",
+          "visitors": 14
+        },
+        {
+          "country": "AR",
           "visitors": 13
         },
         {
@@ -513,19 +517,19 @@
         },
         {
           "country": "SG",
-          "visitors": 10
+          "visitors": 11
+        },
+        {
+          "country": "DE",
+          "visitors": 8
         },
         {
           "country": "EC",
           "visitors": 8
         },
         {
-          "country": "DE",
-          "visitors": 7
-        },
-        {
           "country": "IN",
-          "visitors": 6
+          "visitors": 7
         },
         {
           "country": "CA",
@@ -536,15 +540,15 @@
           "visitors": 5
         },
         {
+          "country": "KR",
+          "visitors": 4
+        },
+        {
           "country": "VE",
           "visitors": 4
         },
         {
           "country": "AT",
-          "visitors": 3
-        },
-        {
-          "country": "KR",
           "visitors": 3
         },
         {
@@ -560,7 +564,15 @@
           "visitors": 3
         },
         {
+          "country": "FR",
+          "visitors": 2
+        },
+        {
           "country": "IT",
+          "visitors": 2
+        },
+        {
+          "country": "MX",
           "visitors": 2
         },
         {
@@ -569,10 +581,6 @@
         },
         {
           "country": "PL",
-          "visitors": 2
-        },
-        {
-          "country": "TW",
           "visitors": 2
         },
         {
@@ -600,15 +608,7 @@
           "visitors": 1
         },
         {
-          "country": "FR",
-          "visitors": 1
-        },
-        {
           "country": "JP",
-          "visitors": 1
-        },
-        {
-          "country": "MX",
           "visitors": 1
         },
         {
@@ -635,14 +635,14 @@
     "goals": {
       "results": [
         {
-          "events": 11,
+          "events": 12,
           "goal": "Outbound Link: Click",
-          "visitors": 10
+          "visitors": 11
         },
         {
-          "events": 6,
+          "events": 7,
           "goal": "Download",
-          "visitors": 6
+          "visitors": 7
         }
       ]
     }
@@ -650,11 +650,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-10-12",
-    "last_date": "2026-11-10",
+    "first_date": "2026-10-13",
+    "last_date": "2026-11-11",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-11-11"
+  "snapshot_date": "2026-11-12"
 }
