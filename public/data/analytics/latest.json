@@ -4,21 +4,21 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-11-12T01:32:00+00:00",
+  "captured_at_utc": "2026-11-13T01:31:38+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 317
+          "value": 324
         },
         "visit_duration": {
-          "value": 32
+          "value": 31
         },
         "visitors": {
-          "value": 249
+          "value": 255
         },
         "visits": {
-          "value": 255
+          "value": 261
         },
         "bounce_rate": {
           "value": 85
@@ -27,11 +27,6 @@
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-10-13",
-          "pageviews": 7,
-          "visitors": 4
-        },
         {
           "date": "2026-10-14",
           "pageviews": 8,
@@ -176,6 +171,11 @@
           "date": "2026-11-11",
           "pageviews": 25,
           "visitors": 20
+        },
+        {
+          "date": "2026-11-12",
+          "pageviews": 14,
+          "visitors": 10
         }
       ]
     },
@@ -183,15 +183,19 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 177
+          "visitors": 181
         },
         {
           "source": "Google",
-          "visitors": 52
+          "visitors": 51
         },
         {
           "source": "chatgpt.com",
           "visitors": 6
+        },
+        {
+          "source": "DuckDuckGo",
+          "visitors": 3
         },
         {
           "source": "Facebook",
@@ -200,10 +204,6 @@
         {
           "source": "aocr.org",
           "visitors": 3
-        },
-        {
-          "source": "DuckDuckGo",
-          "visitors": 2
         },
         {
           "source": "LinkedIn",
@@ -226,7 +226,15 @@
           "visitors": 1
         },
         {
+          "source": "danmackinlay.name",
+          "visitors": 1
+        },
+        {
           "source": "go.bsky.app",
+          "visitors": 1
+        },
+        {
+          "source": "https://git.chanpinqingbaoju.com",
           "visitors": 1
         }
       ]
@@ -235,8 +243,8 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 124,
-          "visitors": 101
+          "pageviews": 125,
+          "visitors": 103
         },
         {
           "page": "/dashboard/",
@@ -254,19 +262,19 @@
           "visitors": 9
         },
         {
+          "page": "/about/",
+          "pageviews": 9,
+          "visitors": 8
+        },
+        {
           "page": "/events/",
           "pageviews": 8,
           "visitors": 8
         },
         {
-          "page": "/about/",
-          "pageviews": 8,
-          "visitors": 7
-        },
-        {
           "page": "/resources/",
-          "pageviews": 8,
-          "visitors": 7
+          "pageviews": 9,
+          "visitors": 8
         },
         {
           "page": "/events/arxiv_41f01220cbd1248e.html",
@@ -274,14 +282,14 @@
           "visitors": 6
         },
         {
-          "page": "/blog/",
-          "pageviews": 5,
-          "visitors": 5
+          "page": "/game-changelog/",
+          "pageviews": 6,
+          "visitors": 6
         },
         {
-          "page": "/game-changelog/",
-          "pageviews": 5,
-          "visitors": 5
+          "page": "/press/",
+          "pageviews": 6,
+          "visitors": 6
         },
         {
           "page": "/issues/",
@@ -289,9 +297,9 @@
           "visitors": 5
         },
         {
-          "page": "/press/",
-          "pageviews": 5,
-          "visitors": 5
+          "page": "/blog/",
+          "pageviews": 4,
+          "visitors": 4
         },
         {
           "page": "/cats/",
@@ -299,14 +307,14 @@
           "visitors": 4
         },
         {
-          "page": "/events/arxiv_0b1f4debe314fa2e.html",
+          "page": "/docs/",
           "pageviews": 4,
           "visitors": 4
         },
         {
-          "page": "/docs/",
-          "pageviews": 3,
-          "visitors": 3
+          "page": "/events/arxiv_0b1f4debe314fa2e.html",
+          "pageviews": 4,
+          "visitors": 4
         },
         {
           "page": "/events/arxiv_137bbec0e331870d.html",
@@ -359,6 +367,11 @@
           "visitors": 2
         },
         {
+          "page": "/bug-report/",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
           "page": "/design-notes/",
           "pageviews": 1,
           "visitors": 1
@@ -385,11 +398,6 @@
         },
         {
           "page": "/events/alignmentforum_054a2bfba124eaa8.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/alignmentforum_372ff158811c3362.html",
           "pageviews": 1,
           "visitors": 1
         },
@@ -493,7 +501,7 @@
         },
         {
           "country": "CN",
-          "visitors": 23
+          "visitors": 26
         },
         {
           "country": "CO",
@@ -512,12 +520,12 @@
           "visitors": 13
         },
         {
-          "country": "GB",
-          "visitors": 11
+          "country": "SG",
+          "visitors": 13
         },
         {
-          "country": "SG",
-          "visitors": 11
+          "country": "GB",
+          "visitors": 12
         },
         {
           "country": "DE",
@@ -548,10 +556,6 @@
           "visitors": 4
         },
         {
-          "country": "AT",
-          "visitors": 3
-        },
-        {
           "country": "NL",
           "visitors": 3
         },
@@ -564,11 +568,19 @@
           "visitors": 3
         },
         {
+          "country": "AT",
+          "visitors": 2
+        },
+        {
           "country": "FR",
           "visitors": 2
         },
         {
           "country": "IT",
+          "visitors": 2
+        },
+        {
+          "country": "JP",
           "visitors": 2
         },
         {
@@ -584,15 +596,15 @@
           "visitors": 2
         },
         {
+          "country": "BE",
+          "visitors": 1
+        },
+        {
           "country": "CH",
           "visitors": 1
         },
         {
           "country": "CL",
-          "visitors": 1
-        },
-        {
-          "country": "CZ",
           "visitors": 1
         },
         {
@@ -605,10 +617,6 @@
         },
         {
           "country": "FI",
-          "visitors": 1
-        },
-        {
-          "country": "JP",
           "visitors": 1
         },
         {
@@ -635,14 +643,14 @@
     "goals": {
       "results": [
         {
-          "events": 12,
+          "events": 15,
           "goal": "Outbound Link: Click",
-          "visitors": 11
+          "visitors": 12
         },
         {
-          "events": 7,
+          "events": 10,
           "goal": "Download",
-          "visitors": 7
+          "visitors": 8
         }
       ]
     }
@@ -650,11 +658,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-10-13",
-    "last_date": "2026-11-11",
+    "first_date": "2026-10-14",
+    "last_date": "2026-11-12",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-11-12"
+  "snapshot_date": "2026-11-13"
 }
