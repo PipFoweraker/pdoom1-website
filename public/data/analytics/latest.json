@@ -4,34 +4,29 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-11-16T01:33:54+00:00",
+  "captured_at_utc": "2026-11-17T01:32:07+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 331
+          "value": 330
         },
         "visit_duration": {
           "value": 29
         },
         "visitors": {
-          "value": 263
+          "value": 261
         },
         "visits": {
-          "value": 269
+          "value": 267
         },
         "bounce_rate": {
-          "value": 86
+          "value": 85
         }
       }
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-10-17",
-          "pageviews": 7,
-          "visitors": 6
-        },
         {
           "date": "2026-10-18",
           "pageviews": 6,
@@ -176,6 +171,11 @@
           "date": "2026-11-15",
           "pageviews": 16,
           "visitors": 16
+        },
+        {
+          "date": "2026-11-16",
+          "pageviews": 6,
+          "visitors": 4
         }
       ]
     },
@@ -183,7 +183,7 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 193
+          "visitors": 191
         },
         {
           "source": "Google",
@@ -247,18 +247,18 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 121,
-          "visitors": 101
+          "pageviews": 118,
+          "visitors": 98
         },
         {
           "page": "/dashboard/",
-          "pageviews": 42,
-          "visitors": 30
+          "pageviews": 45,
+          "visitors": 33
         },
         {
           "page": "/leaderboard/",
-          "pageviews": 18,
-          "visitors": 15
+          "pageviews": 17,
+          "visitors": 14
         },
         {
           "page": "/about/",
@@ -363,16 +363,6 @@
         {
           "page": "/events/suggest-metadata.html",
           "pageviews": 2,
-          "visitors": 2
-        },
-        {
-          "page": "/frontier-labs/",
-          "pageviews": 2,
-          "visitors": 2
-        },
-        {
-          "page": "/launch",
-          "pageviews": 0,
           "visitors": 2
         },
         {
@@ -494,6 +484,16 @@
           "page": "/events/arxiv_a444c76549f57bb1.html",
           "pageviews": 1,
           "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_a69c2e9998290359.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_a76d89c0283d4a2e.html",
+          "pageviews": 1,
+          "visitors": 1
         }
       ]
     },
@@ -505,11 +505,11 @@
         },
         {
           "country": "CN",
-          "visitors": 25
+          "visitors": 24
         },
         {
           "country": "CO",
-          "visitors": 21
+          "visitors": 22
         },
         {
           "country": "SG",
@@ -520,16 +520,16 @@
           "visitors": 13
         },
         {
-          "country": "AU",
+          "country": "GB",
           "visitors": 13
         },
         {
           "country": "BR",
-          "visitors": 13
+          "visitors": 12
         },
         {
-          "country": "GB",
-          "visitors": 12
+          "country": "AU",
+          "visitors": 11
         },
         {
           "country": "DE",
@@ -651,9 +651,9 @@
     "goals": {
       "results": [
         {
-          "events": 15,
+          "events": 14,
           "goal": "Outbound Link: Click",
-          "visitors": 12
+          "visitors": 11
         },
         {
           "events": 10,
@@ -666,11 +666,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-10-17",
-    "last_date": "2026-11-15",
+    "first_date": "2026-10-18",
+    "last_date": "2026-11-16",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-11-16"
+  "snapshot_date": "2026-11-17"
 }
