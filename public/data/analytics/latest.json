@@ -4,21 +4,21 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-11-18T01:31:31+00:00",
+  "captured_at_utc": "2026-11-19T01:31:46+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 337
+          "value": 344
         },
         "visit_duration": {
-          "value": 31
+          "value": 30
         },
         "visitors": {
-          "value": 262
+          "value": 269
         },
         "visits": {
-          "value": 268
+          "value": 275
         },
         "bounce_rate": {
           "value": 84
@@ -27,11 +27,6 @@
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-10-19",
-          "pageviews": 4,
-          "visitors": 4
-        },
         {
           "date": "2026-10-20",
           "pageviews": 1,
@@ -176,6 +171,11 @@
           "date": "2026-11-17",
           "pageviews": 13,
           "visitors": 6
+        },
+        {
+          "date": "2026-11-18",
+          "pageviews": 11,
+          "visitors": 11
         }
       ]
     },
@@ -183,11 +183,11 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 191
+          "visitors": 197
         },
         {
           "source": "Google",
-          "visitors": 49
+          "visitors": 50
         },
         {
           "source": "chatgpt.com",
@@ -247,18 +247,18 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 124,
-          "visitors": 100
+          "pageviews": 126,
+          "visitors": 102
         },
         {
           "page": "/dashboard/",
-          "pageviews": 44,
-          "visitors": 32
+          "pageviews": 45,
+          "visitors": 33
         },
         {
           "page": "/leaderboard/",
-          "pageviews": 17,
-          "visitors": 14
+          "pageviews": 18,
+          "visitors": 15
         },
         {
           "page": "/about/",
@@ -286,11 +286,6 @@
           "visitors": 7
         },
         {
-          "page": "/blog/",
-          "pageviews": 6,
-          "visitors": 6
-        },
-        {
           "page": "/events/arxiv_41f01220cbd1248e.html",
           "pageviews": 6,
           "visitors": 6
@@ -299,6 +294,11 @@
           "page": "/issues/",
           "pageviews": 6,
           "visitors": 6
+        },
+        {
+          "page": "/blog/",
+          "pageviews": 5,
+          "visitors": 5
         },
         {
           "page": "/docs/",
@@ -311,17 +311,22 @@
           "visitors": 5
         },
         {
+          "page": "/cats/",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
           "page": "/events/arxiv_0b1f4debe314fa2e.html",
           "pageviews": 4,
           "visitors": 4
         },
         {
-          "page": "/cats/",
+          "page": "/events/arxiv_137bbec0e331870d.html",
           "pageviews": 3,
           "visitors": 3
         },
         {
-          "page": "/events/arxiv_137bbec0e331870d.html",
+          "page": "/events/arxiv_3b8e895af2010f42.html",
           "pageviews": 3,
           "visitors": 3
         },
@@ -396,6 +401,11 @@
           "visitors": 1
         },
         {
+          "page": "/events/apollo_scheming_evals_2024.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
           "page": "/events/arxiv_01422b8e083200ef.html",
           "pageviews": 1,
           "visitors": 1
@@ -427,11 +437,6 @@
         },
         {
           "page": "/events/arxiv_393a7a93bd7a4f33.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_3b8e895af2010f42.html",
           "pageviews": 1,
           "visitors": 1
         },
@@ -476,22 +481,17 @@
           "visitors": 1
         },
         {
+          "page": "/events/arxiv_9ad41374f53f74d9.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
           "page": "/events/arxiv_9daa7dac3bcd0dbc.html",
           "pageviews": 1,
           "visitors": 1
         },
         {
           "page": "/events/arxiv_a444c76549f57bb1.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_a69c2e9998290359.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_a76d89c0283d4a2e.html",
           "pageviews": 1,
           "visitors": 1
         }
@@ -501,31 +501,31 @@
       "results": [
         {
           "country": "US",
-          "visitors": 69
+          "visitors": 73
         },
         {
           "country": "CN",
-          "visitors": 25
+          "visitors": 24
         },
         {
           "country": "CO",
           "visitors": 22
         },
         {
-          "country": "BR",
-          "visitors": 14
-        },
-        {
-          "country": "SG",
-          "visitors": 14
-        },
-        {
           "country": "AR",
+          "visitors": 14
+        },
+        {
+          "country": "BR",
           "visitors": 13
         },
         {
           "country": "GB",
           "visitors": 13
+        },
+        {
+          "country": "SG",
+          "visitors": 12
         },
         {
           "country": "AU",
@@ -537,7 +537,11 @@
         },
         {
           "country": "EC",
-          "visitors": 9
+          "visitors": 10
+        },
+        {
+          "country": "VE",
+          "visitors": 8
         },
         {
           "country": "IN",
@@ -546,10 +550,6 @@
         {
           "country": "HK",
           "visitors": 6
-        },
-        {
-          "country": "VE",
-          "visitors": 5
         },
         {
           "country": "CA",
@@ -565,6 +565,10 @@
         },
         {
           "country": "KR",
+          "visitors": 3
+        },
+        {
+          "country": "PE",
           "visitors": 3
         },
         {
@@ -589,10 +593,6 @@
         },
         {
           "country": "NL",
-          "visitors": 2
-        },
-        {
-          "country": "PE",
           "visitors": 2
         },
         {
@@ -642,6 +642,10 @@
         {
           "country": "TR",
           "visitors": 1
+        },
+        {
+          "country": "UA",
+          "visitors": 1
         }
       ]
     },
@@ -651,14 +655,14 @@
     "goals": {
       "results": [
         {
-          "events": 15,
+          "events": 16,
           "goal": "Outbound Link: Click",
-          "visitors": 12
+          "visitors": 13
         },
         {
-          "events": 11,
+          "events": 12,
           "goal": "Download",
-          "visitors": 9
+          "visitors": 10
         }
       ]
     }
@@ -666,11 +670,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-10-19",
-    "last_date": "2026-11-17",
+    "first_date": "2026-10-20",
+    "last_date": "2026-11-18",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-11-18"
+  "snapshot_date": "2026-11-19"
 }
