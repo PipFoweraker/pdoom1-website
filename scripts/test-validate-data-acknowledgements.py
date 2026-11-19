@@ -22,6 +22,7 @@ import json
 import subprocess
 import sys
 import tempfile
+from datetime import date, timedelta
 from pathlib import Path
 
 for _s in (sys.stdout, sys.stderr):
@@ -67,8 +68,21 @@ real_doc = json.loads(REAL.read_text(encoding="utf-8"))
 freshness = [a for a in real_doc["acknowledgements"]
              if a.get("check") == "validate_data" and a.get("key") == "league:freshness"]
 
+# Every date below is DERIVED from the acknowledgement under test, never typed.
+# Step 1 used to run at the real wall-clock date and step 3 at a literal
+# "2026-09-05", so the suite asserted against a value that moves: it went red
+# the day the acceptance lapsed (2026-09-04), and a re-acceptance with a later
+# review_by would have turned step 3 red as well. What this file tests is the
+# MECHANISM -- live vs expired vs absent -- so it pins "today" to points inside
+# and outside the window rather than reading the calendar.
+if freshness:
+    REVIEW_BY = freshness[0]["review_by"]
+    DAY_AFTER = (date.fromisoformat(REVIEW_BY) + timedelta(days=1)).isoformat()
+else:
+    REVIEW_BY = DAY_AFTER = None
+
 print("1. The real ledger: the finding is acknowledged, not hidden")
-rc, out = run()
+rc, out = run(as_of=REVIEW_BY)
 check(rc == 0, "exit 0 while the acceptance is live")
 check("league:freshness" in out, "the finding still PRINTS -- it is not suppressed from view")
 check("acknowledged" in out.lower(), "the summary counts it")
@@ -90,8 +104,8 @@ else:
         empty.unlink()
 
 print("\n3. An EXPIRED acceptance is red, and red about the EXPIRY")
-rc, out = run(as_of="2026-09-05")
-check(rc == 1, "the day after review_by, the run is RED")
+rc, out = run(as_of=DAY_AFTER) if freshness else (0, "")
+check(rc == 1, f"the day after review_by ({DAY_AFTER}), the run is RED")
 check("EXPIRED" in out, "it says the acceptance expired")
 check("what is red is the ACCEPTANCE" in out,
       "and is explicit that the finding is not what is red")
