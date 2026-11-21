@@ -4,34 +4,29 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-11-20T01:31:44+00:00",
+  "captured_at_utc": "2026-11-21T01:31:39+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 357
+          "value": 359
         },
         "visit_duration": {
-          "value": 29
+          "value": 34
         },
         "visitors": {
-          "value": 278
+          "value": 275
         },
         "visits": {
-          "value": 284
+          "value": 282
         },
         "bounce_rate": {
-          "value": 85
+          "value": 84
         }
       }
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-10-21",
-          "pageviews": 12,
-          "visitors": 9
-        },
         {
           "date": "2026-10-22",
           "pageviews": 14,
@@ -176,6 +171,11 @@
           "date": "2026-11-19",
           "pageviews": 14,
           "visitors": 10
+        },
+        {
+          "date": "2026-11-20",
+          "pageviews": 14,
+          "visitors": 6
         }
       ]
     },
@@ -183,11 +183,11 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 203
+          "visitors": 200
         },
         {
           "source": "Google",
-          "visitors": 53
+          "visitors": 52
         },
         {
           "source": "chatgpt.com",
@@ -210,6 +210,14 @@
           "visitors": 2
         },
         {
+          "source": "danmackinlay.name",
+          "visitors": 2
+        },
+        {
+          "source": "https://coder.social",
+          "visitors": 2
+        },
+        {
           "source": "Brave",
           "visitors": 1
         },
@@ -226,15 +234,7 @@
           "visitors": 1
         },
         {
-          "source": "danmackinlay.name",
-          "visitors": 1
-        },
-        {
           "source": "go.bsky.app",
-          "visitors": 1
-        },
-        {
-          "source": "https://coder.social",
           "visitors": 1
         },
         {
@@ -247,8 +247,8 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 129,
-          "visitors": 105
+          "pageviews": 131,
+          "visitors": 104
         },
         {
           "page": "/dashboard/",
@@ -261,28 +261,28 @@
           "visitors": 17
         },
         {
-          "page": "/about/",
-          "pageviews": 11,
-          "visitors": 10
-        },
-        {
           "page": "/events/",
           "pageviews": 10,
           "visitors": 10
         },
         {
-          "page": "/game-stats/",
-          "pageviews": 10,
-          "visitors": 10
+          "page": "/about/",
+          "pageviews": 9,
+          "visitors": 9
         },
         {
-          "page": "/resources/",
+          "page": "/game-stats/",
           "pageviews": 9,
-          "visitors": 8
+          "visitors": 9
         },
         {
           "page": "/press/",
           "pageviews": 7,
+          "visitors": 7
+        },
+        {
+          "page": "/resources/",
+          "pageviews": 8,
           "visitors": 7
         },
         {
@@ -296,17 +296,17 @@
           "visitors": 6
         },
         {
+          "page": "/game-changelog/",
+          "pageviews": 7,
+          "visitors": 6
+        },
+        {
           "page": "/issues/",
           "pageviews": 6,
           "visitors": 6
         },
         {
           "page": "/docs/",
-          "pageviews": 5,
-          "visitors": 5
-        },
-        {
-          "page": "/game-changelog/",
           "pageviews": 5,
           "visitors": 5
         },
@@ -441,6 +441,11 @@
           "visitors": 1
         },
         {
+          "page": "/events/arxiv_1405aec1edf8be7e.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
           "page": "/events/arxiv_230fb9bb493fe9e0.html",
           "pageviews": 1,
           "visitors": 1
@@ -489,11 +494,6 @@
           "page": "/events/arxiv_9ad41374f53f74d9.html",
           "pageviews": 1,
           "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_9c2fbcdfc8dd0ae5.html",
-          "pageviews": 1,
-          "visitors": 1
         }
       ]
     },
@@ -501,11 +501,11 @@
       "results": [
         {
           "country": "US",
-          "visitors": 74
+          "visitors": 73
         },
         {
           "country": "CN",
-          "visitors": 24
+          "visitors": 23
         },
         {
           "country": "CO",
@@ -517,10 +517,6 @@
         },
         {
           "country": "BR",
-          "visitors": 14
-        },
-        {
-          "country": "GB",
           "visitors": 13
         },
         {
@@ -528,15 +524,19 @@
           "visitors": 13
         },
         {
-          "country": "DE",
+          "country": "EC",
           "visitors": 12
         },
         {
-          "country": "AU",
+          "country": "GB",
+          "visitors": 12
+        },
+        {
+          "country": "DE",
           "visitors": 11
         },
         {
-          "country": "EC",
+          "country": "AU",
           "visitors": 10
         },
         {
@@ -564,6 +564,10 @@
           "visitors": 3
         },
         {
+          "country": "FR",
+          "visitors": 3
+        },
+        {
           "country": "KR",
           "visitors": 3
         },
@@ -581,10 +585,6 @@
         },
         {
           "country": "AT",
-          "visitors": 2
-        },
-        {
-          "country": "FR",
           "visitors": 2
         },
         {
@@ -640,10 +640,6 @@
           "visitors": 1
         },
         {
-          "country": "PH",
-          "visitors": 1
-        },
-        {
           "country": "TR",
           "visitors": 1
         }
@@ -655,9 +651,9 @@
     "goals": {
       "results": [
         {
-          "events": 16,
+          "events": 17,
           "goal": "Outbound Link: Click",
-          "visitors": 13
+          "visitors": 14
         },
         {
           "events": 12,
@@ -670,11 +666,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-10-21",
-    "last_date": "2026-11-19",
+    "first_date": "2026-10-22",
+    "last_date": "2026-11-20",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-11-20"
+  "snapshot_date": "2026-11-21"
 }
