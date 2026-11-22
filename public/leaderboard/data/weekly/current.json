@@ -1,20 +1,21 @@
 {
   "meta": {
-    "week_id": "2026_W35",
+    "week_id": "2026_W48",
     "season": "2025_Q4",
-    "generated": "2026-08-20T14:13:44.191787Z",
-    "game_version": "v0.14.1",
-    "ladder_version": "L4",
+    "generated": "2026-11-22T03:40:50.811014Z",
+    "game_version": "v0.14.5",
+    "ladder_version": "L6",
     "competition_type": "weekly_league",
-    "start_date": "2026-08-21T00:00:00+10:00",
-    "end_date": "2026-08-27T23:59:59+10:00",
+    "start_date": "2026-11-20T00:00:00+11:00",
+    "end_date": null,
+    "closes": "on_next_blessing",
     "total_participants": 0,
     "total_submissions": 0
   },
   "epoch": {
     "id": "regularised",
     "anomalous": false,
-    "ladder_version": "L5",
+    "ladder_version": "L6",
     "boundary_ladder_version": "L3",
     "boundary_local": "2026-07-31T00:00:00+10:00",
     "boundary_tz": "Australia/Hobart",
@@ -25,47 +26,43 @@
     "board_opens_local": "2026-07-31T17:00:00+10:00",
     "board_opens_utc": "2026-07-31T07:00:00Z",
     "board_opens_confirmed": true,
-    "observed_defects": {
-      "unblessed-seed": "the seed was derived website-side by weekly-league-manager.py and is not the blessed competitive key in docs/LEAGUE_SEED_LEDGER.md. No client ever POSTed under it."
-    }
+    "observed_defects": {}
   },
-  "seed": "weekly_2026_W35_a97e68ae",
+  "seed": "weekly-2026-w35",
   "seed_provenance": {
-    "blessed": false,
-    "derivation": "sha256('pdoom1_weekly_<week_id>_<season>')[:8], website-side",
-    "canonical_source": "the shipped game client, recorded in docs/LEAGUE_SEED_LEDGER.md",
-    "note": "Placeholder. Do NOT present this to players as the competitive seed. The board key scores are actually submitted under is blessed in docs/LEAGUE_SEED_LEDGER.md; a seed that is not in that ledger routes submissions to a board nobody displays, with no error shown to the player. The live score API has NO key validation -- a wrong seed or version returns ok:true with an empty board (verified 2026-07-29), so a bad key is indistinguishable from nobody having played.",
-    "seed_status": "unblessed",
-    "ladder_version": "L4",
-    "board_key_shape": "(seed, L<n>)"
+    "blessed": true,
+    "ladder_version": "L6",
+    "board_key": "(weekly-2026-w35, L6)",
+    "canonical_source": "the shipped game client; blessed in docs/LEAGUE_SEED_LEDGER.md and copied into public/data/ladder-epochs.json",
+    "source": "pdoom1 on pdoom1-website#151, comment 2026-07-28T23:13Z"
   },
   "board_key": {
-    "seed": "weekly_2026_W35_a97e68ae",
-    "ladder_version": "L4",
+    "seed": "weekly-2026-w35",
+    "ladder_version": "L6",
     "shape": "(seed, L<n>)",
-    "blessed": false
+    "blessed": true
   },
   "economic_model": "unknown",
   "week_info": {
-    "week_id": "2026_W35",
+    "week_id": "2026_W48",
     "year": 2026,
-    "week_number": 35,
+    "week_number": 48,
     "timezone": "Australia/Hobart",
-    "start_date": "2026-08-21",
-    "end_date": "2026-08-27",
-    "start_timestamp": "2026-08-21T00:00:00+10:00",
-    "end_timestamp": "2026-08-27T23:59:59+10:00",
-    "start_timestamp_utc": "2026-08-20T14:00:00Z",
-    "end_timestamp_utc": "2026-08-27T13:59:59Z",
-    "days_remaining": 6,
-    "hours_remaining": 23,
+    "start_date": "2026-11-20",
+    "end_date": null,
+    "start_timestamp": "2026-11-20T00:00:00+11:00",
+    "end_timestamp": null,
+    "start_timestamp_utc": "2026-11-19T13:00:00Z",
+    "end_timestamp_utc": null,
+    "days_remaining": 4,
+    "hours_remaining": 9,
     "is_current": true,
-    "status": "running",
+    "status": "open",
     "season": "2025_Q4",
     "epoch": {
       "id": "regularised",
       "anomalous": false,
-      "ladder_version": "L5",
+      "ladder_version": "L6",
       "boundary_ladder_version": "L3",
       "boundary_local": "2026-07-31T00:00:00+10:00",
       "boundary_tz": "Australia/Hobart",
@@ -76,7 +73,8 @@
       "board_opens_local": "2026-07-31T17:00:00+10:00",
       "board_opens_utc": "2026-07-31T07:00:00Z",
       "board_opens_confirmed": true
-    }
+    },
+    "closes": "on_next_blessing"
   },
   "entries": [],
   "statistics": {

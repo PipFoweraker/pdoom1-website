@@ -160,10 +160,16 @@ live_text = "\n".join(live)
 check(not any("already" in ln and "archiv" in ln.lower() for ln in live),
       "no live line speculates that the week was already archived")
 
-archive_lines = [ln for ln in live if "--archive-week" in ln]
-check(archive_lines, "the archive step still runs --archive-week")
-check(all("||" not in ln for ln in archive_lines),
-      "...and no live --archive-week invocation is masked with ||")
+# Since 2026-11-22 (blessing-driven league) there is NO separate archive step:
+# --new-week archives the previous week itself, and only when the blessed key
+# moved. A standalone --archive-week would archive the LIVE week on every
+# dispatch. So the contract is now: the rollover runs --new-week, unmasked.
+check(not [ln for ln in live if "--archive-week" in ln],
+      "no live --archive-week step (it would archive the live week every run)")
+rollover_lines = [ln for ln in live if "--new-week" in ln and "weekly-league-manager" in ln]
+check(rollover_lines, "the rollover step runs --new-week")
+check(all("||" not in ln for ln in rollover_lines),
+      "...and no live --new-week invocation is masked with ||")
 
 # The `if:` that reads as a safety toggle. github.event.inputs is EMPTY on a
 # schedule trigger, so the old spelling was unconditionally true on cron --
@@ -174,8 +180,8 @@ check(not any("event.inputs" in ln and "archive_previous" in ln for ln in live),
 # The outcome this step reports is FILED, not just printed: it is passed to
 # log-automation-run.py, which writes what /monitoring/ publishes. That is the
 # reason the masking mattered, so the linkage is pinned here.
-check("--archive-status" in live_text and "steps.archive.outcome" in live_text,
-      "steps.archive.outcome is still what gets recorded to monitoring")
+check("--archive-status" in live_text and "steps.new-week.outcome" in live_text,
+      "the rollover step's real outcome is what gets recorded to monitoring")
 
 print("\n" + "=" * 62)
 if failures:

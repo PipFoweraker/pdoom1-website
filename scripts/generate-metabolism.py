@@ -1246,7 +1246,29 @@ def build():
     # visitor that no job is keeping. Instead this states the park, and states
     # that clocks.json still DECLARES an anchor -- because that is the thing a
     # reader could be misled by, and it is true whether or not anyone noticed.
-    if not reset["crons"]:
+    # A THIRD STATE since 2026-11-22: BLESSING-DRIVEN. Not running on a clock and
+    # not parked waiting to resume one -- the calendar is retired (Pip, D1 (i)) and
+    # a week opens when a seed is blessed. It is declared by a marker line in the
+    # workflow's trigger block, so a schedule that merely vanished still raises.
+    _reset_text = reset["file"].read_text(encoding="utf-8").split("\njobs:", 1)[0]
+    _bd = re.search(r"#\s*BLESSING-DRIVEN:\s*(.+)", _reset_text)
+    if not reset["crons"] and _bd:
+        checks.append({
+            "name": "The league rolls over on a BLESSING, not a clock",
+            "verdict": "BLESSING-DRIVEN",
+            "cls": "p-ok",
+            "detail": ("%s has no schedule by design: %s. A week opens when "
+                       "scripts/bless-seed.py records a seed blessed against the "
+                       "shipped release manifest; how long the league may stand "
+                       "still is policy in public/data/ladder-epochs.json -> "
+                       "blessing_policy, checked by validate_data.py "
+                       "(league:blessing_age)."
+                       % (reset["file"].name, _bd.group(1).strip())),
+            "cites": [cite(reset["file"], "BLESSING-DRIVEN:")],
+        })
+        reset_cron = None
+        reset_parsed = None
+    elif not reset["crons"]:
         if not reset["park"]:
             raise SourceError(
                 "weekly-league-reset.yml has no schedule and no park notice. A "

@@ -245,3 +245,26 @@ stays as a reference implementation of that *proposed* scheme, not the current o
 2. Get Pip's explicit blessing on that value.
 3. Add the row with the real UTC date. Never edit a past row's seed; a corrected
    seed is a new epoch, not a rewrite of history.
+
+### Weekly seed rolls on an unchanged ladder (added 2026-11-22)
+
+The league is **blessing-driven** since 2026-11-22 (Pip, D1 (i)): a week opens
+when a seed is blessed, not on a calendar, and blessings are planned for Fridays.
+A seed roll that does not fork the ladder (L6 -> L6) is the common case:
+
+1. Ship a release whose `release_manifest.json` carries the new `league_seed`.
+2. `python scripts/bless-seed.py --seed <seed>` -- refuses unless the manifest
+   carries exactly that seed on the current ladder, then writes
+   `ladder-epochs.json` and opens the week. It writes nothing on any refusal.
+3. **Add a NEW row for the same epoch** (do not edit the old one) with the date
+   of the blessing. `bless-seed.py` prints it. Several rows for one epoch are
+   legitimate: `check-blessing-consistency.py` reads the **latest-dated** row as
+   current, and reports two rows on the same latest date with different seeds as
+   ambiguous rather than guessing from table order.
+4. Open a PR. CI checks the chain: the shipped manifest against the blessing
+   (`check-epoch-drift.py`), the blessing against `weekly/current.json`
+   (`validate_data.py` -> `league:key`), and how long since the last blessing
+   (`league:blessing_age`, window in `ladder-epochs.json` -> `blessing_policy`).
+
+A **ladder fork** (L6 -> L7) is not a seed roll: `bless-seed.py` refuses it, and
+the epoch cut is done by hand -- epochs[] row, boundary, board-probe-targets.json.

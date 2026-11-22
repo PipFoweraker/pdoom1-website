@@ -707,7 +707,9 @@ python  scripts/acknowledgements.py --audit   # every dated exemption, and when 
 
 python  scripts/sync/sync-keybinds.py --check # FULL gate; needs ../pdoom1   [local only]
 python  scripts/sync/sync-keybinds.py --ci    # no-typed-keys half only      [content-honesty]
-python  scripts/test-weekly-league-boundary.py  # run-time -> week (A9)      [weekly-league-reset]
+python  scripts/test-weekly-league-boundary.py  # run-time -> week (A9); calendar stays retired [data-contract]
+python  scripts/test-bless-seed.py           # a blessing refuses, writes nothing, or moves it all [data-contract]
+python  scripts/test-league-key.py           # league:key / blessing_age can fail      [data-contract]
 python  scripts/stamp-league-epoch.py --check   # weekly records carry epoch [data-contract]
 python  scripts/test-stamp-league-epoch.py      # defect texts claim only what they verify [data-contract]
 node    scripts/test-board-escaping.js    # no API field reaches innerHTML   [board-liveness]
@@ -719,7 +721,7 @@ python  scripts/test-board-liveness-escalation.py # a sustained "cannot tell" es
 python  scripts/check-epoch-drift.py      # declared board key vs the published one [epoch-drift]
 python  scripts/test-epoch-drift.py       # ...and drift is red, absence is UNKNOWN  [epoch-drift]
 python  scripts/check-blessing-consistency.py # the four blessing artefacts agree [content-honesty ADVISORY]
-python  scripts/test-blessing-consistency.py  # ...and every disagreement shape is caught [content-honesty]
+python  scripts/test-blessing-consistency.py  # ...and every disagreement shape is caught [data-contract; was listed as content-honesty but wired nowhere until 2026-11-22]
 python  scripts/check-token-drift.py      # token-named vars carry the token value [content-honesty ADVISORY]
 python  scripts/test-design-questions.py  # DQ mirror: no row dropped, caveats publish [content-honesty]
 python  scripts/sync/sync-design-questions.py --check # /design-questions/ in step  [local only, needs ../pdoom1]
@@ -799,6 +801,14 @@ seed (`weekly_2026_W36_...`) while the shipped v0.14.4 client posts to the bless
 finding is true and its named remedy is harmful**, which is exactly when a dated
 acceptance beats both fixing and disarming. `check-epoch-drift.py` measures the
 property that actually matters and is green.
+**FIXED 2026-11-22, and the fix was to the CHECK, as that entry said.**
+`league:freshness` is gone: under a blessing-driven league age is the wrong
+property, and it was wrong in the dangerous direction -- the 2026-08-20 rollover
+wrote a derived, unblessed seed and the age check was green on it for four days,
+then `current.json` stayed on that wrong key for three months. Replaced by
+`league:key` (record vs blessing) and `league:blessing_age` (has the league moved?),
+see Automation notes. The acknowledgement that replaced this one is
+`league:blessing_age`, review_by 2026-12-04, Pip's.
 
 Machinery: `scripts/acknowledgements.py` + `data/acknowledgements.json` (repo root,
 NOT under `public/` — it is CI metadata and `public/` is rsynced). Every entry needs
@@ -1183,13 +1193,38 @@ and nobody was counting it. Enumerate by grepping for consumers, not from this l
   `scripts/test-changelog-structure.py` opens it.
 
 ## Automation notes
+- **THE LEAGUE IS BLESSING-DRIVEN, NOT CALENDAR-DRIVEN (Pip, 2026-11-22, D1 (i)).**
+  A week opens because a seed was blessed, never because a clock ticked. The
+  calendar cron is **retired, not parked** -- its park clock lapsed 2026-09-02 and
+  sat red 81 days on a remedy ("restore the schedule") that would have broken the
+  board. The Friday path is `python scripts/bless-seed.py --seed <seed>` in a PR
+  (procedure: `docs/LEAGUE_SEED_LEDGER.md` -> "Weekly seed rolls").
+  - **A week has no end date** (E1 (a)): `meta.end_date` is null and
+    `meta.closes == "on_next_blessing"`; it is closed, at that moment, when the next
+    blessing archives it. A null end **without** the marker is a defect, and
+    `/leaderboard/`, `/league/` and `validate_data.py` all treat it as one.
+  - **The chain, and its honest limit.** `check-epoch-drift.py`: shipped manifest vs
+    the site (the only link with an OUTSIDE reference). `league:key`: blessing vs
+    `current.json` -- the rollover writes the second FROM the first, so this catches
+    "rollover did not run", never "blessing is wrong". `league:blessing_age`: three
+    files can agree on a seed nobody has re-blessed (shape D); window is POLICY in
+    `ladder-epochs.json` -> `blessing_policy` (warn > 8 days, fail > 15).
+  - **The rollover is idempotent and refuses.** `--new-week` REFUSES an unblessed
+    seed, prints NO-OP when already on the blessed key, never overwrites an archive
+    (two blessings in one week get a seed-suffixed file), and no longer replaces
+    `current.json` when the archive step fails -- that return value used to be ignored.
+  - `weekly-league-reset.yml` is a **manual recovery** path (dispatch only, marker
+    `BLESSING-DRIVEN:`), not a schedule. `test-weekly-league-boundary.py` fails if a
+    `schedule:` returns, active or commented; it now runs in `data-contract-validation.yml`,
+    because its only caller was the cron it used to gate.
 - Weekly-league rollover only opens a GitHub issue **on failure**
   (`weekly-league-reset.yml`). The old workflow that spammed 35 "success" issues
   was removed 2026-07-14 — don't reintroduce success-issue creation.
-- **The league week is anchored to Friday 00:00 `Australia/Hobart`** (Pip,
-  2026-07-28: "Everything is going to be based off Hobart time, AEST"), matching
-  the game's own "Seed — every Fri" cadence in
-  `pdoom1/docs/RELEASE_NOMENCLATURE.md`. The cron is `0 14 * * 4` — **Thursday**
+- **Week IDs are still anchored to Friday 00:00 `Australia/Hobart`** (Pip,
+  2026-07-28: "Everything is going to be based off Hobart time, AEST") -- but since
+  2026-11-22 that only NAMES archives (D3); nothing fires on it. The text below is
+  the history of the retired cron, kept because the zone rules still apply. The
+  cron was `0 14 * * 4` — **Thursday**
   14:00 UTC — which is Fri 00:00 Hobart in winter and Fri 01:00 in summer, i.e.
   always a Friday there and never *before* the week it opens.
   **`Australia/Hobart` is not a fixed offset:** +10 (AEST) in winter, +11 (AEDT)

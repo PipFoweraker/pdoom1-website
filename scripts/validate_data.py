@@ -163,7 +163,107 @@ def parse_dt(s):
         return None
 
 
-def check_weekly_league():
+LADDER_EPOCHS = PUBLIC / "data" / "ladder-epochs.json"
+# The marker a blessing-driven week carries instead of an end date. Shared with
+# weekly-league-manager.py and the pages; a week with no end date and no marker
+# is a defect, not an open week.
+CLOSES_ON_BLESSING = "on_next_blessing"
+
+
+def check_league_blessing(d, today):
+    """league:key and league:blessing_age -- replaced league:freshness 2026-11-22.
+
+    WHY THE AGE CHECK WENT. It asked "is current.json under 9 days old?", which
+    is a question about a CALENDAR. Under the (seed, ladder_version) key model the
+    week changes when Pip blesses a new seed (ruled 2026-11-22, D1 (i)), so age
+    was the wrong property -- and it was wrong in the dangerous direction: on
+    2026-08-20 a rollover wrote a DERIVED, unblessed seed, and this check was
+    green on it for four days, because it was young.
+
+    league:key -- the record a page reads must be on the key Pip blessed.
+      Observation: weekly/current.json. Expectation: ladder-epochs.json.
+      HONEST LIMIT: the rollover writes the first FROM the second, so this link
+      catches "the rollover did not run / ran wrong", never "the blessing is
+      wrong". The outside reference -- the shipped client's release manifest --
+      is check-epoch-drift.py's job. Two links, two checks.
+
+    league:blessing_age -- everything can agree and nothing move. Three files
+      agreeing on a seed nobody has re-blessed in 13 weeks is CLAUDE.md shape D,
+      "derived correctly from a source that stopped moving". The window is POLICY
+      declared in ladder-epochs.json -> blessing_policy, never derived from a cron.
+      A missing window or blessing date is FAIL: absence is never agreement.
+    """
+    try:
+        contract = load_json(LADDER_EPOCHS)
+    except (FileNotFoundError, ValueError) as exc:
+        add("league:key", FAIL, f"cannot read {LADDER_EPOCHS.name}: {exc} -- no blessing "
+            "to compare against, which is not the same as agreement")
+        add("league:blessing_age", FAIL, f"cannot read {LADDER_EPOCHS.name}")
+        return
+    cut = contract.get("regularised_from") or {}
+    b_seed, b_ladder = cut.get("seed"), cut.get("ladder_version")
+
+    # ---- league:key ----------------------------------------------------------
+    bk = d.get("board_key") or {}
+    meta = d.get("meta") or {}
+    have = (bk.get("seed"), bk.get("ladder_version"))
+    problems = []
+    if cut.get("seed_status") != "blessed" or not b_seed or not b_ladder:
+        problems.append(f"{LADDER_EPOCHS.name} declares no blessed key "
+                        f"(seed={b_seed!r}, ladder={b_ladder!r}, "
+                        f"seed_status={cut.get('seed_status')!r})")
+    if not all(have):
+        problems.append(f"current.json board_key is incomplete: {have}")
+    elif b_seed and b_ladder and have != (b_seed, b_ladder):
+        problems.append(f"current.json is on {have} but the blessed key is "
+                        f"({b_seed}, {b_ladder}) -- run "
+                        f"`python scripts/weekly-league-manager.py --new-week`")
+    if bk.get("blessed") is not True or \
+            (d.get("seed_provenance") or {}).get("blessed") is not True:
+        problems.append("current.json is not labelled blessed (board_key.blessed / "
+                        "seed_provenance.blessed) -- a matching string on an "
+                        "unblessed record is not a blessing")
+    if d.get("seed") != bk.get("seed") or meta.get("ladder_version") != bk.get("ladder_version"):
+        problems.append(f"current.json disagrees with itself: seed={d.get('seed')!r} vs "
+                        f"board_key.seed={bk.get('seed')!r}, meta.ladder_version="
+                        f"{meta.get('ladder_version')!r} vs board_key.ladder_version="
+                        f"{bk.get('ladder_version')!r}")
+    if problems:
+        add("league:key", FAIL, "; ".join(problems))
+    else:
+        add("league:key", OK, f"current.json is on the blessed key ({b_seed}, {b_ladder})")
+
+    # ---- league:blessing_age -------------------------------------------------
+    policy = contract.get("blessing_policy") or {}
+    warn_d, fail_d = policy.get("warn_after_days"), policy.get("fail_after_days")
+    on = cut.get("seed_blessed_on")
+    try:
+        blessed_on = datetime.fromisoformat(str(on)).date()
+    except ValueError:
+        blessed_on = None
+    if not (isinstance(warn_d, int) and isinstance(fail_d, int) and 0 < warn_d < fail_d):
+        add("league:blessing_age", FAIL, f"{LADDER_EPOCHS.name} -> blessing_policy has no "
+            f"valid window (warn_after_days={warn_d!r}, fail_after_days={fail_d!r}). A "
+            "window nobody declared is not a pass.")
+    elif blessed_on is None:
+        add("league:blessing_age", FAIL, f"regularised_from.seed_blessed_on={on!r} is not "
+            "a date, so how long the league has stood still cannot be established")
+    elif blessed_on > today:
+        add("league:blessing_age", FAIL, f"seed_blessed_on {blessed_on} is in the future")
+    else:
+        age = (today - blessed_on).days
+        msg = (f"({b_seed}, {b_ladder}) blessed {blessed_on}, {age} day(s) ago "
+               f"(policy: warn > {warn_d}, fail > {fail_d})")
+        if age > fail_d:
+            add("league:blessing_age", FAIL, msg + " -- the league has not moved. Bless "
+                "the next seed (docs/LEAGUE_SEED_LEDGER.md), or acknowledge on a date.")
+        elif age > warn_d:
+            add("league:blessing_age", WARN, msg + " -- a Friday was missed")
+        else:
+            add("league:blessing_age", OK, msg)
+
+
+def check_weekly_league(today=None):
     path = PUBLIC / "leaderboard" / "data" / "weekly" / "current.json"
     try:
         d = load_json(path)
@@ -171,26 +271,25 @@ def check_weekly_league():
         add("league:present", FAIL, "weekly/current.json missing")
         return
     now = datetime.now(timezone.utc)
-
-    # freshness
-    gen = parse_dt((d.get("meta") or {}).get("generated"))
-    if gen:
-        age_days = (now - gen).total_seconds() / 86400
-        if age_days > 9:
-            add("league:freshness", FAIL, f"current.json is {age_days:.1f} days old -- weekly rollover likely stalled")
-        elif age_days > 7:
-            add("league:freshness", WARN, f"current.json is {age_days:.1f} days old (rollover due)")
-        else:
-            add("league:freshness", OK, f"generated {age_days:.1f} days ago")
-    else:
-        add("league:freshness", WARN, "no parseable meta.generated")
+    check_league_blessing(d, today or now.date())
 
     # current week actually current?
     wi = d.get("week_info") or {}
     end = None
     for k in ("end_timestamp", "end_date"):
         end = end or parse_dt(wi.get(k))
-    if wi.get("is_current") and end:
+    if end is None:
+        # Open-ended is legitimate ONLY with the marker. A week that lost its
+        # end date to a bug must not read as "open until further notice".
+        closes = (d.get("meta") or {}).get("closes")
+        if closes == CLOSES_ON_BLESSING:
+            add("league:current_week", OK,
+                f"week {wi.get('week_id')} is open until the next seed is blessed")
+        else:
+            add("league:current_week", FAIL,
+                f"week {wi.get('week_id')} has no end date and meta.closes={closes!r}, "
+                f"not {CLOSES_ON_BLESSING!r} -- open-ended by accident is not open")
+    elif wi.get("is_current") and end:
         past = (now - end).total_seconds() / 86400
         if past > 2:
             add("league:current_week", WARN,
@@ -216,8 +315,9 @@ def check_weekly_league():
             f"deployed {deployed}. An unstamped board matches nothing and receives nothing.")
     elif deployed != lb_ver:
         add("league:version_drift", WARN,
-            f"weekly league game_version={lb_ver} but deployed game={deployed} -- a "
-            f"{deployed} client's scores cannot land on a {lb_ver} board")
+            f"weekly league record was stamped by game_version={lb_ver}; deployed game is "
+            f"{deployed}. A RECORD STAMP only -- the board key is (seed, ladder_version), so "
+            f"this does not stop a {deployed} client's scores landing (league:key owns that)")
     else:
         add("league:version_drift", OK, f"game_version {lb_ver} matches deployed")
 
@@ -225,10 +325,14 @@ def check_weekly_league():
     seed = d.get("seed")
     if not seed:
         add("league:seed", FAIL,
-            "weekly/current.json has no seed -- half the board key (seed, game_version) "
+            "weekly/current.json has no seed -- half the board key (seed, ladder_version) "
             "is missing, so no submission can be matched to this board")
     else:
-        add("league:seed", OK, f"weekly seed {seed}")
+        # PRESENCE ONLY. This used to read as a bare "OK weekly seed <x>" on a
+        # derived, unblessed seed for three months; whether it is the RIGHT seed is
+        # league:key's job, and the detail says so rather than implying approval.
+        add("league:seed", OK, f"weekly seed {seed} is present (whether it is the "
+            f"blessed seed: see league:key)")
 
     # referential integrity: stats vs entries
     entries = d.get("entries") or []
@@ -601,7 +705,7 @@ def main():
     for _sf in sorted(glob.glob(str(PUBLIC / "leaderboard" / "data" / "seed_leaderboard_*.json"))):
         check_encoding("seed:" + Path(_sf).stem.replace("seed_leaderboard_", ""), _sf)
 
-    check_weekly_league()
+    check_weekly_league(today)
     check_published_board()
     check_board_liveness()
     check_seed_leaderboards()

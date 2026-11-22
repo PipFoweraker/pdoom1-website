@@ -605,94 +605,46 @@ finally:
     wlm._CONTRACT_CACHE[:] = _saved
 
 # --------------------------------------------------------------------------
-# 10. The cron in the workflow must still match the constants -- AND still land
-#     on a Friday in Hobart in both halves of the year. The numeric check
-#     catches a typo; the semantic check catches someone "fixing" DST by moving
-#     the cron hour, which is the tempting wrong answer.
+# 10. THE CALENDAR IS RETIRED (Pip, 2026-11-22, D1 (i)). A league week opens
+#     because a seed was blessed; nothing rolls the league on a clock.
+#
+#     This section used to validate the cron against ROLLOVER_HOUR_UTC and police
+#     a PARKED-UNTIL clock on it. That clock lapsed on 2026-09-02 and this file
+#     sat red for 81 days on "restore the schedule or re-park" -- and restoring
+#     the schedule was the one remedy that would have broken the board (a derived
+#     seed no client posts to). The week arithmetic above is still pinned,
+#     because it still NAMES archives (D3); what is gone is anything that FIRES.
+#
+#     What is asserted now is that the calendar cannot quietly come back:
+#       - no `schedule:` in the workflow, active OR commented (a commented cron is
+#         how the last park hid a value that could be "restored" in one keystroke);
+#       - the BLESSING-DRIVEN marker is present, so /metabolism/ renders the
+#         workflow as what it is rather than as a cadence that vanished;
+#       - no park clock is left behind to lapse again.
 # --------------------------------------------------------------------------
-print("\n-- cron agrees with the anchor, in both DST states --")
+print("\n-- the calendar rollover is retired, and cannot quietly return --")
 wf = (Path(__file__).parent.parent / ".github" / "workflows" / "weekly-league-reset.yml").read_text(encoding="utf-8")
-
-# ACTIVE vs PARKED. This used to collect every line containing "- cron:" without
-# looking at whether it was commented out, so commenting the schedule would have
-# left all the assertions below passing over a schedule that no longer runs --
-# green while disarmed, which is the exact shape CLAUDE.md calls class 5.
-_cron_lines = [ln for ln in wf.splitlines() if "- cron:" in ln and "'" in ln]
-crons = [ln.split("'")[1] for ln in _cron_lines if not ln.lstrip().startswith("#")]
-parked_crons = [ln.split("'")[1] for ln in _cron_lines if ln.lstrip().startswith("#")]
-
-# PARKED-UNTIL is a clock on the ACCEPTANCE, not on the finding. While the date is
-# in the future the park is a legitimate state and this is green -- but it is
-# printed, never silent, because green must carry a number. Past the date the
-# check goes RED on "the park expired", which a human closes by restoring the
-# schedule or re-parking with a new date. A red on the underlying condition would
-# not be closeable by whoever hits it; this one always is.
-# ANCHORED to the `on:` block, not searched over the whole file. An adversarial
-# review defeated the whole-file version: a line reading
-# "# historical note: the sibling job used PARKED-UNTIL: 2027-01-01" placed above
-# `name:` -- outside `on:` entirely -- was picked up as THIS park's clock, and an
-# expired acceptance reported 108/108 green with 130 days left. For a mechanism
-# whose entire purpose is that it cannot be quietly defeated, first-match-wins
-# over the whole file is the wrong reader.
 _on_block = wf.split("\njobs:", 1)[0]
-if "\non:" in _on_block:
-    _on_block = _on_block.split("\non:", 1)[1]
-_park = re.search(r"PARKED-UNTIL:\s*(\d{4}-\d{2}-\d{2})", _on_block)
-_parked = bool(parked_crons) and not crons
-# A second PARKED-UNTIL anywhere in the file is ambiguous, and ambiguity in a
-# clock reads as whichever date the reader happens to find first.
-if len(re.findall(r"PARKED-UNTIL:\s*\d{4}-\d{2}-\d{2}", wf)) > 1:
-    check("exactly one PARKED-UNTIL date in weekly-league-reset.yml",
-          len(re.findall(r"PARKED-UNTIL:\s*\d{4}-\d{2}-\d{2}", wf)), 1)
-
-if _parked:
-    check("a parked schedule carries a PARKED-UNTIL date", bool(_park), True)
-    if _park:
-        _until = date.fromisoformat(_park.group(1))
-        _today = datetime.now(UTC).date()
-        print(f"   PARKED: the rollover schedule is commented out until {_until} "
-              f"({(_until - _today).days} day(s) left). "
-              f"{len(parked_crons)} parked cron line(s), still validated below.")
-        check(f"the park has not expired (PARKED-UNTIL {_until}); restore the "
-              f"schedule or re-park with a new date and reason",
-              _until >= _today, True)
-    # The parked VALUE is still checked against the constants below, so it cannot
-    # rot unnoticed and be restored wrong. That is why it is commented, not deleted.
-    crons = parked_crons
-else:
-    check("exactly one cron in weekly-league-reset.yml", len(crons), 1)
-    check("no leftover parked cron line while a schedule is active",
-          len(parked_crons), 0)
-
-if crons:
-    minute, hour, _dom, _mon, dow = crons[0].split()
-    check("cron hour matches ROLLOVER_HOUR_UTC", int(hour), wlm.ROLLOVER_HOUR_UTC)
-    check("cron minute is 0", int(minute), 0)
-    # cron day-of-week 0 == Sunday, so Thursday == 4.
-    check("cron day-of-week matches ROLLOVER_CRON_DOW", int(dow), wlm.ROLLOVER_CRON_DOW)
-    check("ROLLOVER_CRON_DOW is Thursday", wlm.ROLLOVER_CRON_DOW, 4)
-
-    # Semantic: build real UTC instants from the cron fields, one in each DST
-    # state, and assert both are Fridays in Hobart AND are inside (never before)
-    # the week they open.
-    cron_weekday_py = (int(dow) - 1) % 7          # cron 0=Sun -> weekday() Sun=6
-    bad_day = bad_order = 0
-    probes = []
-    for base in (datetime(2026, 7, 30, tzinfo=UTC),      # winter, AEST
-                 datetime(2026, 11, 26, tzinfo=UTC)):    # summer, AEDT
-        assert base.weekday() == cron_weekday_py, "probe is not on the cron's weekday"
-        fire = base.replace(hour=int(hour), minute=int(minute))
-        local = fire.astimezone(_TZ)
-        if local.weekday() != wlm.ANCHOR_WEEKDAY:
-            bad_day += 1
-        start = wlm.league_week_start(fire)
-        if wlm.as_utc(start) > wlm.as_utc(fire):
-            bad_order += 1
-        probes.append(local.isoformat())
-    check("the cron instant is a Friday in Hobart in both DST states", bad_day, 0)
-    check("the cron never fires BEFORE the week it opens", bad_order, 0)
-    check("the two probe instants in Hobart terms", probes,
-          ["2026-07-31T00:00:00+10:00", "2026-11-27T01:00:00+11:00"])
+_lines = _on_block.splitlines()
+check("no `schedule:` line in the workflow's trigger block, active or commented",
+      [ln.strip() for ln in _lines if re.match(r"^\s*#?\s*schedule:", ln)], [])
+check("no `- cron:` line in the workflow, active or commented",
+      [ln.strip() for ln in wf.splitlines() if "- cron:" in ln], [])
+check("the BLESSING-DRIVEN marker is present in the trigger block",
+      "BLESSING-DRIVEN:" in _on_block, True)
+check("no park clock left behind to lapse",
+      re.findall(r"PARKED-UNTIL:\s*\d{4}-\d{2}-\d{2}", wf), [])
+check("workflow_dispatch is the only trigger",
+      sorted({m for m in re.findall(
+          r"^  ([a-z_]+):",
+          # the `on:` mapping only: stop at the next top-level key (permissions:)
+          re.split(r"\n(?=[a-z])", _on_block.split("\non:", 1)[-1], maxsplit=1)[0],
+          re.M)}),
+      ["workflow_dispatch"])
+check("the workflow does not run a separate --archive-week step (it would archive "
+      "the LIVE week on every dispatch)",
+      [ln.strip() for ln in wf.splitlines()
+       if "--archive-week" in ln and not ln.strip().startswith("#")], [])
 
 # --------------------------------------------------------------------------
 print("\n" + "-" * 72)

@@ -203,6 +203,30 @@ async function main() {
       'and it gets its own banner rather than inheriting the previous board\'s');
   }
 
+  // ---- 6b. BLESSING-DRIVEN weeks (2026-11-22): no end date, by design -------
+  // A week opens when a seed is blessed and closes when the next one is; there is
+  // no end date to compare against. The marker is the ONLY thing that makes a
+  // null end legitimate -- case 4 above ("null end_date") is the control that the
+  // marker is doing the work, not the null.
+  console.log('6b. A blessing-driven week (no end date + marker) is open; the marker overrides nothing else');
+  for (const [label, data, want] of [
+    ['marker, no end date', { meta: { week_id: '2026_W48', end_date: null,
+      closes: 'on_next_blessing' }, week_info: { end_timestamp: null }, entries: [] }, 1],
+    ['marker, but a REAL end that has passed', { meta: { end_date: null,
+      closes: 'on_next_blessing' }, week_info: {
+      end_timestamp: new Date(Date.now() - DAY).toISOString() }, entries: [] }, 0],
+    ['a misspelt marker', { meta: { end_date: null, closes: 'on_next_blesing' },
+      entries: [] }, 0],
+  ]) {
+    const { env, calls } = makeEnv({
+      seedFilter: 'current-week',
+      fetchImpl: () => jsonResponse(data),
+    });
+    await buildRunner(env);
+    check(calls.displayLeaderboard === want,
+      `${label} -> ${want ? 'rendered' : 'NOT rendered'}`);
+  }
+
   // ---- 7. source-level: one freshness authority, not two -------------------
   console.log('7. There is ONE freshness authority, shared');
   check((src.match(/function weekIsOpen\(/g) || []).length === 1,
