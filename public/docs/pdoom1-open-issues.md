@@ -1,9 +1,17 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-11-22T06:25:01.760Z UTC
+Generated: 2026-11-22T12:21:55.874Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1384 | [Bug]: Scouting submenu options show the missing-icon placeholder (scout_* ids not in icon_mapping.json) |  |  | 2026-11-22 10:31:28 | [link](https://github.com/PipFoweraker/pdoom1/issues/1384) |
+| 1383 | [Bug]: door submenu key hints are unreadable (10 px, 60% alpha, under the icon) |  |  | 2026-11-22 10:28:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/1383) |
+| 1382 | [Bug]: run_godot_tests.py reuses the user:// sandbox between runs, so one run's config.cfg breaks the next |  |  | 2026-11-22 08:54:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/1382) |
+| 1381 | [Bug]: the first run day is Tue 4 Jul, so month 1 opens at workday 2 of 21 (start day says Mon 3 Jul) |  |  | 2026-11-22 08:54:53 | [link](https://github.com/PipFoweraker/pdoom1/issues/1381) |
+| 1380 | [Bug]: WATCH 'reserve N' shows the hours set aside at Commit, not the hours still held |  |  | 2026-11-22 08:54:52 | [link](https://github.com/PipFoweraker/pdoom1/issues/1380) |
+| 1379 | [Bug]: queued plays never book their typed hours, so planning plays can overflow into operating hours |  |  | 2026-11-22 06:46:59 | [link](https://github.com/PipFoweraker/pdoom1/issues/1379) |
+| 1378 | [Bug]: Undo removes the first queued copy of the last action, not the last entry |  |  | 2026-11-22 06:43:41 | [link](https://github.com/PipFoweraker/pdoom1/issues/1378) |
+| 1377 | [Bug]: the background baseline game writes into the live run's VerificationTracker (thread race, engine error on an early commit) |  |  | 2026-11-22 08:55:00 | [link](https://github.com/PipFoweraker/pdoom1/issues/1377) |
 | 1375 | Release Checklist: v0.15.0 | release, checklist |  | 2026-11-22 03:40:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1375) |
 | 1374 | ladder gate: a sub-commit's 'Ladder-Impact: none' covers a whole squash merge |  |  | 2026-11-22 03:26:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1374) |
 | 1357 | Release Checklist: v0.14.5 | release, checklist |  | 2026-10-28 21:43:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/1357) |
