@@ -1,9 +1,10 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-11-22T12:21:55.874Z UTC
+Generated: 2026-11-22T18:18:52.281Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1385 | [Bug]: test_music_player_controls.gd fails intermittently on a slow machine (conductor nudge timer leaks between tests) |  |  | 2026-11-22 12:41:40 | [link](https://github.com/PipFoweraker/pdoom1/issues/1385) |
 | 1384 | [Bug]: Scouting submenu options show the missing-icon placeholder (scout_* ids not in icon_mapping.json) |  |  | 2026-11-22 10:31:28 | [link](https://github.com/PipFoweraker/pdoom1/issues/1384) |
 | 1383 | [Bug]: door submenu key hints are unreadable (10 px, 60% alpha, under the icon) |  |  | 2026-11-22 10:28:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/1383) |
 | 1382 | [Bug]: run_godot_tests.py reuses the user:// sandbox between runs, so one run's config.cfg breaks the next |  |  | 2026-11-22 08:54:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/1382) |
