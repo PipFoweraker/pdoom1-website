@@ -1,11 +1,13 @@
 # Open Issues from PipFoweraker/pdoom1
 
-Generated: 2026-11-22T00:40:09.933Z UTC
+Generated: 2026-11-22T06:25:01.760Z UTC
 
 | # | Title | Labels | Milestone | Updated | Link |
 |---:|-------|--------|-----------|---------|------|
+| 1375 | Release Checklist: v0.15.0 | release, checklist |  | 2026-11-22 03:40:54 | [link](https://github.com/PipFoweraker/pdoom1/issues/1375) |
+| 1374 | ladder gate: a sub-commit's 'Ladder-Impact: none' covers a whole squash merge |  |  | 2026-11-22 03:26:18 | [link](https://github.com/PipFoweraker/pdoom1/issues/1374) |
 | 1357 | Release Checklist: v0.14.5 | release, checklist |  | 2026-10-28 21:43:38 | [link](https://github.com/PipFoweraker/pdoom1/issues/1357) |
-| 1356 | Release ledger: a version was bumped and never tagged | release-ledger |  | 2026-10-29 04:29:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1356) |
+| 1356 | Release ledger: a version was bumped and never tagged | release-ledger |  | 2026-11-22 04:26:55 | [link](https://github.com/PipFoweraker/pdoom1/issues/1356) |
 | 1355 | Release candidate playtest window: friends get days with a build before the tag |  |  | 2026-10-25 23:17:36 | [link](https://github.com/PipFoweraker/pdoom1/issues/1355) |
 | 1353 | Lab names: hall-of-fame names enter the rolls, plus a reserved hand-written list for dense lists (low priority) |  |  | 2026-10-25 22:16:20 | [link](https://github.com/PipFoweraker/pdoom1/issues/1353) |
 | 1331 | ASCII-only rule: 52 docs in breach, ~3,700 characters, invisible because the test never ran |  |  | 2026-08-28 23:37:14 | [link](https://github.com/PipFoweraker/pdoom1/issues/1331) |
