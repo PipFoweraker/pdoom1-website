@@ -20,6 +20,16 @@ on:
       - 'scripts/test_ingest_scores.py'
       - 'scripts/stamp-league-epoch.py'
       - 'scripts/test-stamp-league-epoch.py'
+      - 'scripts/weekly-league-manager.py'
+      - 'scripts/test-weekly-league-boundary.py'
+      - 'scripts/bless-seed.py'
+      - 'scripts/test-bless-seed.py'
+      - 'scripts/test-league-key.py'
+      - 'scripts/check-blessing-consistency.py'
+      - 'scripts/test-blessing-consistency.py'
+      - 'scripts/check-epoch-drift.py'
+      - 'docs/LEAGUE_SEED_LEDGER.md'
+      - '.github/workflows/weekly-league-reset.yml'
       - '.github/workflows/data-contract-validation.yml'
   pull_request:
     paths:
@@ -34,6 +44,16 @@ on:
       - 'scripts/test_ingest_scores.py'
       - 'scripts/stamp-league-epoch.py'
       - 'scripts/test-stamp-league-epoch.py'
+      - 'scripts/weekly-league-manager.py'
+      - 'scripts/test-weekly-league-boundary.py'
+      - 'scripts/bless-seed.py'
+      - 'scripts/test-bless-seed.py'
+      - 'scripts/test-league-key.py'
+      - 'scripts/check-blessing-consistency.py'
+      - 'scripts/test-blessing-consistency.py'
+      - 'scripts/check-epoch-drift.py'
+      - 'docs/LEAGUE_SEED_LEDGER.md'
+      - '.github/workflows/weekly-league-reset.yml'
       - '.github/workflows/data-contract-validation.yml'
   schedule:
     - cron: '0 6 * * *'   # daily 06:00 UTC -- catches drift even with no commits
@@ -90,6 +110,29 @@ jobs:
       # running-week and completed-week states rather than observing the tree.
       - name: Defect stamps claim only what they verify
         run: python scripts/test-stamp-league-epoch.py
+
+      # ---- the blessing-driven league (2026-11-22) ---------------------------
+      # The week arithmetic still NAMES archives, and the calendar must not come
+      # back. This ran ONLY as a step of weekly-league-reset.yml, so once that
+      # workflow lost its cron it would have run nowhere -- moved here.
+      - name: Week arithmetic is pinned, and the calendar rollover stays retired
+        run: python scripts/test-weekly-league-boundary.py
+
+      # Every refusal in bless-seed.py and the rollover is FORCED and checked
+      # against the bytes on disk, not against what the script printed.
+      - name: A blessing refuses, writes nothing, or moves the whole record
+        run: python scripts/test-bless-seed.py
+
+      # league:key cannot agree by accident, a league that stands still is a
+      # finding, and an open-ended week needs its marker.
+      - name: The league key and blessing-age rows can fail
+        run: python scripts/test-league-key.py
+
+      # CLAUDE.md listed this as wired to content-honesty; it was wired nowhere
+      # (grep of .github/workflows/, 2026-11-22). The CHECK stays advisory in
+      # content-honesty; its TEST is blocking, as the doctrine requires.
+      - name: Every blessing-disagreement shape is caught
+        run: python scripts/test-blessing-consistency.py
 
   validate:
     name: Validate data contracts

@@ -65,6 +65,11 @@ for _s in (sys.stdout, sys.stderr):
 # before that week expired. Ten weeks of green checkmarks, every one a week late.
 # Pinned by scripts/test-weekly-league-boundary.py.
 LEAGUE_TZ_NAME = "Australia/Hobart"
+
+# Written into meta.closes and week_info.closes on a blessing-driven week, whose
+# end date is null until the next seed is blessed. Shared by validate_data.py and
+# the /leaderboard/ and /league/ pages: a null end WITHOUT this marker is a defect.
+CLOSES_ON_BLESSING = "on_next_blessing"
 ANCHOR_WEEKDAY = 4          # datetime.weekday(): Mon=0 ... Fri=4, in LEAGUE_TZ_NAME
 ROLLOVER_HOUR_UTC = 14      # cron hour; must match weekly-league-reset.yml
 ROLLOVER_CRON_DOW = 4       # cron day-of-week numbering: 0=Sun ... 4=Thu
@@ -434,8 +439,10 @@ def epoch_for(week_start: datetime) -> Dict[str, Any]:
 class WeeklyLeagueManager:
     """Manages weekly league competitions for p(Doom)1."""
     
-    def __init__(self):
-        self.website_dir = Path(__file__).parent.parent
+    def __init__(self, root: Optional[Path] = None):
+        # `root` lets a test run a real rollover inside a temp tree. Production
+        # callers pass nothing and get the repo this file lives in.
+        self.website_dir = Path(root) if root else Path(__file__).parent.parent
         self.version_file = self.website_dir / "public" / "data" / "version.json"
         self.league_data_dir = self.website_dir / "public" / "leaderboard" / "data" / "weekly"
         self.current_league_file = self.league_data_dir / "current.json"
@@ -604,7 +611,10 @@ class WeeklyLeagueManager:
         
         return {
             "current_week": week_info,
-            "current_seed": current_seed,
+            # The seed the live RECORD is on -- not generate_weekly_seed()'s derived
+            # placeholder, which this used to report and which no client posts to.
+            "current_seed": (current_league_data or {}).get("seed"),
+            "derived_placeholder_seed": current_seed,
             "league_active": current_league_exists,
             "current_league_data": current_league_data,
             "total_participants": total_participants,
@@ -634,20 +644,63 @@ class WeeklyLeagueManager:
         ladder = (week_info['epoch'].get('ladder_version')
                   or ladder_contract()["regularised_from"]["ladder_version"])
 
+        # BLESSING-DRIVEN since 2026-11-22 (Pip, D1 (i)). A week opens because a
+        # seed was blessed, never because a calendar ticked -- so:
+        #
+        # 1. REFUSE an unblessed seed. Opening a derived placeholder is exactly
+        #    what stranded 23 real submissions: no shipped client posts to it.
+        if not seed_block["seed_provenance"].get("blessed"):
+            print("REFUSED: ladder-epochs.json declares no blessed seed, so there is "
+                  "nothing to open. A derived placeholder is not a league week -- no "
+                  "client posts to it. Bless a seed first: scripts/bless-seed.py.")
+            return False
+        # 2. NO-OP, out loud, when the record is already on the blessed key. The
+        #    rollover is idempotent: running it with nothing new to open must not
+        #    archive a live week and reopen the same board under a new week id.
+        #    Printed, because a script that quietly does nothing is externally
+        #    identical to one that is broken; league:blessing_age escalates if
+        #    nothing new arrives for too long.
+        if self.current_league_file.exists():
+            try:
+                cur = json.loads(self.current_league_file.read_text(encoding="utf-8"))
+            except Exception:
+                cur = {}
+            cur_key = ((cur.get("board_key") or {}).get("seed"),
+                       (cur.get("board_key") or {}).get("ladder_version"))
+            if (cur_key == (seed_block["seed"], ladder)
+                    and (cur.get("board_key") or {}).get("blessed") is True):
+                print(f"NO-OP: current.json is already on the blessed key "
+                      f"({seed_block['seed']}, {ladder}). Nothing new has been blessed, "
+                      f"so no week was opened or archived.")
+                return True
+
+        # 3. NO END DATE. The week closes when the NEXT seed is blessed, and that
+        #    date is not known. A calendar end ("ends Thu") becomes a lie the first
+        #    Friday that slips (E1 (a)). The week id and start are still derived
+        #    from the Hobart week, for naming archives only (D3).
+        week_info = dict(week_info,
+                         end_date=None, end_timestamp=None, end_timestamp_utc=None,
+                         status="open", closes=CLOSES_ON_BLESSING)
+
         print(f"NEW WEEK: Starting new weekly league for {week_info['week_id']}")
         print(f"SEED: {seed_block['seed']} "
               f"(blessed={seed_block['seed_provenance']['blessed']})")
         print(f"BOARD_KEY: ({seed_block['seed']}, {ladder})")
         print(f"GAME_VERSION: {game_version}  [record stamp only -- NOT part of the board key]")
-        print(f"PERIOD: {week_info['start_date']} to {week_info['end_date']} "
-              f"({week_info['timezone']})")
+        print(f"PERIOD: from {week_info['start_date']}, open until the next seed is "
+              f"blessed ({week_info['timezone']})")
         print(f"EPOCH: {week_info['epoch']['id']} "
               f"(anomalous={week_info['epoch']['anomalous']})")
 
         # Archive current week if it exists
         if self.current_league_file.exists():
             print("ARCHIVE: Archiving previous week...")
-            self.archive_current_week(now)
+            # The return value used to be ignored, so a failed archive was
+            # followed by overwriting current.json -- the week lost outright.
+            if not self.archive_current_week(now):
+                print("REFUSED: the previous week could not be archived, so it was "
+                      "not replaced. Nothing new was opened.")
+                return False
 
         # Create new league data structure
         new_league_data = {
@@ -666,7 +719,10 @@ class WeeklyLeagueManager:
                 "ladder_version": ladder,
                 "competition_type": "weekly_league",
                 "start_date": week_info['start_timestamp'],
-                "end_date": week_info['end_timestamp'],
+                "end_date": None,
+                # The ONLY legitimate reason for end_date to be null. Pages and
+                # validate_data treat a null end WITHOUT this marker as a defect.
+                "closes": CLOSES_ON_BLESSING,
                 "total_participants": 0,
                 "total_submissions": 0
             },
@@ -739,11 +795,34 @@ class WeeklyLeagueManager:
             if isinstance(league_data.get("week_info"), dict):
                 league_data["week_info"]["is_current"] = False
                 league_data["week_info"]["status"] = "ended"
+                # A blessing-driven week has no end until it is superseded, so
+                # its end IS this moment. Written once, at archive time, from
+                # the clock -- never predicted.
+                if league_data["week_info"].get("end_timestamp") is None:
+                    league_data["week_info"]["end_timestamp"] = iso_z(now)
+                    league_data["week_info"]["end_timestamp_utc"] = iso_z(now)
+                    league_data["week_info"]["end_date"] = (
+                        now.astimezone(league_tz()).strftime("%Y-%m-%d"))
+                    league_data["week_info"]["closed_by"] = "the next blessed seed"
+                    if isinstance(league_data.get("meta"), dict):
+                        league_data["meta"]["end_date"] = iso_z(now)
 
             # Determine archive filename
             week_id = league_data.get("week_info", {}).get("week_id", "unknown_week")
             archive_filename = f"{week_id}_league.json"
             archive_path = self.archive_dir / archive_filename
+            # NEVER OVERWRITE AN ARCHIVE. Under the calendar rollover one week id
+            # meant one file. Blessing-driven, two blessings in one Hobart week
+            # (a correction, say) produce two records with the same week id, and
+            # the second would silently replace the first. Disambiguate by seed;
+            # if even that collides, refuse -- an archive is history.
+            if archive_path.exists():
+                seed = str(league_data.get("seed") or "unknown_seed")
+                archive_path = self.archive_dir / f"{week_id}_{seed}_league.json"
+                if archive_path.exists():
+                    print(f"ERROR: refusing to overwrite {archive_path.name}; both "
+                          f"{archive_filename} and the seed-suffixed name exist.")
+                    return False
 
             # Save to archive
             with open(archive_path, 'w', encoding='utf-8') as f:
@@ -978,16 +1057,31 @@ def main():
         if args.status:
             status = manager.get_league_status(now)
             week = status['current_week']
+            # REPORT THE RECORD, not the calendar (2026-11-22). This used to print
+            # the calendar week, a calendar end date, a TIME_REMAINING countdown
+            # and generate_weekly_seed()'s DERIVED seed under "CURRENT_SEED" --
+            # every one a value no player's board was on. Blessing-driven, the
+            # live week is whatever current.json holds, open until the next
+            # blessing.
+            rec = status.get('current_league_data') or {}
+            rmeta = rec.get('meta') or {}
+            rkey = rec.get('board_key') or {}
 
             print("WEEKLY LEAGUE STATUS:")
             print(f"   SEASON: {status['season']}")
-            print(f"   CURRENT_WEEK: {week['week_id']}")
-            print(f"   PERIOD: {week['start_date']} to {week['end_date']} "
-                  f"({week['timezone']})")
-            print(f"   WEEK_STATUS: {week['status']}")
+            print(f"   CURRENT_WEEK: {rmeta.get('week_id') or '(no current.json)'}")
+            if rmeta.get('end_date') is None and rmeta.get('closes') == CLOSES_ON_BLESSING:
+                period = (f"from {rmeta.get('start_date')}, open until the next seed is "
+                          f"blessed")
+            else:
+                period = f"{rmeta.get('start_date')} to {rmeta.get('end_date')}"
+            print(f"   PERIOD: {period}")
+            print(f"   CALENDAR_WEEK_NOW: {week['week_id']} ({week['timezone']}; "
+                  f"names archives only)")
             print(f"   EPOCH: {week['epoch']['id']} (anomalous={week['epoch']['anomalous']})")
-            print(f"   TIME_REMAINING: {week['days_remaining']} days, {week['hours_remaining']} hours")
-            print(f"   CURRENT_SEED: {status['current_seed']}")
+            print(f"   CURRENT_SEED: {rec.get('seed') or '(none)'} "
+                  f"(blessed={rkey.get('blessed')}, board_key=({rkey.get('seed')}, "
+                  f"{rkey.get('ladder_version')}))")
             print(f"   LEAGUE_ACTIVE: {status['league_active']}")
             print(f"   PARTICIPANTS: {status['total_participants']}")
             print(f"   ARCHIVED_WEEKS: {status['archived_weeks']}")

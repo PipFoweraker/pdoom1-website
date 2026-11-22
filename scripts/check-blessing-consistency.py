@@ -146,8 +146,33 @@ def parse_ledger(path):
             if c and c not in ("-", "—") and len(c) < 24 and c.isalpha():
                 by = c
                 break
-        rows[epoch] = {"seed": None if unfilled else seed, "blessed": not unfilled,
-                       "blessed_utc": date, "by": by, "unfilled": unfilled}
+        row = {"seed": None if unfilled else seed, "blessed": not unfilled,
+               "blessed_utc": date, "by": by, "unfilled": unfilled}
+
+        # SEVERAL ROWS FOR ONE EPOCH ARE LEGITIMATE since 2026-11-22: the league
+        # is blessing-driven, and a weekly seed roll on an unchanged ladder adds a
+        # row for the SAME epoch rather than rewriting the old one (the ledger's
+        # own rule: never edit a past row's seed). This used to be
+        # `rows[epoch] = row`, i.e. whichever duplicate the file happened to list
+        # LAST won -- and the table is not sorted, so that was an accident of
+        # layout deciding which seed is current.
+        #
+        # The rule now: the row with the LATEST blessed date governs. Two rows on
+        # the same latest date with different seeds cannot be ordered, and an
+        # order guessed from layout is the defect above, so that is AMBIGUOUS and
+        # main() reports it as cannot-tell rather than picking one.
+        prev = rows.get(epoch)
+        if prev is None or prev.get("ambiguous"):
+            if prev is None:
+                rows[epoch] = row
+            continue
+        p_date, n_date = prev.get("blessed_utc") or "", date or ""
+        if n_date > p_date:
+            rows[epoch] = row
+        elif n_date == p_date and row["seed"] != prev["seed"]:
+            rows[epoch] = dict(row, ambiguous=True,
+                               ambiguous_seeds=sorted(filter(None, (prev["seed"],
+                                                                    row["seed"]))))
     return rows
 
 
@@ -196,6 +221,13 @@ def main():
 
     # ---- 1. the human record -------------------------------------------------
     row = (ledger or {}).get(epoch)
+    if row is not None and row.get("ambiguous"):
+        print("  CANNOT TELL: the ledger has several rows for %s on the same latest"
+              % epoch)
+        print("  date with different seeds (%s), so which one is current cannot be"
+              % ", ".join(row.get("ambiguous_seeds") or []))
+        print("  read from it. Give the newer row a later date, or remove the error.")
+        return 2
     if row is None:
         findings.append("LEDGER has NO ROW for %s. The blessing is not recorded "
                         "where a human would look for it." % epoch)

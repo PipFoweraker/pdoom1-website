@@ -1572,6 +1572,15 @@
     // the dropdown; the path a visitor could actually reach had no copy of it. One
     // function, two callers, so the two answers cannot drift apart.
     function weekIsOpen(weekData) {
+      // BLESSING-DRIVEN WEEKS HAVE NO END DATE (2026-11-22): a week is open until
+      // the next seed is blessed, and that date is not known in advance. Open
+      // ONLY when the record says so explicitly -- a null end WITHOUT the marker
+      // is a broken record and still fails closed below, never "open forever".
+      const meta = (weekData && weekData.meta) || {};
+      const wi = (weekData && weekData.week_info) || {};
+      if (meta.closes === 'on_next_blessing' && !meta.end_date && !wi.end_timestamp) {
+        return true;
+      }
       const endsAt = Date.parse(
         (weekData && weekData.week_info && weekData.week_info.end_timestamp) ||
         (weekData && weekData.meta && weekData.meta.end_date) || ''
@@ -1634,8 +1643,9 @@
         // while the live epoch was L6, with 0 participants. A visitor who had just played
         // the shipped build and submitted a score would have read that as "the league is
         // empty", when their score was on a different board key entirely.
-        // The rollover being parked (weekly-league-reset.yml, PARKED-UNTIL 2026-09-02)
-        // is exactly the stalled-rollover case the sibling guard's comment anticipates.
+        // Blessing-driven since 2026-11-22: an open week carries no end date and
+        // the meta.closes marker instead, which the shared open-week check reads. A week that
+        // DID end (or a record missing both) still lands here.
         if (!weekIsOpen(weekData)) {
           showFilterNotice(
             '&#9432; <strong>The most recent league week has closed, and a new one has not ' +

@@ -222,6 +222,41 @@ code, out = run(r)
 check("WILL NOT FILL A LEDGER ROW" in out,
       "says out loud that filling the row is a human's act, not a seat's")
 
+print("\n12. Several rows for one epoch (weekly seed rolls, 2026-11-22)")
+# The newer seed is listed ABOVE the older one in one case and BELOW it in the
+# other: the result must not depend on layout, which is what the old
+# last-row-wins parser did.
+for label, rows in (
+        ("newer row listed first", [blessed_row("L6", "weekly-2026-w48", "2026-11-27"),
+                                    blessed_row("L6", "weekly-2026-w35", "2026-08-24")]),
+        ("newer row listed last", [blessed_row("L6", "weekly-2026-w35", "2026-08-24"),
+                                   blessed_row("L6", "weekly-2026-w48", "2026-11-27")])):
+    r = build(tmp / ("m" + label[6]), "L6", rows,
+              ladder_of("L6", "weekly-2026-w48"),
+              weekly_of("L6", "weekly-2026-w48", True),
+              pub_of("L6", "weekly-2026-w48"))
+    code, out = run(r)
+    check(code == 0, "%s: the LATEST-dated row governs (got %s)" % (label, code))
+
+r = build(tmp / "n", "L6", [blessed_row("L6", "weekly-2026-w48", "2026-11-27"),
+                            blessed_row("L6", "weekly-2026-w35", "2026-08-24")],
+          ladder_of("L6", "weekly-2026-w35"),
+          weekly_of("L6", "weekly-2026-w35", True),
+          pub_of("L6", "weekly-2026-w35"))
+code, out = run(r)
+check(code == 1, "negative control: data still on the OLDER seed disagrees with the "
+                 "newest row (got %s)" % code)
+
+r = build(tmp / "o", "L6", [blessed_row("L6", "weekly-2026-w48", "2026-11-27"),
+                            blessed_row("L6", "weekly-2026-w49", "2026-11-27")],
+          ladder_of("L6", "weekly-2026-w48"),
+          weekly_of("L6", "weekly-2026-w48", True),
+          pub_of("L6", "weekly-2026-w48"))
+code, out = run(r)
+check(code == 2 and "CANNOT TELL" in out,
+      "two rows, same latest date, different seeds: AMBIGUOUS, exit 2 -- never "
+      "an order guessed from layout (got %s)" % code)
+
 shutil.rmtree(tmp, ignore_errors=True)
 
 print()

@@ -7,76 +7,37 @@ name: Weekly League Reset
 # that the old rollover workflow provided.
 
 on:
-  # THURSDAY 14:00 UTC. The league week is anchored to Friday 00:00 in
-  # Australia/Hobart (Pip's ruling, 2026-07-28; pdoom1/docs/RELEASE_NOMENCLATURE.md
-  # says a Seed roll is "every Fri"). Hobart is UTC+10 in winter and UTC+11 under
-  # daylight saving, and GitHub cron is UTC-only with no DST awareness, so this
-  # single UTC time lands:
-  #     winter  Thu 2026-07-30 14:00Z -> Fri 2026-07-31 00:00 +10:00  (exactly the boundary)
-  #     summer  Thu 2026-11-26 14:00Z -> Fri 2026-11-27 01:00 +11:00  (one hour in)
-  # i.e. always a Friday in Hobart, and never before the week it opens. The cron
-  # is only the trigger; the week is derived from the zone in
-  # scripts/weekly-league-manager.py (league_week_start), so a DST change cannot
-  # move which week is opened -- only how far into it the run happens.
-  # scripts/test-weekly-league-boundary.py parses this cron and fails if it stops
-  # agreeing with ROLLOVER_HOUR_UTC / ROLLOVER_CRON_DOW.
-  # PARKED 2026-08-24. PARKED-UNTIL: 2026-09-02
+  # BLESSING-DRIVEN since 2026-11-22. There is no schedule and there will not be
+  # one: Pip ruled D1 (i) -- "a league week opens because a seed was blessed,
+  # never because a clock ticked". The calendar cron (Thu 14:00 UTC = Fri 00:00
+  # Hobart) is RETIRED, not paused: the dated pause it replaces is what
+  # this replaced, and that clock lapsed on 2026-09-02 and sat red for 81 days.
   #
-  # WHY: this job pushes a league rollover straight to `main` unattended, and the
-  # repo's data contract is currently RED (`board:publish` -- the site serves
-  # epoch L4 while the live epoch is L5). Pip flies to Singapore Wed 2026-08-26
-  # and lands back in Hobart Tue 2026-09-01, so the Friday 2026-08-28 rollover
-  # would fire with nobody able to look at what it did. The deploy that follows a
-  # push to main runs no tests, so a bad rollover reaches pdoom1.com in ~20s.
+  # WHY NO CALENDAR. Under the (seed, ladder_version) key the seed comes from the
+  # SHIPPED CLIENT. A calendar rollover therefore had two outcomes, both measured:
+  # it opened a website-derived seed no client posts to (23 stranded submissions),
+  # or, parked to stop that, the league stood still for 13 weeks with every check
+  # green.
   #
-  # This is the third option in the "merge #349 or leave it red" choice: the test
-  # fix is right and the red was protecting nothing, but merging it alone re-arms
-  # THIS cron. Parking the schedule lets the fix land and keeps the unattended
-  # publish off until a human is back.
+  # THE FRIDAY PATH IS NOT THIS WORKFLOW. It is `python scripts/bless-seed.py
+  # --seed <seed>`, run by a human, in a PR: it checks the seed against the shipped
+  # release manifest, writes ladder-epochs.json, runs the rollover, and prints the
+  # ledger row. CI then checks the chain (check-epoch-drift.py, validate_data.py
+  # league:key / league:blessing_age). A blessing is reviewed before it is live.
   #
-  # The cron value is deliberately left in place, commented, rather than deleted:
-  # scripts/test-weekly-league-boundary.py still parses and validates it against
-  # ROLLOVER_HOUR_UTC / ROLLOVER_CRON_DOW while parked, so it cannot rot in the
-  # dark and be restored wrong.
+  # THIS WORKFLOW is the manual recovery path: a blessing merged but its rollover
+  # was not committed. `--new-week` is idempotent -- it REFUSES an unblessed seed,
+  # prints NO-OP when current.json is already on the blessed key, and only
+  # otherwise archives the live week (at this moment) and opens the blessed one.
+  # Dispatching it with nothing to do changes nothing.
   #
-  # TO RESTORE, all three steps -- CORRECTED 2026-08-24, the first version of
-  # this note said "uncomment two lines, that is the whole change" and following
-  # it exactly BREAKS THE BUILD:
-  #   1. delete the `#` in front of the `schedule:` and `- cron:` lines below;
-  #   2. delete the `PARKED` / `PARKED-UNTIL` marker lines above -- otherwise
-  #      scripts/generate-metabolism.py exits 2 with "carries the park marker
-  #      but still has a schedule. One of the two is a lie";
-  #   3. re-run `python scripts/generate-metabolism.py` and commit the page.
-  # Step 2 is the one that bites, and it bites in a DIFFERENT workflow
-  # (metabolism-map.yml) while scripts/test-weekly-league-boundary.py -- the
-  # check built to watch this park -- reports 108/108 PASSED on the same tree.
-  # The check nearest the change stays green and the failure surfaces elsewhere,
-  # which is the worst shape for whoever is doing the restore.
-  #
-  # Also restore public/data/clocks.json: delete the league clock's `paused`
-  # block. Parking the cron without it left /state-of-doom/ rendering a live
-  # countdown to a rollover that would not happen.
-  #
-  # PARKED-UNTIL is a CLOCK, not a note. On 2026-09-02 the boundary test goes RED
-  # with "the park expired" -- closeable by a human either restoring the schedule
-  # or re-parking with a new date and a reason. Per CLAUDE.md: an acknowledgement
-  # is a state with a clock, and the thing that expires is the ACCEPTANCE, never
-  # the finding.
-  #
-  # schedule:
-  #   - cron: '0 14 * * 4'  # Thursday 14:00 UTC = Friday 00:00 (winter) / 01:00 (summer) Hobart
+  # scripts/test-weekly-league-boundary.py fails if a `schedule:` reappears here,
+  # active or commented, and if this BLESSING-DRIVEN marker goes missing; and
+  # scripts/generate-metabolism.py renders the workflow as blessing-driven from it.
+  # BLESSING-DRIVEN: no schedule; a week opens when a seed is blessed (Pip, 2026-11-22)
 
-  # Manual trigger for testing or manual league resets
+  # Manual recovery only -- see the block above.
   workflow_dispatch:
-    inputs:
-      archive_previous:
-        description: 'Archive previous week before starting new one'
-        type: boolean
-        default: true
-      force_reset:
-        description: 'Force reset even if league is active'
-        type: boolean
-        default: false
 
 permissions:
   contents: write
@@ -129,66 +90,29 @@ jobs:
           python scripts/weekly-league-manager.py --status
 
       # NEVER WRITE A REASON YOU DID NOT MEASURE.  D4 of pdoom1-website#384.
+      # A non-zero exit is a real fault, never "probably fine" -- the script
+      # distinguishes benign from broken in its exit code, and
+      # scripts/test-league-archive-outcomes.py forces both.
       #
-      # This step used to end with `|| echo` and a message speculating that the
-      # week had probably been archived already. That is worse than a bare
-      # `|| true`, because a plausible reason stops the reader looking -- and
-      # the reason was not merely unchecked, it was IMPOSSIBLE. (The literal is
-      # deliberately not repeated here: the guard below greps this file, and
-      # quoting a defect to explain it is how three guards in this repo have
-      # been tripped by their own documentation.)
-      #
-      # Measured in weekly-league-manager.py: archive_current_week() returns
-      # True and the CLI exits 0 when there is no current league to archive
-      # ("INFO: No current league to archive"). Exit 1 happens only in the
-      # `except` branch, i.e. a real failure. So a non-zero here has NEVER once
-      # meant "may already be archived" -- every time that message printed, it
-      # printed a false explanation over a genuine fault.
-      #
-      # The second-order effect is why it mattered. `|| echo` makes the step
-      # SUCCEED, so `steps.archive.outcome` was "success" and the "Log
-      # automation run" step below recorded that invented success into
-      # public/monitoring/data/, which /monitoring/ publishes. The excuse was
-      # not just printed, it was filed.
-      #
-      # No branch is needed here because the script already distinguishes the
-      # two cases in its exit code. scripts/test-league-archive-outcomes.py
-      # forces all three states and asserts that contract, so this comment is
-      # evidence rather than a claim.
-      - name: Archive previous week
-        id: archive
-        # The old gate read the dispatch inputs context, which is EMPTY on a
-        # schedule trigger (CLAUDE.md, workflow trap #2) -- so a condition that
-        # looks like a safety toggle was unconditionally true on cron. Harmless
-        # while the schedule is parked; the park expires 2026-09-02. Written
-        # explicitly instead: always archive on a schedule, honour the toggle
-        # on a dispatch.
-        if: github.event_name != 'workflow_dispatch' || inputs.archive_previous
-        run: |
-          echo "📦 Archiving previous week..."
-          python scripts/weekly-league-manager.py --archive-week
-
-      - name: Generate new competitive seed
-        run: |
-          echo "🎲 Generating new competitive seed for the week..."
-          NEW_SEED=$(python scripts/weekly-league-manager.py --generate-seed)
-          echo "✅ New seed generated: $NEW_SEED"
-
-      - name: Start new weekly league
+      # THERE IS NO SEPARATE ARCHIVE STEP ANY MORE. Under the calendar it ran
+      # --archive-week and then --new-week; blessing-driven, that pair would
+      # archive the LIVE week on every dispatch and reopen the same board under a
+      # new week id. --new-week archives the previous week itself, and only when
+      # the blessed key has actually moved.
+      - name: Open the blessed week (idempotent)
         id: new-week
         run: |
-          echo "🚀 Starting new weekly league..."
-
-          if [ "${{ github.event.inputs.force_reset }}" = "true" ]; then
-            echo "⚠️  Force reset enabled"
-            python scripts/weekly-league-manager.py --new-week --force || exit 1
-          else
-            python scripts/weekly-league-manager.py --new-week || exit 1
-          fi
-
+          echo "Opening the blessed week, if a blessing is waiting..."
+          python scripts/weekly-league-manager.py --new-week
           NEW_WEEK=$(python scripts/weekly-league-manager.py --status | grep "CURRENT_WEEK:" | awk '{print $2}')
           echo "new_week=$NEW_WEEK" >> $GITHUB_OUTPUT
-          echo "✅ New weekly league started successfully"
+
+      # The check runs INSIDE the producer, before it commits (CLAUDE.md trap 6):
+      # the record must be on the blessed key, or nothing is pushed.
+      - name: The record is on the blessed key
+        run: |
+          python scripts/validate_data.py | grep -E 'league:(key|current_week)'
+          python scripts/validate_data.py | grep -qE '^\[OK  \] league:key'
 
       # Stamps epoch{} onto every weekly record (idempotent) and rebuilds the
       # derived archive index, so the archive page's anomaly section can never
@@ -213,7 +137,7 @@ jobs:
           echo "Logging league rollover to monitoring..."
           python scripts/log-automation-run.py \
             --job "weekly-league-rollover" \
-            --archive-status "${{ steps.archive.outcome }}" \
+            --archive-status "${{ steps.new-week.outcome }}" \
             --new-week-status "${{ steps.new-week.outcome }}" \
             --verify-status "${{ steps.verify.outcome }}" \
             --new-week-id "${{ steps.new-week.outputs.new_week }}" \
@@ -240,13 +164,11 @@ jobs:
           else
             WEEK_ID=$(python scripts/weekly-league-manager.py --status | grep "CURRENT_WEEK:" | awk '{print $2}')
 
-            git commit -m "Weekly league reset - $WEEK_ID
+            git commit -m "League: open the blessed week - $WEEK_ID
 
-            - Archived previous week's results
-            - Generated new competitive seed
-            - Started new weekly league competition
-            - Reset standings and statistics
-            
+            Manual recovery rollover: opened the week for the seed blessed in
+            public/data/ladder-epochs.json (the previous week is archived).
+
             Automated by: weekly-league-reset.yml
             Triggered: $(date -u +'%Y-%m-%d %H:%M UTC')
             New week: $WEEK_ID"
@@ -266,15 +188,14 @@ jobs:
           echo "🏆 New Week: $WEEK_ID"
           echo "🎲 Seed: $SEED"
           echo "⏰ Started: $(date -u +'%Y-%m-%d %H:%M UTC')"
-          # No hardcoded end day: the week runs Friday 00:00 -> Thursday 23:59:59
-          # Australia/Hobart, and the actual dates are printed by the status step
-          # above, out of the code that derives them.
+          # No end day: a blessing-driven week is open until the NEXT seed is
+          # blessed, and that date is not known in advance (E1 (a), 2026-11-22).
           echo ""
           echo "🔗 Live at: https://pdoom1.com/leaderboard/"
           echo ""
           echo "Next steps:"
           echo "  - Announce new week in Discord"
-          echo "  - Share competitive seed with players"
+          echo "  - Add the ledger row if bless-seed.py printed one"
           echo "  - Monitor first scores coming in"
 
   post_reset_verification:
@@ -337,13 +258,11 @@ jobs:
           echo "  1. Check workflow logs for errors"
           echo "  2. Verify league data integrity"
           echo "  3. Manual reset if needed:"
-          echo "     python scripts/weekly-league-manager.py --archive-week"
-          echo "     python scripts/weekly-league-manager.py --new-week"
+          echo "     python scripts/weekly-league-manager.py --new-week   (idempotent; archives only when the blessed key moved)"
           echo "  4. Notify players of delay"
           echo "  5. Update Discord with status"
           echo ""
-          echo "Players may already be expecting new league!"
-          echo "Time-sensitive - resolve ASAP"
+          echo "A blessing may be merged but not yet open on the site."
 
       - name: Create failure alert issue
         uses: actions/github-script@v7

@@ -919,6 +919,13 @@
       // Update countdown timer
       if (data.week_info && data.week_info.end_timestamp) {
         updateCountdown(data.week_info.end_timestamp);
+      } else if (data.meta && data.meta.closes === 'on_next_blessing') {
+        // Blessing-driven (2026-11-22): no end date exists to count down to.
+        // Trusted literal only -- no fetched field reaches this innerHTML.
+        document.getElementById('countdown-section').innerHTML = `
+          <h2>Open until the next seed is blessed</h2>
+          <p style="color: var(--text-secondary); margin-top: 1rem;">A new week opens when a new seed ships in a release and is blessed, not on a fixed day.</p>
+        `;
       }
 
       // Update week statistics.
