@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-21T06:13:59.264712+00:00",
+  "generated": "2026-11-22T03:22:24.769975+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -123,13 +123,13 @@
     {
       "name": "league:freshness",
       "status": "ACK",
-      "detail": "current.json is 92.7 days old -- weekly rollover likely stalled",
+      "detail": "current.json is 93.5 days old -- weekly rollover likely stalled",
       "acknowledged": true
     },
     {
       "name": "league:current_week",
       "status": "WARN",
-      "detail": "week 2026_W35 is marked is_current but ended 85.7 days ago -- rollover cadence off"
+      "detail": "week 2026_W35 is marked is_current but ended 86.6 days ago -- rollover cadence off"
     },
     {
       "name": "league:version_drift",
@@ -164,12 +164,12 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 5.5h ago"
+      "detail": "live API checked 2.5h ago"
     },
     {
       "name": "board:archived_anomaly",
       "status": "WARN",
-      "detail": "48 score entries across 7 board(s) from 18 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, Bureau of Catastrophe... -- Pip, CogDerp, Cognitive Development, Cognitive Systems Studies, Cognitive Systems Studies II, Division of Intelligent Agents, Division of Machine Learning, GRIM, GRIM (Global Risk Intervention Mechanism, Hamthropic, Intelligent Agents Studies, Kaur, Chen & Lindqvist, Laboratory of Autonomous Systems, Notkilleveryone Inc, gronklabs, gronklabs the better). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
+      "detail": "36 score entries across 5 board(s) from 12 player(s) sit in the permanent anomaly archive (AI Safety Lab, Applied AI Safety, CogDerp, Cognitive Development, Cognitive Systems Studies, Cognitive Systems Studies II, Division of Intelligent Agents, Division of Machine Learning, Hamthropic, Intelligent Agents Studies, Laboratory of Autonomous Systems, Notkilleveryone Inc). Acknowledged history, NOT a regression -- reported every run so it stays visible, never failed on."
     },
     {
       "name": "board:liveness",
