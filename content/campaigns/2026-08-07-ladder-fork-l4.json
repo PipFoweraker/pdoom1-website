@@ -4,6 +4,11 @@
   "title": "The ladder forks - L3 to L4",
   "url": "https://pdoom1.com/",
   "approved": false,
+  "archived": {
+    "on": "2026-11-22",
+    "by": "Pip, in the pdoom1-website terminal, 2026-11-22",
+    "why": "\"On Q1 - archiving seems best. We want our claims to presently match reality.\" Unposted since August; its copy and fact-guards describe the project as it was then. Archived rather than re-verified: copy nobody plans to post does not need its facts re-checked, and re-stamping them would claim a verification nobody did."
+  },
   "_drafted": "2026-08-07T13:40Z, rewritten 2026-08-08T02:20Z by the pdoom1-website seat.",
   "_why_the_slug_has_no_version_in_it": "First draft was campaign 'v0-14-0-2026-08-07' and every line opened 'p(Doom)1 v0.14.0 is out'. A patch shipping the same night would have made that copy announce a superseded build before it was ever posted. The DURABLE event is the ladder fork L3->L4, which no patch can touch: GameConfig.get_board_version() returns 'L' + LADDER_VERSION, so the build version is not part of the board key by construction. Renamed before anything went out, which is free; a utm_campaign value is stable forever once posted.",
   "_facts_this_copy_must_not_break": [

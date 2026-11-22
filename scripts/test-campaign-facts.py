@@ -122,6 +122,8 @@ CLEAN_COPY = {
     "bluesky": "The game is playable. Windows, macOS and Linux.\n\nhttps://pdoom1.com/",
 }
 
+FIXTURE_AS_OF = "2026-09-01"   # inside CLEAN_FACTS' human clock window
+
 LEDGER = {
     "note": "test fixture",
     "schema": "pdoom-acknowledgements/v1",
@@ -145,7 +147,8 @@ class Sandbox:
     def __init__(self, facts=None, copy=None, platforms=None, posted=None,
                  entries=11, observed_days_ago=0, published=("weekly-2026-w32", "L4"),
                  observed_key=None, wire_workflow=True, create_guard=True,
-                 campaigns=True, ledger=None, drop_platforms_key=False):
+                 campaigns=True, ledger=None, drop_platforms_key=False,
+                 archived=None, approved=False):
         self.facts = CLEAN_FACTS if facts is None else facts
         self.copy = CLEAN_COPY if copy is None else copy
         self.platforms = {"windows": True, "macos": True, "linux": True} \
@@ -160,6 +163,8 @@ class Sandbox:
         self.campaigns = campaigns
         self.ledger = LEDGER if ledger is None else ledger
         self.drop_platforms_key = drop_platforms_key
+        self.archived = archived
+        self.approved = approved
 
     def __enter__(self):
         self.tmp = Path(tempfile.mkdtemp())
@@ -168,11 +173,15 @@ class Sandbox:
         camp = self.tmp / "content" / "campaigns"
         camp.mkdir(parents=True)
         if self.campaigns:
-            (camp / "2026-01-01-test.json").write_text(json.dumps({
-                "campaign": "test", "approved": False,
+            body = {
+                "campaign": "test", "approved": self.approved,
                 "_facts_this_copy_must_not_break": self.facts,
                 "copy": self.copy, "posted": self.posted,
-            }, indent=2), encoding="utf-8")
+            }
+            if self.archived is not None:
+                body["archived"] = self.archived
+            (camp / "2026-01-01-test.json").write_text(json.dumps(body, indent=2),
+                                                       encoding="utf-8")
 
         release = {"version": "v9.9.9"}
         if not self.drop_platforms_key:
@@ -219,6 +228,13 @@ class Sandbox:
         return self
 
     def run(self, *extra):
+        # The fixture's human clock runs 2026-08-14 -> 2026-11-14. A run with no
+        # --as-of used to evaluate it against the REAL date, so the clean-world
+        # baseline went red on 2026-11-15 and took three other cases with it --
+        # CLAUDE.md's "never assert a literal against a value that moves".
+        # Pin a date inside the window unless the case chooses its own.
+        if "--as-of" not in extra:
+            extra = ("--as-of", FIXTURE_AS_OF, *extra)
         argv = sys.argv
         sys.argv = ["check-campaign-facts.py", "--ledger", str(self.ledger_path),
                     *extra]
@@ -398,6 +414,44 @@ with Sandbox(copy={"bluesky": "Windows today; Mac and Linux this week."},
     code, out = s.run("--as-of", "2026-09-16")
     check(code == 1 and "EXPIRED" in out,
           "...and the acceptance itself expires, which is a red a person can close")
+
+print("\n7b. ARCHIVED -- a dated decision that the copy makes no present claim")
+ARCH = {"on": "2026-11-22", "by": "test", "why": "shelved"}
+STALE = {"bluesky": "Windows today; Mac and Linux this week."}
+# Negative control first: the SAME stale copy and the SAME lapsed clock, not
+# archived, must be red -- otherwise the green below proves nothing.
+with Sandbox(copy=STALE) as s:
+    code, out = s.run("--as-of", "2026-11-22")
+    check(code == 1 and "copy-defers-a-shipped-platform" in out
+          and "HUMAN VERIFICATION EXPIRED" in out,
+          "control: unarchived stale copy + lapsed clock is RED")
+with Sandbox(copy=STALE, archived=ARCH) as s:
+    code, out = s.run("--as-of", "2026-11-22")
+    check(code == 0, f"the same campaign ARCHIVED is green (got {code})")
+    check("ARCHIVED 2026-11-22 by test" in out and "shelved" in out,
+          "...and says who archived it, when and why -- never silent")
+    check("OK: 0 fact-guard(s) checked, 7 not evaluated" in out,
+          "...and the summary counts what it did NOT evaluate")
+with Sandbox(copy=STALE, archived=ARCH, facts=drop(5, "human_verified")) as s:
+    code, out = s.run("--as-of", "2026-11-22")
+    check(code == 1 and "MISSING human_verified" in out,
+          "STRUCTURE is still enforced on an archived campaign, so revival is clean")
+for bad_arch, label, needle in (
+        ({"on": "2026-11-22", "by": "", "why": "x"}, "no owner", "MISSING archived.by"),
+        ({"on": "2026-11-22", "by": "x", "why": " "}, "no reason", "MISSING archived.why"),
+        ({"on": "someday", "by": "x", "why": "x"}, "an undated archive", "BAD archived.on"),
+        ({"on": "2026-12-25", "by": "x", "why": "x"}, "a future-dated archive",
+         "IN THE FUTURE"),
+        ("yes", "a bare flag", "NOT AN OBJECT")):
+    with Sandbox(copy=STALE, archived=bad_arch) as s:
+        code, out = s.run("--as-of", "2026-11-22")
+        check(code == 1 and needle in out
+              and "copy-defers-a-shipped-platform" in out,
+              f"{label} is RED and does NOT disarm the guard (got {code})")
+with Sandbox(archived=ARCH, approved=True) as s:
+    code, out = s.run("--as-of", "2026-11-22")
+    check(code == 1 and "ARCHIVED BUT APPROVED" in out,
+          "archived and approved:true at once is RED -- nobody decided")
 
 print("\n8. The check refuses rather than guessing")
 bad = copymod.deepcopy(LEDGER)

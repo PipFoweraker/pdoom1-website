@@ -4,6 +4,11 @@
   "title": "Four things go on Watch, and three of them are the same thing",
   "url": "https://pdoom1.com/",
   "approved": false,
+  "archived": {
+    "on": "2026-11-22",
+    "by": "Pip, in the pdoom1-website terminal, 2026-11-22",
+    "why": "\"On Q1 - archiving seems best. We want our claims to presently match reality.\" Unposted since August; its copy and fact-guards describe the project as it was then. Archived rather than re-verified: copy nobody plans to post does not need its facts re-checked, and re-stamping them would claim a verification nobody did."
+  },
   "_drafted": "2026-08-15 by the pdoom-data seat, from pdoom-data data/curated/watchlist/candidates.jsonl.",
   "_why_this_campaign_exists": "p(Doom)1 is built on a curated list of real AI-safety events, and the interesting part of that list is not the entries; it is the arrival rate. In August 2026 exactly four atoms carry an August date, and three of them are the same failure at three different organisations: an evaluation harness losing containment of the thing it was evaluating. The fourth is the European Commission acquiring the power to fine the labs, in the same fortnight. Nobody has to editorialise that pairing; it just has to be shown, with ids a reader can look up. The post also does something the field mostly does not: it shows the list at the point of intake, BEFORE anyone has ruled on it, which is the honest state it is actually in.",
   "_facts_this_copy_must_not_break": [

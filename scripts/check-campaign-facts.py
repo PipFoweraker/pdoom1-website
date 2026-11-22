@@ -571,6 +571,56 @@ def validate_entry(fact, rel, index, seen_ids):
     return f
 
 
+ARCHIVE_KEY = "archived"
+
+
+def validate_archived(campaign, rel, today):
+    """Blocking structural findings for an `archived` block. Returns (findings, block).
+
+    WHY ARCHIVING IS A FIELD AND NOT A FOLDER. Moving a campaign out of
+    content/campaigns/ also takes it out of this check, and if every campaign
+    is archived the check would scan an empty set -- which is red on purpose,
+    because a guard with nothing to read must not report OK. Keeping the file
+    here keeps it under the STRUCTURAL check, so it can be revived without
+    re-migrating anything, and its archival is a dated, attributed record.
+
+    An archived campaign makes no claim about the present, so its fact-guards
+    are not evaluated and its human clocks cannot lapse. Archiving is a decision
+    with a name on it, not a mute button: it carries on/by/why, it cannot be
+    future-dated, and it cannot sit alongside approved:true -- copy that is both
+    shelved and cleared to post is a contradiction, and the safe reading of a
+    contradiction is "nobody decided".
+    """
+    block = campaign.get(ARCHIVE_KEY)
+    if block is None:
+        return [], None
+    where = f"{rel}::{ARCHIVE_KEY}"
+    if not isinstance(block, dict):
+        return [Finding(where, "ARCHIVED IS NOT AN OBJECT", type(block).__name__,
+                        fix='Use {"on": "YYYY-MM-DD", "by": "<who decided>", '
+                            '"why": "<reason>"}.')], None
+    f = []
+    on = _iso(block.get("on"))
+    if not on:
+        f.append(Finding(where, "BAD archived.on", repr(block.get("on")),
+                         fix="An ISO date: when the decision was made."))
+    elif on > today:
+        f.append(Finding(where, "archived.on IS IN THE FUTURE", str(on),
+                         fix="An archive is a decision already made, not a plan."))
+    for field in ("by", "why"):
+        if not str(block.get(field) or "").strip():
+            f.append(Finding(where, f"MISSING archived.{field}",
+                             "an archive with no owner or reason is "
+                             "indistinguishable from someone silencing the check",
+                             fix="Name who decided and quote why."))
+    if campaign.get("approved") is True:
+        f.append(Finding(where, "ARCHIVED BUT APPROVED",
+                         "approved:true and archived at once -- which one is the "
+                         "decision?",
+                         fix="Set approved:false, or remove the archived block."))
+    return f, (None if f else block)
+
+
 def check_clock(fact, rel, today, warn_within_days):
     """The human tier's expiry. Returns (findings, expiring_notes)."""
     hv = fact.get("human_verified") or {}
@@ -628,9 +678,18 @@ def scan(today, online, warn_within_days):
             continue
 
         posted = is_posted(campaign)
-        notes.append(f"\n  {rel}  ({len(facts)} fact-guards"
-                     + (", POSTED -- copy findings print as history)"
-                        if posted else ", not yet posted)"))
+        arch_faults, archived = validate_archived(campaign, rel, today)
+        findings.extend(arch_faults)
+        if archived:
+            notes.append(
+                f"\n  {rel}  ({len(facts)} fact-guards, ARCHIVED {archived['on']} by "
+                f"{archived['by']} -- NOT EVALUATED: archived copy makes no claim "
+                f"about the present)\n    why        {archived['why']}\n    revive     "
+                f"delete `archived`; every human clock must then be re-verified")
+        else:
+            notes.append(f"\n  {rel}  ({len(facts)} fact-guards"
+                         + (", POSTED -- copy findings print as history)"
+                            if posted else ", not yet posted)"))
 
         seen_ids = set()
         for i, fact in enumerate(facts):
@@ -642,6 +701,11 @@ def scan(today, online, warn_within_days):
                 continue
 
             tier = fact["verify"]
+            if archived:
+                # Structure is still enforced above, so revival needs no
+                # re-migration. Nothing below runs: no verifier, no clock.
+                rows.append((rel, fact["id"], f"{tier} (archived)"))
+                continue
             rows.append((rel, fact["id"], tier))
             if tier == "checked":
                 findings.extend(
@@ -761,7 +825,10 @@ def main():
               f"ACCEPTANCE, listed above with what to do about it.")
         return 1
 
-    print(f"\nOK: {len(rows)} fact-guard(s) checked, {len(waived)} acknowledged, "
+    n_archived = sum(1 for _, _, tier in rows if tier.endswith("(archived)"))
+    live = len(rows) - n_archived
+    print(f"\nOK: {live} fact-guard(s) checked, {n_archived} not evaluated "
+          f"(archived campaigns), {len(waived)} acknowledged, "
           f"{len(unchecked)} deferred to the online run, "
           f"{len(reported)} reported against posted copy.")
     return 0
