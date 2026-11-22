@@ -1,6 +1,79 @@
 {
   "issues": [
     {
+      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1385",
+      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
+      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1385/labels{/name}",
+      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1385/comments",
+      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1385/events",
+      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/1385",
+      "id": 6542505548,
+      "node_id": "I_kwDOPVWa588AAAABhfa2TA",
+      "number": 1385,
+      "title": "[Bug]: test_music_player_controls.gd fails intermittently on a slow machine (conductor nudge timer leaks between tests)",
+      "user": {
+        "login": "SwitchOCE",
+        "id": 116769543,
+        "node_id": "U_kgDOBvXDBw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/116769543?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/SwitchOCE",
+        "html_url": "https://github.com/SwitchOCE",
+        "followers_url": "https://api.github.com/users/SwitchOCE/followers",
+        "following_url": "https://api.github.com/users/SwitchOCE/following{/other_user}",
+        "gists_url": "https://api.github.com/users/SwitchOCE/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/SwitchOCE/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/SwitchOCE/subscriptions",
+        "organizations_url": "https://api.github.com/users/SwitchOCE/orgs",
+        "repos_url": "https://api.github.com/users/SwitchOCE/repos",
+        "events_url": "https://api.github.com/users/SwitchOCE/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/SwitchOCE/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "labels": [],
+      "state": "open",
+      "locked": false,
+      "assignees": [],
+      "milestone": null,
+      "comments": 0,
+      "created_at": "2026-11-22T12:41:40Z",
+      "updated_at": "2026-11-22T12:41:40Z",
+      "closed_at": null,
+      "assignee": null,
+      "author_association": "NONE",
+      "active_lock_reason": null,
+      "sub_issues_summary": {
+        "total": 0,
+        "completed": 0,
+        "percent_completed": 0
+      },
+      "issue_dependencies_summary": {
+        "blocked_by": 0,
+        "total_blocked_by": 0,
+        "blocking": 0,
+        "total_blocking": 0
+      },
+      "closed_by": null,
+      "reactions": {
+        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1385/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1385/timeline",
+      "performed_via_github_app": null,
+      "state_reason": null,
+      "pinned_comment": null
+    },
+    {
       "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1384",
       "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
       "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1384/labels{/name}",
@@ -837,114 +910,18 @@
       "performed_via_github_app": null,
       "state_reason": null,
       "pinned_comment": null
-    },
-    {
-      "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1357",
-      "repository_url": "https://api.github.com/repos/PipFoweraker/pdoom1",
-      "labels_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1357/labels{/name}",
-      "comments_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1357/comments",
-      "events_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1357/events",
-      "html_url": "https://github.com/PipFoweraker/pdoom1/issues/1357",
-      "id": 6088033079,
-      "node_id": "I_kwDOPVWa588AAAABauADNw",
-      "number": 1357,
-      "title": "Release Checklist: v0.14.5",
-      "user": {
-        "login": "github-actions[bot]",
-        "id": 41898282,
-        "node_id": "MDM6Qm90NDE4OTgyODI=",
-        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/github-actions%5Bbot%5D",
-        "html_url": "https://github.com/apps/github-actions",
-        "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
-        "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
-        "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
-        "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
-        "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
-        "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
-        "type": "Bot",
-        "user_view_type": "public",
-        "site_admin": false
-      },
-      "labels": [
-        {
-          "id": 9820300690,
-          "node_id": "LA_kwDOPVWa588AAAACSVXlkg",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/release",
-          "name": "release",
-          "color": "5319E7",
-          "default": false,
-          "description": "Release engineering",
-          "archived_at": null,
-          "archived_by": null
-        },
-        {
-          "id": 11905765365,
-          "node_id": "LA_kwDOPVWa588AAAACxaOP9Q",
-          "url": "https://api.github.com/repos/PipFoweraker/pdoom1/labels/checklist",
-          "name": "checklist",
-          "color": "ededed",
-          "default": false,
-          "description": null,
-          "archived_at": null,
-          "archived_by": null
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2026-10-28T21:43:38Z",
-      "updated_at": "2026-10-28T21:43:38Z",
-      "closed_at": null,
-      "assignee": null,
-      "author_association": "NONE",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "issue_dependencies_summary": {
-        "blocked_by": 0,
-        "total_blocked_by": 0,
-        "blocking": 0,
-        "total_blocking": 0
-      },
-      "closed_by": null,
-      "reactions": {
-        "url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1357/reactions",
-        "total_count": 0,
-        "+1": 0,
-        "-1": 0,
-        "laugh": 0,
-        "hooray": 0,
-        "confused": 0,
-        "heart": 0,
-        "rocket": 0,
-        "eyes": 0
-      },
-      "timeline_url": "https://api.github.com/repos/PipFoweraker/pdoom1/issues/1357/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null,
-      "pinned_comment": null
     }
   ],
   "count": 12,
   "sample_size": 12,
   "sample_requested": 15,
   "sample_sort": "recently updated",
-  "total_open_issues": 224,
+  "total_open_issues": 225,
   "total_open_prs": 4,
-  "untriaged_in_sample": 9,
+  "untriaged_in_sample": 10,
   "bodies_included": false,
   "summary": {
-    "as_of": "2026-11-22T12:01:14Z",
+    "as_of": "2026-11-22T18:01:09Z",
     "source": {
       "repository": "PipFoweraker/pdoom1",
       "repository_url": "https://github.com/PipFoweraker/pdoom1",
@@ -962,14 +939,14 @@
       "no_floor": "There is no minimum and no fallback. A count that could not be measured is null; the previous run's value is never carried forward under a new as_of."
     },
     "counts": {
-      "open_issues": 224,
+      "open_issues": 225,
       "open_pull_requests": 4,
-      "open_issues_without_label": 112,
+      "open_issues_without_label": 113,
       "open_issues_labelled_bug": 17,
       "open_issues_labelled_enhancement": 16
     },
     "completeness": "known_incomplete",
-    "known_uncategorised": 112,
+    "known_uncategorised": 113,
     "measurement": "complete",
     "unmeasured": [],
     "recent_window": {
@@ -981,6 +958,6 @@
       "is_not": "a complete list. It is the most recently touched fifteen. Absence from it proves nothing -- see content/campaigns/*.json, which already records that trap."
     }
   },
-  "last_updated": "2026-11-22T12:01:14Z",
+  "last_updated": "2026-11-22T18:01:09Z",
   "_comment": "issues is a SAMPLE -- the `sample_requested` most recently updated open issues, pull requests removed. total_open_issues is the real count from /search/issues and may be null, which means UNKNOWN and must never render as zero. Bodies are deliberately absent: nothing renders them and they are third-party text on a public host."
 }
