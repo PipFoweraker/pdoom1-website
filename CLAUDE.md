@@ -625,10 +625,13 @@ deliberate — **a copy with provenance, not a live link**.
   human reviewed the same variant and recorded `discard` in
   `pdoom1/tools/art_review/review_state.json`. **The bytes never changed, so every
   filesystem check stayed green and nothing in this repo would ever have asked.**
-  #283 was not wrong; it was overtaken. Held under
-  `data/acknowledgements.json` → `S1:assets/icons/events/action_funding_grant_proposal_v2_128.png`,
-  **review_by 2026-10-10**, because deciding whether the generation spec or the
-  human review governs "what art ships" is a cross-repo ruling and not a seat's.
+  #283 was not wrong; it was overtaken. It was held on a dated acknowledgement
+  (review_by 2026-10-10) because deciding whether the generation spec or the
+  human review governs "what art ships" was Pip's ruling, not a seat's.
+  **RULED 2026-11-22: the human review governs.** The icon was deleted from
+  `public/` (so `rsync --delete` unpublishes it), `PROVENANCE.json` records the
+  removal and the rule, and the acknowledgement is gone. The Grant Proposal slot
+  now has no published icon until a variant is both spec-selected and kept.
 - **`build-art-register.py --check` is NOT wired to CI**, on purpose and for the
   same reason as `sync-keybinds.py`'s drift half: it re-derives from
   `tools/art_review/`, which no runner has, so blocking on it would make an

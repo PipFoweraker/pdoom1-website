@@ -4,7 +4,7 @@
   "_not_under_public_because": "public/ is rsynced to production. This file names another repo's internal review verdicts over a corpus that is gitignored to keep it private, and docs/ART_DRIP_2026-08.md gate 3 -- a published-asset export with selected/rejected labelled -- is an unmet decision belonging to Pip. Same reasoning as data/acknowledgements.json.",
   "_claims_rule": "field_verification below declares how EVERY field is known, by default, for every record. A record carries a `claims` entry only where it DEVIATES from that default -- which today means exactly one thing: an origin asserted by a person in data/art-origins.json, at the `human` tier, with a dated clock. So `claims` is the list of things a machine did not derive, and it is short on purpose. Absence of a claims entry means 'derived, per field_verification', never 'unchecked'.",
   "generated_by": "scripts/build-art-register.py",
-  "generated_on": "2026-08-25",
+  "generated_on": "2026-11-22",
   "origin_vocabulary": [
     "generated",
     "photograph",
@@ -80,19 +80,19 @@
     "is_mirror": true,
     "source_repo": "pdoom1",
     "source_path": "tools/art_review",
-    "source_commit": "84a191d020af3225b665a871dc2d54e803393071",
+    "source_commit": "e046b88be7e870f270311933ae2126484e15f450",
     "upstream_mode": "read",
-    "verified_on": "2026-08-25",
+    "verified_on": "2026-11-22",
     "max_age_days": 90,
     "why_a_mirror": "pdoom1 publishes no art-provenance artifact, so this is a copy taken at a commit, not a live read. A mirror rots; scripts/check-art-staleness.py is the thing that notices."
   },
   "counts": {
-    "images_total": 173,
-    "images_deployed": 43,
+    "images_total": 172,
+    "images_deployed": 42,
     "origin_unknown": 163,
     "upstream_unresolved": 170,
     "deployed_origin_unknown": 33,
-    "deployed_upstream_resolved": 3
+    "deployed_upstream_resolved": 2
   },
   "images": [
     {
@@ -657,36 +657,6 @@
       "upstream": null,
       "uplifted_from": null,
       "uplifted_on": "2025-10-31",
-      "claims": {}
-    },
-    {
-      "path": "assets/icons/events/action_funding_grant_proposal_v2_128.png",
-      "served_url": "/assets/icons/events/action_funding_grant_proposal_v2_128.png",
-      "bytes": 25869,
-      "sha256": "f461553933381dc2a22613ce29dffbea5d89c87622139421aa244b33a625301b",
-      "deploys": true,
-      "excluded_by": null,
-      "referenced_by_pages": [],
-      "referenced_by_data": [
-        "public/assets/icons/events/PROVENANCE.json"
-      ],
-      "origin": "generated",
-      "origin_source": "public/assets/icons/events/PROVENANCE.json -> machine_generated: true",
-      "upstream": {
-        "asset_id": "gen:game_icons:action_funding_grant_proposal:v2",
-        "batch": "game_icons",
-        "slot_id": "action_funding_grant_proposal",
-        "variant": "v2",
-        "verdict": "discard",
-        "verdict_updated_at": "2026-08-14T12:05:58.205624+00:00",
-        "artq_ids": [
-          "artq-016"
-        ],
-        "cleared_for": null,
-        "selected_by_spec": "v2"
-      },
-      "uplifted_from": "pdoom1:art_prompts/batch_2_actions_and_ui.yaml",
-      "uplifted_on": "2025-11-24",
       "claims": {}
     },
     {
@@ -4227,7 +4197,9 @@
       "sha256": "edf531a95623c8b0ae488a70074ad003469e3070dd3ed97ccc7d0ea62f1410ab",
       "deploys": true,
       "excluded_by": null,
-      "referenced_by_pages": [],
+      "referenced_by_pages": [
+        "public/index.html"
+      ],
       "referenced_by_data": [],
       "origin": "unknown",
       "origin_source": null,

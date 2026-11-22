@@ -169,6 +169,8 @@ in public with a generator's name attached).
    ships, and the human review recorded on 2026-08-14 discards it — a week AFTER
    #283 read the selection out of the generation spec. Held on a dated
    acknowledgement (review_by 2026-10-10) rather than acted on unilaterally.
+   **Ruled by Pip 2026-11-22: the human review governs;** the icon was removed
+   from `public/` and the removal is recorded in its `PROVENANCE.json`.
 
 4. **The raw transcript never moves to a tracked path.** An Australian mobile
    number is spoken aloud in the recording. `art_generated/` being gitignored is

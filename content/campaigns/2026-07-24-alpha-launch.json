@@ -4,6 +4,11 @@
   "title": "p(Doom)1 friends-and-family alpha",
   "url": "https://pdoom1.com/",
   "approved": false,
+  "archived": {
+    "on": "2026-11-22",
+    "by": "Pip, in the pdoom1-website terminal, 2026-11-22",
+    "why": "\"On Q1 - archiving seems best. We want our claims to presently match reality.\" Unposted since August; its copy and fact-guards describe the project as it was then. Archived rather than re-verified: copy nobody plans to post does not need its facts re-checked, and re-stamping them would claim a verification nobody did."
+  },
   "_facts_this_copy_must_not_break": [
     {
       "id": "platforms-downloadable",

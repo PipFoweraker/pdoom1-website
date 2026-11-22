@@ -173,6 +173,32 @@ post for hours or days; Twitter and Bluesky are near-realtime and mostly dead
 within the hour. Posting the slow ones first means they are accumulating reach
 while you handle the fast ones, and it staggers the replies you have to answer.
 
+### 3.1 Archiving a campaign (added 2026-11-22)
+
+A campaign nobody plans to post still carries fact-guards, and their human
+clocks keep lapsing -- which turns every PR red over copy that will never reach
+a reader. Re-stamping those clocks would claim a verification nobody did.
+Archive it instead, **in place**, with a dated and attributed block:
+
+```json
+"approved": false,
+"archived": {"on": "YYYY-MM-DD", "by": "<who decided>", "why": "<their reason>"},
+```
+
+- `check-campaign-facts.py` then prints the campaign as ARCHIVED with its
+  reason, still enforces the **structure** of every fact-guard, and evaluates
+  none of them. The summary line counts what it did not evaluate.
+- It stays in this folder on purpose: moving it out would also take it out of
+  the check, and a check over an empty folder is red by design.
+- It is refused if `on`/`by`/`why` is missing, if `on` is in the future, or if
+  `approved` is `true` -- each of those would make archiving a mute button.
+- **To revive:** delete the `archived` block. Every `human` clock will almost
+  certainly have lapsed, and each one needs re-verifying against its source
+  before the copy is posted.
+
+All six August-era campaigns were archived on 2026-11-22 (Pip: "We want our
+claims to presently match reality").
+
 ---
 
 ## 4. Collecting feedback (the half that usually gets dropped)
