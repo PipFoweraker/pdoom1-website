@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-22T03:22:24.769975+00:00",
+  "generated": "2026-11-22T06:13:56.313909+00:00",
   "overall_status": "WARN",
   "summary": {
     "fail": 0,
@@ -123,18 +123,18 @@
     {
       "name": "league:freshness",
       "status": "ACK",
-      "detail": "current.json is 93.5 days old -- weekly rollover likely stalled",
+      "detail": "current.json is 93.7 days old -- weekly rollover likely stalled",
       "acknowledged": true
     },
     {
       "name": "league:current_week",
       "status": "WARN",
-      "detail": "week 2026_W35 is marked is_current but ended 86.6 days ago -- rollover cadence off"
+      "detail": "week 2026_W35 is marked is_current but ended 86.7 days ago -- rollover cadence off"
     },
     {
       "name": "league:version_drift",
       "status": "WARN",
-      "detail": "weekly league game_version=v0.14.1 but deployed game=v0.14.5 -- a v0.14.5 client's scores cannot land on a v0.14.1 board"
+      "detail": "weekly league game_version=v0.14.1 but deployed game=v0.15.0 -- a v0.15.0 client's scores cannot land on a v0.14.1 board"
     },
     {
       "name": "league:seed",
@@ -164,7 +164,7 @@
     {
       "name": "board:liveness_freshness",
       "status": "OK",
-      "detail": "live API checked 2.5h ago"
+      "detail": "live API checked 5.4h ago"
     },
     {
       "name": "board:archived_anomaly",
@@ -189,7 +189,7 @@
     {
       "name": "seed_leaderboards:version_census",
       "status": "WARN",
-      "detail": "NO stored seed file is stamped with the deployed version v0.14.5, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
+      "detail": "NO stored seed file is stamped with the deployed version v0.15.0, so ingest_scores.py has nothing publishable and the board will be empty whatever happens upstream. Present: 1.0.0: 15 file(s)/64 entries"
     }
   ]
 }
