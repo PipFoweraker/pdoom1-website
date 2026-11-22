@@ -4,34 +4,29 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-11-21T01:31:39+00:00",
+  "captured_at_utc": "2026-11-22T01:31:43+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 359
+          "value": 352
         },
         "visit_duration": {
           "value": 34
         },
         "visitors": {
-          "value": 275
+          "value": 276
         },
         "visits": {
-          "value": 282
+          "value": 285
         },
         "bounce_rate": {
-          "value": 84
+          "value": 85
         }
       }
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-10-22",
-          "pageviews": 14,
-          "visitors": 8
-        },
         {
           "date": "2026-10-23",
           "pageviews": 11,
@@ -176,6 +171,11 @@
           "date": "2026-11-20",
           "pageviews": 14,
           "visitors": 6
+        },
+        {
+          "date": "2026-11-21",
+          "pageviews": 7,
+          "visitors": 8
         }
       ]
     },
@@ -183,11 +183,11 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 200
+          "visitors": 198
         },
         {
           "source": "Google",
-          "visitors": 52
+          "visitors": 55
         },
         {
           "source": "chatgpt.com",
@@ -206,10 +206,6 @@
           "visitors": 2
         },
         {
-          "source": "LinkedIn",
-          "visitors": 2
-        },
-        {
           "source": "danmackinlay.name",
           "visitors": 2
         },
@@ -223,6 +219,10 @@
         },
         {
           "source": "Gmail",
+          "visitors": 1
+        },
+        {
+          "source": "LinkedIn",
           "visitors": 1
         },
         {
@@ -247,18 +247,18 @@
       "results": [
         {
           "page": "/",
-          "pageviews": 131,
-          "visitors": 104
+          "pageviews": 130,
+          "visitors": 105
         },
         {
           "page": "/dashboard/",
-          "pageviews": 48,
+          "pageviews": 47,
           "visitors": 34
         },
         {
           "page": "/leaderboard/",
-          "pageviews": 21,
-          "visitors": 17
+          "pageviews": 17,
+          "visitors": 14
         },
         {
           "page": "/events/",
@@ -291,11 +291,6 @@
           "visitors": 6
         },
         {
-          "page": "/events/arxiv_41f01220cbd1248e.html",
-          "pageviews": 6,
-          "visitors": 6
-        },
-        {
           "page": "/game-changelog/",
           "pageviews": 7,
           "visitors": 6
@@ -317,6 +312,11 @@
         },
         {
           "page": "/events/arxiv_0b1f4debe314fa2e.html",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "page": "/events/arxiv_41f01220cbd1248e.html",
           "pageviews": 4,
           "visitors": 4
         },
@@ -381,8 +381,18 @@
           "visitors": 2
         },
         {
+          "page": "/launch",
+          "pageviews": 0,
+          "visitors": 2
+        },
+        {
           "page": "/metabolism/",
           "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/state-of-doom/",
+          "pageviews": 3,
           "visitors": 2
         },
         {
@@ -407,6 +417,11 @@
         },
         {
           "page": "/design-notes/adr-0010-adoption-routing.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/dev-notes/",
           "pageviews": 1,
           "visitors": 1
         },
@@ -479,21 +494,6 @@
           "page": "/events/arxiv_584641e15cc07415.html",
           "pageviews": 1,
           "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_5ab982619e6ba5b0.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_6e217576bd92ec66.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_9ad41374f53f74d9.html",
-          "pageviews": 1,
-          "visitors": 1
         }
       ]
     },
@@ -501,7 +501,7 @@
       "results": [
         {
           "country": "US",
-          "visitors": 73
+          "visitors": 71
         },
         {
           "country": "CN",
@@ -509,7 +509,7 @@
         },
         {
           "country": "CO",
-          "visitors": 23
+          "visitors": 21
         },
         {
           "country": "AR",
@@ -517,6 +517,10 @@
         },
         {
           "country": "BR",
+          "visitors": 13
+        },
+        {
+          "country": "GB",
           "visitors": 13
         },
         {
@@ -528,20 +532,16 @@
           "visitors": 12
         },
         {
-          "country": "GB",
-          "visitors": 12
+          "country": "AU",
+          "visitors": 11
         },
         {
           "country": "DE",
           "visitors": 11
         },
         {
-          "country": "AU",
-          "visitors": 10
-        },
-        {
           "country": "VE",
-          "visitors": 9
+          "visitors": 10
         },
         {
           "country": "HK",
@@ -553,7 +553,7 @@
         },
         {
           "country": "CA",
-          "visitors": 4
+          "visitors": 5
         },
         {
           "country": "JP",
@@ -612,6 +612,10 @@
           "visitors": 1
         },
         {
+          "country": "CZ",
+          "visitors": 1
+        },
+        {
           "country": "DK",
           "visitors": 1
         },
@@ -651,9 +655,9 @@
     "goals": {
       "results": [
         {
-          "events": 17,
+          "events": 16,
           "goal": "Outbound Link: Click",
-          "visitors": 14
+          "visitors": 13
         },
         {
           "events": 12,
@@ -666,11 +670,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-10-22",
-    "last_date": "2026-11-20",
+    "first_date": "2026-10-23",
+    "last_date": "2026-11-21",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-11-21"
+  "snapshot_date": "2026-11-22"
 }
