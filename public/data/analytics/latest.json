@@ -4,34 +4,29 @@
   "period": "30d",
   "range": null,
   "source": "https://analytics.pdoom1.com",
-  "captured_at_utc": "2026-11-26T01:31:50+00:00",
+  "captured_at_utc": "2026-11-27T01:31:49+00:00",
   "sections": {
     "aggregate": {
       "results": {
         "pageviews": {
-          "value": 355
+          "value": 357
         },
         "visit_duration": {
-          "value": 165
+          "value": 166
         },
         "visitors": {
-          "value": 276
+          "value": 277
         },
         "visits": {
-          "value": 288
+          "value": 289
         },
         "bounce_rate": {
-          "value": 83
+          "value": 82
         }
       }
     },
     "timeseries": {
       "results": [
-        {
-          "date": "2026-10-27",
-          "pageviews": 8,
-          "visitors": 8
-        },
         {
           "date": "2026-10-28",
           "pageviews": 11,
@@ -176,6 +171,11 @@
           "date": "2026-11-25",
           "pageviews": 9,
           "visitors": 8
+        },
+        {
+          "date": "2026-11-26",
+          "pageviews": 10,
+          "visitors": 9
         }
       ]
     },
@@ -183,7 +183,7 @@
       "results": [
         {
           "source": "Direct / None",
-          "visitors": 195
+          "visitors": 196
         },
         {
           "source": "Google",
@@ -244,7 +244,7 @@
         {
           "page": "/",
           "pageviews": 131,
-          "visitors": 106
+          "visitors": 105
         },
         {
           "page": "/dashboard/",
@@ -253,18 +253,18 @@
         },
         {
           "page": "/leaderboard/",
-          "pageviews": 19,
-          "visitors": 15
+          "pageviews": 20,
+          "visitors": 16
+        },
+        {
+          "page": "/events/",
+          "pageviews": 10,
+          "visitors": 10
         },
         {
           "page": "/game-stats/",
           "pageviews": 10,
           "visitors": 10
-        },
-        {
-          "page": "/events/",
-          "pageviews": 9,
-          "visitors": 9
         },
         {
           "page": "/press/",
@@ -297,6 +297,11 @@
           "visitors": 6
         },
         {
+          "page": "/game-changelog/",
+          "pageviews": 6,
+          "visitors": 5
+        },
+        {
           "page": "/launch",
           "pageviews": 0,
           "visitors": 5
@@ -310,16 +315,6 @@
           "page": "/events/arxiv_3b8e895af2010f42.html",
           "pageviews": 4,
           "visitors": 4
-        },
-        {
-          "page": "/game-changelog/",
-          "pageviews": 5,
-          "visitors": 4
-        },
-        {
-          "page": "/events/arxiv_0b1f4debe314fa2e.html",
-          "pageviews": 3,
-          "visitors": 3
         },
         {
           "page": "/events/arxiv_f699ce072a0d412e.html",
@@ -343,6 +338,11 @@
         },
         {
           "page": "/docs/roadmap/",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/events/arxiv_0b1f4debe314fa2e.html",
           "pageviews": 2,
           "visitors": 2
         },
@@ -437,6 +437,11 @@
           "visitors": 1
         },
         {
+          "page": "/events/arxiv_3d2e35721e7e6af2.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
           "page": "/events/arxiv_3dfc5c5b2dbf412a.html",
           "pageviews": 1,
           "visitors": 1
@@ -447,17 +452,7 @@
           "visitors": 1
         },
         {
-          "page": "/events/arxiv_41880a502afdcb9f.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
           "page": "/events/arxiv_4d58fc236181a582.html",
-          "pageviews": 1,
-          "visitors": 1
-        },
-        {
-          "page": "/events/arxiv_4d86e7039be72db7.html",
           "pageviews": 1,
           "visitors": 1
         },
@@ -482,6 +477,11 @@
           "visitors": 1
         },
         {
+          "page": "/events/arxiv_80f6a648f25568e2.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
           "page": "/events/arxiv_867cf2251f9d3258.html",
           "pageviews": 1,
           "visitors": 1
@@ -501,7 +501,7 @@
         },
         {
           "country": "CN",
-          "visitors": 24
+          "visitors": 25
         },
         {
           "country": "CO",
@@ -516,15 +516,11 @@
           "visitors": 13
         },
         {
-          "country": "EC",
-          "visitors": 12
-        },
-        {
           "country": "GB",
-          "visitors": 12
+          "visitors": 13
         },
         {
-          "country": "VE",
+          "country": "EC",
           "visitors": 12
         },
         {
@@ -536,24 +532,28 @@
           "visitors": 11
         },
         {
+          "country": "VE",
+          "visitors": 11
+        },
+        {
           "country": "AR",
           "visitors": 9
         },
         {
           "country": "HK",
-          "visitors": 8
+          "visitors": 9
         },
         {
           "country": "IN",
-          "visitors": 7
-        },
-        {
-          "country": "CA",
-          "visitors": 5
+          "visitors": 8
         },
         {
           "country": "FR",
           "visitors": 5
+        },
+        {
+          "country": "CA",
+          "visitors": 4
         },
         {
           "country": "JP",
@@ -580,6 +580,10 @@
           "visitors": 3
         },
         {
+          "country": "SE",
+          "visitors": 3
+        },
+        {
           "country": "BE",
           "visitors": 2
         },
@@ -589,14 +593,6 @@
         },
         {
           "country": "NL",
-          "visitors": 2
-        },
-        {
-          "country": "RU",
-          "visitors": 2
-        },
-        {
-          "country": "SE",
           "visitors": 2
         },
         {
@@ -640,7 +636,7 @@
           "visitors": 1
         },
         {
-          "country": "PL",
+          "country": "RU",
           "visitors": 1
         },
         {
@@ -674,11 +670,11 @@
   "errors": {},
   "coverage": {
     "days_returned": 30,
-    "first_date": "2026-10-27",
-    "last_date": "2026-11-25",
+    "first_date": "2026-10-28",
+    "last_date": "2026-11-26",
     "missing_dates": [],
     "zero_dates": [],
     "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
   },
-  "snapshot_date": "2026-11-26"
+  "snapshot_date": "2026-11-27"
 }
