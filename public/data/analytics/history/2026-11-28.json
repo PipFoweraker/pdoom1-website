@@ -1,0 +1,680 @@
+{
+  "schema": 2,
+  "site": "pdoom1.com",
+  "period": "30d",
+  "range": null,
+  "source": "https://analytics.pdoom1.com",
+  "captured_at_utc": "2026-11-28T01:31:45+00:00",
+  "sections": {
+    "aggregate": {
+      "results": {
+        "pageviews": {
+          "value": 354
+        },
+        "visit_duration": {
+          "value": 166
+        },
+        "visitors": {
+          "value": 276
+        },
+        "visits": {
+          "value": 288
+        },
+        "bounce_rate": {
+          "value": 83
+        }
+      }
+    },
+    "timeseries": {
+      "results": [
+        {
+          "date": "2026-10-29",
+          "pageviews": 12,
+          "visitors": 9
+        },
+        {
+          "date": "2026-10-30",
+          "pageviews": 22,
+          "visitors": 13
+        },
+        {
+          "date": "2026-10-31",
+          "pageviews": 10,
+          "visitors": 8
+        },
+        {
+          "date": "2026-11-01",
+          "pageviews": 10,
+          "visitors": 10
+        },
+        {
+          "date": "2026-11-02",
+          "pageviews": 6,
+          "visitors": 5
+        },
+        {
+          "date": "2026-11-03",
+          "pageviews": 26,
+          "visitors": 14
+        },
+        {
+          "date": "2026-11-04",
+          "pageviews": 13,
+          "visitors": 13
+        },
+        {
+          "date": "2026-11-05",
+          "pageviews": 8,
+          "visitors": 8
+        },
+        {
+          "date": "2026-11-06",
+          "pageviews": 8,
+          "visitors": 7
+        },
+        {
+          "date": "2026-11-07",
+          "pageviews": 19,
+          "visitors": 16
+        },
+        {
+          "date": "2026-11-08",
+          "pageviews": 9,
+          "visitors": 8
+        },
+        {
+          "date": "2026-11-09",
+          "pageviews": 7,
+          "visitors": 7
+        },
+        {
+          "date": "2026-11-10",
+          "pageviews": 11,
+          "visitors": 11
+        },
+        {
+          "date": "2026-11-11",
+          "pageviews": 25,
+          "visitors": 20
+        },
+        {
+          "date": "2026-11-12",
+          "pageviews": 14,
+          "visitors": 10
+        },
+        {
+          "date": "2026-11-13",
+          "pageviews": 7,
+          "visitors": 4
+        },
+        {
+          "date": "2026-11-14",
+          "pageviews": 8,
+          "visitors": 5
+        },
+        {
+          "date": "2026-11-15",
+          "pageviews": 16,
+          "visitors": 16
+        },
+        {
+          "date": "2026-11-16",
+          "pageviews": 6,
+          "visitors": 4
+        },
+        {
+          "date": "2026-11-17",
+          "pageviews": 13,
+          "visitors": 6
+        },
+        {
+          "date": "2026-11-18",
+          "pageviews": 11,
+          "visitors": 11
+        },
+        {
+          "date": "2026-11-19",
+          "pageviews": 14,
+          "visitors": 10
+        },
+        {
+          "date": "2026-11-20",
+          "pageviews": 14,
+          "visitors": 6
+        },
+        {
+          "date": "2026-11-21",
+          "pageviews": 7,
+          "visitors": 8
+        },
+        {
+          "date": "2026-11-22",
+          "pageviews": 15,
+          "visitors": 10
+        },
+        {
+          "date": "2026-11-23",
+          "pageviews": 8,
+          "visitors": 8
+        },
+        {
+          "date": "2026-11-24",
+          "pageviews": 8,
+          "visitors": 7
+        },
+        {
+          "date": "2026-11-25",
+          "pageviews": 9,
+          "visitors": 8
+        },
+        {
+          "date": "2026-11-26",
+          "pageviews": 10,
+          "visitors": 9
+        },
+        {
+          "date": "2026-11-27",
+          "pageviews": 8,
+          "visitors": 7
+        }
+      ]
+    },
+    "sources": {
+      "results": [
+        {
+          "source": "Direct / None",
+          "visitors": 195
+        },
+        {
+          "source": "Google",
+          "visitors": 58
+        },
+        {
+          "source": "chatgpt.com",
+          "visitors": 5
+        },
+        {
+          "source": "DuckDuckGo",
+          "visitors": 3
+        },
+        {
+          "source": "aocr.org",
+          "visitors": 3
+        },
+        {
+          "source": "Facebook",
+          "visitors": 2
+        },
+        {
+          "source": "danmackinlay.name",
+          "visitors": 2
+        },
+        {
+          "source": "go.bsky.app",
+          "visitors": 2
+        },
+        {
+          "source": "https://coder.social",
+          "visitors": 2
+        },
+        {
+          "source": "Gmail",
+          "visitors": 1
+        },
+        {
+          "source": "LinkedIn",
+          "visitors": 1
+        },
+        {
+          "source": "T-Online",
+          "visitors": 1
+        },
+        {
+          "source": "Twitter",
+          "visitors": 1
+        },
+        {
+          "source": "https://git.chanpinqingbaoju.com",
+          "visitors": 1
+        }
+      ]
+    },
+    "pages": {
+      "results": [
+        {
+          "page": "/",
+          "pageviews": 127,
+          "visitors": 103
+        },
+        {
+          "page": "/dashboard/",
+          "pageviews": 54,
+          "visitors": 36
+        },
+        {
+          "page": "/leaderboard/",
+          "pageviews": 20,
+          "visitors": 16
+        },
+        {
+          "page": "/events/",
+          "pageviews": 10,
+          "visitors": 10
+        },
+        {
+          "page": "/game-stats/",
+          "pageviews": 9,
+          "visitors": 9
+        },
+        {
+          "page": "/press/",
+          "pageviews": 8,
+          "visitors": 8
+        },
+        {
+          "page": "/about/",
+          "pageviews": 7,
+          "visitors": 7
+        },
+        {
+          "page": "/blog/",
+          "pageviews": 7,
+          "visitors": 7
+        },
+        {
+          "page": "/docs/",
+          "pageviews": 8,
+          "visitors": 7
+        },
+        {
+          "page": "/resources/",
+          "pageviews": 8,
+          "visitors": 7
+        },
+        {
+          "page": "/issues/",
+          "pageviews": 6,
+          "visitors": 6
+        },
+        {
+          "page": "/game-changelog/",
+          "pageviews": 6,
+          "visitors": 5
+        },
+        {
+          "page": "/launch",
+          "pageviews": 0,
+          "visitors": 5
+        },
+        {
+          "page": "/cats/",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "page": "/events/arxiv_3b8e895af2010f42.html",
+          "pageviews": 4,
+          "visitors": 4
+        },
+        {
+          "page": "/events/arxiv_89cd3ef79c4ea526.html",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "page": "/events/arxiv_f699ce072a0d412e.html",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "page": "/metrics/",
+          "pageviews": 4,
+          "visitors": 3
+        },
+        {
+          "page": "/monitoring/",
+          "pageviews": 3,
+          "visitors": 3
+        },
+        {
+          "page": "/bug-report/",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/docs/roadmap/",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/events/arxiv_0b1f4debe314fa2e.html",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/events/arxiv_137bbec0e331870d.html",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/events/arxiv_14ff96fd6948a4bf.html",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/events/arxiv_393a7a93bd7a4f33.html",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/events/suggest-metadata.html",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/metabolism/",
+          "pageviews": 2,
+          "visitors": 2
+        },
+        {
+          "page": "/design-notes/",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/design-notes/adr-0003-liability-ledger.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/design-notes/adr-0008-deferrals-and-rejections.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/design-notes/adr-0010-adoption-routing.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/dev-notes/",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/docs/CONTRIBUTING_TO_EVENTS.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/apollo_scheming_evals_2024.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_01422b8e083200ef.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_02949cb93049b82c.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_10237dc027826413.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_1051dda54eaf8c38.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_1405aec1edf8be7e.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_21e9aed4c6db2398.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_3d2e35721e7e6af2.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_3dfc5c5b2dbf412a.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_402f917ef1f85b47.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_54c4066155dbf604.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_584641e15cc07415.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_5ab982619e6ba5b0.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_709c102c9237b620.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_80f6a648f25568e2.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_867cf2251f9d3258.html",
+          "pageviews": 1,
+          "visitors": 1
+        },
+        {
+          "page": "/events/arxiv_9ad41374f53f74d9.html",
+          "pageviews": 1,
+          "visitors": 1
+        }
+      ]
+    },
+    "countries": {
+      "results": [
+        {
+          "country": "US",
+          "visitors": 68
+        },
+        {
+          "country": "CN",
+          "visitors": 26
+        },
+        {
+          "country": "CO",
+          "visitors": 17
+        },
+        {
+          "country": "AU",
+          "visitors": 15
+        },
+        {
+          "country": "GB",
+          "visitors": 13
+        },
+        {
+          "country": "BR",
+          "visitors": 12
+        },
+        {
+          "country": "DE",
+          "visitors": 12
+        },
+        {
+          "country": "EC",
+          "visitors": 12
+        },
+        {
+          "country": "SG",
+          "visitors": 12
+        },
+        {
+          "country": "VE",
+          "visitors": 11
+        },
+        {
+          "country": "AR",
+          "visitors": 9
+        },
+        {
+          "country": "IN",
+          "visitors": 8
+        },
+        {
+          "country": "HK",
+          "visitors": 7
+        },
+        {
+          "country": "FR",
+          "visitors": 5
+        },
+        {
+          "country": "CA",
+          "visitors": 4
+        },
+        {
+          "country": "JP",
+          "visitors": 4
+        },
+        {
+          "country": "KR",
+          "visitors": 4
+        },
+        {
+          "country": "PE",
+          "visitors": 4
+        },
+        {
+          "country": "AT",
+          "visitors": 3
+        },
+        {
+          "country": "FI",
+          "visitors": 3
+        },
+        {
+          "country": "MX",
+          "visitors": 3
+        },
+        {
+          "country": "SE",
+          "visitors": 3
+        },
+        {
+          "country": "BE",
+          "visitors": 2
+        },
+        {
+          "country": "BO",
+          "visitors": 2
+        },
+        {
+          "country": "NL",
+          "visitors": 2
+        },
+        {
+          "country": "UA",
+          "visitors": 2
+        },
+        {
+          "country": "BB",
+          "visitors": 1
+        },
+        {
+          "country": "CZ",
+          "visitors": 1
+        },
+        {
+          "country": "DK",
+          "visitors": 1
+        },
+        {
+          "country": "EG",
+          "visitors": 1
+        },
+        {
+          "country": "HU",
+          "visitors": 1
+        },
+        {
+          "country": "IL",
+          "visitors": 1
+        },
+        {
+          "country": "IT",
+          "visitors": 1
+        },
+        {
+          "country": "NO",
+          "visitors": 1
+        },
+        {
+          "country": "NP",
+          "visitors": 1
+        },
+        {
+          "country": "RU",
+          "visitors": 1
+        },
+        {
+          "country": "TR",
+          "visitors": 1
+        },
+        {
+          "country": "VN",
+          "visitors": 1
+        }
+      ]
+    },
+    "utm_campaign": {
+      "results": []
+    },
+    "goals": {
+      "results": [
+        {
+          "events": 14,
+          "goal": "Outbound Link: Click",
+          "visitors": 12
+        },
+        {
+          "events": 11,
+          "goal": "Download",
+          "visitors": 9
+        }
+      ]
+    }
+  },
+  "errors": {},
+  "coverage": {
+    "days_returned": 30,
+    "first_date": "2026-10-29",
+    "last_date": "2026-11-27",
+    "missing_dates": [],
+    "zero_dates": [],
+    "note": "missing_dates are days the API omitted inside the span it returned; they are recorded, never interpolated"
+  },
+  "snapshot_date": "2026-11-28"
+}
